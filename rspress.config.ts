@@ -17,9 +17,7 @@ export default defineConfig({
   },
   plugins: [
     pluginApiDocgen({
-      entries: {
-        Button: './src/Button.tsx',
-      },
+      entries: {},
       apiParseTool: 'react-docgen-typescript',
     }),
     pluginPreview(),

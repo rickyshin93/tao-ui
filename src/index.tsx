@@ -1,4 +1,3 @@
-export { Button } from './Button';
 export {
   type FormatOptions,
   NumberInput,
