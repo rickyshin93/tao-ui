@@ -1,5 +1,5 @@
 {
-  "name": "tao-ui",
+  "name": "@rockshin/tao-ui",
   "version": "0.0.1",
   "type": "module",
   "description": "A modern React 19 component library with semantic DOM customization and OKLCH-based theming.",
@@ -31,7 +31,8 @@
   },
   "types": "./dist/index.d.ts",
   "files": [
-    "dist"
+    "dist",
+    "llms.txt"
   ],
   "scripts": {
     "build": "rslib",

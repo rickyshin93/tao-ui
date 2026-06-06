@@ -12,9 +12,9 @@ A modern React 19 component library with semantic DOM customization and OKLCH-ba
 ## Install
 
 ```bash
-npm install tao-ui
+npm install @rockshin/tao-ui
 # or
-bun add tao-ui
+bun add @rockshin/tao-ui
 ```
 
 Peer dependencies: `react >=19`, `react-dom >=19`, `dayjs >=1.11` (for the date pickers).
@@ -24,7 +24,7 @@ Peer dependencies: `react >=19`, `react-dom >=19`, `dayjs >=1.11` (for the date 
 Wrap your app once with `TaoProvider`, then use components. Import the component CSS that ships alongside the JS (your bundler resolves the side-effect imports automatically).
 
 ```tsx
-import { TaoProvider, Input, Select, Switch } from 'tao-ui';
+import { TaoProvider, Input, Select, Switch } from '@rockshin/tao-ui';
 
 export default function App() {
   return (

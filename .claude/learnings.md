@@ -1,5 +1,12 @@
 # tao-ui 项目自我学习
 
+## [发布] npm 包名相似度校验比查询严格 + scoped 包发布
+- **日期**: 2026-06-06
+- **错误假设**: 以为 `npm view tao-ui` 返回 404（未占用）就一定能发布
+- **真实行为**: npm 发布时有防混淆校验，`tao-ui` 因与已存在的 `taoui` 太像被 403 拒绝（"Package name too similar"）。查询 404 ≠ 可发布
+- **正确做法**: 用 scoped 包名规避（如 `@rockshin/tao-ui`，scope 必须等于 npm 用户名/所属 org），publishConfig 设 `access: public`。另：CI 发布需要能绕过 2FA 的 token —— Classic **Automation** token 或权限设为 Read+write 的 Granular token，普通 Classic "Publish" token 会因 2FA 被 403
+- **适用场景**: 任何首次发布 npm 包；包名先用 scoped 最稳
+
 ## [设计] 项目已更名为 tao-ui
 
 - **日期**: 2026-06-02
