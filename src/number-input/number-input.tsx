@@ -50,10 +50,10 @@ export function NumberInput(props: NumberInputProps) {
   const { inputProps } = useNumberInput(hookOpts);
 
   return (
-    <span className={containerClassName} data-rh-number-input="">
-      {prefix !== undefined && <span data-rh-prefix="">{prefix}</span>}
+    <span className={containerClassName} data-tao-number-input="">
+      {prefix !== undefined && <span data-tao-prefix="">{prefix}</span>}
       <input {...nativeAttrs} {...inputProps} className={className} />
-      {suffix !== undefined && <span data-rh-suffix="">{suffix}</span>}
+      {suffix !== undefined && <span data-tao-suffix="">{suffix}</span>}
     </span>
   );
 }

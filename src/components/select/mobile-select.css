@@ -1,0 +1,109 @@
+@import '../../theme/theme.css';
+
+/* ===========================
+   Mobile Select — inside Drawer
+   Drawer body padding is removed for full-width list
+   =========================== */
+
+/* Override drawer body padding for select sheet */
+[data-tao-drawer]:has([data-tao-sheet-list]) [data-tao-drawer-body] {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ===========================
+   Search
+   =========================== */
+[data-tao-sheet-search] {
+  display: flex;
+  align-items: center;
+  gap: var(--tao-padding-xs);
+  padding: var(--tao-padding-xs) var(--tao-padding);
+  border-block-end: var(--tao-line-width) solid var(--tao-color-border-secondary);
+  color: var(--tao-color-text-tertiary);
+  flex-shrink: 0;
+}
+
+[data-tao-sheet-search-input] {
+  flex: 1;
+  height: 36px;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: var(--tao-font-family);
+  font-size: 16px; /* Prevent iOS zoom on focus */
+  color: var(--tao-color-text);
+  min-width: 0;
+}
+
+[data-tao-sheet-search-input]::placeholder {
+  color: var(--tao-color-text-placeholder);
+}
+
+/* ===========================
+   List (virtual scroll container)
+   =========================== */
+[data-tao-sheet-list] {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+/* ===========================
+   Item
+   =========================== */
+[data-tao-sheet-item] {
+  display: flex;
+  align-items: center;
+  min-height: 48px;
+  padding-inline: var(--tao-padding);
+  font-family: var(--tao-font-family);
+  font-size: var(--tao-font-size-base);
+  color: var(--tao-color-text);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Active (touch press) */
+[data-tao-sheet-item]:active:not([data-tao-disabled]) {
+  background: var(--tao-color-fill-tertiary);
+}
+
+/* Selected */
+[data-tao-sheet-item][data-tao-selected] {
+  font-weight: var(--tao-font-weight-medium);
+}
+
+/* Disabled */
+[data-tao-sheet-item][data-tao-disabled] {
+  color: var(--tao-color-text-disabled);
+  cursor: not-allowed;
+}
+
+/* Label */
+[data-tao-sheet-item-label] {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Check icon */
+[data-tao-sheet-item-check] {
+  display: flex;
+  align-items: center;
+  color: var(--tao-primary);
+  flex-shrink: 0;
+  margin-inline-start: var(--tao-padding-xs);
+}
+
+/* Empty state */
+[data-tao-sheet-empty] {
+  padding: var(--tao-padding-xl) var(--tao-padding);
+  text-align: center;
+  font-size: var(--tao-font-size-sm);
+  color: var(--tao-color-text-tertiary);
+}

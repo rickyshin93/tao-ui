@@ -1,0 +1,108 @@
+@import '../../theme/theme.css';
+
+/* ===========================
+   Button
+   =========================== */
+[data-tao-variant] {
+  /* Intentionally empty — just to reference the selector */
+}
+
+button[data-tao-variant] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-family: var(--tao-font-family);
+  font-weight: var(--tao-font-weight-strong);
+  border: var(--tao-line-width) solid transparent;
+  cursor: pointer;
+  outline: none;
+  user-select: none;
+  white-space: nowrap;
+  transition:
+    background-color var(--tao-motion-duration-fast) var(--tao-motion-ease-out),
+    border-color var(--tao-motion-duration-fast) var(--tao-motion-ease-out),
+    transform var(--tao-motion-duration-fast) var(--tao-motion-ease-out);
+}
+
+/* Sizes */
+button[data-tao-size="small"] {
+  height: var(--tao-control-height-sm);
+  padding-inline: var(--tao-padding-xs);
+  font-size: var(--tao-font-size-sm);
+  border-radius: var(--tao-radius-sm);
+}
+
+button[data-tao-size="medium"] {
+  height: var(--tao-control-height);
+  padding-inline: var(--tao-padding-sm);
+  font-size: var(--tao-font-size-base);
+  border-radius: var(--tao-radius-md);
+}
+
+button[data-tao-size="large"] {
+  height: var(--tao-control-height-lg);
+  padding-inline: var(--tao-padding);
+  font-size: var(--tao-font-size-base);
+  border-radius: var(--tao-radius-md);
+}
+
+/* Variant: primary */
+button[data-tao-variant="primary"] {
+  background: var(--tao-primary);
+  color: var(--tao-primary-fg);
+}
+button[data-tao-variant="primary"]:hover:not(:disabled) {
+  background: var(--tao-primary-hover);
+}
+button[data-tao-variant="primary"]:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+/* Variant: secondary */
+button[data-tao-variant="secondary"] {
+  background: transparent;
+  color: var(--tao-color-text);
+  border-color: var(--tao-color-border);
+}
+button[data-tao-variant="secondary"]:hover:not(:disabled) {
+  background: var(--tao-color-fill-tertiary);
+  border-color: var(--tao-color-border);
+}
+button[data-tao-variant="secondary"]:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+/* Variant: ghost */
+button[data-tao-variant="ghost"] {
+  background: transparent;
+  color: var(--tao-color-text-secondary);
+}
+button[data-tao-variant="ghost"]:hover:not(:disabled) {
+  background: var(--tao-color-fill-tertiary);
+  color: var(--tao-color-text);
+}
+
+/* Variant: destructive */
+button[data-tao-variant="destructive"] {
+  background: var(--tao-error);
+  color: var(--tao-error-fg);
+}
+button[data-tao-variant="destructive"]:hover:not(:disabled) {
+  background: var(--tao-error-hover);
+}
+button[data-tao-variant="destructive"]:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+/* Disabled */
+button[data-tao-variant]:disabled {
+  opacity: var(--tao-opacity-loading);
+  cursor: not-allowed;
+}
+
+/* Focus */
+button[data-tao-variant]:focus-visible {
+  box-shadow: 0 0 0 2px var(--tao-control-outline);
+  outline: none;
+}

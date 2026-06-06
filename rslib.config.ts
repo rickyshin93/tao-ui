@@ -14,6 +14,9 @@ export default defineConfig({
       bundle: false,
       dts: true,
       format: 'esm',
+      style: {
+        inject: true,
+      },
     },
   ],
   output: {

@@ -1,0 +1,168 @@
+@import '../../theme/theme.css';
+
+/* ===========================
+   Pagination Container
+   =========================== */
+[data-tao-pagination] {
+  display: flex;
+  align-items: center;
+  gap: var(--tao-padding-xxs);
+  font-family: var(--tao-font-family);
+  user-select: none;
+}
+
+/* ===========================
+   Buttons (page numbers + prev/next)
+   =========================== */
+[data-tao-pagination-btn] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--tao-color-text-secondary);
+  cursor: pointer;
+  outline: none;
+  font-family: inherit;
+  font-variant-numeric: tabular-nums;
+  border-radius: var(--tao-radius-sm);
+  transition:
+    color var(--tao-motion-duration-fast) var(--tao-motion-ease-out),
+    background-color var(--tao-motion-duration-fast) var(--tao-motion-ease-out);
+}
+
+[data-tao-pagination-btn]:hover:not(:disabled) {
+  background: var(--tao-color-fill-tertiary);
+  color: var(--tao-color-text);
+}
+
+[data-tao-pagination-btn][data-tao-active] {
+  background: var(--tao-primary);
+  color: var(--tao-primary-fg);
+  font-weight: var(--tao-font-weight-medium);
+}
+
+[data-tao-pagination-btn][data-tao-active]:hover:not(:disabled) {
+  background: var(--tao-primary-hover);
+  color: var(--tao-primary-fg);
+}
+
+[data-tao-pagination-btn]:disabled {
+  color: var(--tao-color-text-disabled);
+  cursor: not-allowed;
+}
+
+[data-tao-pagination-btn]:focus-visible {
+  box-shadow: 0 0 0 2px var(--tao-control-outline);
+}
+
+/* ===========================
+   Size: small
+   =========================== */
+[data-tao-pagination][data-tao-size="small"] [data-tao-pagination-btn] {
+  min-width: 28px;
+  height: 28px;
+  font-size: var(--tao-font-size-xs);
+}
+[data-tao-pagination][data-tao-size="small"] [data-tao-pagination-total] {
+  font-size: var(--tao-font-size-xs);
+}
+[data-tao-pagination][data-tao-size="small"] [data-tao-pagination-sizer] {
+  height: 28px;
+  font-size: var(--tao-font-size-xs);
+}
+
+/* ===========================
+   Size: medium (default)
+   =========================== */
+[data-tao-pagination][data-tao-size="medium"] [data-tao-pagination-btn],
+[data-tao-pagination]:not([data-tao-size]) [data-tao-pagination-btn] {
+  min-width: 32px;
+  height: 32px;
+  font-size: var(--tao-font-size-sm);
+}
+[data-tao-pagination][data-tao-size="medium"] [data-tao-pagination-total],
+[data-tao-pagination]:not([data-tao-size]) [data-tao-pagination-total] {
+  font-size: var(--tao-font-size-sm);
+}
+[data-tao-pagination][data-tao-size="medium"] [data-tao-pagination-sizer],
+[data-tao-pagination]:not([data-tao-size]) [data-tao-pagination-sizer] {
+  height: 32px;
+  font-size: var(--tao-font-size-sm);
+}
+
+/* ===========================
+   Size: large
+   =========================== */
+[data-tao-pagination][data-tao-size="large"] [data-tao-pagination-btn] {
+  min-width: 36px;
+  height: 36px;
+  font-size: var(--tao-font-size-base);
+}
+[data-tao-pagination][data-tao-size="large"] [data-tao-pagination-total] {
+  font-size: var(--tao-font-size-base);
+}
+[data-tao-pagination][data-tao-size="large"] [data-tao-pagination-sizer] {
+  height: 36px;
+  font-size: var(--tao-font-size-base);
+}
+
+/* ===========================
+   Ellipsis
+   =========================== */
+[data-tao-pagination-ellipsis] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
+  color: var(--tao-color-text-tertiary);
+  font-size: var(--tao-font-size-sm);
+  letter-spacing: 1px;
+}
+
+/* ===========================
+   Total text
+   =========================== */
+[data-tao-pagination-total] {
+  color: var(--tao-color-text-secondary);
+  margin-inline-end: var(--tao-padding-xs);
+  white-space: nowrap;
+}
+
+/* ===========================
+   Size changer (native select)
+   =========================== */
+[data-tao-pagination-sizer] {
+  margin-inline-start: var(--tao-padding-xs);
+  padding-inline: var(--tao-padding-xs);
+  border: var(--tao-line-width) solid var(--tao-color-border);
+  border-radius: var(--tao-radius-sm);
+  background: transparent;
+  color: var(--tao-color-text-secondary);
+  font-family: inherit;
+  cursor: pointer;
+  outline: none;
+  transition: border-color var(--tao-motion-duration-fast) var(--tao-motion-ease-out);
+}
+
+[data-tao-pagination-sizer]:hover:not(:disabled) {
+  border-color: var(--tao-primary);
+}
+
+[data-tao-pagination-sizer]:focus-visible {
+  box-shadow: 0 0 0 2px var(--tao-control-outline);
+}
+
+[data-tao-pagination-sizer]:disabled {
+  opacity: var(--tao-opacity-loading);
+  cursor: not-allowed;
+}
+
+/* ===========================
+   Disabled state (container level)
+   =========================== */
+[data-tao-pagination][data-tao-disabled] {
+  opacity: var(--tao-opacity-loading);
+  pointer-events: none;
+}

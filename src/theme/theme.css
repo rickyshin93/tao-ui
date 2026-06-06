@@ -1,0 +1,182 @@
+@import 'tailwindcss';
+
+/*
+ * tao-ui Design Tokens
+ * Seed → Derived via CSS calc() + color-mix()
+ * Reference: DESIGN.md §2
+ */
+
+@layer base {
+  :root, [data-tao-provider] {
+    /* ===========================
+       SEED TOKENS
+       =========================== */
+
+    /* Color seeds */
+    --tao-color-primary:   oklch(0.205 0.010 70);
+    --tao-color-success:   oklch(0.555 0.140 155);
+    --tao-color-warning:   oklch(0.700 0.150 70);
+    --tao-color-error:     oklch(0.570 0.190 25);
+    --tao-color-bg-base:   oklch(0.985 0.004 70);
+    --tao-color-text-base: oklch(0.155 0.010 70);
+
+    /* Size seeds */
+    --tao-radius:          6px;
+    --tao-font-size:       14px;
+    --tao-control-height:  36px;
+    --tao-size-unit:       4px;
+    --tao-line-width:      1px;
+
+    /* Font seeds */
+    --tao-font-family:      'Geist Sans', ui-sans-serif, system-ui, -apple-system, sans-serif;
+    --tao-font-family-code: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+    /* Motion seeds */
+    --tao-motion-unit: 0.1s;
+
+    /* ===========================
+       DERIVED: Primary color palette
+       =========================== */
+    --tao-primary:            var(--tao-color-primary);
+    --tao-primary-hover:      color-mix(in oklch, var(--tao-color-primary) 80%, white);
+    --tao-primary-active:     color-mix(in oklch, var(--tao-color-primary) 90%, black);
+    --tao-primary-bg:         color-mix(in oklch, var(--tao-color-primary) 8%, var(--tao-color-bg-base));
+    --tao-primary-bg-hover:   color-mix(in oklch, var(--tao-color-primary) 12%, var(--tao-color-bg-base));
+    --tao-primary-border:     color-mix(in oklch, var(--tao-color-primary) 30%, var(--tao-color-bg-base));
+    --tao-primary-fg:         var(--tao-color-bg-base);
+
+    /* ===========================
+       DERIVED: Error color palette
+       =========================== */
+    --tao-error:              var(--tao-color-error);
+    --tao-error-hover:        color-mix(in oklch, var(--tao-color-error) 80%, white);
+    --tao-error-active:       color-mix(in oklch, var(--tao-color-error) 90%, black);
+    --tao-error-bg:           color-mix(in oklch, var(--tao-color-error) 6%, var(--tao-color-bg-base));
+    --tao-error-border:       color-mix(in oklch, var(--tao-color-error) 30%, var(--tao-color-bg-base));
+    --tao-error-fg:           var(--tao-color-bg-base);
+
+    /* ===========================
+       DERIVED: Success color palette
+       =========================== */
+    --tao-success:            var(--tao-color-success);
+    --tao-success-bg:         color-mix(in oklch, var(--tao-color-success) 6%, var(--tao-color-bg-base));
+    --tao-success-border:     color-mix(in oklch, var(--tao-color-success) 30%, var(--tao-color-bg-base));
+
+    /* ===========================
+       DERIVED: Warning color palette
+       =========================== */
+    --tao-warning:            var(--tao-color-warning);
+    --tao-warning-bg:         color-mix(in oklch, var(--tao-color-warning) 6%, var(--tao-color-bg-base));
+    --tao-warning-border:     color-mix(in oklch, var(--tao-color-warning) 30%, var(--tao-color-bg-base));
+
+    /* ===========================
+       DERIVED: Neutral text (4 levels)
+       =========================== */
+    --tao-color-text:            var(--tao-color-text-base);
+    --tao-color-text-secondary:  color-mix(in oklch, var(--tao-color-text-base) 65%, var(--tao-color-bg-base));
+    --tao-color-text-tertiary:   color-mix(in oklch, var(--tao-color-text-base) 45%, var(--tao-color-bg-base));
+    --tao-color-text-quaternary: color-mix(in oklch, var(--tao-color-text-base) 30%, var(--tao-color-bg-base));
+
+    /* ===========================
+       DERIVED: Neutral fill (4 levels)
+       =========================== */
+    --tao-color-fill:            color-mix(in oklch, var(--tao-color-text-base) 15%, var(--tao-color-bg-base));
+    --tao-color-fill-secondary:  color-mix(in oklch, var(--tao-color-text-base) 10%, var(--tao-color-bg-base));
+    --tao-color-fill-tertiary:   color-mix(in oklch, var(--tao-color-text-base) 6%, var(--tao-color-bg-base));
+    --tao-color-fill-quaternary: color-mix(in oklch, var(--tao-color-text-base) 3%, var(--tao-color-bg-base));
+
+    /* ===========================
+       DERIVED: Background levels
+       =========================== */
+    --tao-color-bg-layout:    color-mix(in oklch, var(--tao-color-text-base) 4%, var(--tao-color-bg-base));
+    --tao-color-bg-container: var(--tao-color-bg-base);
+    --tao-color-bg-elevated:  var(--tao-color-bg-base);
+
+    /* ===========================
+       DERIVED: Border (2 levels)
+       =========================== */
+    --tao-color-border:           color-mix(in oklch, var(--tao-color-text-base) 18%, var(--tao-color-bg-base));
+    --tao-color-border-secondary: color-mix(in oklch, var(--tao-color-text-base) 10%, var(--tao-color-bg-base));
+
+    /* ===========================
+       DERIVED: Radius
+       =========================== */
+    --tao-radius-xs:   2px;
+    --tao-radius-sm:   calc(var(--tao-radius) - 2px);
+    --tao-radius-md:   var(--tao-radius);
+    --tao-radius-lg:   calc(var(--tao-radius) + 2px);
+    --tao-radius-xl:   calc(var(--tao-radius) * 2);
+    --tao-radius-2xl:  calc(var(--tao-radius) * 2.67);
+    --tao-radius-full: 9999px;
+
+    /* ===========================
+       DERIVED: Control height
+       =========================== */
+    --tao-control-height-sm: calc(var(--tao-control-height) - 4px);
+    --tao-control-height-lg: calc(var(--tao-control-height) + 4px);
+
+    /* ===========================
+       DERIVED: Font sizes (fixed for default 14px)
+       =========================== */
+    --tao-font-size-xs:  12px;
+    --tao-font-size-sm:  13px;
+    --tao-font-size-base: var(--tao-font-size);
+    --tao-font-size-lg:  16px;
+    --tao-font-size-xl:  20px;
+
+    /* Font weight */
+    --tao-font-weight-normal: 400;
+    --tao-font-weight-medium: 500;
+    --tao-font-weight-strong: 600;
+
+    /* Line height */
+    --tao-line-height:    1.5714;
+    --tao-line-height-sm: 1.6667;
+    --tao-line-height-lg: 1.5;
+
+    /* ===========================
+       DERIVED: Spacing
+       =========================== */
+    --tao-padding-xxs: 2px;
+    --tao-padding-xs:  calc(var(--tao-size-unit) * 2);
+    --tao-padding-sm:  calc(var(--tao-size-unit) * 3);
+    --tao-padding:     calc(var(--tao-size-unit) * 4);
+    --tao-padding-md:  calc(var(--tao-size-unit) * 5);
+    --tao-padding-lg:  calc(var(--tao-size-unit) * 6);
+    --tao-padding-xl:  calc(var(--tao-size-unit) * 8);
+
+    /* ===========================
+       DERIVED: Motion
+       =========================== */
+    --tao-motion-duration-fast: calc(var(--tao-motion-unit) * 1);
+    --tao-motion-duration-mid:  calc(var(--tao-motion-unit) * 2);
+    --tao-motion-duration-slow: calc(var(--tao-motion-unit) * 3);
+    --tao-motion-ease-out:      cubic-bezier(0.215, 0.61, 0.355, 1);
+    --tao-motion-ease-in-out:   cubic-bezier(0.645, 0.045, 0.355, 1);
+    --tao-motion-ease-out-quint: cubic-bezier(0.23, 1, 0.32, 1);
+
+    /* ===========================
+       DERIVED: Shadow
+       =========================== */
+    --tao-box-shadow:           0 1px 2px oklch(0 0 0 / 0.04), 0 0 1px oklch(0 0 0 / 0.08);
+    --tao-box-shadow-secondary: 0 2px 8px oklch(0 0 0 / 0.06), 0 0 1px oklch(0 0 0 / 0.06);
+    --tao-box-shadow-tertiary:  0 1px 2px oklch(0 0 0 / 0.04);
+
+    /* ===========================
+       DERIVED: Focus (antd: box-shadow based, not outline)
+       =========================== */
+    --tao-control-outline:       color-mix(in oklch, var(--tao-color-primary) 10%, transparent);
+    --tao-color-error-outline:   color-mix(in oklch, var(--tao-color-error) 10%, transparent);
+    --tao-color-warning-outline: color-mix(in oklch, var(--tao-color-warning) 10%, transparent);
+
+    /* ===========================
+       ALIAS: Semantic shortcuts
+       =========================== */
+    --tao-color-text-placeholder:  var(--tao-color-text-quaternary);
+    --tao-color-text-disabled:     var(--tao-color-text-quaternary);
+    --tao-color-bg-disabled:       var(--tao-color-fill-tertiary);
+    --tao-control-item-bg-hover:   var(--tao-color-fill-tertiary);
+    --tao-control-item-bg-active:  var(--tao-primary-bg);
+    --tao-opacity-loading:         0.65;
+  }
+}

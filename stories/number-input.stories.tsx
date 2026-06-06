@@ -4,7 +4,7 @@ import { fn } from 'storybook/test';
 import { NumberInput } from '../src/number-input';
 
 const meta = {
-  title: 'Example/NumberInput',
+  title: '数据录入 Data Entry/NumberInput',
   component: NumberInput,
   parameters: { layout: 'centered' },
   tags: ['autodocs'],

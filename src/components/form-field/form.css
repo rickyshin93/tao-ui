@@ -1,0 +1,89 @@
+@import '../../theme/theme.css';
+
+/* ===========================
+   FormField
+   =========================== */
+[data-tao-form-field] {
+  display: flex;
+  flex-direction: column;
+}
+
+[data-tao-form-label] {
+  font-size: var(--tao-font-size-sm);
+  font-weight: var(--tao-font-weight-medium);
+  color: var(--tao-color-text);
+  margin-block-end: 6px;
+  line-height: var(--tao-line-height);
+}
+
+[data-tao-required] {
+  color: var(--tao-error);
+  margin-inline-start: 2px;
+}
+
+[data-tao-form-description] {
+  font-size: var(--tao-font-size-xs);
+  color: var(--tao-color-text-tertiary);
+  margin-block-start: 4px;
+  line-height: var(--tao-line-height-sm);
+}
+
+[data-tao-form-error] {
+  font-size: var(--tao-font-size-xs);
+  color: var(--tao-error);
+  margin-block-start: 4px;
+  line-height: var(--tao-line-height-sm);
+}
+
+/* ===========================
+   FormSection
+   =========================== */
+[data-tao-form-section] {
+  display: flex;
+  flex-direction: column;
+  border: none;
+  padding: 0;
+  margin: 0;
+}
+
+[data-tao-form-section] + [data-tao-form-section] {
+  border-block-start: var(--tao-line-width) solid var(--tao-color-border-secondary);
+  padding-block-start: var(--tao-padding-xl);
+  margin-block-start: var(--tao-padding-xl);
+}
+
+[data-tao-form-section-header] {
+  margin-block-end: var(--tao-padding);
+}
+
+[data-tao-form-section-title] {
+  font-size: var(--tao-font-size-lg);
+  font-weight: var(--tao-font-weight-strong);
+  color: var(--tao-color-text);
+  line-height: 1.25;
+  padding: 0;
+}
+
+[data-tao-form-section-description] {
+  font-size: var(--tao-font-size-base);
+  color: var(--tao-color-text-secondary);
+  margin-block-start: 4px;
+}
+
+[data-tao-form-section-body] {
+  display: flex;
+  flex-direction: column;
+  gap: var(--tao-padding-md);
+}
+
+/* ===========================
+   FormActions
+   =========================== */
+[data-tao-form-actions] {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--tao-padding-sm);
+  border-block-start: var(--tao-line-width) solid var(--tao-color-border-secondary);
+  padding-block-start: var(--tao-padding-lg);
+  margin-block-start: var(--tao-padding-xl);
+}

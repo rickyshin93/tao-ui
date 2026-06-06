@@ -1,4 +1,18 @@
-# rihua-ui 项目自我学习
+# tao-ui 项目自我学习
+
+## [设计] 项目已更名为 tao-ui
+
+- **日期**: 2026-06-02
+- **错误假设**: 以为项目名仍是 rihua-ui
+- **正确做法**: 库名已改为 `tao-ui`，CSS 变量前缀 `--tao-*`，data 属性 `data-tao-*`。包名尚未在 package.json 中更新（等开发时一起改）
+- **适用场景**: 所有代码生成和文档引用都应使用 tao-ui / --tao- 前缀
+
+## [设计] antd v6 主题架构参考
+
+- **日期**: 2026-06-02
+- **错误假设**: 以为 CSS Variables 简单直接覆盖就够了
+- **正确做法**: 参考 antd v6 完整的 Seed→Map→Alias 分层。tao-ui 简化为 Seed→Derived 两层，但保留了 antd 的关键派生算法（genRadius 分段逻辑、genFontSizes 自然对数阶梯、genControlHeight 比例因子）。CSS calc/color-mix 能算的纯 CSS 处理，不能算的（圆角分段、字号对数）在 TaoProvider JS 侧计算注入
+- **适用场景**: 开发 TaoProvider 和主题系统时，去 `/tmp/antd-check/` 查看 antd v6 源码对照。核心文件在 `lib/theme/themes/shared/` 下
 
 ## [测试] rstest 不自带 testing-library auto-cleanup
 
@@ -13,7 +27,19 @@
   否则前面所有测试的 React 树都积累在 happy-dom 的 body 里，`getByTestId` 报 "Found multiple elements"
 - **适用场景**: 任何在 rihua-ui 里写 `render(<X />)` 多个测试同名 testid 的组件库测试。新增组件的第一组测试写完跑通就要 verify 这个，避免后面 debug 浪费时间
 
-## [构建] rslib dts 输出路径必须有独立的 build tsconfig 才能扁平
+## [构建] rslib bundle:false + style.inject 不会内联 CSS
+
+- **日期**: 2026-06-02
+- **错误假设**: 以为 `style.inject: true` 在 `bundle: false` 模式下会把 CSS 内联到 JS
+- **真实行为**: `bundle: false` 模式下 CSS 仍输出为独立文件 + JS 里 `import "./xxx.css"` side-effect import。用户的 bundler (Vite/Rspack/webpack) 会处理这个 CSS import
+- **适用场景**: 如果后续确实需要零配置内联 CSS，需切换到 `bundle: true` 或用其他方案
+
+## [构建] CSS 文件里 @import 路径是相对于 CSS 文件本身的
+
+- **日期**: 2026-06-02
+- **错误假设**: 以为 `src/components/button/button.css` 里 `@import '../theme/theme.css'` 会解析到 `src/theme/`
+- **正确做法**: CSS `@import` 路径相对于当前 CSS 文件位置，`src/components/button/` → `../` = `src/components/`，所以需要 `../../theme/theme.css`
+- **适用场景**: 所有组件 CSS 文件引用 theme.css 时
 
 - **日期**: 2026-05-15
 - **错误假设**: 以为 `bundle: false + dts: true` 会让 d.ts 跟 JS 一样扁平到 `dist/index.d.ts`

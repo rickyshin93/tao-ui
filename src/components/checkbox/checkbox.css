@@ -1,0 +1,104 @@
+@import '../../theme/theme.css';
+
+/* ===========================
+   Checkbox Wrapper (label)
+   =========================== */
+[data-tao-checkbox-wrapper] {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--tao-padding-xs);
+  cursor: pointer;
+  font-family: var(--tao-font-family);
+  font-size: var(--tao-font-size-base);
+  color: var(--tao-color-text);
+  user-select: none;
+  line-height: var(--tao-line-height);
+}
+
+[data-tao-checkbox-wrapper][data-tao-disabled] {
+  cursor: not-allowed;
+  opacity: var(--tao-opacity-loading);
+}
+
+/* Hide native input */
+[data-tao-checkbox-input] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ===========================
+   Checkbox visual box
+   =========================== */
+[data-tao-checkbox] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border: var(--tao-line-width) solid var(--tao-color-border);
+  border-radius: var(--tao-radius-sm);
+  background: var(--tao-color-bg-container);
+  flex-shrink: 0;
+  transition:
+    background-color var(--tao-motion-duration-fast) var(--tao-motion-ease-out),
+    border-color var(--tao-motion-duration-fast) var(--tao-motion-ease-out),
+    box-shadow var(--tao-motion-duration-fast) var(--tao-motion-ease-out);
+}
+
+/* Hover */
+[data-tao-checkbox-wrapper]:not([data-tao-disabled]):hover [data-tao-checkbox] {
+  border-color: var(--tao-primary);
+}
+
+/* Focus */
+[data-tao-checkbox-input]:focus-visible + [data-tao-checkbox] {
+  box-shadow: 0 0 0 2px var(--tao-control-outline);
+}
+
+/* Checked */
+[data-tao-checkbox][data-tao-checked] {
+  background: var(--tao-primary);
+  border-color: var(--tao-primary);
+}
+
+/* Indeterminate */
+[data-tao-checkbox][data-tao-indeterminate] {
+  background: var(--tao-primary);
+  border-color: var(--tao-primary);
+}
+
+/* Icon color */
+[data-tao-checkbox-icon] {
+  color: white;
+}
+
+/* ===========================
+   Label
+   =========================== */
+[data-tao-checkbox-label] {
+  color: inherit;
+}
+
+/* ===========================
+   Group
+   =========================== */
+[data-tao-checkbox-group] {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--tao-padding-xs) var(--tao-padding);
+}
+
+[data-tao-checkbox-group][data-tao-direction="vertical"] {
+  flex-direction: column;
+}
+
+[data-tao-checkbox-group][data-tao-direction="horizontal"] {
+  flex-direction: row;
+}

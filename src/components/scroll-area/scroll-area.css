@@ -1,0 +1,172 @@
+@import '../../theme/theme.css';
+
+/* ===========================
+   ScrollArea Container
+   =========================== */
+[data-tao-scroll-area] {
+  position: relative;
+  overflow: hidden;
+}
+
+/* ===========================
+   Viewport — hide native scrollbar
+   =========================== */
+[data-tao-scroll-viewport] {
+  width: 100%;
+  height: inherit;
+  max-height: inherit;
+  max-width: inherit;
+  scrollbar-width: none; /* Firefox */
+}
+
+[data-tao-scroll-viewport]::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+
+/* ===========================
+   Scrollbar Track
+   =========================== */
+[data-tao-scrollbar] {
+  position: absolute;
+  user-select: none;
+  touch-action: none;
+  transition: opacity var(--tao-motion-duration-mid) var(--tao-motion-ease-out);
+  z-index: 2;
+}
+
+/* Vertical track */
+[data-tao-scrollbar][data-tao-orientation="vertical"] {
+  top: var(--tao-scrollbar-offset);
+  right: var(--tao-scrollbar-offset);
+  bottom: var(--tao-scrollbar-offset);
+  width: var(--tao-scrollbar-size);
+}
+
+/* Horizontal track */
+[data-tao-scrollbar][data-tao-orientation="horizontal"] {
+  left: var(--tao-scrollbar-offset);
+  right: var(--tao-scrollbar-offset);
+  bottom: var(--tao-scrollbar-offset);
+  height: var(--tao-scrollbar-size);
+}
+
+/* Corner gap when both scrollbars present */
+[data-tao-scroll-area][data-tao-has-v][data-tao-has-h] [data-tao-scrollbar][data-tao-orientation="vertical"] {
+  bottom: calc(var(--tao-scrollbar-offset) + var(--tao-scrollbar-size) + var(--tao-scrollbar-offset));
+}
+
+[data-tao-scroll-area][data-tao-has-v][data-tao-has-h] [data-tao-scrollbar][data-tao-orientation="horizontal"] {
+  right: calc(var(--tao-scrollbar-offset) + var(--tao-scrollbar-size) + var(--tao-scrollbar-offset));
+}
+
+/* ===========================
+   Thumb
+   =========================== */
+[data-tao-scroll-thumb] {
+  position: absolute;
+  border-radius: var(--tao-radius-full);
+  background: var(--tao-color-text-quaternary);
+  cursor: pointer;
+  transition: background-color var(--tao-motion-duration-fast) var(--tao-motion-ease-out);
+}
+
+[data-tao-scroll-thumb][data-tao-orientation="vertical"] {
+  width: 100%;
+  min-height: 20px;
+}
+
+[data-tao-scroll-thumb][data-tao-orientation="horizontal"] {
+  height: 100%;
+  min-width: 20px;
+}
+
+[data-tao-scroll-thumb]:hover {
+  background: var(--tao-color-text-tertiary);
+}
+
+[data-tao-scroll-thumb]:active {
+  background: var(--tao-color-text-secondary);
+}
+
+/* ===========================
+   Visibility modes
+   =========================== */
+
+/* type="auto" — show on scroll/hover, fade out */
+[data-tao-scroll-area][data-tao-scroll-type="auto"] [data-tao-scrollbar] {
+  opacity: 0;
+}
+
+[data-tao-scroll-area][data-tao-scroll-type="auto"]:hover [data-tao-scrollbar] {
+  opacity: 1;
+}
+
+/* type="hover" — show on hover only */
+[data-tao-scroll-area][data-tao-scroll-type="hover"] [data-tao-scrollbar] {
+  opacity: 0;
+}
+
+[data-tao-scroll-area][data-tao-scroll-type="hover"]:hover [data-tao-scrollbar] {
+  opacity: 1;
+}
+
+/* type="always" — always visible */
+[data-tao-scroll-area][data-tao-scroll-type="always"] [data-tao-scrollbar] {
+  opacity: 1;
+}
+
+/* type="scroll" — show only during scroll (via JS class, fallback to hover) */
+[data-tao-scroll-area][data-tao-scroll-type="scroll"] [data-tao-scrollbar] {
+  opacity: 0;
+}
+
+[data-tao-scroll-area][data-tao-scroll-type="scroll"]:hover [data-tao-scrollbar] {
+  opacity: 1;
+}
+
+/* ===========================
+   Scroll Shadows
+   =========================== */
+[data-tao-scroll-shadow] {
+  position: absolute;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0;
+  transition: opacity var(--tao-motion-duration-fast) var(--tao-motion-ease-out);
+}
+
+[data-tao-scroll-shadow][data-tao-visible] {
+  opacity: 1;
+}
+
+[data-tao-scroll-shadow="top"] {
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 16px;
+  background: linear-gradient(to bottom, oklch(0 0 0 / 0.06), transparent);
+}
+
+[data-tao-scroll-shadow="bottom"] {
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 16px;
+  background: linear-gradient(to top, oklch(0 0 0 / 0.06), transparent);
+}
+
+[data-tao-scroll-shadow="left"] {
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 16px;
+  background: linear-gradient(to right, oklch(0 0 0 / 0.06), transparent);
+}
+
+[data-tao-scroll-shadow="right"] {
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 16px;
+  background: linear-gradient(to left, oklch(0 0 0 / 0.06), transparent);
+}

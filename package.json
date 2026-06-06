@@ -1,7 +1,28 @@
 {
-  "name": "rihua-ui",
-  "version": "1.0.0",
+  "name": "tao-ui",
+  "version": "0.0.1",
   "type": "module",
+  "description": "A modern React 19 component library with semantic DOM customization and OKLCH-based theming.",
+  "keywords": [
+    "react",
+    "react19",
+    "component-library",
+    "ui",
+    "design-system",
+    "tao-ui",
+    "oklch"
+  ],
+  "author": "rickyshin",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rickyshin93/tao-ui.git"
+  },
+  "homepage": "https://github.com/rickyshin93/tao-ui#readme",
+  "bugs": "https://github.com/rickyshin93/tao-ui/issues",
+  "sideEffects": [
+    "**/*.css"
+  ],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -39,23 +60,37 @@
     "@storybook/addon-docs": "^10.3.6",
     "@storybook/addon-onboarding": "^10.3.6",
     "@storybook/react": "^10.3.6",
+    "@tailwindcss/postcss": "^4.3.0",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@types/node": "^24.12.4",
     "@types/react": "^19.2.14",
     "babel-plugin-react-compiler": "^1.0.0",
     "happy-dom": "^20.9.0",
+    "postcss": "^8.5.15",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
     "rsbuild-plugin-workspace-dev": "^0.1.4",
     "storybook": "^10.3.6",
     "storybook-addon-rslib": "^3.3.3",
     "storybook-react-rsbuild": "^3.3.3",
+    "tailwindcss": "^4.3.0",
     "typescript": "^6.0.3"
   },
   "peerDependencies": {
+    "dayjs": ">=1.11.0",
     "react": ">=19.0.0",
     "react-dom": ">=19.0.0"
   },
-  "private": true
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "dependencies": {
+    "@radix-ui/react-dialog": "^1.1.15",
+    "@radix-ui/react-popover": "^1.1.15",
+    "@radix-ui/react-select": "^2.2.6",
+    "@tanstack/react-virtual": "^3.14.2",
+    "dayjs": "^1.11.21"
+  }
 }

@@ -1,0 +1,177 @@
+@import '../../theme/theme.css';
+
+/* ===========================
+   Splitter Container
+   =========================== */
+[data-tao-splitter] {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  font-family: var(--tao-font-family);
+  overflow: hidden;
+}
+
+[data-tao-splitter][data-tao-orientation="horizontal"] {
+  flex-direction: row;
+}
+
+[data-tao-splitter][data-tao-orientation="vertical"] {
+  flex-direction: column;
+}
+
+/* ===========================
+   Panel
+   =========================== */
+[data-tao-splitter-panel] {
+  overflow: auto;
+  position: relative;
+}
+
+[data-tao-splitter-panel][data-tao-collapsed] {
+  overflow: hidden;
+}
+
+/* ===========================
+   Dragger — 1px visible line, expanded hit area via pseudo
+   =========================== */
+[data-tao-splitter-dragger] {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  z-index: 1;
+  user-select: none;
+  touch-action: none;
+  background: var(--tao-color-border-secondary);
+  transition: background-color var(--tao-motion-duration-fast) var(--tao-motion-ease-out);
+}
+
+/* Horizontal: 1px wide line, hit area expanded with ::before */
+[data-tao-splitter-dragger][data-tao-orientation="horizontal"] {
+  width: 1px;
+  cursor: col-resize;
+  flex-direction: column;
+}
+
+[data-tao-splitter-dragger][data-tao-orientation="horizontal"]::before {
+  content: '';
+  position: absolute;
+  inset: 0 -5px;
+  z-index: -1;
+}
+
+/* Vertical: 1px tall line */
+[data-tao-splitter-dragger][data-tao-orientation="vertical"] {
+  height: 1px;
+  cursor: row-resize;
+  flex-direction: row;
+}
+
+[data-tao-splitter-dragger][data-tao-orientation="vertical"]::before {
+  content: '';
+  position: absolute;
+  inset: -5px 0;
+  z-index: -1;
+}
+
+/* Hover: line slightly darker */
+[data-tao-splitter-dragger]:hover {
+  background: var(--tao-color-border);
+}
+
+/* Active: same as hover, not jarring */
+[data-tao-splitter-dragger]:active {
+  background: var(--tao-color-border);
+}
+
+/* ===========================
+   Dragger Bar — small handle, always visible
+   =========================== */
+[data-tao-splitter-dragger-bar] {
+  border-radius: var(--tao-radius-full);
+  background: var(--tao-color-text-quaternary);
+  transition:
+    background-color var(--tao-motion-duration-fast) var(--tao-motion-ease-out);
+}
+
+[data-tao-splitter-dragger]:hover [data-tao-splitter-dragger-bar] {
+  background: var(--tao-color-text-tertiary);
+}
+
+[data-tao-orientation="horizontal"] > [data-tao-splitter-dragger-bar] {
+  width: 3px;
+  height: 24px;
+  position: absolute;
+}
+
+[data-tao-orientation="vertical"] > [data-tao-splitter-dragger-bar] {
+  height: 3px;
+  width: 24px;
+  position: absolute;
+}
+
+/* ===========================
+   Collapse buttons
+   =========================== */
+[data-tao-splitter-collapse] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border: none;
+  background: var(--tao-color-bg-container);
+  border-radius: var(--tao-radius-full);
+  color: var(--tao-color-text-tertiary);
+  cursor: pointer;
+  box-shadow: var(--tao-box-shadow-tertiary);
+  padding: 0;
+  position: absolute;
+  z-index: 2;
+  opacity: 0;
+  transition:
+    opacity var(--tao-motion-duration-fast) var(--tao-motion-ease-out),
+    color var(--tao-motion-duration-fast) var(--tao-motion-ease-out),
+    background-color var(--tao-motion-duration-fast) var(--tao-motion-ease-out);
+}
+
+[data-tao-splitter-dragger]:hover [data-tao-splitter-collapse] {
+  opacity: 1;
+}
+
+[data-tao-splitter-collapse]:hover {
+  color: var(--tao-primary);
+  background: var(--tao-color-fill-quaternary);
+}
+
+/* Horizontal: collapse buttons above/below center */
+[data-tao-splitter-collapse][data-tao-orientation="horizontal"][data-tao-collapse-direction="start"] {
+  top: calc(50% - 24px);
+}
+
+[data-tao-splitter-collapse][data-tao-orientation="horizontal"][data-tao-collapse-direction="end"] {
+  top: calc(50% + 4px);
+}
+
+/* Vertical: collapse buttons left/right of center */
+[data-tao-splitter-collapse][data-tao-orientation="vertical"][data-tao-collapse-direction="start"] {
+  left: calc(50% - 24px);
+}
+
+[data-tao-splitter-collapse][data-tao-orientation="vertical"][data-tao-collapse-direction="end"] {
+  left: calc(50% + 4px);
+}
+
+/* Rotate icons for orientation + direction */
+[data-tao-splitter-collapse][data-tao-orientation="horizontal"] svg[data-tao-collapse-direction="end"] {
+  transform: rotate(180deg);
+}
+
+[data-tao-splitter-collapse][data-tao-orientation="vertical"] svg {
+  transform: rotate(90deg);
+}
+
+[data-tao-splitter-collapse][data-tao-orientation="vertical"] svg[data-tao-collapse-direction="end"] {
+  transform: rotate(-90deg);
+}

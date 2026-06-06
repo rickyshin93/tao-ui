@@ -9,22 +9,22 @@ test('6.1 — renders single <input> inside <span> container', () => {
   expect(root.querySelectorAll('input')).toHaveLength(1);
 });
 
-test('6.2 — prefix renders before input with data-rh-prefix and is NOT in input value', () => {
+test('6.2 — prefix renders before input with data-tao-prefix and is NOT in input value', () => {
   const { container } = render(<NumberInput value="100" prefix="$" />);
   const root = container.firstChild as HTMLElement;
   const children = Array.from(root.children);
-  expect(children[0].getAttribute('data-rh-prefix')).toBe('');
+  expect(children[0].getAttribute('data-tao-prefix')).toBe('');
   expect(children[0].textContent).toBe('$');
   expect(children[1].tagName).toBe('INPUT');
   expect((children[1] as HTMLInputElement).value).toBe('100');
 });
 
-test('6.3 — suffix renders after input with data-rh-suffix', () => {
+test('6.3 — suffix renders after input with data-tao-suffix', () => {
   const { container } = render(<NumberInput value="100" suffix="USD" />);
   const root = container.firstChild as HTMLElement;
   const children = Array.from(root.children);
   expect(children[0].tagName).toBe('INPUT');
-  expect(children[1].getAttribute('data-rh-suffix')).toBe('');
+  expect(children[1].getAttribute('data-tao-suffix')).toBe('');
   expect(children[1].textContent).toBe('USD');
 });
 

@@ -1,0 +1,148 @@
+@import '../../theme/theme.css';
+
+/* ===========================
+   Overlay
+   =========================== */
+[data-tao-drawer-overlay] {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  background: oklch(0 0 0 / 0.4);
+  animation: tao-fade-in var(--tao-motion-duration-mid) ease-out;
+}
+
+@keyframes tao-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ===========================
+   Content
+   =========================== */
+[data-tao-drawer] {
+  position: fixed;
+  z-index: 1000;
+  background: var(--tao-color-bg-elevated);
+  box-shadow: var(--tao-box-shadow-secondary);
+  display: flex;
+  flex-direction: column;
+  outline: none;
+  overflow: hidden;
+  font-family: var(--tao-font-family);
+}
+
+/* Right (default) */
+[data-tao-drawer][data-tao-placement="right"] {
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 378px;
+  animation: tao-slide-from-right var(--tao-motion-duration-slow) cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes tao-slide-from-right {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+/* Left */
+[data-tao-drawer][data-tao-placement="left"] {
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 378px;
+  animation: tao-slide-from-left var(--tao-motion-duration-slow) cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes tao-slide-from-left {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+/* Bottom */
+[data-tao-drawer][data-tao-placement="bottom"] {
+  bottom: 0;
+  left: 0;
+  right: 0;
+  max-height: 85vh;
+  border-radius: var(--tao-radius-xl) var(--tao-radius-xl) 0 0;
+  animation: tao-slide-from-bottom var(--tao-motion-duration-slow) cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes tao-slide-from-bottom {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+/* Top */
+[data-tao-drawer][data-tao-placement="top"] {
+  top: 0;
+  left: 0;
+  right: 0;
+  max-height: 85vh;
+  border-radius: 0 0 var(--tao-radius-xl) var(--tao-radius-xl);
+  animation: tao-slide-from-top var(--tao-motion-duration-slow) cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes tao-slide-from-top {
+  from { transform: translateY(-100%); }
+  to { transform: translateY(0); }
+}
+
+/* ===========================
+   Header
+   =========================== */
+[data-tao-drawer-header] {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--tao-padding) var(--tao-padding-lg);
+  border-block-end: var(--tao-line-width) solid var(--tao-color-border-secondary);
+  flex-shrink: 0;
+}
+
+[data-tao-drawer-title] {
+  font-size: var(--tao-font-size-lg);
+  font-weight: var(--tao-font-weight-strong);
+  color: var(--tao-color-text);
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Close button */
+button[data-tao-drawer-close] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: var(--tao-radius-sm);
+  background: transparent;
+  color: var(--tao-color-text-tertiary);
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+  transition: all var(--tao-motion-duration-fast) ease-out;
+  outline: none;
+  appearance: none;
+}
+
+button[data-tao-drawer-close]:hover {
+  background: var(--tao-color-fill-tertiary);
+  color: var(--tao-color-text);
+}
+
+button[data-tao-drawer-close]:focus-visible {
+  box-shadow: 0 0 0 2px var(--tao-control-outline);
+}
+
+/* ===========================
+   Body
+   =========================== */
+[data-tao-drawer-body] {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--tao-padding-lg);
+  -webkit-overflow-scrolling: touch;
+}

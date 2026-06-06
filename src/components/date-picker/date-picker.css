@@ -1,0 +1,755 @@
+@import '../../theme/theme.css';
+@import '../../theme/control.css';
+
+/* ===========================
+   Trigger (shared with Input/Select)
+   =========================== */
+button[data-tao-picker-trigger] {
+  display: flex;
+  align-items: center;
+  gap: var(--tao-padding-xs);
+  width: 100%;
+  font-family: var(--tao-font-family);
+  cursor: pointer;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  text-align: start;
+}
+
+button[data-tao-picker-trigger][data-tao-size="small"] {
+  height: var(--tao-control-height-sm);
+  padding-inline: var(--tao-padding-xs);
+  font-size: var(--tao-font-size-sm);
+  border-radius: var(--tao-radius-sm);
+}
+button[data-tao-picker-trigger][data-tao-size="medium"] {
+  height: var(--tao-control-height);
+  padding-inline: var(--tao-padding-sm);
+  font-size: var(--tao-font-size-base);
+  border-radius: var(--tao-radius-md);
+}
+button[data-tao-picker-trigger][data-tao-size="large"] {
+  height: var(--tao-control-height-lg);
+  padding-inline: var(--tao-padding-sm);
+  font-size: var(--tao-font-size-lg);
+  border-radius: var(--tao-radius-md);
+}
+
+[data-tao-picker-input] {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+  color: var(--tao-color-text);
+}
+
+[data-tao-picker-placeholder] {
+  color: var(--tao-color-text-placeholder);
+}
+
+[data-tao-picker-icons] {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  margin-inline-start: auto;
+}
+
+[data-tao-picker-prefix] {
+  display: flex;
+  align-items: center;
+  color: var(--tao-color-text-tertiary);
+  flex-shrink: 0;
+}
+
+[data-tao-picker-suffix],
+[data-tao-picker-clear] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+[data-tao-picker-suffix] {
+  color: var(--tao-color-text-tertiary);
+}
+
+[data-tao-picker-clear] {
+  color: var(--tao-color-text-quaternary);
+  cursor: pointer;
+  transition: color var(--tao-motion-duration-fast) ease-out;
+}
+[data-tao-picker-clear]:hover {
+  color: var(--tao-color-text-secondary);
+}
+
+/* ===========================
+   Dropdown (Popover)
+   =========================== */
+[data-tao-picker-dropdown] {
+  background: var(--tao-color-bg-elevated);
+  border: var(--tao-line-width) solid var(--tao-color-border);
+  border-radius: var(--tao-radius-lg);
+  box-shadow: var(--tao-box-shadow-secondary);
+  z-index: 1000;
+  overflow: hidden;
+  width: auto;
+  animation: tao-picker-in var(--tao-motion-duration-fast) cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes tao-picker-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===========================
+   Panel
+   =========================== */
+[data-tao-picker-panel] {
+  font-family: var(--tao-font-family);
+  padding: var(--tao-padding-xs);
+  width: 280px;
+}
+
+[data-tao-picker-panel][data-tao-has-time] {
+  width: auto;
+}
+
+/* In Drawer: panel fills width, reduce spacing */
+[data-tao-drawer] [data-tao-picker-panel] {
+  width: 100%;
+}
+
+[data-tao-drawer]:has([data-tao-picker-panel]) [data-tao-drawer-body] {
+  padding: 0;
+}
+
+/* In Drawer: datetime stacks vertically */
+[data-tao-drawer] [data-tao-picker-datetime] {
+  flex-direction: column;
+}
+
+[data-tao-drawer] [data-tao-picker-date-side] {
+  width: 100%;
+}
+
+[data-tao-drawer] [data-tao-picker-time] {
+  border-inline-start: none;
+  border-block-start: var(--tao-line-width) solid var(--tao-color-border-secondary);
+  width: auto;
+}
+
+[data-tao-drawer] [data-tao-time-column] {
+  /* inherits the column border from base styles */
+}
+
+[data-tao-drawer] [data-tao-time-column-list] {
+  max-height: 196px;
+}
+
+/* ===========================
+   DateTime side-by-side layout
+   =========================== */
+[data-tao-picker-datetime] {
+  display: flex;
+}
+
+[data-tao-picker-date-side] {
+  flex: none;
+  width: 280px;
+}
+
+/* ===========================
+   Calendar Header
+   =========================== */
+[data-tao-calendar-header] {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--tao-padding-xxs) 0;
+  margin-block-end: var(--tao-padding-xs);
+}
+
+[data-tao-calendar-nav] {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+button[data-tao-calendar-nav-btn] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: var(--tao-radius-sm);
+  background: transparent;
+  color: var(--tao-color-text-tertiary);
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+  outline: none;
+  appearance: none;
+  transition: all var(--tao-motion-duration-fast) ease-out;
+}
+button[data-tao-calendar-nav-btn]:hover {
+  background: var(--tao-color-fill-tertiary);
+  color: var(--tao-color-text);
+}
+
+[data-tao-calendar-title] {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+button[data-tao-calendar-title-btn] {
+  border: none;
+  background: transparent;
+  font-family: var(--tao-font-family);
+  font-size: var(--tao-font-size-base);
+  font-weight: var(--tao-font-weight-medium);
+  color: var(--tao-color-text);
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: var(--tao-radius-sm);
+  outline: none;
+  appearance: none;
+  transition: background-color var(--tao-motion-duration-fast) ease-out;
+}
+button[data-tao-calendar-title-btn]:hover {
+  background: var(--tao-color-fill-tertiary);
+}
+
+[data-tao-calendar-title-text] {
+  font-size: var(--tao-font-size-base);
+  font-weight: var(--tao-font-weight-medium);
+  color: var(--tao-color-text);
+  padding: 4px 8px;
+}
+
+/* ===========================
+   Calendar Grid (date cells)
+   Range strip uses ::before on <td>, inner circle uses z-index: 2
+   =========================== */
+[data-tao-calendar-grid] {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: fixed;
+}
+
+[data-tao-calendar-weekday] {
+  font-size: var(--tao-font-size-xs);
+  font-weight: var(--tao-font-weight-medium);
+  color: var(--tao-color-text-tertiary);
+  text-align: center;
+  padding: 4px 0;
+  height: 32px;
+  vertical-align: middle;
+}
+
+[data-tao-calendar-cell] {
+  position: relative;
+  text-align: center;
+  padding: 2px 0;
+  cursor: pointer;
+  vertical-align: middle;
+}
+
+/* ::before = range background strip (full cell width, half cell height) */
+[data-tao-calendar-cell]::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  inset-inline-start: 0;
+  inset-inline-end: 0;
+  height: 28px;
+  z-index: 0;
+  background: transparent;
+}
+
+/* Inner circle (day number) — above the strip */
+[data-tao-calendar-cell-inner] {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--tao-radius-sm);
+  font-size: var(--tao-font-size-sm);
+  color: var(--tao-color-text);
+  transition: all var(--tao-motion-duration-fast) ease-out;
+  line-height: 1;
+}
+
+/* ---- Single select: hover ---- */
+[data-tao-calendar-cell]:not([data-tao-disabled]):not([data-tao-selected]):not([data-tao-range-start]):not([data-tao-range-end]):not([data-tao-in-range]):hover [data-tao-calendar-cell-inner] {
+  background: var(--tao-color-fill-tertiary);
+}
+
+/* ---- Single select: selected ---- */
+[data-tao-calendar-cell][data-tao-selected] [data-tao-calendar-cell-inner] {
+  background: var(--tao-primary);
+  color: white;
+}
+
+/* ---- Today marker ---- */
+[data-tao-calendar-cell][data-tao-today]:not([data-tao-selected]):not([data-tao-range-start]):not([data-tao-range-end]) [data-tao-calendar-cell-inner] {
+  border: var(--tao-line-width) solid var(--tao-primary);
+}
+
+/* ---- Other month (faded) ---- */
+[data-tao-calendar-cell][data-tao-other-month] [data-tao-calendar-cell-inner] {
+  color: var(--tao-color-text-quaternary);
+}
+
+/* ---- Disabled ---- */
+[data-tao-calendar-cell][data-tao-disabled] {
+  cursor: not-allowed;
+}
+[data-tao-calendar-cell][data-tao-disabled] [data-tao-calendar-cell-inner] {
+  color: var(--tao-color-text-disabled);
+  background: transparent;
+}
+
+/* ---- Range: in-range strip (middle cells) ---- */
+[data-tao-calendar-cell][data-tao-in-range]::before {
+  background: var(--tao-primary-bg);
+}
+
+/* ---- Range: start cell — strip from 50% to right ---- */
+[data-tao-calendar-cell][data-tao-range-start]::before {
+  background: var(--tao-primary-bg);
+  inset-inline-start: 50%;
+}
+[data-tao-calendar-cell][data-tao-range-start] [data-tao-calendar-cell-inner] {
+  background: var(--tao-primary);
+  color: white;
+}
+
+/* ---- Range: end cell — strip from left to 50% ---- */
+[data-tao-calendar-cell][data-tao-range-end]::before {
+  background: var(--tao-primary-bg);
+  inset-inline-end: 50%;
+}
+[data-tao-calendar-cell][data-tao-range-end] [data-tao-calendar-cell-inner] {
+  background: var(--tao-primary);
+  color: white;
+}
+
+/* If start and end are the same day — no strip */
+[data-tao-calendar-cell][data-tao-range-start][data-tao-range-end]::before {
+  background: transparent;
+}
+
+/* ---- Range: hover on in-range cells — no extra gray ---- */
+[data-tao-calendar-cell][data-tao-in-range]:hover [data-tao-calendar-cell-inner],
+[data-tao-calendar-cell][data-tao-range-start]:hover [data-tao-calendar-cell-inner],
+[data-tao-calendar-cell][data-tao-range-end]:hover [data-tao-calendar-cell-inner] {
+  /* Keep current state, no gray overlay */
+}
+
+/* ===========================
+   Month / Year Grid
+   =========================== */
+[data-tao-month-grid],
+[data-tao-year-grid] {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--tao-padding-xs);
+  padding: var(--tao-padding-xs) 0;
+}
+
+button[data-tao-month-cell],
+button[data-tao-year-cell] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  border: none;
+  border-radius: var(--tao-radius-sm);
+  background: transparent;
+  font-family: var(--tao-font-family);
+  font-size: var(--tao-font-size-sm);
+  color: var(--tao-color-text);
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+  outline: none;
+  appearance: none;
+  transition: all var(--tao-motion-duration-fast) ease-out;
+}
+
+button[data-tao-month-cell]:hover:not(:disabled),
+button[data-tao-year-cell]:hover:not(:disabled) {
+  background: var(--tao-color-fill-tertiary);
+}
+
+button[data-tao-month-cell][data-tao-selected],
+button[data-tao-year-cell][data-tao-selected] {
+  background: var(--tao-primary);
+  color: white;
+}
+
+button[data-tao-month-cell][data-tao-other-month],
+button[data-tao-year-cell][data-tao-other-month] {
+  color: var(--tao-color-text-quaternary);
+}
+
+button[data-tao-month-cell]:disabled,
+button[data-tao-year-cell]:disabled {
+  color: var(--tao-color-text-disabled);
+  cursor: not-allowed;
+}
+
+/* ===========================
+   Time Panel (right side in datetime mode)
+   =========================== */
+[data-tao-picker-time] {
+  border-inline-start: var(--tao-line-width) solid var(--tao-color-border-secondary);
+  display: flex;
+  flex-direction: column;
+  width: 192px;
+}
+
+[data-tao-time-header] {
+  font-size: var(--tao-font-size-base);
+  font-weight: var(--tao-font-weight-medium);
+  color: var(--tao-color-text);
+  text-align: center;
+  padding: var(--tao-padding-xxs) var(--tao-padding-xs);
+  border-block-end: var(--tao-line-width) solid var(--tao-color-border-secondary);
+  line-height: 28px;
+}
+
+[data-tao-time-panel] {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  flex: 1;
+  min-height: 0;
+}
+
+[data-tao-time-column] {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  border-inline-end: var(--tao-line-width) solid var(--tao-color-border-secondary);
+}
+
+[data-tao-time-column]:last-child {
+  border-inline-end: none;
+}
+
+[data-tao-time-column-title] {
+  display: none;
+}
+
+/* Show column titles only inside Drawer (mobile) */
+[data-tao-drawer] [data-tao-time-column-title] {
+  display: block;
+  font-size: var(--tao-font-size-xs);
+  font-weight: var(--tao-font-weight-medium);
+  color: var(--tao-color-text-tertiary);
+  text-align: center;
+  padding: 4px 0;
+  border-block-end: var(--tao-line-width) solid var(--tao-color-border-secondary);
+  flex-shrink: 0;
+}
+
+[data-tao-time-column-list] {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-height: 256px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+  padding: 2px 0;
+}
+
+button[data-tao-time-cell] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 28px;
+  min-height: 28px;
+  border: none;
+  border-radius: var(--tao-radius-sm);
+  background: transparent;
+  font-family: var(--tao-font-family);
+  font-size: var(--tao-font-size-base);
+  color: var(--tao-color-text);
+  cursor: pointer;
+  padding: 0 4px;
+  margin: 0;
+  outline: none;
+  appearance: none;
+  transition: background-color var(--tao-motion-duration-fast) ease-out;
+}
+
+button[data-tao-time-cell]:hover {
+  background: var(--tao-color-fill-tertiary);
+}
+
+button[data-tao-time-cell][data-tao-selected] {
+  background: var(--tao-primary-bg);
+  font-weight: var(--tao-font-weight-medium);
+}
+
+/* ===========================
+   Presets
+   =========================== */
+[data-tao-picker-presets] {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--tao-padding-xxs);
+  padding: var(--tao-padding-xs) 0;
+  border-block-start: var(--tao-line-width) solid var(--tao-color-border-secondary);
+  margin-block-start: var(--tao-padding-xs);
+}
+
+button[data-tao-preset-btn] {
+  border: var(--tao-line-width) solid var(--tao-color-border);
+  border-radius: var(--tao-radius-sm);
+  background: transparent;
+  font-family: var(--tao-font-family);
+  font-size: var(--tao-font-size-xs);
+  color: var(--tao-color-text-secondary);
+  cursor: pointer;
+  padding: 2px 8px;
+  margin: 0;
+  outline: none;
+  appearance: none;
+  transition: all var(--tao-motion-duration-fast) ease-out;
+}
+button[data-tao-preset-btn]:hover {
+  border-color: var(--tao-primary);
+  color: var(--tao-primary);
+}
+
+/* ===========================
+   Footer (showTime: Now + OK)
+   =========================== */
+[data-tao-picker-footer] {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--tao-padding-xs);
+  padding-block-start: var(--tao-padding-xs);
+  border-block-start: var(--tao-line-width) solid var(--tao-color-border-secondary);
+  margin-block-start: var(--tao-padding-xs);
+}
+
+button[data-tao-picker-footer-btn] {
+  border: var(--tao-line-width) solid var(--tao-color-border);
+  border-radius: var(--tao-radius-sm);
+  background: transparent;
+  font-family: var(--tao-font-family);
+  font-size: var(--tao-font-size-xs);
+  color: var(--tao-color-text-secondary);
+  cursor: pointer;
+  padding: 4px 12px;
+  margin: 0;
+  outline: none;
+  appearance: none;
+  transition: all var(--tao-motion-duration-fast) ease-out;
+}
+button[data-tao-picker-footer-btn]:hover {
+  border-color: var(--tao-primary);
+  color: var(--tao-primary);
+}
+button[data-tao-picker-footer-btn][data-tao-primary] {
+  background: var(--tao-primary);
+  border-color: var(--tao-primary);
+  color: white;
+}
+button[data-tao-picker-footer-btn][data-tao-primary]:hover {
+  background: var(--tao-primary-hover);
+}
+
+/* ===========================
+   RangePicker trigger
+   =========================== */
+button[data-tao-range-trigger] {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  width: 100%;
+  font-family: var(--tao-font-family);
+  cursor: pointer;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  text-align: start;
+}
+
+button[data-tao-range-trigger][data-tao-size="small"] {
+  height: var(--tao-control-height-sm);
+  padding-inline: var(--tao-padding-xs);
+  font-size: var(--tao-font-size-sm);
+  border-radius: var(--tao-radius-sm);
+}
+button[data-tao-range-trigger][data-tao-size="medium"] {
+  height: var(--tao-control-height);
+  padding-inline: var(--tao-padding-sm);
+  font-size: var(--tao-font-size-base);
+  border-radius: var(--tao-radius-md);
+}
+button[data-tao-range-trigger][data-tao-size="large"] {
+  height: var(--tao-control-height-lg);
+  padding-inline: var(--tao-padding-sm);
+  font-size: var(--tao-font-size-lg);
+  border-radius: var(--tao-radius-md);
+}
+
+[data-tao-range-input] {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--tao-color-text);
+  text-align: center;
+}
+
+[data-tao-range-input][data-tao-active] {
+  color: var(--tao-primary);
+}
+
+[data-tao-range-separator] {
+  padding-inline: var(--tao-padding-xs);
+  color: var(--tao-color-text-quaternary);
+  flex-shrink: 0;
+}
+
+/* RangePicker dual panel layout */
+[data-tao-range-panels] {
+  display: flex;
+  gap: var(--tao-padding);
+}
+
+/* Remove individual panel padding in range mode (header is shared) */
+[data-tao-range-panel] [data-tao-picker-panel] {
+  padding: 0 var(--tao-padding-xs) var(--tao-padding-xs);
+  width: 280px;
+}
+
+[data-tao-range-panel] {
+  font-family: var(--tao-font-family);
+  padding: var(--tao-padding-xs);
+}
+
+/* Shared range header */
+[data-tao-range-header] {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--tao-padding-xxs) 0;
+  margin-block-end: var(--tao-padding-xs);
+}
+
+[data-tao-range-titles] {
+  display: flex;
+  flex: 1;
+  justify-content: space-around;
+}
+
+[data-tao-range-title] {
+  font-size: var(--tao-font-size-base);
+  font-weight: var(--tao-font-weight-medium);
+  color: var(--tao-color-text);
+  padding: 4px 8px;
+}
+
+/* On mobile, stack vertically */
+@media (max-width: 479px) {
+  [data-tao-range-panels] {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  /* DateTime: stack date and time vertically in mobile popover */
+  [data-tao-picker-datetime] {
+    flex-direction: column;
+  }
+
+  [data-tao-picker-date-side] {
+    width: 100%;
+  }
+
+  [data-tao-picker-time] {
+    border-inline-start: none;
+    border-block-start: var(--tao-line-width) solid var(--tao-color-border-secondary);
+  }
+
+  [data-tao-time-column-list] {
+    max-height: 196px;
+  }
+
+  /* Range panel fills drawer width */
+  [data-tao-drawer] [data-tao-range-panel] {
+    width: 100%;
+    padding: 0;
+  }
+
+  [data-tao-drawer] [data-tao-range-panel] [data-tao-picker-panel] {
+    width: 100%;
+    padding: var(--tao-padding-xs);
+  }
+
+  /* Sticky header in drawer */
+  [data-tao-drawer] [data-tao-range-header] {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: var(--tao-color-bg-elevated);
+    padding: var(--tao-padding-xs);
+    border-block-end: var(--tao-line-width) solid var(--tao-color-border-secondary);
+    margin-block-end: 0;
+  }
+
+  [data-tao-drawer] [data-tao-calendar-header] {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: var(--tao-color-bg-elevated);
+    padding-block: var(--tao-padding-xs);
+  }
+
+  /* Drawer body scrollable */
+  [data-tao-drawer]:has([data-tao-range-panel]) [data-tao-drawer-body] {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Larger touch targets in Drawer */
+  [data-tao-drawer] [data-tao-calendar-cell-inner] {
+    width: 36px;
+    height: 36px;
+    font-size: var(--tao-font-size-base);
+  }
+
+  [data-tao-drawer] [data-tao-calendar-cell]::before {
+    height: 36px;
+  }
+
+  [data-tao-drawer] [data-tao-calendar-weekday] {
+    height: 32px;
+  }
+
+  [data-tao-drawer] button[data-tao-month-cell],
+  [data-tao-drawer] button[data-tao-year-cell] {
+    height: 48px;
+    font-size: var(--tao-font-size-base);
+  }
+}

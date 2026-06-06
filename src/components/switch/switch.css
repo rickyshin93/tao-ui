@@ -1,0 +1,252 @@
+@import '../../theme/theme.css';
+
+/*
+ * Switch — mirrors antd rc-switch structure:
+ *   <button data-tao-switch>
+ *     <div data-tao-switch-handle />       ← absolute positioned
+ *     <span data-tao-switch-inner>         ← overflow hidden, padding shifts for handle
+ *       <span data-tao-switch-inner-checked />    ← stacked via negative margin-top
+ *       <span data-tao-switch-inner-unchecked />
+ *     </span>
+ *   </button>
+ *
+ * Medium: track 44×22, handle 18×18, padding 2
+ * Small:  track 28×16, handle 12×12, padding 2
+ */
+
+/* ===========================
+   Track (button)
+   =========================== */
+button[data-tao-switch] {
+  position: relative;
+  display: inline-block;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  vertical-align: middle;
+  border: 0;
+  border-radius: 100px;
+  cursor: pointer;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  background: var(--tao-color-text-quaternary);
+  transition: background-color var(--tao-motion-duration-mid) ease-in-out;
+  user-select: none;
+  -webkit-user-select: none;
+  font: inherit;
+  color: inherit;
+}
+
+/* Medium */
+button[data-tao-switch][data-tao-size="medium"] {
+  min-width: 44px;
+  height: 22px;
+  line-height: 22px;
+}
+
+/* Small */
+button[data-tao-switch][data-tao-size="small"] {
+  min-width: 28px;
+  height: 16px;
+  line-height: 16px;
+}
+
+/* Checked */
+button[data-tao-switch][data-tao-checked] {
+  background: var(--tao-primary);
+}
+
+/* Hover */
+button[data-tao-switch]:hover:not([disabled]) {
+  background: var(--tao-color-text-tertiary);
+}
+button[data-tao-switch][data-tao-checked]:hover:not([disabled]) {
+  background: var(--tao-primary-hover);
+}
+
+/* Focus */
+button[data-tao-switch]:focus-visible {
+  outline: 2px solid var(--tao-primary-border);
+  outline-offset: 1px;
+}
+
+/* Disabled */
+button[data-tao-switch][disabled] {
+  cursor: not-allowed;
+  opacity: var(--tao-opacity-loading);
+}
+
+/* ===========================
+   Handle (absolute positioned circle)
+   =========================== */
+[data-tao-switch-handle] {
+  position: absolute;
+  top: 2px;
+  inset-inline-start: 2px;
+  transition: all var(--tao-motion-duration-mid) ease-in-out;
+}
+
+[data-tao-switch-handle]::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  inset-inline-start: 0;
+  inset-inline-end: 0;
+  bottom: 0;
+  background-color: white;
+  border-radius: 9px;
+  box-shadow: 0 2px 4px 0 oklch(0.15 0.01 150 / 0.2);
+  transition: all var(--tao-motion-duration-mid) ease-in-out;
+}
+
+/* Medium handle: 18×18 */
+button[data-tao-switch][data-tao-size="medium"] [data-tao-switch-handle] {
+  width: 18px;
+  height: 18px;
+}
+button[data-tao-switch][data-tao-size="medium"][data-tao-checked] [data-tao-switch-handle] {
+  inset-inline-start: calc(100% - 18px - 2px);
+}
+
+/* Small handle: 12×12 */
+button[data-tao-switch][data-tao-size="small"] [data-tao-switch-handle] {
+  width: 12px;
+  height: 12px;
+}
+button[data-tao-switch][data-tao-size="small"][data-tao-checked] [data-tao-switch-handle] {
+  inset-inline-start: calc(100% - 12px - 2px);
+}
+
+/* Active: handle stretches (antd: inset -30%) */
+button[data-tao-switch]:not([disabled]):active [data-tao-switch-handle]::before {
+  inset-inline-end: -30%;
+}
+button[data-tao-switch][data-tao-checked]:not([disabled]):active [data-tao-switch-handle]::before {
+  inset-inline-start: -30%;
+  inset-inline-end: 0;
+}
+
+/* Loading icon inside handle */
+[data-tao-switch-handle] [data-tao-switch-loading] {
+  position: absolute;
+  top: 50%;
+  inset-inline-start: 50%;
+  transform: translate(-50%, -50%);
+  animation: tao-spin 0.8s linear infinite;
+  color: oklch(0.4 0 0 / 0.65);
+  z-index: 1;
+}
+
+button[data-tao-switch][data-tao-size="medium"] [data-tao-switch-loading] { width: 12px; height: 12px; }
+button[data-tao-switch][data-tao-size="small"] [data-tao-switch-loading] { width: 8px; height: 8px; }
+button[data-tao-switch][data-tao-checked] [data-tao-switch-loading] { color: var(--tao-primary); }
+
+@keyframes tao-spin {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* ===========================
+   Inner (text labels)
+   Two spans stacked vertically via negative margin-top.
+   Padding shifts to make room for handle on alternating sides.
+   =========================== */
+[data-tao-switch-inner] {
+  display: block;
+  overflow: hidden;
+  border-radius: 100px;
+  height: 100%;
+  font-family: var(--tao-font-family);
+  transition:
+    padding-inline-start var(--tao-motion-duration-mid) ease-in-out,
+    padding-inline-end var(--tao-motion-duration-mid) ease-in-out;
+}
+
+[data-tao-switch-inner-checked],
+[data-tao-switch-inner-unchecked] {
+  display: block;
+  color: white;
+  pointer-events: none;
+  transition:
+    margin-inline-start var(--tao-motion-duration-mid) ease-in-out,
+    margin-inline-end var(--tao-motion-duration-mid) ease-in-out;
+}
+
+/* ---- Medium inner (handle=18, padding=2) ---- */
+/* handleTotal = handle(18) + padding(2)*2 = 22 */
+/* innerMaxMargin = handle(18) + padding(2) + padding(2)*2 = 24 */
+/* innerMinMargin = handle(18)/2 = 9 */
+
+button[data-tao-switch][data-tao-size="medium"] [data-tao-switch-inner] {
+  padding-inline-start: 24px;
+  padding-inline-end: 9px;
+  font-size: 12px;
+}
+
+button[data-tao-switch][data-tao-size="medium"] [data-tao-switch-inner-checked],
+button[data-tao-switch][data-tao-size="medium"] [data-tao-switch-inner-unchecked] {
+  min-height: 22px;
+  display: flex;
+  align-items: center;
+}
+
+/* Unchecked: checked-text slides left out of view, unchecked-text visible */
+button[data-tao-switch][data-tao-size="medium"] [data-tao-switch-inner-checked] {
+  margin-inline-start: calc(-100% + 22px - 48px);
+  margin-inline-end: calc(100% - 22px + 48px);
+}
+button[data-tao-switch][data-tao-size="medium"] [data-tao-switch-inner-unchecked] {
+  margin-top: -22px;
+}
+
+/* Checked: swap padding, checked-text visible */
+button[data-tao-switch][data-tao-size="medium"][data-tao-checked] [data-tao-switch-inner] {
+  padding-inline-start: 9px;
+  padding-inline-end: 24px;
+}
+button[data-tao-switch][data-tao-size="medium"][data-tao-checked] [data-tao-switch-inner-checked] {
+  margin-inline-start: 0;
+  margin-inline-end: 0;
+}
+button[data-tao-switch][data-tao-size="medium"][data-tao-checked] [data-tao-switch-inner-unchecked] {
+  margin-top: -22px;
+  margin-inline-start: calc(100% - 22px + 48px);
+  margin-inline-end: calc(-100% + 22px - 48px);
+}
+
+/* ---- Small inner (handle=12, padding=2) ---- */
+button[data-tao-switch][data-tao-size="small"] [data-tao-switch-inner] {
+  padding-inline-start: 18px;
+  padding-inline-end: 6px;
+  font-size: 9px;
+}
+
+button[data-tao-switch][data-tao-size="small"] [data-tao-switch-inner-checked],
+button[data-tao-switch][data-tao-size="small"] [data-tao-switch-inner-unchecked] {
+  min-height: 16px;
+  display: flex;
+  align-items: center;
+}
+
+button[data-tao-switch][data-tao-size="small"] [data-tao-switch-inner-checked] {
+  margin-inline-start: calc(-100% + 14px - 36px);
+  margin-inline-end: calc(100% - 14px + 36px);
+}
+button[data-tao-switch][data-tao-size="small"] [data-tao-switch-inner-unchecked] {
+  margin-top: -16px;
+}
+
+button[data-tao-switch][data-tao-size="small"][data-tao-checked] [data-tao-switch-inner] {
+  padding-inline-start: 6px;
+  padding-inline-end: 18px;
+}
+button[data-tao-switch][data-tao-size="small"][data-tao-checked] [data-tao-switch-inner-checked] {
+  margin-inline-start: 0;
+  margin-inline-end: 0;
+}
+button[data-tao-switch][data-tao-size="small"][data-tao-checked] [data-tao-switch-inner-unchecked] {
+  margin-top: -16px;
+  margin-inline-start: calc(100% - 14px + 36px);
+  margin-inline-end: calc(-100% + 14px - 36px);
+}

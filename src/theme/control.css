@@ -1,0 +1,145 @@
+@import './theme.css';
+
+/*
+ * Shared interaction states for all form controls (Input, Select)
+ * Mirrors antd's genBaseOutlinedStyle / genBaseFilledStyle / genBorderlessStyle
+ *
+ * Uses data-tao-variant="outlined|filled|borderless"
+ * Uses data-tao-error for error state
+ */
+
+/* ===========================
+   Base transition
+   =========================== */
+[data-tao-control] {
+  transition:
+    border-color var(--tao-motion-duration-mid) var(--tao-motion-ease-out),
+    background-color var(--tao-motion-duration-mid) var(--tao-motion-ease-out),
+    box-shadow var(--tao-motion-duration-mid) var(--tao-motion-ease-out);
+}
+
+/* ===========================
+   Outlined (default)
+   =========================== */
+[data-tao-control][data-tao-variant="outlined"] {
+  background: var(--tao-color-bg-container);
+  border: var(--tao-line-width) solid var(--tao-color-border);
+}
+
+/* Outlined: hover */
+[data-tao-control][data-tao-variant="outlined"]:hover:not([data-disabled]):not(:focus-within):not([data-state="open"]) {
+  border-color: var(--tao-primary-hover);
+}
+
+/* Outlined: focus / open */
+[data-tao-control][data-tao-variant="outlined"]:focus-within,
+[data-tao-control][data-tao-variant="outlined"][data-state="open"] {
+  border-color: var(--tao-primary);
+  box-shadow: 0 0 0 2px var(--tao-control-outline);
+  outline: none;
+}
+
+/* Outlined: error */
+[data-tao-control][data-tao-variant="outlined"][data-tao-error] {
+  border-color: var(--tao-error);
+}
+
+/* Outlined: error + hover */
+[data-tao-control][data-tao-variant="outlined"][data-tao-error]:hover:not([data-disabled]):not(:focus-within) {
+  border-color: var(--tao-error-hover);
+}
+
+/* Outlined: error + focus */
+[data-tao-control][data-tao-variant="outlined"][data-tao-error]:focus-within,
+[data-tao-control][data-tao-variant="outlined"][data-tao-error][data-state="open"] {
+  border-color: var(--tao-error);
+  box-shadow: 0 0 0 2px var(--tao-color-error-outline);
+}
+
+/* Outlined: disabled */
+[data-tao-control][data-tao-variant="outlined"][data-disabled],
+[data-tao-control][data-tao-variant="outlined"]:has(input:disabled) {
+  background: var(--tao-color-bg-disabled);
+  border-color: var(--tao-color-border);
+  color: var(--tao-color-text-disabled);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* ===========================
+   Filled
+   =========================== */
+[data-tao-control][data-tao-variant="filled"] {
+  background: var(--tao-color-fill-tertiary);
+  border: var(--tao-line-width) solid transparent;
+}
+
+/* Filled: hover */
+[data-tao-control][data-tao-variant="filled"]:hover:not([data-disabled]):not(:focus-within):not([data-state="open"]) {
+  background: var(--tao-color-fill-secondary);
+}
+
+/* Filled: focus / open */
+[data-tao-control][data-tao-variant="filled"]:focus-within,
+[data-tao-control][data-tao-variant="filled"][data-state="open"] {
+  background: var(--tao-color-bg-container);
+  border-color: var(--tao-primary);
+  box-shadow: 0 0 0 2px var(--tao-control-outline);
+  outline: none;
+}
+
+/* Filled: error */
+[data-tao-control][data-tao-variant="filled"][data-tao-error] {
+  background: var(--tao-error-bg);
+}
+
+/* Filled: error + hover */
+[data-tao-control][data-tao-variant="filled"][data-tao-error]:hover:not([data-disabled]):not(:focus-within) {
+  background: color-mix(in oklch, var(--tao-color-error) 10%, var(--tao-color-bg-base));
+}
+
+/* Filled: error + focus */
+[data-tao-control][data-tao-variant="filled"][data-tao-error]:focus-within,
+[data-tao-control][data-tao-variant="filled"][data-tao-error][data-state="open"] {
+  background: var(--tao-color-bg-container);
+  border-color: var(--tao-error);
+  box-shadow: 0 0 0 2px var(--tao-color-error-outline);
+}
+
+/* Filled: disabled */
+[data-tao-control][data-tao-variant="filled"][data-disabled],
+[data-tao-control][data-tao-variant="filled"]:has(input:disabled) {
+  background: var(--tao-color-bg-disabled);
+  border-color: var(--tao-color-border);
+  color: var(--tao-color-text-disabled);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* ===========================
+   Borderless
+   =========================== */
+[data-tao-control][data-tao-variant="borderless"] {
+  background: transparent;
+  border: var(--tao-line-width) solid transparent;
+  border-radius: 0 !important;
+}
+
+/* Borderless: focus — subtle bottom border only, no shadow */
+[data-tao-control][data-tao-variant="borderless"]:focus-within,
+[data-tao-control][data-tao-variant="borderless"][data-state="open"] {
+  border-block-end-color: var(--tao-primary);
+  outline: none;
+}
+
+/* Borderless: error — text color change */
+[data-tao-control][data-tao-variant="borderless"][data-tao-error] {
+  border-block-end-color: var(--tao-error);
+}
+
+/* Borderless: disabled */
+[data-tao-control][data-tao-variant="borderless"][data-disabled],
+[data-tao-control][data-tao-variant="borderless"]:has(input:disabled) {
+  color: var(--tao-color-text-disabled);
+  cursor: not-allowed;
+}

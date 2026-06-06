@@ -1,0 +1,339 @@
+@import '../../theme/theme.css';
+
+/* ===========================
+   Table Wrapper
+   =========================== */
+[data-tao-table-wrapper] {
+  font-family: var(--tao-font-family);
+  color: var(--tao-color-text);
+  position: relative;
+}
+
+/* ===========================
+   Scroll container
+   =========================== */
+[data-tao-table-scroll] {
+  overflow-x: auto;
+  position: relative;
+}
+
+/* ===========================
+   Table element
+   =========================== */
+[data-tao-table] {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: auto;
+}
+
+/* Fixed width columns → fixed layout */
+[data-tao-table-scroll]:has([data-tao-fixed]) [data-tao-table] {
+  table-layout: fixed;
+}
+
+/* ===========================
+   Cells (th + td)
+   =========================== */
+[data-tao-table-cell] {
+  padding: var(--tao-padding-sm) var(--tao-padding);
+  text-align: left;
+  border-bottom: var(--tao-line-width) solid var(--tao-color-border-secondary);
+  background: var(--tao-color-bg-container);
+  transition: background-color var(--tao-motion-duration-fast) var(--tao-motion-ease-out);
+}
+
+/* Alignment */
+[data-tao-table-cell][data-tao-align="center"] {
+  text-align: center;
+}
+[data-tao-table-cell][data-tao-align="right"] {
+  text-align: right;
+}
+
+/* Ellipsis */
+[data-tao-table-cell][data-tao-ellipsis] {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ===========================
+   Header
+   =========================== */
+[data-tao-table-thead] [data-tao-table-cell] {
+  font-weight: var(--tao-font-weight-medium);
+  color: var(--tao-color-text-secondary);
+  background: var(--tao-color-fill-quaternary);
+  white-space: nowrap;
+}
+
+[data-tao-table-header-content] {
+  display: flex;
+  align-items: center;
+  gap: var(--tao-padding-xxs);
+}
+
+[data-tao-table-header-title] {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+[data-tao-table-header-title][data-tao-sortable] {
+  cursor: pointer;
+  user-select: none;
+}
+
+[data-tao-table-header-title][data-tao-sortable]:hover {
+  color: var(--tao-color-text);
+}
+
+/* ===========================
+   Sort icon
+   =========================== */
+[data-tao-table-sort-icon] {
+  display: inline-flex;
+  color: var(--tao-color-text-quaternary);
+}
+
+[data-tao-table-sort-icon][data-tao-sort-order] {
+  color: var(--tao-primary);
+}
+
+/* ===========================
+   Filter icon + dropdown
+   =========================== */
+[data-tao-table-filter-dropdown] {
+  position: relative;
+  display: inline-flex;
+}
+
+[data-tao-table-filter-trigger] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 2px;
+  border-radius: var(--tao-radius-xs);
+  color: var(--tao-color-text-quaternary);
+  transition: color var(--tao-motion-duration-fast) var(--tao-motion-ease-out);
+}
+
+[data-tao-table-filter-trigger]:hover {
+  color: var(--tao-color-text);
+}
+
+[data-tao-table-filter-icon][data-tao-active] {
+  color: var(--tao-primary);
+}
+
+[data-tao-table-filter-panel] {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  z-index: 10;
+  min-width: 140px;
+  padding: var(--tao-padding-xxs);
+  background: var(--tao-color-bg-container);
+  border-radius: var(--tao-radius-md);
+  box-shadow: var(--tao-box-shadow-secondary);
+  border: var(--tao-line-width) solid var(--tao-color-border-secondary);
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+[data-tao-table-filter-option] {
+  display: flex;
+  align-items: center;
+  gap: var(--tao-padding-xs);
+  padding: var(--tao-padding-xxs) var(--tao-padding-xs);
+  border-radius: var(--tao-radius-sm);
+  cursor: pointer;
+  font-size: var(--tao-font-size-sm);
+  color: var(--tao-color-text);
+  transition: background-color var(--tao-motion-duration-fast) var(--tao-motion-ease-out);
+}
+
+[data-tao-table-filter-option]:hover {
+  background: var(--tao-color-fill-tertiary);
+}
+
+[data-tao-table-filter-check] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border: var(--tao-line-width) solid var(--tao-color-border);
+  border-radius: var(--tao-radius-xs);
+  flex-shrink: 0;
+  transition:
+    background-color var(--tao-motion-duration-fast) var(--tao-motion-ease-out),
+    border-color var(--tao-motion-duration-fast) var(--tao-motion-ease-out);
+}
+
+[data-tao-table-filter-check][data-tao-checked] {
+  background: var(--tao-primary);
+  border-color: var(--tao-primary);
+  color: var(--tao-primary-fg);
+}
+
+[data-tao-table-filter-reset] {
+  margin-top: var(--tao-padding-xxs);
+  padding: var(--tao-padding-xxs) var(--tao-padding-xs);
+  border: none;
+  background: transparent;
+  color: var(--tao-primary);
+  font-size: var(--tao-font-size-xs);
+  cursor: pointer;
+  text-align: left;
+  border-top: var(--tao-line-width) solid var(--tao-color-border-secondary);
+  font-family: inherit;
+}
+
+[data-tao-table-filter-reset]:hover {
+  color: var(--tao-primary-hover);
+}
+
+/* ===========================
+   Body rows
+   =========================== */
+[data-tao-table-row]:hover [data-tao-table-cell] {
+  background: var(--tao-color-fill-quaternary);
+}
+
+[data-tao-table-row][data-tao-selected] [data-tao-table-cell] {
+  background: var(--tao-primary-bg);
+}
+
+[data-tao-table-row][data-tao-selected]:hover [data-tao-table-cell] {
+  background: var(--tao-primary-bg-hover);
+}
+
+/* ===========================
+   Selection column
+   =========================== */
+[data-tao-table-selection-cell] {
+  text-align: center;
+  width: 48px;
+}
+
+[data-tao-table-checkbox] {
+  cursor: pointer;
+  accent-color: var(--tao-primary);
+}
+
+/* ===========================
+   Fixed columns (sticky)
+   =========================== */
+[data-tao-table-cell][data-tao-fixed] {
+  position: sticky;
+  z-index: 1;
+}
+
+[data-tao-table-thead] [data-tao-table-cell][data-tao-fixed] {
+  z-index: 3;
+}
+
+/* Shadow indicators */
+[data-tao-table-wrapper][data-tao-scroll-state="middle"] [data-tao-fixed="left"]::after,
+[data-tao-table-wrapper][data-tao-scroll-state="right"] [data-tao-fixed="left"]::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: -6px;
+  bottom: 0;
+  width: 6px;
+  background: linear-gradient(to right, oklch(0 0 0 / 0.04), transparent);
+  pointer-events: none;
+}
+
+[data-tao-table-wrapper][data-tao-scroll-state="middle"] [data-tao-fixed="right"]::before,
+[data-tao-table-wrapper][data-tao-scroll-state="left"] [data-tao-fixed="right"]::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -6px;
+  bottom: 0;
+  width: 6px;
+  background: linear-gradient(to left, oklch(0 0 0 / 0.04), transparent);
+  pointer-events: none;
+}
+
+/* ===========================
+   Empty state
+   =========================== */
+[data-tao-table-empty] {
+  text-align: center;
+  padding: var(--tao-padding-xl) var(--tao-padding);
+  color: var(--tao-color-text-tertiary);
+}
+
+/* ===========================
+   Loading overlay
+   =========================== */
+[data-tao-table-loading] {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in oklch, var(--tao-color-bg-container) 65%, transparent);
+  z-index: 5;
+  border-radius: var(--tao-radius-md);
+}
+
+@keyframes tao-spin {
+  to { transform: rotate(360deg); }
+}
+
+[data-tao-table-spinner] {
+  animation: tao-spin 0.8s linear infinite;
+  color: var(--tao-primary);
+}
+
+/* ===========================
+   Bordered variant
+   =========================== */
+[data-tao-table-wrapper][data-tao-bordered] [data-tao-table] {
+  border: var(--tao-line-width) solid var(--tao-color-border-secondary);
+  border-radius: var(--tao-radius-md);
+}
+
+[data-tao-table-wrapper][data-tao-bordered] [data-tao-table-cell] {
+  border-right: var(--tao-line-width) solid var(--tao-color-border-secondary);
+}
+
+[data-tao-table-wrapper][data-tao-bordered] tr > [data-tao-table-cell]:last-child {
+  border-right: none;
+}
+
+/* ===========================
+   Sizes
+   =========================== */
+[data-tao-table-wrapper][data-tao-size="small"] [data-tao-table-cell] {
+  padding: var(--tao-padding-xxs) var(--tao-padding-xs);
+  font-size: var(--tao-font-size-sm);
+}
+
+[data-tao-table-wrapper][data-tao-size="medium"] [data-tao-table-cell] {
+  padding: var(--tao-padding-sm) var(--tao-padding);
+  font-size: var(--tao-font-size-base);
+}
+
+[data-tao-table-wrapper][data-tao-size="large"] [data-tao-table-cell] {
+  padding: var(--tao-padding) var(--tao-padding-md);
+  font-size: var(--tao-font-size-base);
+}
+
+/* ===========================
+   Pagination
+   =========================== */
+[data-tao-table-pagination] {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: var(--tao-padding);
+}

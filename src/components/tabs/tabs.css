@@ -1,0 +1,148 @@
+@import '../../theme/theme.css';
+
+/* ===========================
+   Tabs Container
+   =========================== */
+[data-tao-tabs] {
+  font-family: var(--tao-font-family);
+  color: var(--tao-color-text);
+}
+
+/* ===========================
+   Nav (border-bottom for line variant)
+   =========================== */
+[data-tao-tabs][data-tao-variant="line"] [data-tao-tabs-nav] {
+  border-bottom: var(--tao-line-width) solid var(--tao-color-border-secondary);
+}
+
+/* ===========================
+   Tab List
+   =========================== */
+[data-tao-tabs-list] {
+  display: flex;
+  position: relative;
+}
+
+/* ===========================
+   Tab Button (shared)
+   =========================== */
+[data-tao-tab] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  color: var(--tao-color-text-secondary);
+  outline: none;
+  white-space: nowrap;
+  transition:
+    color var(--tao-motion-duration-fast) var(--tao-motion-ease-out),
+    background-color var(--tao-motion-duration-fast) var(--tao-motion-ease-out);
+}
+
+[data-tao-tab]:hover:not(:disabled) {
+  color: var(--tao-color-text);
+}
+
+[data-tao-tab][data-tao-active] {
+  color: var(--tao-primary);
+  font-weight: var(--tao-font-weight-medium);
+}
+
+[data-tao-tab]:disabled {
+  color: var(--tao-color-text-disabled);
+  cursor: not-allowed;
+}
+
+[data-tao-tab]:focus-visible {
+  box-shadow: 0 0 0 2px var(--tao-control-outline);
+  border-radius: var(--tao-radius-sm);
+}
+
+/* ===========================
+   Line Variant — Sizes
+   =========================== */
+[data-tao-tabs][data-tao-variant="line"] [data-tao-tab] {
+  padding: var(--tao-padding-xs) 0;
+  margin-inline-end: var(--tao-padding-lg);
+}
+
+[data-tao-tabs][data-tao-variant="line"][data-tao-size="small"] [data-tao-tab] {
+  font-size: var(--tao-font-size-sm);
+  padding: var(--tao-padding-xxs) 0;
+  margin-inline-end: var(--tao-padding);
+}
+
+[data-tao-tabs][data-tao-variant="line"][data-tao-size="medium"] [data-tao-tab] {
+  font-size: var(--tao-font-size-base);
+}
+
+[data-tao-tabs][data-tao-variant="line"][data-tao-size="large"] [data-tao-tab] {
+  font-size: var(--tao-font-size-lg);
+  padding: var(--tao-padding-sm) 0;
+}
+
+/* ===========================
+   Ink Bar
+   =========================== */
+[data-tao-tabs-ink] {
+  position: absolute;
+  bottom: 0;
+  height: 2px;
+  background: var(--tao-primary);
+  border-radius: var(--tao-radius-full);
+  transition:
+    left var(--tao-motion-duration-mid) var(--tao-motion-ease-out-quint),
+    width var(--tao-motion-duration-mid) var(--tao-motion-ease-out-quint);
+}
+
+/* ===========================
+   Card Variant
+   =========================== */
+[data-tao-tabs][data-tao-variant="card"] [data-tao-tabs-list] {
+  gap: var(--tao-padding-xxs);
+  background: var(--tao-color-fill-quaternary);
+  border-radius: var(--tao-radius-md);
+  padding: var(--tao-padding-xxs);
+}
+
+[data-tao-tabs][data-tao-variant="card"] [data-tao-tab] {
+  border-radius: var(--tao-radius-sm);
+}
+
+[data-tao-tabs][data-tao-variant="card"][data-tao-size="small"] [data-tao-tab] {
+  font-size: var(--tao-font-size-sm);
+  padding: var(--tao-padding-xxs) var(--tao-padding-xs);
+}
+
+[data-tao-tabs][data-tao-variant="card"][data-tao-size="medium"] [data-tao-tab] {
+  font-size: var(--tao-font-size-base);
+  padding: var(--tao-padding-xxs) var(--tao-padding-sm);
+}
+
+[data-tao-tabs][data-tao-variant="card"][data-tao-size="large"] [data-tao-tab] {
+  font-size: var(--tao-font-size-lg);
+  padding: var(--tao-padding-xs) var(--tao-padding);
+}
+
+[data-tao-tabs][data-tao-variant="card"] [data-tao-tab]:hover:not(:disabled):not([data-tao-active]) {
+  background: var(--tao-color-fill-tertiary);
+}
+
+[data-tao-tabs][data-tao-variant="card"] [data-tao-tab][data-tao-active] {
+  background: var(--tao-color-bg-container);
+  box-shadow: var(--tao-box-shadow-tertiary);
+}
+
+/* ===========================
+   Tab Panel
+   =========================== */
+[data-tao-tabs-panel] {
+  padding-top: var(--tao-padding);
+}
+
+[data-tao-tabs-panel][hidden] {
+  display: none;
+}
