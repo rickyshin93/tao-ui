@@ -1,4 +1,4 @@
-@import './theme.css';
+@import "./theme.css";
 
 /*
  * Shared interaction states for all form controls (Input, Select)
@@ -49,7 +49,9 @@
 }
 
 /* Outlined: hover */
-[data-tao-control][data-tao-variant="outlined"]:hover:not([data-disabled]):not(:focus-within):not([data-state="open"]) {
+[data-tao-control][data-tao-variant="outlined"]:hover:not([data-disabled]):not(
+  :focus-within
+):not([data-state="open"]) {
   border-color: var(--tao-primary-hover);
 }
 
@@ -67,7 +69,9 @@
 }
 
 /* Outlined: error + hover */
-[data-tao-control][data-tao-variant="outlined"][data-tao-error]:hover:not([data-disabled]):not(:focus-within) {
+[data-tao-control][data-tao-variant="outlined"][data-tao-error]:hover:not(
+  [data-disabled]
+):not(:focus-within) {
   border-color: var(--tao-error-hover);
 }
 
@@ -76,6 +80,25 @@
 [data-tao-control][data-tao-variant="outlined"][data-tao-error][data-state="open"] {
   border-color: var(--tao-error);
   box-shadow: 0 0 0 2px var(--tao-color-error-outline);
+}
+
+/* Outlined: warning */
+[data-tao-control][data-tao-variant="outlined"][data-tao-warning] {
+  border-color: var(--tao-warning);
+}
+
+/* Outlined: warning + hover */
+[data-tao-control][data-tao-variant="outlined"][data-tao-warning]:hover:not(
+  [data-disabled]
+):not(:focus-within) {
+  border-color: color-mix(in oklch, var(--tao-color-warning) 80%, white);
+}
+
+/* Outlined: warning + focus */
+[data-tao-control][data-tao-variant="outlined"][data-tao-warning]:focus-within,
+[data-tao-control][data-tao-variant="outlined"][data-tao-warning][data-state="open"] {
+  border-color: var(--tao-warning);
+  box-shadow: 0 0 0 2px var(--tao-color-warning-outline);
 }
 
 /* Outlined: disabled */
@@ -97,7 +120,9 @@
 }
 
 /* Filled: hover */
-[data-tao-control][data-tao-variant="filled"]:hover:not([data-disabled]):not(:focus-within):not([data-state="open"]) {
+[data-tao-control][data-tao-variant="filled"]:hover:not([data-disabled]):not(
+  :focus-within
+):not([data-state="open"]) {
   background: var(--tao-color-fill-secondary);
 }
 
@@ -116,8 +141,14 @@
 }
 
 /* Filled: error + hover */
-[data-tao-control][data-tao-variant="filled"][data-tao-error]:hover:not([data-disabled]):not(:focus-within) {
-  background: color-mix(in oklch, var(--tao-color-error) 10%, var(--tao-color-bg-base));
+[data-tao-control][data-tao-variant="filled"][data-tao-error]:hover:not(
+  [data-disabled]
+):not(:focus-within) {
+  background: color-mix(
+    in oklch,
+    var(--tao-color-error) 10%,
+    var(--tao-color-bg-base)
+  );
 }
 
 /* Filled: error + focus */
@@ -126,6 +157,30 @@
   background: var(--tao-color-bg-container);
   border-color: var(--tao-error);
   box-shadow: 0 0 0 2px var(--tao-color-error-outline);
+}
+
+/* Filled: warning */
+[data-tao-control][data-tao-variant="filled"][data-tao-warning] {
+  background: var(--tao-warning-bg);
+}
+
+/* Filled: warning + hover */
+[data-tao-control][data-tao-variant="filled"][data-tao-warning]:hover:not(
+  [data-disabled]
+):not(:focus-within) {
+  background: color-mix(
+    in oklch,
+    var(--tao-color-warning) 10%,
+    var(--tao-color-bg-base)
+  );
+}
+
+/* Filled: warning + focus */
+[data-tao-control][data-tao-variant="filled"][data-tao-warning]:focus-within,
+[data-tao-control][data-tao-variant="filled"][data-tao-warning][data-state="open"] {
+  background: var(--tao-color-bg-container);
+  border-color: var(--tao-warning);
+  box-shadow: 0 0 0 2px var(--tao-color-warning-outline);
 }
 
 /* Filled: disabled */

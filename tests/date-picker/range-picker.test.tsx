@@ -11,9 +11,7 @@ test('renders with placeholder', () => {
 });
 
 test('displays formatted range values', () => {
-  render(
-    <RangePicker value={[dayjs('2026-06-01'), dayjs('2026-06-15')]} />,
-  );
+  render(<RangePicker value={[dayjs('2026-06-01'), dayjs('2026-06-15')]} />);
   expect(screen.getByText('2026-06-01')).toBeTruthy();
   expect(screen.getByText('2026-06-15')).toBeTruthy();
 });
@@ -37,7 +35,9 @@ test('clear button resets range', async () => {
     <RangePicker
       value={[dayjs('2026-06-01'), dayjs('2026-06-15')]}
       allowClear
-      onChange={(d) => { if (d === null) cleared = true; }}
+      onChange={(d) => {
+        if (d === null) cleared = true;
+      }}
     />,
   );
   const trigger = container.querySelector('[data-tao-range-trigger]')!;
@@ -50,7 +50,10 @@ test('presets render in range picker', async () => {
   render(
     <RangePicker
       presets={[
-        { label: 'This week', value: [dayjs().startOf('week'), dayjs().endOf('week')] },
+        {
+          label: 'This week',
+          value: [dayjs().startOf('week'), dayjs().endOf('week')],
+        },
       ]}
     />,
   );

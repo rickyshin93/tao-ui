@@ -1,6 +1,6 @@
 import * as RC from '@radix-ui/react-context-menu';
 import type { CSSProperties, ReactNode } from 'react';
-import { useTaoConfig } from '../../provider/tao-provider';
+import { TaoPortalScope, useTaoConfig } from '../../provider/tao-provider';
 import {
   cx,
   type SemanticClassNames,
@@ -67,15 +67,17 @@ export function ContextMenu({
         {children}
       </RC.Trigger>
       <RC.Portal>
-        <RC.Content
-          data-tao-menu-content=""
-          data-tao-context-menu=""
-          data-tao-size={size}
-          className={cx(classNames?.content, className)}
-          style={{ ...styles?.content, ...style }}
-        >
-          {content}
-        </RC.Content>
+        <TaoPortalScope>
+          <RC.Content
+            data-tao-menu-content=""
+            data-tao-context-menu=""
+            data-tao-size={size}
+            className={cx(classNames?.content, className)}
+            style={{ ...styles?.content, ...style }}
+          >
+            {content}
+          </RC.Content>
+        </TaoPortalScope>
       </RC.Portal>
     </RC.Root>
   );

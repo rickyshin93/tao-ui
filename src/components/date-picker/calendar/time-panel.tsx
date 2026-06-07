@@ -11,22 +11,41 @@ interface TimePanelProps {
   scrollKey?: number;
 }
 
-export function TimePanel({ hour, minute, second, onChange, config, scrollKey }: TimePanelProps) {
+export function TimePanel({
+  hour,
+  minute,
+  second,
+  onChange,
+  config,
+  scrollKey,
+}: TimePanelProps) {
   const hourStep = config?.hourStep ?? 1;
   const minuteStep = config?.minuteStep ?? 1;
   const secondStep = config?.secondStep ?? 1;
 
-  const hours = useMemo(() =>
-    Array.from({ length: Math.ceil(24 / hourStep) }, (_, i) => i * hourStep),
-  [hourStep]);
+  const hours = useMemo(
+    () =>
+      Array.from({ length: Math.ceil(24 / hourStep) }, (_, i) => i * hourStep),
+    [hourStep],
+  );
 
-  const minutes = useMemo(() =>
-    Array.from({ length: Math.ceil(60 / minuteStep) }, (_, i) => i * minuteStep),
-  [minuteStep]);
+  const minutes = useMemo(
+    () =>
+      Array.from(
+        { length: Math.ceil(60 / minuteStep) },
+        (_, i) => i * minuteStep,
+      ),
+    [minuteStep],
+  );
 
-  const seconds = useMemo(() =>
-    Array.from({ length: Math.ceil(60 / secondStep) }, (_, i) => i * secondStep),
-  [secondStep]);
+  const seconds = useMemo(
+    () =>
+      Array.from(
+        { length: Math.ceil(60 / secondStep) },
+        (_, i) => i * secondStep,
+      ),
+    [secondStep],
+  );
 
   return (
     <div data-tao-time-panel="">
@@ -63,7 +82,13 @@ interface TimeColumnProps {
   scrollKey?: number;
 }
 
-function TimeColumn({ values, selected, onSelect, label, scrollKey }: TimeColumnProps) {
+function TimeColumn({
+  values,
+  selected,
+  onSelect,
+  label,
+  scrollKey,
+}: TimeColumnProps) {
   const listRef = useRef<HTMLDivElement>(null);
 
   const scrollToSelected = useCallback(() => {
@@ -91,7 +116,8 @@ function TimeColumn({ values, selected, onSelect, label, scrollKey }: TimeColumn
       <div
         data-tao-time-column-list=""
         ref={(el) => {
-          (listRef as React.MutableRefObject<HTMLDivElement | null>).current = el;
+          (listRef as React.MutableRefObject<HTMLDivElement | null>).current =
+            el;
           initRef(el);
         }}
       >

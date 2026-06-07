@@ -1,10 +1,5 @@
+import { FormField, Radio, RadioGroup, Stack } from '@rockshin/tao-ui';
 import type { Meta, StoryObj } from '@storybook/react';
-import {
-  Radio,
-  RadioGroup,
-  FormField,
-  Stack,
-} from '@rockshin/tao-ui';
 
 const meta: Meta = {
   title: '数据录入 Data Entry/Radio',
@@ -14,9 +9,13 @@ export default meta;
 export const Basic: StoryObj = {
   render: () => (
     <Stack direction="horizontal" gap="lg">
-      <Radio value="a" checked onChange={() => {}}>Selected</Radio>
+      <Radio value="a" checked onChange={() => {}}>
+        Selected
+      </Radio>
       <Radio value="b">Unselected</Radio>
-      <Radio value="c" disabled>Disabled</Radio>
+      <Radio value="c" disabled>
+        Disabled
+      </Radio>
     </Stack>
   ),
 };

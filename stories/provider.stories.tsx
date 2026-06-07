@@ -1,11 +1,5 @@
+import { Button, FormField, Input, Stack, TaoProvider } from '@rockshin/tao-ui';
 import type { Meta, StoryObj } from '@storybook/react';
-import {
-  TaoProvider,
-  Button,
-  Input,
-  FormField,
-  Stack,
-} from '@rockshin/tao-ui';
 
 const meta: Meta = {
   title: '配置 Config/TaoProvider',
@@ -18,21 +12,27 @@ export const GlobalSize: StoryObj = {
     <Stack gap="lg">
       <TaoProvider size="small">
         <Stack direction="horizontal" gap="sm" align="center">
-          <span style={{ fontSize: 12, color: '#888', minWidth: 60 }}>small</span>
+          <span style={{ fontSize: 12, color: '#888', minWidth: 60 }}>
+            small
+          </span>
           <Button>Button</Button>
           <Input placeholder="Input" style={{ width: 160 }} />
         </Stack>
       </TaoProvider>
       <TaoProvider size="medium">
         <Stack direction="horizontal" gap="sm" align="center">
-          <span style={{ fontSize: 12, color: '#888', minWidth: 60 }}>medium</span>
+          <span style={{ fontSize: 12, color: '#888', minWidth: 60 }}>
+            medium
+          </span>
           <Button>Button</Button>
           <Input placeholder="Input" style={{ width: 160 }} />
         </Stack>
       </TaoProvider>
       <TaoProvider size="large">
         <Stack direction="horizontal" gap="sm" align="center">
-          <span style={{ fontSize: 12, color: '#888', minWidth: 60 }}>large</span>
+          <span style={{ fontSize: 12, color: '#888', minWidth: 60 }}>
+            large
+          </span>
           <Button>Button</Button>
           <Input placeholder="Input" style={{ width: 160 }} />
         </Stack>

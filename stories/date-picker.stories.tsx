@@ -1,13 +1,8 @@
-import { useState } from 'react';
+import { DatePicker, FormField, RangePicker, Stack } from '@rockshin/tao-ui';
 import type { Meta, StoryObj } from '@storybook/react';
-import dayjs from 'dayjs';
 import type { Dayjs } from 'dayjs';
-import {
-  DatePicker,
-  FormField,
-  RangePicker,
-  Stack,
-} from '@rockshin/tao-ui';
+import dayjs from 'dayjs';
+import { useState } from 'react';
 
 const meta: Meta = {
   title: '数据录入 Data Entry/DatePicker',
@@ -70,11 +65,7 @@ export const WithTime: StoryObj = {
       return (
         <Stack gap="md" style={{ maxWidth: 300 }}>
           <FormField label="Date & Time">
-            <DatePicker
-              value={val}
-              onChange={(d) => setVal(d)}
-              showTime
-            />
+            <DatePicker value={val} onChange={(d) => setVal(d)} showTime />
           </FormField>
           <p style={{ fontSize: 13, color: '#888' }}>
             Value: {val ? val.format('YYYY-MM-DD HH:mm:ss') : 'none'}
@@ -147,13 +138,11 @@ export const RangePickerBasic: StoryObj = {
       return (
         <Stack gap="md" style={{ maxWidth: 500 }}>
           <FormField label="Date Range">
-            <RangePicker
-              value={val}
-              onChange={(d) => setVal(d)}
-            />
+            <RangePicker value={val} onChange={(d) => setVal(d)} />
           </FormField>
           <p style={{ fontSize: 13, color: '#888' }}>
-            Range: {val?.[0]?.format('YYYY-MM-DD') ?? '?'} ~ {val?.[1]?.format('YYYY-MM-DD') ?? '?'}
+            Range: {val?.[0]?.format('YYYY-MM-DD') ?? '?'} ~{' '}
+            {val?.[1]?.format('YYYY-MM-DD') ?? '?'}
           </p>
         </Stack>
       );
@@ -174,10 +163,22 @@ export const RangePickerPresets: StoryObj = {
               value={val}
               onChange={(d) => setVal(d)}
               presets={[
-                { label: 'This week', value: [dayjs().startOf('week'), dayjs().endOf('week')] },
-                { label: 'This month', value: [dayjs().startOf('month'), dayjs().endOf('month')] },
-                { label: 'Last 7 days', value: [dayjs().subtract(7, 'day'), dayjs()] },
-                { label: 'Last 30 days', value: [dayjs().subtract(30, 'day'), dayjs()] },
+                {
+                  label: 'This week',
+                  value: [dayjs().startOf('week'), dayjs().endOf('week')],
+                },
+                {
+                  label: 'This month',
+                  value: [dayjs().startOf('month'), dayjs().endOf('month')],
+                },
+                {
+                  label: 'Last 7 days',
+                  value: [dayjs().subtract(7, 'day'), dayjs()],
+                },
+                {
+                  label: 'Last 30 days',
+                  value: [dayjs().subtract(30, 'day'), dayjs()],
+                },
               ]}
             />
           </FormField>

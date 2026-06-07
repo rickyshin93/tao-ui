@@ -6,14 +6,27 @@ import {
   useRef,
   useState,
 } from 'react';
-import { type TaoSize, type TaoVariant, useTaoConfig } from '../../provider/tao-provider';
-import { cx, type SemanticClassNames, type SemanticStyles } from '../../utils/semantic';
+import {
+  type TaoSize,
+  type TaoVariant,
+  useTaoConfig,
+} from '../../provider/tao-provider';
+import {
+  cx,
+  type SemanticClassNames,
+  type SemanticStyles,
+} from '../../utils/semantic';
 import { Pagination } from '../pagination/pagination';
 import './table.css';
 
 // ---- Types ----
 
-export type TableSemanticPart = 'root' | 'header.cell' | 'body.row' | 'body.cell' | 'pagination';
+export type TableSemanticPart =
+  | 'root'
+  | 'header.cell'
+  | 'body.row'
+  | 'body.cell'
+  | 'pagination';
 
 export type SortOrder = 'ascend' | 'descend' | null;
 
@@ -107,7 +120,10 @@ export interface TableProps<T = any> {
 
 // ---- Helpers ----
 
-function getRowKey<T>(record: T, rowKey: string | ((record: T) => React.Key)): React.Key {
+function getRowKey<T>(
+  record: T,
+  rowKey: string | ((record: T) => React.Key),
+): React.Key {
   if (typeof rowKey === 'function') return rowKey(record);
   return (record as any)[rowKey];
 }
@@ -161,9 +177,28 @@ function FilterIcon({ active }: { active: boolean }) {
 function LoadingSpinner() {
   return (
     <div data-tao-table-loading="">
-      <svg data-tao-table-spinner="" width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden>
-        <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2.5" opacity="0.2" />
-        <path d="M12 2a10 10 0 019.8 8" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
+      <svg
+        data-tao-table-spinner=""
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        aria-hidden
+      >
+        <circle
+          cx="12"
+          cy="12"
+          r="10"
+          stroke="currentColor"
+          strokeWidth="2.5"
+          opacity="0.2"
+        />
+        <path
+          d="M12 2a10 10 0 019.8 8"
+          stroke="currentColor"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+        />
       </svg>
     </div>
   );
@@ -172,7 +207,13 @@ function LoadingSpinner() {
 function CheckIcon() {
   return (
     <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden>
-      <path d="M2.5 6L5 8.5L9.5 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      <path
+        d="M2.5 6L5 8.5L9.5 3.5"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   );
 }
@@ -225,7 +266,11 @@ function FilterDropdown({
           {filters.map((f) => {
             const checked = activeValues.includes(f.value);
             return (
-              <label key={f.value} data-tao-table-filter-option="" onClick={() => toggle(f.value)}>
+              <label
+                key={f.value}
+                data-tao-table-filter-option=""
+                onClick={() => toggle(f.value)}
+              >
                 <span
                   data-tao-table-filter-check=""
                   data-tao-checked={checked || undefined}
@@ -280,32 +325,42 @@ export function Table<T = any>({
   // outlined variant draws the full border; `bordered` prop still works for
   // other variants, but borderless stays frame-free.
   const showBorder =
-    resolvedVariant === 'outlined' || (bordered && resolvedVariant !== 'borderless');
+    resolvedVariant === 'outlined' ||
+    (bordered && resolvedVariant !== 'borderless');
 
   // ---- Sort state ----
   const defaultSortCol = columns.find((c) => c.defaultSortOrder);
   const [sortKey, setSortKey] = useState<string | null>(
-    defaultSortCol ? getColKey(defaultSortCol, columns.indexOf(defaultSortCol)) : null,
+    defaultSortCol
+      ? getColKey(defaultSortCol, columns.indexOf(defaultSortCol))
+      : null,
   );
-  const [sortOrder, setSortOrder] = useState<SortOrder>(defaultSortCol?.defaultSortOrder ?? null);
+  const [sortOrder, setSortOrder] = useState<SortOrder>(
+    defaultSortCol?.defaultSortOrder ?? null,
+  );
 
   // ---- Filter state ----
-  const [filterValues, setFilterValues] = useState<Record<string, string[]>>(() => {
-    const init: Record<string, string[]> = {};
-    for (let i = 0; i < columns.length; i++) {
-      const col = columns[i];
-      if (col.filters) {
-        const key = getColKey(col, i);
-        init[key] = col.filteredValue ?? [];
+  const [filterValues, setFilterValues] = useState<Record<string, string[]>>(
+    () => {
+      const init: Record<string, string[]> = {};
+      for (let i = 0; i < columns.length; i++) {
+        const col = columns[i];
+        if (col.filters) {
+          const key = getColKey(col, i);
+          init[key] = col.filteredValue ?? [];
+        }
       }
-    }
-    return init;
-  });
+      return init;
+    },
+  );
 
   // ---- Pagination state ----
   const hasPagination = paginationProp !== false;
-  const paginationConfig = paginationProp === false ? undefined : paginationProp;
-  const [internalPage, setInternalPage] = useState(paginationConfig?.defaultCurrent ?? 1);
+  const paginationConfig =
+    paginationProp === false ? undefined : paginationProp;
+  const [internalPage, setInternalPage] = useState(
+    paginationConfig?.defaultCurrent ?? 1,
+  );
   const [internalPageSize, setInternalPageSize] = useState(
     paginationConfig?.defaultPageSize ?? paginationConfig?.pageSize ?? 10,
   );
@@ -367,7 +422,13 @@ export function Table<T = any>({
     (colKey: string, col: TableColumn<T>) => {
       // Controlled sort — do nothing internally
       if (col.sortOrder !== undefined) {
-        triggerChange(currentPage, pageSize, colKey, nextSortOrder(col.sortOrder), filterValues);
+        triggerChange(
+          currentPage,
+          pageSize,
+          colKey,
+          nextSortOrder(col.sortOrder),
+          filterValues,
+        );
         return;
       }
       const next = sortKey === colKey ? nextSortOrder(sortOrder) : 'ascend';
@@ -422,13 +483,23 @@ export function Table<T = any>({
     // Apply client-side sort
     const activeSortCol = columns.find((col, i) => {
       const key = getColKey(col, i);
-      const order = col.sortOrder !== undefined ? col.sortOrder : (sortKey === key ? sortOrder : null);
+      const order =
+        col.sortOrder !== undefined
+          ? col.sortOrder
+          : sortKey === key
+            ? sortOrder
+            : null;
       return order !== null && typeof col.sorter === 'function';
     });
     if (activeSortCol && typeof activeSortCol.sorter === 'function') {
       const colIdx = columns.indexOf(activeSortCol);
       const key = getColKey(activeSortCol, colIdx);
-      const order = activeSortCol.sortOrder !== undefined ? activeSortCol.sortOrder : (sortKey === key ? sortOrder : null);
+      const order =
+        activeSortCol.sortOrder !== undefined
+          ? activeSortCol.sortOrder
+          : sortKey === key
+            ? sortOrder
+            : null;
       const sorterFn = activeSortCol.sorter as (a: T, b: T) => number;
       data.sort((a, b) => {
         const result = sorterFn(a, b);
@@ -465,7 +536,9 @@ export function Table<T = any>({
           ? selectedKeys.filter((k) => k !== key)
           : [...selectedKeys, key];
       }
-      const nextRows = dataSource.filter((r) => nextKeys.includes(getRowKey(r, rowKey)));
+      const nextRows = dataSource.filter((r) =>
+        nextKeys.includes(getRowKey(r, rowKey)),
+      );
       rowSelection.onChange(nextKeys, nextRows);
     },
     [rowSelection, selectionType, selectedKeys, dataSource, rowKey],
@@ -481,7 +554,9 @@ export function Table<T = any>({
             return !props?.disabled;
           })
           .map((r) => getRowKey(r, rowKey));
-        const nextRows = dataSource.filter((r) => allKeys.includes(getRowKey(r, rowKey)));
+        const nextRows = dataSource.filter((r) =>
+          allKeys.includes(getRowKey(r, rowKey)),
+        );
         rowSelection.onChange(allKeys, nextRows);
       } else {
         rowSelection.onChange([], []);
@@ -492,7 +567,9 @@ export function Table<T = any>({
 
   // ---- Scroll + sticky columns ----
   const scrollRef = useRef<HTMLDivElement>(null);
-  const [scrollState, setScrollState] = useState<'left' | 'middle' | 'right' | 'both'>('left');
+  const [scrollState, setScrollState] = useState<
+    'left' | 'middle' | 'right' | 'both'
+  >('left');
 
   const handleScroll = useCallback(() => {
     const el = scrollRef.current;
@@ -541,7 +618,7 @@ export function Table<T = any>({
     for (const col of allColumns) {
       if (col.fixed === 'left') {
         positions[col._key] = { left: leftOffset };
-        leftOffset += (typeof col.width === 'number' ? col.width : 0);
+        leftOffset += typeof col.width === 'number' ? col.width : 0;
       }
     }
 
@@ -551,7 +628,7 @@ export function Table<T = any>({
       const col = allColumns[i];
       if (col.fixed === 'right') {
         positions[col._key] = { right: rightOffset };
-        rightOffset += (typeof col.width === 'number' ? col.width : 0);
+        rightOffset += typeof col.width === 'number' ? col.width : 0;
       }
     }
 
@@ -559,7 +636,10 @@ export function Table<T = any>({
   }, [allColumns, scroll?.x]);
 
   // ---- Resolve sort order for a column ----
-  const getResolvedSortOrder = (col: TableColumn<T>, colKey: string): SortOrder => {
+  const getResolvedSortOrder = (
+    col: TableColumn<T>,
+    colKey: string,
+  ): SortOrder => {
     if (col.sortOrder !== undefined) return col.sortOrder;
     return sortKey === colKey ? sortOrder : null;
   };
@@ -605,7 +685,11 @@ export function Table<T = any>({
                   style={{
                     width: selectionColWidth,
                     ...(stickyPositions.__selection__
-                      ? { position: 'sticky', left: stickyPositions.__selection__.left, zIndex: 2 }
+                      ? {
+                          position: 'sticky',
+                          left: stickyPositions.__selection__.left,
+                          zIndex: 2,
+                        }
                       : {}),
                   }}
                 >
@@ -613,7 +697,9 @@ export function Table<T = any>({
                     <input
                       type="checkbox"
                       checked={isAllSelected}
-                      ref={(el) => { if (el) el.indeterminate = isIndeterminate; }}
+                      ref={(el) => {
+                        if (el) el.indeterminate = isIndeterminate;
+                      }}
                       onChange={(e) => handleSelectAll(e.target.checked)}
                       data-tao-table-checkbox=""
                     />
@@ -626,7 +712,8 @@ export function Table<T = any>({
                 const hasFilter = !!(col.filters && col.filters.length > 0);
                 const resolvedOrder = getResolvedSortOrder(col, colKey);
                 const controlledFilterValues = col.filteredValue;
-                const activeFilterValues = controlledFilterValues ?? filterValues[colKey] ?? [];
+                const activeFilterValues =
+                  controlledFilterValues ?? filterValues[colKey] ?? [];
                 const stickyPos = stickyPositions[colKey];
                 const isFixed = !!col.fixed && !!scroll?.x;
 
@@ -643,8 +730,12 @@ export function Table<T = any>({
                       ...(isFixed && stickyPos
                         ? {
                             position: 'sticky',
-                            ...(stickyPos.left !== undefined ? { left: stickyPos.left } : {}),
-                            ...(stickyPos.right !== undefined ? { right: stickyPos.right } : {}),
+                            ...(stickyPos.left !== undefined
+                              ? { left: stickyPos.left }
+                              : {}),
+                            ...(stickyPos.right !== undefined
+                              ? { right: stickyPos.right }
+                              : {}),
                             zIndex: 2,
                           }
                         : {}),
@@ -655,12 +746,19 @@ export function Table<T = any>({
                       <span
                         data-tao-table-header-title=""
                         data-tao-sortable={hasSorter || undefined}
-                        onClick={hasSorter ? () => handleSort(colKey, col) : undefined}
+                        onClick={
+                          hasSorter ? () => handleSort(colKey, col) : undefined
+                        }
                         role={hasSorter ? 'button' : undefined}
                         tabIndex={hasSorter ? 0 : undefined}
                         onKeyDown={
                           hasSorter
-                            ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleSort(colKey, col); } }
+                            ? (e) => {
+                                if (e.key === 'Enter' || e.key === ' ') {
+                                  e.preventDefault();
+                                  handleSort(colKey, col);
+                                }
+                              }
                             : undefined
                         }
                       >
@@ -712,12 +810,18 @@ export function Table<T = any>({
                         data-tao-fixed="left"
                         style={{
                           ...(stickyPositions.__selection__
-                            ? { position: 'sticky', left: stickyPositions.__selection__.left, zIndex: 1 }
+                            ? {
+                                position: 'sticky',
+                                left: stickyPositions.__selection__.left,
+                                zIndex: 1,
+                              }
                             : {}),
                         }}
                       >
                         <input
-                          type={selectionType === 'radio' ? 'radio' : 'checkbox'}
+                          type={
+                            selectionType === 'radio' ? 'radio' : 'checkbox'
+                          }
                           checked={isSelected}
                           disabled={checkboxProps?.disabled}
                           onChange={() => handleSelectRow(key, record)}
@@ -743,15 +847,21 @@ export function Table<T = any>({
                             ...(isFixed && stickyPos
                               ? {
                                   position: 'sticky',
-                                  ...(stickyPos.left !== undefined ? { left: stickyPos.left } : {}),
-                                  ...(stickyPos.right !== undefined ? { right: stickyPos.right } : {}),
+                                  ...(stickyPos.left !== undefined
+                                    ? { left: stickyPos.left }
+                                    : {}),
+                                  ...(stickyPos.right !== undefined
+                                    ? { right: stickyPos.right }
+                                    : {}),
                                   zIndex: 1,
                                 }
                               : {}),
                             ...styles?.['body.cell'],
                           }}
                         >
-                          {col.render ? col.render(value, record, rowIdx) : value}
+                          {col.render
+                            ? col.render(value, record, rowIdx)
+                            : value}
                         </td>
                       );
                     })}
@@ -764,7 +874,11 @@ export function Table<T = any>({
       </div>
 
       {hasPagination && totalForPagination > 0 && (
-        <div data-tao-table-pagination="" className={classNames?.pagination} style={styles?.pagination}>
+        <div
+          data-tao-table-pagination=""
+          className={classNames?.pagination}
+          style={styles?.pagination}
+        >
           <Pagination
             current={currentPage}
             pageSize={pageSize}

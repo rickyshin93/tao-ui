@@ -7,12 +7,20 @@ import {
   useRef,
   useState,
 } from 'react';
-import { cx, type SemanticClassNames, type SemanticStyles } from '../../utils/semantic';
+import {
+  cx,
+  type SemanticClassNames,
+  type SemanticStyles,
+} from '../../utils/semantic';
 import './scroll-area.css';
 
 // ---- Types ----
 
-export type ScrollAreaSemanticPart = 'root' | 'viewport' | 'scrollbar' | 'thumb';
+export type ScrollAreaSemanticPart =
+  | 'root'
+  | 'viewport'
+  | 'scrollbar'
+  | 'thumb';
 
 export type ScrollAreaType = 'auto' | 'always' | 'hover' | 'scroll';
 
@@ -69,10 +77,10 @@ export function ScrollArea({
   const [scrollState, setScrollState] = useState({
     hasVertical: false,
     hasHorizontal: false,
-    thumbYRatio: 0,    // thumb height as fraction of track
-    thumbXRatio: 0,    // thumb width as fraction of track
-    thumbYOffset: 0,   // thumb top position as fraction
-    thumbXOffset: 0,   // thumb left position as fraction
+    thumbYRatio: 0, // thumb height as fraction of track
+    thumbXRatio: 0, // thumb width as fraction of track
+    thumbYOffset: 0, // thumb top position as fraction
+    thumbXOffset: 0, // thumb left position as fraction
     atTop: true,
     atBottom: true,
     atLeft: true,
@@ -84,9 +92,12 @@ export function ScrollArea({
     if (!el) return;
 
     const {
-      scrollTop, scrollLeft,
-      scrollHeight, scrollWidth,
-      clientHeight, clientWidth,
+      scrollTop,
+      scrollLeft,
+      scrollHeight,
+      scrollWidth,
+      clientHeight,
+      clientWidth,
     } = el;
 
     const hasV = scrollHeight > clientHeight + 1;
@@ -130,7 +141,8 @@ export function ScrollArea({
       if (onScrollEnd) {
         const el = e.currentTarget;
         const { scrollTop, scrollHeight, clientHeight } = el;
-        const nearBottom = scrollTop + clientHeight >= scrollHeight - scrollEndThreshold;
+        const nearBottom =
+          scrollTop + clientHeight >= scrollHeight - scrollEndThreshold;
         if (nearBottom && !firedScrollEnd.current) {
           firedScrollEnd.current = true;
           onScrollEnd();
@@ -143,7 +155,11 @@ export function ScrollArea({
   );
 
   // ---- Thumb drag ----
-  const dragging = useRef<{ axis: 'x' | 'y'; startPos: number; startScroll: number } | null>(null);
+  const dragging = useRef<{
+    axis: 'x' | 'y';
+    startPos: number;
+    startScroll: number;
+  } | null>(null);
 
   const handleThumbPointerDown = useCallback(
     (axis: 'x' | 'y', e: React.PointerEvent) => {
@@ -187,12 +203,14 @@ export function ScrollArea({
       const el = viewportRef.current;
       if (!el) return;
       // Don't handle if click was on thumb
-      if ((e.target as HTMLElement).hasAttribute('data-tao-scroll-thumb')) return;
+      if ((e.target as HTMLElement).hasAttribute('data-tao-scroll-thumb'))
+        return;
 
       const rect = e.currentTarget.getBoundingClientRect();
-      const clickPos = axis === 'y'
-        ? (e.clientY - rect.top) / rect.height
-        : (e.clientX - rect.left) / rect.width;
+      const clickPos =
+        axis === 'y'
+          ? (e.clientY - rect.top) / rect.height
+          : (e.clientX - rect.left) / rect.width;
 
       if (axis === 'y') {
         el.scrollTop = clickPos * (el.scrollHeight - el.clientHeight);
@@ -245,14 +263,26 @@ export function ScrollArea({
       {/* Scroll shadows */}
       {scrollShadow && showVertical && (
         <>
-          <div data-tao-scroll-shadow="top" data-tao-visible={!scrollState.atTop || undefined} />
-          <div data-tao-scroll-shadow="bottom" data-tao-visible={!scrollState.atBottom || undefined} />
+          <div
+            data-tao-scroll-shadow="top"
+            data-tao-visible={!scrollState.atTop || undefined}
+          />
+          <div
+            data-tao-scroll-shadow="bottom"
+            data-tao-visible={!scrollState.atBottom || undefined}
+          />
         </>
       )}
       {scrollShadow && showHorizontal && (
         <>
-          <div data-tao-scroll-shadow="left" data-tao-visible={!scrollState.atLeft || undefined} />
-          <div data-tao-scroll-shadow="right" data-tao-visible={!scrollState.atRight || undefined} />
+          <div
+            data-tao-scroll-shadow="left"
+            data-tao-visible={!scrollState.atLeft || undefined}
+          />
+          <div
+            data-tao-scroll-shadow="right"
+            data-tao-visible={!scrollState.atRight || undefined}
+          />
         </>
       )}
 

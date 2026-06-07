@@ -7,7 +7,11 @@ import {
   useRef,
   useState,
 } from 'react';
-import { type TaoSize, useTaoConfig } from '../../provider/tao-provider';
+import {
+  TaoPortalScope,
+  type TaoSize,
+  useTaoConfig,
+} from '../../provider/tao-provider';
 import {
   cx,
   type SemanticClassNames,
@@ -215,22 +219,24 @@ export function Dropdown(props: DropdownProps) {
         {triggerChild}
       </RD.Trigger>
       <RD.Portal>
-        <RD.Content
-          data-tao-menu-content=""
-          data-tao-dropdown=""
-          data-tao-size={size}
-          className={cx(classNames?.content, className)}
-          style={{ ...styles?.content, ...style }}
-          side={side}
-          align={align}
-          sideOffset={4}
-          {...hoverProps}
-        >
-          {arrow && (
-            <RD.Arrow data-tao-dropdown-arrow="" width={12} height={6} />
-          )}
-          {content}
-        </RD.Content>
+        <TaoPortalScope>
+          <RD.Content
+            data-tao-menu-content=""
+            data-tao-dropdown=""
+            data-tao-size={size}
+            className={cx(classNames?.content, className)}
+            style={{ ...styles?.content, ...style }}
+            side={side}
+            align={align}
+            sideOffset={4}
+            {...hoverProps}
+          >
+            {arrow && (
+              <RD.Arrow data-tao-dropdown-arrow="" width={12} height={6} />
+            )}
+            {content}
+          </RD.Content>
+        </TaoPortalScope>
       </RD.Portal>
     </RD.Root>
   );

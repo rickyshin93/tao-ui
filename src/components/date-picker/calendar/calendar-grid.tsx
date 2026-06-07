@@ -57,7 +57,10 @@ export function CalendarGrid({
 
   const isInRange = (date: Dayjs): boolean => {
     if (!effectiveRange) return false;
-    return date.isAfter(effectiveRange[0], 'day') && date.isBefore(effectiveRange[1], 'day');
+    return (
+      date.isAfter(effectiveRange[0], 'day') &&
+      date.isBefore(effectiveRange[1], 'day')
+    );
   };
 
   const isRangeStart = (date: Dayjs): boolean => {
@@ -75,7 +78,9 @@ export function CalendarGrid({
       <thead>
         <tr>
           {WEEKDAYS.map((d) => (
-            <th key={d} data-tao-calendar-weekday="">{d}</th>
+            <th key={d} data-tao-calendar-weekday="">
+              {d}
+            </th>
           ))}
         </tr>
       </thead>
@@ -85,7 +90,8 @@ export function CalendarGrid({
             {week.map((date) => {
               const isOtherMonth = date.month() !== currentMonth;
               const disabled = isDisabled(date);
-              const isSelected = !isRangeMode && value && date.isSame(value, 'day');
+              const isSelected =
+                !isRangeMode && value && date.isSame(value, 'day');
               const isToday = date.isSame(today, 'day');
               // Range states only apply to current month cells
               const inRange = !isOtherMonth && isInRange(date);
@@ -103,7 +109,9 @@ export function CalendarGrid({
                   data-tao-in-range={inRange || undefined}
                   data-tao-range-start={rStart || undefined}
                   data-tao-range-end={rEnd || undefined}
-                  onClick={() => { if (!disabled) onSelect(date); }}
+                  onClick={() => {
+                    if (!disabled) onSelect(date);
+                  }}
                   onMouseEnter={() => onHover?.(date)}
                   onMouseLeave={() => onHover?.(null)}
                 >

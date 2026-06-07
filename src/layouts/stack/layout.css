@@ -1,4 +1,4 @@
-@import '../../theme/theme.css';
+@import "../../theme/theme.css";
 
 /* ===========================
    Stack
@@ -16,15 +16,29 @@
 }
 
 /* Gap */
-[data-tao-stack][data-tao-gap="sm"] { gap: var(--tao-padding-xs); }
-[data-tao-stack][data-tao-gap="md"] { gap: var(--tao-padding); }
-[data-tao-stack][data-tao-gap="lg"] { gap: var(--tao-padding-lg); }
+[data-tao-stack][data-tao-gap="sm"] {
+  gap: var(--tao-padding-xs);
+}
+[data-tao-stack][data-tao-gap="md"] {
+  gap: var(--tao-padding);
+}
+[data-tao-stack][data-tao-gap="lg"] {
+  gap: var(--tao-padding-lg);
+}
 
 /* Align */
-[data-tao-stack][data-tao-align="start"]   { align-items: flex-start; }
-[data-tao-stack][data-tao-align="center"]  { align-items: center; }
-[data-tao-stack][data-tao-align="end"]     { align-items: flex-end; }
-[data-tao-stack][data-tao-align="stretch"] { align-items: stretch; }
+[data-tao-stack][data-tao-align="start"] {
+  align-items: flex-start;
+}
+[data-tao-stack][data-tao-align="center"] {
+  align-items: center;
+}
+[data-tao-stack][data-tao-align="end"] {
+  align-items: flex-end;
+}
+[data-tao-stack][data-tao-align="stretch"] {
+  align-items: stretch;
+}
 
 /* ===========================
    FormLayout

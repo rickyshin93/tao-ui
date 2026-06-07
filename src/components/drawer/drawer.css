@@ -6,7 +6,7 @@
 [data-tao-drawer-overlay] {
   position: fixed;
   inset: 0;
-  z-index: 999;
+  z-index: var(--tao-z-index-drawer);
   background: oklch(0 0 0 / 0.1);
   animation: tao-fade-in var(--tao-motion-duration-mid) ease-out;
 }
@@ -38,7 +38,7 @@
    =========================== */
 [data-tao-drawer] {
   position: fixed;
-  z-index: 1000;
+  z-index: calc(var(--tao-z-index-drawer) + 1);
   background: var(--tao-color-bg-elevated);
   box-shadow: var(--tao-box-shadow-secondary);
   display: flex;
@@ -211,10 +211,18 @@ button[data-tao-drawer-close]:focus-visible {
 }
 
 [data-tao-drawer-dragger]:hover {
-  background-color: color-mix(in oklch, var(--tao-color-primary) 20%, transparent);
+  background-color: color-mix(
+    in oklch,
+    var(--tao-color-primary) 20%,
+    transparent
+  );
 }
 [data-tao-drawer-dragger]:active {
-  background-color: color-mix(in oklch, var(--tao-color-primary) 30%, transparent);
+  background-color: color-mix(
+    in oklch,
+    var(--tao-color-primary) 30%,
+    transparent
+  );
 }
 
 [data-tao-drawer-dragger][data-tao-placement="right"],

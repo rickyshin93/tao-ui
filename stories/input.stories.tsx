@@ -1,5 +1,5 @@
+import { FormField, Input, Stack } from '@rockshin/tao-ui';
 import type { Meta, StoryObj } from '@storybook/react';
-import { Input, Stack, FormField } from '@rockshin/tao-ui';
 
 const meta: Meta = {
   title: '数据录入 Data Entry/Input',

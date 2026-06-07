@@ -1,4 +1,4 @@
-@import '../../theme/theme.css';
+@import "../../theme/theme.css";
 
 /* ===========================
    Tabs Container
@@ -73,7 +73,8 @@
   margin-inline-end: var(--tao-padding);
 }
 
-[data-tao-tabs][data-tao-variant="line"][data-tao-size="medium"] [data-tao-tab] {
+[data-tao-tabs][data-tao-variant="line"][data-tao-size="medium"]
+  [data-tao-tab] {
   font-size: var(--tao-font-size-base);
 }
 
@@ -115,7 +116,8 @@
   padding: var(--tao-padding-xxs) var(--tao-padding-xs);
 }
 
-[data-tao-tabs][data-tao-variant="card"][data-tao-size="medium"] [data-tao-tab] {
+[data-tao-tabs][data-tao-variant="card"][data-tao-size="medium"]
+  [data-tao-tab] {
   font-size: var(--tao-font-size-base);
   padding: var(--tao-padding-xxs) var(--tao-padding-sm);
 }
@@ -125,7 +127,8 @@
   padding: var(--tao-padding-xs) var(--tao-padding);
 }
 
-[data-tao-tabs][data-tao-variant="card"] [data-tao-tab]:hover:not(:disabled):not([data-tao-active]) {
+[data-tao-tabs][data-tao-variant="card"]
+  [data-tao-tab]:hover:not(:disabled):not([data-tao-active]) {
   background: var(--tao-color-fill-tertiary);
 }
 

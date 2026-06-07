@@ -1,7 +1,20 @@
 import type { Dayjs } from 'dayjs';
 import { getMonths } from './use-calendar';
 
-const MONTH_LABELS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const MONTH_LABELS = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
+];
 
 interface MonthGridProps {
   viewDate: Dayjs;
@@ -10,13 +23,19 @@ interface MonthGridProps {
   disabledDate?: (date: Dayjs) => boolean;
 }
 
-export function MonthGrid({ viewDate, value, onSelect, disabledDate }: MonthGridProps) {
+export function MonthGrid({
+  viewDate,
+  value,
+  onSelect,
+  disabledDate,
+}: MonthGridProps) {
   const months = getMonths(viewDate.year());
 
   return (
     <div data-tao-month-grid="">
       {months.map((m, i) => {
-        const isSelected = value && value.month() === i && value.year() === viewDate.year();
+        const isSelected =
+          value && value.month() === i && value.year() === viewDate.year();
         const disabled = disabledDate?.(m) ?? false;
         return (
           <button

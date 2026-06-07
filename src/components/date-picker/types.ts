@@ -42,7 +42,10 @@ export interface SharedPickerProps {
   onOpenChange?: (open: boolean) => void;
 }
 
-export function getDefaultFormat(picker: PickerMode, showTime?: boolean | TimeConfig): string {
+export function getDefaultFormat(
+  picker: PickerMode,
+  showTime?: boolean | TimeConfig,
+): string {
   if (picker === 'year') return 'YYYY';
   if (picker === 'month') return 'YYYY-MM';
   if (showTime) return 'YYYY-MM-DD HH:mm:ss';

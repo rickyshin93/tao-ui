@@ -41,7 +41,9 @@ test('selecting a date triggers onChange', async () => {
   const { container } = render(
     <DatePicker
       value={dayjs('2026-06-15')}
-      onChange={(_, str) => { result = str; }}
+      onChange={(_, str) => {
+        result = str;
+      }}
     />,
   );
   await userEvent.click(container.querySelector('[data-tao-picker-trigger]')!);
@@ -51,7 +53,9 @@ test('selecting a date triggers onChange', async () => {
 });
 
 test('allowClear shows clear button on hover', async () => {
-  const { container } = render(<DatePicker value={dayjs('2026-06-15')} allowClear />);
+  const { container } = render(
+    <DatePicker value={dayjs('2026-06-15')} allowClear />,
+  );
   const trigger = container.querySelector('[data-tao-picker-trigger]')!;
   await userEvent.hover(trigger);
   expect(screen.getByLabelText('Clear')).toBeTruthy();
@@ -63,7 +67,9 @@ test('clear button resets value', async () => {
     <DatePicker
       value={dayjs('2026-06-15')}
       allowClear
-      onChange={(d) => { if (d === null) cleared = true; }}
+      onChange={(d) => {
+        if (d === null) cleared = true;
+      }}
     />,
   );
   const trigger = container.querySelector('[data-tao-picker-trigger]')!;

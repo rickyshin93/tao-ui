@@ -81,3 +81,38 @@
 - **正确做法**: 派生链是 `--tao-color-bg-base: oklch(0.985 0.004 70)`（**暖 off-white，非纯白**）→ `bg-container` 和 `bg-elevated` 历史上都 `= bg-base`。所以所有浮层(modal/drawer/select/date-picker 弹层)、控件表面(checkbox/radio 框、table 固定列、filled focus 态)的"白"都带这层暖灰，在纯白宿主上会显米色。2026-06-07 已把 `bg-container`/`bg-elevated` 改为纯白 `oklch(1 0 0)`，而 `bg-base` 保留作所有 color-mix 推导底（text/fill/border 调性不变，类比 antd colorBgContainer 默认 #fff）
 - **适用场景**: 跨系统集成"白底发灰/不融入"的根因在 bg-base；浮层不能改 transparent(会透穿)，只能定 surface 色或让宿主覆盖 colorBgBase。内联控件(input)才用 transparent 融入宿主
 
+
+## [架构] Portal 组件逃逸 TaoProvider 作用域 → 丢失主题 token
+- **日期**: 2026-06-07
+- **错误假设**: 以为组件 CSS 写了 `var(--tao-color-*)` 就能消费自定义主题
+- **真实行为**: 自定义 token 由 TaoProvider 以 inline style 注入到 `<div data-tao-provider>` 上。Modal/Drawer/Select/DatePicker/Dropdown/ContextMenu 用 Radix Portal 渲染到 `document.body`，DOM 上脱离了 provider 子树 → 只拿到 `:root` 默认值，自定义主题失效
+- **正确做法**: TaoConfigContext 增加 merged `tokenStyle`（累积所有祖先 provider 的 vars），导出 `TaoPortalScope`，在每个 Portal 内层包一个 `<div data-tao-provider style={tokenStyle}>` 重建 token 作用域。Radix 定位用 floating-ui 基于 trigger 虚拟元素，与 DOM 父级无关，多包一层 div 不影响定位/focus trap
+- **适用场景**: 任何新增的 Portal/浮层组件，都要用 `TaoPortalScope` 包裹 portal 内容，否则自定义主题不生效
+
+## [架构] 浮层 z-index 必须高于 Modal/Drawer
+- **日期**: 2026-06-07
+- **错误假设**: 浮层和 Modal 都用 z-index 1000 没问题
+- **真实行为**: Modal wrap 1001 > Select dropdown 1000 → Modal 里的 Select 下拉被遮住看不见
+- **正确做法**: theme.css 定义 z-index 层级变量：`--tao-z-index-modal/drawer: 1000`，`--tao-z-index-popup: 1100`。Modal/Drawer overlay 用 modal/drawer 变量，content 用 `calc(+1)`；所有浮层（select-content/picker-dropdown/menu-content）用 `--tao-z-index-popup`，保证嵌在 Modal 里也在上层
+- **适用场景**: 新增浮层组件的 dropdown/popup content z-index 一律用 `var(--tao-z-index-popup)`
+
+## [测试] Radix Select 桌面下拉在 happy-dom 不展开
+- **日期**: 2026-06-07
+- **错误假设**: 以为能在 rstest 里 click trigger 打开 Radix Select 下拉、断言 option/分组/placement
+- **真实行为**: Radix Select(position="popper") 依赖 DOM 测量/pointer，在 happy-dom 里点击 trigger 不会渲染出 Content。select 既有测试也全程回避桌面展开
+- **正确做法**: 开合相关行为（onChange 拿到 option、分组渲染、选中回调）用 `mobile` 分支测（真实 DOM 的 Drawer + div 可点击）；trigger 上可观察的 props（status data 属性、defaultValue/labelRender 显示、suffixIcon、classNames 合并、hover 出 clear）在桌面关闭态直接断言
+- **适用场景**: 给 Select / 其他 Radix Popover-类浮层组件写测试时
+
+## [样式] Select trigger flex 布局：`> span:first-of-type` hack 会抢 prefix 的 flex
+- **日期**: 2026-06-07
+- **错误假设**: 以为 trigger 里只有 `[data-tao-select-value]{flex:1}` 控制布局
+- **真实行为**: select.css 有个 Radix-Value 时代的遗留 hack `[data-tao-select] > span:first-of-type { flex:1 }`。重构后 trigger 总是显式渲染 value span，但有 `prefix` 时 first span 变成 prefix → 这个 hack 把 flex:1 给了 prefix，prefix 撑大把 placeholder/文字挤到右边贴着 loading/箭头，看起来「位置偏移」
+- **正确做法**: 删掉 `> span:first-of-type` hack，只靠显式的 `[data-tao-select-value]{flex:1}`。value-icon/prefix 用各自的 flex:0 0 auto
+- **适用场景**: 改 Select trigger 内部布局时；新增 trigger 子元素（prefix/suffix/icon）务必检查是否被这类 first-of-type/nth 选择器误伤
+
+## [验证] happy-dom 不算布局，用 headless Chrome 截图验 CSS 定位
+- **日期**: 2026-06-07
+- **错误假设**: 以为靠读 CSS + happy-dom 测试能判断 flex/定位类视觉 bug
+- **真实行为**: rstest 用 happy-dom，不计算 flex/宽度/位置，定位类问题测不出来；项目也没装 playwright/puppeteer
+- **正确做法**: 用系统自带 Chrome 截图实测：拼一个最小 HTML，`@import url("file://.../dist/theme/theme.css" + control.css + 组件.css)`，照着真实 DOM（可用一个 throw outerHTML 的临时测试 dump 出来）写 markup，`"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless --disable-gpu --screenshot=out.png --window-size=W,H --default-background-color=FFFFFFFF page.html`，再 Read 图。注意 theme.css 里的 `@import 'tailwindcss'` 会 404 但不影响 CSS 变量加载
+- **适用场景**: 任何位置/对齐/尺寸类视觉 bug，不要靠猜，截图实测

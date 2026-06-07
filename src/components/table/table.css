@@ -1,4 +1,4 @@
-@import '../../theme/theme.css';
+@import "../../theme/theme.css";
 
 /* ===========================
    Table Wrapper
@@ -67,7 +67,8 @@
   text-align: left;
   border-bottom: var(--tao-line-width) solid var(--tao-color-border-secondary);
   background: var(--tao-table-cell-bg);
-  transition: background-color var(--tao-motion-duration-fast) var(--tao-motion-ease-out);
+  transition: background-color var(--tao-motion-duration-fast)
+    var(--tao-motion-ease-out);
 }
 
 /* Alignment */
@@ -182,7 +183,8 @@
   cursor: pointer;
   font-size: var(--tao-font-size-sm);
   color: var(--tao-color-text);
-  transition: background-color var(--tao-motion-duration-fast) var(--tao-motion-ease-out);
+  transition: background-color var(--tao-motion-duration-fast)
+    var(--tao-motion-ease-out);
 }
 
 [data-tao-table-filter-option]:hover {
@@ -270,9 +272,11 @@
 }
 
 /* Shadow indicators */
-[data-tao-table-wrapper][data-tao-scroll-state="middle"] [data-tao-fixed="left"]::after,
-[data-tao-table-wrapper][data-tao-scroll-state="right"] [data-tao-fixed="left"]::after {
-  content: '';
+[data-tao-table-wrapper][data-tao-scroll-state="middle"]
+  [data-tao-fixed="left"]::after,
+[data-tao-table-wrapper][data-tao-scroll-state="right"]
+  [data-tao-fixed="left"]::after {
+  content: "";
   position: absolute;
   top: 0;
   right: -6px;
@@ -282,9 +286,11 @@
   pointer-events: none;
 }
 
-[data-tao-table-wrapper][data-tao-scroll-state="middle"] [data-tao-fixed="right"]::before,
-[data-tao-table-wrapper][data-tao-scroll-state="left"] [data-tao-fixed="right"]::before {
-  content: '';
+[data-tao-table-wrapper][data-tao-scroll-state="middle"]
+  [data-tao-fixed="right"]::before,
+[data-tao-table-wrapper][data-tao-scroll-state="left"]
+  [data-tao-fixed="right"]::before {
+  content: "";
   position: absolute;
   top: 0;
   left: -6px;
@@ -312,13 +318,19 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: color-mix(in oklch, var(--tao-color-bg-container) 65%, transparent);
+  background: color-mix(
+    in oklch,
+    var(--tao-color-bg-container) 65%,
+    transparent
+  );
   z-index: 5;
   border-radius: var(--tao-radius-md);
 }
 
 @keyframes tao-spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 [data-tao-table-spinner] {
@@ -338,7 +350,9 @@
   border-right: var(--tao-line-width) solid var(--tao-color-border-secondary);
 }
 
-[data-tao-table-wrapper][data-tao-bordered] tr > [data-tao-table-cell]:last-child {
+[data-tao-table-wrapper][data-tao-bordered]
+  tr
+  > [data-tao-table-cell]:last-child {
   border-right: none;
 }
 

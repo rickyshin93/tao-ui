@@ -22,7 +22,9 @@ export function getCalendarWeeks(viewDate: Dayjs): Dayjs[][] {
  * Generate 12 months for a given year.
  */
 export function getMonths(year: number): Dayjs[] {
-  return Array.from({ length: 12 }, (_, i) => dayjs().year(year).month(i).startOf('month'));
+  return Array.from({ length: 12 }, (_, i) =>
+    dayjs().year(year).month(i).startOf('month'),
+  );
 }
 
 /**
@@ -32,6 +34,8 @@ export function getMonths(year: number): Dayjs[] {
 export function getYears(year: number): Dayjs[] {
   const decadeStart = Math.floor(year / 10) * 10;
   return Array.from({ length: 12 }, (_, i) =>
-    dayjs().year(decadeStart + i).startOf('year'),
+    dayjs()
+      .year(decadeStart + i)
+      .startOf('year'),
   );
 }

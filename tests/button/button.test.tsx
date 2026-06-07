@@ -58,7 +58,16 @@ test('inherits disabled from TaoProvider', () => {
 
 test('disabled prop prevents onClick', async () => {
   let clicked = false;
-  render(<Button disabled onClick={() => { clicked = true; }}>OK</Button>);
+  render(
+    <Button
+      disabled
+      onClick={() => {
+        clicked = true;
+      }}
+    >
+      OK
+    </Button>,
+  );
   await userEvent.click(screen.getByRole('button'));
   expect(clicked).toBe(false);
 });

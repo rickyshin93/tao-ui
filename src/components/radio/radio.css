@@ -1,4 +1,4 @@
-@import '../../theme/theme.css';
+@import "../../theme/theme.css";
 
 /* ===========================
    Radio Wrapper (label)
@@ -53,7 +53,7 @@
 
 /* Inner dot — via pseudo element */
 [data-tao-radio]::after {
-  content: '';
+  content: "";
   width: 8px;
   height: 8px;
   border-radius: var(--tao-radius-full);

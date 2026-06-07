@@ -1,7 +1,7 @@
 import { expect, test } from '@rstest/core';
 import { fireEvent, render, screen } from '@testing-library/react';
-import { TaoProvider } from '../../src/provider/tao-provider';
 import { Tabs } from '../../src/components/tabs/tabs';
+import { TaoProvider } from '../../src/provider/tao-provider';
 
 const items = [
   { key: 'a', label: 'Tab A', children: 'Content A' },
@@ -40,14 +40,28 @@ test('controlled activeKey', () => {
 
 test('onChange fires on tab click', () => {
   let selected = '';
-  render(<Tabs items={items} onChange={(k) => { selected = k; }} />);
+  render(
+    <Tabs
+      items={items}
+      onChange={(k) => {
+        selected = k;
+      }}
+    />,
+  );
   fireEvent.click(screen.getByRole('tab', { name: 'Tab B' }));
   expect(selected).toBe('b');
 });
 
 test('disabled tab not clickable', () => {
   let selected = '';
-  render(<Tabs items={items} onChange={(k) => { selected = k; }} />);
+  render(
+    <Tabs
+      items={items}
+      onChange={(k) => {
+        selected = k;
+      }}
+    />,
+  );
   fireEvent.click(screen.getByRole('tab', { name: 'Tab C' }));
   expect(selected).toBe('');
 });
@@ -82,7 +96,9 @@ test('inherits size from TaoProvider', () => {
       <Tabs items={items} />
     </TaoProvider>,
   );
-  const tabsEl = screen.getAllByRole('tab')[0].closest('[data-tao-tabs]') as HTMLElement;
+  const tabsEl = screen
+    .getAllByRole('tab')[0]
+    .closest('[data-tao-tabs]') as HTMLElement;
   expect(tabsEl.dataset.taoSize).toBe('large');
 });
 

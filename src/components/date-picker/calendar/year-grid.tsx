@@ -8,7 +8,12 @@ interface YearGridProps {
   disabledDate?: (date: Dayjs) => boolean;
 }
 
-export function YearGrid({ viewDate, value, onSelect, disabledDate }: YearGridProps) {
+export function YearGrid({
+  viewDate,
+  value,
+  onSelect,
+  disabledDate,
+}: YearGridProps) {
   const years = getYears(viewDate.year());
   const decadeStart = Math.floor(viewDate.year() / 10) * 10;
 

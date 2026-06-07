@@ -1,5 +1,5 @@
-@import '../../theme/theme.css';
-@import '../../theme/control.css';
+@import "../../theme/theme.css";
+@import "../../theme/control.css";
 
 /* ===========================
    Trigger (shared with Input/Select)
@@ -94,15 +94,22 @@ button[data-tao-picker-trigger][data-tao-size="large"] {
   border: var(--tao-line-width) solid var(--tao-color-border);
   border-radius: var(--tao-radius-lg);
   box-shadow: var(--tao-box-shadow-secondary);
-  z-index: 1000;
+  z-index: var(--tao-z-index-popup);
   overflow: hidden;
   width: auto;
-  animation: tao-picker-in var(--tao-motion-duration-fast) cubic-bezier(0.16, 1, 0.3, 1);
+  animation: tao-picker-in var(--tao-motion-duration-fast)
+    cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes tao-picker-in {
-  from { opacity: 0; transform: translateY(-4px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ===========================
@@ -138,7 +145,8 @@ button[data-tao-picker-trigger][data-tao-size="large"] {
 
 [data-tao-drawer] [data-tao-picker-time] {
   border-inline-start: none;
-  border-block-start: var(--tao-line-width) solid var(--tao-color-border-secondary);
+  border-block-start: var(--tao-line-width) solid
+    var(--tao-color-border-secondary);
   width: auto;
 }
 
@@ -263,7 +271,7 @@ button[data-tao-calendar-title-btn]:hover {
 
 /* ::before = range background strip (full cell width, half cell height) */
 [data-tao-calendar-cell]::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
@@ -291,7 +299,10 @@ button[data-tao-calendar-title-btn]:hover {
 }
 
 /* ---- Single select: hover ---- */
-[data-tao-calendar-cell]:not([data-tao-disabled]):not([data-tao-selected]):not([data-tao-range-start]):not([data-tao-range-end]):not([data-tao-in-range]):hover [data-tao-calendar-cell-inner] {
+[data-tao-calendar-cell]:not([data-tao-disabled]):not([data-tao-selected]):not(
+    [data-tao-range-start]
+  ):not([data-tao-range-end]):not([data-tao-in-range]):hover
+  [data-tao-calendar-cell-inner] {
   background: var(--tao-color-fill-tertiary);
 }
 
@@ -302,7 +313,10 @@ button[data-tao-calendar-title-btn]:hover {
 }
 
 /* ---- Today marker ---- */
-[data-tao-calendar-cell][data-tao-today]:not([data-tao-selected]):not([data-tao-range-start]):not([data-tao-range-end]) [data-tao-calendar-cell-inner] {
+[data-tao-calendar-cell][data-tao-today]:not([data-tao-selected]):not(
+    [data-tao-range-start]
+  ):not([data-tao-range-end])
+  [data-tao-calendar-cell-inner] {
   border: var(--tao-line-width) solid var(--tao-primary);
 }
 
@@ -351,9 +365,12 @@ button[data-tao-calendar-title-btn]:hover {
 }
 
 /* ---- Range: hover on in-range cells — no extra gray ---- */
-[data-tao-calendar-cell][data-tao-in-range]:hover [data-tao-calendar-cell-inner],
-[data-tao-calendar-cell][data-tao-range-start]:hover [data-tao-calendar-cell-inner],
-[data-tao-calendar-cell][data-tao-range-end]:hover [data-tao-calendar-cell-inner] {
+[data-tao-calendar-cell][data-tao-in-range]:hover
+  [data-tao-calendar-cell-inner],
+[data-tao-calendar-cell][data-tao-range-start]:hover
+  [data-tao-calendar-cell-inner],
+[data-tao-calendar-cell][data-tao-range-end]:hover
+  [data-tao-calendar-cell-inner] {
   /* Keep current state, no gray overlay */
 }
 
@@ -414,7 +431,8 @@ button[data-tao-year-cell]:disabled {
    Time Panel (right side in datetime mode)
    =========================== */
 [data-tao-picker-time] {
-  border-inline-start: var(--tao-line-width) solid var(--tao-color-border-secondary);
+  border-inline-start: var(--tao-line-width) solid
+    var(--tao-color-border-secondary);
   display: flex;
   flex-direction: column;
   width: 192px;
@@ -426,7 +444,8 @@ button[data-tao-year-cell]:disabled {
   color: var(--tao-color-text);
   text-align: center;
   padding: var(--tao-padding-xxs) var(--tao-padding-xs);
-  border-block-end: var(--tao-line-width) solid var(--tao-color-border-secondary);
+  border-block-end: var(--tao-line-width) solid
+    var(--tao-color-border-secondary);
   line-height: 28px;
 }
 
@@ -442,7 +461,8 @@ button[data-tao-year-cell]:disabled {
   display: flex;
   flex-direction: column;
   flex: 1;
-  border-inline-end: var(--tao-line-width) solid var(--tao-color-border-secondary);
+  border-inline-end: var(--tao-line-width) solid
+    var(--tao-color-border-secondary);
 }
 
 [data-tao-time-column]:last-child {
@@ -461,7 +481,8 @@ button[data-tao-year-cell]:disabled {
   color: var(--tao-color-text-tertiary);
   text-align: center;
   padding: 4px 0;
-  border-block-end: var(--tao-line-width) solid var(--tao-color-border-secondary);
+  border-block-end: var(--tao-line-width) solid
+    var(--tao-color-border-secondary);
   flex-shrink: 0;
 }
 
@@ -514,7 +535,8 @@ button[data-tao-time-cell][data-tao-selected] {
   flex-wrap: wrap;
   gap: var(--tao-padding-xxs);
   padding: var(--tao-padding-xs) 0;
-  border-block-start: var(--tao-line-width) solid var(--tao-color-border-secondary);
+  border-block-start: var(--tao-line-width) solid
+    var(--tao-color-border-secondary);
   margin-block-start: var(--tao-padding-xs);
 }
 
@@ -545,7 +567,8 @@ button[data-tao-preset-btn]:hover {
   justify-content: flex-end;
   gap: var(--tao-padding-xs);
   padding-block-start: var(--tao-padding-xs);
-  border-block-start: var(--tao-line-width) solid var(--tao-color-border-secondary);
+  border-block-start: var(--tao-line-width) solid
+    var(--tao-color-border-secondary);
   margin-block-start: var(--tao-padding-xs);
 }
 
@@ -687,7 +710,8 @@ button[data-tao-range-trigger][data-tao-size="large"] {
 
   [data-tao-picker-time] {
     border-inline-start: none;
-    border-block-start: var(--tao-line-width) solid var(--tao-color-border-secondary);
+    border-block-start: var(--tao-line-width) solid
+      var(--tao-color-border-secondary);
   }
 
   [data-tao-time-column-list] {
@@ -712,7 +736,8 @@ button[data-tao-range-trigger][data-tao-size="large"] {
     z-index: 2;
     background: var(--tao-color-bg-elevated);
     padding: var(--tao-padding-xs);
-    border-block-end: var(--tao-line-width) solid var(--tao-color-border-secondary);
+    border-block-end: var(--tao-line-width) solid
+      var(--tao-color-border-secondary);
     margin-block-end: 0;
   }
 

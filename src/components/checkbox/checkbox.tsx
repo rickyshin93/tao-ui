@@ -1,14 +1,18 @@
 import {
   type ChangeEvent,
-  type ReactNode,
   createContext,
+  type ReactNode,
   useCallback,
   useContext,
   useEffect,
   useRef,
 } from 'react';
 import { type TaoSize, useTaoConfig } from '../../provider/tao-provider';
-import { cx, type SemanticClassNames, type SemanticStyles } from '../../utils/semantic';
+import {
+  cx,
+  type SemanticClassNames,
+  type SemanticStyles,
+} from '../../utils/semantic';
 import './checkbox.css';
 
 export type CheckboxSemanticPart = 'root' | 'indicator' | 'label';
@@ -21,7 +25,9 @@ interface CheckboxGroupContextValue {
   onChange: (itemValue: string, checked: boolean) => void;
 }
 
-const CheckboxGroupContext = createContext<CheckboxGroupContextValue | null>(null);
+const CheckboxGroupContext = createContext<CheckboxGroupContextValue | null>(
+  null,
+);
 
 // ---- Checkbox ----
 
@@ -51,7 +57,8 @@ export function Checkbox({
   const groupCtx = useContext(CheckboxGroupContext);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const resolvedDisabled = disabled ?? groupCtx?.disabled ?? ctx.disabled ?? false;
+  const resolvedDisabled =
+    disabled ?? groupCtx?.disabled ?? ctx.disabled ?? false;
   const resolvedChecked = groupCtx
     ? groupCtx.value.includes(value ?? '')
     : checked;
@@ -99,14 +106,24 @@ export function Checkbox({
         {resolvedChecked && !indeterminate && <CheckIcon />}
         {indeterminate && <MinusIcon />}
       </span>
-      {children != null && <span data-tao-checkbox-label="" className={cx(classNames?.label)} style={styles?.label}>{children}</span>}
+      {children != null && (
+        <span
+          data-tao-checkbox-label=""
+          className={cx(classNames?.label)}
+          style={styles?.label}
+        >
+          {children}
+        </span>
+      )}
     </label>
   );
 }
 
 // ---- CheckboxGroup ----
 
-export type CheckboxOptionType = { label: ReactNode; value: string; disabled?: boolean } | string;
+export type CheckboxOptionType =
+  | { label: ReactNode; value: string; disabled?: boolean }
+  | string;
 
 export interface CheckboxGroupProps {
   options?: CheckboxOptionType[];
@@ -173,7 +190,17 @@ export function CheckboxGroup({
 
 function CheckIcon() {
   return (
-    <svg data-tao-checkbox-icon="" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      data-tao-checkbox-icon=""
+      width="12"
+      height="12"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="3"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <polyline points="20 6 9 17 4 12" />
     </svg>
   );
@@ -181,7 +208,16 @@ function CheckIcon() {
 
 function MinusIcon() {
   return (
-    <svg data-tao-checkbox-icon="" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round">
+    <svg
+      data-tao-checkbox-icon=""
+      width="12"
+      height="12"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="3"
+      strokeLinecap="round"
+    >
       <line x1="5" y1="12" x2="19" y2="12" />
     </svg>
   );

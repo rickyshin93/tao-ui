@@ -175,3 +175,241 @@ test('options without icon/description render unchanged', () => {
   expect(screen.getByText('Plain')).toBeTruthy();
   expect(document.querySelector('[data-tao-select-value-icon]')).toBeNull();
 });
+
+// ---- antd API alignment ----
+
+test('defaultValue shows the selected label (uncontrolled)', () => {
+  render(
+    <Select
+      options={[
+        { label: 'Alpha', value: 'a' },
+        { label: 'Beta', value: 'b' },
+      ]}
+      defaultValue="b"
+    />,
+  );
+  expect(screen.getByText('Beta')).toBeTruthy();
+});
+
+test('status sets data-tao-error / data-tao-warning on trigger', () => {
+  const { rerender } = render(<Select options={[]} status="error" />);
+  let trigger = screen.getByRole('combobox');
+  expect(trigger.hasAttribute('data-tao-error')).toBe(true);
+
+  rerender(<Select options={[]} status="warning" />);
+  trigger = screen.getByRole('combobox');
+  expect(trigger.hasAttribute('data-tao-warning')).toBe(true);
+});
+
+test('labelRender customizes the trigger label', () => {
+  render(
+    <Select
+      options={[{ label: 'Beta', value: 'b' }]}
+      value="b"
+      labelRender={(o) => `★ ${o.label}`}
+    />,
+  );
+  expect(screen.getByText('★ Beta')).toBeTruthy();
+});
+
+test('suffixIcon renders a custom suffix', () => {
+  render(
+    <Select options={[]} suffixIcon={<span data-testid="suffix">▼</span>} />,
+  );
+  expect(screen.getByTestId('suffix')).toBeTruthy();
+});
+
+test('loading occupies the single icon slot and replaces the suffix arrow', () => {
+  render(
+    <Select
+      options={[]}
+      loading
+      suffixIcon={<span data-testid="arrow">▼</span>}
+    />,
+  );
+  const icons = document.querySelector(
+    '[data-tao-select-icons]',
+  ) as HTMLElement;
+  // exactly one trailing slot, and it is the loading one (arrow not rendered)
+  expect(icons.children.length).toBe(1);
+  expect(document.querySelector('[data-tao-select-loading-slot]')).toBeTruthy();
+  expect(screen.queryByTestId('arrow')).toBeNull();
+});
+
+test('loading uses a custom loadingIcon when provided', () => {
+  render(
+    <Select
+      options={[]}
+      loading
+      loadingIcon={<span data-testid="ld">∞</span>}
+    />,
+  );
+  expect(screen.getByTestId('ld')).toBeTruthy();
+});
+
+test('custom suffixIcon is marked (no rotation); default is not', () => {
+  const { rerender } = render(
+    <Select options={[]} suffixIcon={<span>↕</span>} />,
+  );
+  let icon = document.querySelector('[data-tao-select-icon]') as HTMLElement;
+  expect(icon.hasAttribute('data-tao-custom-suffix')).toBe(true);
+
+  rerender(<Select options={[]} />);
+  icon = document.querySelector('[data-tao-select-icon]') as HTMLElement;
+  expect(icon.hasAttribute('data-tao-custom-suffix')).toBe(false);
+});
+
+test('allowClear object renders a custom clear icon on hover', async () => {
+  render(
+    <Select
+      options={[{ label: 'Beta', value: 'b' }]}
+      value="b"
+      allowClear={{ clearIcon: <span data-testid="clear">x</span> }}
+    />,
+  );
+  await userEvent.hover(screen.getByRole('combobox'));
+  expect(screen.getByTestId('clear')).toBeTruthy();
+});
+
+test('allowClear clears an uncontrolled value (trigger shows placeholder)', async () => {
+  render(
+    <Select
+      options={[
+        { label: 'Alpha', value: 'a' },
+        { label: 'Beta', value: 'b' },
+      ]}
+      defaultValue="b"
+      allowClear
+      placeholder="placeholder-text"
+    />,
+  );
+  const trigger = screen.getByRole('combobox');
+  const valueEl = trigger.querySelector('[data-tao-select-value]');
+  expect(valueEl?.textContent).toBe('Beta');
+
+  await userEvent.hover(trigger);
+  const clear = document.querySelector(
+    '[data-tao-select-clear]',
+  ) as HTMLElement;
+  await userEvent.click(clear);
+  expect(valueEl?.textContent).toBe('placeholder-text');
+});
+
+test('allowClear fires onChange("", undefined) and onClear', async () => {
+  let changed: [string, unknown] | null = null;
+  let cleared = false;
+  render(
+    <Select
+      options={[{ label: 'Beta', value: 'b' }]}
+      value="b"
+      allowClear
+      onChange={(v, o) => {
+        changed = [v, o];
+      }}
+      onClear={() => {
+        cleared = true;
+      }}
+    />,
+  );
+  await userEvent.hover(screen.getByRole('combobox'));
+  await userEvent.click(
+    document.querySelector('[data-tao-select-clear]') as HTMLElement,
+  );
+  expect(changed).toEqual(['', undefined]);
+  expect(cleared).toBe(true);
+});
+
+test('classNames.root and className merge onto the trigger', () => {
+  render(
+    <Select
+      options={[]}
+      className="from-className"
+      classNames={{ root: 'from-semantic' }}
+    />,
+  );
+  const trigger = screen.getByRole('combobox');
+  expect(trigger.classList.contains('from-className')).toBe(true);
+  expect(trigger.classList.contains('from-semantic')).toBe(true);
+});
+
+test('popupMatchSelectWidth=false sets the content data attr (closed has no content)', () => {
+  // Desktop dropdown does not open in the test DOM; just assert it renders
+  // without throwing when the prop is provided.
+  render(
+    <Select
+      options={[{ label: 'A', value: 'a' }]}
+      popupMatchSelectWidth={false}
+    />,
+  );
+  expect(screen.getByRole('combobox')).toBeTruthy();
+});
+
+test('mobile: onChange receives (value, option)', async () => {
+  let received: { value: string; label: unknown } | null = null;
+  render(
+    <Select
+      options={[
+        { label: 'Alpha', value: 'a' },
+        { label: 'Beta', value: 'b' },
+      ]}
+      onChange={(v, opt) => {
+        received = { value: v, label: opt?.label };
+      }}
+      mobile
+    />,
+  );
+  await userEvent.click(screen.getByRole('button'));
+  await userEvent.click(screen.getByText('Beta'));
+  expect(received).toEqual({ value: 'b', label: 'Beta' });
+});
+
+test('mobile: grouped options render group labels and nested items', async () => {
+  render(
+    <Select
+      options={[
+        {
+          label: 'Fruits',
+          value: 'fruits',
+          options: [
+            { label: 'Apple', value: 'apple' },
+            { label: 'Pear', value: 'pear' },
+          ],
+        },
+        {
+          label: 'Veggies',
+          value: 'veggies',
+          options: [{ label: 'Carrot', value: 'carrot' }],
+        },
+      ]}
+      placeholder="Pick"
+      mobile
+    />,
+  );
+  await userEvent.click(screen.getByRole('button'));
+  expect(screen.getByText('Fruits')).toBeTruthy();
+  expect(screen.getByText('Veggies')).toBeTruthy();
+  expect(screen.getByText('Apple')).toBeTruthy();
+  expect(screen.getByText('Carrot')).toBeTruthy();
+});
+
+test('mobile: selecting a grouped item reports its value', async () => {
+  let val = '';
+  render(
+    <Select
+      options={[
+        {
+          label: 'Fruits',
+          value: 'fruits',
+          options: [{ label: 'Apple', value: 'apple' }],
+        },
+      ]}
+      onChange={(v) => {
+        val = v;
+      }}
+      mobile
+    />,
+  );
+  await userEvent.click(screen.getByRole('button'));
+  await userEvent.click(screen.getByText('Apple'));
+  expect(val).toBe('apple');
+});

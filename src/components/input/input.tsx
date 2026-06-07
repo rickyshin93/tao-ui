@@ -1,6 +1,14 @@
 import type { InputHTMLAttributes, ReactNode } from 'react';
-import { type TaoSize, type TaoVariant, useTaoConfig } from '../../provider/tao-provider';
-import { cx, type SemanticClassNames, type SemanticStyles } from '../../utils/semantic';
+import {
+  type TaoSize,
+  type TaoVariant,
+  useTaoConfig,
+} from '../../provider/tao-provider';
+import {
+  cx,
+  type SemanticClassNames,
+  type SemanticStyles,
+} from '../../utils/semantic';
 import './input.css';
 
 export type InputSemanticPart = 'root' | 'input' | 'prefix' | 'suffix';

@@ -1,6 +1,10 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 import { type TaoSize, useTaoConfig } from '../../provider/tao-provider';
-import { cx, type SemanticClassNames, type SemanticStyles } from '../../utils/semantic';
+import {
+  cx,
+  type SemanticClassNames,
+  type SemanticStyles,
+} from '../../utils/semantic';
 import './button.css';
 
 export type ButtonSemanticPart = 'root';

@@ -13,7 +13,7 @@
   box-shadow: var(--tao-box-shadow-secondary);
   font-family: var(--tao-font-family);
   color: var(--tao-color-text);
-  z-index: 1000;
+  z-index: var(--tao-z-index-popup);
 
   animation-duration: var(--tao-motion-duration-fast);
   animation-timing-function: var(--tao-motion-ease-out-quint);

@@ -1,5 +1,5 @@
-import type { Meta, StoryObj } from '@storybook/react';
 import { Button, Stack, TaoProvider } from '@rockshin/tao-ui';
+import type { Meta, StoryObj } from '@storybook/react';
 
 const meta: Meta = {
   title: '通用 General/Button',
@@ -13,8 +13,12 @@ export const Variants: StoryObj = {
       <Button variant="secondary">Secondary</Button>
       <Button variant="ghost">Ghost</Button>
       <Button variant="destructive">Destructive</Button>
-      <Button variant="primary" disabled>Disabled</Button>
-      <Button variant="primary" loading>Loading</Button>
+      <Button variant="primary" disabled>
+        Disabled
+      </Button>
+      <Button variant="primary" loading>
+        Loading
+      </Button>
     </Stack>
   ),
 };

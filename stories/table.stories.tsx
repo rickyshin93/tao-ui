@@ -1,6 +1,11 @@
-import { useState } from 'react';
+import {
+  type SortOrder,
+  Stack,
+  Table,
+  type TableColumn,
+} from '@rockshin/tao-ui';
 import type { Meta, StoryObj } from '@storybook/react';
-import { Table, type TableColumn, type SortOrder, Stack } from '@rockshin/tao-ui';
+import { useState } from 'react';
 
 const meta: Meta = {
   title: '数据展示 Data Display/Table',
@@ -20,7 +25,9 @@ interface User {
 
 const users: User[] = Array.from({ length: 46 }, (_, i) => ({
   id: i + 1,
-  name: ['Alice', 'Bob', 'Charlie', 'Diana', 'Eve', 'Frank', 'Grace', 'Hank'][i % 8],
+  name: ['Alice', 'Bob', 'Charlie', 'Diana', 'Eve', 'Frank', 'Grace', 'Hank'][
+    i % 8
+  ],
   age: 22 + (i % 20),
   email: `user${i + 1}@example.com`,
   role: i % 3 === 0 ? 'admin' : i % 3 === 1 ? 'editor' : 'viewer',
@@ -38,9 +45,7 @@ const baseColumns: TableColumn<User>[] = [
 // ---- Stories ----
 
 export const Basic: StoryObj = {
-  render: () => (
-    <Table columns={baseColumns} dataSource={users} rowKey="id" />
-  ),
+  render: () => <Table columns={baseColumns} dataSource={users} rowKey="id" />,
 };
 
 export const Bordered: StoryObj = {
@@ -54,16 +59,40 @@ export const Variants: StoryObj = {
   render: () => (
     <Stack gap="xl">
       <div>
-        <p style={{ fontSize: 13, color: '#888', marginBottom: 8 }}>filled（默认 / 灰底表头）</p>
-        <Table columns={baseColumns} dataSource={users.slice(0, 4)} rowKey="id" variant="filled" pagination={false} />
+        <p style={{ fontSize: 13, color: '#888', marginBottom: 8 }}>
+          filled（默认 / 灰底表头）
+        </p>
+        <Table
+          columns={baseColumns}
+          dataSource={users.slice(0, 4)}
+          rowKey="id"
+          variant="filled"
+          pagination={false}
+        />
       </div>
       <div>
-        <p style={{ fontSize: 13, color: '#888', marginBottom: 8 }}>outlined（带外框 + 列分隔线）</p>
-        <Table columns={baseColumns} dataSource={users.slice(0, 4)} rowKey="id" variant="outlined" pagination={false} />
+        <p style={{ fontSize: 13, color: '#888', marginBottom: 8 }}>
+          outlined（带外框 + 列分隔线）
+        </p>
+        <Table
+          columns={baseColumns}
+          dataSource={users.slice(0, 4)}
+          rowKey="id"
+          variant="outlined"
+          pagination={false}
+        />
       </div>
       <div>
-        <p style={{ fontSize: 13, color: '#888', marginBottom: 8 }}>borderless（极简 / 无自带色）</p>
-        <Table columns={baseColumns} dataSource={users.slice(0, 4)} rowKey="id" variant="borderless" pagination={false} />
+        <p style={{ fontSize: 13, color: '#888', marginBottom: 8 }}>
+          borderless（极简 / 无自带色）
+        </p>
+        <Table
+          columns={baseColumns}
+          dataSource={users.slice(0, 4)}
+          rowKey="id"
+          variant="borderless"
+          pagination={false}
+        />
       </div>
     </Stack>
   ),
@@ -80,11 +109,45 @@ export const Minimal: StoryObj = {
       downloads: string;
     }
     const sounds: Sound[] = [
-      { id: 1, description: 'A single cute cat meow, playful and friendly. stylized game SFX, 0.4 seconds.', category: 'Animals › Cat Domestic', duration: '0.5s', downloads: '507' },
-      { id: 2, description: "Create a short, friendly 'pop' (thud) sound effect for a button click or window…", category: 'User Interface › Click', duration: '2s', downloads: '181' },
-      { id: 3, description: 'Cute magical pop sound of throwing stones into the swamp, then a short…', category: 'Designed › Ethereal', duration: '7.1s', downloads: '91' },
-      { id: 4, description: 'Short positive organic interface resolution chime, 1.5 to 2 seconds, gentle…', category: 'User Interface', duration: '1s', downloads: '596' },
-      { id: 5, description: 'high boom swoosh', category: 'Designed › Boom', duration: '4s', downloads: '1.8K' },
+      {
+        id: 1,
+        description:
+          'A single cute cat meow, playful and friendly. stylized game SFX, 0.4 seconds.',
+        category: 'Animals › Cat Domestic',
+        duration: '0.5s',
+        downloads: '507',
+      },
+      {
+        id: 2,
+        description:
+          "Create a short, friendly 'pop' (thud) sound effect for a button click or window…",
+        category: 'User Interface › Click',
+        duration: '2s',
+        downloads: '181',
+      },
+      {
+        id: 3,
+        description:
+          'Cute magical pop sound of throwing stones into the swamp, then a short…',
+        category: 'Designed › Ethereal',
+        duration: '7.1s',
+        downloads: '91',
+      },
+      {
+        id: 4,
+        description:
+          'Short positive organic interface resolution chime, 1.5 to 2 seconds, gentle…',
+        category: 'User Interface',
+        duration: '1s',
+        downloads: '596',
+      },
+      {
+        id: 5,
+        description: 'high boom swoosh',
+        category: 'Designed › Boom',
+        duration: '4s',
+        downloads: '1.8K',
+      },
     ];
     const columns: TableColumn<Sound>[] = [
       {
@@ -93,15 +156,35 @@ export const Minimal: StoryObj = {
         title: 'Description',
         render: (_v, record) => (
           <div>
-            <div style={{ color: 'var(--tao-color-text)' }}>{record.description}</div>
-            <div style={{ color: 'var(--tao-color-text-tertiary)', fontSize: 13, marginTop: 2 }}>
+            <div style={{ color: 'var(--tao-color-text)' }}>
+              {record.description}
+            </div>
+            <div
+              style={{
+                color: 'var(--tao-color-text-tertiary)',
+                fontSize: 13,
+                marginTop: 2,
+              }}
+            >
               {record.category}
             </div>
           </div>
         ),
       },
-      { key: 'duration', dataIndex: 'duration', title: 'Duration', width: 120, align: 'right' },
-      { key: 'downloads', dataIndex: 'downloads', title: 'Downloads', width: 120, align: 'right' },
+      {
+        key: 'duration',
+        dataIndex: 'duration',
+        title: 'Duration',
+        width: 120,
+        align: 'right',
+      },
+      {
+        key: 'downloads',
+        dataIndex: 'downloads',
+        title: 'Downloads',
+        width: 120,
+        align: 'right',
+      },
     ];
     return (
       <Table
@@ -120,15 +203,35 @@ export const Sizes: StoryObj = {
     <Stack gap="xl">
       <div>
         <p style={{ fontSize: 13, color: '#888', marginBottom: 8 }}>small</p>
-        <Table columns={baseColumns} dataSource={users.slice(0, 3)} rowKey="id" size="small" pagination={false} />
+        <Table
+          columns={baseColumns}
+          dataSource={users.slice(0, 3)}
+          rowKey="id"
+          size="small"
+          pagination={false}
+        />
       </div>
       <div>
-        <p style={{ fontSize: 13, color: '#888', marginBottom: 8 }}>medium (default)</p>
-        <Table columns={baseColumns} dataSource={users.slice(0, 3)} rowKey="id" size="medium" pagination={false} />
+        <p style={{ fontSize: 13, color: '#888', marginBottom: 8 }}>
+          medium (default)
+        </p>
+        <Table
+          columns={baseColumns}
+          dataSource={users.slice(0, 3)}
+          rowKey="id"
+          size="medium"
+          pagination={false}
+        />
       </div>
       <div>
         <p style={{ fontSize: 13, color: '#888', marginBottom: 8 }}>large</p>
-        <Table columns={baseColumns} dataSource={users.slice(0, 3)} rowKey="id" size="large" pagination={false} />
+        <Table
+          columns={baseColumns}
+          dataSource={users.slice(0, 3)}
+          rowKey="id"
+          size="large"
+          pagination={false}
+        />
       </div>
     </Stack>
   ),
@@ -137,8 +240,19 @@ export const Sizes: StoryObj = {
 export const Sorting: StoryObj = {
   render: () => {
     const columns: TableColumn<User>[] = [
-      { key: 'name', dataIndex: 'name', title: 'Name', sorter: (a, b) => a.name.localeCompare(b.name) },
-      { key: 'age', dataIndex: 'age', title: 'Age', sorter: (a, b) => a.age - b.age, defaultSortOrder: 'ascend' },
+      {
+        key: 'name',
+        dataIndex: 'name',
+        title: 'Name',
+        sorter: (a, b) => a.name.localeCompare(b.name),
+      },
+      {
+        key: 'age',
+        dataIndex: 'age',
+        title: 'Age',
+        sorter: (a, b) => a.age - b.age,
+        defaultSortOrder: 'ascend',
+      },
       { key: 'role', dataIndex: 'role', title: 'Role' },
     ];
     return <Table columns={columns} dataSource={users} rowKey="id" />;
@@ -185,7 +299,8 @@ export const RowSelection: StoryObj = {
       return (
         <Stack gap="sm">
           <p style={{ fontSize: 13, color: '#888' }}>
-            Selected: {selectedKeys.length === 0 ? 'none' : selectedKeys.join(', ')}
+            Selected:{' '}
+            {selectedKeys.length === 0 ? 'none' : selectedKeys.join(', ')}
           </p>
           <Table
             columns={baseColumns}
@@ -194,7 +309,9 @@ export const RowSelection: StoryObj = {
             rowSelection={{
               selectedRowKeys: selectedKeys,
               onChange: (keys) => setSelectedKeys(keys),
-              getCheckboxProps: (record) => ({ disabled: record.role === 'viewer' }),
+              getCheckboxProps: (record) => ({
+                disabled: record.role === 'viewer',
+              }),
             }}
           />
         </Stack>
@@ -209,16 +326,39 @@ export const HorizontalScroll: StoryObj = {
   render: () => {
     const columns: TableColumn<User>[] = [
       { key: 'id', dataIndex: 'id', title: 'ID', width: 80, fixed: 'left' },
-      { key: 'name', dataIndex: 'name', title: 'Name', width: 150, fixed: 'left' },
+      {
+        key: 'name',
+        dataIndex: 'name',
+        title: 'Name',
+        width: 150,
+        fixed: 'left',
+      },
       { key: 'age', dataIndex: 'age', title: 'Age', width: 100 },
       { key: 'email', dataIndex: 'email', title: 'Email', width: 250 },
       { key: 'role', dataIndex: 'role', title: 'Role', width: 120 },
-      { key: 'department', dataIndex: 'department', title: 'Department', width: 150 },
-      { key: 'actions', title: 'Actions', width: 120, fixed: 'right', render: () => <a style={{ color: 'var(--tao-primary)' }}>Edit</a> },
+      {
+        key: 'department',
+        dataIndex: 'department',
+        title: 'Department',
+        width: 150,
+      },
+      {
+        key: 'actions',
+        title: 'Actions',
+        width: 120,
+        fixed: 'right',
+        render: () => <a style={{ color: 'var(--tao-primary)' }}>Edit</a>,
+      },
     ];
     return (
       <div style={{ maxWidth: 600 }}>
-        <Table columns={columns} dataSource={users.slice(0, 8)} rowKey="id" scroll={{ x: 1000 }} pagination={false} />
+        <Table
+          columns={columns}
+          dataSource={users.slice(0, 8)}
+          rowKey="id"
+          scroll={{ x: 1000 }}
+          pagination={false}
+        />
       </div>
     );
   },
@@ -226,13 +366,24 @@ export const HorizontalScroll: StoryObj = {
 
 export const Loading: StoryObj = {
   render: () => (
-    <Table columns={baseColumns} dataSource={users.slice(0, 5)} rowKey="id" loading pagination={false} />
+    <Table
+      columns={baseColumns}
+      dataSource={users.slice(0, 5)}
+      rowKey="id"
+      loading
+      pagination={false}
+    />
   ),
 };
 
 export const Empty: StoryObj = {
   render: () => (
-    <Table columns={baseColumns} dataSource={[]} rowKey="id" emptyText="No users found." />
+    <Table
+      columns={baseColumns}
+      dataSource={[]}
+      rowKey="id"
+      emptyText="No users found."
+    />
   ),
 };
 
@@ -258,10 +409,36 @@ export const FullFeature: StoryObj = {
     function Demo() {
       const [selectedKeys, setSelectedKeys] = useState<React.Key[]>([]);
       const columns: TableColumn<User>[] = [
-        { key: 'id', dataIndex: 'id', title: 'ID', width: 60, align: 'center', fixed: 'left' },
-        { key: 'name', dataIndex: 'name', title: 'Name', width: 120, fixed: 'left', sorter: (a, b) => a.name.localeCompare(b.name) },
-        { key: 'age', dataIndex: 'age', title: 'Age', width: 80, sorter: (a, b) => a.age - b.age },
-        { key: 'email', dataIndex: 'email', title: 'Email', width: 220, ellipsis: true },
+        {
+          key: 'id',
+          dataIndex: 'id',
+          title: 'ID',
+          width: 60,
+          align: 'center',
+          fixed: 'left',
+        },
+        {
+          key: 'name',
+          dataIndex: 'name',
+          title: 'Name',
+          width: 120,
+          fixed: 'left',
+          sorter: (a, b) => a.name.localeCompare(b.name),
+        },
+        {
+          key: 'age',
+          dataIndex: 'age',
+          title: 'Age',
+          width: 80,
+          sorter: (a, b) => a.age - b.age,
+        },
+        {
+          key: 'email',
+          dataIndex: 'email',
+          title: 'Email',
+          width: 220,
+          ellipsis: true,
+        },
         {
           key: 'role',
           dataIndex: 'role',
@@ -292,7 +469,11 @@ export const FullFeature: StoryObj = {
           title: 'Actions',
           width: 100,
           fixed: 'right',
-          render: () => <a style={{ color: 'var(--tao-primary)', cursor: 'pointer' }}>Edit</a>,
+          render: () => (
+            <a style={{ color: 'var(--tao-primary)', cursor: 'pointer' }}>
+              Edit
+            </a>
+          ),
         },
       ];
       return (

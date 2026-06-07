@@ -1,8 +1,19 @@
 import * as Popover from '@radix-ui/react-popover';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
-import { type ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
-import { type TaoSize, type TaoVariant, useTaoConfig } from '../../provider/tao-provider';
+import {
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
+import {
+  TaoPortalScope,
+  type TaoSize,
+  type TaoVariant,
+  useTaoConfig,
+} from '../../provider/tao-provider';
 import { Drawer } from '../drawer/drawer';
 import { useIsMobile } from '../select/use-is-mobile';
 import { CalendarGrid } from './calendar/calendar-grid';
@@ -12,7 +23,12 @@ import { TimePanel } from './calendar/time-panel';
 import { YearGrid } from './calendar/year-grid';
 import './date-picker.css';
 import { Presets } from './presets';
-import { type PanelMode, type PresetItem, type TimeConfig, getDefaultFormat } from './types';
+import {
+  getDefaultFormat,
+  type PanelMode,
+  type PresetItem,
+  type TimeConfig,
+} from './types';
 
 export interface DatePickerProps {
   value?: Dayjs | null;
@@ -83,30 +99,40 @@ export function DatePicker({
   );
 
   const [viewDate, setViewDate] = useState<Dayjs>(() => value ?? dayjs());
-  const [panelMode, setPanelMode] = useState<PanelMode>(picker === 'year' ? 'year' : picker === 'month' ? 'month' : 'date');
+  const [panelMode, setPanelMode] = useState<PanelMode>(
+    picker === 'year' ? 'year' : picker === 'month' ? 'month' : 'date',
+  );
   const [timeScrollKey, setTimeScrollKey] = useState(0);
 
   // Reset panel state when opening
   useEffect(() => {
     if (isOpen) {
       setViewDate(value ?? dayjs());
-      setPanelMode(picker === 'year' ? 'year' : picker === 'month' ? 'month' : 'date');
+      setPanelMode(
+        picker === 'year' ? 'year' : picker === 'month' ? 'month' : 'date',
+      );
       setTimeScrollKey((k) => k + 1);
     }
   }, [isOpen]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Time state
-  const timeValue = useMemo(() => ({
-    hour: value?.hour() ?? 0,
-    minute: value?.minute() ?? 0,
-    second: value?.second() ?? 0,
-  }), [value]);
+  const timeValue = useMemo(
+    () => ({
+      hour: value?.hour() ?? 0,
+      minute: value?.minute() ?? 0,
+      second: value?.second() ?? 0,
+    }),
+    [value],
+  );
 
   const handleDateSelect = useCallback(
     (date: Dayjs) => {
       let result = date;
       if (showTime && value) {
-        result = date.hour(value.hour()).minute(value.minute()).second(value.second());
+        result = date
+          .hour(value.hour())
+          .minute(value.minute())
+          .second(value.second());
       }
       if (!showTime) {
         onChange?.(result, result.format(fmt));
@@ -229,7 +255,10 @@ export function DatePicker({
 
   // Panel content (shared between desktop popover and mobile drawer)
   const panelContent = (
-    <div data-tao-picker-panel="" data-tao-has-time={showTimePanel || undefined}>
+    <div
+      data-tao-picker-panel=""
+      data-tao-has-time={showTimePanel || undefined}
+    >
       {showTimePanel ? (
         <div data-tao-picker-datetime="">
           <div data-tao-picker-date-side="">{datePanel}</div>
@@ -257,8 +286,21 @@ export function DatePicker({
       )}
       {showTimePanel && (
         <div data-tao-picker-footer="">
-          <button type="button" data-tao-picker-footer-btn="" onClick={handleNow}>Now</button>
-          <button type="button" data-tao-picker-footer-btn="" data-tao-primary="" onClick={handleOk}>OK</button>
+          <button
+            type="button"
+            data-tao-picker-footer-btn=""
+            onClick={handleNow}
+          >
+            Now
+          </button>
+          <button
+            type="button"
+            data-tao-picker-footer-btn=""
+            data-tao-primary=""
+            onClick={handleOk}
+          >
+            OK
+          </button>
         </div>
       )}
     </div>
@@ -280,11 +322,18 @@ export function DatePicker({
     >
       {prefix != null && <span data-tao-picker-prefix="">{prefix}</span>}
       <span data-tao-picker-input="">
-        {displayValue || <span data-tao-picker-placeholder="">{defaultPlaceholder}</span>}
+        {displayValue || (
+          <span data-tao-picker-placeholder="">{defaultPlaceholder}</span>
+        )}
       </span>
       <span data-tao-picker-icons="">
         {showClearBtn && hovering ? (
-          <span data-tao-picker-clear="" onClick={handleClear} role="button" aria-label="Clear">
+          <span
+            data-tao-picker-clear=""
+            onClick={handleClear}
+            role="button"
+            aria-label="Clear"
+          >
             <CloseIcon />
           </span>
         ) : (
@@ -317,14 +366,16 @@ export function DatePicker({
     <Popover.Root open={isOpen} onOpenChange={setOpen}>
       <Popover.Trigger asChild>{trigger}</Popover.Trigger>
       <Popover.Portal>
-        <Popover.Content
-          data-tao-picker-dropdown=""
-          sideOffset={4}
-          align="start"
-          onOpenAutoFocus={(e) => e.preventDefault()}
-        >
-          {panelContent}
-        </Popover.Content>
+        <TaoPortalScope>
+          <Popover.Content
+            data-tao-picker-dropdown=""
+            sideOffset={4}
+            align="start"
+            onOpenAutoFocus={(e) => e.preventDefault()}
+          >
+            {panelContent}
+          </Popover.Content>
+        </TaoPortalScope>
       </Popover.Portal>
     </Popover.Root>
   );
@@ -332,15 +383,35 @@ export function DatePicker({
 
 function CalendarIcon() {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M8 2v4M16 2v4" /><rect width="18" height="18" x="3" y="4" rx="2" /><path d="M3 10h18" />
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M8 2v4M16 2v4" />
+      <rect width="18" height="18" x="3" y="4" rx="2" />
+      <path d="M3 10h18" />
     </svg>
   );
 }
 
 function CloseIcon() {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <path d="M18 6 6 18M6 6l12 12" />
     </svg>
   );

@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import type { Meta, StoryObj } from '@storybook/react';
 import { Pagination } from '@rockshin/tao-ui';
+import type { Meta, StoryObj } from '@storybook/react';
+import { useState } from 'react';
 
 const meta: Meta = {
   title: '导航 Navigation/Pagination',
@@ -11,7 +11,9 @@ export const Basic: StoryObj = {
   render: () => {
     function Demo() {
       const [page, setPage] = useState(1);
-      return <Pagination total={100} current={page} onChange={(p) => setPage(p)} />;
+      return (
+        <Pagination total={100} current={page} onChange={(p) => setPage(p)} />
+      );
     }
     return <Demo />;
   },
@@ -45,7 +47,10 @@ export const SizeChanger: StoryObj = {
           total={200}
           current={page}
           pageSize={ps}
-          onChange={(p, s) => { setPage(p); setPs(s); }}
+          onChange={(p, s) => {
+            setPage(p);
+            setPs(s);
+          }}
           showSizeChanger
         />
       );

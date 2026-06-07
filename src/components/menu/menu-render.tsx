@@ -4,6 +4,7 @@ import {
   useCallback,
   useState,
 } from 'react';
+import { TaoPortalScope } from '../../provider/tao-provider';
 import {
   cx,
   type SemanticClassNames,
@@ -255,16 +256,18 @@ export function renderMenuItems(items: MenuItem[], ctx: RenderCtx): ReactNode {
             <ChevronRightIcon />
           </P.SubTrigger>
           <P.Portal>
-            <P.SubContent
-              data-tao-menu-content=""
-              data-tao-menu-sub-content=""
-              className={cx(ctx.classNames?.subContent)}
-              style={ctx.styles?.subContent}
-              sideOffset={2}
-              alignOffset={-4}
-            >
-              {renderMenuItems(item.children, ctx)}
-            </P.SubContent>
+            <TaoPortalScope>
+              <P.SubContent
+                data-tao-menu-content=""
+                data-tao-menu-sub-content=""
+                className={cx(ctx.classNames?.subContent)}
+                style={ctx.styles?.subContent}
+                sideOffset={2}
+                alignOffset={-4}
+              >
+                {renderMenuItems(item.children, ctx)}
+              </P.SubContent>
+            </TaoPortalScope>
           </P.Portal>
         </P.Sub>
       );

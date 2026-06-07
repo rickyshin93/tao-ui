@@ -39,8 +39,9 @@ const config: StorybookConfig = {
   rsbuildFinal: (rsbuildConfig) => {
     rsbuildConfig.resolve ??= {};
     rsbuildConfig.resolve.alias ??= {};
-    (rsbuildConfig.resolve.alias as Record<string, string>)['@rockshin/tao-ui'] =
-      resolve(fileURLToPath(new URL('../src/index.tsx', import.meta.url)));
+    (rsbuildConfig.resolve.alias as Record<string, string>)[
+      '@rockshin/tao-ui'
+    ] = resolve(fileURLToPath(new URL('../src/index.tsx', import.meta.url)));
     return rsbuildConfig;
   },
 };

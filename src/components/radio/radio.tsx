@@ -1,12 +1,16 @@
 import {
   type ChangeEvent,
-  type ReactNode,
   createContext,
+  type ReactNode,
   useCallback,
   useContext,
 } from 'react';
 import { type TaoSize, useTaoConfig } from '../../provider/tao-provider';
-import { cx, type SemanticClassNames, type SemanticStyles } from '../../utils/semantic';
+import {
+  cx,
+  type SemanticClassNames,
+  type SemanticStyles,
+} from '../../utils/semantic';
 import './radio.css';
 
 export type RadioSemanticPart = 'root' | 'indicator' | 'label';
@@ -49,7 +53,8 @@ export function Radio({
   const ctx = useTaoConfig();
   const groupCtx = useContext(RadioGroupContext);
 
-  const resolvedDisabled = disabled ?? groupCtx?.disabled ?? ctx.disabled ?? false;
+  const resolvedDisabled =
+    disabled ?? groupCtx?.disabled ?? ctx.disabled ?? false;
   const resolvedChecked = groupCtx ? groupCtx.value === value : checked;
   const resolvedName = groupCtx?.name ?? name;
 
@@ -86,14 +91,24 @@ export function Radio({
         className={cx(classNames?.indicator)}
         style={styles?.indicator}
       />
-      {children != null && <span data-tao-radio-label="" className={cx(classNames?.label)} style={styles?.label}>{children}</span>}
+      {children != null && (
+        <span
+          data-tao-radio-label=""
+          className={cx(classNames?.label)}
+          style={styles?.label}
+        >
+          {children}
+        </span>
+      )}
     </label>
   );
 }
 
 // ---- RadioGroup ----
 
-export type RadioOptionType = { label: ReactNode; value: string; disabled?: boolean } | string;
+export type RadioOptionType =
+  | { label: ReactNode; value: string; disabled?: boolean }
+  | string;
 
 export interface RadioGroupProps {
   options?: RadioOptionType[];
@@ -139,14 +154,14 @@ export function RadioGroup({
 
   return (
     <RadioGroupContext.Provider value={groupCtxValue}>
-      <div data-tao-radio-group="" data-tao-direction={direction} role="radiogroup">
+      <div
+        data-tao-radio-group=""
+        data-tao-direction={direction}
+        role="radiogroup"
+      >
         {normalizedOptions
           ? normalizedOptions.map((opt) => (
-              <Radio
-                key={opt.value}
-                value={opt.value}
-                disabled={opt.disabled}
-              >
+              <Radio key={opt.value} value={opt.value} disabled={opt.disabled}>
                 {opt.label}
               </Radio>
             ))

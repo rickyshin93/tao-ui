@@ -4,7 +4,11 @@ import {
   type ReactNode,
   useCallback,
 } from 'react';
-import { cx, type SemanticClassNames, type SemanticStyles } from '../../utils/semantic';
+import {
+  cx,
+  type SemanticClassNames,
+  type SemanticStyles,
+} from '../../utils/semantic';
 import './tag.css';
 
 // ---- Types ----
@@ -50,7 +54,12 @@ export interface CheckableTagProps {
 function CloseIcon() {
   return (
     <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden>
-      <path d="M3 3l6 6M9 3l-6 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <path
+        d="M3 3l6 6M9 3l-6 6"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
     </svg>
   );
 }
@@ -70,8 +79,15 @@ export function Tag({
   classNames,
   styles,
 }: TagProps) {
-  const isPreset = ['default', 'primary', 'success', 'warning', 'error'].includes(color);
-  const showClose = closeIcon !== false && closeIcon !== null && (closeIcon || onClose);
+  const isPreset = [
+    'default',
+    'primary',
+    'success',
+    'warning',
+    'error',
+  ].includes(color);
+  const showClose =
+    closeIcon !== false && closeIcon !== null && (closeIcon || onClose);
 
   const handleClose = useCallback(
     (e: MouseEvent<HTMLElement>) => {
@@ -88,7 +104,11 @@ export function Tag({
             ? { background: color, color: '#fff', borderColor: color }
             : variant === 'outlined'
               ? { color, borderColor: color }
-              : { background: `color-mix(in oklch, ${color} 12%, var(--tao-color-bg-base))`, color, borderColor: `color-mix(in oklch, ${color} 30%, var(--tao-color-bg-base))` }),
+              : {
+                  background: `color-mix(in oklch, ${color} 12%, var(--tao-color-bg-base))`,
+                  color,
+                  borderColor: `color-mix(in oklch, ${color} 30%, var(--tao-color-bg-base))`,
+                }),
         }
       : undefined;
 
@@ -102,7 +122,11 @@ export function Tag({
       style={{ ...customColorStyle, ...styles?.root, ...style }}
     >
       {icon != null && (
-        <span data-tao-tag-icon="" className={cx(classNames?.icon)} style={styles?.icon}>
+        <span
+          data-tao-tag-icon=""
+          className={cx(classNames?.icon)}
+          style={styles?.icon}
+        >
           {icon}
         </span>
       )}
@@ -123,7 +147,11 @@ export function Tag({
           className={cx(classNames?.close)}
           style={styles?.close}
         >
-          {closeIcon === true || closeIcon === undefined ? <CloseIcon /> : closeIcon}
+          {closeIcon === true || closeIcon === undefined ? (
+            <CloseIcon />
+          ) : (
+            closeIcon
+          )}
         </span>
       )}
     </span>

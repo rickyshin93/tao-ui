@@ -1,6 +1,10 @@
 import { expect, test } from '@rstest/core';
 import dayjs from 'dayjs';
-import { getCalendarWeeks, getMonths, getYears } from '../../src/components/date-picker/calendar/use-calendar';
+import {
+  getCalendarWeeks,
+  getMonths,
+  getYears,
+} from '../../src/components/date-picker/calendar/use-calendar';
 
 // ---- getCalendarWeeks ----
 

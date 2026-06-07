@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { Stack, Switch } from '@rockshin/tao-ui';
 import type { Meta, StoryObj } from '@storybook/react';
-import { Switch, Stack } from '@rockshin/tao-ui';
+import { useState } from 'react';
 
 const meta: Meta = {
   title: '数据录入 Data Entry/Switch',
@@ -34,8 +34,18 @@ export const WithLabels: StoryObj = {
       const [b, setB] = useState(false);
       return (
         <Stack direction="horizontal" gap="lg" align="center">
-          <Switch checked={a} onChange={setA} checkedChildren="ON" unCheckedChildren="OFF" />
-          <Switch checked={b} onChange={setB} checkedChildren="是" unCheckedChildren="否" />
+          <Switch
+            checked={a}
+            onChange={setA}
+            checkedChildren="ON"
+            unCheckedChildren="OFF"
+          />
+          <Switch
+            checked={b}
+            onChange={setB}
+            checkedChildren="是"
+            unCheckedChildren="否"
+          />
         </Stack>
       );
     }

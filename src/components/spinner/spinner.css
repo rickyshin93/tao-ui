@@ -1,0 +1,106 @@
+@import "../../theme/theme.css";
+
+/* ===========================
+   Spinner (standalone)
+   =========================== */
+[data-tao-spinner] {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--tao-padding-xs);
+  color: var(--tao-color-primary);
+  font-family: var(--tao-font-family);
+}
+
+[data-tao-spinner-indicator] {
+  display: inline-flex;
+  line-height: 0;
+}
+
+[data-tao-spinner-svg] {
+  width: 1.25em;
+  height: 1.25em;
+  animation: tao-spinner-rotate 0.8s linear infinite;
+}
+
+/* Indicator size scales with font-size so a custom em-based indicator follows */
+[data-tao-spinner][data-tao-size="small"] {
+  font-size: 14px;
+}
+[data-tao-spinner][data-tao-size="medium"] {
+  font-size: 20px;
+}
+[data-tao-spinner][data-tao-size="large"] {
+  font-size: 32px;
+}
+
+@keyframes tao-spinner-rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Tip */
+[data-tao-spinner-tip] {
+  font-size: var(--tao-font-size-sm);
+  color: var(--tao-color-text-secondary);
+  line-height: 1.4;
+  text-align: center;
+}
+
+/* ===========================
+   Wrapper / overlay mode
+   =========================== */
+[data-tao-spinner-container] {
+  position: relative;
+}
+
+[data-tao-spinner-content] {
+  transition: opacity var(--tao-motion-duration-mid) var(--tao-motion-ease-out);
+}
+
+[data-tao-spinner-container][data-tao-spinning] [data-tao-spinner-content] {
+  opacity: 0.5;
+  pointer-events: none;
+  user-select: none;
+}
+
+[data-tao-spinner-overlay] {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+
+/* ===========================
+   Full-screen backdrop
+   =========================== */
+[data-tao-spinner-fullscreen] {
+  position: fixed;
+  inset: 0;
+  z-index: var(--tao-z-index-popup);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in oklch, var(--tao-color-bg-base) 60%, transparent);
+  animation: tao-spinner-fade-in var(--tao-motion-duration-mid) ease-out;
+}
+
+@supports (backdrop-filter: blur(2px)) {
+  [data-tao-spinner-fullscreen] {
+    -webkit-backdrop-filter: blur(2px);
+    backdrop-filter: blur(2px);
+  }
+}
+
+@keyframes tao-spinner-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

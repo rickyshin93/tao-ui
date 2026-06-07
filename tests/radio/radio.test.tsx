@@ -17,20 +17,43 @@ test('renders as role=radio', () => {
 });
 
 test('checked prop controls state', () => {
-  render(<Radio value="a" checked onChange={() => {}}>A</Radio>);
+  render(
+    <Radio value="a" checked onChange={() => {}}>
+      A
+    </Radio>,
+  );
   expect(screen.getByRole('radio')).toBeChecked();
 });
 
 test('click triggers onChange', async () => {
   let called = false;
-  render(<Radio value="a" onChange={() => { called = true; }}>A</Radio>);
+  render(
+    <Radio
+      value="a"
+      onChange={() => {
+        called = true;
+      }}
+    >
+      A
+    </Radio>,
+  );
   await userEvent.click(screen.getByRole('radio'));
   expect(called).toBe(true);
 });
 
 test('disabled prevents onChange', async () => {
   let called = false;
-  render(<Radio value="a" onChange={() => { called = true; }} disabled>A</Radio>);
+  render(
+    <Radio
+      value="a"
+      onChange={() => {
+        called = true;
+      }}
+      disabled
+    >
+      A
+    </Radio>,
+  );
   await userEvent.click(screen.getByRole('radio'));
   expect(called).toBe(false);
 });
@@ -83,7 +106,9 @@ test('RadioGroup onChange returns new value', async () => {
         { label: 'Banana', value: 'banana' },
       ]}
       value={val}
-      onChange={(v) => { val = v; }}
+      onChange={(v) => {
+        val = v;
+      }}
     />,
   );
   await userEvent.click(screen.getAllByRole('radio')[1]);
@@ -101,14 +126,19 @@ test('RadioGroup direction sets data-tao-direction', () => {
   const { container } = render(
     <RadioGroup options={['A']} direction="vertical" />,
   );
-  const group = container.querySelector('[data-tao-radio-group]')! as HTMLElement;
+  const group = container.querySelector(
+    '[data-tao-radio-group]',
+  )! as HTMLElement;
   expect(group.dataset.taoDirection).toBe('vertical');
 });
 
 test('RadioGroup disabled disables all radios', () => {
   render(
     <RadioGroup
-      options={[{ label: 'A', value: 'a' }, { label: 'B', value: 'b' }]}
+      options={[
+        { label: 'A', value: 'a' },
+        { label: 'B', value: 'b' },
+      ]}
       disabled
     />,
   );

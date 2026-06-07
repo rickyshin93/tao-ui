@@ -53,6 +53,14 @@
   overscroll-behavior: contain;
 }
 
+/* Group */
+[data-tao-sheet-group-label] {
+  padding: var(--tao-padding-sm) var(--tao-padding) var(--tao-padding-xxs);
+  font-size: var(--tao-font-size-sm);
+  font-weight: var(--tao-font-weight-medium);
+  color: var(--tao-color-text-tertiary);
+}
+
 /* ===========================
    Item
    =========================== */

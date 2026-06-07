@@ -1,7 +1,10 @@
 import { expect, test } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { Checkbox, CheckboxGroup } from '../../src/components/checkbox/checkbox';
+import {
+  Checkbox,
+  CheckboxGroup,
+} from '../../src/components/checkbox/checkbox';
 import { TaoProvider } from '../../src/provider/tao-provider';
 
 // ---- Checkbox ----
@@ -17,27 +20,52 @@ test('renders as role=checkbox', () => {
 });
 
 test('checked prop controls checked state', () => {
-  render(<Checkbox checked onChange={() => {}}>A</Checkbox>);
+  render(
+    <Checkbox checked onChange={() => {}}>
+      A
+    </Checkbox>,
+  );
   expect(screen.getByRole('checkbox')).toBeChecked();
 });
 
 test('click triggers onChange', async () => {
   let checked = false;
-  render(<Checkbox checked={checked} onChange={() => { checked = true; }}>A</Checkbox>);
+  render(
+    <Checkbox
+      checked={checked}
+      onChange={() => {
+        checked = true;
+      }}
+    >
+      A
+    </Checkbox>,
+  );
   await userEvent.click(screen.getByRole('checkbox'));
   expect(checked).toBe(true);
 });
 
 test('disabled prevents onChange', async () => {
   let checked = false;
-  render(<Checkbox checked={checked} onChange={() => { checked = true; }} disabled>A</Checkbox>);
+  render(
+    <Checkbox
+      checked={checked}
+      onChange={() => {
+        checked = true;
+      }}
+      disabled
+    >
+      A
+    </Checkbox>,
+  );
   await userEvent.click(screen.getByRole('checkbox'));
   expect(checked).toBe(false);
 });
 
 test('indeterminate sets aria-checked=mixed', () => {
   render(<Checkbox indeterminate>A</Checkbox>);
-  expect(screen.getByRole('checkbox').getAttribute('aria-checked')).toBe('mixed');
+  expect(screen.getByRole('checkbox').getAttribute('aria-checked')).toBe(
+    'mixed',
+  );
 });
 
 test('inherits disabled from TaoProvider', () => {
@@ -88,7 +116,9 @@ test('CheckboxGroup onChange returns updated values', async () => {
         { label: 'Banana', value: 'banana' },
       ]}
       value={vals}
-      onChange={(v) => { vals = v; }}
+      onChange={(v) => {
+        vals = v;
+      }}
     />,
   );
   await userEvent.click(screen.getAllByRole('checkbox')[0]);
@@ -106,6 +136,8 @@ test('CheckboxGroup direction sets data-tao-direction', () => {
   const { container } = render(
     <CheckboxGroup options={['A']} direction="vertical" />,
   );
-  const group = container.querySelector('[data-tao-checkbox-group]')! as HTMLElement;
+  const group = container.querySelector(
+    '[data-tao-checkbox-group]',
+  )! as HTMLElement;
   expect(group.dataset.taoDirection).toBe('vertical');
 });

@@ -1,4 +1,4 @@
-@import '../../theme/theme.css';
+@import "../../theme/theme.css";
 
 /* ===========================
    Pagination Container
@@ -143,7 +143,8 @@
   font-family: inherit;
   cursor: pointer;
   outline: none;
-  transition: border-color var(--tao-motion-duration-fast) var(--tao-motion-ease-out);
+  transition: border-color var(--tao-motion-duration-fast)
+    var(--tao-motion-ease-out);
 }
 
 [data-tao-pagination-sizer]:hover:not(:disabled) {

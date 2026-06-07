@@ -6,6 +6,7 @@ import {
   useEffect,
   useRef,
 } from 'react';
+import { TaoPortalScope } from '../../provider/tao-provider';
 import {
   cx,
   type SemanticClassNames,
@@ -147,85 +148,87 @@ export function Modal({
       }}
     >
       <Dialog.Portal forceMount={forceMount}>
-        <Dialog.Overlay
-          forceMount={forceMount}
-          data-tao-modal-overlay=""
-          className={cx(classNames?.overlay)}
-          style={stylesProp?.overlay}
-        />
-        <div
-          data-tao-modal-wrap=""
-          data-tao-centered={centered ? '' : undefined}
-          data-tao-open={open ? '' : undefined}
-        >
-          <Dialog.Content
+        <TaoPortalScope>
+          <Dialog.Overlay
             forceMount={forceMount}
-            data-tao-modal=""
-            style={contentStyle}
-            className={cx(classNames?.root)}
-            aria-describedby={undefined}
-            onEscapeKeyDown={(e) => {
-              if (!keyboard) e.preventDefault();
-            }}
-            onPointerDownOutside={(e) => {
-              if (!maskClosable) e.preventDefault();
-            }}
-            onInteractOutside={(e) => {
-              if (!maskClosable) e.preventDefault();
-            }}
+            data-tao-modal-overlay=""
+            className={cx(classNames?.overlay)}
+            style={stylesProp?.overlay}
+          />
+          <div
+            data-tao-modal-wrap=""
+            data-tao-centered={centered ? '' : undefined}
+            data-tao-open={open ? '' : undefined}
           >
-            {(title != null || closable) && (
-              <div
-                data-tao-modal-header=""
-                className={cx(classNames?.header)}
-                style={stylesProp?.header}
-              >
-                {title != null ? (
-                  <Dialog.Title
-                    data-tao-modal-title=""
-                    className={cx(classNames?.title)}
-                    style={stylesProp?.title}
-                  >
-                    {title}
-                  </Dialog.Title>
-                ) : (
-                  <Dialog.Title
-                    data-tao-modal-title=""
-                    style={{ display: 'none' }}
-                  />
-                )}
-                {closable && (
-                  <button
-                    type="button"
-                    data-tao-modal-close=""
-                    className={cx(classNames?.close)}
-                    style={stylesProp?.close}
-                    onClick={onClose}
-                    aria-label="Close"
-                  >
-                    <CloseIcon />
-                  </button>
-                )}
-              </div>
-            )}
-            <div
-              data-tao-modal-body=""
-              className={cx(classNames?.body)}
-              style={stylesProp?.body}
+            <Dialog.Content
+              forceMount={forceMount}
+              data-tao-modal=""
+              style={contentStyle}
+              className={cx(classNames?.root)}
+              aria-describedby={undefined}
+              onEscapeKeyDown={(e) => {
+                if (!keyboard) e.preventDefault();
+              }}
+              onPointerDownOutside={(e) => {
+                if (!maskClosable) e.preventDefault();
+              }}
+              onInteractOutside={(e) => {
+                if (!maskClosable) e.preventDefault();
+              }}
             >
-              {children}
-            </div>
-            {footerContent != null && (
+              {(title != null || closable) && (
+                <div
+                  data-tao-modal-header=""
+                  className={cx(classNames?.header)}
+                  style={stylesProp?.header}
+                >
+                  {title != null ? (
+                    <Dialog.Title
+                      data-tao-modal-title=""
+                      className={cx(classNames?.title)}
+                      style={stylesProp?.title}
+                    >
+                      {title}
+                    </Dialog.Title>
+                  ) : (
+                    <Dialog.Title
+                      data-tao-modal-title=""
+                      style={{ display: 'none' }}
+                    />
+                  )}
+                  {closable && (
+                    <button
+                      type="button"
+                      data-tao-modal-close=""
+                      className={cx(classNames?.close)}
+                      style={stylesProp?.close}
+                      onClick={onClose}
+                      aria-label="Close"
+                    >
+                      <CloseIcon />
+                    </button>
+                  )}
+                </div>
+              )}
               <div
-                data-tao-modal-footer=""
-                className={cx(classNames?.footer)}
-                style={stylesProp?.footer}
+                data-tao-modal-body=""
+                className={cx(classNames?.body)}
+                style={stylesProp?.body}
               >
-                {footerContent}
+                {children}
               </div>
-            )}
-          </Dialog.Content>
-        </div>
+              {footerContent != null && (
+                <div
+                  data-tao-modal-footer=""
+                  className={cx(classNames?.footer)}
+                  style={stylesProp?.footer}
+                >
+                  {footerContent}
+                </div>
+              )}
+            </Dialog.Content>
+          </div>
+        </TaoPortalScope>
       </Dialog.Portal>
     </Dialog.Root>
   );

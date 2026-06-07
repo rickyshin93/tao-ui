@@ -1,4 +1,4 @@
-@import '../../theme/theme.css';
+@import "../../theme/theme.css";
 
 /* ===========================
    FormField
@@ -47,7 +47,8 @@
 }
 
 [data-tao-form-section] + [data-tao-form-section] {
-  border-block-start: var(--tao-line-width) solid var(--tao-color-border-secondary);
+  border-block-start: var(--tao-line-width) solid
+    var(--tao-color-border-secondary);
   padding-block-start: var(--tao-padding-xl);
   margin-block-start: var(--tao-padding-xl);
 }
@@ -83,7 +84,8 @@
   display: flex;
   justify-content: flex-end;
   gap: var(--tao-padding-sm);
-  border-block-start: var(--tao-line-width) solid var(--tao-color-border-secondary);
+  border-block-start: var(--tao-line-width) solid
+    var(--tao-color-border-secondary);
   padding-block-start: var(--tao-padding-lg);
   margin-block-start: var(--tao-padding-xl);
 }

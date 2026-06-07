@@ -7,10 +7,14 @@ import type { CSSProperties } from 'react';
  */
 
 export type SemanticClassNames<T extends string> = Partial<Record<T, string>>;
-export type SemanticStyles<T extends string> = Partial<Record<T, CSSProperties>>;
+export type SemanticStyles<T extends string> = Partial<
+  Record<T, CSSProperties>
+>;
 
 /** Join class names, filtering out falsy values. */
-export function cx(...classes: (string | undefined | false | null)[]): string | undefined {
+export function cx(
+  ...classes: (string | undefined | false | null)[]
+): string | undefined {
   const result = classes.filter(Boolean).join(' ');
   return result || undefined;
 }

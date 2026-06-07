@@ -1,7 +1,7 @@
 import { expect, test } from '@rstest/core';
 import { fireEvent, render, screen } from '@testing-library/react';
-import { TaoProvider } from '../../src/provider/tao-provider';
 import { Pagination } from '../../src/components/pagination/pagination';
+import { TaoProvider } from '../../src/provider/tao-provider';
 
 test('renders correct page buttons for small total', () => {
   render(<Pagination total={50} />);
@@ -32,7 +32,14 @@ test('controlled current', () => {
 
 test('onChange fires on page click', () => {
   let page = 0;
-  render(<Pagination total={50} onChange={(p) => { page = p; }} />);
+  render(
+    <Pagination
+      total={50}
+      onChange={(p) => {
+        page = p;
+      }}
+    />,
+  );
   fireEvent.click(screen.getByLabelText('Page 3'));
   expect(page).toBe(3);
 });
@@ -49,7 +56,15 @@ test('next button disabled on last page', () => {
 
 test('prev/next navigation works', () => {
   let page = 0;
-  render(<Pagination total={50} defaultCurrent={3} onChange={(p) => { page = p; }} />);
+  render(
+    <Pagination
+      total={50}
+      defaultCurrent={3}
+      onChange={(p) => {
+        page = p;
+      }}
+    />,
+  );
   fireEvent.click(screen.getByLabelText('Next page'));
   expect(page).toBe(4);
   fireEvent.click(screen.getByLabelText('Previous page'));
@@ -76,13 +91,7 @@ test('showTotal renders total info', () => {
 });
 
 test('showSizeChanger renders select', () => {
-  render(
-    <Pagination
-      total={100}
-      showSizeChanger
-      onChange={(_p, ps) => {}}
-    />,
-  );
+  render(<Pagination total={100} showSizeChanger onChange={(_p, ps) => {}} />);
   const select = screen.getByRole('combobox');
   expect(select).toBeTruthy();
   // Default value should be "10 / page"

@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import type { Meta, StoryObj } from '@storybook/react';
 import { Splitter, Stack } from '@rockshin/tao-ui';
+import type { Meta, StoryObj } from '@storybook/react';
+import { useState } from 'react';
 
 const Panel = Splitter.Panel;
 
@@ -23,10 +23,18 @@ const boxStyle = (bg: string): React.CSSProperties => ({
 
 export const Basic: StoryObj = {
   render: () => (
-    <div style={{ height: 200, border: '1px solid var(--tao-color-border-secondary)', borderRadius: 6 }}>
+    <div
+      style={{
+        height: 200,
+        border: '1px solid var(--tao-color-border-secondary)',
+        borderRadius: 6,
+      }}
+    >
       <Splitter>
         <Panel defaultSize="40%">
-          <div style={boxStyle('var(--tao-color-fill-quaternary)')}>Panel 1</div>
+          <div style={boxStyle('var(--tao-color-fill-quaternary)')}>
+            Panel 1
+          </div>
         </Panel>
         <Panel>
           <div style={boxStyle('var(--tao-color-fill-tertiary)')}>Panel 2</div>
@@ -38,7 +46,13 @@ export const Basic: StoryObj = {
 
 export const Vertical: StoryObj = {
   render: () => (
-    <div style={{ height: 300, border: '1px solid var(--tao-color-border-secondary)', borderRadius: 6 }}>
+    <div
+      style={{
+        height: 300,
+        border: '1px solid var(--tao-color-border-secondary)',
+        borderRadius: 6,
+      }}
+    >
       <Splitter orientation="vertical">
         <Panel defaultSize="40%">
           <div style={boxStyle('var(--tao-color-fill-quaternary)')}>Top</div>
@@ -54,10 +68,18 @@ export const Vertical: StoryObj = {
 export const ThreePanels: StoryObj = {
   name: 'Multiple Panels',
   render: () => (
-    <div style={{ height: 200, border: '1px solid var(--tao-color-border-secondary)', borderRadius: 6 }}>
+    <div
+      style={{
+        height: 200,
+        border: '1px solid var(--tao-color-border-secondary)',
+        borderRadius: 6,
+      }}
+    >
       <Splitter>
         <Panel defaultSize="25%" min={60}>
-          <div style={boxStyle('var(--tao-color-fill-quaternary)')}>Sidebar</div>
+          <div style={boxStyle('var(--tao-color-fill-quaternary)')}>
+            Sidebar
+          </div>
         </Panel>
         <Panel min={100}>
           <div style={boxStyle('var(--tao-color-fill-tertiary)')}>Main</div>
@@ -72,13 +94,23 @@ export const ThreePanels: StoryObj = {
 
 export const Collapsible: StoryObj = {
   render: () => (
-    <div style={{ height: 200, border: '1px solid var(--tao-color-border-secondary)', borderRadius: 6 }}>
+    <div
+      style={{
+        height: 200,
+        border: '1px solid var(--tao-color-border-secondary)',
+        borderRadius: 6,
+      }}
+    >
       <Splitter>
         <Panel defaultSize="30%" collapsible min={0}>
-          <div style={boxStyle('var(--tao-color-fill-quaternary)')}>Collapsible</div>
+          <div style={boxStyle('var(--tao-color-fill-quaternary)')}>
+            Collapsible
+          </div>
         </Panel>
         <Panel>
-          <div style={boxStyle('var(--tao-color-fill-tertiary)')}>Main Content</div>
+          <div style={boxStyle('var(--tao-color-fill-tertiary)')}>
+            Main Content
+          </div>
         </Panel>
       </Splitter>
     </div>
@@ -88,10 +120,18 @@ export const Collapsible: StoryObj = {
 export const MinMax: StoryObj = {
   name: 'Min / Max Constraints',
   render: () => (
-    <div style={{ height: 200, border: '1px solid var(--tao-color-border-secondary)', borderRadius: 6 }}>
+    <div
+      style={{
+        height: 200,
+        border: '1px solid var(--tao-color-border-secondary)',
+        borderRadius: 6,
+      }}
+    >
       <Splitter>
         <Panel defaultSize="30%" min={100} max={300}>
-          <div style={boxStyle('var(--tao-color-fill-quaternary)')}>min:100 max:300</div>
+          <div style={boxStyle('var(--tao-color-fill-quaternary)')}>
+            min:100 max:300
+          </div>
         </Panel>
         <Panel min={100}>
           <div style={boxStyle('var(--tao-color-fill-tertiary)')}>min:100</div>
@@ -110,13 +150,23 @@ export const Controlled: StoryObj = {
           <p style={{ fontSize: 13, color: '#888' }}>
             sizes: [{sizes.map((s) => Math.round(s)).join(', ')}]
           </p>
-          <div style={{ height: 200, border: '1px solid var(--tao-color-border-secondary)', borderRadius: 6 }}>
+          <div
+            style={{
+              height: 200,
+              border: '1px solid var(--tao-color-border-secondary)',
+              borderRadius: 6,
+            }}
+          >
             <Splitter onResize={setSizes}>
               <Panel defaultSize="40%">
-                <div style={boxStyle('var(--tao-color-fill-quaternary)')}>Left</div>
+                <div style={boxStyle('var(--tao-color-fill-quaternary)')}>
+                  Left
+                </div>
               </Panel>
               <Panel>
-                <div style={boxStyle('var(--tao-color-fill-tertiary)')}>Right</div>
+                <div style={boxStyle('var(--tao-color-fill-tertiary)')}>
+                  Right
+                </div>
               </Panel>
             </Splitter>
           </div>
@@ -130,18 +180,30 @@ export const Controlled: StoryObj = {
 export const Nested: StoryObj = {
   name: 'Nested (Complex Layout)',
   render: () => (
-    <div style={{ height: 400, border: '1px solid var(--tao-color-border-secondary)', borderRadius: 6 }}>
+    <div
+      style={{
+        height: 400,
+        border: '1px solid var(--tao-color-border-secondary)',
+        borderRadius: 6,
+      }}
+    >
       <Splitter>
         <Panel defaultSize="25%" collapsible min={0}>
-          <div style={boxStyle('var(--tao-color-fill-quaternary)')}>Sidebar</div>
+          <div style={boxStyle('var(--tao-color-fill-quaternary)')}>
+            Sidebar
+          </div>
         </Panel>
         <Panel>
           <Splitter orientation="vertical">
             <Panel defaultSize="70%">
-              <div style={boxStyle('var(--tao-color-fill-tertiary)')}>Editor</div>
+              <div style={boxStyle('var(--tao-color-fill-tertiary)')}>
+                Editor
+              </div>
             </Panel>
             <Panel collapsible min={0}>
-              <div style={boxStyle('var(--tao-color-fill-quaternary)')}>Terminal</div>
+              <div style={boxStyle('var(--tao-color-fill-quaternary)')}>
+                Terminal
+              </div>
             </Panel>
           </Splitter>
         </Panel>

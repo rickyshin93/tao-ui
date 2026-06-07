@@ -1,4 +1,4 @@
-import { FormField, Select, Stack } from '@rockshin/tao-ui';
+import { ChevronsUpDownIcon, FormField, Select, Stack } from '@rockshin/tao-ui';
 import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
 
@@ -45,35 +45,81 @@ export const WithSearch: StoryObj = {
 };
 
 export const AllowClear: StoryObj = {
-  render: () => (
-    <Stack gap="md" style={{ maxWidth: 400 }}>
-      <FormField label="Allow clear">
-        <Select
-          options={[
-            { label: 'English', value: 'en' },
-            { label: '简体中文', value: 'zh' },
-            { label: '日本語', value: 'ja' },
-          ]}
-          value="zh"
-          allowClear
-          placeholder="Select language"
-        />
-      </FormField>
-    </Stack>
-  ),
+  render: () => {
+    function Demo() {
+      const [val, setVal] = useState('zh');
+      return (
+        <Stack gap="md" style={{ maxWidth: 400 }}>
+          <FormField label="Allow clear">
+            <Select
+              options={[
+                { label: 'English', value: 'en' },
+                { label: '简体中文', value: 'zh' },
+                { label: '日本語', value: 'ja' },
+              ]}
+              value={val}
+              onChange={setVal}
+              allowClear
+              placeholder="Select language"
+            />
+          </FormField>
+        </Stack>
+      );
+    }
+    return <Demo />;
+  },
 };
 
 export const LoadingAndPrefix: StoryObj = {
   name: 'Loading + Prefix',
+  render: () => {
+    function Demo() {
+      const [loading, setLoading] = useState(false);
+      const [options, setOptions] = useState<
+        { label: string; value: string }[]
+      >([]);
+
+      const load = () => {
+        setLoading(true);
+        setOptions([]);
+        setTimeout(() => {
+          setOptions([
+            { label: 'United States', value: 'us' },
+            { label: 'United Kingdom', value: 'uk' },
+            { label: 'Japan', value: 'jp' },
+            { label: 'Germany', value: 'de' },
+          ]);
+          setLoading(false);
+        }, 1500);
+      };
+
+      return (
+        <Stack gap="md" style={{ maxWidth: 400 }}>
+          <button type="button" onClick={load} disabled={loading}>
+            {loading ? 'Loading…' : 'Load options'}
+          </button>
+          <FormField label="Async options (click to load)">
+            <Select
+              options={options}
+              placeholder="Select a country"
+              loading={loading}
+              prefix={<span>🌍</span>}
+              notFoundContent={loading ? 'Loading…' : 'No options — click load'}
+            />
+          </FormField>
+        </Stack>
+      );
+    }
+    return <Demo />;
+  },
+};
+
+export const LoadingStatic: StoryObj = {
+  name: 'Loading (always on)',
   render: () => (
     <Stack gap="md" style={{ maxWidth: 400 }}>
-      <FormField label="With prefix + loading">
-        <Select
-          options={[]}
-          placeholder="Loading options..."
-          loading
-          prefix={<span>🌍</span>}
-        />
+      <FormField label="Spinner replaces the arrow while loading">
+        <Select options={[]} placeholder="Loading options…" loading />
       </FormField>
     </Stack>
   ),
@@ -186,10 +232,185 @@ export const WorkspaceSwitcher: StoryObj = {
             value={val}
             onChange={setVal}
             placeholder="Select workspace"
+            suffixIcon={<ChevronsUpDownIcon />}
           />
         </div>
       );
     }
     return <Demo />;
   },
+};
+
+export const Status: StoryObj = {
+  render: () => (
+    <Stack gap="md" style={{ maxWidth: 400 }}>
+      <FormField label="Error">
+        <Select
+          options={[{ label: 'Option A', value: 'a' }]}
+          value="a"
+          status="error"
+        />
+      </FormField>
+      <FormField label="Warning">
+        <Select
+          options={[{ label: 'Option A', value: 'a' }]}
+          value="a"
+          status="warning"
+        />
+      </FormField>
+    </Stack>
+  ),
+};
+
+export const Grouped: StoryObj = {
+  render: () => (
+    <Stack gap="md" style={{ maxWidth: 400 }}>
+      <FormField label="Grouped options">
+        <Select
+          placeholder="Pick a food"
+          options={[
+            {
+              label: 'Fruits',
+              value: 'fruits',
+              options: [
+                { label: 'Apple', value: 'apple' },
+                { label: 'Pear', value: 'pear' },
+                { label: 'Orange', value: 'orange' },
+              ],
+            },
+            {
+              label: 'Vegetables',
+              value: 'vegetables',
+              options: [
+                { label: 'Carrot', value: 'carrot' },
+                { label: 'Spinach', value: 'spinach' },
+              ],
+            },
+          ]}
+        />
+      </FormField>
+    </Stack>
+  ),
+};
+
+export const ControlledOpen: StoryObj = {
+  render: () => {
+    function Demo() {
+      const [open, setOpen] = useState(false);
+      return (
+        <Stack gap="md" style={{ maxWidth: 400 }}>
+          <button type="button" onClick={() => setOpen((o) => !o)}>
+            {open ? 'Close' : 'Open'} dropdown
+          </button>
+          <Select
+            open={open}
+            onOpenChange={setOpen}
+            options={[
+              { label: 'Option A', value: 'a' },
+              { label: 'Option B', value: 'b' },
+            ]}
+            placeholder="Controlled open"
+          />
+        </Stack>
+      );
+    }
+    return <Demo />;
+  },
+};
+
+export const CustomRender: StoryObj = {
+  name: 'optionRender + labelRender',
+  render: () => {
+    function Demo() {
+      const [val, setVal] = useState('b');
+      return (
+        <Stack gap="md" style={{ maxWidth: 400 }}>
+          <Select
+            value={val}
+            onChange={setVal}
+            placeholder="Pick a color"
+            options={[
+              { label: 'Red', value: 'r' },
+              { label: 'Green', value: 'g' },
+              { label: 'Blue', value: 'b' },
+            ]}
+            labelRender={(o) => <strong>★ {o.label}</strong>}
+            optionRender={(o, { index }) => (
+              <span>
+                {index + 1}. {o.label}
+              </span>
+            )}
+          />
+        </Stack>
+      );
+    }
+    return <Demo />;
+  },
+};
+
+export const Placement: StoryObj = {
+  render: () => (
+    <Stack gap="md" style={{ maxWidth: 400, paddingTop: 200 }}>
+      <FormField label="topRight (opens upward)">
+        <Select
+          placement="topRight"
+          options={[
+            { label: 'Option A', value: 'a' },
+            { label: 'Option B', value: 'b' },
+            { label: 'Option C', value: 'c' },
+          ]}
+          placeholder="Opens upward, right-aligned"
+        />
+      </FormField>
+    </Stack>
+  ),
+};
+
+export const PopupWidth: StoryObj = {
+  name: 'popupMatchSelectWidth',
+  render: () => (
+    <Stack gap="md" style={{ maxWidth: 240 }}>
+      <FormField label="false → fit content">
+        <Select
+          popupMatchSelectWidth={false}
+          options={[
+            { label: 'A very long option label that overflows', value: 'a' },
+            { label: 'Short', value: 'b' },
+          ]}
+          placeholder="Fit content"
+        />
+      </FormField>
+      <FormField label="320 → fixed width">
+        <Select
+          popupMatchSelectWidth={320}
+          options={[
+            { label: 'Option A', value: 'a' },
+            { label: 'Option B', value: 'b' },
+          ]}
+          placeholder="Fixed 320px"
+        />
+      </FormField>
+    </Stack>
+  ),
+};
+
+export const SemanticDOM: StoryObj = {
+  name: 'classNames / styles',
+  render: () => (
+    <Stack gap="md" style={{ maxWidth: 400 }}>
+      <FormField label="Custom semantic styles">
+        <Select
+          options={[
+            { label: 'Option A', value: 'a' },
+            { label: 'Option B', value: 'b' },
+          ]}
+          value="a"
+          styles={{
+            root: { borderColor: '#7c3aed' },
+            groupLabel: { color: '#7c3aed' },
+          }}
+        />
+      </FormField>
+    </Stack>
+  ),
 };

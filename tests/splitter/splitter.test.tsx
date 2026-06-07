@@ -7,7 +7,9 @@ const Panel = Splitter.Panel;
 // Mock ResizeObserver
 class MockResizeObserver {
   callback: ResizeObserverCallback;
-  constructor(cb: ResizeObserverCallback) { this.callback = cb; }
+  constructor(cb: ResizeObserverCallback) {
+    this.callback = cb;
+  }
   observe(el: Element) {
     // Simulate container size
     this.callback(
@@ -23,8 +25,12 @@ class MockResizeObserver {
 test('renders panels', () => {
   render(
     <Splitter>
-      <Panel><div>Left</div></Panel>
-      <Panel><div>Right</div></Panel>
+      <Panel>
+        <div>Left</div>
+      </Panel>
+      <Panel>
+        <div>Right</div>
+      </Panel>
     </Splitter>,
   );
   expect(screen.getByText('Left')).toBeTruthy();
@@ -34,8 +40,12 @@ test('renders panels', () => {
 test('renders dragger between panels', () => {
   const { container } = render(
     <Splitter>
-      <Panel><div>A</div></Panel>
-      <Panel><div>B</div></Panel>
+      <Panel>
+        <div>A</div>
+      </Panel>
+      <Panel>
+        <div>B</div>
+      </Panel>
     </Splitter>,
   );
   const dragger = container.querySelector('[data-tao-splitter-dragger]');
@@ -45,9 +55,15 @@ test('renders dragger between panels', () => {
 test('renders multiple panels with multiple draggers', () => {
   const { container } = render(
     <Splitter>
-      <Panel><div>A</div></Panel>
-      <Panel><div>B</div></Panel>
-      <Panel><div>C</div></Panel>
+      <Panel>
+        <div>A</div>
+      </Panel>
+      <Panel>
+        <div>B</div>
+      </Panel>
+      <Panel>
+        <div>C</div>
+      </Panel>
     </Splitter>,
   );
   const draggers = container.querySelectorAll('[data-tao-splitter-dragger]');
@@ -57,19 +73,29 @@ test('renders multiple panels with multiple draggers', () => {
 test('vertical orientation', () => {
   const { container } = render(
     <Splitter orientation="vertical">
-      <Panel><div>Top</div></Panel>
-      <Panel><div>Bottom</div></Panel>
+      <Panel>
+        <div>Top</div>
+      </Panel>
+      <Panel>
+        <div>Bottom</div>
+      </Panel>
     </Splitter>,
   );
-  const splitter = container.querySelector('[data-tao-splitter]') as HTMLElement;
+  const splitter = container.querySelector(
+    '[data-tao-splitter]',
+  ) as HTMLElement;
   expect(splitter.dataset.taoOrientation).toBe('vertical');
 });
 
 test('collapsible shows collapse button on dragger', () => {
   const { container } = render(
     <Splitter>
-      <Panel collapsible><div>Left</div></Panel>
-      <Panel><div>Right</div></Panel>
+      <Panel collapsible>
+        <div>Left</div>
+      </Panel>
+      <Panel>
+        <div>Right</div>
+      </Panel>
     </Splitter>,
   );
   const collapseBtn = container.querySelector('[data-tao-splitter-collapse]');
@@ -79,8 +105,12 @@ test('collapsible shows collapse button on dragger', () => {
 test('classNames applied to root', () => {
   const { container } = render(
     <Splitter classNames={{ root: 'my-splitter' }}>
-      <Panel><div>A</div></Panel>
-      <Panel><div>B</div></Panel>
+      <Panel>
+        <div>A</div>
+      </Panel>
+      <Panel>
+        <div>B</div>
+      </Panel>
     </Splitter>,
   );
   const root = container.querySelector('[data-tao-splitter]') as HTMLElement;
@@ -90,8 +120,12 @@ test('classNames applied to root', () => {
 test('classNames applied to panel', () => {
   const { container } = render(
     <Splitter classNames={{ panel: 'my-panel' }}>
-      <Panel><div>A</div></Panel>
-      <Panel><div>B</div></Panel>
+      <Panel>
+        <div>A</div>
+      </Panel>
+      <Panel>
+        <div>B</div>
+      </Panel>
     </Splitter>,
   );
   const panels = container.querySelectorAll('[data-tao-splitter-panel]');
@@ -102,19 +136,29 @@ test('classNames applied to panel', () => {
 test('classNames applied to dragger', () => {
   const { container } = render(
     <Splitter classNames={{ dragger: 'my-dragger' }}>
-      <Panel><div>A</div></Panel>
-      <Panel><div>B</div></Panel>
+      <Panel>
+        <div>A</div>
+      </Panel>
+      <Panel>
+        <div>B</div>
+      </Panel>
     </Splitter>,
   );
-  const dragger = container.querySelector('[data-tao-splitter-dragger]') as HTMLElement;
+  const dragger = container.querySelector(
+    '[data-tao-splitter-dragger]',
+  ) as HTMLElement;
   expect(dragger.className).toContain('my-dragger');
 });
 
 test('defaultSize distributes space', () => {
   const { container } = render(
     <Splitter>
-      <Panel defaultSize="30%"><div>A</div></Panel>
-      <Panel><div>B</div></Panel>
+      <Panel defaultSize="30%">
+        <div>A</div>
+      </Panel>
+      <Panel>
+        <div>B</div>
+      </Panel>
     </Splitter>,
   );
   const panels = container.querySelectorAll('[data-tao-splitter-panel]');

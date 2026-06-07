@@ -82,12 +82,6 @@ export {
   type InputSemanticPart,
 } from './components/input/input';
 export {
-  type AutoSizeOptions,
-  Textarea,
-  type TextareaProps,
-  type TextareaSemanticPart,
-} from './components/textarea/textarea';
-export {
   type ConfirmType,
   Modal,
   type ModalFooterRender,
@@ -117,10 +111,18 @@ export {
   type ScrollAreaType,
 } from './components/scroll-area/scroll-area';
 export {
+  ChevronsUpDownIcon,
   Select,
   type SelectOption,
+  type SelectPlacement,
   type SelectProps,
+  type SelectSemanticPart,
 } from './components/select/select';
+export {
+  Spinner,
+  type SpinnerProps,
+  type SpinnerSemanticPart,
+} from './components/spinner/spinner';
 export {
   Splitter,
   type SplitterPanelProps,
@@ -159,6 +161,12 @@ export {
   type TagVariant,
 } from './components/tag/tag';
 export {
+  type AutoSizeOptions,
+  Textarea,
+  type TextareaProps,
+  type TextareaSemanticPart,
+} from './components/textarea/textarea';
+export {
   FormLayout,
   type FormLayoutProps,
 } from './layouts/form-layout/form-layout';
@@ -175,6 +183,7 @@ export {
   useNumberInput,
 } from './number-input';
 export {
+  TaoPortalScope,
   TaoProvider,
   type TaoProviderProps,
   type TaoSeedToken,

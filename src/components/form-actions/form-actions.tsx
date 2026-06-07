@@ -1,5 +1,9 @@
 import type { CSSProperties, ReactNode } from 'react';
-import { cx, type SemanticClassNames, type SemanticStyles } from '../../utils/semantic';
+import {
+  cx,
+  type SemanticClassNames,
+  type SemanticStyles,
+} from '../../utils/semantic';
 import '../form-field/form.css';
 
 export type FormActionsSemanticPart = 'root';

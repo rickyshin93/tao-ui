@@ -1,5 +1,9 @@
 import type { CSSProperties, ReactNode } from 'react';
-import { cx, type SemanticClassNames, type SemanticStyles } from '../../utils/semantic';
+import {
+  cx,
+  type SemanticClassNames,
+  type SemanticStyles,
+} from '../../utils/semantic';
 import './form.css';
 
 export type FormFieldSemanticPart = 'root' | 'label' | 'error' | 'description';
@@ -42,7 +46,11 @@ export function FormField({
         data-tao-form-label=""
       >
         {label}
-        {required && <span data-tao-required="" aria-hidden="true">*</span>}
+        {required && (
+          <span data-tao-required="" aria-hidden="true">
+            *
+          </span>
+        )}
       </label>
       {children}
       {error ? (

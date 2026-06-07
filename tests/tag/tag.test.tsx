@@ -1,6 +1,6 @@
 import { expect, test } from '@rstest/core';
 import { fireEvent, render, screen } from '@testing-library/react';
-import { Tag, CheckableTag } from '../../src/components/tag/tag';
+import { CheckableTag, Tag } from '../../src/components/tag/tag';
 
 test('renders tag with text', () => {
   render(<Tag>Hello</Tag>);
@@ -32,7 +32,15 @@ test('custom color applies inline style', () => {
 
 test('close icon renders when onClose provided', () => {
   let closed = false;
-  render(<Tag onClose={() => { closed = true; }}>Closable</Tag>);
+  render(
+    <Tag
+      onClose={() => {
+        closed = true;
+      }}
+    >
+      Closable
+    </Tag>,
+  );
   const closeBtn = screen.getByLabelText('Close');
   expect(closeBtn).toBeTruthy();
   fireEvent.click(closeBtn);
@@ -40,19 +48,34 @@ test('close icon renders when onClose provided', () => {
 });
 
 test('closeIcon={false} hides close button', () => {
-  render(<Tag closeIcon={false} onClose={() => {}}>No Close</Tag>);
+  render(
+    <Tag closeIcon={false} onClose={() => {}}>
+      No Close
+    </Tag>,
+  );
   expect(screen.queryByLabelText('Close')).toBeNull();
 });
 
 test('disabled prevents close', () => {
   let closed = false;
-  const { container } = render(<Tag disabled onClose={() => { closed = true; }}>Disabled</Tag>);
+  const { container } = render(
+    <Tag
+      disabled
+      onClose={() => {
+        closed = true;
+      }}
+    >
+      Disabled
+    </Tag>,
+  );
   const tag = container.querySelector('[data-tao-tag]') as HTMLElement;
   expect(tag.dataset.taoDisabled).toBeTruthy();
 });
 
 test('classNames applied to root', () => {
-  const { container } = render(<Tag classNames={{ root: 'my-tag' }}>Styled</Tag>);
+  const { container } = render(
+    <Tag classNames={{ root: 'my-tag' }}>Styled</Tag>,
+  );
   const tag = container.querySelector('[data-tao-tag]') as HTMLElement;
   expect(tag.className).toContain('my-tag');
 });
@@ -72,14 +95,31 @@ test('CheckableTag checked state', () => {
 
 test('CheckableTag onChange fires', () => {
   let val = false;
-  render(<CheckableTag onChange={(c) => { val = c; }}>Toggle</CheckableTag>);
+  render(
+    <CheckableTag
+      onChange={(c) => {
+        val = c;
+      }}
+    >
+      Toggle
+    </CheckableTag>,
+  );
   fireEvent.click(screen.getByText('Toggle'));
   expect(val).toBe(true);
 });
 
 test('CheckableTag disabled', () => {
   let val = false;
-  render(<CheckableTag disabled onChange={(c) => { val = c; }}>Nope</CheckableTag>);
+  render(
+    <CheckableTag
+      disabled
+      onChange={(c) => {
+        val = c;
+      }}
+    >
+      Nope
+    </CheckableTag>,
+  );
   fireEvent.click(screen.getByText('Nope'));
   expect(val).toBe(false);
 });

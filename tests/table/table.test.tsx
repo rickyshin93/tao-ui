@@ -1,7 +1,7 @@
 import { expect, test } from '@rstest/core';
 import { fireEvent, render, screen } from '@testing-library/react';
-import { TaoProvider } from '../../src/provider/tao-provider';
 import { Table, type TableColumn } from '../../src/components/table/table';
+import { TaoProvider } from '../../src/provider/tao-provider';
 
 interface User {
   id: number;
@@ -27,14 +27,28 @@ const columns: TableColumn<User>[] = [
 // ---- Basic rendering ----
 
 test('renders all rows', () => {
-  render(<Table columns={columns} dataSource={data} rowKey="id" pagination={false} />);
+  render(
+    <Table
+      columns={columns}
+      dataSource={data}
+      rowKey="id"
+      pagination={false}
+    />,
+  );
   expect(screen.getByText('Alice')).toBeTruthy();
   expect(screen.getByText('Bob')).toBeTruthy();
   expect(screen.getByText('Charlie')).toBeTruthy();
 });
 
 test('renders column headers', () => {
-  render(<Table columns={columns} dataSource={data} rowKey="id" pagination={false} />);
+  render(
+    <Table
+      columns={columns}
+      dataSource={data}
+      rowKey="id"
+      pagination={false}
+    />,
+  );
   expect(screen.getByText('Name')).toBeTruthy();
   expect(screen.getByText('Age')).toBeTruthy();
   expect(screen.getByText('Role')).toBeTruthy();
@@ -46,7 +60,14 @@ test('shows empty text when no data', () => {
 });
 
 test('custom emptyText', () => {
-  render(<Table columns={columns} dataSource={[]} rowKey="id" emptyText="Nothing here" />);
+  render(
+    <Table
+      columns={columns}
+      dataSource={[]}
+      rowKey="id"
+      emptyText="Nothing here"
+    />,
+  );
   expect(screen.getByText('Nothing here')).toBeTruthy();
 });
 
@@ -54,12 +75,21 @@ test('custom render function', () => {
   const cols: TableColumn<User>[] = [
     { key: 'name', dataIndex: 'name', title: 'Name', render: (v) => `>> ${v}` },
   ];
-  render(<Table columns={cols} dataSource={data} rowKey="id" pagination={false} />);
+  render(
+    <Table columns={cols} dataSource={data} rowKey="id" pagination={false} />,
+  );
   expect(screen.getByText('>> Alice')).toBeTruthy();
 });
 
 test('rowKey as function', () => {
-  render(<Table columns={columns} dataSource={data} rowKey={(r) => `user-${r.id}`} pagination={false} />);
+  render(
+    <Table
+      columns={columns}
+      dataSource={data}
+      rowKey={(r) => `user-${r.id}`}
+      pagination={false}
+    />,
+  );
   expect(screen.getByText('Alice')).toBeTruthy();
 });
 
@@ -68,10 +98,17 @@ test('rowKey as function', () => {
 test('inherits size from TaoProvider', () => {
   const { container } = render(
     <TaoProvider size="small">
-      <Table columns={columns} dataSource={data} rowKey="id" pagination={false} />
+      <Table
+        columns={columns}
+        dataSource={data}
+        rowKey="id"
+        pagination={false}
+      />
     </TaoProvider>,
   );
-  const wrapper = container.querySelector('[data-tao-table-wrapper]') as HTMLElement;
+  const wrapper = container.querySelector(
+    '[data-tao-table-wrapper]',
+  ) as HTMLElement;
   expect(wrapper.dataset.taoSize).toBe('small');
 });
 
@@ -79,9 +116,17 @@ test('inherits size from TaoProvider', () => {
 
 test('bordered adds data attribute', () => {
   const { container } = render(
-    <Table columns={columns} dataSource={data} rowKey="id" bordered pagination={false} />,
+    <Table
+      columns={columns}
+      dataSource={data}
+      rowKey="id"
+      bordered
+      pagination={false}
+    />,
   );
-  const wrapper = container.querySelector('[data-tao-table-wrapper]') as HTMLElement;
+  const wrapper = container.querySelector(
+    '[data-tao-table-wrapper]',
+  ) as HTMLElement;
   expect(wrapper.dataset.taoBordered).toBeTruthy();
 });
 
@@ -89,9 +134,16 @@ test('bordered adds data attribute', () => {
 
 test('defaults to filled variant (legacy grey header)', () => {
   const { container } = render(
-    <Table columns={columns} dataSource={data} rowKey="id" pagination={false} />,
+    <Table
+      columns={columns}
+      dataSource={data}
+      rowKey="id"
+      pagination={false}
+    />,
   );
-  const wrapper = container.querySelector('[data-tao-table-wrapper]') as HTMLElement;
+  const wrapper = container.querySelector(
+    '[data-tao-table-wrapper]',
+  ) as HTMLElement;
   expect(wrapper.dataset.taoVariant).toBe('filled');
 });
 
@@ -99,9 +151,16 @@ test('defaults to filled variant (legacy grey header)', () => {
 
 test('header background on by default (no off attribute)', () => {
   const { container } = render(
-    <Table columns={columns} dataSource={data} rowKey="id" pagination={false} />,
+    <Table
+      columns={columns}
+      dataSource={data}
+      rowKey="id"
+      pagination={false}
+    />,
   );
-  const wrapper = container.querySelector('[data-tao-table-wrapper]') as HTMLElement;
+  const wrapper = container.querySelector(
+    '[data-tao-table-wrapper]',
+  ) as HTMLElement;
   expect(wrapper.dataset.taoHeaderBg).toBeUndefined();
 });
 
@@ -115,43 +174,77 @@ test('headerBackground={false} marks the wrapper for a minimal header', () => {
       pagination={false}
     />,
   );
-  const wrapper = container.querySelector('[data-tao-table-wrapper]') as HTMLElement;
+  const wrapper = container.querySelector(
+    '[data-tao-table-wrapper]',
+  ) as HTMLElement;
   expect(wrapper.dataset.taoHeaderBg).toBe('off');
 });
 
 test('borderless variant sets data attribute and no border', () => {
   const { container } = render(
-    <Table columns={columns} dataSource={data} rowKey="id" variant="borderless" pagination={false} />,
+    <Table
+      columns={columns}
+      dataSource={data}
+      rowKey="id"
+      variant="borderless"
+      pagination={false}
+    />,
   );
-  const wrapper = container.querySelector('[data-tao-table-wrapper]') as HTMLElement;
+  const wrapper = container.querySelector(
+    '[data-tao-table-wrapper]',
+  ) as HTMLElement;
   expect(wrapper.dataset.taoVariant).toBe('borderless');
   expect(wrapper.dataset.taoBordered).toBeFalsy();
 });
 
 test('outlined variant implies border', () => {
   const { container } = render(
-    <Table columns={columns} dataSource={data} rowKey="id" variant="outlined" pagination={false} />,
+    <Table
+      columns={columns}
+      dataSource={data}
+      rowKey="id"
+      variant="outlined"
+      pagination={false}
+    />,
   );
-  const wrapper = container.querySelector('[data-tao-table-wrapper]') as HTMLElement;
+  const wrapper = container.querySelector(
+    '[data-tao-table-wrapper]',
+  ) as HTMLElement;
   expect(wrapper.dataset.taoVariant).toBe('outlined');
   expect(wrapper.dataset.taoBordered).toBeTruthy();
 });
 
 test('borderless ignores bordered prop', () => {
   const { container } = render(
-    <Table columns={columns} dataSource={data} rowKey="id" variant="borderless" bordered pagination={false} />,
+    <Table
+      columns={columns}
+      dataSource={data}
+      rowKey="id"
+      variant="borderless"
+      bordered
+      pagination={false}
+    />,
   );
-  const wrapper = container.querySelector('[data-tao-table-wrapper]') as HTMLElement;
+  const wrapper = container.querySelector(
+    '[data-tao-table-wrapper]',
+  ) as HTMLElement;
   expect(wrapper.dataset.taoBordered).toBeFalsy();
 });
 
 test('inherits variant from TaoProvider', () => {
   const { container } = render(
     <TaoProvider variant="borderless">
-      <Table columns={columns} dataSource={data} rowKey="id" pagination={false} />
+      <Table
+        columns={columns}
+        dataSource={data}
+        rowKey="id"
+        pagination={false}
+      />
     </TaoProvider>,
   );
-  const wrapper = container.querySelector('[data-tao-table-wrapper]') as HTMLElement;
+  const wrapper = container.querySelector(
+    '[data-tao-table-wrapper]',
+  ) as HTMLElement;
   expect(wrapper.dataset.taoVariant).toBe('borderless');
 });
 
@@ -160,9 +253,21 @@ test('inherits variant from TaoProvider', () => {
 test('client-side sort on click', () => {
   const sortColumns: TableColumn<User>[] = [
     { key: 'name', dataIndex: 'name', title: 'Name' },
-    { key: 'age', dataIndex: 'age', title: 'Age', sorter: (a, b) => a.age - b.age },
+    {
+      key: 'age',
+      dataIndex: 'age',
+      title: 'Age',
+      sorter: (a, b) => a.age - b.age,
+    },
   ];
-  render(<Table columns={sortColumns} dataSource={data} rowKey="id" pagination={false} />);
+  render(
+    <Table
+      columns={sortColumns}
+      dataSource={data}
+      rowKey="id"
+      pagination={false}
+    />,
+  );
 
   const ageHeader = screen.getByText('Age');
   fireEvent.click(ageHeader);
@@ -178,7 +283,12 @@ test('client-side sort on click', () => {
 
 test('sort cycles ascend -> descend -> null', () => {
   const sortColumns: TableColumn<User>[] = [
-    { key: 'age', dataIndex: 'age', title: 'Age', sorter: (a, b) => a.age - b.age },
+    {
+      key: 'age',
+      dataIndex: 'age',
+      title: 'Age',
+      sorter: (a, b) => a.age - b.age,
+    },
   ];
   let lastSorter: any = null;
   render(
@@ -187,7 +297,9 @@ test('sort cycles ascend -> descend -> null', () => {
       dataSource={data}
       rowKey="id"
       pagination={false}
-      onChange={(_p, _f, s) => { lastSorter = s; }}
+      onChange={(_p, _f, s) => {
+        lastSorter = s;
+      }}
     />,
   );
   const header = screen.getByText('Age');
@@ -218,7 +330,14 @@ test('client-side filter', () => {
       onFilter: (value, record) => record.role === value,
     },
   ];
-  render(<Table columns={filterColumns} dataSource={data} rowKey="id" pagination={false} />);
+  render(
+    <Table
+      columns={filterColumns}
+      dataSource={data}
+      rowKey="id"
+      pagination={false}
+    />,
+  );
 
   // Click filter trigger
   const filterBtn = screen.getByLabelText('Filter');
@@ -257,7 +376,14 @@ test('pagination: false shows all data', () => {
     age: 20 + i,
     role: 'user',
   }));
-  render(<Table columns={columns} dataSource={bigData} rowKey="id" pagination={false} />);
+  render(
+    <Table
+      columns={columns}
+      dataSource={bigData}
+      rowKey="id"
+      pagination={false}
+    />,
+  );
   expect(screen.getByText('User 0')).toBeTruthy();
   expect(screen.getByText('User 24')).toBeTruthy();
 });
@@ -289,7 +415,9 @@ test('rowSelection onChange fires', () => {
       pagination={false}
       rowSelection={{
         selectedRowKeys: [],
-        onChange: (k) => { keys = k; },
+        onChange: (k) => {
+          keys = k;
+        },
       }}
     />,
   );
@@ -308,7 +436,9 @@ test('select all checkbox', () => {
       pagination={false}
       rowSelection={{
         selectedRowKeys: [],
-        onChange: (k) => { keys = k; },
+        onChange: (k) => {
+          keys = k;
+        },
       }}
     />,
   );
@@ -321,7 +451,13 @@ test('select all checkbox', () => {
 
 test('loading shows spinner overlay', () => {
   const { container } = render(
-    <Table columns={columns} dataSource={data} rowKey="id" loading pagination={false} />,
+    <Table
+      columns={columns}
+      dataSource={data}
+      rowKey="id"
+      loading
+      pagination={false}
+    />,
   );
   expect(container.querySelector('[data-tao-table-loading]')).toBeTruthy();
 });

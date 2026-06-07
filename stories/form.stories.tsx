@@ -1,4 +1,3 @@
-import type { Meta, StoryObj } from '@storybook/react';
 import {
   Button,
   FormActions,
@@ -9,6 +8,7 @@ import {
   Select,
   Stack,
 } from '@rockshin/tao-ui';
+import type { Meta, StoryObj } from '@storybook/react';
 
 const meta: Meta = {
   title: '数据录入 Data Entry/Form',
@@ -22,7 +22,11 @@ export const FormFieldBasic: StoryObj = {
       <FormField label="Email" required description="We won't share it.">
         <Input placeholder="you@example.com" />
       </FormField>
-      <FormField label="Username" required error="Must be at least 3 characters.">
+      <FormField
+        label="Username"
+        required
+        error="Must be at least 3 characters."
+      >
         <Input value="ab" error />
       </FormField>
     </Stack>
@@ -33,7 +37,10 @@ export const CompleteForm: StoryObj = {
   name: 'Complete Form',
   render: () => (
     <FormLayout>
-      <FormSection title="Personal Information" description="Basic details about you.">
+      <FormSection
+        title="Personal Information"
+        description="Basic details about you."
+      >
         <Stack direction="horizontal" gap="md">
           <FormField label="First name" required>
             <Input value="Rihua" />

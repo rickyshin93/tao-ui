@@ -11,6 +11,7 @@ interface MobileSelectContentProps {
   showSearch?: boolean;
   filterOption?: (input: string, option: SelectOption) => boolean;
   notFoundContent?: ReactNode;
+  optionRender?: (option: SelectOption, info: { index: number }) => ReactNode;
   onClose: () => void;
 }
 
@@ -20,6 +21,31 @@ const defaultFilter = (input: string, option: SelectOption): boolean => {
   return label.toLowerCase().includes(input.toLowerCase());
 };
 
+/** Filter while preserving group structure; empty groups are dropped. */
+function filterTree(
+  options: SelectOption[],
+  fn: (input: string, option: SelectOption) => boolean,
+  input: string,
+): SelectOption[] {
+  const result: SelectOption[] = [];
+  for (const o of options) {
+    if (o.options) {
+      const kids = filterTree(o.options, fn, input);
+      if (kids.length) result.push({ ...o, options: kids });
+    } else if (fn(input, o)) {
+      result.push(o);
+    }
+  }
+  return result;
+}
+
+function countLeaves(options: SelectOption[]): number {
+  return options.reduce(
+    (n, o) => n + (o.options ? countLeaves(o.options) : 1),
+    0,
+  );
+}
+
 export function MobileSelectContent({
   options,
   value,
@@ -27,6 +53,7 @@ export function MobileSelectContent({
   showSearch,
   filterOption,
   notFoundContent = 'No results',
+  optionRender,
   onClose,
 }: MobileSelectContentProps) {
   const [search, setSearch] = useState('');
@@ -34,7 +61,7 @@ export function MobileSelectContent({
   const filteredOptions = useMemo(() => {
     if (!showSearch || !search) return options;
     const fn = filterOption ?? defaultFilter;
-    return options.filter((o) => fn(search, o));
+    return filterTree(options, fn, search);
   }, [options, search, showSearch, filterOption]);
 
   const handleSelect = useCallback(
@@ -44,6 +71,57 @@ export function MobileSelectContent({
     },
     [onChange, onClose],
   );
+
+  let optIndex = 0;
+  const renderItem = (opt: SelectOption): ReactNode => {
+    const index = optIndex++;
+    const isSelected = opt.value === value;
+    return (
+      <div
+        key={opt.value}
+        data-tao-sheet-item=""
+        data-tao-selected={isSelected || undefined}
+        data-tao-disabled={opt.disabled || undefined}
+        onClick={() => {
+          if (!opt.disabled) handleSelect(opt.value);
+        }}
+        data-tao-has-desc={opt.description != null || undefined}
+      >
+        {optionRender ? (
+          optionRender(opt, { index })
+        ) : (
+          <>
+            {opt.icon != null && (
+              <span data-tao-sheet-item-icon="">{opt.icon}</span>
+            )}
+            <span data-tao-sheet-item-main="">
+              <span data-tao-sheet-item-label="">{opt.label}</span>
+              {opt.description != null && (
+                <span data-tao-sheet-item-desc="">{opt.description}</span>
+              )}
+            </span>
+          </>
+        )}
+        {isSelected && (
+          <span data-tao-sheet-item-check="">
+            <CheckIcon />
+          </span>
+        )}
+      </div>
+    );
+  };
+
+  const renderTree = (opts: SelectOption[]): ReactNode =>
+    opts.map((o) =>
+      o.options ? (
+        <div key={o.value} data-tao-sheet-group="">
+          <div data-tao-sheet-group-label="">{o.label}</div>
+          {o.options.map(renderItem)}
+        </div>
+      ) : (
+        renderItem(o)
+      ),
+    );
 
   return (
     <>
@@ -60,37 +138,8 @@ export function MobileSelectContent({
         </div>
       )}
       <div data-tao-sheet-list="">
-        {filteredOptions.length > 0 ? (
-          filteredOptions.map((opt) => {
-            const isSelected = opt.value === value;
-            return (
-              <div
-                key={opt.value}
-                data-tao-sheet-item=""
-                data-tao-selected={isSelected || undefined}
-                data-tao-disabled={opt.disabled || undefined}
-                onClick={() => {
-                  if (!opt.disabled) handleSelect(opt.value);
-                }}
-                data-tao-has-desc={opt.description != null || undefined}
-              >
-                {opt.icon != null && (
-                  <span data-tao-sheet-item-icon="">{opt.icon}</span>
-                )}
-                <span data-tao-sheet-item-main="">
-                  <span data-tao-sheet-item-label="">{opt.label}</span>
-                  {opt.description != null && (
-                    <span data-tao-sheet-item-desc="">{opt.description}</span>
-                  )}
-                </span>
-                {isSelected && (
-                  <span data-tao-sheet-item-check="">
-                    <CheckIcon />
-                  </span>
-                )}
-              </div>
-            );
-          })
+        {countLeaves(filteredOptions) > 0 ? (
+          renderTree(filteredOptions)
         ) : (
           <div data-tao-sheet-empty="">{notFoundContent}</div>
         )}

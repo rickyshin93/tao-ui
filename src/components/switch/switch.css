@@ -1,4 +1,4 @@
-@import '../../theme/theme.css';
+@import "../../theme/theme.css";
 
 /*
  * Switch — mirrors antd rc-switch structure:
@@ -105,7 +105,8 @@ button[data-tao-switch][data-tao-size="medium"] [data-tao-switch-handle] {
   width: 18px;
   height: 18px;
 }
-button[data-tao-switch][data-tao-size="medium"][data-tao-checked] [data-tao-switch-handle] {
+button[data-tao-switch][data-tao-size="medium"][data-tao-checked]
+  [data-tao-switch-handle] {
   inset-inline-start: calc(100% - 18px - 2px);
 }
 
@@ -114,15 +115,18 @@ button[data-tao-switch][data-tao-size="small"] [data-tao-switch-handle] {
   width: 12px;
   height: 12px;
 }
-button[data-tao-switch][data-tao-size="small"][data-tao-checked] [data-tao-switch-handle] {
+button[data-tao-switch][data-tao-size="small"][data-tao-checked]
+  [data-tao-switch-handle] {
   inset-inline-start: calc(100% - 12px - 2px);
 }
 
 /* Active: handle stretches (antd: inset -30%) */
-button[data-tao-switch]:not([disabled]):active [data-tao-switch-handle]::before {
+button[data-tao-switch]:not([disabled]):active
+[data-tao-switch-handle]::before {
   inset-inline-end: -30%;
 }
-button[data-tao-switch][data-tao-checked]:not([disabled]):active [data-tao-switch-handle]::before {
+button[data-tao-switch][data-tao-checked]:not([disabled]):active
+  [data-tao-switch-handle]::before {
   inset-inline-start: -30%;
   inset-inline-end: 0;
 }
@@ -138,13 +142,25 @@ button[data-tao-switch][data-tao-checked]:not([disabled]):active [data-tao-switc
   z-index: 1;
 }
 
-button[data-tao-switch][data-tao-size="medium"] [data-tao-switch-loading] { width: 12px; height: 12px; }
-button[data-tao-switch][data-tao-size="small"] [data-tao-switch-loading] { width: 8px; height: 8px; }
-button[data-tao-switch][data-tao-checked] [data-tao-switch-loading] { color: var(--tao-primary); }
+button[data-tao-switch][data-tao-size="medium"] [data-tao-switch-loading] {
+  width: 12px;
+  height: 12px;
+}
+button[data-tao-switch][data-tao-size="small"] [data-tao-switch-loading] {
+  width: 8px;
+  height: 8px;
+}
+button[data-tao-switch][data-tao-checked] [data-tao-switch-loading] {
+  color: var(--tao-primary);
+}
 
 @keyframes tao-spin {
-  from { transform: translate(-50%, -50%) rotate(0deg); }
-  to { transform: translate(-50%, -50%) rotate(360deg); }
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
 }
 
 /* ===========================
@@ -185,31 +201,37 @@ button[data-tao-switch][data-tao-size="medium"] [data-tao-switch-inner] {
 }
 
 button[data-tao-switch][data-tao-size="medium"] [data-tao-switch-inner-checked],
-button[data-tao-switch][data-tao-size="medium"] [data-tao-switch-inner-unchecked] {
+button[data-tao-switch][data-tao-size="medium"]
+  [data-tao-switch-inner-unchecked] {
   min-height: 22px;
   display: flex;
   align-items: center;
 }
 
 /* Unchecked: checked-text slides left out of view, unchecked-text visible */
-button[data-tao-switch][data-tao-size="medium"] [data-tao-switch-inner-checked] {
+button[data-tao-switch][data-tao-size="medium"]
+[data-tao-switch-inner-checked] {
   margin-inline-start: calc(-100% + 22px - 48px);
   margin-inline-end: calc(100% - 22px + 48px);
 }
-button[data-tao-switch][data-tao-size="medium"] [data-tao-switch-inner-unchecked] {
+button[data-tao-switch][data-tao-size="medium"]
+  [data-tao-switch-inner-unchecked] {
   margin-top: -22px;
 }
 
 /* Checked: swap padding, checked-text visible */
-button[data-tao-switch][data-tao-size="medium"][data-tao-checked] [data-tao-switch-inner] {
+button[data-tao-switch][data-tao-size="medium"][data-tao-checked]
+[data-tao-switch-inner] {
   padding-inline-start: 9px;
   padding-inline-end: 24px;
 }
-button[data-tao-switch][data-tao-size="medium"][data-tao-checked] [data-tao-switch-inner-checked] {
+button[data-tao-switch][data-tao-size="medium"][data-tao-checked]
+  [data-tao-switch-inner-checked] {
   margin-inline-start: 0;
   margin-inline-end: 0;
 }
-button[data-tao-switch][data-tao-size="medium"][data-tao-checked] [data-tao-switch-inner-unchecked] {
+button[data-tao-switch][data-tao-size="medium"][data-tao-checked]
+  [data-tao-switch-inner-unchecked] {
   margin-top: -22px;
   margin-inline-start: calc(100% - 22px + 48px);
   margin-inline-end: calc(-100% + 22px - 48px);
@@ -223,7 +245,8 @@ button[data-tao-switch][data-tao-size="small"] [data-tao-switch-inner] {
 }
 
 button[data-tao-switch][data-tao-size="small"] [data-tao-switch-inner-checked],
-button[data-tao-switch][data-tao-size="small"] [data-tao-switch-inner-unchecked] {
+button[data-tao-switch][data-tao-size="small"]
+  [data-tao-switch-inner-unchecked] {
   min-height: 16px;
   display: flex;
   align-items: center;
@@ -233,19 +256,23 @@ button[data-tao-switch][data-tao-size="small"] [data-tao-switch-inner-checked] {
   margin-inline-start: calc(-100% + 14px - 36px);
   margin-inline-end: calc(100% - 14px + 36px);
 }
-button[data-tao-switch][data-tao-size="small"] [data-tao-switch-inner-unchecked] {
+button[data-tao-switch][data-tao-size="small"]
+  [data-tao-switch-inner-unchecked] {
   margin-top: -16px;
 }
 
-button[data-tao-switch][data-tao-size="small"][data-tao-checked] [data-tao-switch-inner] {
+button[data-tao-switch][data-tao-size="small"][data-tao-checked]
+  [data-tao-switch-inner] {
   padding-inline-start: 6px;
   padding-inline-end: 18px;
 }
-button[data-tao-switch][data-tao-size="small"][data-tao-checked] [data-tao-switch-inner-checked] {
+button[data-tao-switch][data-tao-size="small"][data-tao-checked]
+  [data-tao-switch-inner-checked] {
   margin-inline-start: 0;
   margin-inline-end: 0;
 }
-button[data-tao-switch][data-tao-size="small"][data-tao-checked] [data-tao-switch-inner-unchecked] {
+button[data-tao-switch][data-tao-size="small"][data-tao-checked]
+  [data-tao-switch-inner-unchecked] {
   margin-top: -16px;
   margin-inline-start: calc(100% - 14px + 36px);
   margin-inline-end: calc(-100% + 14px - 36px);

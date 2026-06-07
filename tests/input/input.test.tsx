@@ -11,7 +11,14 @@ test('renders input with value', () => {
 
 test('calls onChange on typing', async () => {
   let val = '';
-  render(<Input value={val} onChange={(e) => { val = e.target.value; }} />);
+  render(
+    <Input
+      value={val}
+      onChange={(e) => {
+        val = e.target.value;
+      }}
+    />,
+  );
   await userEvent.type(screen.getByRole('textbox'), 'a');
   expect(val).toBe('a');
 });

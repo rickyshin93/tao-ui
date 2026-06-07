@@ -21,21 +21,44 @@ test('aria-checked false when unchecked', () => {
 
 test('click triggers onChange with toggled value', async () => {
   let val = false;
-  render(<Switch checked={val} onChange={(v) => { val = v; }} />);
+  render(
+    <Switch
+      checked={val}
+      onChange={(v) => {
+        val = v;
+      }}
+    />,
+  );
   await userEvent.click(screen.getByRole('switch'));
   expect(val).toBe(true);
 });
 
 test('disabled prevents onChange', async () => {
   let val = false;
-  render(<Switch checked={val} onChange={(v) => { val = v; }} disabled />);
+  render(
+    <Switch
+      checked={val}
+      onChange={(v) => {
+        val = v;
+      }}
+      disabled
+    />,
+  );
   await userEvent.click(screen.getByRole('switch'));
   expect(val).toBe(false);
 });
 
 test('loading disables interaction and shows spinner', async () => {
   let val = false;
-  render(<Switch checked={val} onChange={(v) => { val = v; }} loading />);
+  render(
+    <Switch
+      checked={val}
+      onChange={(v) => {
+        val = v;
+      }}
+      loading
+    />,
+  );
   const sw = screen.getByRole('switch');
   expect(sw).toBeDisabled();
   expect(sw.querySelector('[data-tao-switch-loading]')).toBeTruthy();
@@ -49,7 +72,9 @@ test('checkedChildren displayed when checked', () => {
 });
 
 test('unCheckedChildren displayed when unchecked', () => {
-  render(<Switch checked={false} checkedChildren="ON" unCheckedChildren="OFF" />);
+  render(
+    <Switch checked={false} checkedChildren="ON" unCheckedChildren="OFF" />,
+  );
   expect(screen.getByText('OFF')).toBeTruthy();
 });
 

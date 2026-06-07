@@ -6,7 +6,7 @@
 [data-tao-modal-overlay] {
   position: fixed;
   inset: 0;
-  z-index: 1000;
+  z-index: var(--tao-z-index-modal);
   background: oklch(0 0 0 / 0.1);
   animation: tao-modal-fade-in var(--tao-motion-duration-mid) ease-out;
 }
@@ -33,7 +33,7 @@
 [data-tao-modal-wrap] {
   position: fixed;
   inset: 0;
-  z-index: 1001;
+  z-index: calc(var(--tao-z-index-modal) + 1);
   display: flex;
   justify-content: center;
   align-items: flex-start;

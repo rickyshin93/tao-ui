@@ -1,7 +1,7 @@
 import {
   type CSSProperties,
-  type ReactNode,
   createContext,
+  type ReactNode,
   useContext,
   useMemo,
 } from 'react';
@@ -45,16 +45,44 @@ interface TaoConfigContextValue {
   size: TaoSize;
   disabled: boolean;
   variant: TaoVariant;
+  /**
+   * Merged CSS custom-property overrides from this provider and all ancestors.
+   * Carried through context so portaled layers (Modal/Drawer/Select dropdown…)
+   * — which render outside the provider's DOM subtree — can re-apply the theme.
+   */
+  tokenStyle: CSSProperties;
 }
 
 const TaoConfigContext = createContext<TaoConfigContextValue>({
   size: 'medium',
   disabled: false,
   variant: 'outlined',
+  tokenStyle: {},
 });
 
 export function useTaoConfig(): TaoConfigContextValue {
   return useContext(TaoConfigContext);
+}
+
+/**
+ * Re-establishes the theme token scope inside a portal. Floating components
+ * portal their popup to document.body, escaping the `[data-tao-provider]`
+ * element that carries custom token overrides; wrapping the portal content in
+ * this component re-applies those overrides so colors/sizes stay consistent.
+ */
+export function TaoPortalScope({
+  children,
+  style,
+}: {
+  children: ReactNode;
+  style?: CSSProperties;
+}) {
+  const { tokenStyle } = useTaoConfig();
+  return (
+    <div data-tao-provider="" style={{ ...tokenStyle, ...style }}>
+      {children}
+    </div>
+  );
 }
 
 // ---- Provider ----
@@ -96,16 +124,7 @@ export function TaoProvider({
   const parentConfig = useContext(TaoConfigContext);
   const inherit = theme?.inherit ?? true;
 
-  const config = useMemo<TaoConfigContextValue>(
-    () => ({
-      size: size ?? (inherit ? parentConfig.size : 'medium'),
-      disabled: disabled ?? (inherit ? parentConfig.disabled : false),
-      variant: variant ?? (inherit ? parentConfig.variant : 'outlined'),
-    }),
-    [size, disabled, variant, parentConfig, inherit],
-  );
-
-  const style = useMemo(() => {
+  const ownVars = useMemo(() => {
     if (!theme?.token) return undefined;
 
     const vars: Record<string, string> = {};
@@ -121,12 +140,27 @@ export function TaoProvider({
       if (val != null) vars[varName] = `${val}px`;
     }
 
-    return vars as CSSProperties;
+    return vars;
   }, [theme?.token]);
+
+  const tokenStyle = useMemo<CSSProperties>(
+    () => ({ ...parentConfig.tokenStyle, ...ownVars }),
+    [parentConfig.tokenStyle, ownVars],
+  );
+
+  const config = useMemo<TaoConfigContextValue>(
+    () => ({
+      size: size ?? (inherit ? parentConfig.size : 'medium'),
+      disabled: disabled ?? (inherit ? parentConfig.disabled : false),
+      variant: variant ?? (inherit ? parentConfig.variant : 'outlined'),
+      tokenStyle,
+    }),
+    [size, disabled, variant, parentConfig, inherit, tokenStyle],
+  );
 
   return (
     <TaoConfigContext.Provider value={config}>
-      <div style={style} data-tao-provider="">
+      <div style={ownVars as CSSProperties} data-tao-provider="">
         {children}
       </div>
     </TaoConfigContext.Provider>

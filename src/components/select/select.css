@@ -57,16 +57,6 @@ button[data-tao-select] {
   border-radius: var(--tao-radius-md);
 }
 
-/* Value text — Radix renders a <span> inside trigger */
-[data-tao-select] > span:first-of-type {
-  flex: 1;
-  text-align: start;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  min-width: 0;
-}
-
 /* Prefix */
 [data-tao-select-prefix] {
   display: flex;
@@ -75,9 +65,7 @@ button[data-tao-select] {
   flex-shrink: 0;
 }
 
-/* Selected option's leading icon/avatar (shown in trigger).
-   Qualified selector beats the generic `> span:first-of-type { flex: 1 }`
-   so the icon keeps its fixed size when it's the first child. */
+/* Selected option's leading icon/avatar (shown in trigger). */
 [data-tao-select] > span[data-tao-select-value-icon] {
   display: inline-flex;
   align-items: center;
@@ -126,6 +114,19 @@ button[data-tao-select] {
   transform: rotate(180deg);
 }
 
+/* A custom suffix icon (e.g. the ↕ switcher icon) keeps its orientation. */
+[data-tao-select][data-state="open"]
+  [data-tao-select-icon][data-tao-custom-suffix] {
+  transform: none;
+}
+
+/* Loading sits in the same slot as the arrow; don't let the open-rotate
+   stack on top of its own spin animation. */
+[data-tao-select][data-state="open"]
+  [data-tao-select-icon][data-tao-select-loading-slot] {
+  transform: none;
+}
+
 [data-tao-select-clear] {
   color: var(--tao-color-text-quaternary);
   cursor: pointer;
@@ -137,7 +138,7 @@ button[data-tao-select] {
 
 /* Loading spinner */
 [data-tao-select-loading] {
-  color: var(--tao-color-text-quaternary);
+  color: var(--tao-color-text-tertiary);
   animation: tao-spin 0.8s linear infinite;
 }
 
@@ -163,7 +164,7 @@ button[data-tao-select] {
   border: var(--tao-line-width) solid var(--tao-color-border);
   border-radius: var(--tao-radius-lg);
   box-shadow: var(--tao-box-shadow-secondary);
-  z-index: 1000;
+  z-index: var(--tao-z-index-popup);
   overflow: hidden;
   min-width: var(--radix-select-trigger-width);
 
@@ -173,6 +174,11 @@ button[data-tao-select] {
 
 [data-tao-select-content][data-state="open"] {
   animation-name: tao-select-in;
+}
+
+/* popupMatchSelectWidth={false}: fit the widest option instead of the trigger */
+[data-tao-select-content][data-tao-popup-width="content"] {
+  min-width: max-content;
 }
 
 @keyframes tao-select-in {
@@ -216,6 +222,19 @@ button[data-tao-select] {
 [data-tao-select-viewport] {
   padding: var(--tao-padding-xxs);
   max-height: 256px;
+}
+
+/* Group */
+[data-tao-select-group]:not(:first-child) {
+  margin-block-start: var(--tao-padding-xxs);
+}
+
+[data-tao-select-group-label] {
+  padding: var(--tao-padding-xs) var(--tao-padding-sm) var(--tao-padding-xxs);
+  font-size: var(--tao-font-size-xs);
+  font-weight: var(--tao-font-weight-medium);
+  color: var(--tao-color-text-tertiary);
+  user-select: none;
 }
 
 /* Item */

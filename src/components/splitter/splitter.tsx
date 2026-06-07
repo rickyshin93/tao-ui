@@ -6,7 +6,11 @@ import {
   useRef,
   useState,
 } from 'react';
-import { cx, type SemanticClassNames, type SemanticStyles } from '../../utils/semantic';
+import {
+  cx,
+  type SemanticClassNames,
+  type SemanticStyles,
+} from '../../utils/semantic';
 import './splitter.css';
 
 // ---- Types ----
@@ -38,7 +42,10 @@ export interface SplitterProps {
 
 // ---- Helpers ----
 
-function parseSize(value: number | string | undefined, total: number): number | undefined {
+function parseSize(
+  value: number | string | undefined,
+  total: number,
+): number | undefined {
   if (value === undefined) return undefined;
   if (typeof value === 'number') return value;
   if (value.endsWith('%')) return (parseFloat(value) / 100) * total;
@@ -54,11 +61,29 @@ function clampSize(size: number, min?: number, max?: number): number {
 
 // ---- Icons ----
 
-function CollapseIcon({ direction }: { direction: 'start' | 'end'; orientation: 'horizontal' | 'vertical' }) {
+function CollapseIcon({
+  direction,
+}: {
+  direction: 'start' | 'end';
+  orientation: 'horizontal' | 'vertical';
+}) {
   // Simple chevron — rotated via CSS
   return (
-    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden data-tao-collapse-direction={direction}>
-      <path d="M7.5 2.5L4 6l3.5 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    <svg
+      width="12"
+      height="12"
+      viewBox="0 0 12 12"
+      fill="none"
+      aria-hidden
+      data-tao-collapse-direction={direction}
+    >
+      <path
+        d="M7.5 2.5L4 6l3.5 3.5"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   );
 }
@@ -90,7 +115,12 @@ export function Splitter({
 
   const childArray = Array.isArray(children) ? children : [children];
   for (const child of childArray) {
-    if (child && typeof child === 'object' && 'type' in child && (child as any).type === Panel) {
+    if (
+      child &&
+      typeof child === 'object' &&
+      'type' in child &&
+      (child as any).type === Panel
+    ) {
       panels.push((child as any).props as SplitterPanelProps);
       panelChildren.push((child as any).props.children);
     }
@@ -111,7 +141,9 @@ export function Splitter({
     const observer = new ResizeObserver((entries) => {
       const entry = entries[0];
       if (!entry) return;
-      const total = isHorizontal ? entry.contentRect.width : entry.contentRect.height;
+      const total = isHorizontal
+        ? entry.contentRect.width
+        : entry.contentRect.height;
       setContainerSize(total);
     });
     observer.observe(el);
@@ -132,8 +164,12 @@ export function Splitter({
 
     for (let i = 0; i < panelCount; i++) {
       const p = panels[i];
-      const controlled = p.size !== undefined ? parseSize(p.size, available) : undefined;
-      const def = p.defaultSize !== undefined ? parseSize(p.defaultSize, available) : undefined;
+      const controlled =
+        p.size !== undefined ? parseSize(p.size, available) : undefined;
+      const def =
+        p.defaultSize !== undefined
+          ? parseSize(p.defaultSize, available)
+          : undefined;
       const s = controlled ?? def;
       if (s !== undefined) {
         newSizes.push(s);
@@ -164,7 +200,10 @@ export function Splitter({
     let changed = false;
     const next = [...sizes];
     for (let i = 0; i < panelCount; i++) {
-      const controlled = panels[i].size !== undefined ? parseSize(panels[i].size, available) : undefined;
+      const controlled =
+        panels[i].size !== undefined
+          ? parseSize(panels[i].size, available)
+          : undefined;
       if (controlled !== undefined && Math.abs(controlled - next[i]) > 0.5) {
         next[i] = controlled;
         changed = true;
@@ -174,7 +213,11 @@ export function Splitter({
   });
 
   // ---- Drag logic ----
-  const dragging = useRef<{ index: number; startPos: number; startSizes: number[] } | null>(null);
+  const dragging = useRef<{
+    index: number;
+    startPos: number;
+    startSizes: number[];
+  } | null>(null);
 
   const handleDragStart = useCallback(
     (index: number, e: React.PointerEvent) => {
@@ -211,8 +254,10 @@ export function Splitter({
         newLeft = Math.max(0, newLeft);
 
         // Right panel constraints → bound newLeft from the other side
-        if (rightMin !== undefined) newLeft = Math.min(newLeft, total - rightMin);
-        if (rightMax !== undefined) newLeft = Math.max(newLeft, total - rightMax);
+        if (rightMin !== undefined)
+          newLeft = Math.min(newLeft, total - rightMin);
+        if (rightMax !== undefined)
+          newLeft = Math.max(newLeft, total - rightMax);
         newLeft = Math.max(0, Math.min(newLeft, total));
 
         newRight = total - newLeft;
@@ -240,7 +285,16 @@ export function Splitter({
       document.addEventListener('pointermove', handleMove);
       document.addEventListener('pointerup', handleUp);
     },
-    [isHorizontal, sizes, panelCount, containerSize, panels, onResize, onResizeEnd, onResizeStart],
+    [
+      isHorizontal,
+      sizes,
+      panelCount,
+      containerSize,
+      panels,
+      onResize,
+      onResizeEnd,
+      onResizeStart,
+    ],
   );
 
   // ---- Collapse ----
@@ -342,7 +396,10 @@ export function Splitter({
                 className={cx(classNames?.dragger)}
                 style={styles?.dragger}
                 onPointerDown={(e) => {
-                  if ((panel.resizable ?? true) && (panels[i + 1]?.resizable ?? true)) {
+                  if (
+                    (panel.resizable ?? true) &&
+                    (panels[i + 1]?.resizable ?? true)
+                  ) {
                     handleDragStart(i, e);
                   }
                 }}
@@ -361,7 +418,10 @@ export function Splitter({
                           aria-label="Collapse panel"
                           onClick={() => handleCollapse(i, 'start')}
                         >
-                          <CollapseIcon direction={sizes[i] <= 0 ? 'end' : 'start'} orientation={orientation} />
+                          <CollapseIcon
+                            direction={sizes[i] <= 0 ? 'end' : 'start'}
+                            orientation={orientation}
+                          />
                         </button>
                       )}
                       {end && (
@@ -373,7 +433,10 @@ export function Splitter({
                           aria-label="Collapse panel"
                           onClick={() => handleCollapse(i, 'end')}
                         >
-                          <CollapseIcon direction={sizes[i + 1] <= 0 ? 'start' : 'end'} orientation={orientation} />
+                          <CollapseIcon
+                            direction={sizes[i + 1] <= 0 ? 'start' : 'end'}
+                            orientation={orientation}
+                          />
                         </button>
                       )}
                     </>

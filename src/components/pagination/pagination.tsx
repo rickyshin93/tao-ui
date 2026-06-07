@@ -1,6 +1,10 @@
 import { type ReactNode, useCallback, useMemo, useState } from 'react';
 import { type TaoSize, useTaoConfig } from '../../provider/tao-provider';
-import { cx, type SemanticClassNames, type SemanticStyles } from '../../utils/semantic';
+import {
+  cx,
+  type SemanticClassNames,
+  type SemanticStyles,
+} from '../../utils/semantic';
 import { Select } from '../select/select';
 import './pagination.css';
 
@@ -33,7 +37,10 @@ function range(start: number, end: number): number[] {
   return result;
 }
 
-function computePages(current: number, totalPages: number): (number | 'ellipsis')[] {
+function computePages(
+  current: number,
+  totalPages: number,
+): (number | 'ellipsis')[] {
   if (totalPages <= 7) return range(1, totalPages);
 
   const items: (number | 'ellipsis')[] = [1];
@@ -43,7 +50,14 @@ function computePages(current: number, totalPages: number): (number | 'ellipsis'
   } else if (current >= totalPages - 3) {
     items.push('ellipsis', ...range(totalPages - 4, totalPages));
   } else {
-    items.push('ellipsis', current - 1, current, current + 1, 'ellipsis', totalPages);
+    items.push(
+      'ellipsis',
+      current - 1,
+      current,
+      current + 1,
+      'ellipsis',
+      totalPages,
+    );
   }
 
   return items;
@@ -54,7 +68,13 @@ function computePages(current: number, totalPages: number): (number | 'ellipsis'
 function ChevronLeft() {
   return (
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden>
-      <path d="M10 12L6 8l4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      <path
+        d="M10 12L6 8l4-4"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   );
 }
@@ -62,7 +82,13 @@ function ChevronLeft() {
 function ChevronRight() {
   return (
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden>
-      <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      <path
+        d="M6 4l4 4-4 4"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   );
 }
@@ -100,7 +126,10 @@ export function Pagination({
   const pageSize = isPageSizeControlled ? pageSizeProp : internalPageSize;
 
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
-  const pages = useMemo(() => computePages(current, totalPages), [current, totalPages]);
+  const pages = useMemo(
+    () => computePages(current, totalPages),
+    [current, totalPages],
+  );
 
   const goTo = useCallback(
     (page: number, newPageSize?: number) => {
@@ -108,7 +137,8 @@ export function Pagination({
       const maxPage = Math.max(1, Math.ceil(total / ps));
       const safePage = Math.min(Math.max(1, page), maxPage);
       if (!isCurrentControlled) setInternalCurrent(safePage);
-      if (newPageSize != null && !isPageSizeControlled) setInternalPageSize(newPageSize);
+      if (newPageSize != null && !isPageSizeControlled)
+        setInternalPageSize(newPageSize);
       onChange?.(safePage, ps);
     },
     [pageSize, total, isCurrentControlled, isPageSizeControlled, onChange],
@@ -127,7 +157,11 @@ export function Pagination({
       style={styles?.root}
     >
       {showTotal && (
-        <span data-tao-pagination-total="" className={classNames?.total} style={styles?.total}>
+        <span
+          data-tao-pagination-total=""
+          className={classNames?.total}
+          style={styles?.total}
+        >
           {showTotal(total, [rangeStart, rangeEnd])}
         </span>
       )}
@@ -181,7 +215,7 @@ export function Pagination({
 
       {showSizeChanger && (
         <Select
-          data-tao-pagination-sizer=""
+          style={{ width: 'auto' }}
           options={pageSizeOptions.map((opt) => ({
             label: `${opt} / page`,
             value: String(opt),

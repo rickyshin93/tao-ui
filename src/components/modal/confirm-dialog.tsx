@@ -73,7 +73,10 @@ export function ConfirmDialog({
   const [loading, setLoading] = useState(false);
   const showCancel = okCancel ?? type === 'confirm';
 
-  const runAndClose = async (handler?: () => unknown, withLoading?: boolean) => {
+  const runAndClose = async (
+    handler?: () => unknown,
+    withLoading?: boolean,
+  ) => {
     const result = handler?.();
     if (isPromise(result)) {
       if (withLoading) setLoading(true);

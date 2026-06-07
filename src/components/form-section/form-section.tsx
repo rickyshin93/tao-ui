@@ -1,8 +1,17 @@
 import type { CSSProperties, ReactNode } from 'react';
-import { cx, type SemanticClassNames, type SemanticStyles } from '../../utils/semantic';
+import {
+  cx,
+  type SemanticClassNames,
+  type SemanticStyles,
+} from '../../utils/semantic';
 import '../form-field/form.css';
 
-export type FormSectionSemanticPart = 'root' | 'header' | 'title' | 'description' | 'body';
+export type FormSectionSemanticPart =
+  | 'root'
+  | 'header'
+  | 'title'
+  | 'description'
+  | 'body';
 
 export interface FormSectionProps {
   title?: string;
