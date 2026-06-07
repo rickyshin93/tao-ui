@@ -15,7 +15,8 @@ interface MobileSelectContentProps {
 }
 
 const defaultFilter = (input: string, option: SelectOption): boolean => {
-  const label = typeof option.label === 'string' ? option.label : String(option.label);
+  const label =
+    typeof option.label === 'string' ? option.label : String(option.label);
   return label.toLowerCase().includes(input.toLowerCase());
 };
 
@@ -71,8 +72,17 @@ export function MobileSelectContent({
                 onClick={() => {
                   if (!opt.disabled) handleSelect(opt.value);
                 }}
+                data-tao-has-desc={opt.description != null || undefined}
               >
-                <span data-tao-sheet-item-label="">{opt.label}</span>
+                {opt.icon != null && (
+                  <span data-tao-sheet-item-icon="">{opt.icon}</span>
+                )}
+                <span data-tao-sheet-item-main="">
+                  <span data-tao-sheet-item-label="">{opt.label}</span>
+                  {opt.description != null && (
+                    <span data-tao-sheet-item-desc="">{opt.description}</span>
+                  )}
+                </span>
                 {isSelected && (
                   <span data-tao-sheet-item-check="">
                     <CheckIcon />
@@ -107,14 +117,27 @@ export function MobileSelectDrawer({
       title={placeholder ?? 'Select'}
       height="70vh"
     >
-      <MobileSelectContent onClose={onClose} placeholder={placeholder} {...rest} />
+      <MobileSelectContent
+        onClose={onClose}
+        placeholder={placeholder}
+        {...rest}
+      />
     </Drawer>
   );
 }
 
 function SearchIcon() {
   return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <circle cx="11" cy="11" r="8" />
       <path d="m21 21-4.3-4.3" />
     </svg>
@@ -123,7 +146,16 @@ function SearchIcon() {
 
 function CheckIcon() {
   return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <polyline points="20 6 9 17 4 12" />
     </svg>
   );

@@ -11,9 +11,9 @@ button[data-tao-variant] {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: var(--tao-padding-xs);
   font-family: var(--tao-font-family);
-  font-weight: var(--tao-font-weight-strong);
+  font-weight: var(--tao-font-weight-normal);
   border: var(--tao-line-width) solid transparent;
   cursor: pointer;
   outline: none;
@@ -21,8 +21,7 @@ button[data-tao-variant] {
   white-space: nowrap;
   transition:
     background-color var(--tao-motion-duration-fast) var(--tao-motion-ease-out),
-    border-color var(--tao-motion-duration-fast) var(--tao-motion-ease-out),
-    transform var(--tao-motion-duration-fast) var(--tao-motion-ease-out);
+    border-color var(--tao-motion-duration-fast) var(--tao-motion-ease-out);
 }
 
 /* Sizes */
@@ -35,7 +34,7 @@ button[data-tao-size="small"] {
 
 button[data-tao-size="medium"] {
   height: var(--tao-control-height);
-  padding-inline: var(--tao-padding-sm);
+  padding-inline: var(--tao-padding);
   font-size: var(--tao-font-size-base);
   border-radius: var(--tao-radius-md);
 }
@@ -56,7 +55,7 @@ button[data-tao-variant="primary"]:hover:not(:disabled) {
   background: var(--tao-primary-hover);
 }
 button[data-tao-variant="primary"]:active:not(:disabled) {
-  transform: scale(0.98);
+  background: var(--tao-primary-active);
 }
 
 /* Variant: secondary */
@@ -70,7 +69,7 @@ button[data-tao-variant="secondary"]:hover:not(:disabled) {
   border-color: var(--tao-color-border);
 }
 button[data-tao-variant="secondary"]:active:not(:disabled) {
-  transform: scale(0.98);
+  background: var(--tao-color-fill-secondary);
 }
 
 /* Variant: ghost */
@@ -82,6 +81,9 @@ button[data-tao-variant="ghost"]:hover:not(:disabled) {
   background: var(--tao-color-fill-tertiary);
   color: var(--tao-color-text);
 }
+button[data-tao-variant="ghost"]:active:not(:disabled) {
+  background: var(--tao-color-fill-secondary);
+}
 
 /* Variant: destructive */
 button[data-tao-variant="destructive"] {
@@ -92,7 +94,7 @@ button[data-tao-variant="destructive"]:hover:not(:disabled) {
   background: var(--tao-error-hover);
 }
 button[data-tao-variant="destructive"]:active:not(:disabled) {
-  transform: scale(0.98);
+  background: var(--tao-error-active);
 }
 
 /* Disabled */

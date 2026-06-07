@@ -66,3 +66,18 @@
   ```
   并在 `rslib.config.ts` 的 `source` 里加 `tsconfigPath: './tsconfig.build.json'`。这样 d.ts 就跟 JS 同样扁平。
 - **适用场景**: 任何新组件改 `src/index.tsx` 时不用再担心 d.ts 路径漂移；如果未来要把组件库切分子入口（比如 `rihua-ui/number-input`），`exports` 里的 `types` 路径都按 `./dist/<sub>/index.d.ts` 写就对。
+
+## [主题] 表单控件的共享样式在 theme/control.css，不在各组件 css
+
+- **日期**: 2026-06-07
+- **错误假设**: 诊断"组件自带背景色"时，只扫了 `src/components/*/*.css`，以为每个组件的样式都在自己目录里，得出"装饰底只有 table header 一处"的错误结论
+- **正确做法**: input / select / date-picker / range-picker 都带 `data-tao-control` 属性，它们的 variant 背景/边框/focus/error/disabled 全部由共享层 `src/theme/control.css` 统一定义（outlined / filled / borderless 三档）。诊断颜色或交互样式问题，必须连 `src/theme/` 一起看（`theme.css` 管 token，`control.css` 管控件交互态）
+- **适用场景**: 任何"为什么所有输入框都有某个颜色/边框/态"的排查；改表单控件统一外观时改 control.css 一处即可
+
+## [主题] 全库所有"白色表面"派生自 bg-base，且 bg-base 是暖 off-white
+
+- **日期**: 2026-06-07
+- **错误假设**: 以为组件的白底是各自写死的 `#fff`
+- **正确做法**: 派生链是 `--tao-color-bg-base: oklch(0.985 0.004 70)`（**暖 off-white，非纯白**）→ `bg-container` 和 `bg-elevated` 历史上都 `= bg-base`。所以所有浮层(modal/drawer/select/date-picker 弹层)、控件表面(checkbox/radio 框、table 固定列、filled focus 态)的"白"都带这层暖灰，在纯白宿主上会显米色。2026-06-07 已把 `bg-container`/`bg-elevated` 改为纯白 `oklch(1 0 0)`，而 `bg-base` 保留作所有 color-mix 推导底（text/fill/border 调性不变，类比 antd colorBgContainer 默认 #fff）
+- **适用场景**: 跨系统集成"白底发灰/不融入"的根因在 bg-base；浮层不能改 transparent(会透穿)，只能定 surface 色或让宿主覆盖 colorBgBase。内联控件(input)才用 transparent 融入宿主
+

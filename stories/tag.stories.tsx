@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
-import { Tag, CheckableTag, Stack } from 'tao-ui';
+import { Tag, CheckableTag, Stack } from '@rockshin/tao-ui';
 
 const meta: Meta = {
   title: '数据展示 Data Display/Tag',

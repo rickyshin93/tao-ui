@@ -4,7 +4,7 @@ import {
   RadioGroup,
   FormField,
   Stack,
-} from 'tao-ui';
+} from '@rockshin/tao-ui';
 
 const meta: Meta = {
   title: '数据录入 Data Entry/Radio',

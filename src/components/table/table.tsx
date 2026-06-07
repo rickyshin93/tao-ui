@@ -6,7 +6,7 @@ import {
   useRef,
   useState,
 } from 'react';
-import { type TaoSize, useTaoConfig } from '../../provider/tao-provider';
+import { type TaoSize, type TaoVariant, useTaoConfig } from '../../provider/tao-provider';
 import { cx, type SemanticClassNames, type SemanticStyles } from '../../utils/semantic';
 import { Pagination } from '../pagination/pagination';
 import './table.css';
@@ -83,6 +83,21 @@ export interface TableProps<T = any> {
   scroll?: { x?: number | string };
   rowSelection?: TableRowSelection<T>;
   size?: TaoSize;
+  /**
+   * 表面风格。
+   * - `borderless`（极简）：无表头底色、单元格透明、仅行底分隔线。
+   * - `filled`：表头灰底（库的默认表现）。
+   * - `outlined`：filled + 整体外框 + 列分隔线。
+   *
+   * 不传时继承 TaoProvider 的 variant；当继承到框架默认 `outlined` 时，
+   * Table 回落为 `filled` 以保持向后兼容（裸用 `<Table>` 仍是灰底表头）。
+   */
+  variant?: TaoVariant;
+  /**
+   * 表头灰底开关，默认 `true`。设为 `false` 关掉表头底色（极简表头），
+   * 不影响外框 / 列分隔线等其它 variant 表现。
+   */
+  headerBackground?: boolean;
   emptyText?: ReactNode;
   bordered?: boolean;
   className?: string;
@@ -248,6 +263,8 @@ export function Table<T = any>({
   scroll,
   rowSelection,
   size,
+  variant,
+  headerBackground = true,
   emptyText = 'No Data',
   bordered = false,
   className,
@@ -256,6 +273,14 @@ export function Table<T = any>({
 }: TableProps<T>) {
   const ctx = useTaoConfig();
   const resolvedSize = size ?? ctx.size;
+  // Inherit variant from provider, but treat the framework default `outlined`
+  // as `filled` so a bare <Table> keeps its legacy grey-header look.
+  const resolvedVariant: TaoVariant =
+    variant ?? (ctx.variant === 'outlined' ? 'filled' : ctx.variant);
+  // outlined variant draws the full border; `bordered` prop still works for
+  // other variants, but borderless stays frame-free.
+  const showBorder =
+    resolvedVariant === 'outlined' || (bordered && resolvedVariant !== 'borderless');
 
   // ---- Sort state ----
   const defaultSortCol = columns.find((c) => c.defaultSortOrder);
@@ -556,7 +581,9 @@ export function Table<T = any>({
     <div
       data-tao-table-wrapper=""
       data-tao-size={resolvedSize}
-      data-tao-bordered={bordered || undefined}
+      data-tao-variant={resolvedVariant}
+      data-tao-header-bg={headerBackground ? undefined : 'off'}
+      data-tao-bordered={showBorder || undefined}
       data-tao-scroll-state={scroll?.x ? scrollState : undefined}
       className={cx(classNames?.root, className)}
       style={styles?.root}

@@ -1,0 +1,142 @@
+@import "../../theme/theme.css";
+
+/* ===========================
+   Breadcrumb root
+   =========================== */
+[data-tao-breadcrumb] {
+  font-family: var(--tao-font-family);
+}
+
+/* ===========================
+   List
+   =========================== */
+[data-tao-breadcrumb-list] {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--tao-font-size-sm);
+  color: var(--tao-color-text-tertiary);
+  word-break: break-word;
+}
+
+/* ===========================
+   Item
+   =========================== */
+[data-tao-breadcrumb-item] {
+  display: inline-flex;
+  align-items: center;
+}
+
+/* ===========================
+   Link / interactive label
+   =========================== */
+[data-tao-breadcrumb-link] {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--tao-color-text-secondary);
+  text-decoration: none;
+  border-radius: var(--tao-radius-sm);
+  cursor: pointer;
+  outline: none;
+  transition: color var(--tao-motion-duration-fast) var(--tao-motion-ease-out);
+}
+
+[data-tao-breadcrumb-link]:hover {
+  color: var(--tao-color-text);
+}
+
+[data-tao-breadcrumb-link]:focus-visible {
+  box-shadow: 0 0 0 2px var(--tao-control-outline);
+}
+
+[data-tao-breadcrumb-link][data-tao-disabled] {
+  color: var(--tao-color-text-disabled);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ===========================
+   Plain (non-interactive) label
+   =========================== */
+[data-tao-breadcrumb-text] {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ===========================
+   Current page
+   =========================== */
+[data-tao-breadcrumb-page] {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--tao-color-text);
+  font-weight: var(--tao-font-weight-normal);
+}
+
+/* ===========================
+   Separator
+   =========================== */
+[data-tao-breadcrumb-separator] {
+  display: inline-flex;
+  align-items: center;
+  color: var(--tao-color-text-quaternary);
+  user-select: none;
+}
+
+[data-tao-breadcrumb-separator] svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* ===========================
+   Ellipsis
+   =========================== */
+[data-tao-breadcrumb-ellipsis] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  background: none;
+  border: none;
+  border-radius: var(--tao-radius-sm);
+  color: var(--tao-color-text-tertiary);
+  cursor: pointer;
+  outline: none;
+  transition:
+    color var(--tao-motion-duration-fast) var(--tao-motion-ease-out),
+    background-color var(--tao-motion-duration-fast) var(--tao-motion-ease-out);
+}
+
+button[data-tao-breadcrumb-ellipsis]:hover {
+  color: var(--tao-color-text);
+  background: var(--tao-color-fill-tertiary);
+}
+
+[data-tao-breadcrumb-ellipsis]:focus-visible {
+  box-shadow: 0 0 0 2px var(--tao-control-outline);
+}
+
+[data-tao-breadcrumb-ellipsis] svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* ===========================
+   Size (inherited from TaoProvider)
+   =========================== */
+[data-tao-breadcrumb][data-tao-size="small"] [data-tao-breadcrumb-list] {
+  font-size: var(--tao-font-size-xs);
+}
+
+[data-tao-breadcrumb][data-tao-size="large"] [data-tao-breadcrumb-list] {
+  font-size: var(--tao-font-size-base);
+}

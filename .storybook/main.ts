@@ -36,6 +36,13 @@ const config: StorybookConfig = {
     reactDocgen: 'react-docgen-typescript',
     check: true,
   },
+  rsbuildFinal: (rsbuildConfig) => {
+    rsbuildConfig.resolve ??= {};
+    rsbuildConfig.resolve.alias ??= {};
+    (rsbuildConfig.resolve.alias as Record<string, string>)['@rockshin/tao-ui'] =
+      resolve(fileURLToPath(new URL('../src/index.tsx', import.meta.url)));
+    return rsbuildConfig;
+  },
 };
 
 export default config;

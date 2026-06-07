@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
-import { Switch, Stack } from 'tao-ui';
+import { Switch, Stack } from '@rockshin/tao-ui';
 
 const meta: Meta = {
   title: '数据录入 Data Entry/Switch',

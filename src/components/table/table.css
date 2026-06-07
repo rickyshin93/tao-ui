@@ -7,6 +7,34 @@
   font-family: var(--tao-font-family);
   color: var(--tao-color-text);
   position: relative;
+
+  /* ---------------------------------------------------------------
+     Surface tokens — themeable per instance.
+     Defaults below describe the `borderless` (minimal) look:
+     no self color, transparent cells, only a faint row divider.
+     `filled` / `outlined` variants override these to a grey header.
+     --------------------------------------------------------------- */
+  --tao-table-cell-bg: transparent;
+  --tao-table-header-bg: transparent;
+  --tao-table-header-color: var(--tao-color-text-secondary);
+  --tao-table-row-hover-bg: oklch(0 0 0 / 0.02);
+  --tao-table-row-selected-bg: oklch(0 0 0 / 0.05);
+  --tao-table-row-selected-hover-bg: oklch(0 0 0 / 0.07);
+}
+
+/* Filled / outlined: bring back the grey header + tinted interaction states */
+[data-tao-table-wrapper][data-tao-variant="filled"],
+[data-tao-table-wrapper][data-tao-variant="outlined"] {
+  --tao-table-header-bg: oklch(0.985 0 0); /* #FAFAFA */
+  --tao-table-row-hover-bg: oklch(0.985 0 0); /* #FAFAFA */
+  --tao-table-row-selected-bg: var(--tao-primary-bg);
+  --tao-table-row-selected-hover-bg: var(--tao-primary-bg-hover);
+}
+
+/* headerBackground={false}: drop the header fill for a minimal header,
+   regardless of variant. */
+[data-tao-table-wrapper][data-tao-header-bg="off"] {
+  --tao-table-header-bg: transparent;
 }
 
 /* ===========================
@@ -38,7 +66,7 @@
   padding: var(--tao-padding-sm) var(--tao-padding);
   text-align: left;
   border-bottom: var(--tao-line-width) solid var(--tao-color-border-secondary);
-  background: var(--tao-color-bg-container);
+  background: var(--tao-table-cell-bg);
   transition: background-color var(--tao-motion-duration-fast) var(--tao-motion-ease-out);
 }
 
@@ -62,8 +90,8 @@
    =========================== */
 [data-tao-table-thead] [data-tao-table-cell] {
   font-weight: var(--tao-font-weight-medium);
-  color: var(--tao-color-text-secondary);
-  background: var(--tao-color-fill-quaternary);
+  color: var(--tao-table-header-color);
+  background: var(--tao-table-header-bg);
   white-space: nowrap;
 }
 
@@ -202,15 +230,15 @@
    Body rows
    =========================== */
 [data-tao-table-row]:hover [data-tao-table-cell] {
-  background: var(--tao-color-fill-quaternary);
+  background: var(--tao-table-row-hover-bg);
 }
 
 [data-tao-table-row][data-tao-selected] [data-tao-table-cell] {
-  background: var(--tao-primary-bg);
+  background: var(--tao-table-row-selected-bg);
 }
 
 [data-tao-table-row][data-tao-selected]:hover [data-tao-table-cell] {
-  background: var(--tao-primary-bg-hover);
+  background: var(--tao-table-row-selected-hover-bg);
 }
 
 /* ===========================
@@ -232,6 +260,9 @@
 [data-tao-table-cell][data-tao-fixed] {
   position: sticky;
   z-index: 1;
+  /* Sticky cells must be opaque, otherwise scrolled content shows through.
+     This is functional backing, not a decorative "self color". */
+  background: var(--tao-color-bg-container);
 }
 
 [data-tao-table-thead] [data-tao-table-cell][data-tao-fixed] {

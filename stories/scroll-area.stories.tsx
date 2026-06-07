@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { ScrollArea, Stack, Tag } from 'tao-ui';
+import { ScrollArea, Stack, Tag } from '@rockshin/tao-ui';
 
 const meta: Meta = {
   title: '数据展示 Data Display/ScrollArea',

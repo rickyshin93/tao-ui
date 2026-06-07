@@ -13,7 +13,7 @@ Module format: ESM only. Types and CSS ship alongside the JS; component CSS is i
 
 ## Core concepts
 
-- **TaoProvider**: wrap the app once. Provides `size` (`'small' | 'middle' | 'large'`), `disabled`, and `variant` defaults to all descendants, plus theme tokens. A local prop on a component overrides the provider value. Hook: `useTaoConfig()`.
+- **TaoProvider**: wrap the app once. Provides `size` (`'small' | 'medium' | 'large'`), `disabled`, and `variant` (`'outlined' | 'filled' | 'borderless'`) defaults to all descendants, plus theme tokens. A local prop on a component overrides the provider value. Hook: `useTaoConfig()`.
 - **Theming**: a small seed token set (`TaoSeedToken`) is expanded into a full theme. Pure-CSS-computable values use `calc()`/`color-mix()` with OKLCH; non-linear values (radius steps, font-size log scale, control heights) are computed in JS and injected by `TaoProvider`. CSS variables are prefixed `--tao-*`; data attributes are `data-tao-*`.
 - **Semantic DOM**: every component takes optional `classNames?: SemanticClassNames<Part>` and `styles?: SemanticStyles<Part>`, where `Part` is a component-specific union (e.g. `'root' | 'header' | 'body'`, dotted for nested parts like `'header.cell'`). The top-level `className` prop merges into the `root` part. Helper `cx` is exported.
 
@@ -24,7 +24,7 @@ import { TaoProvider, Input, Select, Switch } from '@rockshin/tao-ui';
 
 function App() {
   return (
-    <TaoProvider size="middle">
+    <TaoProvider size="medium">
       <Input placeholder="Search" />
       <Select options={[{ label: 'A', value: 'a' }]} />
       <Switch defaultChecked />
@@ -46,10 +46,10 @@ Provider & utilities:
 Components (each exports `<Name>Props` and, where applicable, `<Name>SemanticPart`):
 - General: `Button`
 - Layout: `Stack`, `FormLayout`, `Splitter` (+ `SplitterPanelProps`)
-- Navigation: `Tabs` (+ `TabItem`), `Pagination`
-- Data Entry: `Input`, `Select` (+ `SelectOption`), `Checkbox` / `CheckboxGroup` (+ `CheckboxOptionType`), `Radio` / `RadioGroup` (+ `RadioOptionType`), `Switch`, `DatePicker`, `RangePicker`, `FormField`, `FormSection`, `FormActions`
-- Data Display: `Table` (+ `TableColumn`, `TableRowSelection`, `TableFilterItem`, `TablePagination`, `SortOrder`, `SorterResult`), `Tag` / `CheckableTag` (+ `TagColor`, `TagVariant`), `ScrollArea` (+ `ScrollAreaType`)
-- Feedback: `Drawer` (+ `DrawerPlacement`)
+- Navigation: `Tabs` (+ `TabItem`), `Pagination`, `Breadcrumb` (+ `BreadcrumbItemType`), `Dropdown` (+ `DropdownButtonProps`, `DropdownPlacement`, `DropdownTrigger`, and menu-config types `MenuProps`, `MenuItem`, `MenuItemType`, `MenuGroupType`, `MenuDividerType`), `ContextMenu`
+- Data Entry: `Input`, `Textarea` (+ `AutoSizeOptions`), `Select` (+ `SelectOption`), `Checkbox` / `CheckboxGroup` (+ `CheckboxOptionType`), `Radio` / `RadioGroup` (+ `RadioOptionType`), `Switch`, `DatePicker`, `RangePicker`, `FormField`, `FormSection`, `FormActions`
+- Data Display: `Table` (+ `TableColumn`, `TableRowSelection`, `TableFilterItem`, `TablePagination`, `SortOrder`, `SorterResult`), `Tag` / `CheckableTag` (+ `TagColor`, `TagVariant`), `ScrollArea` (+ `ScrollAreaType`), `Collapsible` (+ `CollapsibleTriggerProps`, `CollapsibleContentProps`)
+- Feedback: `Drawer` (+ `DrawerPlacement`, `DrawerSize`, `DrawerResizableConfig`), `Modal` (+ `ModalSemanticPart`; static helpers `Modal.confirm/info/success/error/warning`, hook `Modal.useModal()`, `Modal.destroyAll()`; types `ModalHookApi`, `ModalFuncProps`, `ModalFuncReturn`, `ModalFooterRender`, `ConfirmType`)
 
 Headless:
 - `useNumberInput`, `NumberInput` (+ `NumberInputProps`, `UseNumberInputOptions`, `UseNumberInputReturn`, `FormatOptions`, `PadDecimalsOnBlur`)
@@ -59,6 +59,7 @@ Headless:
 - Import everything from the package root `@rockshin/tao-ui`; there are no deep sub-path entry points.
 - Do not hand-write internal class names; customize via `classNames`/`styles` semantic parts.
 - Prefer setting `size`/`disabled`/`variant` on `TaoProvider` for app-wide defaults; override per-component only when needed.
+- `Modal` follows the antd pattern: render `<Modal open onCancel ...>` for controlled dialogs, or call `Modal.confirm({ title, onOk })` / `Modal.info|success|error|warning` for one-off dialogs. Inside components prefer `const [modal, contextHolder] = Modal.useModal()` (render `contextHolder`) so dialogs read the surrounding `TaoProvider` context.
 - Override theme by passing a partial seed to `TaoProvider`'s theme config rather than overriding `--tao-*` variables directly.
 
 ## Source

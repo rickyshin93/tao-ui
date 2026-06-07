@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { FormLayout, FormSection, FormField, FormActions, Input, Button } from 'tao-ui';
+import { FormLayout, FormSection, FormField, FormActions, Input, Button } from '@rockshin/tao-ui';
 
 const meta: Meta = {
   title: '布局 Layout/FormLayout',

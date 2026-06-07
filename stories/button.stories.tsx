@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { Button, Stack, TaoProvider } from 'tao-ui';
+import { Button, Stack, TaoProvider } from '@rockshin/tao-ui';
 
 const meta: Meta = {
   title: '通用 General/Button',

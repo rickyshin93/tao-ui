@@ -1,0 +1,218 @@
+@import "../../theme/theme.css";
+
+/* ===========================
+   Overlay
+   =========================== */
+[data-tao-modal-overlay] {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: oklch(0 0 0 / 0.1);
+  animation: tao-modal-fade-in var(--tao-motion-duration-mid) ease-out;
+}
+
+@supports (backdrop-filter: blur(4px)) {
+  [data-tao-modal-overlay] {
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+  }
+}
+
+@keyframes tao-modal-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ===========================
+   Wrap (positioning layer)
+   =========================== */
+[data-tao-modal-wrap] {
+  position: fixed;
+  inset: 0;
+  z-index: 1001;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 100px var(--tao-padding-lg) var(--tao-padding-lg);
+  overflow: auto;
+}
+
+[data-tao-modal-wrap][data-tao-centered] {
+  align-items: center;
+  padding-block: var(--tao-padding-lg);
+}
+
+/* Keep-alive (destroyOnHidden={false}): hide the force-mounted subtree when closed */
+[data-tao-modal-wrap]:not([data-tao-open]) {
+  display: none;
+}
+
+[data-tao-modal-overlay][data-state="closed"] {
+  display: none;
+}
+
+/* ===========================
+   Content
+   =========================== */
+[data-tao-modal] {
+  position: relative;
+  max-width: 100%;
+  background: var(--tao-color-bg-elevated);
+  border-radius: var(--tao-radius-lg);
+  box-shadow: var(--tao-box-shadow-secondary);
+  display: flex;
+  flex-direction: column;
+  outline: none;
+  font-family: var(--tao-font-family);
+  animation: tao-modal-zoom-in var(--tao-motion-duration-mid)
+    cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes tao-modal-zoom-in {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ===========================
+   Header
+   =========================== */
+[data-tao-modal-header] {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--tao-padding) var(--tao-padding-lg);
+  flex-shrink: 0;
+}
+
+[data-tao-modal-title] {
+  font-size: var(--tao-font-size-lg);
+  font-weight: var(--tao-font-weight-strong);
+  color: var(--tao-color-text);
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Close button */
+button[data-tao-modal-close] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: var(--tao-radius-sm);
+  background: transparent;
+  color: var(--tao-color-text-tertiary);
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+  margin-inline-start: auto;
+  transition: all var(--tao-motion-duration-fast) ease-out;
+  outline: none;
+  appearance: none;
+}
+
+button[data-tao-modal-close]:hover {
+  background: var(--tao-color-fill-tertiary);
+  color: var(--tao-color-text);
+}
+
+button[data-tao-modal-close]:focus-visible {
+  box-shadow: 0 0 0 2px var(--tao-control-outline);
+}
+
+/* ===========================
+   Body
+   =========================== */
+[data-tao-modal-body] {
+  flex: 1;
+  padding: 0 var(--tao-padding-lg);
+  color: var(--tao-color-text);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ===========================
+   Footer
+   =========================== */
+[data-tao-modal-footer] {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--tao-padding-xs);
+  padding: var(--tao-padding) var(--tao-padding-lg);
+  flex-shrink: 0;
+}
+
+/* ===========================
+   Confirm dialog (imperative)
+   =========================== */
+
+/* Confirm reuses the shared modal body/footer; retune their padding to a
+   compact, antd-like rhythm: comfortable top, tight content→buttons gap. */
+[data-tao-modal-body]:has(> [data-tao-modal-confirm-body]) {
+  padding-top: var(--tao-padding-lg);
+  padding-bottom: 0;
+}
+
+[data-tao-modal]:has([data-tao-modal-confirm-body]) [data-tao-modal-footer] {
+  padding-top: var(--tao-padding-sm);
+}
+
+[data-tao-modal-confirm-body] {
+  display: flex;
+  gap: var(--tao-padding-sm);
+  align-items: flex-start;
+}
+
+[data-tao-modal-confirm-icon] {
+  display: flex;
+  flex-shrink: 0;
+  font-size: var(--tao-font-size-lg);
+  line-height: 1.4;
+}
+
+[data-tao-modal-confirm-icon][data-tao-status="info"] {
+  color: var(--tao-color-primary);
+}
+[data-tao-modal-confirm-icon][data-tao-status="success"] {
+  color: var(--tao-color-success);
+}
+[data-tao-modal-confirm-icon][data-tao-status="warning"] {
+  color: var(--tao-color-warning);
+}
+[data-tao-modal-confirm-icon][data-tao-status="error"] {
+  color: var(--tao-color-error);
+}
+[data-tao-modal-confirm-icon][data-tao-status="confirm"] {
+  color: var(--tao-color-warning);
+}
+
+[data-tao-modal-confirm-main] {
+  flex: 1;
+  min-width: 0;
+}
+
+[data-tao-modal-confirm-title] {
+  font-size: var(--tao-font-size-lg);
+  font-weight: var(--tao-font-weight-strong);
+  color: var(--tao-color-text);
+  margin: 0;
+  line-height: 1.4;
+}
+
+[data-tao-modal-confirm-content] {
+  margin-top: var(--tao-padding-xs);
+  color: var(--tao-color-text-secondary);
+  line-height: 1.6;
+}

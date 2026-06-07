@@ -1,0 +1,187 @@
+@import "../../theme/theme.css";
+
+/* ===========================
+   Menu panel (dropdown + context + submenu)
+   =========================== */
+[data-tao-menu-content] {
+  box-sizing: border-box;
+  min-width: 8rem;
+  padding: var(--tao-padding-xxs);
+  background: var(--tao-color-bg-elevated);
+  border: var(--tao-line-width) solid var(--tao-color-border-secondary);
+  border-radius: var(--tao-radius-lg);
+  box-shadow: var(--tao-box-shadow-secondary);
+  font-family: var(--tao-font-family);
+  color: var(--tao-color-text);
+  z-index: 1000;
+
+  animation-duration: var(--tao-motion-duration-fast);
+  animation-timing-function: var(--tao-motion-ease-out-quint);
+}
+
+[data-tao-menu-content][data-state="open"] {
+  animation-name: tao-menu-in;
+}
+
+[data-tao-menu-content][data-side="top"] {
+  --tao-menu-from-y: 4px;
+}
+[data-tao-menu-content][data-side="bottom"] {
+  --tao-menu-from-y: -4px;
+}
+
+@keyframes tao-menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(var(--tao-menu-from-y, -4px));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===========================
+   Item
+   =========================== */
+[data-tao-menu-item] {
+  display: flex;
+  align-items: center;
+  gap: var(--tao-padding-xs);
+  position: relative;
+  min-height: 32px;
+  padding-block: 6px;
+  padding-inline: var(--tao-padding-sm);
+  font-size: var(--tao-font-size-base);
+  color: var(--tao-color-text);
+  border-radius: var(--tao-radius-sm);
+  cursor: pointer;
+  outline: none;
+  user-select: none;
+  transition: background-color var(--tao-motion-duration-fast)
+    var(--tao-motion-ease-out);
+}
+
+[data-tao-menu-item][data-highlighted] {
+  background: var(--tao-control-item-bg-hover);
+}
+
+[data-tao-menu-item][data-disabled] {
+  color: var(--tao-color-text-disabled);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Danger */
+[data-tao-menu-item][data-tao-danger] {
+  color: var(--tao-error);
+}
+[data-tao-menu-item][data-tao-danger][data-highlighted] {
+  background: var(--tao-error-bg);
+  color: var(--tao-error);
+}
+
+/* Item parts */
+[data-tao-menu-item-icon] {
+  display: inline-flex;
+  align-items: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+[data-tao-menu-item-icon] svg {
+  width: 16px;
+  height: 16px;
+}
+
+[data-tao-menu-item-label] {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+[data-tao-menu-item-extra] {
+  margin-inline-start: auto;
+  padding-inline-start: var(--tao-padding);
+  font-size: var(--tao-font-size-xs);
+  color: var(--tao-color-text-tertiary);
+  letter-spacing: 0.05em;
+}
+[data-tao-menu-item][data-highlighted] [data-tao-menu-item-extra] {
+  color: var(--tao-color-text-secondary);
+}
+
+/* ===========================
+   Selectable items (checkbox / radio indicator)
+   =========================== */
+[data-tao-menu-selectable] {
+  padding-inline-start: calc(var(--tao-padding-sm) + 20px);
+}
+
+[data-tao-menu-item-indicator] {
+  position: absolute;
+  inset-inline-start: var(--tao-padding-sm);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  color: var(--tao-primary);
+}
+
+/* ===========================
+   Submenu trigger
+   =========================== */
+[data-tao-menu-sub-trigger][data-state="open"] {
+  background: var(--tao-control-item-bg-hover);
+}
+
+[data-tao-menu-sub-icon] {
+  margin-inline-start: auto;
+  color: var(--tao-color-text-tertiary);
+}
+
+/* When an item has both extra and a sub icon, keep the chevron last */
+[data-tao-menu-sub-trigger] [data-tao-menu-item-extra] {
+  margin-inline-start: auto;
+}
+[data-tao-menu-sub-trigger]
+  [data-tao-menu-item-extra]
+  + [data-tao-menu-sub-icon] {
+  margin-inline-start: 0;
+}
+
+/* ===========================
+   Divider
+   =========================== */
+[data-tao-menu-divider] {
+  height: var(--tao-line-width);
+  margin-block: var(--tao-padding-xxs);
+  margin-inline: calc(-1 * var(--tao-padding-xxs));
+  background: var(--tao-color-border-secondary);
+}
+
+/* ===========================
+   Group label
+   =========================== */
+[data-tao-menu-group-label] {
+  padding-block: 6px;
+  padding-inline: var(--tao-padding-sm);
+  font-size: var(--tao-font-size-xs);
+  font-weight: var(--tao-font-weight-medium);
+  color: var(--tao-color-text-tertiary);
+  user-select: none;
+}
+
+/* ===========================
+   Size (inherited from TaoProvider)
+   =========================== */
+[data-tao-menu-content][data-tao-size="small"] [data-tao-menu-item] {
+  min-height: 28px;
+  font-size: var(--tao-font-size-sm);
+  padding-block: 4px;
+}
+[data-tao-menu-content][data-tao-size="large"] [data-tao-menu-item] {
+  min-height: 38px;
+  font-size: var(--tao-font-size-lg);
+  padding-block: 8px;
+}

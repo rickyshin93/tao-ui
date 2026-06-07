@@ -6,13 +6,9 @@
 [data-tao-tabs] {
   font-family: var(--tao-font-family);
   color: var(--tao-color-text);
-}
-
-/* ===========================
-   Nav (border-bottom for line variant)
-   =========================== */
-[data-tao-tabs][data-tao-variant="line"] [data-tao-tabs-nav] {
-  border-bottom: var(--tao-line-width) solid var(--tao-color-border-secondary);
+  /* Shrink to content width — don't stretch to fill the parent in block layout. */
+  width: fit-content;
+  max-width: 100%;
 }
 
 /* ===========================
@@ -48,7 +44,9 @@
 
 [data-tao-tab][data-tao-active] {
   color: var(--tao-primary);
-  font-weight: var(--tao-font-weight-medium);
+  /* Fake-bold via text-shadow (antd's approach): emphasizes the active tab
+     without changing text width, so switching causes no layout shift / flicker. */
+  text-shadow: 0 0 0.25px currentColor;
 }
 
 [data-tao-tab]:disabled {

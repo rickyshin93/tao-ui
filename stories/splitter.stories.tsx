@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
-import { Splitter, Stack } from 'tao-ui';
+import { Splitter, Stack } from '@rockshin/tao-ui';
 
 const Panel = Splitter.Panel;
 

@@ -5,7 +5,7 @@ import {
   Input,
   FormField,
   Stack,
-} from 'tao-ui';
+} from '@rockshin/tao-ui';
 
 const meta: Meta = {
   title: '配置 Config/TaoProvider',

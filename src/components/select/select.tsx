@@ -1,6 +1,10 @@
 import * as RadixSelect from '@radix-ui/react-select';
 import { type ReactNode, useCallback, useMemo, useState } from 'react';
-import { type TaoSize, type TaoVariant, useTaoConfig } from '../../provider/tao-provider';
+import {
+  type TaoSize,
+  type TaoVariant,
+  useTaoConfig,
+} from '../../provider/tao-provider';
 import { MobileSelectDrawer } from './mobile-select';
 import './select.css';
 import { useIsMobile } from './use-is-mobile';
@@ -9,6 +13,10 @@ export interface SelectOption {
   label: ReactNode;
   value: string;
   disabled?: boolean;
+  /** Leading icon/avatar shown in the option row and in the trigger when selected. */
+  icon?: ReactNode;
+  /** Secondary description line shown under the label in the option row. */
+  description?: ReactNode;
 }
 
 export interface SelectProps {
@@ -36,7 +44,8 @@ export interface SelectProps {
 }
 
 const defaultFilter = (input: string, option: SelectOption): boolean => {
-  const label = typeof option.label === 'string' ? option.label : String(option.label);
+  const label =
+    typeof option.label === 'string' ? option.label : String(option.label);
   return label.toLowerCase().includes(input.toLowerCase());
 };
 
@@ -108,15 +117,25 @@ export function Select(props: SelectProps) {
           onMouseLeave={() => setHovering(false)}
         >
           {prefix != null && <span data-tao-select-prefix="">{prefix}</span>}
+          {selectedOption?.icon != null && (
+            <span data-tao-select-value-icon="">{selectedOption.icon}</span>
+          )}
           <span data-tao-select-value="">
-            {selectedOption ? selectedOption.label : (
+            {selectedOption ? (
+              selectedOption.label
+            ) : (
               <span data-tao-select-placeholder="">{placeholder}</span>
             )}
           </span>
           <span data-tao-select-icons="">
             {loading && <LoadingIcon />}
             {showClearBtn && hovering ? (
-              <span data-tao-select-clear="" onClick={handleClear} role="button" aria-label="Clear">
+              <span
+                data-tao-select-clear=""
+                onClick={handleClear}
+                role="button"
+                aria-label="Clear"
+              >
                 <CloseIcon />
               </span>
             ) : (
@@ -160,11 +179,19 @@ export function Select(props: SelectProps) {
         onMouseLeave={() => setHovering(false)}
       >
         {prefix != null && <span data-tao-select-prefix="">{prefix}</span>}
+        {selectedOption?.icon != null && (
+          <span data-tao-select-value-icon="">{selectedOption.icon}</span>
+        )}
         <RadixSelect.Value placeholder={placeholder} />
         <span data-tao-select-icons="">
           {loading && <LoadingIcon />}
           {showClearBtn && hovering ? (
-            <span data-tao-select-clear="" onClick={handleClear} role="button" aria-label="Clear">
+            <span
+              data-tao-select-clear=""
+              onClick={handleClear}
+              role="button"
+              aria-label="Clear"
+            >
               <CloseIcon />
             </span>
           ) : (
@@ -176,7 +203,11 @@ export function Select(props: SelectProps) {
       </RadixSelect.Trigger>
 
       <RadixSelect.Portal>
-        <RadixSelect.Content data-tao-select-content="" position="popper" sideOffset={4}>
+        <RadixSelect.Content
+          data-tao-select-content=""
+          position="popper"
+          sideOffset={4}
+        >
           {showSearch && (
             <div data-tao-select-search="">
               <SearchIcon />
@@ -197,8 +228,19 @@ export function Select(props: SelectProps) {
                   value={opt.value}
                   disabled={opt.disabled}
                   data-tao-select-item=""
+                  data-tao-has-desc={opt.description != null || undefined}
                 >
-                  <RadixSelect.ItemText>{opt.label}</RadixSelect.ItemText>
+                  {opt.icon != null && (
+                    <span data-tao-select-item-icon="">{opt.icon}</span>
+                  )}
+                  <span data-tao-select-item-main="">
+                    <RadixSelect.ItemText>{opt.label}</RadixSelect.ItemText>
+                    {opt.description != null && (
+                      <span data-tao-select-item-desc="">
+                        {opt.description}
+                      </span>
+                    )}
+                  </span>
                   <RadixSelect.ItemIndicator data-tao-select-check="">
                     <CheckIcon />
                   </RadixSelect.ItemIndicator>
@@ -216,7 +258,16 @@ export function Select(props: SelectProps) {
 
 function ChevronDownIcon() {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <path d="m6 9 6 6 6-6" />
     </svg>
   );
@@ -224,7 +275,16 @@ function ChevronDownIcon() {
 
 function CheckIcon() {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <polyline points="20 6 9 17 4 12" />
     </svg>
   );
@@ -232,7 +292,16 @@ function CheckIcon() {
 
 function CloseIcon() {
   return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <path d="M18 6 6 18M6 6l12 12" />
     </svg>
   );
@@ -240,7 +309,16 @@ function CloseIcon() {
 
 function SearchIcon() {
   return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <circle cx="11" cy="11" r="8" />
       <path d="m21 21-4.3-4.3" />
     </svg>
@@ -249,7 +327,17 @@ function SearchIcon() {
 
 function LoadingIcon() {
   return (
-    <svg data-tao-select-loading="" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      data-tao-select-loading=""
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <path d="M21 12a9 9 0 1 1-6.219-8.56" />
     </svg>
   );

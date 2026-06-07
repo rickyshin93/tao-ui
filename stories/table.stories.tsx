@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
-import { Table, type TableColumn, type SortOrder, Stack } from 'tao-ui';
+import { Table, type TableColumn, type SortOrder, Stack } from '@rockshin/tao-ui';
 
 const meta: Meta = {
   title: '数据展示 Data Display/Table',
@@ -47,6 +47,72 @@ export const Bordered: StoryObj = {
   render: () => (
     <Table columns={baseColumns} dataSource={users} rowKey="id" bordered />
   ),
+};
+
+export const Variants: StoryObj = {
+  name: 'Variants (filled / outlined / borderless)',
+  render: () => (
+    <Stack gap="xl">
+      <div>
+        <p style={{ fontSize: 13, color: '#888', marginBottom: 8 }}>filled（默认 / 灰底表头）</p>
+        <Table columns={baseColumns} dataSource={users.slice(0, 4)} rowKey="id" variant="filled" pagination={false} />
+      </div>
+      <div>
+        <p style={{ fontSize: 13, color: '#888', marginBottom: 8 }}>outlined（带外框 + 列分隔线）</p>
+        <Table columns={baseColumns} dataSource={users.slice(0, 4)} rowKey="id" variant="outlined" pagination={false} />
+      </div>
+      <div>
+        <p style={{ fontSize: 13, color: '#888', marginBottom: 8 }}>borderless（极简 / 无自带色）</p>
+        <Table columns={baseColumns} dataSource={users.slice(0, 4)} rowKey="id" variant="borderless" pagination={false} />
+      </div>
+    </Stack>
+  ),
+};
+
+export const Minimal: StoryObj = {
+  name: 'Minimal (borderless)',
+  render: () => {
+    interface Sound {
+      id: number;
+      description: string;
+      category: string;
+      duration: string;
+      downloads: string;
+    }
+    const sounds: Sound[] = [
+      { id: 1, description: 'A single cute cat meow, playful and friendly. stylized game SFX, 0.4 seconds.', category: 'Animals › Cat Domestic', duration: '0.5s', downloads: '507' },
+      { id: 2, description: "Create a short, friendly 'pop' (thud) sound effect for a button click or window…", category: 'User Interface › Click', duration: '2s', downloads: '181' },
+      { id: 3, description: 'Cute magical pop sound of throwing stones into the swamp, then a short…', category: 'Designed › Ethereal', duration: '7.1s', downloads: '91' },
+      { id: 4, description: 'Short positive organic interface resolution chime, 1.5 to 2 seconds, gentle…', category: 'User Interface', duration: '1s', downloads: '596' },
+      { id: 5, description: 'high boom swoosh', category: 'Designed › Boom', duration: '4s', downloads: '1.8K' },
+    ];
+    const columns: TableColumn<Sound>[] = [
+      {
+        key: 'description',
+        dataIndex: 'description',
+        title: 'Description',
+        render: (_v, record) => (
+          <div>
+            <div style={{ color: 'var(--tao-color-text)' }}>{record.description}</div>
+            <div style={{ color: 'var(--tao-color-text-tertiary)', fontSize: 13, marginTop: 2 }}>
+              {record.category}
+            </div>
+          </div>
+        ),
+      },
+      { key: 'duration', dataIndex: 'duration', title: 'Duration', width: 120, align: 'right' },
+      { key: 'downloads', dataIndex: 'downloads', title: 'Downloads', width: 120, align: 'right' },
+    ];
+    return (
+      <Table
+        columns={columns}
+        dataSource={sounds}
+        rowKey="id"
+        variant="borderless"
+        pagination={false}
+      />
+    );
+  },
 };
 
 export const Sizes: StoryObj = {

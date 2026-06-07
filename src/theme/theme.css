@@ -24,6 +24,8 @@
     --tao-radius:          6px;
     --tao-font-size:       14px;
     --tao-control-height:  36px;
+    --tao-control-width:       200px; /* default width for Input/Select/DatePicker; override per-instance or use 100% for full width */
+    --tao-control-range-width: 360px; /* RangePicker holds two dates + separator */
     --tao-size-unit:       4px;
     --tao-line-width:      1px;
 
@@ -89,14 +91,16 @@
        DERIVED: Background levels
        =========================== */
     --tao-color-bg-layout:    color-mix(in oklch, var(--tao-color-text-base) 4%, var(--tao-color-bg-base));
-    --tao-color-bg-container: var(--tao-color-bg-base);
-    --tao-color-bg-elevated:  var(--tao-color-bg-base);
+    /* Surfaces are pure white so popovers/controls blend into white hosts.
+       bg-base stays the (warm) mix base for all neutral derivations below. */
+    --tao-color-bg-container: oklch(1 0 0);
+    --tao-color-bg-elevated:  oklch(1 0 0);
 
     /* ===========================
        DERIVED: Border (2 levels)
        =========================== */
     --tao-color-border:           color-mix(in oklch, var(--tao-color-text-base) 18%, var(--tao-color-bg-base));
-    --tao-color-border-secondary: color-mix(in oklch, var(--tao-color-text-base) 10%, var(--tao-color-bg-base));
+    --tao-color-border-secondary: #0000170b; /* gray-alpha-100：半透明冷灰，淡雅分隔线 */
 
     /* ===========================
        DERIVED: Radius

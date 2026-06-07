@@ -1,0 +1,7 @@
+@import "../menu/menu.css";
+
+/* Trigger wraps the right-click target without affecting its layout. */
+[data-tao-context-menu-trigger] {
+  display: contents;
+}
+

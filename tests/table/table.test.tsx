@@ -85,6 +85,76 @@ test('bordered adds data attribute', () => {
   expect(wrapper.dataset.taoBordered).toBeTruthy();
 });
 
+// ---- Variant ----
+
+test('defaults to filled variant (legacy grey header)', () => {
+  const { container } = render(
+    <Table columns={columns} dataSource={data} rowKey="id" pagination={false} />,
+  );
+  const wrapper = container.querySelector('[data-tao-table-wrapper]') as HTMLElement;
+  expect(wrapper.dataset.taoVariant).toBe('filled');
+});
+
+// ---- Header background ----
+
+test('header background on by default (no off attribute)', () => {
+  const { container } = render(
+    <Table columns={columns} dataSource={data} rowKey="id" pagination={false} />,
+  );
+  const wrapper = container.querySelector('[data-tao-table-wrapper]') as HTMLElement;
+  expect(wrapper.dataset.taoHeaderBg).toBeUndefined();
+});
+
+test('headerBackground={false} marks the wrapper for a minimal header', () => {
+  const { container } = render(
+    <Table
+      columns={columns}
+      dataSource={data}
+      rowKey="id"
+      headerBackground={false}
+      pagination={false}
+    />,
+  );
+  const wrapper = container.querySelector('[data-tao-table-wrapper]') as HTMLElement;
+  expect(wrapper.dataset.taoHeaderBg).toBe('off');
+});
+
+test('borderless variant sets data attribute and no border', () => {
+  const { container } = render(
+    <Table columns={columns} dataSource={data} rowKey="id" variant="borderless" pagination={false} />,
+  );
+  const wrapper = container.querySelector('[data-tao-table-wrapper]') as HTMLElement;
+  expect(wrapper.dataset.taoVariant).toBe('borderless');
+  expect(wrapper.dataset.taoBordered).toBeFalsy();
+});
+
+test('outlined variant implies border', () => {
+  const { container } = render(
+    <Table columns={columns} dataSource={data} rowKey="id" variant="outlined" pagination={false} />,
+  );
+  const wrapper = container.querySelector('[data-tao-table-wrapper]') as HTMLElement;
+  expect(wrapper.dataset.taoVariant).toBe('outlined');
+  expect(wrapper.dataset.taoBordered).toBeTruthy();
+});
+
+test('borderless ignores bordered prop', () => {
+  const { container } = render(
+    <Table columns={columns} dataSource={data} rowKey="id" variant="borderless" bordered pagination={false} />,
+  );
+  const wrapper = container.querySelector('[data-tao-table-wrapper]') as HTMLElement;
+  expect(wrapper.dataset.taoBordered).toBeFalsy();
+});
+
+test('inherits variant from TaoProvider', () => {
+  const { container } = render(
+    <TaoProvider variant="borderless">
+      <Table columns={columns} dataSource={data} rowKey="id" pagination={false} />
+    </TaoProvider>,
+  );
+  const wrapper = container.querySelector('[data-tao-table-wrapper]') as HTMLElement;
+  expect(wrapper.dataset.taoVariant).toBe('borderless');
+});
+
 // ---- Sorting ----
 
 test('client-side sort on click', () => {

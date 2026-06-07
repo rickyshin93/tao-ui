@@ -1,0 +1,61 @@
+@import "../../theme/theme.css";
+
+/* ===========================
+   Collapsible
+   Inline expand/collapse panel (radix-collapsible wrapper).
+   No height animation by design — only opacity/transform allowed.
+   =========================== */
+
+[data-tao-collapsible] {
+  font-family: var(--tao-font-family);
+  color: var(--tao-color-text);
+}
+
+/* Trigger — a clickable row. Reset native button defaults. */
+[data-tao-collapsible-trigger] {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--tao-padding-xs);
+  appearance: none;
+  -webkit-appearance: none;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  border: none;
+  font: inherit;
+  color: inherit;
+  text-align: start;
+  cursor: pointer;
+  outline: none;
+  border-radius: var(--tao-radius-sm);
+  transition: color var(--tao-motion-duration-fast) var(--tao-motion-ease-out);
+}
+
+[data-tao-collapsible-trigger]:focus-visible {
+  outline: var(--tao-line-width-focus, 2px) solid var(--tao-color-primary);
+  outline-offset: 2px;
+}
+
+[data-tao-collapsible-trigger][data-disabled] {
+  color: var(--tao-color-text-disabled);
+  cursor: not-allowed;
+}
+
+/* Optional chevron inside a trigger: rotates on open. */
+[data-tao-collapsible-chevron] {
+  display: inline-flex;
+  align-items: center;
+  color: var(--tao-color-text-tertiary);
+  transition: transform var(--tao-motion-duration-fast)
+    var(--tao-motion-ease-out);
+}
+
+[data-tao-collapsible-trigger][data-state="open"]
+  [data-tao-collapsible-chevron] {
+  transform: rotate(180deg);
+}
+
+/* Content — base typography. */
+[data-tao-collapsible-content] {
+  color: var(--tao-color-text-secondary);
+}

@@ -1,25 +1,71 @@
 // Provider
+
 export {
-  TaoProvider,
-  useTaoConfig,
-  type TaoProviderProps,
-  type TaoThemeConfig,
-  type TaoSeedToken,
-  type TaoSize,
-  type TaoVariant,
-} from './provider/tao-provider';
-
-// Semantic DOM utilities
-export { cx, type SemanticClassNames, type SemanticStyles } from './utils/semantic';
-
+  Breadcrumb,
+  type BreadcrumbItemType,
+  type BreadcrumbProps,
+  type BreadcrumbSemanticPart,
+} from './components/breadcrumb/breadcrumb';
 // Components
-export { Button, type ButtonProps, type ButtonSemanticPart } from './components/button/button';
-export { Input, type InputProps, type InputSemanticPart } from './components/input/input';
 export {
-  Select,
-  type SelectProps,
-  type SelectOption,
-} from './components/select/select';
+  Button,
+  type ButtonProps,
+  type ButtonSemanticPart,
+} from './components/button/button';
+export {
+  Checkbox,
+  CheckboxGroup,
+  type CheckboxGroupProps,
+  type CheckboxOptionType,
+  type CheckboxProps,
+  type CheckboxSemanticPart,
+} from './components/checkbox/checkbox';
+export {
+  Collapsible,
+  type CollapsibleContentProps,
+  type CollapsibleProps,
+  type CollapsibleSemanticPart,
+  type CollapsibleTriggerProps,
+} from './components/collapsible/collapsible';
+export {
+  ContextMenu,
+  type ContextMenuProps,
+  type ContextMenuSemanticPart,
+} from './components/context-menu/context-menu';
+export {
+  DatePicker,
+  type DatePickerProps,
+} from './components/date-picker/date-picker';
+export {
+  RangePicker,
+  type RangePickerProps,
+} from './components/date-picker/range-picker';
+export {
+  Drawer,
+  type DrawerPlacement,
+  type DrawerProps,
+  type DrawerResizableConfig,
+  type DrawerSemanticPart,
+  type DrawerSize,
+} from './components/drawer/drawer';
+export {
+  Dropdown,
+  type DropdownButtonProps,
+  type DropdownPlacement,
+  type DropdownProps,
+  type DropdownSemanticPart,
+  type DropdownTrigger,
+  type MenuDividerType,
+  type MenuGroupType,
+  type MenuItem,
+  type MenuItemType,
+  type MenuProps,
+} from './components/dropdown/dropdown';
+export {
+  FormActions,
+  type FormActionsProps,
+  type FormActionsSemanticPart,
+} from './components/form-actions/form-actions';
 export {
   FormField,
   type FormFieldProps,
@@ -31,90 +77,93 @@ export {
   type FormSectionSemanticPart,
 } from './components/form-section/form-section';
 export {
-  FormActions,
-  type FormActionsProps,
-  type FormActionsSemanticPart,
-} from './components/form-actions/form-actions';
+  Input,
+  type InputProps,
+  type InputSemanticPart,
+} from './components/input/input';
 export {
-  Drawer,
-  type DrawerProps,
-  type DrawerPlacement,
-  type DrawerSemanticPart,
-} from './components/drawer/drawer';
-export { Switch, type SwitchProps, type SwitchSemanticPart } from './components/switch/switch';
+  type AutoSizeOptions,
+  Textarea,
+  type TextareaProps,
+  type TextareaSemanticPart,
+} from './components/textarea/textarea';
 export {
-  DatePicker,
-  type DatePickerProps,
-} from './components/date-picker/date-picker';
-export {
-  RangePicker,
-  type RangePickerProps,
-} from './components/date-picker/range-picker';
-export {
-  Checkbox,
-  CheckboxGroup,
-  type CheckboxProps,
-  type CheckboxGroupProps,
-  type CheckboxOptionType,
-  type CheckboxSemanticPart,
-} from './components/checkbox/checkbox';
-export {
-  Radio,
-  RadioGroup,
-  type RadioProps,
-  type RadioGroupProps,
-  type RadioOptionType,
-  type RadioSemanticPart,
-} from './components/radio/radio';
-
-export {
-  Tabs,
-  type TabsProps,
-  type TabItem,
-  type TabsSemanticPart,
-} from './components/tabs/tabs';
+  type ConfirmType,
+  Modal,
+  type ModalFooterRender,
+  type ModalFuncProps,
+  type ModalFuncReturn,
+  type ModalHookApi,
+  type ModalProps,
+  type ModalSemanticPart,
+} from './components/modal';
 export {
   Pagination,
   type PaginationProps,
   type PaginationSemanticPart,
 } from './components/pagination/pagination';
 export {
-  Table,
-  type TableProps,
-  type TableColumn,
-  type TableRowSelection,
-  type TableFilterItem,
-  type TablePagination,
-  type SortOrder,
-  type SorterResult,
-  type TableSemanticPart,
-} from './components/table/table';
-export {
-  Splitter,
-  type SplitterProps,
-  type SplitterPanelProps,
-  type SplitterSemanticPart,
-} from './components/splitter/splitter';
-export {
-  Tag,
-  CheckableTag,
-  type TagProps,
-  type CheckableTagProps,
-  type TagColor,
-  type TagVariant,
-  type TagSemanticPart,
-} from './components/tag/tag';
+  Radio,
+  RadioGroup,
+  type RadioGroupProps,
+  type RadioOptionType,
+  type RadioProps,
+  type RadioSemanticPart,
+} from './components/radio/radio';
 export {
   ScrollArea,
   type ScrollAreaProps,
-  type ScrollAreaType,
   type ScrollAreaSemanticPart,
+  type ScrollAreaType,
 } from './components/scroll-area/scroll-area';
-
+export {
+  Select,
+  type SelectOption,
+  type SelectProps,
+} from './components/select/select';
+export {
+  Splitter,
+  type SplitterPanelProps,
+  type SplitterProps,
+  type SplitterSemanticPart,
+} from './components/splitter/splitter';
+export {
+  Switch,
+  type SwitchProps,
+  type SwitchSemanticPart,
+} from './components/switch/switch';
+export {
+  type SorterResult,
+  type SortOrder,
+  Table,
+  type TableColumn,
+  type TableFilterItem,
+  type TablePagination,
+  type TableProps,
+  type TableRowSelection,
+  type TableSemanticPart,
+} from './components/table/table';
+export {
+  type TabItem,
+  Tabs,
+  type TabsProps,
+  type TabsSemanticPart,
+} from './components/tabs/tabs';
+export {
+  CheckableTag,
+  type CheckableTagProps,
+  Tag,
+  type TagColor,
+  type TagProps,
+  type TagSemanticPart,
+  type TagVariant,
+} from './components/tag/tag';
+export {
+  FormLayout,
+  type FormLayoutProps,
+} from './layouts/form-layout/form-layout';
 // Layouts
 export { Stack, type StackProps } from './layouts/stack/stack';
-export { FormLayout, type FormLayoutProps } from './layouts/form-layout/form-layout';
-
 // Legacy (headless)
 export {
   type FormatOptions,
@@ -125,3 +174,18 @@ export {
   type UseNumberInputReturn,
   useNumberInput,
 } from './number-input';
+export {
+  TaoProvider,
+  type TaoProviderProps,
+  type TaoSeedToken,
+  type TaoSize,
+  type TaoThemeConfig,
+  type TaoVariant,
+  useTaoConfig,
+} from './provider/tao-provider';
+// Semantic DOM utilities
+export {
+  cx,
+  type SemanticClassNames,
+  type SemanticStyles,
+} from './utils/semantic';

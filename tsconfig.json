@@ -8,7 +8,7 @@
     "moduleResolution": "bundler",
     "useDefineForClassFields": true,
     "paths": {
-      "rihua-ui": ["."]
+      "@rockshin/tao-ui": ["./src/index.tsx"]
     }
   },
   "include": ["src", "docs", "rspress.config.ts"]

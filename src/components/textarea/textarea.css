@@ -1,0 +1,78 @@
+@import "../../theme/theme.css";
+@import "../../theme/control.css";
+
+/* ===========================
+   Textarea wrapper
+   Border / background / focus ring come from theme/control.css
+   (shared [data-tao-control] variant styles). Layout + inner reset here.
+   =========================== */
+[data-tao-textarea] {
+  display: block;
+  font-family: var(--tao-font-family);
+}
+
+/* Sizes — radius on wrapper, padding / font on inner textarea */
+[data-tao-textarea][data-tao-size="small"] {
+  border-radius: var(--tao-radius-sm);
+}
+[data-tao-textarea][data-tao-size="small"] textarea {
+  padding: var(--tao-padding-xs) var(--tao-padding-xs);
+  font-size: var(--tao-font-size-sm);
+  line-height: var(--tao-line-height-sm);
+  min-height: calc(1lh + 2 * var(--tao-padding-xs));
+}
+
+[data-tao-textarea][data-tao-size="medium"] {
+  border-radius: var(--tao-radius-md);
+}
+[data-tao-textarea][data-tao-size="medium"] textarea {
+  padding: var(--tao-padding-xs) var(--tao-padding-sm);
+  font-size: var(--tao-font-size-base);
+  line-height: var(--tao-line-height);
+  min-height: calc(3lh + 2 * var(--tao-padding-xs));
+}
+
+[data-tao-textarea][data-tao-size="large"] {
+  border-radius: var(--tao-radius-md);
+}
+[data-tao-textarea][data-tao-size="large"] textarea {
+  padding: var(--tao-padding-sm) var(--tao-padding-sm);
+  font-size: var(--tao-font-size-lg);
+  line-height: var(--tao-line-height-lg);
+  min-height: calc(3lh + 2 * var(--tao-padding-sm));
+}
+
+/* Borderless: override radius from size rules */
+[data-tao-textarea][data-tao-variant="borderless"] {
+  border-radius: 0 !important;
+}
+
+/* Inner textarea reset */
+[data-tao-textarea] textarea {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: inherit;
+  color: var(--tao-color-text);
+  resize: vertical;
+}
+
+/* autoSize controls its own height — disable manual resize + size floor */
+[data-tao-textarea] textarea[data-tao-autosize] {
+  resize: none;
+  overflow-y: hidden;
+  min-height: 0;
+}
+
+[data-tao-textarea] textarea::placeholder {
+  color: var(--tao-color-text-placeholder);
+}
+
+[data-tao-textarea] textarea:disabled {
+  color: var(--tao-color-text-disabled);
+  cursor: not-allowed;
+}

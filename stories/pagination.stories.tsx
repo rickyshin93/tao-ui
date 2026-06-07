@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
-import { Pagination } from 'tao-ui';
+import { Pagination } from '@rockshin/tao-ui';
 
 const meta: Meta = {
   title: '导航 Navigation/Pagination',

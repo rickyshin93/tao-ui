@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
-import { Tabs, TaoProvider, Stack } from 'tao-ui';
+import { Tabs, TaoProvider, Stack } from '@rockshin/tao-ui';
 
 const meta: Meta = {
   title: '导航 Navigation/Tabs',

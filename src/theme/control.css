@@ -9,6 +9,26 @@
  */
 
 /* ===========================
+   Default width
+   Controls take a sensible fixed width by default (like antd), not 100%.
+   Override per-instance via style/className, or set width:100% for full-width.
+   =========================== */
+[data-tao-control] {
+  box-sizing: border-box;
+  width: var(--tao-control-width);
+}
+
+/* RangePicker needs room for two dates */
+[data-tao-control][data-tao-range-trigger] {
+  width: var(--tao-control-range-width);
+}
+
+/* Inside FormField, controls fill the field width (matches antd Form) */
+[data-tao-form-field] [data-tao-control] {
+  width: 100%;
+}
+
+/* ===========================
    Base transition
    =========================== */
 [data-tao-control] {
@@ -22,7 +42,9 @@
    Outlined (default)
    =========================== */
 [data-tao-control][data-tao-variant="outlined"] {
-  background: var(--tao-color-bg-container);
+  /* transparent so the control blends into any host background;
+     use the `filled` variant when an opaque surface is wanted. */
+  background: transparent;
   border: var(--tao-line-width) solid var(--tao-color-border);
 }
 

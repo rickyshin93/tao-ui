@@ -8,7 +8,6 @@ button[data-tao-picker-trigger] {
   display: flex;
   align-items: center;
   gap: var(--tao-padding-xs);
-  width: 100%;
   font-family: var(--tao-font-family);
   cursor: pointer;
   outline: none;
@@ -584,7 +583,6 @@ button[data-tao-range-trigger] {
   display: flex;
   align-items: center;
   gap: 0;
-  width: 100%;
   font-family: var(--tao-font-family);
   cursor: pointer;
   outline: none;

@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { FormField, Select, Stack } from '@rockshin/tao-ui';
 import type { Meta, StoryObj } from '@storybook/react';
-import { Select, FormField, Stack } from 'tao-ui';
+import { useState } from 'react';
 
 const meta: Meta = {
   title: '数据录入 Data Entry/Select',
@@ -133,6 +133,61 @@ export const MobileMode: StoryObj = {
             />
           </FormField>
         </Stack>
+      );
+    }
+    return <Demo />;
+  },
+};
+
+// Rounded-square gradient avatar placeholder (stands in for a real logo).
+function Avatar({ from, to }: { from: string; to: string }) {
+  return (
+    <span
+      style={{
+        display: 'block',
+        width: '100%',
+        height: '100%',
+        background: `radial-gradient(circle at 30% 30%, ${from}, ${to})`,
+      }}
+    />
+  );
+}
+
+const workspaceOptions = [
+  {
+    value: 'creative',
+    label: 'ElevenCreative',
+    description: 'Create, edit and localize content with AI',
+    icon: <Avatar from="#ff9a6b" to="#e8453c" />,
+  },
+  {
+    value: 'agents',
+    label: 'ElevenAgents',
+    description: 'Deploy and monitor conversational agents',
+    icon: <Avatar from="#6be39a" to="#1f7a8c" />,
+  },
+  {
+    value: 'api',
+    label: 'ElevenAPI',
+    description: 'Build with our leading AI audio models',
+    icon: <Avatar from="#d9d9d9" to="#6b6b6b" />,
+  },
+];
+
+export const WorkspaceSwitcher: StoryObj = {
+  name: 'Workspace Switcher (icon + description)',
+  render: () => {
+    function Demo() {
+      const [val, setVal] = useState('agents');
+      return (
+        <div style={{ maxWidth: 320 }}>
+          <Select
+            options={workspaceOptions}
+            value={val}
+            onChange={setVal}
+            placeholder="Select workspace"
+          />
+        </div>
       );
     }
     return <Demo />;
