@@ -53,7 +53,7 @@ export interface ExampleProps {
 ### 样式规范
 
 - CSS 变量前缀 `--tao-*`，data 属性 `data-tao-*`
-- CSS 文件引用 theme：`@import '../../theme/theme.css';`
+- theme.css 和 control.css 在 `src/index.tsx` 顶层统一导入，组件 CSS 不需要 `@import theme`
 - 用 data 属性驱动样式，不用 className
 - 颜色用 OKLCH + `color-mix()`
 - 动画只允许 `opacity`, `transform`, `background-color`, `border-color`, `color`

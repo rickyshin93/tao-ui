@@ -116,3 +116,15 @@
 - **真实行为**: rstest 用 happy-dom，不计算 flex/宽度/位置，定位类问题测不出来；项目也没装 playwright/puppeteer
 - **正确做法**: 用系统自带 Chrome 截图实测：拼一个最小 HTML，`@import url("file://.../dist/theme/theme.css" + control.css + 组件.css)`，照着真实 DOM（可用一个 throw outerHTML 的临时测试 dump 出来）写 markup，`"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless --disable-gpu --screenshot=out.png --window-size=W,H --default-background-color=FFFFFFFF page.html`，再 Read 图。注意 theme.css 里的 `@import 'tailwindcss'` 会 404 但不影响 CSS 变量加载
 - **适用场景**: 任何位置/对齐/尺寸类视觉 bug，不要靠猜，截图实测
+
+## [工具链] 包管理器是 bun，不是 pnpm/npm
+- **日期**: 2026-06-07
+- **错误假设**: 看到没有 lockfile 就用 `pnpm install`，生成了 pnpm-lock.yaml
+- **真实行为**: 项目用 **bun**：`bun.lockb` 已入库，CI(release.yml) 用 `bun install --frozen-lockfile`。误用 pnpm 会留下冲突 lockfile，且 package.json 改了而 bun.lockb 没更 → CI frozen-lockfile 直接失败、发布挂掉
+- **正确做法**: 一律用 `bun install` / `bun run <script>`。改完依赖用 bun 重装更新 bun.lockb，再 `bun run test` + `bun run build` 镜像 CI 验证。别生成 pnpm-lock/package-lock
+- **适用场景**: 任何装/改依赖、跑脚本、发版前验证
+
+## [发布] tao-ui 发版流程：GitHub Release 触发 CI npm publish
+- **日期**: 2026-06-07
+- **正确做法**: ① 改 package.json version ② `bun install` 更新 bun.lockb ③ commit + push main ④ `gh release create vX.Y.Z`（tag 必须 = package.json version，否则 CI 的 verify 步骤报错）。release.yml 在 `release: published` 时跑 test→build→`npm publish`(NODE_AUTH_TOKEN=secrets.NPM_TOKEN)。包名 `@rockshin/tao-ui`
+- **适用场景**: 发新版本时照此走，不要本地手动 npm publish

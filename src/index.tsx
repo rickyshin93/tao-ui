@@ -1,200 +1,204 @@
+// Global theme — imported once here so consumers don't need a separate CSS import.
+import "./theme/theme.css";
+import "./theme/control.css";
+
 // Provider
 
 export {
-  Breadcrumb,
-  type BreadcrumbItemType,
-  type BreadcrumbProps,
-  type BreadcrumbSemanticPart,
-} from './components/breadcrumb/breadcrumb';
+	Breadcrumb,
+	type BreadcrumbItemType,
+	type BreadcrumbProps,
+	type BreadcrumbSemanticPart,
+} from "./components/breadcrumb/breadcrumb";
 // Components
 export {
-  Button,
-  type ButtonProps,
-  type ButtonSemanticPart,
-} from './components/button/button';
+	Button,
+	type ButtonProps,
+	type ButtonSemanticPart,
+} from "./components/button/button";
 export {
-  Checkbox,
-  CheckboxGroup,
-  type CheckboxGroupProps,
-  type CheckboxOptionType,
-  type CheckboxProps,
-  type CheckboxSemanticPart,
-} from './components/checkbox/checkbox';
+	Checkbox,
+	CheckboxGroup,
+	type CheckboxGroupProps,
+	type CheckboxOptionType,
+	type CheckboxProps,
+	type CheckboxSemanticPart,
+} from "./components/checkbox/checkbox";
 export {
-  Collapsible,
-  type CollapsibleContentProps,
-  type CollapsibleProps,
-  type CollapsibleSemanticPart,
-  type CollapsibleTriggerProps,
-} from './components/collapsible/collapsible';
+	Collapsible,
+	type CollapsibleContentProps,
+	type CollapsibleProps,
+	type CollapsibleSemanticPart,
+	type CollapsibleTriggerProps,
+} from "./components/collapsible/collapsible";
 export {
-  ContextMenu,
-  type ContextMenuProps,
-  type ContextMenuSemanticPart,
-} from './components/context-menu/context-menu';
+	ContextMenu,
+	type ContextMenuProps,
+	type ContextMenuSemanticPart,
+} from "./components/context-menu/context-menu";
 export {
-  DatePicker,
-  type DatePickerProps,
-} from './components/date-picker/date-picker';
+	DatePicker,
+	type DatePickerProps,
+} from "./components/date-picker/date-picker";
 export {
-  RangePicker,
-  type RangePickerProps,
-} from './components/date-picker/range-picker';
+	RangePicker,
+	type RangePickerProps,
+} from "./components/date-picker/range-picker";
 export {
-  Drawer,
-  type DrawerPlacement,
-  type DrawerProps,
-  type DrawerResizableConfig,
-  type DrawerSemanticPart,
-  type DrawerSize,
-} from './components/drawer/drawer';
+	Drawer,
+	type DrawerPlacement,
+	type DrawerProps,
+	type DrawerResizableConfig,
+	type DrawerSemanticPart,
+	type DrawerSize,
+} from "./components/drawer/drawer";
 export {
-  Dropdown,
-  type DropdownButtonProps,
-  type DropdownPlacement,
-  type DropdownProps,
-  type DropdownSemanticPart,
-  type DropdownTrigger,
-  type MenuDividerType,
-  type MenuGroupType,
-  type MenuItem,
-  type MenuItemType,
-  type MenuProps,
-} from './components/dropdown/dropdown';
+	Dropdown,
+	type DropdownButtonProps,
+	type DropdownPlacement,
+	type DropdownProps,
+	type DropdownSemanticPart,
+	type DropdownTrigger,
+	type MenuDividerType,
+	type MenuGroupType,
+	type MenuItem,
+	type MenuItemType,
+	type MenuProps,
+} from "./components/dropdown/dropdown";
 export {
-  FormActions,
-  type FormActionsProps,
-  type FormActionsSemanticPart,
-} from './components/form-actions/form-actions';
+	FormActions,
+	type FormActionsProps,
+	type FormActionsSemanticPart,
+} from "./components/form-actions/form-actions";
 export {
-  FormField,
-  type FormFieldProps,
-  type FormFieldSemanticPart,
-} from './components/form-field/form-field';
+	FormField,
+	type FormFieldProps,
+	type FormFieldSemanticPart,
+} from "./components/form-field/form-field";
 export {
-  FormSection,
-  type FormSectionProps,
-  type FormSectionSemanticPart,
-} from './components/form-section/form-section';
+	FormSection,
+	type FormSectionProps,
+	type FormSectionSemanticPart,
+} from "./components/form-section/form-section";
 export {
-  Input,
-  type InputProps,
-  type InputSemanticPart,
-} from './components/input/input';
+	Input,
+	type InputProps,
+	type InputSemanticPart,
+} from "./components/input/input";
 export {
-  type ConfirmType,
-  Modal,
-  type ModalFooterRender,
-  type ModalFuncProps,
-  type ModalFuncReturn,
-  type ModalHookApi,
-  type ModalProps,
-  type ModalSemanticPart,
-} from './components/modal';
+	type ConfirmType,
+	Modal,
+	type ModalFooterRender,
+	type ModalFuncProps,
+	type ModalFuncReturn,
+	type ModalHookApi,
+	type ModalProps,
+	type ModalSemanticPart,
+} from "./components/modal";
 export {
-  Pagination,
-  type PaginationProps,
-  type PaginationSemanticPart,
-} from './components/pagination/pagination';
+	Pagination,
+	type PaginationProps,
+	type PaginationSemanticPart,
+} from "./components/pagination/pagination";
 export {
-  Radio,
-  RadioGroup,
-  type RadioGroupProps,
-  type RadioOptionType,
-  type RadioProps,
-  type RadioSemanticPart,
-} from './components/radio/radio';
+	Radio,
+	RadioGroup,
+	type RadioGroupProps,
+	type RadioOptionType,
+	type RadioProps,
+	type RadioSemanticPart,
+} from "./components/radio/radio";
 export {
-  ScrollArea,
-  type ScrollAreaProps,
-  type ScrollAreaSemanticPart,
-  type ScrollAreaType,
-} from './components/scroll-area/scroll-area';
+	ScrollArea,
+	type ScrollAreaProps,
+	type ScrollAreaSemanticPart,
+	type ScrollAreaType,
+} from "./components/scroll-area/scroll-area";
 export {
-  ChevronsUpDownIcon,
-  Select,
-  type SelectOption,
-  type SelectPlacement,
-  type SelectProps,
-  type SelectSemanticPart,
-} from './components/select/select';
+	ChevronsUpDownIcon,
+	Select,
+	type SelectOption,
+	type SelectPlacement,
+	type SelectProps,
+	type SelectSemanticPart,
+} from "./components/select/select";
 export {
-  Spinner,
-  type SpinnerProps,
-  type SpinnerSemanticPart,
-} from './components/spinner/spinner';
+	Spinner,
+	type SpinnerProps,
+	type SpinnerSemanticPart,
+} from "./components/spinner/spinner";
 export {
-  Splitter,
-  type SplitterPanelProps,
-  type SplitterProps,
-  type SplitterSemanticPart,
-} from './components/splitter/splitter';
+	Splitter,
+	type SplitterPanelProps,
+	type SplitterProps,
+	type SplitterSemanticPart,
+} from "./components/splitter/splitter";
 export {
-  Switch,
-  type SwitchProps,
-  type SwitchSemanticPart,
-} from './components/switch/switch';
+	Switch,
+	type SwitchProps,
+	type SwitchSemanticPart,
+} from "./components/switch/switch";
 export {
-  type SorterResult,
-  type SortOrder,
-  Table,
-  type TableColumn,
-  type TableFilterItem,
-  type TablePagination,
-  type TableProps,
-  type TableRowSelection,
-  type TableSemanticPart,
-} from './components/table/table';
+	type SorterResult,
+	type SortOrder,
+	Table,
+	type TableColumn,
+	type TableFilterItem,
+	type TablePagination,
+	type TableProps,
+	type TableRowSelection,
+	type TableSemanticPart,
+} from "./components/table/table";
 export {
-  type TabItem,
-  Tabs,
-  type TabsProps,
-  type TabsSemanticPart,
-} from './components/tabs/tabs';
+	type TabItem,
+	Tabs,
+	type TabsProps,
+	type TabsSemanticPart,
+} from "./components/tabs/tabs";
 export {
-  CheckableTag,
-  type CheckableTagProps,
-  Tag,
-  type TagColor,
-  type TagProps,
-  type TagSemanticPart,
-  type TagVariant,
-} from './components/tag/tag';
+	CheckableTag,
+	type CheckableTagProps,
+	Tag,
+	type TagColor,
+	type TagProps,
+	type TagSemanticPart,
+	type TagVariant,
+} from "./components/tag/tag";
 export {
-  type AutoSizeOptions,
-  Textarea,
-  type TextareaProps,
-  type TextareaSemanticPart,
-} from './components/textarea/textarea';
+	type AutoSizeOptions,
+	Textarea,
+	type TextareaProps,
+	type TextareaSemanticPart,
+} from "./components/textarea/textarea";
 export {
-  FormLayout,
-  type FormLayoutProps,
-} from './layouts/form-layout/form-layout';
+	FormLayout,
+	type FormLayoutProps,
+} from "./layouts/form-layout/form-layout";
 // Layouts
-export { Stack, type StackProps } from './layouts/stack/stack';
+export { Stack, type StackProps } from "./layouts/stack/stack";
 // Legacy (headless)
 export {
-  type FormatOptions,
-  NumberInput,
-  type NumberInputProps,
-  type PadDecimalsOnBlur,
-  type UseNumberInputOptions,
-  type UseNumberInputReturn,
-  useNumberInput,
-} from './number-input';
+	type FormatOptions,
+	NumberInput,
+	type NumberInputProps,
+	type PadDecimalsOnBlur,
+	type UseNumberInputOptions,
+	type UseNumberInputReturn,
+	useNumberInput,
+} from "./number-input";
 export {
-  TaoPortalScope,
-  TaoProvider,
-  type TaoProviderProps,
-  type TaoSeedToken,
-  type TaoSize,
-  type TaoThemeConfig,
-  type TaoVariant,
-  useTaoConfig,
-} from './provider/tao-provider';
+	TaoPortalScope,
+	TaoProvider,
+	type TaoProviderProps,
+	type TaoSeedToken,
+	type TaoSize,
+	type TaoThemeConfig,
+	type TaoVariant,
+	useTaoConfig,
+} from "./provider/tao-provider";
 // Semantic DOM utilities
 export {
-  cx,
-  type SemanticClassNames,
-  type SemanticStyles,
-} from './utils/semantic';
+	cx,
+	type SemanticClassNames,
+	type SemanticStyles,
+} from "./utils/semantic";
