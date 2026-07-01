@@ -1,6 +1,6 @@
 {
   "name": "@rockshin/tao-ui",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "type": "module",
   "description": "A modern React 19 component library with semantic DOM customization and OKLCH-based theming.",
   "keywords": [
@@ -21,7 +21,9 @@
   "homepage": "https://github.com/rickyshin93/tao-ui#readme",
   "bugs": "https://github.com/rickyshin93/tao-ui/issues",
   "sideEffects": [
-    "**/*.css"
+    "**/*.css",
+    "./dist/index.js",
+    "./src/index.tsx"
   ],
   "exports": {
     ".": {
@@ -52,7 +54,7 @@
     "@rsbuild/core": "^2.0.11",
     "@rsbuild/plugin-babel": "^1.2.1",
     "@rsbuild/plugin-react": "^2.0.1",
-    "@rslib/core": "^0.22.0",
+    "@rslib/core": "^0.23.1",
     "@rspress/core": "^2.0.13",
     "@rspress/plugin-api-docgen": "^2.0.13",
     "@rspress/plugin-preview": "^2.0.13",

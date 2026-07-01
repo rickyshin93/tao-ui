@@ -9,7 +9,7 @@ npm install @rockshin/tao-ui
 ```
 
 Peer dependencies: `react >=19`, `react-dom >=19`, `dayjs >=1.11` (only needed for `DatePicker`/`RangePicker`).
-Module format: ESM only. Types and CSS ship alongside the JS; component CSS is imported as a side effect, so keep tree-shaking aware of CSS (`sideEffects` is declared in package.json).
+Module format: ESM only. Types and CSS ship alongside the JS. **No manual CSS import required** — the package entry (`dist/index.js`) imports design tokens (`--tao-*`) and shared control states on load. This is preserved end-to-end via a `sideEffects` whitelist (`["**/*.css", "./dist/index.js", "./src/index.tsx"]`) so tree-shakers keep the CSS side effects while still eliminating unused component exports at the export granularity.
 
 ## Core concepts
 

@@ -1,4 +1,8 @@
 // Global theme — imported once here so consumers don't need a separate CSS import.
+// This entry's CSS side effects are preserved end-to-end via the `sideEffects`
+// whitelist in package.json (./dist/index.js + ./src/index.tsx). Without that
+// whitelist, tree-shakers mark this module side-effect-free based on the CSS-only
+// sideEffects glob and silently drop these two imports.
 import "./theme/theme.css";
 import "./theme/control.css";
 

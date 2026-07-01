@@ -9,35 +9,41 @@
   font-family: var(--tao-font-family);
 }
 
-/* Sizes — radius on wrapper, padding / font on inner textarea */
+/* Sizes — radius on wrapper; padding-block derived from
+   (controlHeight - fontSize*lineHeight)/2 - border, so a single-row
+   textarea equals the matching Input height. minHeight = controlHeight
+   keeps a scrunched textarea aligned with Input. */
 [data-tao-textarea][data-tao-size="small"] {
   border-radius: var(--tao-radius-sm);
 }
 [data-tao-textarea][data-tao-size="small"] textarea {
-  padding: var(--tao-padding-xs) var(--tao-padding-xs);
+  padding-inline: var(--tao-padding-xs);
+  padding-block: calc((var(--tao-control-height-sm) - var(--tao-font-size-sm) * var(--tao-line-height-sm)) / 2 - 1px);
   font-size: var(--tao-font-size-sm);
   line-height: var(--tao-line-height-sm);
-  min-height: calc(1lh + 2 * var(--tao-padding-xs));
+  min-height: var(--tao-control-height-sm);
 }
 
 [data-tao-textarea][data-tao-size="medium"] {
   border-radius: var(--tao-radius-md);
 }
 [data-tao-textarea][data-tao-size="medium"] textarea {
-  padding: var(--tao-padding-xs) var(--tao-padding-sm);
+  padding-inline: var(--tao-padding-sm);
+  padding-block: calc((var(--tao-control-height) - var(--tao-font-size-base) * var(--tao-line-height)) / 2 - 1px);
   font-size: var(--tao-font-size-base);
   line-height: var(--tao-line-height);
-  min-height: calc(3lh + 2 * var(--tao-padding-xs));
+  min-height: var(--tao-control-height);
 }
 
 [data-tao-textarea][data-tao-size="large"] {
   border-radius: var(--tao-radius-md);
 }
 [data-tao-textarea][data-tao-size="large"] textarea {
-  padding: var(--tao-padding-sm) var(--tao-padding-sm);
+  padding-inline: var(--tao-padding-sm);
+  padding-block: calc((var(--tao-control-height-lg) - var(--tao-font-size-lg) * var(--tao-line-height-lg)) / 2 - 1px);
   font-size: var(--tao-font-size-lg);
   line-height: var(--tao-line-height-lg);
-  min-height: calc(3lh + 2 * var(--tao-padding-sm));
+  min-height: var(--tao-control-height-lg);
 }
 
 /* Borderless: override radius from size rules */
