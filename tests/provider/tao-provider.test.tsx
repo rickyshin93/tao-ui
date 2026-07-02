@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { expect, test } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
 import { TaoProvider, useTaoConfig } from '../../src/provider/tao-provider';
@@ -16,6 +17,13 @@ test('theme.token.colorPrimary sets --tao-color-primary CSS variable', () => {
   const provider = screen.getByTestId('child').parentElement!;
   expect(provider.style.getPropertyValue('--tao-color-primary')).toBe(
     'oklch(0.5 0.2 260)',
+  );
+});
+
+test('default theme tokens are not scoped to data-tao-provider', () => {
+  const css = readFileSync('src/theme/theme.css', 'utf8');
+  expect(css).not.toContain(
+    ':root,\n\t[data-tao-provider]',
   );
 });
 
