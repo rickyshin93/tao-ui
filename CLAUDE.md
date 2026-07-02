@@ -62,3 +62,28 @@ export interface ExampleProps {
 ### TaoProvider 继承
 
 组件通过 `useTaoConfig()` 继承 `size` / `disabled` / `variant`，本地 prop 优先。
+
+## 消费方本地 link 使用指南
+
+**场景**：在别的项目里 link 本仓库（`"@rockshin/tao-ui": "link:../../../personal/tao-ui"`），一改一试。
+
+**消费方 `vite.config.ts` 必须加**：
+```ts
+export default defineConfig({
+  resolve: { dedupe: ["react", "react-dom"] },
+  optimizeDeps: { exclude: ["@rockshin/tao-ui"] },
+});
+```
+
+- `resolve.dedupe`：**必需**。tao-ui 自己 devDeps 装了 react（dev/test/story 需要），symlink 后 Node 模块解析会从 `tao-ui/node_modules/react` 拿一份，消费方拿另一份 → 两份 React 实例 → `Invalid hook call` 整页白屏。dedupe 强制走消费方版本，唯一的解。（这不是 tao-ui 端能修的——peer/external 都已配对，问题在 Node 解析算法。）
+- `optimizeDeps.exclude`：性能优化。vite 不 pre-bundle tao-ui，你 `pnpm build` 后直接 HMR，不用每次 `vite --force` 清 `.vite/deps`。
+
+**开发流程**：
+```
+在 tao-ui：pnpm build   # rebuild dist；因为是 symlink，消费方立刻可见
+浏览器：⌘⇧R              # 硬刷拿新 CSS/JS
+```
+
+不需要在消费方 `pnpm install` 或 `--force` 重启 vite。
+
+**回归 npm**：切回 `"@rockshin/tao-ui": "^0.0.5"` 时，`optimizeDeps.exclude` 可去掉（享受 pre-bundle 加速），`resolve.dedupe` 建议留着（React lib 消费方通用护栏）。

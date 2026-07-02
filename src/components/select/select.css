@@ -4,7 +4,12 @@
    Works for both Radix <Trigger> and mobile <button>
    =========================== */
 [data-tao-select] {
+  /* 默认撑满父容器——跟 Input/Textarea/DatePicker 一致。
+     antd Select 本身是 inline-flex 缩到内容宽度，但那在现代
+     form 布局（Card + Field）里几乎总要用户额外 w-full，
+     反直觉。想要缩到内容宽的场景：style={{ width: 'fit-content' }}。 */
   display: flex;
+  width: 100%;
   align-items: center;
   gap: var(--tao-padding-xs);
   font-family: var(--tao-font-family);

@@ -6,6 +6,7 @@
    =========================== */
 [data-tao-textarea] {
   display: block;
+  width: 100%; /* antd Textarea 对齐：默认撑满父容器 */
   font-family: var(--tao-font-family);
 }
 

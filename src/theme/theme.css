@@ -2,12 +2,33 @@
  * tao-ui Design Tokens
  * Seed → Derived via CSS calc() + color-mix()
  * Reference: DESIGN.md §2
+ *
+ * ─── SEED vs DERIVED split ────────────────────────────────────────────────
+ * CSS custom properties are computed EAGERLY at the element that declares
+ * them: a rule like `--tao-primary: var(--tao-color-primary)` written only
+ * on `:root` fixes --tao-primary at :root's --tao-color-primary. Overriding
+ * --tao-color-primary on a nested `<TaoProvider>` does NOT re-derive
+ * --tao-primary — the derived value was already frozen at :root and merely
+ * inherits down (verified in headless Chrome).
+ *
+ * Fix: seeds live at `:root` only (so nested providers inherit them
+ * unmodified — critical for the "child TaoProvider without theme.token
+ * still sees parent's overrides" case). Every DERIVED rule is duplicated to
+ * `:root, [data-tao-provider]` so each provider level RE-computes its
+ * derived tokens from that scope's current seed values. That's what makes
+ * `<TaoProvider theme={{ token: { colorPrimary: '...' } }}>` actually
+ * cascade through to Button/Tag/Input via --tao-primary, --tao-primary-bg,
+ * --tao-control-outline, etc.
  */
 
 @layer base {
 	:root {
 		/* ===========================
        SEED TOKENS
+       Declared at :root ONLY. Nested providers inherit these; they must not
+       be re-declared at [data-tao-provider] or the redeclaration would
+       reset each un-overridden provider back to defaults, breaking the
+       nested-inheritance contract.
        =========================== */
 
 		/* Color seeds */
@@ -19,13 +40,15 @@
 		--tao-color-text-base: oklch(0.155 0.01 70);
 
 		/* Size seeds */
-		--tao-radius: 6px;
+		--tao-radius: 10px; /* shadcn baseline */
 		--tao-font-size: 14px;
 		--tao-control-height: 36px;
 		--tao-control-width: 200px; /* default width for Input/Select/DatePicker; override per-instance or use 100% for full width */
 		--tao-control-range-width: 360px; /* RangePicker holds two dates + separator */
 		--tao-size-unit: 4px;
 		--tao-line-width: 1px;
+		/* Focus ring width — shadcn uses 3px, more visible than antd's 2px */
+		--tao-ring-width: 3px;
 
 		/* Font seeds */
 		--tao-font-family:
@@ -41,7 +64,16 @@
 		--tao-z-index-drawer: 1000;
 		--tao-z-index-modal: 1000;
 		--tao-z-index-popup: 1100;
+	}
 
+	/* ═════════════════════════════════════════════════════════════════════
+     DERIVED TOKENS
+     Re-declared at every [data-tao-provider] level so that overriding a
+     seed on any provider re-derives these on THAT scope (and descendants
+     inherit the re-derived values). See file-header note.
+     ═════════════════════════════════════════════════════════════════════ */
+	:root,
+	[data-tao-provider] {
 		/* ===========================
        DERIVED: Primary color palette
        =========================== */
@@ -181,22 +213,25 @@
 		/* ===========================
        DERIVED: Border (2 levels)
        =========================== */
+		/* shadcn 边框比 antd 更浅（12% vs 原 18%），配合更粗的 focus ring 依旧清晰 */
 		--tao-color-border: color-mix(
 			in oklch,
-			var(--tao-color-text-base) 18%,
+			var(--tao-color-text-base) 12%,
 			var(--tao-color-bg-base)
 		);
 		--tao-color-border-secondary: #0000170b; /* gray-alpha-100：半透明冷灰，淡雅分隔线 */
 
 		/* ===========================
        DERIVED: Radius
+       shadcn 语义：sm/md/lg/xl 都相对 base 递增，非等比。
+       base=10 时: xs=2, sm=8, md=10, lg=12, xl=14
        =========================== */
 		--tao-radius-xs: 2px;
 		--tao-radius-sm: calc(var(--tao-radius) - 2px);
 		--tao-radius-md: var(--tao-radius);
 		--tao-radius-lg: calc(var(--tao-radius) + 2px);
-		--tao-radius-xl: calc(var(--tao-radius) * 2);
-		--tao-radius-2xl: calc(var(--tao-radius) * 2.67);
+		--tao-radius-xl: calc(var(--tao-radius) + 4px);
+		--tao-radius-2xl: calc(var(--tao-radius) * 2);
 		--tao-radius-full: 9999px;
 
 		/* ===========================
@@ -206,7 +241,7 @@
 		--tao-control-height-lg: calc(var(--tao-control-height) + 4px);
 
 		/* ===========================
-       DERIVED: Font sizes (fixed for default 14px)
+       DERIVED: Font sizes
        =========================== */
 		--tao-font-size-xs: 12px;
 		--tao-font-size-sm: 13px;
@@ -247,7 +282,10 @@
 
 		/* ===========================
        DERIVED: Shadow
+       shadow-xs 是 shadcn 按钮/输入的关键"活着"的感觉——极细的一道，
+       不喧宾夺主，但让元素浮起来一层。
        =========================== */
+		--tao-box-shadow-xs: 0 1px 2px 0 oklch(0 0 0 / 0.05);
 		--tao-box-shadow:
 			0 1px 2px oklch(0 0 0 / 0.04), 0 0 1px oklch(0 0 0 / 0.08);
 		--tao-box-shadow-secondary:
@@ -255,21 +293,24 @@
 		--tao-box-shadow-tertiary: 0 1px 2px oklch(0 0 0 / 0.04);
 
 		/* ===========================
-       DERIVED: Focus (antd: box-shadow based, not outline)
+       DERIVED: Focus ring
+       primary 是近黑（0.205），40% α 出来是死灰。降到 20% 后
+       ring 变成一层薄薄的"辉光"，透气感明显（有色 primary
+       比如蓝/靛用 40% 更合适，这里为暗中性色调低）。
        =========================== */
 		--tao-control-outline: color-mix(
 			in oklch,
-			var(--tao-color-primary) 10%,
+			var(--tao-color-primary) 20%,
 			transparent
 		);
 		--tao-color-error-outline: color-mix(
 			in oklch,
-			var(--tao-color-error) 10%,
+			var(--tao-color-error) 25%,
 			transparent
 		);
 		--tao-color-warning-outline: color-mix(
 			in oklch,
-			var(--tao-color-warning) 10%,
+			var(--tao-color-warning) 25%,
 			transparent
 		);
 

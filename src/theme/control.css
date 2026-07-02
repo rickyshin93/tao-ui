@@ -8,21 +8,16 @@
  */
 
 /* ===========================
-   Default width
-   Controls take a sensible fixed width by default (like antd), not 100%.
-   Override per-instance via style/className, or set width:100% for full-width.
+   Box sizing + width defaults (per antd)
+     - Input / Textarea / DatePicker / RangePicker → width: 100% (fill parent)
+       — set on each component's own selector, not here, since Select must
+       remain inline-flex-sized-to-content when not in a form.
+     - Select → inline-flex (shrinks to content), unless nested in <FormField>.
+   In <FormField> ALL controls fill the field width — matches antd Form.Item.
    =========================== */
 [data-tao-control] {
   box-sizing: border-box;
-  width: var(--tao-control-width);
 }
-
-/* RangePicker needs room for two dates */
-[data-tao-control][data-tao-range-trigger] {
-  width: var(--tao-control-range-width);
-}
-
-/* Inside FormField, controls fill the field width (matches antd Form) */
 [data-tao-form-field] [data-tao-control] {
   width: 100%;
 }
@@ -47,18 +42,22 @@
   border: var(--tao-line-width) solid var(--tao-color-border);
 }
 
-/* Outlined: hover */
+/* Outlined: hover — shadcn 风格保持边框不动，只有 focus 才响应 */
 [data-tao-control][data-tao-variant="outlined"]:hover:not([data-disabled]):not(
   :focus-within
 ):not([data-state="open"]) {
-  border-color: var(--tao-primary-hover);
+  border-color: color-mix(
+    in oklch,
+    var(--tao-color-text-base) 20%,
+    var(--tao-color-bg-base)
+  );
 }
 
 /* Outlined: focus / open */
 [data-tao-control][data-tao-variant="outlined"]:focus-within,
 [data-tao-control][data-tao-variant="outlined"][data-state="open"] {
   border-color: var(--tao-primary);
-  box-shadow: 0 0 0 2px var(--tao-control-outline);
+  box-shadow: 0 0 0 var(--tao-ring-width) var(--tao-control-outline);
   outline: none;
 }
 
@@ -78,7 +77,7 @@
 [data-tao-control][data-tao-variant="outlined"][data-tao-error]:focus-within,
 [data-tao-control][data-tao-variant="outlined"][data-tao-error][data-state="open"] {
   border-color: var(--tao-error);
-  box-shadow: 0 0 0 2px var(--tao-color-error-outline);
+  box-shadow: 0 0 0 var(--tao-ring-width) var(--tao-color-error-outline);
 }
 
 /* Outlined: warning */
@@ -97,7 +96,7 @@
 [data-tao-control][data-tao-variant="outlined"][data-tao-warning]:focus-within,
 [data-tao-control][data-tao-variant="outlined"][data-tao-warning][data-state="open"] {
   border-color: var(--tao-warning);
-  box-shadow: 0 0 0 2px var(--tao-color-warning-outline);
+  box-shadow: 0 0 0 var(--tao-ring-width) var(--tao-color-warning-outline);
 }
 
 /* Outlined: disabled */
@@ -130,7 +129,7 @@
 [data-tao-control][data-tao-variant="filled"][data-state="open"] {
   background: var(--tao-color-bg-container);
   border-color: var(--tao-primary);
-  box-shadow: 0 0 0 2px var(--tao-control-outline);
+  box-shadow: 0 0 0 var(--tao-ring-width) var(--tao-control-outline);
   outline: none;
 }
 
@@ -155,7 +154,7 @@
 [data-tao-control][data-tao-variant="filled"][data-tao-error][data-state="open"] {
   background: var(--tao-color-bg-container);
   border-color: var(--tao-error);
-  box-shadow: 0 0 0 2px var(--tao-color-error-outline);
+  box-shadow: 0 0 0 var(--tao-ring-width) var(--tao-color-error-outline);
 }
 
 /* Filled: warning */
@@ -179,7 +178,7 @@
 [data-tao-control][data-tao-variant="filled"][data-tao-warning][data-state="open"] {
   background: var(--tao-color-bg-container);
   border-color: var(--tao-warning);
-  box-shadow: 0 0 0 2px var(--tao-color-warning-outline);
+  box-shadow: 0 0 0 var(--tao-ring-width) var(--tao-color-warning-outline);
 }
 
 /* Filled: disabled */

@@ -4,6 +4,7 @@
    =========================== */
 button[data-tao-picker-trigger] {
   display: flex;
+  width: 100%; /* antd DatePicker 对齐：默认撑满父容器 */
   align-items: center;
   gap: var(--tao-padding-xs);
   font-family: var(--tao-font-family);
@@ -602,6 +603,7 @@ button[data-tao-picker-footer-btn][data-tao-primary]:hover {
    =========================== */
 button[data-tao-range-trigger] {
   display: flex;
+  width: 100%; /* antd RangePicker 对齐：默认撑满父容器 */
   align-items: center;
   gap: 0;
   font-family: var(--tao-font-family);

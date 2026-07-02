@@ -4,6 +4,7 @@ import {
   type ReactNode,
   useContext,
   useMemo,
+  useRef,
 } from 'react';
 
 // ---- Seed Token ----
@@ -114,6 +115,19 @@ const TOKEN_TO_VAR_PX: Record<string, string> = {
   lineWidth: '--tao-line-width',
 };
 
+/**
+ * Stable memoization key for theme.token: users routinely inline
+ * `theme={{ token: {...} }}` — a fresh object every render — which would
+ * otherwise cascade through ownVars → tokenStyle → config and force every
+ * `useTaoConfig()` consumer to rerender on every parent render.
+ */
+function useStableTokenKey(token: Partial<TaoSeedToken> | undefined): string {
+  const key = token ? JSON.stringify(token) : '';
+  const ref = useRef(key);
+  if (ref.current !== key) ref.current = key;
+  return ref.current;
+}
+
 export function TaoProvider({
   theme,
   size,
@@ -123,6 +137,7 @@ export function TaoProvider({
 }: TaoProviderProps) {
   const parentConfig = useContext(TaoConfigContext);
   const inherit = theme?.inherit ?? true;
+  const tokenKey = useStableTokenKey(theme?.token);
 
   const ownVars = useMemo(() => {
     if (!theme?.token) return undefined;
@@ -141,26 +156,51 @@ export function TaoProvider({
     }
 
     return vars;
-  }, [theme?.token]);
+    // biome-ignore lint/correctness/useExhaustiveDependencies: tokenKey stringifies token; value-equality avoids reference-churn rerenders.
+  }, [tokenKey]);
 
   const tokenStyle = useMemo<CSSProperties>(
     () => ({ ...parentConfig.tokenStyle, ...ownVars }),
     [parentConfig.tokenStyle, ownVars],
   );
 
+  /**
+   * `display: contents` makes this wrapper layout-transparent so a
+   * `<TaoProvider>` nested inside a flex/grid parent doesn't collapse its
+   * children into one grid/flex item. CSS custom properties still cascade
+   * to descendants regardless of `display: contents`.
+   */
+  const divStyle = useMemo<CSSProperties>(
+    () => ({ display: 'contents', ...(ownVars as CSSProperties | undefined) }),
+    [ownVars],
+  );
+
+  const parentSize = parentConfig.size;
+  const parentDisabled = parentConfig.disabled;
+  const parentVariant = parentConfig.variant;
+
   const config = useMemo<TaoConfigContextValue>(
     () => ({
-      size: size ?? (inherit ? parentConfig.size : 'medium'),
-      disabled: disabled ?? (inherit ? parentConfig.disabled : false),
-      variant: variant ?? (inherit ? parentConfig.variant : 'outlined'),
+      size: size ?? (inherit ? parentSize : 'medium'),
+      disabled: disabled ?? (inherit ? parentDisabled : false),
+      variant: variant ?? (inherit ? parentVariant : 'outlined'),
       tokenStyle,
     }),
-    [size, disabled, variant, parentConfig, inherit, tokenStyle],
+    [
+      size,
+      disabled,
+      variant,
+      inherit,
+      parentSize,
+      parentDisabled,
+      parentVariant,
+      tokenStyle,
+    ],
   );
 
   return (
     <TaoConfigContext.Provider value={config}>
-      <div style={ownVars as CSSProperties} data-tao-provider="">
+      <div style={divStyle} data-tao-provider="">
         {children}
       </div>
     </TaoConfigContext.Provider>
