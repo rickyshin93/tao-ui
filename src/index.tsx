@@ -152,6 +152,7 @@ export {
 	type TableProps,
 	type TableRowSelection,
 	type TableSemanticPart,
+	type TableVariant,
 } from "./components/table/table";
 export {
 	type TabItem,

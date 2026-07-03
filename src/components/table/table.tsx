@@ -28,6 +28,8 @@ export type TableSemanticPart =
   | 'body.cell'
   | 'pagination';
 
+export type TableVariant = TaoVariant | 'modern';
+
 export type SortOrder = 'ascend' | 'descend' | null;
 
 export interface TableFilterItem {
@@ -99,13 +101,14 @@ export interface TableProps<T = any> {
   /**
    * 表面风格。
    * - `borderless`（极简）：无表头底色、单元格透明、仅行底分隔线。
-   * - `filled`：表头灰底（库的默认表现）。
+   * - `filled`：表头灰底。
    * - `outlined`：filled + 整体外框 + 列分隔线。
+   * - `modern`：轻外框、圆角、克制表头，更接近 shadcn 的表格视觉。
    *
    * 不传时继承 TaoProvider 的 variant；当继承到框架默认 `outlined` 时，
-   * Table 回落为 `filled` 以保持向后兼容（裸用 `<Table>` 仍是灰底表头）。
+   * Table 回落为 `modern`，让裸用 `<Table>` 默认呈现现代轻外框风格。
    */
-  variant?: TaoVariant;
+  variant?: TableVariant;
   /**
    * 表头灰底开关，默认 `true`。设为 `false` 关掉表头底色（极简表头），
    * 不影响外框 / 列分隔线等其它 variant 表现。
@@ -319,13 +322,15 @@ export function Table<T = any>({
   const ctx = useTaoConfig();
   const resolvedSize = size ?? ctx.size;
   // Inherit variant from provider, but treat the framework default `outlined`
-  // as `filled` so a bare <Table> keeps its legacy grey-header look.
-  const resolvedVariant: TaoVariant =
-    variant ?? (ctx.variant === 'outlined' ? 'filled' : ctx.variant);
+  // as `modern` so a bare <Table> uses the modern table skin by default.
+  const resolvedVariant: TableVariant =
+    variant ?? (ctx.variant === 'outlined' ? 'modern' : ctx.variant);
   // outlined variant draws the full border; `bordered` prop still works for
-  // other variants, but borderless stays frame-free.
+  // other variants. Modern owns its subtle outer frame; borderless stays
+  // frame-free.
   const showBorder =
     resolvedVariant === 'outlined' ||
+    resolvedVariant === 'modern' ||
     (bordered && resolvedVariant !== 'borderless');
 
   // ---- Sort state ----

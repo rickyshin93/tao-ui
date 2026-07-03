@@ -1,5 +1,4 @@
 import {
-  type SortOrder,
   Stack,
   Table,
   type TableColumn,
@@ -55,7 +54,7 @@ export const Bordered: StoryObj = {
 };
 
 export const Variants: StoryObj = {
-  name: 'Variants (filled / outlined / borderless)',
+  name: 'Variants (filled / outlined / borderless / modern)',
   render: () => (
     <Stack gap="xl">
       <div>
@@ -84,6 +83,18 @@ export const Variants: StoryObj = {
       </div>
       <div>
         <p style={{ fontSize: 13, color: '#888', marginBottom: 8 }}>
+          modern（轻外框 / shadcn-like）
+        </p>
+        <Table
+          columns={baseColumns}
+          dataSource={users.slice(0, 4)}
+          rowKey="id"
+          variant="modern"
+          pagination={false}
+        />
+      </div>
+      <div>
+        <p style={{ fontSize: 13, color: '#888', marginBottom: 8 }}>
           borderless（极简 / 无自带色）
         </p>
         <Table
@@ -95,6 +106,18 @@ export const Variants: StoryObj = {
         />
       </div>
     </Stack>
+  ),
+};
+
+export const Modern: StoryObj = {
+  name: 'Modern',
+  render: () => (
+    <Table
+      columns={baseColumns}
+      dataSource={users}
+      rowKey="id"
+      variant="modern"
+    />
   ),
 };
 

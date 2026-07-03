@@ -265,14 +265,18 @@ export function Select(props: SelectProps) {
     [isSearchControlled, onSearch],
   );
 
+  const clearValue = useCallback(() => {
+    if (!isValueControlled) setValueInternal(undefined);
+    onChange?.('', undefined);
+    onClear?.();
+  }, [isValueControlled, onChange, onClear]);
+
   const handleClear = useCallback(
     (e: React.MouseEvent) => {
       e.stopPropagation();
-      if (!isValueControlled) setValueInternal(undefined);
-      onChange?.('', undefined);
-      onClear?.();
+      clearValue();
     },
-    [isValueControlled, onChange, onClear],
+    [clearValue],
   );
 
   const filteredOptions = useMemo(() => {
@@ -316,13 +320,22 @@ export function Select(props: SelectProps) {
           {loadingIcon ?? <LoadingIcon />}
         </span>
       ) : showClearBtn && hovering ? (
+        // biome-ignore lint/a11y/useSemanticElements: This sits inside the Radix button trigger; nesting a button here would be invalid HTML.
         <span
           data-tao-select-clear=""
           className={cx(classNames?.clear)}
           style={styles?.clear}
           onPointerDown={(e) => e.stopPropagation()}
           onClick={handleClear}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              e.stopPropagation();
+              clearValue();
+            }
+          }}
           role="button"
+          tabIndex={0}
           aria-label="Clear"
         >
           {clearIcon}
@@ -354,6 +367,7 @@ export function Select(props: SelectProps) {
           data-tao-disabled={resolvedDisabled || undefined}
           {...statusProps}
           disabled={resolvedDisabled}
+          // biome-ignore lint/a11y/noAutofocus: Select exposes autoFocus to match native input-like controls.
           autoFocus={autoFocus}
           className={cx(classNames?.root, className)}
           style={{ ...styles?.root, ...style }}
@@ -498,6 +512,7 @@ export function Select(props: SelectProps) {
             value={search}
             onChange={(e) => handleSearchChange(e.target.value)}
             placeholder="Search..."
+            // biome-ignore lint/a11y/noAutofocus: Opening a searchable select should put focus in its search field.
             autoFocus
           />
         </div>
@@ -599,6 +614,8 @@ function ChevronDownIcon() {
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
+      aria-hidden="true"
+      role="presentation"
     >
       <path d="m6 9 6 6 6-6" />
     </svg>
@@ -635,6 +652,8 @@ function CheckIcon() {
       strokeWidth="2.5"
       strokeLinecap="round"
       strokeLinejoin="round"
+      aria-hidden="true"
+      role="presentation"
     >
       <polyline points="20 6 9 17 4 12" />
     </svg>
@@ -652,6 +671,8 @@ function CloseIcon() {
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
+      aria-hidden="true"
+      role="presentation"
     >
       <path d="M18 6 6 18M6 6l12 12" />
     </svg>
@@ -669,6 +690,8 @@ function SearchIcon() {
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
+      aria-hidden="true"
+      role="presentation"
     >
       <circle cx="11" cy="11" r="8" />
       <path d="m21 21-4.3-4.3" />
@@ -688,6 +711,8 @@ function LoadingIcon() {
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
+      aria-hidden="true"
+      role="presentation"
     >
       <path d="M21 12a9 9 0 1 1-6.219-8.56" />
     </svg>

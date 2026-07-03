@@ -13,7 +13,7 @@ import './tag.css';
 
 // ---- Types ----
 
-export type TagSemanticPart = 'root' | 'icon' | 'close';
+export type TagSemanticPart = 'root' | 'icon' | 'content' | 'close';
 
 export type TagColor =
   | 'default'
@@ -53,7 +53,14 @@ export interface CheckableTagProps {
 
 function CloseIcon() {
   return (
-    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden>
+    <svg
+      width="12"
+      height="12"
+      viewBox="0 0 12 12"
+      fill="none"
+      aria-hidden="true"
+      role="presentation"
+    >
       <path
         d="M3 3l6 6M9 3l-6 6"
         stroke="currentColor"
@@ -103,11 +110,14 @@ export function Tag({
           ...(variant === 'solid'
             ? { background: color, color: '#fff', borderColor: color }
             : variant === 'outlined'
-              ? { color, borderColor: color }
-              : {
-                  background: `color-mix(in oklch, ${color} 12%, var(--tao-color-bg-base))`,
+              ? {
                   color,
-                  borderColor: `color-mix(in oklch, ${color} 30%, var(--tao-color-bg-base))`,
+                  borderColor: `color-mix(in oklch, ${color} 36%, transparent)`,
+                }
+              : {
+                  background: `color-mix(in oklch, ${color} 10%, var(--tao-color-bg-base))`,
+                  color,
+                  borderColor: `color-mix(in oklch, ${color} 18%, var(--tao-color-bg-base))`,
                 }),
         }
       : undefined;
@@ -118,6 +128,7 @@ export function Tag({
       data-tao-color={isPreset ? color : undefined}
       data-tao-variant={variant}
       data-tao-disabled={disabled || undefined}
+      data-tao-closable={showClose || undefined}
       className={cx(classNames?.root, className)}
       style={{ ...customColorStyle, ...styles?.root, ...style }}
     >
@@ -130,20 +141,22 @@ export function Tag({
           {icon}
         </span>
       )}
-      {children}
-      {showClose && (
+      {children != null && (
         <span
+          data-tao-tag-content=""
+          className={cx(classNames?.content)}
+          style={styles?.content}
+        >
+          {children}
+        </span>
+      )}
+      {showClose && (
+        <button
+          type="button"
           data-tao-tag-close=""
-          role="button"
-          tabIndex={disabled ? undefined : 0}
           aria-label="Close"
+          disabled={disabled}
           onClick={handleClose}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault();
-              handleClose(e as any);
-            }
-          }}
           className={cx(classNames?.close)}
           style={styles?.close}
         >
@@ -152,7 +165,7 @@ export function Tag({
           ) : (
             closeIcon
           )}
-        </span>
+        </button>
       )}
     </span>
   );
@@ -170,6 +183,7 @@ export function CheckableTag({
   style,
 }: CheckableTagProps) {
   return (
+    // biome-ignore lint/a11y/useSemanticElements: CheckableTag intentionally keeps one inline tag element with checkbox semantics.
     <span
       data-tao-tag=""
       data-tao-checkable=""
@@ -189,7 +203,7 @@ export function CheckableTag({
       }}
     >
       {icon != null && <span data-tao-tag-icon="">{icon}</span>}
-      {children}
+      {children != null && <span data-tao-tag-content="">{children}</span>}
     </span>
   );
 }

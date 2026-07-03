@@ -1,25 +1,35 @@
-
 /* ===========================
    Tag Base
    =========================== */
 [data-tao-tag] {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  justify-content: center;
+  gap: 6px;
+  box-sizing: border-box;
+  min-height: calc(
+    var(--tao-font-size-xs) *
+    var(--tao-line-height-sm) +
+    var(--tao-line-width) *
+    2
+  );
   font-family: var(--tao-font-family);
   font-size: var(--tao-font-size-xs);
-  font-weight: var(--tao-font-weight-medium);
-  line-height: 1;
-  padding: 3px 8px;
-  border-radius: var(--tao-radius-sm);
+  font-weight: var(--tao-font-weight-strong);
+  line-height: var(--tao-line-height-sm);
+  padding-block: 0;
+  padding-inline: 8px;
+  border-radius: var(--tao-radius-md);
   border: var(--tao-line-width) solid transparent;
   white-space: nowrap;
   cursor: default;
   user-select: none;
+  box-shadow: none;
   transition:
     background-color var(--tao-motion-duration-fast) var(--tao-motion-ease-out),
     border-color var(--tao-motion-duration-fast) var(--tao-motion-ease-out),
     color var(--tao-motion-duration-fast) var(--tao-motion-ease-out),
+    box-shadow var(--tao-motion-duration-fast) var(--tao-motion-ease-out),
     opacity var(--tao-motion-duration-fast) var(--tao-motion-ease-out);
 }
 
@@ -29,7 +39,23 @@
 [data-tao-tag-icon] {
   display: inline-flex;
   align-items: center;
-  font-size: 14px;
+  justify-content: center;
+  flex: 0 0 auto;
+  font-size: 12px;
+  line-height: 0;
+}
+
+/* ===========================
+   Content
+   =========================== */
+[data-tao-tag-content] {
+  display: inline-flex;
+  align-items: center;
+  line-height: inherit;
+}
+
+[data-tao-tag]:not([data-tao-closable]) [data-tao-tag-content] {
+  transform: translateY(-0.03em);
 }
 
 /* ===========================
@@ -38,23 +64,32 @@
 [data-tao-tag-close] {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 14px;
+  height: 14px;
+  padding: 0;
+  border: 0;
   cursor: pointer;
-  margin-inline-start: 2px;
-  margin-inline-end: -2px;
-  border-radius: var(--tao-radius-xs);
-  padding: 1px;
-  opacity: 0.6;
+  margin-inline-start: -1px;
+  margin-inline-end: -4px;
+  border-radius: var(--tao-radius-full);
+  background: transparent;
+  color: color-mix(in oklch, currentColor 72%, transparent);
+  font: inherit;
+  line-height: 1;
   transition:
-    opacity var(--tao-motion-duration-fast) var(--tao-motion-ease-out),
-    background-color var(--tao-motion-duration-fast) var(--tao-motion-ease-out);
+    background-color var(--tao-motion-duration-fast) var(--tao-motion-ease-out),
+    color var(--tao-motion-duration-fast) var(--tao-motion-ease-out);
 }
 
 [data-tao-tag-close]:hover {
-  opacity: 1;
+  background: color-mix(in oklch, currentColor 12%, transparent);
+  color: currentColor;
 }
 
 [data-tao-tag-close]:focus-visible {
-  box-shadow: 0 0 0 2px var(--tao-control-outline);
+  box-shadow: 0 0 0 var(--tao-ring-width) var(--tao-control-outline);
   outline: none;
 }
 
@@ -72,37 +107,70 @@
 
 /* Default */
 [data-tao-tag][data-tao-color="default"][data-tao-variant="filled"] {
-  background: var(--tao-color-fill-tertiary);
+  background: var(--tao-color-fill-secondary);
   color: var(--tao-color-text);
-  border-color: transparent;
+  border-color: var(--tao-color-border-secondary);
+  box-shadow: var(--tao-box-shadow-xs);
 }
 
 /* Primary */
 [data-tao-tag][data-tao-color="primary"][data-tao-variant="filled"] {
-  background: var(--tao-primary-bg);
+  background: color-mix(
+    in oklch,
+    var(--tao-color-primary) 10%,
+    var(--tao-color-bg-base)
+  );
   color: var(--tao-primary);
-  border-color: var(--tao-primary-border);
+  border-color: color-mix(
+    in oklch,
+    var(--tao-color-primary) 18%,
+    var(--tao-color-bg-base)
+  );
 }
 
 /* Success */
 [data-tao-tag][data-tao-color="success"][data-tao-variant="filled"] {
-  background: var(--tao-success-bg);
+  background: color-mix(
+    in oklch,
+    var(--tao-color-success) 10%,
+    var(--tao-color-bg-base)
+  );
   color: var(--tao-success);
-  border-color: var(--tao-success-border);
+  border-color: color-mix(
+    in oklch,
+    var(--tao-color-success) 18%,
+    var(--tao-color-bg-base)
+  );
 }
 
 /* Warning */
 [data-tao-tag][data-tao-color="warning"][data-tao-variant="filled"] {
-  background: var(--tao-warning-bg);
+  background: color-mix(
+    in oklch,
+    var(--tao-color-warning) 12%,
+    var(--tao-color-bg-base)
+  );
   color: var(--tao-warning);
-  border-color: var(--tao-warning-border);
+  border-color: color-mix(
+    in oklch,
+    var(--tao-color-warning) 22%,
+    var(--tao-color-bg-base)
+  );
 }
 
 /* Error */
 [data-tao-tag][data-tao-color="error"][data-tao-variant="filled"] {
-  background: var(--tao-error-bg);
+  background: color-mix(
+    in oklch,
+    var(--tao-color-error) 10%,
+    var(--tao-color-bg-base)
+  );
   color: var(--tao-error);
-  border-color: var(--tao-error-border);
+  border-color: color-mix(
+    in oklch,
+    var(--tao-color-error) 18%,
+    var(--tao-color-bg-base)
+  );
 }
 
 /* ===========================
@@ -113,30 +181,35 @@
   background: var(--tao-color-text);
   color: var(--tao-color-bg-base);
   border-color: transparent;
+  box-shadow: var(--tao-box-shadow-xs);
 }
 
 [data-tao-tag][data-tao-color="primary"][data-tao-variant="solid"] {
   background: var(--tao-primary);
   color: var(--tao-primary-fg);
   border-color: transparent;
+  box-shadow: var(--tao-box-shadow-xs);
 }
 
 [data-tao-tag][data-tao-color="success"][data-tao-variant="solid"] {
   background: var(--tao-success);
   color: #fff;
   border-color: transparent;
+  box-shadow: var(--tao-box-shadow-xs);
 }
 
 [data-tao-tag][data-tao-color="warning"][data-tao-variant="solid"] {
   background: var(--tao-warning);
   color: #fff;
   border-color: transparent;
+  box-shadow: var(--tao-box-shadow-xs);
 }
 
 [data-tao-tag][data-tao-color="error"][data-tao-variant="solid"] {
   background: var(--tao-error);
   color: var(--tao-error-fg);
   border-color: transparent;
+  box-shadow: var(--tao-box-shadow-xs);
 }
 
 /* ===========================
@@ -146,31 +219,31 @@
 [data-tao-tag][data-tao-color="default"][data-tao-variant="outlined"] {
   background: transparent;
   color: var(--tao-color-text);
-  border-color: var(--tao-color-border);
+  border-color: var(--tao-color-border-secondary);
 }
 
 [data-tao-tag][data-tao-color="primary"][data-tao-variant="outlined"] {
   background: transparent;
   color: var(--tao-primary);
-  border-color: var(--tao-primary);
+  border-color: color-mix(in oklch, var(--tao-color-primary) 32%, transparent);
 }
 
 [data-tao-tag][data-tao-color="success"][data-tao-variant="outlined"] {
   background: transparent;
   color: var(--tao-success);
-  border-color: var(--tao-success);
+  border-color: color-mix(in oklch, var(--tao-color-success) 36%, transparent);
 }
 
 [data-tao-tag][data-tao-color="warning"][data-tao-variant="outlined"] {
   background: transparent;
   color: var(--tao-warning);
-  border-color: var(--tao-warning);
+  border-color: color-mix(in oklch, var(--tao-color-warning) 40%, transparent);
 }
 
 [data-tao-tag][data-tao-color="error"][data-tao-variant="outlined"] {
   background: transparent;
   color: var(--tao-error);
-  border-color: var(--tao-error);
+  border-color: color-mix(in oklch, var(--tao-color-error) 36%, transparent);
 }
 
 /* ===========================
@@ -180,18 +253,20 @@
   cursor: pointer;
   background: transparent;
   color: var(--tao-color-text-secondary);
-  border-color: var(--tao-color-border);
+  border-color: var(--tao-color-border-secondary);
 }
 
 [data-tao-tag][data-tao-checkable]:hover {
-  color: var(--tao-primary);
-  border-color: var(--tao-primary);
+  background: var(--tao-color-fill-tertiary);
+  color: var(--tao-color-text);
+  border-color: var(--tao-color-border);
 }
 
 [data-tao-tag][data-tao-checkable][data-tao-checked] {
   background: var(--tao-primary);
   color: var(--tao-primary-fg);
   border-color: var(--tao-primary);
+  box-shadow: var(--tao-box-shadow-xs);
 }
 
 [data-tao-tag][data-tao-checkable][data-tao-checked]:hover {
@@ -200,6 +275,6 @@
 }
 
 [data-tao-tag][data-tao-checkable]:focus-visible {
-  box-shadow: 0 0 0 2px var(--tao-control-outline);
+  box-shadow: 0 0 0 var(--tao-ring-width) var(--tao-control-outline);
   outline: none;
 }

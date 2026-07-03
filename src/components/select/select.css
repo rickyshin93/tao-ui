@@ -1,18 +1,35 @@
-
 /* ===========================
    Select Trigger (extends data-tao-control)
    Works for both Radix <Trigger> and mobile <button>
    =========================== */
 [data-tao-select] {
+  --tao-select-height: var(--tao-control-height);
+  --tao-select-font-size: var(--tao-font-size-base);
+  --tao-select-line-height: var(--tao-line-height);
+  --tao-select-padding-inline: var(--tao-padding-sm);
+  --tao-select-padding-block: calc(
+    (
+      var(--tao-select-height) -
+      var(--tao-select-font-size) *
+      var(--tao-select-line-height)
+    ) /
+    2 -
+    var(--tao-line-width)
+  );
   /* 默认撑满父容器——跟 Input/Textarea/DatePicker 一致。
      antd Select 本身是 inline-flex 缩到内容宽度，但那在现代
      form 布局（Card + Field）里几乎总要用户额外 w-full，
      反直觉。想要缩到内容宽的场景：style={{ width: 'fit-content' }}。 */
   display: flex;
   width: 100%;
-  align-items: center;
+  align-items: flex-start;
   gap: var(--tao-padding-xs);
   font-family: var(--tao-font-family);
+  font-size: var(--tao-select-font-size);
+  line-height: var(--tao-select-line-height);
+  height: var(--tao-select-height);
+  padding-block: max(var(--tao-select-padding-block), 0px);
+  padding-inline: var(--tao-select-padding-inline);
   cursor: pointer;
   outline: none;
 }
@@ -26,37 +43,39 @@ button[data-tao-select] {
 
 /* Value / placeholder inside mobile trigger */
 [data-tao-select-value] {
+  display: block;
+  align-self: center;
   flex: 1;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   min-width: 0;
   color: var(--tao-color-text);
+  line-height: var(--tao-select-line-height);
 }
 
 [data-tao-select-placeholder] {
   color: var(--tao-color-text-placeholder);
+  line-height: var(--tao-select-line-height);
 }
 
 /* Sizes */
 [data-tao-select][data-tao-size="small"] {
-  height: var(--tao-control-height-sm);
-  padding-inline: var(--tao-padding-xs);
-  font-size: var(--tao-font-size-sm);
+  --tao-select-height: var(--tao-control-height-sm);
+  --tao-select-font-size: var(--tao-font-size-sm);
+  --tao-select-line-height: var(--tao-line-height-sm);
+  --tao-select-padding-inline: var(--tao-padding-xs);
   border-radius: var(--tao-radius-sm);
 }
 
 [data-tao-select][data-tao-size="medium"] {
-  height: var(--tao-control-height);
-  padding-inline: var(--tao-padding-sm);
-  font-size: var(--tao-font-size-base);
   border-radius: var(--tao-radius-md);
 }
 
 [data-tao-select][data-tao-size="large"] {
-  height: var(--tao-control-height-lg);
-  padding-inline: var(--tao-padding-sm);
-  font-size: var(--tao-font-size-lg);
+  --tao-select-height: var(--tao-control-height-lg);
+  --tao-select-font-size: var(--tao-font-size-lg);
+  --tao-select-line-height: var(--tao-line-height-lg);
   border-radius: var(--tao-radius-md);
 }
 
@@ -64,8 +83,11 @@ button[data-tao-select] {
 [data-tao-select-prefix] {
   display: flex;
   align-items: center;
+  justify-content: center;
+  align-self: center;
   color: var(--tao-color-text-tertiary);
   flex-shrink: 0;
+  line-height: 0;
 }
 
 /* Selected option's leading icon/avatar (shown in trigger). */
@@ -73,6 +95,7 @@ button[data-tao-select] {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  align-self: center;
   flex: 0 0 auto;
   width: 1.25rem;
   height: 1.25rem;
@@ -90,10 +113,13 @@ button[data-tao-select] {
 [data-tao-select-icons] {
   display: flex;
   align-items: center;
+  justify-content: center;
+  align-self: center;
   gap: 4px;
   flex-shrink: 0;
   margin-inline-start: auto;
   position: relative;
+  line-height: 0;
 }
 
 /* Arrow / Clear — fixed size container, icon centered */
@@ -200,19 +226,23 @@ button[data-tao-select] {
   display: flex;
   align-items: center;
   gap: var(--tao-padding-xs);
+  min-height: var(--tao-control-height);
   padding: var(--tao-padding-xs) var(--tao-padding-sm);
   border-block-end: var(--tao-line-width) solid
     var(--tao-color-border-secondary);
   color: var(--tao-color-text-tertiary);
+  line-height: 1;
 }
 
 [data-tao-select-search-input] {
   flex: 1;
+  height: calc(var(--tao-control-height) - var(--tao-padding-xs) * 2);
   border: none;
   outline: none;
   background: transparent;
   font-family: var(--tao-font-family);
   font-size: var(--tao-font-size-base);
+  line-height: 1;
   color: var(--tao-color-text);
   min-width: 0;
 }
@@ -248,6 +278,7 @@ button[data-tao-select] {
   padding-inline: var(--tao-padding-sm);
   font-size: var(--tao-font-size-base);
   font-family: var(--tao-font-family);
+  line-height: 1;
   color: var(--tao-color-text);
   border-radius: var(--tao-radius-sm);
   cursor: pointer;
@@ -299,8 +330,10 @@ button[data-tao-select] {
 [data-tao-select-item-main] {
   display: flex;
   flex-direction: column;
+  justify-content: center;
   min-width: 0;
   flex: 1;
+  line-height: 1;
 }
 
 [data-tao-select-item-desc] {

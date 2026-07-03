@@ -132,7 +132,7 @@ test('bordered adds data attribute', () => {
 
 // ---- Variant ----
 
-test('defaults to filled variant (legacy grey header)', () => {
+test('defaults to modern variant', () => {
   const { container } = render(
     <Table
       columns={columns}
@@ -144,7 +144,8 @@ test('defaults to filled variant (legacy grey header)', () => {
   const wrapper = container.querySelector(
     '[data-tao-table-wrapper]',
   ) as HTMLElement;
-  expect(wrapper.dataset.taoVariant).toBe('filled');
+  expect(wrapper.dataset.taoVariant).toBe('modern');
+  expect(wrapper.dataset.taoBordered).toBeTruthy();
 });
 
 // ---- Header background ----
@@ -211,6 +212,23 @@ test('outlined variant implies border', () => {
     '[data-tao-table-wrapper]',
   ) as HTMLElement;
   expect(wrapper.dataset.taoVariant).toBe('outlined');
+  expect(wrapper.dataset.taoBordered).toBeTruthy();
+});
+
+test('modern variant sets data attribute and subtle frame', () => {
+  const { container } = render(
+    <Table
+      columns={columns}
+      dataSource={data}
+      rowKey="id"
+      variant="modern"
+      pagination={false}
+    />,
+  );
+  const wrapper = container.querySelector(
+    '[data-tao-table-wrapper]',
+  ) as HTMLElement;
+  expect(wrapper.dataset.taoVariant).toBe('modern');
   expect(wrapper.dataset.taoBordered).toBeTruthy();
 });
 
