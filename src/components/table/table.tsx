@@ -1,5 +1,9 @@
 import {
+  type CSSProperties,
+  type HTMLAttributes,
   type ReactNode,
+  type TdHTMLAttributes,
+  type ThHTMLAttributes,
   useCallback,
   useEffect,
   useMemo,
@@ -23,9 +27,17 @@ import './table.css';
 
 export type TableSemanticPart =
   | 'root'
+  | 'scroll'
+  | 'table'
+  | 'header.wrapper'
+  | 'header.row'
   | 'header.cell'
+  | 'header.content'
+  | 'header.title'
   | 'body.row'
   | 'body.cell'
+  | 'selection.cell'
+  | 'empty'
   | 'pagination';
 
 export type TableVariant = TaoVariant | 'modern';
@@ -46,6 +58,13 @@ export interface TableColumn<T = any> {
   align?: 'left' | 'center' | 'right';
   fixed?: 'left' | 'right';
   ellipsis?: boolean;
+  onCell?: (
+    record: T,
+    index: number,
+  ) => TdHTMLAttributes<HTMLTableCellElement>;
+  onHeaderCell?: (
+    column: TableColumn<T>,
+  ) => ThHTMLAttributes<HTMLTableCellElement>;
 
   // Sorting
   sorter?: ((a: T, b: T) => number) | boolean;
@@ -84,6 +103,14 @@ export interface SorterResult<T = any> {
   field?: string;
 }
 
+export type TableSemanticInfo<T = any> = { props: TableProps<T> };
+export type TableSemanticClassNames<T = any> =
+  | SemanticClassNames<TableSemanticPart>
+  | ((info: TableSemanticInfo<T>) => SemanticClassNames<TableSemanticPart>);
+export type TableSemanticStyles<T = any> =
+  | SemanticStyles<TableSemanticPart>
+  | ((info: TableSemanticInfo<T>) => SemanticStyles<TableSemanticPart>);
+
 export interface TableProps<T = any> {
   columns: TableColumn<T>[];
   dataSource: T[];
@@ -97,6 +124,13 @@ export interface TableProps<T = any> {
   ) => void;
   scroll?: { x?: number | string };
   rowSelection?: TableRowSelection<T>;
+  rowClassName?: string | ((record: T, index: number) => string);
+  rowStyle?: CSSProperties | ((record: T, index: number) => CSSProperties);
+  onRow?: (record: T, index: number) => HTMLAttributes<HTMLTableRowElement>;
+  onHeaderRow?: (
+    columns: TableColumn<T>[],
+    index: number,
+  ) => HTMLAttributes<HTMLTableRowElement>;
   size?: TaoSize;
   /**
    * 表面风格。
@@ -117,8 +151,9 @@ export interface TableProps<T = any> {
   emptyText?: ReactNode;
   bordered?: boolean;
   className?: string;
-  classNames?: SemanticClassNames<TableSemanticPart>;
-  styles?: SemanticStyles<TableSemanticPart>;
+  style?: CSSProperties;
+  classNames?: TableSemanticClassNames<T>;
+  styles?: TableSemanticStyles<T>;
 }
 
 // ---- Helpers ----
@@ -138,6 +173,38 @@ function getColKey<T>(col: TableColumn<T>, index: number): string {
 function getCellValue<T>(record: T, dataIndex?: string): any {
   if (!dataIndex) return undefined;
   return (record as any)[dataIndex];
+}
+
+function resolveSemanticClassNames<T>(
+  classNames: TableSemanticClassNames<T> | undefined,
+  props: TableProps<T>,
+): SemanticClassNames<TableSemanticPart> {
+  return typeof classNames === 'function' ? classNames({ props }) : (classNames ?? {});
+}
+
+function resolveSemanticStyles<T>(
+  styles: TableSemanticStyles<T> | undefined,
+  props: TableProps<T>,
+): SemanticStyles<TableSemanticPart> {
+  return typeof styles === 'function' ? styles({ props }) : (styles ?? {});
+}
+
+function resolveRowClassName<T>(
+  rowClassName: TableProps<T>['rowClassName'],
+  record: T,
+  index: number,
+) {
+  return typeof rowClassName === 'function'
+    ? rowClassName(record, index)
+    : rowClassName;
+}
+
+function resolveRowStyle<T>(
+  rowStyle: TableProps<T>['rowStyle'],
+  record: T,
+  index: number,
+) {
+  return typeof rowStyle === 'function' ? rowStyle(record, index) : rowStyle;
 }
 
 // ---- Icons ----
@@ -316,8 +383,13 @@ export function Table<T = any>({
   emptyText = 'No Data',
   bordered = false,
   className,
+  style,
   classNames,
   styles,
+  rowClassName,
+  rowStyle,
+  onRow,
+  onHeaderRow,
 }: TableProps<T>) {
   const ctx = useTaoConfig();
   const resolvedSize = size ?? ctx.size;
@@ -332,6 +404,31 @@ export function Table<T = any>({
     resolvedVariant === 'outlined' ||
     resolvedVariant === 'modern' ||
     (bordered && resolvedVariant !== 'borderless');
+  const semanticProps: TableProps<T> = {
+    columns,
+    dataSource,
+    rowKey,
+    loading,
+    pagination: paginationProp,
+    onChange,
+    scroll,
+    rowSelection,
+    rowClassName,
+    rowStyle,
+    onRow,
+    onHeaderRow,
+    size,
+    variant,
+    headerBackground,
+    emptyText,
+    bordered,
+    className,
+    style,
+    classNames,
+    styles,
+  };
+  const resolvedClassNames = resolveSemanticClassNames(classNames, semanticProps);
+  const resolvedStyles = resolveSemanticStyles(styles, semanticProps);
 
   // ---- Sort state ----
   const defaultSortCol = columns.find((c) => c.defaultSortOrder);
@@ -670,118 +767,162 @@ export function Table<T = any>({
       data-tao-header-bg={headerBackground ? undefined : 'off'}
       data-tao-bordered={showBorder || undefined}
       data-tao-scroll-state={scroll?.x ? scrollState : undefined}
-      className={cx(classNames?.root, className)}
-      style={styles?.root}
+      className={cx(resolvedClassNames.root, className)}
+      style={{ ...resolvedStyles.root, ...style }}
     >
       <div
         data-tao-table-scroll=""
         ref={scrollRef}
         onScroll={scroll?.x ? handleScroll : undefined}
+        className={resolvedClassNames.scroll}
+        style={resolvedStyles.scroll}
       >
         {loading && <LoadingSpinner />}
-        <table data-tao-table="" style={tableStyle}>
-          <thead data-tao-table-thead="">
-            <tr>
-              {rowSelection && (
-                <th
-                  data-tao-table-cell=""
-                  data-tao-table-selection-cell=""
-                  data-tao-fixed="left"
+        <table
+          data-tao-table=""
+          className={resolvedClassNames.table}
+          style={{ ...tableStyle, ...resolvedStyles.table }}
+        >
+          <thead
+            data-tao-table-thead=""
+            className={resolvedClassNames['header.wrapper']}
+            style={resolvedStyles['header.wrapper']}
+          >
+            {(() => {
+              const headerRowProps = onHeaderRow?.(columns, 0) ?? {};
+
+              return (
+                <tr
+                  {...headerRowProps}
+                  className={cx(
+                    resolvedClassNames['header.row'],
+                    headerRowProps.className,
+                  )}
                   style={{
-                    width: selectionColWidth,
-                    ...(stickyPositions.__selection__
-                      ? {
-                          position: 'sticky',
-                          left: stickyPositions.__selection__.left,
-                          zIndex: 2,
-                        }
-                      : {}),
+                    ...resolvedStyles['header.row'],
+                    ...headerRowProps.style,
                   }}
                 >
-                  {selectionType === 'checkbox' && (
-                    <input
-                      type="checkbox"
-                      checked={isAllSelected}
-                      ref={(el) => {
-                        if (el) el.indeterminate = isIndeterminate;
+                  {rowSelection && (
+                    <th
+                      data-tao-table-cell=""
+                      data-tao-table-selection-cell=""
+                      data-tao-fixed="left"
+                      className={resolvedClassNames['selection.cell']}
+                      style={{
+                        width: selectionColWidth,
+                        ...(stickyPositions.__selection__
+                          ? {
+                              position: 'sticky',
+                              left: stickyPositions.__selection__.left,
+                              zIndex: 2,
+                            }
+                          : {}),
+                        ...resolvedStyles['selection.cell'],
                       }}
-                      onChange={(e) => handleSelectAll(e.target.checked)}
-                      data-tao-table-checkbox=""
-                    />
-                  )}
-                </th>
-              )}
-              {columns.map((col, i) => {
-                const colKey = getColKey(col, i);
-                const hasSorter = !!col.sorter;
-                const hasFilter = !!(col.filters && col.filters.length > 0);
-                const resolvedOrder = getResolvedSortOrder(col, colKey);
-                const controlledFilterValues = col.filteredValue;
-                const activeFilterValues =
-                  controlledFilterValues ?? filterValues[colKey] ?? [];
-                const stickyPos = stickyPositions[colKey];
-                const isFixed = !!col.fixed && !!scroll?.x;
-
-                return (
-                  <th
-                    key={colKey}
-                    data-tao-table-cell=""
-                    data-tao-table-header=""
-                    data-tao-align={col.align}
-                    data-tao-fixed={isFixed ? col.fixed : undefined}
-                    className={classNames?.['header.cell']}
-                    style={{
-                      width: col.width,
-                      ...(isFixed && stickyPos
-                        ? {
-                            position: 'sticky',
-                            ...(stickyPos.left !== undefined
-                              ? { left: stickyPos.left }
-                              : {}),
-                            ...(stickyPos.right !== undefined
-                              ? { right: stickyPos.right }
-                              : {}),
-                            zIndex: 2,
-                          }
-                        : {}),
-                      ...styles?.['header.cell'],
-                    }}
-                  >
-                    <div data-tao-table-header-content="">
-                      <span
-                        data-tao-table-header-title=""
-                        data-tao-sortable={hasSorter || undefined}
-                        onClick={
-                          hasSorter ? () => handleSort(colKey, col) : undefined
-                        }
-                        role={hasSorter ? 'button' : undefined}
-                        tabIndex={hasSorter ? 0 : undefined}
-                        onKeyDown={
-                          hasSorter
-                            ? (e) => {
-                                if (e.key === 'Enter' || e.key === ' ') {
-                                  e.preventDefault();
-                                  handleSort(colKey, col);
-                                }
-                              }
-                            : undefined
-                        }
-                      >
-                        {col.title}
-                        {hasSorter && <SortIcon order={resolvedOrder} />}
-                      </span>
-                      {hasFilter && (
-                        <FilterDropdown
-                          filters={col.filters!}
-                          activeValues={activeFilterValues}
-                          onSelect={(vals) => handleFilter(colKey, vals)}
+                    >
+                      {selectionType === 'checkbox' && (
+                        <input
+                          type="checkbox"
+                          checked={isAllSelected}
+                          ref={(el) => {
+                            if (el) el.indeterminate = isIndeterminate;
+                          }}
+                          onChange={(e) => handleSelectAll(e.target.checked)}
+                          data-tao-table-checkbox=""
                         />
                       )}
-                    </div>
-                  </th>
-                );
-              })}
-            </tr>
+                    </th>
+                  )}
+                  {columns.map((col, i) => {
+                    const colKey = getColKey(col, i);
+                    const hasSorter = !!col.sorter;
+                    const hasFilter = !!(
+                      col.filters && col.filters.length > 0
+                    );
+                    const resolvedOrder = getResolvedSortOrder(col, colKey);
+                    const controlledFilterValues = col.filteredValue;
+                    const activeFilterValues =
+                      controlledFilterValues ?? filterValues[colKey] ?? [];
+                    const stickyPos = stickyPositions[colKey];
+                    const isFixed = !!col.fixed && !!scroll?.x;
+                    const headerCellProps = col.onHeaderCell?.(col) ?? {};
+
+                    return (
+                      <th
+                        {...headerCellProps}
+                        key={colKey}
+                        data-tao-table-cell=""
+                        data-tao-table-header=""
+                        data-tao-align={col.align}
+                        data-tao-fixed={isFixed ? col.fixed : undefined}
+                        className={cx(
+                          resolvedClassNames['header.cell'],
+                          headerCellProps.className,
+                        )}
+                        style={{
+                          ...resolvedStyles['header.cell'],
+                          width: col.width,
+                          ...(isFixed && stickyPos
+                            ? {
+                                position: 'sticky',
+                                ...(stickyPos.left !== undefined
+                                  ? { left: stickyPos.left }
+                                  : {}),
+                                ...(stickyPos.right !== undefined
+                                  ? { right: stickyPos.right }
+                                  : {}),
+                                zIndex: 2,
+                              }
+                            : {}),
+                          ...headerCellProps.style,
+                        }}
+                      >
+                        <div
+                          data-tao-table-header-content=""
+                          className={resolvedClassNames['header.content']}
+                          style={resolvedStyles['header.content']}
+                        >
+                          <span
+                            data-tao-table-header-title=""
+                            data-tao-sortable={hasSorter || undefined}
+                            className={resolvedClassNames['header.title']}
+                            style={resolvedStyles['header.title']}
+                            onClick={
+                              hasSorter
+                                ? () => handleSort(colKey, col)
+                                : undefined
+                            }
+                            role={hasSorter ? 'button' : undefined}
+                            tabIndex={hasSorter ? 0 : undefined}
+                            onKeyDown={
+                              hasSorter
+                                ? (e) => {
+                                    if (e.key === 'Enter' || e.key === ' ') {
+                                      e.preventDefault();
+                                      handleSort(colKey, col);
+                                    }
+                                  }
+                                : undefined
+                            }
+                          >
+                            {col.title}
+                            {hasSorter && <SortIcon order={resolvedOrder} />}
+                          </span>
+                          {hasFilter && (
+                            <FilterDropdown
+                              filters={col.filters!}
+                              activeValues={activeFilterValues}
+                              onSelect={(vals) => handleFilter(colKey, vals)}
+                            />
+                          )}
+                        </div>
+                      </th>
+                    );
+                  })}
+                </tr>
+              );
+            })()}
           </thead>
           <tbody data-tao-table-tbody="">
             {paginatedData.length === 0 ? (
@@ -790,6 +931,8 @@ export function Table<T = any>({
                   data-tao-table-cell=""
                   data-tao-table-empty=""
                   colSpan={columns.length + (rowSelection ? 1 : 0)}
+                  className={resolvedClassNames.empty}
+                  style={resolvedStyles.empty}
                 >
                   {emptyText}
                 </td>
@@ -799,20 +942,31 @@ export function Table<T = any>({
                 const key = getRowKey(record, rowKey);
                 const isSelected = selectedKeys.includes(key);
                 const checkboxProps = rowSelection?.getCheckboxProps?.(record);
+                const rowProps = onRow?.(record, rowIdx) ?? {};
 
                 return (
                   <tr
+                    {...rowProps}
                     key={key}
                     data-tao-table-row=""
                     data-tao-selected={isSelected || undefined}
-                    className={classNames?.['body.row']}
-                    style={styles?.['body.row']}
+                    className={cx(
+                      resolvedClassNames['body.row'],
+                      resolveRowClassName(rowClassName, record, rowIdx),
+                      rowProps.className,
+                    )}
+                    style={{
+                      ...resolvedStyles['body.row'],
+                      ...resolveRowStyle(rowStyle, record, rowIdx),
+                      ...rowProps.style,
+                    }}
                   >
                     {rowSelection && (
                       <td
                         data-tao-table-cell=""
                         data-tao-table-selection-cell=""
                         data-tao-fixed="left"
+                        className={resolvedClassNames['selection.cell']}
                         style={{
                           ...(stickyPositions.__selection__
                             ? {
@@ -821,6 +975,7 @@ export function Table<T = any>({
                                 zIndex: 1,
                               }
                             : {}),
+                          ...resolvedStyles['selection.cell'],
                         }}
                       >
                         <input
@@ -839,16 +994,22 @@ export function Table<T = any>({
                       const value = getCellValue(record, col.dataIndex);
                       const stickyPos = stickyPositions[colKey];
                       const isFixed = !!col.fixed && !!scroll?.x;
+                      const cellProps = col.onCell?.(record, rowIdx) ?? {};
 
                       return (
                         <td
+                          {...cellProps}
                           key={colKey}
                           data-tao-table-cell=""
                           data-tao-align={col.align}
                           data-tao-ellipsis={col.ellipsis || undefined}
                           data-tao-fixed={isFixed ? col.fixed : undefined}
-                          className={classNames?.['body.cell']}
+                          className={cx(
+                            resolvedClassNames['body.cell'],
+                            cellProps.className,
+                          )}
                           style={{
+                            ...resolvedStyles['body.cell'],
                             ...(isFixed && stickyPos
                               ? {
                                   position: 'sticky',
@@ -861,7 +1022,7 @@ export function Table<T = any>({
                                   zIndex: 1,
                                 }
                               : {}),
-                            ...styles?.['body.cell'],
+                            ...cellProps.style,
                           }}
                         >
                           {col.render
@@ -881,8 +1042,8 @@ export function Table<T = any>({
       {hasPagination && totalForPagination > 0 && (
         <div
           data-tao-table-pagination=""
-          className={classNames?.pagination}
-          style={styles?.pagination}
+          className={resolvedClassNames.pagination}
+          style={resolvedStyles.pagination}
         >
           <Pagination
             current={currentPage}

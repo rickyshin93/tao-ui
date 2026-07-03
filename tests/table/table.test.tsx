@@ -93,6 +93,102 @@ test('rowKey as function', () => {
   expect(screen.getByText('Alice')).toBeTruthy();
 });
 
+// ---- Customization ----
+
+test('supports semantic classNames and styles as functions', () => {
+  const { container } = render(
+    <Table
+      columns={columns}
+      dataSource={data}
+      rowKey="id"
+      pagination={false}
+      size="small"
+      classNames={({ props }) => ({
+        root: props.size === 'small' ? 'table-small-root' : 'table-root',
+        'header.cell': 'table-header-cell',
+        'header.content': 'table-header-content',
+        'body.cell': 'table-body-cell',
+      })}
+      styles={({ props }) => ({
+        root: { color: props.size === 'small' ? 'rgb(1, 2, 3)' : undefined },
+        'header.cell': { padding: 11 },
+      })}
+    />,
+  );
+  expect(container.querySelector('.table-small-root')).toBeTruthy();
+  expect(container.querySelector('.table-header-cell')).toBeTruthy();
+  expect(container.querySelector('.table-header-content')).toBeTruthy();
+  expect(container.querySelector('.table-body-cell')).toBeTruthy();
+  const wrapper = container.querySelector(
+    '[data-tao-table-wrapper]',
+  ) as HTMLElement;
+  expect(wrapper.style.color).toBe('rgb(1, 2, 3)');
+});
+
+test('supports row props and row class/style hooks', () => {
+  let clickedId: number | null = null;
+  const { container } = render(
+    <Table
+      columns={columns}
+      dataSource={data}
+      rowKey="id"
+      pagination={false}
+      rowClassName={(record) =>
+        record.id === 1 ? 'first-row-class' : 'other-row-class'
+      }
+      rowStyle={(record) =>
+        record.id === 1 ? { backgroundColor: 'rgb(4, 5, 6)' } : {}
+      }
+      onRow={(record) => ({
+        'data-row-id': String(record.id),
+        className: 'row-prop-class',
+        onClick: () => {
+          clickedId = record.id;
+        },
+      })}
+    />,
+  );
+  const firstRow = container.querySelector(
+    '[data-row-id="1"]',
+  ) as HTMLElement;
+  expect(firstRow.className).toContain('first-row-class');
+  expect(firstRow.className).toContain('row-prop-class');
+  expect(firstRow.style.backgroundColor).toBe('rgb(4, 5, 6)');
+  fireEvent.click(firstRow);
+  expect(clickedId).toBe(1);
+});
+
+test('supports column cell and header cell props', () => {
+  const customColumns: TableColumn<User>[] = [
+    {
+      key: 'name',
+      dataIndex: 'name',
+      title: 'Name',
+      onHeaderCell: () => ({
+        className: 'name-header',
+        'data-header': 'name',
+      }),
+      onCell: (record) => ({
+        className: record.id === 1 ? 'first-name-cell' : undefined,
+        'data-cell-id': String(record.id),
+      }),
+    },
+  ];
+
+  const { container } = render(
+    <Table
+      columns={customColumns}
+      dataSource={data}
+      rowKey="id"
+      pagination={false}
+    />,
+  );
+  expect(container.querySelector('[data-header="name"]')).toBeTruthy();
+  expect(container.querySelector('.name-header')).toBeTruthy();
+  expect(container.querySelector('[data-cell-id="1"]')).toBeTruthy();
+  expect(container.querySelector('.first-name-cell')).toBeTruthy();
+});
+
 // ---- Size ----
 
 test('inherits size from TaoProvider', () => {

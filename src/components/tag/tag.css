@@ -5,7 +5,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 4px;
   box-sizing: border-box;
   min-height: calc(
     var(--tao-font-size-xs) *
@@ -16,7 +16,7 @@
   font-family: var(--tao-font-family);
   font-size: var(--tao-font-size-xs);
   font-weight: var(--tao-font-weight-strong);
-  line-height: var(--tao-line-height-sm);
+  line-height: 1;
   padding-block: 0;
   padding-inline: 8px;
   border-radius: var(--tao-radius-md);
@@ -42,7 +42,7 @@
   justify-content: center;
   flex: 0 0 auto;
   font-size: 12px;
-  line-height: 0;
+  line-height: 1;
 }
 
 /* ===========================
@@ -51,11 +51,8 @@
 [data-tao-tag-content] {
   display: inline-flex;
   align-items: center;
-  line-height: inherit;
-}
-
-[data-tao-tag]:not([data-tao-closable]) [data-tao-tag-content] {
-  transform: translateY(-0.03em);
+  gap: inherit;
+  line-height: 1;
 }
 
 /* ===========================

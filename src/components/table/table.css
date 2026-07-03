@@ -20,6 +20,19 @@
   --tao-table-row-selected-hover-bg: oklch(0 0 0 / 0.07);
   --tao-table-border-color: var(--tao-color-border-secondary);
   --tao-table-frame-radius: var(--tao-radius-md);
+  --tao-table-cell-padding-block: var(--tao-padding-sm);
+  --tao-table-cell-padding-inline: var(--tao-padding);
+  --tao-table-cell-font-size: var(--tao-font-size-base);
+  --tao-table-cell-line-height: var(--tao-line-height);
+  --tao-table-header-cell-padding-block: var(--tao-table-cell-padding-block);
+  --tao-table-header-cell-padding-inline: var(--tao-table-cell-padding-inline);
+  --tao-table-header-font-size: var(--tao-table-cell-font-size);
+  --tao-table-header-font-weight: var(--tao-font-weight-medium);
+  --tao-table-header-letter-spacing: normal;
+  --tao-table-header-text-transform: none;
+  --tao-table-empty-padding-block: var(--tao-padding-xl);
+  --tao-table-empty-padding-inline: var(--tao-padding);
+  --tao-table-empty-color: var(--tao-color-text-tertiary);
 }
 
 /* Filled / outlined: bring back the grey header + tinted interaction states */
@@ -78,7 +91,10 @@
    Cells (th + td)
    =========================== */
 [data-tao-table-cell] {
-  padding: var(--tao-padding-sm) var(--tao-padding);
+  padding: var(--tao-table-cell-padding-block)
+    var(--tao-table-cell-padding-inline);
+  font-size: var(--tao-table-cell-font-size);
+  line-height: var(--tao-table-cell-line-height);
   text-align: left;
   border-bottom: var(--tao-line-width) solid var(--tao-table-border-color);
   background: var(--tao-table-cell-bg);
@@ -105,7 +121,12 @@
    Header
    =========================== */
 [data-tao-table-thead] [data-tao-table-cell] {
-  font-weight: var(--tao-font-weight-medium);
+  padding: var(--tao-table-header-cell-padding-block)
+    var(--tao-table-header-cell-padding-inline);
+  font-size: var(--tao-table-header-font-size);
+  font-weight: var(--tao-table-header-font-weight);
+  letter-spacing: var(--tao-table-header-letter-spacing);
+  text-transform: var(--tao-table-header-text-transform);
   color: var(--tao-table-header-color);
   background: var(--tao-table-header-bg);
   white-space: nowrap;
@@ -114,7 +135,7 @@
 [data-tao-table-wrapper][data-tao-variant="modern"]
   [data-tao-table-thead]
   [data-tao-table-cell] {
-  font-size: var(--tao-font-size-sm);
+  --tao-table-header-font-size: var(--tao-font-size-sm);
 }
 
 [data-tao-table-header-content] {
@@ -335,8 +356,9 @@
    =========================== */
 [data-tao-table-empty] {
   text-align: center;
-  padding: var(--tao-padding-xl) var(--tao-padding);
-  color: var(--tao-color-text-tertiary);
+  padding: var(--tao-table-empty-padding-block)
+    var(--tao-table-empty-padding-inline);
+  color: var(--tao-table-empty-color);
 }
 
 /* ===========================
@@ -407,18 +429,21 @@
    Sizes
    =========================== */
 [data-tao-table-wrapper][data-tao-size="small"] [data-tao-table-cell] {
-  padding: var(--tao-padding-xxs) var(--tao-padding-xs);
-  font-size: var(--tao-font-size-sm);
+  --tao-table-cell-padding-block: var(--tao-padding-xxs);
+  --tao-table-cell-padding-inline: var(--tao-padding-xs);
+  --tao-table-cell-font-size: var(--tao-font-size-sm);
 }
 
 [data-tao-table-wrapper][data-tao-size="medium"] [data-tao-table-cell] {
-  padding: var(--tao-padding-sm) var(--tao-padding);
-  font-size: var(--tao-font-size-base);
+  --tao-table-cell-padding-block: var(--tao-padding-sm);
+  --tao-table-cell-padding-inline: var(--tao-padding);
+  --tao-table-cell-font-size: var(--tao-font-size-base);
 }
 
 [data-tao-table-wrapper][data-tao-size="large"] [data-tao-table-cell] {
-  padding: var(--tao-padding) var(--tao-padding-md);
-  font-size: var(--tao-font-size-base);
+  --tao-table-cell-padding-block: var(--tao-padding);
+  --tao-table-cell-padding-inline: var(--tao-padding-md);
+  --tao-table-cell-font-size: var(--tao-font-size-base);
 }
 
 /* ===========================
