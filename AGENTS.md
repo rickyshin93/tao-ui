@@ -6,6 +6,19 @@ You are an expert in JavaScript, Rspack, Rsbuild, Rslib, and library development
 
 - `bun run build` - Build the library for production
 - `bun run dev` - Turn on watch mode, watch for changes and rebuild the library
+- `bun run release <version>` - Bump `package.json`, run tests/builds, commit, tag, push, create the GitHub Release, wait for the release workflow, and verify npm. Example: `bun run release 0.0.8`
+
+## Release
+
+Publishing is automated by `.github/workflows/release.yml`, but the workflow is triggered by a published GitHub Release, not by a tag push alone.
+
+Use:
+
+```bash
+bun run release 0.0.8
+```
+
+The script creates and pushes `v<version>`, publishes the GitHub Release with `gh release create`, waits for the Release workflow, and verifies the npm version. It uses `/private/tmp/npm-cache` by default to avoid local `~/.npm` cache permission issues.
 
 ## Docs
 

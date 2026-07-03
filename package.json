@@ -45,6 +45,7 @@
     "doc:build": "rspress build",
     "doc:preview": "rspress preview",
     "format": "biome format --write",
+    "release": "bun scripts/release.mjs",
     "storybook": "storybook dev",
     "test": "rstest",
     "test:watch": "rstest --watch"
