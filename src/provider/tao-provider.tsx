@@ -80,7 +80,10 @@ export function TaoPortalScope({
 }) {
   const { tokenStyle } = useTaoConfig();
   return (
-    <div data-tao-provider="" style={{ ...tokenStyle, ...style }}>
+    <div
+      data-tao-provider=""
+      style={{ display: 'contents', ...tokenStyle, ...style }}
+    >
       {children}
     </div>
   );

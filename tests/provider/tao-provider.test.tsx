@@ -2,7 +2,11 @@ import { readFileSync } from 'node:fs';
 import { expect, test } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
 import { useEffect, useRef } from 'react';
-import { TaoProvider, useTaoConfig } from '../../src/provider/tao-provider';
+import {
+  TaoPortalScope,
+  TaoProvider,
+  useTaoConfig,
+} from '../../src/provider/tao-provider';
 
 test('renders children', () => {
   render(<TaoProvider>hello</TaoProvider>);
@@ -189,6 +193,20 @@ test('provider wrapper is layout-transparent (display: contents)', () => {
   const provider = screen.getByTestId('a').parentElement!;
   expect(provider.getAttribute('data-tao-provider')).toBe('');
   expect(provider.style.display).toBe('contents');
+});
+
+test('portal scope wrapper is layout-transparent (display: contents)', () => {
+  render(
+    <TaoProvider theme={{ token: { colorPrimary: 'red' } }}>
+      <TaoPortalScope>
+        <span data-testid="portal-child">A</span>
+      </TaoPortalScope>
+    </TaoProvider>,
+  );
+  const portalScope = screen.getByTestId('portal-child').parentElement!;
+  expect(portalScope.getAttribute('data-tao-provider')).toBe('');
+  expect(portalScope.style.display).toBe('contents');
+  expect(portalScope.style.getPropertyValue('--tao-color-primary')).toBe('red');
 });
 
 // Bug C regression: inline `theme={{token:{...}}}` is a fresh object each
