@@ -1,20 +1,22 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
 import { fn } from 'storybook/test';
-import { NumberInput } from '../src/number-input';
+import { HeadlessInputNumber } from '../src/number-input';
 
 const meta = {
-  title: '数据录入 Data Entry/NumberInput',
-  component: NumberInput,
+  title: '数据录入 Data Entry/HeadlessInputNumber',
+  component: HeadlessInputNumber,
   parameters: { layout: 'centered' },
   tags: ['autodocs'],
   args: { onChange: fn(), onBlur: fn() },
-} satisfies Meta<typeof NumberInput>;
+} satisfies Meta<typeof HeadlessInputNumber>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-function ControlledWrapper(props: React.ComponentProps<typeof NumberInput>) {
+function ControlledWrapper(
+  props: React.ComponentProps<typeof HeadlessInputNumber>,
+) {
   const [value, setValue] = useState((props.value as string | undefined) ?? '');
   return (
     <div
@@ -25,7 +27,7 @@ function ControlledWrapper(props: React.ComponentProps<typeof NumberInput>) {
         minWidth: 320,
       }}
     >
-      <NumberInput
+      <HeadlessInputNumber
         {...props}
         value={value}
         onChange={(v) => {

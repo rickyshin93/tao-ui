@@ -1,4 +1,4 @@
-import type { InputHTMLAttributes, ReactNode } from 'react';
+import { forwardRef, type InputHTMLAttributes, type ReactNode } from 'react';
 import {
   type TaoSize,
   type TaoVariant,
@@ -24,19 +24,22 @@ export interface InputProps
   styles?: SemanticStyles<InputSemanticPart>;
 }
 
-export function Input({
-  size,
-  variant,
-  prefix,
-  suffix,
-  error,
-  disabled,
-  className,
-  style,
-  classNames,
-  styles,
-  ...rest
-}: InputProps) {
+export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
+  {
+    size,
+    variant,
+    prefix,
+    suffix,
+    error,
+    disabled,
+    className,
+    style,
+    classNames,
+    styles,
+    ...rest
+  },
+  ref,
+) {
   const ctx = useTaoConfig();
   const resolvedSize = size ?? ctx.size;
   const resolvedVariant = variant ?? ctx.variant;
@@ -63,6 +66,7 @@ export function Input({
       )}
       <input
         {...rest}
+        ref={ref}
         className={classNames?.input}
         style={styles?.input}
         disabled={resolvedDisabled}
@@ -79,4 +83,4 @@ export function Input({
       )}
     </div>
   );
-}
+});

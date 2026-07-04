@@ -1,7 +1,7 @@
 import type { InputHTMLAttributes, ReactNode } from 'react';
 import { type UseNumberInputOptions, useNumberInput } from './use-number-input';
 
-export interface NumberInputProps
+export interface HeadlessInputNumberProps
   extends Omit<
       InputHTMLAttributes<HTMLInputElement>,
       | 'value'
@@ -34,7 +34,11 @@ const HOOK_KEYS = [
   'max',
 ] as const;
 
-export function NumberInput(props: NumberInputProps) {
+// Unstyled numeric field: number-input logic (useNumberInput) wired into a bare
+// span container with prefix / suffix slots — bring your own box CSS. For the
+// batteries-included version use `InputNumber`; for full control use the
+// `useNumberInput` hook directly.
+export function HeadlessInputNumber(props: HeadlessInputNumberProps) {
   const { prefix, suffix, containerClassName, className, ...rest } = props;
 
   const hookOpts: UseNumberInputOptions = {};
@@ -57,3 +61,11 @@ export function NumberInput(props: NumberInputProps) {
     </span>
   );
 }
+
+/**
+ * @deprecated Renamed to `HeadlessInputNumber` to avoid confusion with the
+ * styled `InputNumber`. This alias will be removed in a future release.
+ */
+export const NumberInput = HeadlessInputNumber;
+/** @deprecated Use `HeadlessInputNumberProps`. */
+export type NumberInputProps = HeadlessInputNumberProps;

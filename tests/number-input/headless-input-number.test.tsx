@@ -1,16 +1,16 @@
 import { expect, test } from '@rstest/core';
 import { render } from '@testing-library/react';
-import { NumberInput } from '../../src/number-input/number-input';
+import { HeadlessInputNumber } from '../../src/number-input/number-input';
 
 test('6.1 — renders single <input> inside <span> container', () => {
-  const { container } = render(<NumberInput value="" />);
+  const { container } = render(<HeadlessInputNumber value="" />);
   const root = container.firstChild as HTMLElement;
   expect(root.tagName).toBe('SPAN');
   expect(root.querySelectorAll('input')).toHaveLength(1);
 });
 
 test('6.2 — prefix renders before input with data-tao-prefix and is NOT in input value', () => {
-  const { container } = render(<NumberInput value="100" prefix="$" />);
+  const { container } = render(<HeadlessInputNumber value="100" prefix="$" />);
   const root = container.firstChild as HTMLElement;
   const children = Array.from(root.children);
   expect(children[0].getAttribute('data-tao-prefix')).toBe('');
@@ -20,7 +20,9 @@ test('6.2 — prefix renders before input with data-tao-prefix and is NOT in inp
 });
 
 test('6.3 — suffix renders after input with data-tao-suffix', () => {
-  const { container } = render(<NumberInput value="100" suffix="USD" />);
+  const { container } = render(
+    <HeadlessInputNumber value="100" suffix="USD" />,
+  );
   const root = container.firstChild as HTMLElement;
   const children = Array.from(root.children);
   expect(children[0].tagName).toBe('INPUT');
@@ -30,7 +32,7 @@ test('6.3 — suffix renders after input with data-tao-suffix', () => {
 
 test('6.4 — passes through native input attrs (id, name, placeholder, disabled, aria-label)', () => {
   const { container } = render(
-    <NumberInput
+    <HeadlessInputNumber
       value=""
       id="amount"
       name="amount-field"
@@ -49,7 +51,11 @@ test('6.4 — passes through native input attrs (id, name, placeholder, disabled
 
 test('6.5 — containerClassName goes to container, className goes to input', () => {
   const { container } = render(
-    <NumberInput value="" containerClassName="outer" className="inner" />,
+    <HeadlessInputNumber
+      value=""
+      containerClassName="outer"
+      className="inner"
+    />,
   );
   const root = container.firstChild as HTMLElement;
   expect(root.className).toBe('outer');

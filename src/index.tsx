@@ -90,6 +90,11 @@ export {
 	type InputSemanticPart,
 } from "./components/input/input";
 export {
+	InputNumber,
+	type InputNumberProps,
+	type InputNumberSemanticPart,
+} from "./components/input-number/input-number";
+export {
 	type ConfirmType,
 	Modal,
 	type ModalFooterRender,
@@ -181,9 +186,12 @@ export {
 } from "./layouts/form-layout/form-layout";
 // Layouts
 export { Stack, type StackProps } from "./layouts/stack/stack";
-// Legacy (headless)
+// Number input — headless component + hook (the styled InputNumber is above)
 export {
 	type FormatOptions,
+	HeadlessInputNumber,
+	type HeadlessInputNumberProps,
+	// Deprecated aliases (renamed to HeadlessInputNumber*).
 	NumberInput,
 	type NumberInputProps,
 	type PadDecimalsOnBlur,
