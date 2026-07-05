@@ -33,7 +33,7 @@ export function FormSection({
   styles,
 }: FormSectionProps) {
   return (
-    <fieldset
+    <section
       className={cx(classNames?.root, className)}
       style={{ ...styles?.root, ...style }}
       data-tao-form-section=""
@@ -45,13 +45,13 @@ export function FormSection({
           data-tao-form-section-header=""
         >
           {title && (
-            <legend
+            <div
               className={classNames?.title}
               style={styles?.title}
               data-tao-form-section-title=""
             >
               {title}
-            </legend>
+            </div>
           )}
           {description && (
             <p
@@ -71,6 +71,6 @@ export function FormSection({
       >
         {children}
       </div>
-    </fieldset>
+    </section>
   );
 }
