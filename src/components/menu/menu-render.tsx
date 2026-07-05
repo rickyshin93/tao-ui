@@ -259,7 +259,7 @@ export function renderMenuItems(items: MenuItem[], ctx: RenderCtx): ReactNode {
             <ChevronRightIcon />
           </P.SubTrigger>
           <P.Portal>
-            <TaoPortalScope>
+            <TaoPortalScope asChild>
               <P.SubContent
                 data-tao-menu-content=""
                 data-tao-menu-sub-content=""

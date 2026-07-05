@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { expect, test } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
-import { useEffect, useRef } from 'react';
+import { type CSSProperties, useEffect, useRef } from 'react';
 import {
   TaoPortalScope,
   TaoProvider,
@@ -207,6 +207,45 @@ test('portal scope wrapper is layout-transparent (display: contents)', () => {
   expect(portalScope.getAttribute('data-tao-provider')).toBe('');
   expect(portalScope.style.display).toBe('contents');
   expect(portalScope.style.getPropertyValue('--tao-color-primary')).toBe('red');
+});
+
+// asChild: merge tokens onto the immediate child (no wrapper div). Used inside
+// non-Presence-gated portals (Select) to avoid ghost <div data-tao-provider>
+// in the body for every mounted-but-closed instance.
+test('portal scope asChild merges tokens onto child (no wrapper)', () => {
+  render(
+    <TaoProvider theme={{ token: { colorPrimary: 'red' } }}>
+      <TaoPortalScope asChild>
+        <span data-testid="portal-child">A</span>
+      </TaoPortalScope>
+    </TaoProvider>,
+  );
+  const child = screen.getByTestId('portal-child');
+  expect(child.tagName).toBe('SPAN');
+  expect(child.getAttribute('data-tao-provider')).toBe('');
+  expect(child.style.getPropertyValue('--tao-color-primary')).toBe('red');
+  // no extra wrapper: parent is the TaoProvider div, not another portal scope
+  expect(child.parentElement!.getAttribute('data-tao-provider')).toBe('');
+  expect(child.parentElement!.style.display).toBe('contents');
+});
+
+test('portal scope asChild preserves child style (child wins on conflict)', () => {
+  render(
+    <TaoProvider theme={{ token: { colorPrimary: 'red' } }}>
+      <TaoPortalScope asChild>
+        <span
+          data-testid="portal-child"
+          style={{ color: 'blue', '--tao-color-primary': 'green' } as CSSProperties}
+        >
+          A
+        </span>
+      </TaoPortalScope>
+    </TaoProvider>,
+  );
+  const child = screen.getByTestId('portal-child');
+  // child's own style wins; slot's token vars still flow through for unset keys
+  expect(child.style.color).toBe('blue');
+  expect(child.style.getPropertyValue('--tao-color-primary')).toBe('green');
 });
 
 // Bug C regression: inline `theme={{token:{...}}}` is a fresh object each

@@ -67,7 +67,7 @@ export function ContextMenu({
         {children}
       </RC.Trigger>
       <RC.Portal>
-        <TaoPortalScope>
+        <TaoPortalScope asChild>
           <RC.Content
             data-tao-menu-content=""
             data-tao-context-menu=""

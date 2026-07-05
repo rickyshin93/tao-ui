@@ -582,7 +582,7 @@ export function Select(props: SelectProps) {
       </RadixSelect.Trigger>
 
       <RadixSelect.Portal container={container}>
-        <TaoPortalScope>
+        <TaoPortalScope asChild>
           <RadixSelect.Content
             data-tao-select-content=""
             data-tao-popup-width={

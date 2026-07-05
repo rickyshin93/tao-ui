@@ -1,3 +1,4 @@
+import { Slot } from '@radix-ui/react-slot';
 import {
   type CSSProperties,
   createContext,
@@ -70,15 +71,31 @@ export function useTaoConfig(): TaoConfigContextValue {
  * portal their popup to document.body, escaping the `[data-tao-provider]`
  * element that carries custom token overrides; wrapping the portal content in
  * this component re-applies those overrides so colors/sizes stay consistent.
+ *
+ * With `asChild`, merges the tokens onto the immediate child (via Radix Slot)
+ * instead of adding a wrapper div. Prefer `asChild` inside portals whose Radix
+ * primitive does NOT Presence-gate its Portal (notably `@radix-ui/react-select`
+ * — see `SelectPortal` in `node_modules/@radix-ui/react-select`): the wrapper
+ * div would otherwise render even while the popup is closed, leaving a ghost
+ * `<div data-tao-provider>` in the body for every mounted-but-closed Select.
  */
 export function TaoPortalScope({
   children,
   style,
+  asChild,
 }: {
   children: ReactNode;
   style?: CSSProperties;
+  asChild?: boolean;
 }) {
   const { tokenStyle } = useTaoConfig();
+  if (asChild) {
+    return (
+      <Slot data-tao-provider="" style={{ ...tokenStyle, ...style }}>
+        {children}
+      </Slot>
+    );
+  }
   return (
     <div
       data-tao-provider=""

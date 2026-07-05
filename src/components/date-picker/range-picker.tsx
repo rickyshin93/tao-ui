@@ -309,7 +309,7 @@ export function RangePicker({
     <Popover.Root open={isOpen} onOpenChange={setOpen}>
       <Popover.Trigger asChild>{trigger}</Popover.Trigger>
       <Popover.Portal>
-        <TaoPortalScope>
+        <TaoPortalScope asChild>
           <Popover.Content
             data-tao-picker-dropdown=""
             sideOffset={4}

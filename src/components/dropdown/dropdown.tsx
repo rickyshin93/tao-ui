@@ -220,7 +220,7 @@ export function Dropdown(props: DropdownProps) {
         {triggerChild}
       </RD.Trigger>
       <RD.Portal>
-        <TaoPortalScope>
+        <TaoPortalScope asChild>
           <RD.Content
             data-tao-menu-content=""
             data-tao-dropdown=""
