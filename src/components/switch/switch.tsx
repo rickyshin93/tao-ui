@@ -74,6 +74,8 @@ export function Switch({
 function LoadingIcon() {
   return (
     <svg
+      aria-hidden="true"
+      focusable="false"
       data-tao-switch-loading=""
       viewBox="0 0 24 24"
       fill="none"

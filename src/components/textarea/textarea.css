@@ -1,4 +1,3 @@
-
 /* ===========================
    Textarea wrapper
    Border / background / focus ring come from theme/control.css
@@ -19,7 +18,15 @@
 }
 [data-tao-textarea][data-tao-size="small"] textarea {
   padding-inline: var(--tao-padding-xs);
-  padding-block: calc((var(--tao-control-height-sm) - var(--tao-font-size-sm) * var(--tao-line-height-sm)) / 2 - 1px);
+  padding-block: calc(
+    (
+      var(--tao-control-height-sm) -
+      var(--tao-font-size-sm) *
+      var(--tao-line-height-sm)
+    ) /
+    2 -
+    1px
+  );
   font-size: var(--tao-font-size-sm);
   line-height: var(--tao-line-height-sm);
   min-height: var(--tao-control-height-sm);
@@ -30,7 +37,15 @@
 }
 [data-tao-textarea][data-tao-size="medium"] textarea {
   padding-inline: var(--tao-padding-sm);
-  padding-block: calc((var(--tao-control-height) - var(--tao-font-size-base) * var(--tao-line-height)) / 2 - 1px);
+  padding-block: calc(
+    (
+      var(--tao-control-height) -
+      var(--tao-font-size-base) *
+      var(--tao-line-height)
+    ) /
+    2 -
+    1px
+  );
   font-size: var(--tao-font-size-base);
   line-height: var(--tao-line-height);
   min-height: var(--tao-control-height);
@@ -41,7 +56,15 @@
 }
 [data-tao-textarea][data-tao-size="large"] textarea {
   padding-inline: var(--tao-padding-sm);
-  padding-block: calc((var(--tao-control-height-lg) - var(--tao-font-size-lg) * var(--tao-line-height-lg)) / 2 - 1px);
+  padding-block: calc(
+    (
+      var(--tao-control-height-lg) -
+      var(--tao-font-size-lg) *
+      var(--tao-line-height-lg)
+    ) /
+    2 -
+    1px
+  );
   font-size: var(--tao-font-size-lg);
   line-height: var(--tao-line-height-lg);
   min-height: var(--tao-control-height-lg);

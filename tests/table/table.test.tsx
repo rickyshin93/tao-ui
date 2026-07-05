@@ -148,9 +148,7 @@ test('supports row props and row class/style hooks', () => {
       })}
     />,
   );
-  const firstRow = container.querySelector(
-    '[data-row-id="1"]',
-  ) as HTMLElement;
+  const firstRow = container.querySelector('[data-row-id="1"]') as HTMLElement;
   expect(firstRow.className).toContain('first-row-class');
   expect(firstRow.className).toContain('row-prop-class');
   expect(firstRow.style.backgroundColor).toBe('rgb(4, 5, 6)');

@@ -69,7 +69,10 @@ for (const command of ['git', 'gh', 'bun', 'npm']) {
 }
 
 const branch = read('git', ['branch', '--show-current']);
-assert(branch === 'main', `Release must run from main, current branch is ${branch}`);
+assert(
+  branch === 'main',
+  `Release must run from main, current branch is ${branch}`,
+);
 
 const packageJsonPath = 'package.json';
 const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf8'));
@@ -121,7 +124,15 @@ run('git', ['tag', tag]);
 run('git', ['push', 'origin', 'main']);
 run('git', ['push', 'origin', tag]);
 
-run('gh', ['release', 'create', tag, '--title', tag, '--notes', `Release ${tag}`]);
+run('gh', [
+  'release',
+  'create',
+  tag,
+  '--title',
+  tag,
+  '--notes',
+  `Release ${tag}`,
+]);
 
 let runId;
 for (let attempt = 0; attempt < 20; attempt++) {
@@ -150,7 +161,11 @@ for (let attempt = 0; attempt < 20; attempt++) {
 assert(runId, `Could not find release workflow run for ${tag}`);
 run('gh', ['run', 'watch', runId, '--exit-status']);
 
-const finalPublishedVersion = read('npm', ['view', packageJson.name, 'version']);
+const finalPublishedVersion = read('npm', [
+  'view',
+  packageJson.name,
+  'version',
+]);
 assert(
   finalPublishedVersion === version,
   `Expected npm version ${version}, got ${finalPublishedVersion}`,

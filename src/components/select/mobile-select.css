@@ -1,4 +1,3 @@
-
 /* ===========================
    Mobile Select — inside Drawer
    Drawer body padding is removed for full-width list
@@ -66,10 +65,14 @@
 [data-tao-sheet-item] {
   display: flex;
   align-items: center;
+  width: 100%;
   min-height: 48px;
   padding-inline: var(--tao-padding);
+  border: 0;
+  background: transparent;
   font-family: var(--tao-font-family);
   font-size: var(--tao-font-size-base);
+  text-align: start;
   color: var(--tao-color-text);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;

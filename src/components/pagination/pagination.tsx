@@ -67,7 +67,14 @@ function computePages(
 
 function ChevronLeft() {
   return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden>
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 16 16"
+      fill="none"
+      aria-hidden="true"
+      focusable="false"
+    >
       <path
         d="M10 12L6 8l4-4"
         stroke="currentColor"
@@ -81,7 +88,14 @@ function ChevronLeft() {
 
 function ChevronRight() {
   return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden>
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 16 16"
+      fill="none"
+      aria-hidden="true"
+      focusable="false"
+    >
       <path
         d="M6 4l4 4-4 4"
         stroke="currentColor"
@@ -180,7 +194,10 @@ export function Pagination({
 
       {pages.map((item, i) =>
         item === 'ellipsis' ? (
-          <span key={`e${i}`} data-tao-pagination-ellipsis="">
+          <span
+            key={`ellipsis-${pages[i - 1]}-${pages[i + 1]}`}
+            data-tao-pagination-ellipsis=""
+          >
             ···
           </span>
         ) : (

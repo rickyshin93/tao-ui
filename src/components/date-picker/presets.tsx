@@ -1,5 +1,3 @@
-import type { ReactNode } from 'react';
-
 interface PresetsProps {
   items: Array<{ label: string; value: unknown }>;
   onSelect: (value: unknown) => void;

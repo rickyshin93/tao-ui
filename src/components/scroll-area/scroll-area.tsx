@@ -288,9 +288,11 @@ export function ScrollArea({
 
       {/* Vertical scrollbar */}
       {showVertical && scrollState.hasVertical && (
-        <div
+        <button
+          type="button"
           data-tao-scrollbar=""
           data-tao-orientation="vertical"
+          aria-label="Scroll vertically"
           className={cx(classNames?.scrollbar)}
           style={styles?.scrollbar}
           onClick={(e) => handleTrackClick('y', e)}
@@ -306,14 +308,16 @@ export function ScrollArea({
             }}
             onPointerDown={(e) => handleThumbPointerDown('y', e)}
           />
-        </div>
+        </button>
       )}
 
       {/* Horizontal scrollbar */}
       {showHorizontal && scrollState.hasHorizontal && (
-        <div
+        <button
+          type="button"
           data-tao-scrollbar=""
           data-tao-orientation="horizontal"
+          aria-label="Scroll horizontally"
           className={cx(classNames?.scrollbar)}
           style={styles?.scrollbar}
           onClick={(e) => handleTrackClick('x', e)}
@@ -329,7 +333,7 @@ export function ScrollArea({
             }}
             onPointerDown={(e) => handleThumbPointerDown('x', e)}
           />
-        </div>
+        </button>
       )}
     </div>
   );

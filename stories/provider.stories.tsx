@@ -302,9 +302,7 @@ export const PortalTheming: StoryObj = {
             />
           </FormField>
         </TaoProvider>
-        <TaoProvider
-          theme={{ token: { colorPrimary: 'oklch(0.68 0.17 45)' } }}
-        >
+        <TaoProvider theme={{ token: { colorPrimary: 'oklch(0.68 0.17 45)' } }}>
           <FormField label="Notion-orange scope" style={{ width: 240 }}>
             <Select
               defaultOpen
@@ -362,8 +360,8 @@ export const LayoutTransparent: StoryObj = {
   render: () => (
     <Stack gap="lg">
       <span style={swatchLabel}>
-        Children of a single TaoProvider must land in separate grid columns.
-        If the wrapper collapsed layout, both cards would stack in column 1.
+        Children of a single TaoProvider must land in separate grid columns. If
+        the wrapper collapsed layout, both cards would stack in column 1.
       </span>
       <div
         style={{
@@ -375,7 +373,9 @@ export const LayoutTransparent: StoryObj = {
           borderRadius: 'var(--tao-radius-md)',
         }}
       >
-        <TaoProvider theme={{ token: { colorPrimary: 'oklch(0.52 0.19 275)' } }}>
+        <TaoProvider
+          theme={{ token: { colorPrimary: 'oklch(0.52 0.19 275)' } }}
+        >
           <div
             style={{
               background: 'var(--tao-primary-bg)',
@@ -385,7 +385,9 @@ export const LayoutTransparent: StoryObj = {
             }}
           >
             <b>Sidebar</b>
-            <div style={{ fontSize: 12, color: 'var(--tao-color-text-tertiary)' }}>
+            <div
+              style={{ fontSize: 12, color: 'var(--tao-color-text-tertiary)' }}
+            >
               col 1 · 200px
             </div>
           </div>
@@ -398,7 +400,9 @@ export const LayoutTransparent: StoryObj = {
             }}
           >
             <b>Main</b>
-            <div style={{ fontSize: 12, color: 'var(--tao-color-text-tertiary)' }}>
+            <div
+              style={{ fontSize: 12, color: 'var(--tao-color-text-tertiary)' }}
+            >
               col 2 · 1fr — buttons below should feel indigo
             </div>
             <Stack direction="horizontal" gap="sm">

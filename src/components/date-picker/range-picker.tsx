@@ -119,7 +119,7 @@ export function RangePicker({
   );
 
   const handleClear = useCallback(
-    (e: React.MouseEvent) => {
+    (e: React.SyntheticEvent) => {
       e.stopPropagation();
       onChange?.(null, ['', '']);
     },
@@ -259,11 +259,23 @@ export function RangePicker({
       </span>
       <span data-tao-picker-icons="">
         {showClearBtn && hovering ? (
+          // biome-ignore lint/a11y/useSemanticElements: this control is inside the trigger button, so a nested button would be invalid HTML.
           <span
             data-tao-picker-clear=""
-            onClick={handleClear}
-            role="button"
+            onClick={(event) => {
+              event.stopPropagation();
+              handleClear(event);
+            }}
             aria-label="Clear"
+            role="button"
+            tabIndex={0}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                event.stopPropagation();
+                handleClear(event);
+              }
+            }}
           >
             <CloseIcon />
           </span>
@@ -315,6 +327,8 @@ export function RangePicker({
 function CalendarIcon() {
   return (
     <svg
+      aria-hidden="true"
+      focusable="false"
       width="16"
       height="16"
       viewBox="0 0 24 24"
@@ -334,6 +348,8 @@ function CalendarIcon() {
 function CloseIcon() {
   return (
     <svg
+      aria-hidden="true"
+      focusable="false"
       width="14"
       height="14"
       viewBox="0 0 24 24"
@@ -351,6 +367,8 @@ function CloseIcon() {
 function LeftIcon() {
   return (
     <svg
+      aria-hidden="true"
+      focusable="false"
       width="14"
       height="14"
       viewBox="0 0 24 24"
@@ -368,6 +386,8 @@ function LeftIcon() {
 function RightIcon() {
   return (
     <svg
+      aria-hidden="true"
+      focusable="false"
       width="14"
       height="14"
       viewBox="0 0 24 24"
@@ -385,6 +405,8 @@ function RightIcon() {
 function DoubleLeftIcon() {
   return (
     <svg
+      aria-hidden="true"
+      focusable="false"
       width="14"
       height="14"
       viewBox="0 0 24 24"
@@ -403,6 +425,8 @@ function DoubleLeftIcon() {
 function DoubleRightIcon() {
   return (
     <svg
+      aria-hidden="true"
+      focusable="false"
       width="14"
       height="14"
       viewBox="0 0 24 24"

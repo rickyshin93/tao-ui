@@ -103,7 +103,8 @@ export const Variants: Story = {
   args: { thousandsSeparator: ',' },
 };
 
-export const Error: Story = {
+export const ErrorState: Story = {
+  name: 'Error',
   render: (args) => <ControlledWrapper {...args} />,
   args: {
     error: true,

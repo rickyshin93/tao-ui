@@ -69,7 +69,7 @@ export interface BreadcrumbProps {
 
 function ChevronIcon() {
   return (
-    <svg viewBox="0 0 16 16" fill="none" aria-hidden>
+    <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" focusable="false">
       <path
         d="M6 4l4 4-4 4"
         stroke="currentColor"
@@ -83,7 +83,12 @@ function ChevronIcon() {
 
 function EllipsisIcon() {
   return (
-    <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden>
+    <svg
+      viewBox="0 0 16 16"
+      fill="currentColor"
+      aria-hidden="true"
+      focusable="false"
+    >
       <circle cx="3" cy="8" r="1.3" />
       <circle cx="8" cy="8" r="1.3" />
       <circle cx="13" cy="8" r="1.3" />
@@ -167,9 +172,9 @@ export function Breadcrumb({
     }
     if (item.onClick) {
       return (
-        <span role="link" tabIndex={disabled ? undefined : 0} {...linkProps}>
+        <button type="button" disabled={disabled} {...linkProps}>
           {content}
-        </span>
+        </button>
       );
     }
     // Plain, non-interactive label.
@@ -247,7 +252,7 @@ export function Breadcrumb({
                 <li
                   data-tao-breadcrumb-separator=""
                   role="presentation"
-                  aria-hidden
+                  aria-hidden="true"
                   className={cx(classNames?.separator)}
                   style={styles?.separator}
                 >

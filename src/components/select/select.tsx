@@ -615,6 +615,7 @@ function ChevronDownIcon() {
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden="true"
+      focusable="false"
       role="presentation"
     >
       <path d="m6 9 6 6 6-6" />
@@ -635,6 +636,7 @@ export function ChevronsUpDownIcon() {
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden="true"
+      focusable="false"
     >
       <path d="m7 15 5 5 5-5M7 9l5-5 5 5" />
     </svg>
@@ -653,6 +655,7 @@ function CheckIcon() {
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden="true"
+      focusable="false"
       role="presentation"
     >
       <polyline points="20 6 9 17 4 12" />
@@ -672,6 +675,7 @@ function CloseIcon() {
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden="true"
+      focusable="false"
       role="presentation"
     >
       <path d="M18 6 6 18M6 6l12 12" />
@@ -691,6 +695,7 @@ function SearchIcon() {
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden="true"
+      focusable="false"
       role="presentation"
     >
       <circle cx="11" cy="11" r="8" />
@@ -712,6 +717,7 @@ function LoadingIcon() {
       strokeLinecap="round"
       strokeLinejoin="round"
       aria-hidden="true"
+      focusable="false"
       role="presentation"
     >
       <path d="M21 12a9 9 0 1 1-6.219-8.56" />

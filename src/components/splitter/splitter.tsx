@@ -3,6 +3,7 @@ import {
   type ReactNode,
   useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from 'react';
@@ -52,13 +53,6 @@ function parseSize(
   return parseFloat(value);
 }
 
-function clampSize(size: number, min?: number, max?: number): number {
-  let s = size;
-  if (min !== undefined) s = Math.max(s, min);
-  if (max !== undefined) s = Math.min(s, max);
-  return Math.max(0, s);
-}
-
 // ---- Icons ----
 
 function CollapseIcon({
@@ -74,7 +68,8 @@ function CollapseIcon({
       height="12"
       viewBox="0 0 12 12"
       fill="none"
-      aria-hidden
+      aria-hidden="true"
+      focusable="false"
       data-tao-collapse-direction={direction}
     >
       <path
@@ -109,22 +104,27 @@ export function Splitter({
 }: SplitterProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Extract Panel props from children
-  const panels: SplitterPanelProps[] = [];
-  const panelChildren: ReactNode[] = [];
+  const { panels, panelChildren } = useMemo(() => {
+    const nextPanels: SplitterPanelProps[] = [];
+    const nextPanelChildren: ReactNode[] = [];
+    const childArray = Array.isArray(children) ? children : [children];
 
-  const childArray = Array.isArray(children) ? children : [children];
-  for (const child of childArray) {
-    if (
-      child &&
-      typeof child === 'object' &&
-      'type' in child &&
-      (child as any).type === Panel
-    ) {
-      panels.push((child as any).props as SplitterPanelProps);
-      panelChildren.push((child as any).props.children);
+    for (const child of childArray) {
+      if (child && typeof child === 'object' && 'type' in child) {
+        const panelChild = child as {
+          type?: unknown;
+          props?: SplitterPanelProps;
+        };
+
+        if (panelChild.type === Panel && panelChild.props) {
+          nextPanels.push(panelChild.props);
+          nextPanelChildren.push(panelChild.props.children);
+        }
+      }
     }
-  }
+
+    return { panels: nextPanels, panelChildren: nextPanelChildren };
+  }, [children]);
 
   const panelCount = panels.length;
   const isHorizontal = orientation === 'horizontal';
@@ -189,7 +189,7 @@ export function Splitter({
 
     setSizes(newSizes);
     initialized.current = true;
-  }, [containerSize, panelCount]);
+  }, [containerSize, panelCount, panels, sizes.length]);
 
   // Sync controlled sizes
   useEffect(() => {
@@ -210,7 +210,7 @@ export function Splitter({
       }
     }
     if (changed) setSizes(next);
-  });
+  }, [containerSize, panelCount, panels, sizes]);
 
   // ---- Drag logic ----
   const dragging = useRef<{
@@ -380,6 +380,7 @@ export function Splitter({
         const isCollapsed = sizes[i] <= 0;
 
         return (
+          // biome-ignore lint/suspicious/noArrayIndexKey: Splitter panels are positional layout slots; their order defines resize handles.
           <div key={i} style={{ display: 'contents' }}>
             <div
               data-tao-splitter-panel=""

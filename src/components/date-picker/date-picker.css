@@ -1,4 +1,3 @@
-
 /* ===========================
    Trigger (shared with Input/Select)
    =========================== */
@@ -77,6 +76,9 @@ button[data-tao-picker-trigger][data-tao-size="large"] {
 }
 
 [data-tao-picker-clear] {
+  padding: 0;
+  border: 0;
+  background: transparent;
   color: var(--tao-color-text-quaternary);
   cursor: pointer;
   transition: color var(--tao-motion-duration-fast) ease-out;
@@ -261,15 +263,26 @@ button[data-tao-calendar-title-btn]:hover {
 }
 
 [data-tao-calendar-cell] {
-  position: relative;
-  text-align: center;
   padding: 2px 0;
-  cursor: pointer;
   vertical-align: middle;
 }
 
+[data-tao-calendar-cell-button] {
+  position: relative;
+  display: block;
+  width: 100%;
+  text-align: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  outline: none;
+}
+
 /* ::before = range background strip (full cell width, half cell height) */
-[data-tao-calendar-cell]::before {
+[data-tao-calendar-cell-button]::before {
   content: "";
   position: absolute;
   top: 50%;
@@ -298,21 +311,24 @@ button[data-tao-calendar-title-btn]:hover {
 }
 
 /* ---- Single select: hover ---- */
-[data-tao-calendar-cell]:not([data-tao-disabled]):not([data-tao-selected]):not(
-    [data-tao-range-start]
-  ):not([data-tao-range-end]):not([data-tao-in-range]):hover
+[data-tao-calendar-cell-button]:not([data-tao-disabled]):not(
+    [data-tao-selected]
+  ):not([data-tao-range-start]):not([data-tao-range-end]):not(
+    [data-tao-in-range]
+  ):hover
   [data-tao-calendar-cell-inner] {
   background: var(--tao-color-fill-tertiary);
 }
 
 /* ---- Single select: selected ---- */
-[data-tao-calendar-cell][data-tao-selected] [data-tao-calendar-cell-inner] {
+[data-tao-calendar-cell-button][data-tao-selected]
+  [data-tao-calendar-cell-inner] {
   background: var(--tao-primary);
   color: white;
 }
 
 /* ---- Today marker ---- */
-[data-tao-calendar-cell][data-tao-today]:not([data-tao-selected]):not(
+[data-tao-calendar-cell-button][data-tao-today]:not([data-tao-selected]):not(
     [data-tao-range-start]
   ):not([data-tao-range-end])
   [data-tao-calendar-cell-inner] {
@@ -320,55 +336,59 @@ button[data-tao-calendar-title-btn]:hover {
 }
 
 /* ---- Other month (faded) ---- */
-[data-tao-calendar-cell][data-tao-other-month] [data-tao-calendar-cell-inner] {
+[data-tao-calendar-cell-button][data-tao-other-month]
+  [data-tao-calendar-cell-inner] {
   color: var(--tao-color-text-quaternary);
 }
 
 /* ---- Disabled ---- */
-[data-tao-calendar-cell][data-tao-disabled] {
+[data-tao-calendar-cell-button][data-tao-disabled] {
   cursor: not-allowed;
 }
-[data-tao-calendar-cell][data-tao-disabled] [data-tao-calendar-cell-inner] {
+[data-tao-calendar-cell-button][data-tao-disabled]
+  [data-tao-calendar-cell-inner] {
   color: var(--tao-color-text-disabled);
   background: transparent;
 }
 
 /* ---- Range: in-range strip (middle cells) ---- */
-[data-tao-calendar-cell][data-tao-in-range]::before {
+[data-tao-calendar-cell-button][data-tao-in-range]::before {
   background: var(--tao-primary-bg);
 }
 
 /* ---- Range: start cell — strip from 50% to right ---- */
-[data-tao-calendar-cell][data-tao-range-start]::before {
+[data-tao-calendar-cell-button][data-tao-range-start]::before {
   background: var(--tao-primary-bg);
   inset-inline-start: 50%;
 }
-[data-tao-calendar-cell][data-tao-range-start] [data-tao-calendar-cell-inner] {
+[data-tao-calendar-cell-button][data-tao-range-start]
+  [data-tao-calendar-cell-inner] {
   background: var(--tao-primary);
   color: white;
 }
 
 /* ---- Range: end cell — strip from left to 50% ---- */
-[data-tao-calendar-cell][data-tao-range-end]::before {
+[data-tao-calendar-cell-button][data-tao-range-end]::before {
   background: var(--tao-primary-bg);
   inset-inline-end: 50%;
 }
-[data-tao-calendar-cell][data-tao-range-end] [data-tao-calendar-cell-inner] {
+[data-tao-calendar-cell-button][data-tao-range-end]
+  [data-tao-calendar-cell-inner] {
   background: var(--tao-primary);
   color: white;
 }
 
 /* If start and end are the same day — no strip */
-[data-tao-calendar-cell][data-tao-range-start][data-tao-range-end]::before {
+[data-tao-calendar-cell-button][data-tao-range-start][data-tao-range-end]::before {
   background: transparent;
 }
 
 /* ---- Range: hover on in-range cells — no extra gray ---- */
-[data-tao-calendar-cell][data-tao-in-range]:hover
+[data-tao-calendar-cell-button][data-tao-in-range]:hover
   [data-tao-calendar-cell-inner],
-[data-tao-calendar-cell][data-tao-range-start]:hover
+[data-tao-calendar-cell-button][data-tao-range-start]:hover
   [data-tao-calendar-cell-inner],
-[data-tao-calendar-cell][data-tao-range-end]:hover
+[data-tao-calendar-cell-button][data-tao-range-end]:hover
   [data-tao-calendar-cell-inner] {
   /* Keep current state, no gray overlay */
 }
@@ -762,7 +782,7 @@ button[data-tao-range-trigger][data-tao-size="large"] {
     font-size: var(--tao-font-size-base);
   }
 
-  [data-tao-drawer] [data-tao-calendar-cell]::before {
+  [data-tao-drawer] [data-tao-calendar-cell-button]::before {
     height: 36px;
   }
 

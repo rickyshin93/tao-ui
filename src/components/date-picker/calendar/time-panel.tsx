@@ -105,13 +105,13 @@ function TimeColumn({
     selectedEl?.scrollIntoView({ block: 'center' });
   }, []);
 
-  // Scroll when selected value changes or scrollKey bumps
+  // scrollToSelected closes over selected and scrollKey.
   useEffect(() => {
     scrollToSelected();
-  }, [selected, scrollKey, scrollToSelected]);
+  }, [scrollToSelected]);
 
   return (
-    <div data-tao-time-column="" aria-label={label}>
+    <div data-tao-time-column="">
       <div data-tao-time-column-title="">{label}</div>
       <div
         data-tao-time-column-list=""

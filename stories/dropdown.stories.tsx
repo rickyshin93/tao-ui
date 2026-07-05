@@ -211,6 +211,8 @@ export const SplitButton: StoryObj = {
 function FileIcon() {
   return (
     <svg
+      aria-hidden="true"
+      focusable="false"
       width="16"
       height="16"
       viewBox="0 0 24 24"
@@ -228,6 +230,8 @@ function FileIcon() {
 function CopyIcon() {
   return (
     <svg
+      aria-hidden="true"
+      focusable="false"
       width="16"
       height="16"
       viewBox="0 0 24 24"
@@ -245,6 +249,8 @@ function CopyIcon() {
 function ClipboardIcon() {
   return (
     <svg
+      aria-hidden="true"
+      focusable="false"
       width="16"
       height="16"
       viewBox="0 0 24 24"

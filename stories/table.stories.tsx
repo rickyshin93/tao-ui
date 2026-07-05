@@ -1,8 +1,4 @@
-import {
-  Stack,
-  Table,
-  type TableColumn,
-} from '@rockshin/tao-ui';
+import { Stack, Table, type TableColumn } from '@rockshin/tao-ui';
 import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
 
@@ -370,7 +366,20 @@ export const HorizontalScroll: StoryObj = {
         title: 'Actions',
         width: 120,
         fixed: 'right',
-        render: () => <a style={{ color: 'var(--tao-primary)' }}>Edit</a>,
+        render: () => (
+          <button
+            type="button"
+            style={{
+              padding: 0,
+              border: 0,
+              background: 'transparent',
+              color: 'var(--tao-primary)',
+              cursor: 'pointer',
+            }}
+          >
+            Edit
+          </button>
+        ),
       },
     ];
     return (
@@ -493,9 +502,18 @@ export const FullFeature: StoryObj = {
           width: 100,
           fixed: 'right',
           render: () => (
-            <a style={{ color: 'var(--tao-primary)', cursor: 'pointer' }}>
+            <button
+              type="button"
+              style={{
+                padding: 0,
+                border: 0,
+                background: 'transparent',
+                color: 'var(--tao-primary)',
+                cursor: 'pointer',
+              }}
+            >
               Edit
-            </a>
+            </button>
           ),
         },
       ];

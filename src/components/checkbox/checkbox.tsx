@@ -192,6 +192,8 @@ function CheckIcon() {
   return (
     <svg
       data-tao-checkbox-icon=""
+      aria-hidden="true"
+      focusable="false"
       width="12"
       height="12"
       viewBox="0 0 24 24"
@@ -210,6 +212,8 @@ function MinusIcon() {
   return (
     <svg
       data-tao-checkbox-icon=""
+      aria-hidden="true"
+      focusable="false"
       width="12"
       height="12"
       viewBox="0 0 24 24"

@@ -77,13 +77,15 @@ export function MobileSelectContent({
     const index = optIndex++;
     const isSelected = opt.value === value;
     return (
-      <div
+      <button
+        type="button"
         key={opt.value}
         data-tao-sheet-item=""
         data-tao-selected={isSelected || undefined}
         data-tao-disabled={opt.disabled || undefined}
+        disabled={opt.disabled}
         onClick={() => {
-          if (!opt.disabled) handleSelect(opt.value);
+          handleSelect(opt.value);
         }}
         data-tao-has-desc={opt.description != null || undefined}
       >
@@ -107,7 +109,7 @@ export function MobileSelectContent({
             <CheckIcon />
           </span>
         )}
-      </div>
+      </button>
     );
   };
 
@@ -133,7 +135,6 @@ export function MobileSelectContent({
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search..."
-            autoFocus
           />
         </div>
       )}
@@ -178,6 +179,8 @@ export function MobileSelectDrawer({
 function SearchIcon() {
   return (
     <svg
+      aria-hidden="true"
+      focusable="false"
       width="14"
       height="14"
       viewBox="0 0 24 24"
@@ -196,6 +199,8 @@ function SearchIcon() {
 function CheckIcon() {
   return (
     <svg
+      aria-hidden="true"
+      focusable="false"
       width="18"
       height="18"
       viewBox="0 0 24 24"

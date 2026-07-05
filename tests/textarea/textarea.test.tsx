@@ -25,7 +25,8 @@ test('calls onChange on typing', async () => {
 
 test('size prop sets data-tao-size on wrapper', () => {
   render(<Textarea size="small" />);
-  const wrapper = screen.getByRole('textbox').closest('[data-tao-textarea]')!;
+  const wrapper = screen.getByRole('textbox').closest('[data-tao-textarea]');
+  expect(wrapper).toBeInstanceOf(HTMLElement);
   expect((wrapper as HTMLElement).dataset.taoSize).toBe('small');
 });
 
@@ -35,13 +36,15 @@ test('inherits size from TaoProvider', () => {
       <Textarea />
     </TaoProvider>,
   );
-  const wrapper = screen.getByRole('textbox').closest('[data-tao-textarea]')!;
+  const wrapper = screen.getByRole('textbox').closest('[data-tao-textarea]');
+  expect(wrapper).toBeInstanceOf(HTMLElement);
   expect((wrapper as HTMLElement).dataset.taoSize).toBe('large');
 });
 
 test('variant prop sets data-tao-variant', () => {
   render(<Textarea variant="filled" />);
-  const wrapper = screen.getByRole('textbox').closest('[data-tao-textarea]')!;
+  const wrapper = screen.getByRole('textbox').closest('[data-tao-textarea]');
+  expect(wrapper).toBeInstanceOf(HTMLElement);
   expect((wrapper as HTMLElement).dataset.taoVariant).toBe('filled');
 });
 
@@ -51,7 +54,8 @@ test('inherits variant from TaoProvider', () => {
       <Textarea />
     </TaoProvider>,
   );
-  const wrapper = screen.getByRole('textbox').closest('[data-tao-textarea]')!;
+  const wrapper = screen.getByRole('textbox').closest('[data-tao-textarea]');
+  expect(wrapper).toBeInstanceOf(HTMLElement);
   expect((wrapper as HTMLElement).dataset.taoVariant).toBe('borderless');
 });
 

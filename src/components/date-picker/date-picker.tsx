@@ -113,7 +113,7 @@ export function DatePicker({
       );
       setTimeScrollKey((k) => k + 1);
     }
-  }, [isOpen]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isOpen, picker, value]);
 
   // Time state
   const timeValue = useMemo(
@@ -181,7 +181,7 @@ export function DatePicker({
   );
 
   const handleClear = useCallback(
-    (e: React.MouseEvent) => {
+    (e: React.SyntheticEvent) => {
       e.stopPropagation();
       onChange?.(null, '');
     },
@@ -328,11 +328,23 @@ export function DatePicker({
       </span>
       <span data-tao-picker-icons="">
         {showClearBtn && hovering ? (
+          // biome-ignore lint/a11y/useSemanticElements: this control is inside the trigger button, so a nested button would be invalid HTML.
           <span
             data-tao-picker-clear=""
-            onClick={handleClear}
-            role="button"
+            onClick={(event) => {
+              event.stopPropagation();
+              handleClear(event);
+            }}
             aria-label="Clear"
+            role="button"
+            tabIndex={0}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                event.stopPropagation();
+                handleClear(event);
+              }
+            }}
           >
             <CloseIcon />
           </span>
@@ -384,6 +396,8 @@ export function DatePicker({
 function CalendarIcon() {
   return (
     <svg
+      aria-hidden="true"
+      focusable="false"
       width="16"
       height="16"
       viewBox="0 0 24 24"
@@ -403,6 +417,8 @@ function CalendarIcon() {
 function CloseIcon() {
   return (
     <svg
+      aria-hidden="true"
+      focusable="false"
       width="16"
       height="16"
       viewBox="0 0 24 24"

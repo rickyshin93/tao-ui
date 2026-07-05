@@ -89,7 +89,7 @@ export function Tabs({
     if (active) {
       setInkStyle({ left: active.offsetLeft, width: active.offsetWidth });
     }
-  }, [currentKey, variant, items]);
+  }, [currentKey, variant]);
 
   // Keyboard nav
   const handleKeyDown = useCallback(

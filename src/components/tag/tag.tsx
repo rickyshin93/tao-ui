@@ -59,6 +59,7 @@ function CloseIcon() {
       viewBox="0 0 12 12"
       fill="none"
       aria-hidden="true"
+      focusable="false"
       role="presentation"
     >
       <path

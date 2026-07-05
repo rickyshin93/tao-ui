@@ -1,6 +1,6 @@
 {
   "name": "@rockshin/tao-ui",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "type": "module",
   "description": "A modern React 19 component library with semantic DOM customization and OKLCH-based theming.",
   "keywords": [
@@ -34,16 +34,19 @@
   "types": "./dist/index.d.ts",
   "files": [
     "dist",
+    "component-manifest.json",
     "llms.txt"
   ],
   "scripts": {
     "build": "rslib",
     "build:storybook": "storybook build",
     "check": "biome check --write",
+    "check:components": "node scripts/check-component-sync.mjs",
     "dev": "rslib --watch",
     "doc": "rspress dev",
     "doc:build": "rspress build",
     "doc:preview": "rspress preview",
+    "docs:generate": "node scripts/generate-component-manifest.mjs",
     "format": "biome format --write",
     "release": "bun scripts/release.mjs",
     "storybook": "storybook dev",

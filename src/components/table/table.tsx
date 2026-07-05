@@ -58,10 +58,7 @@ export interface TableColumn<T = any> {
   align?: 'left' | 'center' | 'right';
   fixed?: 'left' | 'right';
   ellipsis?: boolean;
-  onCell?: (
-    record: T,
-    index: number,
-  ) => TdHTMLAttributes<HTMLTableCellElement>;
+  onCell?: (record: T, index: number) => TdHTMLAttributes<HTMLTableCellElement>;
   onHeaderCell?: (
     column: TableColumn<T>,
   ) => ThHTMLAttributes<HTMLTableCellElement>;
@@ -179,7 +176,9 @@ function resolveSemanticClassNames<T>(
   classNames: TableSemanticClassNames<T> | undefined,
   props: TableProps<T>,
 ): SemanticClassNames<TableSemanticPart> {
-  return typeof classNames === 'function' ? classNames({ props }) : (classNames ?? {});
+  return typeof classNames === 'function'
+    ? classNames({ props })
+    : (classNames ?? {});
 }
 
 function resolveSemanticStyles<T>(
@@ -212,7 +211,14 @@ function resolveRowStyle<T>(
 function SortIcon({ order }: { order: SortOrder }) {
   return (
     <span data-tao-table-sort-icon="" data-tao-sort-order={order ?? undefined}>
-      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden>
+      <svg
+        width="14"
+        height="14"
+        viewBox="0 0 14 14"
+        fill="none"
+        aria-hidden="true"
+        focusable="false"
+      >
         <path
           d="M7 2.5L10 6H4L7 2.5Z"
           fill="currentColor"
@@ -231,7 +237,14 @@ function SortIcon({ order }: { order: SortOrder }) {
 function FilterIcon({ active }: { active: boolean }) {
   return (
     <span data-tao-table-filter-icon="" data-tao-active={active || undefined}>
-      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden>
+      <svg
+        width="14"
+        height="14"
+        viewBox="0 0 14 14"
+        fill="none"
+        aria-hidden="true"
+        focusable="false"
+      >
         <path
           d="M2 3h10L8.5 7.5V11L5.5 12V7.5L2 3Z"
           stroke="currentColor"
@@ -253,7 +266,8 @@ function LoadingSpinner() {
         height="24"
         viewBox="0 0 24 24"
         fill="none"
-        aria-hidden
+        aria-hidden="true"
+        focusable="false"
       >
         <circle
           cx="12"
@@ -276,7 +290,14 @@ function LoadingSpinner() {
 
 function CheckIcon() {
   return (
-    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden>
+    <svg
+      width="12"
+      height="12"
+      viewBox="0 0 12 12"
+      fill="none"
+      aria-hidden="true"
+      focusable="false"
+    >
       <path
         d="M2.5 6L5 8.5L9.5 3.5"
         stroke="currentColor"
@@ -336,10 +357,12 @@ function FilterDropdown({
           {filters.map((f) => {
             const checked = activeValues.includes(f.value);
             return (
-              <label
+              <button
+                type="button"
                 key={f.value}
                 data-tao-table-filter-option=""
                 onClick={() => toggle(f.value)}
+                aria-pressed={checked}
               >
                 <span
                   data-tao-table-filter-check=""
@@ -348,7 +371,7 @@ function FilterDropdown({
                   {checked && <CheckIcon />}
                 </span>
                 <span>{f.text}</span>
-              </label>
+              </button>
             );
           })}
           {activeValues.length > 0 && (
@@ -427,7 +450,10 @@ export function Table<T = any>({
     classNames,
     styles,
   };
-  const resolvedClassNames = resolveSemanticClassNames(classNames, semanticProps);
+  const resolvedClassNames = resolveSemanticClassNames(
+    classNames,
+    semanticProps,
+  );
   const resolvedStyles = resolveSemanticStyles(styles, semanticProps);
 
   // ---- Sort state ----
@@ -837,9 +863,7 @@ export function Table<T = any>({
                   {columns.map((col, i) => {
                     const colKey = getColKey(col, i);
                     const hasSorter = !!col.sorter;
-                    const hasFilter = !!(
-                      col.filters && col.filters.length > 0
-                    );
+                    const hasFilter = !!(col.filters && col.filters.length > 0);
                     const resolvedOrder = getResolvedSortOrder(col, colKey);
                     const controlledFilterValues = col.filteredValue;
                     const activeFilterValues =
@@ -883,32 +907,22 @@ export function Table<T = any>({
                           className={resolvedClassNames['header.content']}
                           style={resolvedStyles['header.content']}
                         >
-                          <span
+                          <button
+                            type="button"
                             data-tao-table-header-title=""
                             data-tao-sortable={hasSorter || undefined}
                             className={resolvedClassNames['header.title']}
                             style={resolvedStyles['header.title']}
+                            disabled={!hasSorter}
                             onClick={
                               hasSorter
                                 ? () => handleSort(colKey, col)
                                 : undefined
                             }
-                            role={hasSorter ? 'button' : undefined}
-                            tabIndex={hasSorter ? 0 : undefined}
-                            onKeyDown={
-                              hasSorter
-                                ? (e) => {
-                                    if (e.key === 'Enter' || e.key === ' ') {
-                                      e.preventDefault();
-                                      handleSort(colKey, col);
-                                    }
-                                  }
-                                : undefined
-                            }
                           >
                             {col.title}
                             {hasSorter && <SortIcon order={resolvedOrder} />}
-                          </span>
+                          </button>
                           {hasFilter && (
                             <FilterDropdown
                               filters={col.filters!}

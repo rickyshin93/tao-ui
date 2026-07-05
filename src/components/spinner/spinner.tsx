@@ -130,7 +130,13 @@ export function Spinner({
 
 function DefaultIndicator() {
   return (
-    <svg data-tao-spinner-svg="" viewBox="0 0 50 50" fill="none" aria-hidden>
+    <svg
+      data-tao-spinner-svg=""
+      viewBox="0 0 50 50"
+      fill="none"
+      aria-hidden="true"
+      focusable="false"
+    >
       <circle
         cx="25"
         cy="25"

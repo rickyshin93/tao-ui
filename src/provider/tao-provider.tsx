@@ -125,7 +125,7 @@ const TOKEN_TO_VAR_PX: Record<string, string> = {
  * `useTaoConfig()` consumer to rerender on every parent render.
  */
 function useStableTokenKey(token: Partial<TaoSeedToken> | undefined): string {
-  const key = token ? JSON.stringify(token) : '';
+  const key = JSON.stringify(token ?? null);
   const ref = useRef(key);
   if (ref.current !== key) ref.current = key;
   return ref.current;
@@ -140,26 +140,26 @@ export function TaoProvider({
 }: TaoProviderProps) {
   const parentConfig = useContext(TaoConfigContext);
   const inherit = theme?.inherit ?? true;
-  const tokenKey = useStableTokenKey(theme?.token);
+  const token = theme?.token;
+  const tokenKey = useStableTokenKey(token);
 
   const ownVars = useMemo(() => {
-    if (!theme?.token) return undefined;
+    const parsedToken = JSON.parse(tokenKey) as Partial<TaoSeedToken> | null;
+    if (!parsedToken) return undefined;
 
     const vars: Record<string, string> = {};
-    const t = theme.token;
 
     for (const [key, varName] of Object.entries(TOKEN_TO_VAR)) {
-      const val = t[key as keyof TaoSeedToken];
+      const val = parsedToken[key as keyof TaoSeedToken];
       if (val != null) vars[varName] = String(val);
     }
 
     for (const [key, varName] of Object.entries(TOKEN_TO_VAR_PX)) {
-      const val = t[key as keyof TaoSeedToken];
+      const val = parsedToken[key as keyof TaoSeedToken];
       if (val != null) vars[varName] = `${val}px`;
     }
 
     return vars;
-    // biome-ignore lint/correctness/useExhaustiveDependencies: tokenKey stringifies token; value-equality avoids reference-churn rerenders.
   }, [tokenKey]);
 
   const tokenStyle = useMemo<CSSProperties>(

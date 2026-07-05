@@ -132,6 +132,8 @@ export function CalendarHeader({
 function LeftIcon() {
   return (
     <svg
+      aria-hidden="true"
+      focusable="false"
       width="14"
       height="14"
       viewBox="0 0 24 24"
@@ -149,6 +151,8 @@ function LeftIcon() {
 function RightIcon() {
   return (
     <svg
+      aria-hidden="true"
+      focusable="false"
       width="14"
       height="14"
       viewBox="0 0 24 24"
@@ -166,6 +170,8 @@ function RightIcon() {
 function DoubleLeftIcon() {
   return (
     <svg
+      aria-hidden="true"
+      focusable="false"
       width="14"
       height="14"
       viewBox="0 0 24 24"
@@ -184,6 +190,8 @@ function DoubleLeftIcon() {
 function DoubleRightIcon() {
   return (
     <svg
+      aria-hidden="true"
+      focusable="false"
       width="14"
       height="14"
       viewBox="0 0 24 24"

@@ -1,4 +1,3 @@
-
 /* ===========================
    Breadcrumb root
    =========================== */
@@ -38,6 +37,10 @@
   align-items: center;
   gap: 4px;
   color: var(--tao-color-text-secondary);
+  padding: 0;
+  background: transparent;
+  border: 0;
+  font: inherit;
   text-decoration: none;
   border-radius: var(--tao-radius-sm);
   cursor: pointer;

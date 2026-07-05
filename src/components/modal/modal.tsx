@@ -237,6 +237,8 @@ export function Modal({
 function CloseIcon() {
   return (
     <svg
+      aria-hidden="true"
+      focusable="false"
       width="16"
       height="16"
       viewBox="0 0 24 24"

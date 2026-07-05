@@ -39,7 +39,7 @@ export function MonthGrid({
         const disabled = disabledDate?.(m) ?? false;
         return (
           <button
-            key={i}
+            key={m.format('YYYY-MM')}
             type="button"
             data-tao-month-cell=""
             data-tao-selected={isSelected || undefined}

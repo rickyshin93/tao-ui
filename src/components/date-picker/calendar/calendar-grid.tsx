@@ -74,6 +74,7 @@ export function CalendarGrid({
   };
 
   return (
+    // biome-ignore lint/a11y/noNoninteractiveElementToInteractiveRole: the calendar uses a table-shaped grid with interactive date buttons in cells.
     <table data-tao-calendar-grid="" role="grid">
       <thead>
         <tr>
@@ -85,8 +86,8 @@ export function CalendarGrid({
         </tr>
       </thead>
       <tbody>
-        {weeks.map((week, wi) => (
-          <tr key={wi}>
+        {weeks.map((week) => (
+          <tr key={week[0]?.format('YYYY-MM-DD')}>
             {week.map((date) => {
               const isOtherMonth = date.month() !== currentMonth;
               const disabled = isDisabled(date);
@@ -99,23 +100,25 @@ export function CalendarGrid({
               const rEnd = !isOtherMonth && isRangeEnd(date);
 
               return (
-                <td
-                  key={date.format('YYYY-MM-DD')}
-                  data-tao-calendar-cell=""
-                  data-tao-selected={isSelected || undefined}
-                  data-tao-today={isToday || undefined}
-                  data-tao-other-month={isOtherMonth || undefined}
-                  data-tao-disabled={disabled || undefined}
-                  data-tao-in-range={inRange || undefined}
-                  data-tao-range-start={rStart || undefined}
-                  data-tao-range-end={rEnd || undefined}
-                  onClick={() => {
-                    if (!disabled) onSelect(date);
-                  }}
-                  onMouseEnter={() => onHover?.(date)}
-                  onMouseLeave={() => onHover?.(null)}
-                >
-                  <span data-tao-calendar-cell-inner="">{date.date()}</span>
+                <td key={date.format('YYYY-MM-DD')} data-tao-calendar-cell="">
+                  <button
+                    type="button"
+                    data-tao-calendar-cell-button=""
+                    data-tao-selected={isSelected || undefined}
+                    data-tao-today={isToday || undefined}
+                    data-tao-other-month={isOtherMonth || undefined}
+                    data-tao-disabled={disabled || undefined}
+                    data-tao-in-range={inRange || undefined}
+                    data-tao-range-start={rStart || undefined}
+                    data-tao-range-end={rEnd || undefined}
+                    disabled={disabled}
+                    onClick={() => onSelect(date)}
+                    onMouseEnter={() => onHover?.(date)}
+                    onMouseLeave={() => onHover?.(null)}
+                    aria-label={date.format('YYYY-MM-DD')}
+                  >
+                    <span data-tao-calendar-cell-inner="">{date.date()}</span>
+                  </button>
                 </td>
               );
             })}

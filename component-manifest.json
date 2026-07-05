@@ -1,0 +1,764 @@
+{
+  "schemaVersion": 1,
+  "packageName": "@rockshin/tao-ui",
+  "generatedAt": "2026-07-05T07:28:22.502Z",
+  "components": [
+    {
+      "name": "breadcrumb",
+      "displayName": "Breadcrumb",
+      "category": "Navigation",
+      "description": "Renders the user location in a hierarchy of pages or views.",
+      "exports": ["Breadcrumb"],
+      "source": "src/components/breadcrumb/breadcrumb.tsx",
+      "story": "stories/breadcrumb.stories.tsx",
+      "tests": ["tests/breadcrumb/breadcrumb.test.tsx"],
+      "semanticParts": ["root", "list", "item", "link", "separator"],
+      "keywords": ["navigation", "path", "hierarchy"],
+      "related": ["Tabs", "Dropdown"],
+      "usage": {
+        "description": "Use Breadcrumb near the top of a page when users need to understand or move through nested context.",
+        "bestPractices": [
+          "Keep labels short and recognizable.",
+          "Use links for ancestors and plain text for the current item."
+        ],
+        "avoid": ["Do not use Breadcrumb as primary navigation."]
+      },
+      "props": [
+        {
+          "name": "items",
+          "type": "BreadcrumbItemType[]",
+          "description": "Ordered breadcrumb items."
+        },
+        {
+          "name": "separator",
+          "type": "ReactNode",
+          "description": "Custom separator between items."
+        }
+      ]
+    },
+    {
+      "name": "button",
+      "displayName": "Button",
+      "category": "General",
+      "description": "Triggers an immediate action such as submitting, saving, or opening a surface.",
+      "exports": ["Button"],
+      "source": "src/components/button/button.tsx",
+      "story": "stories/button.stories.tsx",
+      "tests": ["tests/button/button.test.tsx"],
+      "semanticParts": ["root"],
+      "keywords": ["button", "action", "submit", "loading"],
+      "related": ["FormActions", "Modal"],
+      "usage": {
+        "description": "Use Button for explicit actions. It inherits size, disabled, and variant defaults from TaoProvider.",
+        "bestPractices": [
+          "Prefer one primary action per view or decision area.",
+          "Use loading when an action is pending.",
+          "Pass a native type when using a button inside a form."
+        ],
+        "avoid": [
+          "Do not use Button for simple navigation when a link is more accurate."
+        ]
+      },
+      "props": [
+        {
+          "name": "variant",
+          "type": "'primary' | 'secondary' | 'ghost' | 'destructive'",
+          "description": "Visual emphasis.",
+          "defaultValue": "'primary'"
+        },
+        {
+          "name": "size",
+          "type": "TaoSize",
+          "description": "Control size, falling back to TaoProvider."
+        },
+        {
+          "name": "loading",
+          "type": "boolean",
+          "description": "Disables the button and sets aria-busy."
+        },
+        {
+          "name": "classNames",
+          "type": "SemanticClassNames<'root'>",
+          "description": "Semantic class override."
+        }
+      ]
+    },
+    {
+      "name": "checkbox",
+      "displayName": "Checkbox",
+      "category": "Data Entry",
+      "description": "Selects one or more independent boolean options.",
+      "exports": ["Checkbox", "CheckboxGroup"],
+      "source": "src/components/checkbox/checkbox.tsx",
+      "story": "stories/checkbox.stories.tsx",
+      "tests": ["tests/checkbox/checkbox.test.tsx"],
+      "semanticParts": ["root", "input", "box", "label", "group", "option"],
+      "keywords": ["checkbox", "boolean", "multi select"],
+      "related": ["Radio", "Switch"],
+      "usage": {
+        "description": "Use Checkbox for independent choices, or CheckboxGroup when users can select multiple options from a set.",
+        "bestPractices": [
+          "Use clear labels that describe the checked state.",
+          "Group related options with CheckboxGroup."
+        ],
+        "avoid": [
+          "Do not use CheckboxGroup when only one option may be selected; use RadioGroup instead."
+        ]
+      },
+      "props": [
+        {
+          "name": "checked",
+          "type": "boolean",
+          "description": "Controlled checked state."
+        },
+        {
+          "name": "options",
+          "type": "CheckboxOptionType[]",
+          "description": "Options for CheckboxGroup."
+        },
+        {
+          "name": "classNames",
+          "type": "SemanticClassNames<CheckboxSemanticPart>",
+          "description": "Semantic class overrides."
+        }
+      ]
+    },
+    {
+      "name": "collapsible",
+      "displayName": "Collapsible",
+      "category": "Data Display",
+      "description": "Shows and hides a region of content while keeping disclosure state accessible.",
+      "exports": ["Collapsible"],
+      "source": "src/components/collapsible/collapsible.tsx",
+      "story": "stories/collapsible.stories.tsx",
+      "tests": ["tests/collapsible/collapsible.test.tsx"],
+      "semanticParts": ["root", "trigger", "content"],
+      "keywords": ["accordion", "disclosure", "expand"],
+      "related": ["Drawer", "Tabs"],
+      "usage": {
+        "description": "Use Collapsible to hide secondary details while preserving a lightweight page layout.",
+        "bestPractices": [
+          "Make the trigger label describe the hidden content.",
+          "Use controlled open state when it must coordinate with other UI."
+        ],
+        "avoid": [
+          "Do not hide required form inputs in a collapsed region without a clear cue."
+        ]
+      }
+    },
+    {
+      "name": "context-menu",
+      "displayName": "ContextMenu",
+      "category": "Navigation",
+      "description": "Displays contextual actions from a right click or long press interaction.",
+      "exports": ["ContextMenu"],
+      "source": "src/components/context-menu/context-menu.tsx",
+      "story": "stories/context-menu.stories.tsx",
+      "tests": ["tests/context-menu/context-menu.test.tsx"],
+      "semanticParts": ["root", "trigger", "content", "item", "separator"],
+      "keywords": ["menu", "right click", "actions"],
+      "related": ["Dropdown"],
+      "usage": {
+        "description": "Use ContextMenu for secondary actions attached to an object or region.",
+        "bestPractices": [
+          "Keep items short and action-oriented.",
+          "Provide another reachable path for critical actions."
+        ],
+        "avoid": ["Do not put primary workflows only inside a context menu."]
+      }
+    },
+    {
+      "name": "date-picker",
+      "displayName": "DatePicker",
+      "category": "Data Entry",
+      "description": "Lets users enter or choose a single date, with optional time selection.",
+      "exports": ["DatePicker"],
+      "source": "src/components/date-picker/date-picker.tsx",
+      "story": "stories/date-picker.stories.tsx",
+      "tests": [
+        "tests/date-picker/date-picker.test.tsx",
+        "tests/date-picker/use-calendar.test.ts"
+      ],
+      "semanticParts": ["root", "input", "popup", "calendar", "cell", "footer"],
+      "keywords": ["date", "calendar", "time"],
+      "related": ["RangePicker", "Input"],
+      "usage": {
+        "description": "Use DatePicker when free text date input would be error-prone or when users benefit from calendar context.",
+        "bestPractices": [
+          "Support keyboard entry for known dates.",
+          "Use presets for common relative choices when helpful."
+        ],
+        "avoid": [
+          "Do not force calendar navigation for dates far in the past without typed input."
+        ]
+      }
+    },
+    {
+      "name": "drawer",
+      "displayName": "Drawer",
+      "category": "Feedback",
+      "description": "Opens a side panel for related tasks without leaving the current page.",
+      "exports": ["Drawer"],
+      "source": "src/components/drawer/drawer.tsx",
+      "story": "stories/drawer.stories.tsx",
+      "tests": ["tests/drawer/drawer.test.tsx"],
+      "semanticParts": [
+        "root",
+        "overlay",
+        "content",
+        "header",
+        "body",
+        "footer",
+        "close"
+      ],
+      "keywords": ["panel", "overlay", "side sheet"],
+      "related": ["Modal"],
+      "usage": {
+        "description": "Use Drawer for inspection, editing, or supporting workflows that should stay connected to the current page.",
+        "bestPractices": [
+          "Use a clear title and predictable close affordance.",
+          "Keep destructive confirmations in a dedicated confirmation step."
+        ],
+        "avoid": ["Do not stack multiple drawers for a single workflow."]
+      }
+    },
+    {
+      "name": "dropdown",
+      "displayName": "Dropdown",
+      "category": "Navigation",
+      "description": "Opens a menu of actions or navigation choices from a trigger.",
+      "exports": ["Dropdown"],
+      "source": "src/components/dropdown/dropdown.tsx",
+      "story": "stories/dropdown.stories.tsx",
+      "tests": ["tests/dropdown/dropdown.test.tsx"],
+      "semanticParts": [
+        "root",
+        "trigger",
+        "content",
+        "item",
+        "group",
+        "divider"
+      ],
+      "keywords": ["menu", "actions", "more"],
+      "related": ["ContextMenu", "Select"],
+      "usage": {
+        "description": "Use Dropdown for compact action sets that do not need to stay visible.",
+        "bestPractices": [
+          "Order frequent actions first.",
+          "Use destructive styling only for destructive items."
+        ],
+        "avoid": [
+          "Do not use Dropdown as a replacement for visible primary navigation."
+        ]
+      }
+    },
+    {
+      "name": "form-actions",
+      "displayName": "FormActions",
+      "category": "Data Entry",
+      "description": "Lays out submit, cancel, and secondary actions for forms.",
+      "exports": ["FormActions"],
+      "source": "src/components/form-actions/form-actions.tsx",
+      "story": "stories/form.stories.tsx",
+      "tests": ["tests/form-actions/form-actions.test.tsx"],
+      "semanticParts": ["root"],
+      "keywords": ["form", "actions", "submit"],
+      "related": ["Button", "FormField", "FormSection"],
+      "usage": {
+        "description": "Use FormActions at the end of a form or section to align the final actions consistently.",
+        "bestPractices": [
+          "Keep action order consistent across forms.",
+          "Use a single submit action unless the workflow truly branches."
+        ]
+      }
+    },
+    {
+      "name": "form-field",
+      "displayName": "FormField",
+      "category": "Data Entry",
+      "description": "Associates labels, help text, validation state, and controls.",
+      "exports": ["FormField"],
+      "source": "src/components/form-field/form-field.tsx",
+      "story": "stories/form.stories.tsx",
+      "tests": ["tests/form-field/form-field.test.tsx"],
+      "semanticParts": ["root", "label", "control", "description", "error"],
+      "keywords": ["form", "label", "validation"],
+      "related": ["Input", "Select", "FormSection"],
+      "usage": {
+        "description": "Use FormField to provide accessible labeling and status text around a single control.",
+        "bestPractices": [
+          "Connect every input with a visible label.",
+          "Keep validation copy specific and actionable."
+        ]
+      }
+    },
+    {
+      "name": "form-layout",
+      "displayName": "FormLayout",
+      "category": "Layout",
+      "description": "Arranges form content with consistent label and control alignment.",
+      "exports": ["FormLayout"],
+      "source": "src/layouts/form-layout/form-layout.tsx",
+      "story": "stories/form-layout.stories.tsx",
+      "tests": ["tests/layouts/form-layout/form-layout.test.tsx"],
+      "keywords": ["form", "layout", "labels"],
+      "related": ["FormField", "FormSection"],
+      "usage": {
+        "description": "Use FormLayout to keep dense forms aligned and predictable.",
+        "bestPractices": [
+          "Use one layout strategy per form.",
+          "Prefer vertical layout on narrow screens."
+        ]
+      }
+    },
+    {
+      "name": "form-section",
+      "displayName": "FormSection",
+      "category": "Data Entry",
+      "description": "Groups related form fields with a title and optional description.",
+      "exports": ["FormSection"],
+      "source": "src/components/form-section/form-section.tsx",
+      "story": "stories/form.stories.tsx",
+      "tests": ["tests/form-section/form-section.test.tsx"],
+      "semanticParts": ["root", "header", "title", "description", "content"],
+      "keywords": ["form", "section", "group"],
+      "related": ["FormField", "FormLayout"],
+      "usage": {
+        "description": "Use FormSection to break long forms into scannable groups.",
+        "bestPractices": [
+          "Use headings that describe the group, not the control type.",
+          "Keep each section focused on one user decision area."
+        ]
+      }
+    },
+    {
+      "name": "headless-input-number",
+      "displayName": "HeadlessInputNumber",
+      "category": "Headless",
+      "description": "Headless numeric input primitives and hook for custom number entry experiences.",
+      "exports": ["HeadlessInputNumber", "NumberInput", "useNumberInput"],
+      "source": "src/number-input/number-input.tsx",
+      "story": "stories/headless-input-number.stories.tsx",
+      "tests": [
+        "tests/number-input/headless-input-number.test.tsx",
+        "tests/number-input/use-number-input.test.tsx",
+        "tests/number-input/format.test.ts",
+        "tests/number-input/validate.test.ts"
+      ],
+      "keywords": ["headless", "number", "formatting", "validation"],
+      "related": ["InputNumber"],
+      "usage": {
+        "description": "Use the headless API when tao-ui styling is not appropriate but number formatting behavior should stay consistent.",
+        "bestPractices": [
+          "Use useNumberInput for fully custom rendering.",
+          "Reuse the validation helpers for parity with the styled InputNumber."
+        ]
+      }
+    },
+    {
+      "name": "input",
+      "displayName": "Input",
+      "category": "Data Entry",
+      "description": "Single-line text input for short freeform values.",
+      "exports": ["Input"],
+      "source": "src/components/input/input.tsx",
+      "story": "stories/input.stories.tsx",
+      "tests": ["tests/input/input.test.tsx"],
+      "semanticParts": ["root", "input", "prefix", "suffix", "clear"],
+      "keywords": ["text field", "input", "search"],
+      "related": ["Textarea", "FormField"],
+      "usage": {
+        "description": "Use Input for short text values such as names, filters, search terms, and identifiers.",
+        "bestPractices": [
+          "Pair with FormField for labels and validation.",
+          "Use type, inputMode, and autoComplete when applicable."
+        ]
+      }
+    },
+    {
+      "name": "input-number",
+      "displayName": "InputNumber",
+      "category": "Data Entry",
+      "description": "A styled numeric input built on tao-ui number formatting and validation behavior.",
+      "exports": ["InputNumber"],
+      "source": "src/components/input-number/input-number.tsx",
+      "story": "stories/input-number.stories.tsx",
+      "tests": ["tests/input-number/input-number.test.tsx"],
+      "semanticParts": ["root", "input", "controls", "increment", "decrement"],
+      "keywords": ["number", "numeric", "stepper"],
+      "related": ["HeadlessInputNumber", "Input"],
+      "usage": {
+        "description": "Use InputNumber for numeric values that need min, max, step, precision, or formatted display.",
+        "bestPractices": [
+          "Set min and max when the domain is bounded.",
+          "Use the headless API when custom rendering is required."
+        ],
+        "avoid": [
+          "Do not use a numeric input for identifiers such as account numbers."
+        ]
+      }
+    },
+    {
+      "name": "modal",
+      "displayName": "Modal",
+      "category": "Feedback",
+      "description": "Displays a focused dialog for decisions, forms, and interruptive information.",
+      "exports": ["Modal"],
+      "source": "src/components/modal/modal.tsx",
+      "story": "stories/modal.stories.tsx",
+      "tests": ["tests/modal/modal.test.tsx"],
+      "semanticParts": [
+        "root",
+        "overlay",
+        "content",
+        "header",
+        "body",
+        "footer",
+        "close"
+      ],
+      "keywords": ["dialog", "confirm", "overlay"],
+      "related": ["Drawer", "Button"],
+      "usage": {
+        "description": "Use Modal for focused tasks or decisions. Static helpers such as Modal.confirm mirror common confirmation flows.",
+        "bestPractices": [
+          "Prefer Modal.useModal inside React trees so dialogs inherit TaoProvider context.",
+          "Keep modal content short and task-oriented."
+        ],
+        "avoid": ["Do not use nested modals for multi-step workflows."]
+      }
+    },
+    {
+      "name": "pagination",
+      "displayName": "Pagination",
+      "category": "Navigation",
+      "description": "Moves through paged data with current page and page-size controls.",
+      "exports": ["Pagination"],
+      "source": "src/components/pagination/pagination.tsx",
+      "story": "stories/pagination.stories.tsx",
+      "tests": ["tests/pagination/pagination.test.tsx"],
+      "semanticParts": ["root", "item", "prev", "next", "sizeChanger"],
+      "keywords": ["pages", "table", "navigation"],
+      "related": ["Table"],
+      "usage": {
+        "description": "Use Pagination when a collection is split into pages rather than infinitely loaded.",
+        "bestPractices": [
+          "Keep the current page controlled when data is loaded remotely.",
+          "Show total counts when they help users judge scope."
+        ]
+      }
+    },
+    {
+      "name": "radio",
+      "displayName": "Radio",
+      "category": "Data Entry",
+      "description": "Selects exactly one option from a mutually exclusive set.",
+      "exports": ["Radio", "RadioGroup"],
+      "source": "src/components/radio/radio.tsx",
+      "story": "stories/radio.stories.tsx",
+      "tests": ["tests/radio/radio.test.tsx"],
+      "semanticParts": [
+        "root",
+        "input",
+        "indicator",
+        "label",
+        "group",
+        "option"
+      ],
+      "keywords": ["radio", "single choice", "selection"],
+      "related": ["Checkbox", "SegmentedControl"],
+      "usage": {
+        "description": "Use RadioGroup when every option is visible and only one can be selected.",
+        "bestPractices": [
+          "Use concise labels.",
+          "Provide a default value when one option is recommended or required."
+        ],
+        "avoid": [
+          "Do not use RadioGroup for very long option lists; use Select instead."
+        ]
+      }
+    },
+    {
+      "name": "range-picker",
+      "displayName": "RangePicker",
+      "category": "Data Entry",
+      "description": "Lets users select a start and end date as one range value.",
+      "exports": ["RangePicker"],
+      "source": "src/components/date-picker/range-picker.tsx",
+      "story": "stories/date-picker.stories.tsx",
+      "tests": [
+        "tests/date-picker/range-picker.test.tsx",
+        "tests/date-picker/use-calendar.test.ts"
+      ],
+      "semanticParts": ["root", "input", "popup", "calendar", "cell", "footer"],
+      "keywords": ["date range", "calendar", "time range"],
+      "related": ["DatePicker"],
+      "usage": {
+        "description": "Use RangePicker for reporting windows, booking windows, and filters with start/end dates.",
+        "bestPractices": [
+          "Use presets for common ranges such as today, this week, or last 30 days.",
+          "Make inclusive/exclusive range behavior clear when it matters."
+        ]
+      }
+    },
+    {
+      "name": "scroll-area",
+      "displayName": "ScrollArea",
+      "category": "Data Display",
+      "description": "Provides a styled scroll container for overflow content.",
+      "exports": ["ScrollArea"],
+      "source": "src/components/scroll-area/scroll-area.tsx",
+      "story": "stories/scroll-area.stories.tsx",
+      "tests": ["tests/scroll-area/scroll-area.test.tsx"],
+      "semanticParts": ["root", "viewport", "scrollbar", "thumb"],
+      "keywords": ["scroll", "overflow", "viewport"],
+      "related": ["Table"],
+      "usage": {
+        "description": "Use ScrollArea when a fixed region needs overflow behavior without changing page scroll.",
+        "bestPractices": [
+          "Constrain height explicitly.",
+          "Avoid hiding important actions below a small scroll region."
+        ]
+      }
+    },
+    {
+      "name": "select",
+      "displayName": "Select",
+      "category": "Data Entry",
+      "description": "Chooses one value from a compact list of options.",
+      "exports": ["Select", "ChevronsUpDownIcon"],
+      "source": "src/components/select/select.tsx",
+      "story": "stories/select.stories.tsx",
+      "tests": ["tests/select/select.test.tsx"],
+      "semanticParts": ["root", "trigger", "value", "content", "item", "empty"],
+      "keywords": ["select", "combobox", "options"],
+      "related": ["Dropdown", "Radio"],
+      "usage": {
+        "description": "Use Select when choices are known but too numerous or secondary to show as radios.",
+        "bestPractices": [
+          "Use RadioGroup when there are only a few important choices.",
+          "Keep option labels stable and easy to scan."
+        ],
+        "avoid": ["Do not use Select for arbitrary text entry."]
+      }
+    },
+    {
+      "name": "spinner",
+      "displayName": "Spinner",
+      "category": "Feedback",
+      "description": "Indicates indeterminate loading activity.",
+      "exports": ["Spinner"],
+      "source": "src/components/spinner/spinner.tsx",
+      "story": "stories/spinner.stories.tsx",
+      "tests": ["tests/spinner/spinner.test.tsx"],
+      "semanticParts": ["root"],
+      "keywords": ["loading", "progress", "busy"],
+      "related": ["Button"],
+      "usage": {
+        "description": "Use Spinner for short indeterminate waits when progress cannot be measured.",
+        "bestPractices": [
+          "Prefer inline placement near the content that is loading.",
+          "Use aria labels for standalone spinners."
+        ],
+        "avoid": ["Do not use Spinner for determinate progress."]
+      }
+    },
+    {
+      "name": "splitter",
+      "displayName": "Splitter",
+      "category": "Layout",
+      "description": "Creates resizable panes separated by draggable handles.",
+      "exports": ["Splitter"],
+      "source": "src/components/splitter/splitter.tsx",
+      "story": "stories/splitter.stories.tsx",
+      "tests": ["tests/splitter/splitter.test.tsx"],
+      "semanticParts": ["root", "panel", "handle"],
+      "keywords": ["resizable", "panes", "layout"],
+      "related": ["Stack", "FormLayout"],
+      "usage": {
+        "description": "Use Splitter for work surfaces where users need to allocate space between adjacent panes.",
+        "bestPractices": [
+          "Set sensible min sizes.",
+          "Persist sizes only when the layout is user-specific."
+        ]
+      }
+    },
+    {
+      "name": "stack",
+      "displayName": "Stack",
+      "category": "Layout",
+      "description": "Composes children in a flex row or column with consistent spacing.",
+      "exports": ["Stack"],
+      "source": "src/layouts/stack/stack.tsx",
+      "story": "stories/stack.stories.tsx",
+      "tests": ["tests/layouts/stack/stack.test.tsx"],
+      "keywords": ["layout", "flex", "spacing"],
+      "related": ["Splitter", "FormLayout"],
+      "usage": {
+        "description": "Use Stack for simple one-dimensional layout and spacing.",
+        "bestPractices": [
+          "Prefer Stack over one-off margin rules for repeated spacing.",
+          "Use semantic containers when the layout has richer meaning."
+        ]
+      }
+    },
+    {
+      "name": "switch",
+      "displayName": "Switch",
+      "category": "Data Entry",
+      "description": "Toggles a setting on or off with immediate effect.",
+      "exports": ["Switch"],
+      "source": "src/components/switch/switch.tsx",
+      "story": "stories/switch.stories.tsx",
+      "tests": ["tests/switch/switch.test.tsx"],
+      "semanticParts": ["root", "thumb", "label"],
+      "keywords": ["toggle", "setting", "boolean"],
+      "related": ["Checkbox"],
+      "usage": {
+        "description": "Use Switch for settings that take effect immediately.",
+        "bestPractices": [
+          "Use labels that describe the enabled state.",
+          "Use Checkbox when the value is submitted with a form."
+        ]
+      }
+    },
+    {
+      "name": "table",
+      "displayName": "Table",
+      "category": "Data Display",
+      "description": "Displays structured row and column data with selection, sorting, filtering, and pagination hooks.",
+      "exports": ["Table"],
+      "source": "src/components/table/table.tsx",
+      "story": "stories/table.stories.tsx",
+      "tests": ["tests/table/table.test.tsx"],
+      "semanticParts": [
+        "root",
+        "table",
+        "header",
+        "header.cell",
+        "body",
+        "row",
+        "cell",
+        "pagination"
+      ],
+      "keywords": ["data grid", "rows", "columns", "sorting"],
+      "related": ["Pagination", "ScrollArea"],
+      "usage": {
+        "description": "Use Table for dense, comparable records that benefit from aligned columns.",
+        "bestPractices": [
+          "Keep columns focused on the task.",
+          "Use stable row keys.",
+          "Control sorting and pagination when data is remote."
+        ],
+        "avoid": [
+          "Do not use Table for card-like content where comparison is not important."
+        ]
+      }
+    },
+    {
+      "name": "tabs",
+      "displayName": "Tabs",
+      "category": "Navigation",
+      "description": "Switches between peer panels within the same page context.",
+      "exports": ["Tabs"],
+      "source": "src/components/tabs/tabs.tsx",
+      "story": "stories/tabs.stories.tsx",
+      "tests": ["tests/tabs/tabs.test.tsx"],
+      "semanticParts": ["root", "list", "tab", "panel"],
+      "keywords": ["tabs", "sections", "navigation"],
+      "related": ["Breadcrumb"],
+      "usage": {
+        "description": "Use Tabs to separate peer views without navigating away from the current task.",
+        "bestPractices": [
+          "Use short tab labels.",
+          "Keep tab panels at comparable hierarchy."
+        ],
+        "avoid": ["Do not use Tabs for sequential steps."]
+      }
+    },
+    {
+      "name": "tag",
+      "displayName": "Tag",
+      "category": "Data Display",
+      "description": "Displays compact labels, statuses, categories, or checkable chips.",
+      "exports": ["Tag", "CheckableTag"],
+      "source": "src/components/tag/tag.tsx",
+      "story": "stories/tag.stories.tsx",
+      "tests": ["tests/tag/tag.test.tsx"],
+      "semanticParts": ["root", "icon", "close"],
+      "keywords": ["badge", "chip", "status", "label"],
+      "related": ["Checkbox", "Table"],
+      "usage": {
+        "description": "Use Tag for lightweight metadata or status markers. Use CheckableTag for compact filter choices.",
+        "bestPractices": [
+          "Use semantic colors consistently.",
+          "Keep tag text short."
+        ],
+        "avoid": ["Do not encode critical state by color alone."]
+      }
+    },
+    {
+      "name": "tao-provider",
+      "displayName": "TaoProvider",
+      "category": "Config",
+      "description": "Provides global component defaults, portal scoping, and theme seed token overrides.",
+      "exports": ["TaoProvider", "TaoPortalScope"],
+      "source": "src/provider/tao-provider.tsx",
+      "story": "stories/provider.stories.tsx",
+      "tests": ["tests/provider/tao-provider.test.tsx"],
+      "keywords": ["provider", "theme", "tokens", "size", "disabled"],
+      "related": ["Button", "Input", "tokenVar"],
+      "usage": {
+        "description": "Wrap an app or subtree with TaoProvider to set size, disabled, variant, and theme defaults.",
+        "bestPractices": [
+          "Prefer provider-level defaults for app-wide decisions.",
+          "Use nested providers for scoped theme overrides."
+        ],
+        "avoid": [
+          "Do not override derived CSS variables directly unless a theme token cannot express the change."
+        ]
+      },
+      "props": [
+        {
+          "name": "size",
+          "type": "TaoSize",
+          "description": "Default component size for descendants."
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "description": "Default disabled state for descendants."
+        },
+        {
+          "name": "variant",
+          "type": "TaoVariant",
+          "description": "Default field variant for descendants."
+        },
+        {
+          "name": "theme",
+          "type": "TaoThemeConfig",
+          "description": "Seed token overrides for the provider scope."
+        }
+      ]
+    },
+    {
+      "name": "textarea",
+      "displayName": "Textarea",
+      "category": "Data Entry",
+      "description": "Multi-line text input with optional auto sizing.",
+      "exports": ["Textarea"],
+      "source": "src/components/textarea/textarea.tsx",
+      "story": "stories/textarea.stories.tsx",
+      "tests": ["tests/textarea/textarea.test.tsx"],
+      "semanticParts": ["root", "textarea"],
+      "keywords": ["textarea", "multiline", "input"],
+      "related": ["Input", "FormField"],
+      "usage": {
+        "description": "Use Textarea for longer freeform content such as descriptions, notes, and comments.",
+        "bestPractices": [
+          "Set rows or autoSize based on expected content length.",
+          "Use maxLength when limits are strict."
+        ]
+      }
+    }
+  ]
+}
