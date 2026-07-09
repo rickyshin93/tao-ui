@@ -19,6 +19,16 @@ test('renders as role=checkbox', () => {
   expect(screen.getByRole('checkbox')).toBeTruthy();
 });
 
+test('checkbox input stays scoped to its control box', () => {
+  const { container } = render(<Checkbox>A</Checkbox>);
+  const control = container.querySelector(
+    '[data-tao-checkbox-control]',
+  ) as HTMLSpanElement | null;
+  const input = screen.getByRole('checkbox');
+  expect(control).toBeTruthy();
+  expect(control?.contains(input)).toBe(true);
+});
+
 test('checked prop controls checked state', () => {
   render(
     <Checkbox checked onChange={() => {}}>

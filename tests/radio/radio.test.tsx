@@ -16,6 +16,16 @@ test('renders as role=radio', () => {
   expect(screen.getByRole('radio')).toBeTruthy();
 });
 
+test('radio input stays scoped to its control box', () => {
+  const { container } = render(<Radio value="a">A</Radio>);
+  const control = container.querySelector(
+    '[data-tao-radio-control]',
+  ) as HTMLSpanElement | null;
+  const input = screen.getByRole('radio');
+  expect(control).toBeTruthy();
+  expect(control?.contains(input)).toBe(true);
+});
+
 test('checked prop controls state', () => {
   render(
     <Radio value="a" checked onChange={() => {}}>

@@ -87,24 +87,26 @@ export function Checkbox({
       className={cx(classNames?.root)}
       style={styles?.root}
     >
-      <input
-        ref={inputRef}
-        type="checkbox"
-        checked={resolvedChecked}
-        disabled={resolvedDisabled}
-        onChange={handleChange}
-        aria-checked={indeterminate ? 'mixed' : undefined}
-        data-tao-checkbox-input=""
-      />
-      <span
-        data-tao-checkbox=""
-        data-tao-checked={resolvedChecked || undefined}
-        data-tao-indeterminate={indeterminate || undefined}
-        className={cx(classNames?.indicator)}
-        style={styles?.indicator}
-      >
-        {resolvedChecked && !indeterminate && <CheckIcon />}
-        {indeterminate && <MinusIcon />}
+      <span data-tao-checkbox-control="">
+        <input
+          ref={inputRef}
+          type="checkbox"
+          checked={resolvedChecked}
+          disabled={resolvedDisabled}
+          onChange={handleChange}
+          aria-checked={indeterminate ? 'mixed' : undefined}
+          data-tao-checkbox-input=""
+        />
+        <span
+          data-tao-checkbox=""
+          data-tao-checked={resolvedChecked || undefined}
+          data-tao-indeterminate={indeterminate || undefined}
+          className={cx(classNames?.indicator)}
+          style={styles?.indicator}
+        >
+          {resolvedChecked && !indeterminate && <CheckIcon />}
+          {indeterminate && <MinusIcon />}
+        </span>
       </span>
       {children != null && (
         <span

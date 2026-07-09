@@ -76,21 +76,23 @@ export function Radio({
       className={cx(classNames?.root)}
       style={styles?.root}
     >
-      <input
-        type="radio"
-        name={resolvedName}
-        value={value}
-        checked={resolvedChecked}
-        disabled={resolvedDisabled}
-        onChange={handleChange}
-        data-tao-radio-input=""
-      />
-      <span
-        data-tao-radio=""
-        data-tao-checked={resolvedChecked || undefined}
-        className={cx(classNames?.indicator)}
-        style={styles?.indicator}
-      />
+      <span data-tao-radio-control="">
+        <input
+          type="radio"
+          name={resolvedName}
+          value={value}
+          checked={resolvedChecked}
+          disabled={resolvedDisabled}
+          onChange={handleChange}
+          data-tao-radio-input=""
+        />
+        <span
+          data-tao-radio=""
+          data-tao-checked={resolvedChecked || undefined}
+          className={cx(classNames?.indicator)}
+          style={styles?.indicator}
+        />
+      </span>
       {children != null && (
         <span
           data-tao-radio-label=""
