@@ -1,6 +1,7 @@
 import * as RadixSelect from '@radix-ui/react-select';
 import {
   type CSSProperties,
+  Fragment,
   type ReactNode,
   useCallback,
   useMemo,
@@ -42,13 +43,19 @@ export type SelectSemanticPart =
   | 'clear'
   | 'popup'
   | 'search'
+  | 'searchInput'
   | 'group'
   | 'groupLabel'
   | 'item'
   | 'itemIcon'
   | 'itemLabel'
   | 'itemDesc'
-  | 'empty';
+  | 'empty'
+  | 'tag'
+  | 'tagLabel'
+  | 'tagClose'
+  | 'tagRest'
+  | 'values';
 
 export type SelectPlacement =
   | 'bottomLeft'
@@ -56,16 +63,31 @@ export type SelectPlacement =
   | 'topLeft'
   | 'topRight';
 
+export interface TagRenderProps {
+  label: ReactNode;
+  value: string;
+  closable: boolean;
+  disabled: boolean;
+  onClose: (e: React.MouseEvent) => void;
+}
+
 export interface SelectProps {
   options: SelectOption[];
-  value?: string;
-  defaultValue?: string;
-  /** Fired on selection or clear. `option` is undefined when cleared. */
-  onChange?: (value: string, option?: SelectOption) => void;
-  /** Fired only when an option is picked (not on clear). */
+  value?: string | string[];
+  defaultValue?: string | string[];
+  /** Fired on selection or clear. Multi-mode receives `string[]`. */
+  onChange?: (
+    value: string | string[],
+    option?: SelectOption | SelectOption[],
+  ) => void;
+  /** Fired only when an option is picked (not on clear). Multi-mode receives a single value. */
   onSelect?: (value: string, option: SelectOption) => void;
+  /** Fired when an option is deselected (multi-mode only). */
+  onDeselect?: (value: string, option: SelectOption) => void;
   /** Fired when the value is cleared via the clear button. */
   onClear?: () => void;
+  /** Selection mode. `multiple` for multi-select, `tags` for free-form tag input. */
+  mode?: 'multiple' | 'tags';
   placeholder?: string;
   size?: TaoSize;
   variant?: TaoVariant;
@@ -92,9 +114,11 @@ export interface SelectProps {
   prefix?: ReactNode;
   /** Custom suffix (arrow) icon. */
   suffixIcon?: ReactNode;
+  /** Custom remove icon for multi-select tags. */
+  removeIcon?: ReactNode;
   autoFocus?: boolean;
   id?: string;
-  /** Name for hidden form field. */
+  /** Name for hidden form field (single mode only). */
   name?: string;
   /** Controlled open state of the dropdown. */
   open?: boolean;
@@ -110,10 +134,28 @@ export interface SelectProps {
   getPopupContainer?: (trigger: HTMLElement) => HTMLElement;
   /** Customize the rendering of each dropdown option. */
   optionRender?: (option: SelectOption, info: { index: number }) => ReactNode;
-  /** Customize the selected label shown in the trigger. */
+  /** Customize the selected label shown in the trigger (single mode only). */
   labelRender?: (option: SelectOption) => ReactNode;
   /** Wrap/customize the dropdown content. */
   popupRender?: (menu: ReactNode) => ReactNode;
+  /** Custom tag rendering (multi-mode only). */
+  tagRender?: (props: TagRenderProps) => ReactNode;
+  /** Max visible tags before collapsing into "+N". */
+  maxTagCount?: number | 'responsive';
+  /** Placeholder for collapsed tags: node or `(omittedValues) => node`. */
+  maxTagPlaceholder?:
+    | ReactNode
+    | ((omittedValues: SelectOption[]) => ReactNode);
+  /** Truncate tag label text to this length. */
+  maxTagTextLength?: number;
+  /** Max selectable items (multi-mode only). */
+  maxCount?: number;
+  /** Auto-clear search text after selection (multi-mode only, default: true). */
+  autoClearSearchValue?: boolean;
+  /** Characters that split pasted/typed text into multiple selections. */
+  tokenSeparators?: string[];
+  /** Hide already-selected options from the dropdown (multi-mode only). */
+  hideSelected?: boolean;
   /** Force mobile mode (bottom sheet) regardless of screen size */
   mobile?: boolean;
   /** Merged onto the trigger root; use to override width etc. */
@@ -174,7 +216,9 @@ export function Select(props: SelectProps) {
     defaultValue,
     onChange,
     onSelect,
+    onDeselect,
     onClear,
+    mode,
     placeholder,
     size,
     variant,
@@ -190,6 +234,7 @@ export function Select(props: SelectProps) {
     notFoundContent = 'No results',
     prefix,
     suffixIcon,
+    removeIcon,
     autoFocus,
     id,
     name,
@@ -203,6 +248,14 @@ export function Select(props: SelectProps) {
     optionRender,
     labelRender,
     popupRender,
+    tagRender,
+    maxTagCount,
+    maxTagPlaceholder,
+    maxTagTextLength,
+    maxCount,
+    autoClearSearchValue = true,
+    tokenSeparators,
+    hideSelected,
     mobile,
     className,
     style,
@@ -217,12 +270,27 @@ export function Select(props: SelectProps) {
   const autoMobile = useIsMobile();
   const isMobile = mobile ?? autoMobile;
 
-  const triggerRef = useRef<HTMLButtonElement>(null);
+  const triggerRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const isMultiple = mode === 'multiple' || mode === 'tags';
 
   // value (controlled / uncontrolled)
   const isValueControlled = valueProp !== undefined;
-  const [valueInternal, setValueInternal] = useState(defaultValue);
+  const [valueInternal, setValueInternal] = useState<
+    string | string[] | undefined
+  >(
+    isMultiple
+      ? ((defaultValue as string[] | undefined) ?? [])
+      : (defaultValue as string | undefined),
+  );
   const value = isValueControlled ? valueProp : valueInternal;
+
+  // Normalized array form for consistent internal handling.
+  const valueArray = useMemo<string[]>(() => {
+    if (isMultiple) return (value as string[]) ?? [];
+    return value ? [value as string] : [];
+  }, [isMultiple, value]);
 
   // open (controlled / uncontrolled)
   const isOpenControlled = openProp !== undefined;
@@ -236,25 +304,120 @@ export function Select(props: SelectProps) {
 
   const [hovering, setHovering] = useState(false);
 
+  // Prevents Radix from auto-closing the dropdown after a multi-select toggle.
+  const suppressCloseRef = useRef(false);
+
   const allOptions = useMemo(() => flattenOptions(options), [options]);
 
   const handleValueChange = useCallback(
     (next: string) => {
+      if (isMultiple) {
+        // Token separators: split on separator chars
+        if (tokenSeparators && tokenSeparators.length > 0) {
+          const sep = tokenSeparators.find((s) => next.includes(s));
+          if (sep) {
+            const tokens = next
+              .split(sep)
+              .map((t) => t.trim())
+              .filter(Boolean);
+            const toAdd = tokens.filter((t) => {
+              const opt = allOptions.find(
+                (o) => o.value === t || o.label === t,
+              );
+              return opt && !valueArray.includes(opt.value);
+            });
+            if (toAdd.length > 0) {
+              const nextArray = [...valueArray, ...toAdd];
+              if (maxCount != null && nextArray.length > maxCount) return;
+              if (!isValueControlled) setValueInternal(nextArray);
+              const selectedOpts = nextArray
+                .map((v) => allOptions.find((o) => o.value === v))
+                .filter(Boolean) as SelectOption[];
+              onChange?.(nextArray, selectedOpts);
+              for (const v of toAdd) {
+                const opt = allOptions.find((o) => o.value === v);
+                if (opt) onSelect?.(v, opt);
+              }
+            }
+            return;
+          }
+        }
+
+        suppressCloseRef.current = true;
+        const current = valueArray;
+        const existed = current.includes(next);
+        const nextArray = existed
+          ? current.filter((v) => v !== next)
+          : [...current, next];
+
+        if (!existed && maxCount != null && nextArray.length > maxCount) return;
+
+        if (!isValueControlled) setValueInternal(nextArray);
+        const selectedOpts = nextArray
+          .map((v) => allOptions.find((o) => o.value === v))
+          .filter(Boolean) as SelectOption[];
+        onChange?.(nextArray, selectedOpts);
+
+        const opt = allOptions.find((o) => o.value === next);
+        if (opt) {
+          if (existed) {
+            onDeselect?.(next, opt);
+          } else {
+            onSelect?.(next, opt);
+          }
+        }
+
+        if (autoClearSearchValue && !isSearchControlled) {
+          setSearchInternal('');
+        }
+        return;
+      }
+
+      // Single mode
       const opt = allOptions.find((o) => o.value === next);
       if (!isValueControlled) setValueInternal(next);
       onChange?.(next, opt);
       if (opt) onSelect?.(next, opt);
     },
-    [allOptions, isValueControlled, onChange, onSelect],
+    [
+      isMultiple,
+      valueArray,
+      maxCount,
+      tokenSeparators,
+      isValueControlled,
+      allOptions,
+      onChange,
+      onSelect,
+      onDeselect,
+      autoClearSearchValue,
+      isSearchControlled,
+    ],
   );
 
   const handleOpenChange = useCallback(
     (next: boolean) => {
+      // In multi mode, suppress the auto-close that Radix fires after selection.
+      if (isMultiple && !next && suppressCloseRef.current) {
+        suppressCloseRef.current = false;
+        return;
+      }
+      suppressCloseRef.current = false;
       if (!isOpenControlled) setOpenInternal(next);
       if (!next && !isSearchControlled) setSearchInternal('');
+      // Focus the search input once the dropdown mounts.
+      if (next && showSearch && !isMobile) {
+        setTimeout(() => inputRef.current?.focus(), 0);
+      }
       onOpenChange?.(next);
     },
-    [isOpenControlled, isSearchControlled, onOpenChange],
+    [
+      isMultiple,
+      isOpenControlled,
+      isSearchControlled,
+      onOpenChange,
+      showSearch,
+      isMobile,
+    ],
   );
 
   const handleSearchChange = useCallback(
@@ -265,11 +428,31 @@ export function Select(props: SelectProps) {
     [isSearchControlled, onSearch],
   );
 
+  // Token separator handling for search input
+  const handleSearchKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (!isMultiple || !tokenSeparators || tokenSeparators.length === 0)
+        return;
+      const value = (e.target as HTMLInputElement).value;
+      const sep = tokenSeparators.find((s) => value.includes(s));
+      if (!sep) return;
+      e.preventDefault();
+      handleValueChange(value);
+      if (!isSearchControlled) setSearchInternal('');
+    },
+    [isMultiple, tokenSeparators, handleValueChange, isSearchControlled],
+  );
+
   const clearValue = useCallback(() => {
-    if (!isValueControlled) setValueInternal(undefined);
-    onChange?.('', undefined);
+    if (isMultiple) {
+      if (!isValueControlled) setValueInternal([]);
+      onChange?.([], undefined);
+    } else {
+      if (!isValueControlled) setValueInternal(undefined);
+      onChange?.('', undefined);
+    }
     onClear?.();
-  }, [isValueControlled, onChange, onClear]);
+  }, [isMultiple, isValueControlled, onChange, onClear]);
 
   const handleClear = useCallback(
     (e: React.MouseEvent) => {
@@ -279,39 +462,206 @@ export function Select(props: SelectProps) {
     [clearValue],
   );
 
+  // Remove a single tag
+  const handleRemoveTag = useCallback(
+    (removedValue: string, e: React.MouseEvent) => {
+      e.stopPropagation();
+      e.preventDefault();
+      if (!isMultiple) return;
+      const nextArray = valueArray.filter((v) => v !== removedValue);
+      if (!isValueControlled) setValueInternal(nextArray);
+      const selectedOpts = nextArray
+        .map((v) => allOptions.find((o) => o.value === v))
+        .filter(Boolean) as SelectOption[];
+      onChange?.(nextArray, selectedOpts);
+      const opt = allOptions.find((o) => o.value === removedValue);
+      if (opt) onDeselect?.(removedValue, opt);
+    },
+    [
+      isMultiple,
+      valueArray,
+      isValueControlled,
+      allOptions,
+      onChange,
+      onDeselect,
+    ],
+  );
+
+  // Mobile multi-select commit: fires when the user presses "Done" in the drawer.
+  const handleMultiChange = useCallback(
+    (nextArray: string[]) => {
+      if (!isValueControlled) setValueInternal(nextArray);
+      const selectedOpts = nextArray
+        .map((v) => allOptions.find((o) => o.value === v))
+        .filter(Boolean) as SelectOption[];
+      onChange?.(nextArray, selectedOpts);
+
+      // Fire onSelect for newly added, onDeselect for removed.
+      const prev = valueArray;
+      for (const v of nextArray) {
+        if (!prev.includes(v)) {
+          const opt = allOptions.find((o) => o.value === v);
+          if (opt) onSelect?.(v, opt);
+        }
+      }
+      for (const v of prev) {
+        if (!nextArray.includes(v)) {
+          const opt = allOptions.find((o) => o.value === v);
+          if (opt) onDeselect?.(v, opt);
+        }
+      }
+    },
+    [valueArray, isValueControlled, allOptions, onChange, onSelect, onDeselect],
+  );
+
   const filteredOptions = useMemo(() => {
-    if (!showSearch || !search) return options;
+    let opts = options;
+    if (hideSelected && isMultiple && valueArray.length > 0) {
+      const filterSelected = (list: SelectOption[]): SelectOption[] => {
+        const result: SelectOption[] = [];
+        for (const o of list) {
+          if (o.options) {
+            const kids = filterSelected(o.options);
+            if (kids.length) result.push({ ...o, options: kids });
+          } else if (!valueArray.includes(o.value)) {
+            result.push(o);
+          }
+        }
+        return result;
+      };
+      opts = filterSelected(opts);
+    }
+    if (!showSearch || !search) return opts;
     const fn = filterOption ?? defaultFilter;
-    return filterTree(options, fn, search);
-  }, [options, search, showSearch, filterOption]);
+    return filterTree(opts, fn, search);
+  }, [
+    options,
+    search,
+    showSearch,
+    filterOption,
+    hideSelected,
+    isMultiple,
+    valueArray,
+  ]);
 
   const allowClearEnabled = !!allowClear;
   const clearIcon = (typeof allowClear === 'object' &&
     allowClear.clearIcon) || <CloseIcon />;
-  const showClearBtn = allowClearEnabled && !!value && !resolvedDisabled;
-  const selectedOption = allOptions.find((o) => o.value === value);
+  const showClearBtn =
+    allowClearEnabled &&
+    (isMultiple ? valueArray.length > 0 : !!value) &&
+    !resolvedDisabled;
+
+  const selectedOption = useMemo(
+    () =>
+      !isMultiple && value
+        ? allOptions.find((o) => o.value === value)
+        : undefined,
+    [isMultiple, value, allOptions],
+  );
+
+  const selectedOptions = useMemo(
+    () =>
+      isMultiple
+        ? (valueArray
+            .map((v) => allOptions.find((o) => o.value === v))
+            .filter(Boolean) as SelectOption[])
+        : [],
+    [isMultiple, valueArray, allOptions],
+  );
 
   const statusProps = {
     'data-tao-error': status === 'error' || undefined,
     'data-tao-warning': status === 'warning' || undefined,
   };
 
-  // Selected label shown in the trigger.
-  const triggerLabel = selectedOption ? (
-    labelRender ? (
-      labelRender(selectedOption)
-    ) : (
-      selectedOption.label
-    )
-  ) : (
-    <span
-      data-tao-select-placeholder=""
-      className={cx(classNames?.placeholder)}
-      style={styles?.placeholder}
-    >
-      {placeholder}
-    </span>
-  );
+  // ---- Tag rendering for multi mode ----
+
+  const renderTags = (): ReactNode => {
+    if (!isMultiple || selectedOptions.length === 0) return null;
+
+    let visible = selectedOptions;
+    let omitted: SelectOption[] = [];
+
+    if (
+      typeof maxTagCount === 'number' &&
+      maxTagCount < selectedOptions.length
+    ) {
+      visible = selectedOptions.slice(0, maxTagCount);
+      omitted = selectedOptions.slice(maxTagCount);
+    }
+
+    const truncateLabel = (opt: SelectOption): ReactNode => {
+      const raw = typeof opt.label === 'string' ? opt.label : String(opt.label);
+      if (
+        maxTagTextLength != null &&
+        typeof raw === 'string' &&
+        raw.length > maxTagTextLength
+      ) {
+        return `${raw.slice(0, maxTagTextLength)}…`;
+      }
+      return opt.label;
+    };
+
+    return (
+      <>
+        {visible.map((opt) => {
+          const closable = !resolvedDisabled && !opt.disabled;
+          const tagNode = tagRender ? (
+            tagRender({
+              label: truncateLabel(opt),
+              value: opt.value,
+              closable,
+              disabled: !!opt.disabled,
+              onClose: (e) => handleRemoveTag(opt.value, e),
+            })
+          ) : (
+            <span
+              key={opt.value}
+              data-tao-select-tag=""
+              data-tao-disabled={opt.disabled || undefined}
+              className={cx(classNames?.tag)}
+              style={styles?.tag}
+            >
+              <span
+                data-tao-select-tag-label=""
+                className={cx(classNames?.tagLabel)}
+                style={styles?.tagLabel}
+              >
+                {truncateLabel(opt)}
+              </span>
+              {closable && (
+                <span
+                  data-tao-select-tag-close=""
+                  className={cx(classNames?.tagClose)}
+                  style={styles?.tagClose}
+                  role="button"
+                  aria-label={`Remove ${typeof opt.label === 'string' ? opt.label : opt.value}`}
+                  onPointerDown={(e) => e.stopPropagation()}
+                  onClick={(e) => handleRemoveTag(opt.value, e)}
+                >
+                  {removeIcon ?? <CloseSmallIcon />}
+                </span>
+              )}
+            </span>
+          );
+          return <Fragment key={opt.value}>{tagNode}</Fragment>;
+        })}
+        {omitted.length > 0 && (
+          <span
+            data-tao-select-tag=""
+            data-tao-select-tag-rest=""
+            className={cx(classNames?.tagRest)}
+            style={styles?.tagRest}
+          >
+            {typeof maxTagPlaceholder === 'function'
+              ? maxTagPlaceholder(omitted)
+              : (maxTagPlaceholder ?? `+${omitted.length}…`)}
+          </span>
+        )}
+      </>
+    );
+  };
 
   const trailingIcons = (
     <span data-tao-select-icons="">
@@ -320,7 +670,7 @@ export function Select(props: SelectProps) {
           {loadingIcon ?? <LoadingIcon />}
         </span>
       ) : showClearBtn && hovering ? (
-        // biome-ignore lint/a11y/useSemanticElements: This sits inside the Radix button trigger; nesting a button here would be invalid HTML.
+        // biome-ignore lint/a11y/useSemanticElements: inside Radix button trigger; nesting a button here would be invalid HTML.
         <span
           data-tao-select-clear=""
           className={cx(classNames?.clear)}
@@ -357,8 +707,7 @@ export function Select(props: SelectProps) {
   if (isMobile) {
     return (
       <>
-        <button
-          type="button"
+        <div
           id={id}
           data-tao-control=""
           data-tao-select=""
@@ -366,12 +715,20 @@ export function Select(props: SelectProps) {
           data-tao-variant={resolvedVariant}
           data-tao-disabled={resolvedDisabled || undefined}
           {...statusProps}
-          disabled={resolvedDisabled}
           // biome-ignore lint/a11y/noAutofocus: Select exposes autoFocus to match native input-like controls.
           autoFocus={autoFocus}
+          role="button"
+          tabIndex={resolvedDisabled ? undefined : 0}
+          aria-disabled={resolvedDisabled || undefined}
           className={cx(classNames?.root, className)}
           style={{ ...styles?.root, ...style }}
           onClick={() => handleOpenChange(true)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              handleOpenChange(true);
+            }
+          }}
           onMouseEnter={() => setHovering(true)}
           onMouseLeave={() => setHovering(false)}
         >
@@ -384,23 +741,65 @@ export function Select(props: SelectProps) {
               {prefix}
             </span>
           )}
-          {selectedOption?.icon != null && (
-            <span data-tao-select-value-icon="">{selectedOption.icon}</span>
+          {isMultiple ? (
+            <span
+              data-tao-select-values=""
+              className={cx(classNames?.values)}
+              style={styles?.values}
+            >
+              {selectedOptions.length > 0 ? (
+                renderTags()
+              ) : (
+                <span
+                  data-tao-select-placeholder=""
+                  className={cx(classNames?.placeholder)}
+                  style={styles?.placeholder}
+                >
+                  {placeholder}
+                </span>
+              )}
+            </span>
+          ) : (
+            <>
+              {selectedOption?.icon != null && (
+                <span data-tao-select-value-icon="">{selectedOption.icon}</span>
+              )}
+              {selectedOption && labelRender ? (
+                <span data-tao-select-value="">
+                  {labelRender(selectedOption)}
+                </span>
+              ) : selectedOption ? (
+                <span data-tao-select-value="">
+                  {typeof selectedOption.label === 'string'
+                    ? selectedOption.label
+                    : String(selectedOption.label)}
+                </span>
+              ) : (
+                <span
+                  data-tao-select-placeholder=""
+                  className={cx(classNames?.placeholder)}
+                  style={styles?.placeholder}
+                >
+                  {placeholder}
+                </span>
+              )}
+            </>
           )}
-          <span data-tao-select-value="">{triggerLabel}</span>
           {trailingIcons}
-        </button>
+        </div>
         <MobileSelectDrawer
           open={open}
           onClose={() => handleOpenChange(false)}
           options={options}
           value={value}
           onChange={handleValueChange}
+          onMultiChange={handleMultiChange}
           placeholder={placeholder}
           showSearch={showSearch}
           filterOption={filterOption}
           notFoundContent={notFoundContent}
           optionRender={optionRender}
+          multiple={isMultiple}
         />
       </>
     );
@@ -414,21 +813,30 @@ export function Select(props: SelectProps) {
     contentStyle.width = popupMatchSelectWidth;
   }
 
+  // In multi mode, Radix doesn't manage our value — we render our own checkmarks.
+  const radixValue = isMultiple ? '' : (value as string) || undefined;
+
   const resultCount = flattenOptions(filteredOptions).length;
 
-  // Stable index across groups for optionRender.
+  const overMaxCount =
+    isMultiple && maxCount != null && valueArray.length >= maxCount;
+
   let optIndex = 0;
   const renderItem = (opt: SelectOption): ReactNode => {
     const index = optIndex++;
     const textLabel =
       typeof opt.label === 'string' ? opt.label : String(opt.label);
+    const isSelected = valueArray.includes(opt.value);
+    const itemDisabled = opt.disabled || (!isSelected && overMaxCount);
+
     return (
       <RadixSelect.Item
         key={opt.value}
         value={opt.value}
-        disabled={opt.disabled}
+        disabled={itemDisabled}
         data-tao-select-item=""
         data-tao-has-desc={opt.description != null || undefined}
+        data-tao-selected={isMultiple && isSelected ? '' : undefined}
         className={cx(classNames?.item)}
         style={styles?.item}
       >
@@ -468,9 +876,17 @@ export function Select(props: SelectProps) {
             </span>
           </>
         )}
-        <RadixSelect.ItemIndicator data-tao-select-check="">
-          <CheckIcon />
-        </RadixSelect.ItemIndicator>
+        {isMultiple ? (
+          isSelected && (
+            <span data-tao-select-check="">
+              <CheckIcon />
+            </span>
+          )
+        ) : (
+          <RadixSelect.ItemIndicator data-tao-select-check="">
+            <CheckIcon />
+          </RadixSelect.ItemIndicator>
+        )}
       </RadixSelect.Item>
     );
   };
@@ -499,41 +915,22 @@ export function Select(props: SelectProps) {
     );
 
   const menuNode: ReactNode = (
-    <>
-      {showSearch && (
+    <RadixSelect.Viewport
+      data-tao-select-viewport=""
+      style={{ maxHeight: listHeight }}
+    >
+      {resultCount > 0 ? (
+        renderTree(filteredOptions)
+      ) : (
         <div
-          data-tao-select-search=""
-          className={cx(classNames?.search)}
-          style={styles?.search}
+          data-tao-select-empty=""
+          className={cx(classNames?.empty)}
+          style={styles?.empty}
         >
-          <SearchIcon />
-          <input
-            data-tao-select-search-input=""
-            value={search}
-            onChange={(e) => handleSearchChange(e.target.value)}
-            placeholder="Search..."
-            // biome-ignore lint/a11y/noAutofocus: Opening a searchable select should put focus in its search field.
-            autoFocus
-          />
+          {notFoundContent}
         </div>
       )}
-      <RadixSelect.Viewport
-        data-tao-select-viewport=""
-        style={{ maxHeight: listHeight }}
-      >
-        {resultCount > 0 ? (
-          renderTree(filteredOptions)
-        ) : (
-          <div
-            data-tao-select-empty=""
-            className={cx(classNames?.empty)}
-            style={styles?.empty}
-          >
-            {notFoundContent}
-          </div>
-        )}
-      </RadixSelect.Viewport>
-    </>
+    </RadixSelect.Viewport>
   );
 
   const container =
@@ -543,42 +940,84 @@ export function Select(props: SelectProps) {
 
   return (
     <RadixSelect.Root
-      value={value || undefined}
+      value={radixValue}
       onValueChange={handleValueChange}
       disabled={resolvedDisabled}
       open={open}
       onOpenChange={handleOpenChange}
-      name={name}
+      name={isMultiple ? undefined : name}
     >
-      <RadixSelect.Trigger
-        ref={triggerRef}
-        id={id}
-        data-tao-control=""
-        data-tao-select=""
-        data-tao-size={resolvedSize}
-        data-tao-variant={resolvedVariant}
-        data-tao-disabled={resolvedDisabled || undefined}
-        {...statusProps}
-        autoFocus={autoFocus}
-        className={cx(classNames?.root, className)}
-        style={{ ...styles?.root, ...style }}
-        onMouseEnter={() => setHovering(true)}
-        onMouseLeave={() => setHovering(false)}
-      >
-        {prefix != null && (
-          <span
-            data-tao-select-prefix=""
-            className={cx(classNames?.prefix)}
-            style={styles?.prefix}
-          >
-            {prefix}
-          </span>
-        )}
-        {selectedOption?.icon != null && (
-          <span data-tao-select-value-icon="">{selectedOption.icon}</span>
-        )}
-        <span data-tao-select-value="">{triggerLabel}</span>
-        {trailingIcons}
+      <RadixSelect.Trigger asChild>
+        <div
+          ref={triggerRef}
+          id={id}
+          data-tao-control=""
+          data-tao-select=""
+          data-tao-size={resolvedSize}
+          data-tao-variant={resolvedVariant}
+          data-tao-disabled={resolvedDisabled || undefined}
+          data-tao-multiple={isMultiple || undefined}
+          {...statusProps}
+          className={cx(classNames?.root, className)}
+          style={{ ...styles?.root, ...style }}
+          onMouseEnter={() => setHovering(true)}
+          onMouseLeave={() => setHovering(false)}
+        >
+          {prefix != null && (
+            <span
+              data-tao-select-prefix=""
+              className={cx(classNames?.prefix)}
+              style={styles?.prefix}
+            >
+              {prefix}
+            </span>
+          )}
+          {isMultiple ? (
+            <span
+              data-tao-select-values=""
+              className={cx(classNames?.values)}
+              style={styles?.values}
+            >
+              {selectedOptions.length > 0 ? (
+                renderTags()
+              ) : (
+                <span
+                  data-tao-select-placeholder=""
+                  className={cx(classNames?.placeholder)}
+                  style={styles?.placeholder}
+                >
+                  {placeholder}
+                </span>
+              )}
+            </span>
+          ) : (
+            <>
+              {selectedOption?.icon != null && (
+                <span data-tao-select-value-icon="">{selectedOption.icon}</span>
+              )}
+              {selectedOption && labelRender ? (
+                <span data-tao-select-value="">
+                  {labelRender(selectedOption)}
+                </span>
+              ) : selectedOption ? (
+                <span data-tao-select-value="">
+                  {typeof selectedOption.label === 'string'
+                    ? selectedOption.label
+                    : String(selectedOption.label)}
+                </span>
+              ) : (
+                <span
+                  data-tao-select-placeholder=""
+                  className={cx(classNames?.placeholder)}
+                  style={styles?.placeholder}
+                >
+                  {placeholder}
+                </span>
+              )}
+            </>
+          )}
+          {trailingIcons}
+        </div>
       </RadixSelect.Trigger>
 
       <RadixSelect.Portal container={container}>
@@ -595,6 +1034,33 @@ export function Select(props: SelectProps) {
             align={align}
             sideOffset={4}
           >
+            {showSearch && !isMobile && (
+              <div
+                data-tao-select-search=""
+                className={cx(classNames?.search)}
+                style={styles?.search}
+              >
+                <span data-tao-select-search-icon="">
+                  <SearchIcon />
+                </span>
+                <input
+                  ref={inputRef}
+                  data-tao-select-search-input=""
+                  className={cx(classNames?.searchInput)}
+                  style={styles?.searchInput}
+                  value={search}
+                  onChange={(e) => handleSearchChange(e.target.value)}
+                  onKeyDown={(e) => {
+                    // Stop propagation so Radix Content's typeahead / arrow-key
+                    // navigation doesn't swallow keystrokes meant for this input.
+                    e.stopPropagation();
+                    handleSearchKeyDown(e);
+                  }}
+                  placeholder="Search..."
+                  autoComplete="off"
+                />
+              </div>
+            )}
             {popupRender ? popupRender(menuNode) : menuNode}
           </RadixSelect.Content>
         </TaoPortalScope>
@@ -683,7 +1149,27 @@ function CloseIcon() {
   );
 }
 
-function SearchIcon() {
+function CloseSmallIcon() {
+  return (
+    <svg
+      width="10"
+      height="10"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      focusable="false"
+      role="presentation"
+    >
+      <path d="M18 6 6 18M6 6l12 12" />
+    </svg>
+  );
+}
+
+export function SearchIcon() {
   return (
     <svg
       width="14"

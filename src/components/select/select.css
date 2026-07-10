@@ -6,7 +6,6 @@
   --tao-select-height: var(--tao-control-height);
   --tao-select-font-size: var(--tao-font-size-base);
   --tao-select-line-height: var(--tao-line-height);
-  --tao-select-padding-inline: var(--tao-padding-sm);
   --tao-select-padding-block: calc(
     (
       var(--tao-select-height) -
@@ -15,43 +14,39 @@
     ) /
     2 -
     var(--tao-line-width)
+  ); /* = (32 - 14×1.5714) / 2 - 1 ≈ 4px */
+  --tao-select-padding-inline: calc(
+    var(--tao-padding-sm) -
+    var(--tao-line-width)
   );
+  /* = 12 - 1 = 11px */
   /* 默认撑满父容器——跟 Input/Textarea/DatePicker 一致。
      antd Select 本身是 inline-flex 缩到内容宽度，但那在现代
      form 布局（Card + Field）里几乎总要用户额外 w-full，
      反直觉。想要缩到内容宽的场景：style={{ width: 'fit-content' }}。 */
   display: flex;
   width: 100%;
-  align-items: flex-start;
+  align-items: center;
   gap: var(--tao-padding-xs);
   font-family: var(--tao-font-family);
   font-size: var(--tao-select-font-size);
   line-height: var(--tao-select-line-height);
   height: var(--tao-select-height);
-  padding-block: max(var(--tao-select-padding-block), 0px);
+  padding-block: var(--tao-select-padding-block);
   padding-inline: var(--tao-select-padding-inline);
   cursor: pointer;
   outline: none;
 }
 
-/* Mobile trigger: reset button defaults */
-button[data-tao-select] {
-  appearance: none;
-  -webkit-appearance: none;
-  text-align: start;
-}
-
-/* Value / placeholder inside mobile trigger */
+/* Custom labelRender result (span, non-editable) */
 [data-tao-select-value] {
-  display: block;
-  align-self: center;
   flex: 1;
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  min-width: 0;
   color: var(--tao-color-text);
-  line-height: var(--tao-select-line-height);
+  line-height: inherit;
 }
 
 [data-tao-select-placeholder] {
@@ -59,12 +54,22 @@ button[data-tao-select] {
   line-height: var(--tao-select-line-height);
 }
 
+/* Multi-select uses a compact 4px trigger start padding (tags carry the
+   spacing). The empty-state placeholder needs the same start padding the
+   single-select trigger has, so it lines up with the first tag once picked. */
+[data-tao-select][data-tao-multiple] [data-tao-select-placeholder] {
+  padding-inline-start: var(--tao-select-padding-inline);
+}
+
 /* Sizes */
 [data-tao-select][data-tao-size="small"] {
   --tao-select-height: var(--tao-control-height-sm);
   --tao-select-font-size: var(--tao-font-size-sm);
   --tao-select-line-height: var(--tao-line-height-sm);
-  --tao-select-padding-inline: var(--tao-padding-xs);
+  --tao-select-padding-inline: calc(
+    var(--tao-padding-xs) -
+    var(--tao-line-width)
+  );
   border-radius: var(--tao-radius-sm);
 }
 
@@ -361,4 +366,93 @@ button[data-tao-select] {
   text-align: center;
   font-size: var(--tao-font-size-sm);
   color: var(--tao-color-text-tertiary);
+}
+
+/* ===========================
+   Multi-select tags
+   =========================== */
+
+/* Allow multi-select trigger to grow with tags.
+   In multi mode the trigger's own padding is minimal — tags themselves
+   carry the visual spacing, matching antd's compact trigger style. */
+[data-tao-select][data-tao-multiple] {
+  height: auto;
+  min-height: var(--tao-select-height);
+  flex-wrap: wrap;
+  padding-block: 4px;
+  padding-inline-start: 4px;
+  padding-inline-end: var(--tao-select-padding-inline);
+}
+
+/* Tags container */
+[data-tao-select-values] {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+  padding-block: 1px;
+}
+
+/* Individual tag pill */
+[data-tao-select-tag] {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  max-width: 160px;
+  padding-inline: 6px;
+  padding-block: 0;
+  font-size: var(--tao-font-size-sm);
+  line-height: calc(20 / 13);
+  height: 24px;
+  color: var(--tao-color-text);
+  background: var(--tao-color-fill-quaternary);
+  border-radius: var(--tao-radius-sm);
+  border: var(--tao-line-width) solid var(--tao-color-border-secondary);
+}
+
+[data-tao-select-tag][data-tao-disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Tag label */
+[data-tao-select-tag-label] {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Tag close button — hit area extends the full tag height for easy tap/click */
+[data-tao-select-tag-close] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  margin-inline-start: 2px;
+  margin-inline-end: -2px;
+  cursor: pointer;
+  color: var(--tao-color-text-quaternary);
+  border-radius: var(--tao-radius-xs);
+  transition:
+    color var(--tao-motion-duration-fast) var(--tao-motion-ease-out),
+    background-color var(--tao-motion-duration-fast) var(--tao-motion-ease-out);
+}
+
+[data-tao-select-tag-close]:hover {
+  color: var(--tao-color-text-secondary);
+}
+
+/* "+N" rest tag */
+[data-tao-select-tag-rest] {
+  cursor: default;
+  color: var(--tao-color-text-tertiary);
+}
+
+/* In multi mode, selected items show their own checkmark */
+[data-tao-select-item][data-tao-selected] {
+  font-weight: var(--tao-font-weight-medium);
 }

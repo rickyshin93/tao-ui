@@ -414,3 +414,244 @@ export const SemanticDOM: StoryObj = {
     </Stack>
   ),
 };
+
+// ---- Multi-select ----
+
+export const MultipleSelect: StoryObj = {
+  name: 'mode="multiple"',
+  render: () => {
+    function Demo() {
+      const [val, setVal] = useState<string[]>(['react', 'vue']);
+      return (
+        <Stack gap="md" style={{ maxWidth: 400 }}>
+          <FormField label="Multi-select">
+            <Select
+              mode="multiple"
+              options={[
+                { label: 'React', value: 'react' },
+                { label: 'Vue', value: 'vue' },
+                { label: 'Angular', value: 'angular' },
+                { label: 'Svelte', value: 'svelte' },
+                { label: 'Solid', value: 'solid' },
+              ]}
+              value={val}
+              onChange={(v) => setVal(v as string[])}
+              placeholder="Select frameworks..."
+            />
+          </FormField>
+          <p style={{ color: '#888', fontSize: 13 }}>
+            Selected: {val.join(', ') || '(none)'}
+          </p>
+        </Stack>
+      );
+    }
+    return <Demo />;
+  },
+};
+
+export const MultipleWithTagRender: StoryObj = {
+  name: 'mode="multiple" + tagRender',
+  render: () => {
+    function Demo() {
+      const [val, setVal] = useState<string[]>(['a', 'b']);
+      return (
+        <Stack gap="md" style={{ maxWidth: 400 }}>
+          <FormField label="Custom tag rendering">
+            <Select
+              mode="multiple"
+              options={[
+                { label: 'Option A', value: 'a' },
+                { label: 'Option B', value: 'b' },
+                { label: 'Option C', value: 'c' },
+              ]}
+              value={val}
+              onChange={(v) => setVal(v as string[])}
+              placeholder="Pick options"
+              tagRender={(p) => (
+                <span
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 4,
+                    padding: '2px 8px',
+                    background: '#e0e7ff',
+                    color: '#4338ca',
+                    borderRadius: 99,
+                    fontSize: 12,
+                    fontWeight: 500,
+                  }}
+                >
+                  #{p.label}
+                  {p.closable && (
+                    <span
+                      onClick={p.onClose}
+                      style={{ cursor: 'pointer', marginLeft: 2 }}
+                    >
+                      ×
+                    </span>
+                  )}
+                </span>
+              )}
+            />
+          </FormField>
+        </Stack>
+      );
+    }
+    return <Demo />;
+  },
+};
+
+export const MultipleMaxTagCount: StoryObj = {
+  name: 'mode="multiple" + maxTagCount',
+  render: () => (
+    <Stack gap="md" style={{ maxWidth: 400 }}>
+      <FormField label="maxTagCount={2}">
+        <Select
+          mode="multiple"
+          options={[
+            { label: 'React', value: 'react' },
+            { label: 'Vue', value: 'vue' },
+            { label: 'Angular', value: 'angular' },
+            { label: 'Svelte', value: 'svelte' },
+            { label: 'Solid', value: 'solid' },
+            { label: 'Preact', value: 'preact' },
+          ]}
+          defaultValue={[
+            'react',
+            'vue',
+            'angular',
+            'svelte',
+            'solid',
+            'preact',
+          ]}
+          maxTagCount={2}
+          maxTagPlaceholder={(omitted) => `+${omitted.length} more`}
+          placeholder="Pick frameworks"
+        />
+      </FormField>
+    </Stack>
+  ),
+};
+
+export const MultipleMaxCount: StoryObj = {
+  name: 'mode="multiple" + maxCount',
+  render: () => {
+    function Demo() {
+      const [val, setVal] = useState<string[]>([]);
+      return (
+        <Stack gap="md" style={{ maxWidth: 400 }}>
+          <FormField label="maxCount={3} (limit reached disables remaining)">
+            <Select
+              mode="multiple"
+              options={[
+                { label: 'Apple', value: 'apple' },
+                { label: 'Banana', value: 'banana' },
+                { label: 'Cherry', value: 'cherry' },
+                { label: 'Date', value: 'date' },
+                { label: 'Elderberry', value: 'elderberry' },
+              ]}
+              value={val}
+              onChange={(v) => setVal(v as string[])}
+              maxCount={3}
+              placeholder="Pick up to 3 fruits"
+            />
+          </FormField>
+        </Stack>
+      );
+    }
+    return <Demo />;
+  },
+};
+
+export const MultipleAllowClear: StoryObj = {
+  name: 'mode="multiple" + allowClear',
+  render: () => {
+    function Demo() {
+      const [val, setVal] = useState<string[]>(['react', 'vue']);
+      return (
+        <Stack gap="md" style={{ maxWidth: 400 }}>
+          <FormField label="Clear all selections">
+            <Select
+              mode="multiple"
+              options={[
+                { label: 'React', value: 'react' },
+                { label: 'Vue', value: 'vue' },
+                { label: 'Angular', value: 'angular' },
+              ]}
+              value={val}
+              onChange={(v) => setVal(v as string[])}
+              allowClear
+              placeholder="Select frameworks"
+            />
+          </FormField>
+        </Stack>
+      );
+    }
+    return <Demo />;
+  },
+};
+
+export const MultipleMobile: StoryObj = {
+  name: 'mode="multiple" + mobile',
+  render: () => {
+    function Demo() {
+      const [val, setVal] = useState<string[]>(['react']);
+      return (
+        <Stack gap="md" style={{ maxWidth: 400 }}>
+          <p style={{ color: '#888', fontSize: 13 }}>
+            Multi-select with checkboxes and Done button.
+          </p>
+          <FormField label="Mobile multi-select">
+            <Select
+              mode="multiple"
+              options={[
+                { label: 'React', value: 'react' },
+                { label: 'Vue', value: 'vue' },
+                { label: 'Angular', value: 'angular' },
+                { label: 'Svelte', value: 'svelte' },
+              ]}
+              value={val}
+              onChange={(v) => setVal(v as string[])}
+              placeholder="Choose frameworks"
+              mobile
+            />
+          </FormField>
+          <p style={{ color: '#888', fontSize: 13 }}>
+            Selected: {val.join(', ') || '(none)'}
+          </p>
+        </Stack>
+      );
+    }
+    return <Demo />;
+  },
+};
+
+export const MultipleHideSelected: StoryObj = {
+  name: 'mode="multiple" + hideSelected',
+  render: () => {
+    function Demo() {
+      const [val, setVal] = useState<string[]>(['react', 'vue']);
+      return (
+        <Stack gap="md" style={{ maxWidth: 400 }}>
+          <FormField label="Selected options hidden from dropdown">
+            <Select
+              mode="multiple"
+              options={[
+                { label: 'React', value: 'react' },
+                { label: 'Vue', value: 'vue' },
+                { label: 'Angular', value: 'angular' },
+                { label: 'Svelte', value: 'svelte' },
+                { label: 'Solid', value: 'solid' },
+              ]}
+              value={val}
+              onChange={(v) => setVal(v as string[])}
+              hideSelected
+              placeholder="Select frameworks"
+            />
+          </FormField>
+        </Stack>
+      );
+    }
+    return <Demo />;
+  },
+};

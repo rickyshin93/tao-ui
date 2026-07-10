@@ -1,18 +1,22 @@
 import { type ReactNode, useCallback, useMemo, useState } from 'react';
 import { Drawer } from '../drawer/drawer';
-import type { SelectOption } from './select';
+import { SearchIcon, type SelectOption } from './select';
 import './mobile-select.css';
 
 interface MobileSelectContentProps {
   options: SelectOption[];
-  value?: string;
+  value?: string | string[];
   onChange?: (value: string) => void;
+  /** Multi-mode commit callback: fires when "Done" is pressed with the full array. */
+  onMultiChange?: (values: string[]) => void;
   placeholder?: string;
   showSearch?: boolean;
   filterOption?: (input: string, option: SelectOption) => boolean;
   notFoundContent?: ReactNode;
   optionRender?: (option: SelectOption, info: { index: number }) => ReactNode;
   onClose: () => void;
+  /** Enable multi-select checkboxes + Done button flow. */
+  multiple?: boolean;
 }
 
 const defaultFilter = (input: string, option: SelectOption): boolean => {
@@ -46,17 +50,26 @@ function countLeaves(options: SelectOption[]): number {
   );
 }
 
-export function MobileSelectContent({
+function MobileSelectContentInner({
   options,
   value,
   onChange,
+  onMultiChange,
   showSearch,
   filterOption,
   notFoundContent = 'No results',
   optionRender,
   onClose,
+  multiple,
 }: MobileSelectContentProps) {
   const [search, setSearch] = useState('');
+
+  const valueArray = useMemo<string[]>(() => {
+    if (multiple) return (value as string[]) ?? [];
+    return value ? [value as string] : [];
+  }, [multiple, value]);
+
+  const [draft, setDraft] = useState<string[]>(valueArray);
 
   const filteredOptions = useMemo(() => {
     if (!showSearch || !search) return options;
@@ -66,16 +79,31 @@ export function MobileSelectContent({
 
   const handleSelect = useCallback(
     (optValue: string) => {
-      onChange?.(optValue);
-      onClose();
+      if (multiple) {
+        setDraft((prev) =>
+          prev.includes(optValue)
+            ? prev.filter((v) => v !== optValue)
+            : [...prev, optValue],
+        );
+      } else {
+        onChange?.(optValue);
+        onClose();
+      }
     },
-    [onChange, onClose],
+    [multiple, onChange, onClose],
   );
+
+  const handleDone = useCallback(() => {
+    onMultiChange?.(draft);
+    onClose();
+  }, [draft, onMultiChange, onClose]);
 
   let optIndex = 0;
   const renderItem = (opt: SelectOption): ReactNode => {
     const index = optIndex++;
-    const isSelected = opt.value === value;
+    const isSelected = multiple
+      ? draft.includes(opt.value)
+      : opt.value === value;
     return (
       <button
         type="button"
@@ -145,9 +173,18 @@ export function MobileSelectContent({
           <div data-tao-sheet-empty="">{notFoundContent}</div>
         )}
       </div>
+      {multiple && (
+        <div data-tao-sheet-footer="">
+          <button type="button" data-tao-sheet-done="" onClick={handleDone}>
+            Done
+          </button>
+        </div>
+      )}
     </>
   );
 }
+
+export { MobileSelectContentInner as MobileSelectContent };
 
 export interface MobileSelectDrawerProps extends MobileSelectContentProps {
   open: boolean;
@@ -167,32 +204,12 @@ export function MobileSelectDrawer({
       title={placeholder ?? 'Select'}
       height="70vh"
     >
-      <MobileSelectContent
+      <MobileSelectContentInner
         onClose={onClose}
         placeholder={placeholder}
         {...rest}
       />
     </Drawer>
-  );
-}
-
-function SearchIcon() {
-  return (
-    <svg
-      aria-hidden="true"
-      focusable="false"
-      width="14"
-      height="14"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <circle cx="11" cy="11" r="8" />
-      <path d="m21 21-4.3-4.3" />
-    </svg>
   );
 }
 

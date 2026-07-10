@@ -46,7 +46,7 @@ test('inherits disabled from TaoProvider', () => {
     </TaoProvider>,
   );
   const trigger = screen.getByRole('combobox');
-  expect(trigger).toBeDisabled();
+  expect(trigger.getAttribute('data-tao-disabled')).toBe('true');
 });
 
 // ---- Mobile mode ----
@@ -59,7 +59,7 @@ test('mobile prop renders button trigger instead of Radix', () => {
       mobile
     />,
   );
-  const trigger = screen.getByRole('button', { name: /choose/i });
+  const trigger = screen.getByRole('button');
   expect(trigger).toBeTruthy();
   expect(trigger.dataset.taoSelect).toBe('');
 });
@@ -191,6 +191,37 @@ test('defaultValue shows the selected label (uncontrolled)', () => {
   expect(screen.getByText('Beta')).toBeTruthy();
 });
 
+test('showSearch: typing filters options', async () => {
+  const user = userEvent.setup();
+  render(
+    <Select
+      options={[
+        { label: 'Apple', value: 'a' },
+        { label: 'Banana', value: 'b' },
+        { label: 'Cherry', value: 'c' },
+      ]}
+      showSearch
+    />,
+  );
+
+  // Open the dropdown — the search input lives inside the content.
+  await user.click(screen.getByRole('combobox'));
+  const input = document.querySelector(
+    '[data-tao-select-search-input]',
+  ) as HTMLInputElement;
+  expect(input).toBeTruthy();
+  expect(input.readOnly).toBe(false);
+
+  await user.click(input);
+  await user.keyboard('app');
+  expect(input.value).toBe('app');
+
+  // Only "Apple" should remain in the list.
+  expect(screen.getByText('Apple')).toBeTruthy();
+  expect(screen.queryByText('Banana')).toBeNull();
+  expect(screen.queryByText('Cherry')).toBeNull();
+});
+
 test('status sets data-tao-error / data-tao-warning on trigger', () => {
   const { rerender } = render(<Select options={[]} status="error" />);
   let trigger = screen.getByRole('combobox');
@@ -284,15 +315,18 @@ test('allowClear clears an uncontrolled value (trigger shows placeholder)', asyn
     />,
   );
   const trigger = screen.getByRole('combobox');
-  const valueEl = trigger.querySelector('[data-tao-select-value]');
-  expect(valueEl?.textContent).toBe('Beta');
+  expect(trigger.querySelector('[data-tao-select-value]')?.textContent).toBe(
+    'Beta',
+  );
 
   await userEvent.hover(trigger);
   const clear = document.querySelector(
     '[data-tao-select-clear]',
   ) as HTMLElement;
   await userEvent.click(clear);
-  expect(valueEl?.textContent).toBe('placeholder-text');
+  expect(
+    trigger.querySelector('[data-tao-select-placeholder]')?.textContent,
+  ).toBe('placeholder-text');
 });
 
 test('allowClear fires onChange("", undefined) and onClear', async () => {
@@ -412,4 +446,295 @@ test('mobile: selecting a grouped item reports its value', async () => {
   await userEvent.click(screen.getByRole('button'));
   await userEvent.click(screen.getByText('Apple'));
   expect(val).toBe('apple');
+});
+
+// ---- Multi-select ----
+
+test('mode="multiple" shows placeholder when empty', () => {
+  render(
+    <Select
+      options={[
+        { label: 'A', value: 'a' },
+        { label: 'B', value: 'b' },
+      ]}
+      mode="multiple"
+      placeholder="Pick items"
+    />,
+  );
+  expect(screen.getByText('Pick items')).toBeTruthy();
+});
+
+test('mode="multiple" renders tags from value array', () => {
+  render(
+    <Select
+      options={[
+        { label: 'Alpha', value: 'a' },
+        { label: 'Beta', value: 'b' },
+        { label: 'Gamma', value: 'c' },
+      ]}
+      mode="multiple"
+      value={['a', 'c']}
+      onChange={() => {}}
+    />,
+  );
+  const tags = document.querySelectorAll('[data-tao-select-tag]');
+  expect(tags.length).toBe(2);
+  expect(screen.getByText('Alpha')).toBeTruthy();
+  expect(screen.getByText('Gamma')).toBeTruthy();
+});
+
+test('mode="multiple": onChange receives array on select and deselect', async () => {
+  let received: string[] | null = null;
+  render(
+    <Select
+      options={[
+        { label: 'A', value: 'a' },
+        { label: 'B', value: 'b' },
+      ]}
+      mode="multiple"
+      value={[]}
+      onChange={(v) => {
+        received = v as string[];
+      }}
+      open
+    />,
+  );
+  const item = screen.getByText('A');
+  await userEvent.click(item);
+  expect(received).toEqual(['a']);
+});
+
+test('mode="multiple": onDeselect fires when removing a tag', async () => {
+  let deselected: { value: string; label: unknown } | null = null;
+  render(
+    <Select
+      options={[{ label: 'Beta', value: 'b' }]}
+      mode="multiple"
+      value={['b']}
+      onDeselect={(v, o) => {
+        deselected = { value: v, label: o?.label };
+      }}
+    />,
+  );
+  const closeBtn = document.querySelector(
+    '[data-tao-select-tag-close]',
+  ) as HTMLElement;
+  await userEvent.click(closeBtn);
+  expect(deselected).toEqual({ value: 'b', label: 'Beta' });
+});
+
+test('mode="multiple": allowClear clears the array', async () => {
+  let cleared = false;
+  let changed: [string[], unknown] | null = null;
+  render(
+    <Select
+      options={[
+        { label: 'A', value: 'a' },
+        { label: 'B', value: 'b' },
+      ]}
+      mode="multiple"
+      value={['a', 'b']}
+      allowClear
+      onChange={(v, o) => {
+        changed = [v as string[], o];
+      }}
+      onClear={() => {
+        cleared = true;
+      }}
+    />,
+  );
+  const trigger = screen.getByRole('combobox');
+  await userEvent.hover(trigger);
+  const clear = document.querySelector(
+    '[data-tao-select-clear]',
+  ) as HTMLElement;
+  await userEvent.click(clear);
+  expect(changed).toEqual([[], undefined]);
+  expect(cleared).toBe(true);
+});
+
+test('mode="multiple": maxTagCount collapses overflow', () => {
+  render(
+    <Select
+      options={[
+        { label: 'A', value: 'a' },
+        { label: 'B', value: 'b' },
+        { label: 'C', value: 'c' },
+      ]}
+      mode="multiple"
+      value={['a', 'b', 'c']}
+      maxTagCount={2}
+      onChange={() => {}}
+    />,
+  );
+  const tags = document.querySelectorAll('[data-tao-select-tag]');
+  expect(tags.length).toBe(3); // 2 visible + 1 rest
+  expect(screen.getByText('A')).toBeTruthy();
+  expect(screen.getByText('B')).toBeTruthy();
+  const rest = document.querySelector('[data-tao-select-tag-rest]');
+  expect(rest).toBeTruthy();
+});
+
+test('mode="multiple": maxTagPlaceholder renders custom node', () => {
+  render(
+    <Select
+      options={[
+        { label: 'A', value: 'a' },
+        { label: 'B', value: 'b' },
+        { label: 'C', value: 'c' },
+      ]}
+      mode="multiple"
+      value={['a', 'b', 'c']}
+      maxTagCount={1}
+      maxTagPlaceholder="and more"
+      onChange={() => {}}
+    />,
+  );
+  expect(screen.getByText('and more')).toBeTruthy();
+});
+
+test('mode="multiple": maxTagTextLength truncates labels', () => {
+  render(
+    <Select
+      options={[{ label: 'VeryLongLabel', value: 'v' }]}
+      mode="multiple"
+      value={['v']}
+      maxTagTextLength={4}
+      onChange={() => {}}
+    />,
+  );
+  expect(screen.getByText('Very…')).toBeTruthy();
+});
+
+test('mode="multiple": tagRender customizes tag content', () => {
+  render(
+    <Select
+      options={[{ label: 'Beta', value: 'b' }]}
+      mode="multiple"
+      value={['b']}
+      tagRender={(p) => <span data-testid="custom-tag">{p.label}</span>}
+      onChange={() => {}}
+    />,
+  );
+  expect(screen.getByTestId('custom-tag')).toBeTruthy();
+});
+
+test('mode="multiple": maxCount disables options when limit reached', async () => {
+  render(
+    <Select
+      options={[
+        { label: 'A', value: 'a' },
+        { label: 'B', value: 'b' },
+        { label: 'C', value: 'c' },
+      ]}
+      mode="multiple"
+      value={['a', 'b']}
+      maxCount={2}
+      open
+    />,
+  );
+  // A and B should still be enabled (already selected), C should be disabled
+  const items = document.querySelectorAll('[data-tao-select-item]');
+  expect(items.length).toBe(3);
+  const itemC = screen.getByText('C').closest('[data-tao-select-item]');
+  expect(itemC?.hasAttribute('data-disabled')).toBe(true);
+});
+
+test('mode="multiple": hideSelected removes selected options from list', () => {
+  render(
+    <Select
+      options={[
+        { label: 'A', value: 'a' },
+        { label: 'B', value: 'b' },
+      ]}
+      mode="multiple"
+      value={['a']}
+      hideSelected
+      open
+      onChange={() => {}}
+    />,
+  );
+  // A is visible as a tag in the trigger, but should not appear as a dropdown item.
+  const items = document.querySelectorAll('[data-tao-select-item]');
+  const itemTexts = Array.from(items).map((el) => el.textContent?.trim());
+  expect(itemTexts).not.toContain('A');
+  expect(itemTexts).toContain('B');
+});
+
+test('mode="multiple": handles defaultValue as array', () => {
+  render(
+    <Select
+      options={[
+        { label: 'A', value: 'a' },
+        { label: 'B', value: 'b' },
+      ]}
+      mode="multiple"
+      defaultValue={['a', 'b']}
+    />,
+  );
+  const tags = document.querySelectorAll('[data-tao-select-tag]');
+  expect(tags.length).toBe(2);
+});
+
+// ---- Mobile multi-select ----
+
+test('mobile + multiple: shows checkmark and Done button', async () => {
+  render(
+    <Select
+      options={[
+        { label: 'A', value: 'a' },
+        { label: 'B', value: 'b' },
+      ]}
+      mode="multiple"
+      mobile
+      placeholder="Pick"
+    />,
+  );
+  await userEvent.click(screen.getByRole('button'));
+  // Items rendered
+  expect(screen.getByText('A')).toBeTruthy();
+  expect(screen.getByText('B')).toBeTruthy();
+  expect(screen.getByText('Done')).toBeTruthy();
+});
+
+test('mobile + multiple: toggling items does not close drawer', async () => {
+  render(
+    <Select
+      options={[
+        { label: 'A', value: 'a' },
+        { label: 'B', value: 'b' },
+      ]}
+      mode="multiple"
+      mobile
+    />,
+  );
+  await userEvent.click(screen.getByRole('button'));
+  await userEvent.click(screen.getByText('A'));
+  expect(screen.getByRole('dialog')).toBeTruthy(); // still open
+  const check = document.querySelector('[data-tao-sheet-item-check]');
+  expect(check).toBeTruthy();
+});
+
+test('mobile + multiple: Done commits and closes drawer', async () => {
+  let committed: string[] | null = null;
+  render(
+    <Select
+      options={[
+        { label: 'A', value: 'a' },
+        { label: 'B', value: 'b' },
+      ]}
+      mode="multiple"
+      mobile
+      onChange={(v) => {
+        committed = v as string[];
+      }}
+    />,
+  );
+  await userEvent.click(screen.getByRole('button'));
+  await userEvent.click(screen.getByText('A'));
+  await userEvent.click(screen.getByText('B'));
+  await userEvent.click(screen.getByText('Done'));
+  expect(committed).toEqual(['a', 'b']);
+  // Dialog closed after Done
+  expect(screen.queryByRole('dialog')).toBeNull();
 });

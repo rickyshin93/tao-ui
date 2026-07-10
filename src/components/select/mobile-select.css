@@ -155,3 +155,37 @@
   font-size: var(--tao-font-size-sm);
   color: var(--tao-color-text-tertiary);
 }
+
+/* ===========================
+   Multi-select: Done button
+   =========================== */
+
+/* Done button footer */
+[data-tao-sheet-footer] {
+  flex-shrink: 0;
+  padding: var(--tao-padding-sm) var(--tao-padding);
+  border-block-start: var(--tao-line-width) solid
+    var(--tao-color-border-secondary);
+  background: var(--tao-color-bg-elevated);
+}
+
+[data-tao-sheet-done] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 44px;
+  border: none;
+  border-radius: var(--tao-radius-md);
+  background: var(--tao-primary);
+  color: #fff;
+  font-family: var(--tao-font-family);
+  font-size: var(--tao-font-size-base);
+  font-weight: var(--tao-font-weight-medium);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+[data-tao-sheet-done]:active {
+  opacity: 0.85;
+}

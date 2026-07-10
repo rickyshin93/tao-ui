@@ -45,6 +45,7 @@ export function Button({
       style={{ ...styles?.root, ...style }}
       disabled={isDisabled}
       aria-busy={loading || undefined}
+      data-tao-button=""
       data-tao-variant={variant}
       data-tao-size={resolvedSize}
     >

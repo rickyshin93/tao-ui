@@ -235,7 +235,9 @@ test('portal scope asChild preserves child style (child wins on conflict)', () =
       <TaoPortalScope asChild>
         <span
           data-testid="portal-child"
-          style={{ color: 'blue', '--tao-color-primary': 'green' } as CSSProperties}
+          style={
+            { color: 'blue', '--tao-color-primary': 'green' } as CSSProperties
+          }
         >
           A
         </span>

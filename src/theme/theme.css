@@ -42,7 +42,7 @@
     /* Size seeds */
     --tao-radius: 10px; /* shadcn baseline */
     --tao-font-size: 14px;
-    --tao-control-height: 36px;
+    --tao-control-height: 32px;
     --tao-control-width: 200px; /* default width for Input/Select/DatePicker; override per-instance or use 100% for full width */
     --tao-control-range-width: 360px; /* RangePicker holds two dates + separator */
     --tao-size-unit: 4px;

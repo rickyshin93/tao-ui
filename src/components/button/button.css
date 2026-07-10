@@ -1,21 +1,15 @@
 /* ===========================
-   Button
+   Button — scoped to [data-tao-button] to avoid
+   polluting other <button> elements (e.g. mobile select trigger).
    =========================== */
-[data-tao-variant] {
-  /* Intentionally empty — just to reference the selector */
-}
 
-button[data-tao-variant] {
+button[data-tao-button] {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: var(--tao-padding-xs);
   font-family: var(--tao-font-family);
-  /* shadcn 按钮字重 500（medium）——比 antd 的 normal(400) 更有存在感 */
   font-weight: var(--tao-font-weight-medium);
-  /* line-height: 1 让 line-box 收缩到字号，配合 flex align-items:center
-     消除"文字视觉偏上"——继承 body 的 1.5714 line-height 会让 line-box
-     远大于字形，几何居中 ≠ 视觉居中（Geist Sans 视觉重心本身偏上）。 */
   line-height: 1;
   border: var(--tao-line-width) solid transparent;
   cursor: pointer;
@@ -29,89 +23,89 @@ button[data-tao-variant] {
 }
 
 /* Sizes */
-button[data-tao-size="small"] {
+button[data-tao-button][data-tao-size="small"] {
   height: var(--tao-control-height-sm);
   padding-inline: var(--tao-padding-xs);
   font-size: var(--tao-font-size-sm);
   border-radius: var(--tao-radius-sm);
 }
 
-button[data-tao-size="medium"] {
+button[data-tao-button][data-tao-size="medium"] {
   height: var(--tao-control-height);
   padding-inline: var(--tao-padding);
   font-size: var(--tao-font-size-base);
   border-radius: var(--tao-radius-md);
 }
 
-button[data-tao-size="large"] {
+button[data-tao-button][data-tao-size="large"] {
   height: var(--tao-control-height-lg);
   padding-inline: var(--tao-padding);
   font-size: var(--tao-font-size-base);
   border-radius: var(--tao-radius-md);
 }
 
-/* Variant: primary — shadcn shadow-xs 让实心按钮"浮起"一层 */
-button[data-tao-variant="primary"] {
+/* Variant: primary */
+button[data-tao-button][data-tao-variant="primary"] {
   background: var(--tao-primary);
   color: var(--tao-primary-fg);
   box-shadow: var(--tao-box-shadow-xs);
 }
-button[data-tao-variant="primary"]:hover:not(:disabled) {
+button[data-tao-button][data-tao-variant="primary"]:hover:not(:disabled) {
   background: var(--tao-primary-hover);
 }
-button[data-tao-variant="primary"]:active:not(:disabled) {
+button[data-tao-button][data-tao-variant="primary"]:active:not(:disabled) {
   background: var(--tao-primary-active);
 }
 
-/* Variant: secondary（shadcn "outline" 对应）—— 边框 + shadow-xs */
-button[data-tao-variant="secondary"] {
+/* Variant: secondary */
+button[data-tao-button][data-tao-variant="secondary"] {
   background: transparent;
   color: var(--tao-color-text);
   border-color: var(--tao-color-border);
   box-shadow: var(--tao-box-shadow-xs);
 }
-button[data-tao-variant="secondary"]:hover:not(:disabled) {
+button[data-tao-button][data-tao-variant="secondary"]:hover:not(:disabled) {
   background: var(--tao-color-fill-tertiary);
   border-color: var(--tao-color-border);
 }
-button[data-tao-variant="secondary"]:active:not(:disabled) {
+button[data-tao-button][data-tao-variant="secondary"]:active:not(:disabled) {
   background: var(--tao-color-fill-secondary);
 }
 
-/* Variant: ghost —— 无 shadow，只在 hover 显 accent 底色 */
-button[data-tao-variant="ghost"] {
+/* Variant: ghost */
+button[data-tao-button][data-tao-variant="ghost"] {
   background: transparent;
   color: var(--tao-color-text-secondary);
 }
-button[data-tao-variant="ghost"]:hover:not(:disabled) {
+button[data-tao-button][data-tao-variant="ghost"]:hover:not(:disabled) {
   background: var(--tao-color-fill-tertiary);
   color: var(--tao-color-text);
 }
-button[data-tao-variant="ghost"]:active:not(:disabled) {
+button[data-tao-button][data-tao-variant="ghost"]:active:not(:disabled) {
   background: var(--tao-color-fill-secondary);
 }
 
 /* Variant: destructive */
-button[data-tao-variant="destructive"] {
+button[data-tao-button][data-tao-variant="destructive"] {
   background: var(--tao-error);
   color: var(--tao-error-fg);
   box-shadow: var(--tao-box-shadow-xs);
 }
-button[data-tao-variant="destructive"]:hover:not(:disabled) {
+button[data-tao-button][data-tao-variant="destructive"]:hover:not(:disabled) {
   background: var(--tao-error-hover);
 }
-button[data-tao-variant="destructive"]:active:not(:disabled) {
+button[data-tao-button][data-tao-variant="destructive"]:active:not(:disabled) {
   background: var(--tao-error-active);
 }
 
 /* Disabled */
-button[data-tao-variant]:disabled {
+button[data-tao-button]:disabled {
   opacity: var(--tao-opacity-loading);
   cursor: not-allowed;
 }
 
-/* Focus — 3px ring, shadcn 风格 */
-button[data-tao-variant]:focus-visible {
+/* Focus */
+button[data-tao-button]:focus-visible {
   box-shadow: 0 0 0 var(--tao-ring-width) var(--tao-control-outline);
   outline: none;
 }

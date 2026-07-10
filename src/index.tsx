@@ -130,6 +130,7 @@ export {
   type SelectPlacement,
   type SelectProps,
   type SelectSemanticPart,
+  type TagRenderProps,
 } from './components/select/select';
 export {
   Spinner,
