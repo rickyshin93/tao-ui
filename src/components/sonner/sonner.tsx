@@ -5,7 +5,7 @@ import {
   type SemanticStyles,
 } from '../../utils/semantic';
 import { Button } from '../button/button';
-import { useEffect, useMemo, useSyncExternalStore } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import type { CSSProperties, ReactNode } from 'react';
 import './sonner.css';
 
@@ -62,6 +62,7 @@ export interface SonnerToastItem extends SonnerToastOptions {
   type: SonnerType;
   createdAt: number;
   custom?: ReactNode;
+  removing?: boolean;
 }
 
 export interface SonnerProps {
@@ -85,10 +86,18 @@ interface SonnerStoreState {
   toasts: SonnerToastItem[];
 }
 
+interface ToastHeight {
+  id: string;
+  height: number;
+  frontHeight?: number;
+}
+
 const listeners = new Set<Listener>();
 let state: SonnerStoreState = { toasts: [] };
 let seed = 0;
 const timers = new Map<string, ReturnType<typeof setTimeout>>();
+const removeTimers = new Map<string, ReturnType<typeof setTimeout>>();
+const REMOVE_DELAY = 220;
 
 function emit() {
   listeners.forEach((listener) => listener());
@@ -111,16 +120,50 @@ function clearTimer(id: string) {
   }
 }
 
+function clearRemoveTimer(id: string) {
+  const timer = removeTimers.get(id);
+  if (timer) {
+    clearTimeout(timer);
+    removeTimers.delete(id);
+  }
+}
+
 function dismiss(id?: string) {
   if (!id) {
     state.toasts.forEach((toast) => clearTimer(toast.id));
-    state = { toasts: [] };
+    state.toasts.forEach((toast) => clearRemoveTimer(toast.id));
+    state = {
+      toasts: state.toasts.map((toast) => ({ ...toast, removing: true })),
+    };
     emit();
+    state.toasts.forEach((toast) => {
+      removeTimers.set(
+        toast.id,
+        setTimeout(() => {
+          removeTimers.delete(toast.id);
+          state = { toasts: state.toasts.filter((item) => item.id !== toast.id) };
+          emit();
+        }, REMOVE_DELAY),
+      );
+    });
     return;
   }
   clearTimer(id);
-  state = { toasts: state.toasts.filter((toast) => toast.id !== id) };
+  clearRemoveTimer(id);
+  state = {
+    toasts: state.toasts.map((toast) =>
+      toast.id === id ? { ...toast, removing: true } : toast,
+    ),
+  };
   emit();
+  removeTimers.set(
+    id,
+    setTimeout(() => {
+      removeTimers.delete(id);
+      state = { toasts: state.toasts.filter((toast) => toast.id !== id) };
+      emit();
+    }, REMOVE_DELAY),
+  );
 }
 
 function scheduleDismiss(id: string, duration?: number) {
@@ -224,6 +267,7 @@ export function Sonner({
 }: SonnerProps) {
   useTaoConfig();
   const snapshot = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
+  const [heights, setHeights] = useState<ToastHeight[]>([]);
 
   useEffect(() => {
     for (const toast of snapshot.toasts) {
@@ -237,6 +281,8 @@ export function Sonner({
     return sliced.slice(-visibleToasts).reverse();
   }, [expand, snapshot.toasts, visibleToasts]);
 
+  const frontToastHeight = heights[0]?.height ?? 0;
+
   return (
     <TaoPortalScope>
       <div
@@ -246,106 +292,208 @@ export function Sonner({
           ...style,
           ['--tao-sonner-offset' as string]: `${offset}px`,
           ['--tao-sonner-gap' as string]: `${gap}px`,
+          ['--tao-sonner-front-height' as string]: `${frontToastHeight}px`,
         }}
         data-tao-sonner-viewport=""
         data-tao-position={position}
       >
-        {visible.map((toast) => {
+        {visible.map((toast, index) => {
           const showClose = toast.closable ?? closeButton;
+          const yPosition = position.startsWith('top') ? 'top' : 'bottom';
           return (
-            <div
+            <ToastView
               key={toast.id}
-              className={cx(classNames?.toast)}
-              style={styles?.toast}
-              role="status"
-              aria-live="polite"
-              aria-label={getAriaLabel(toast.type)}
-              data-tao-sonner-toast=""
-              data-tao-type={resolveDataType(toast.type, richColors)}
-            >
-              {toast.custom ? (
-                toast.custom
-              ) : (
-                <>
-                  <div
-                    className={cx(classNames?.content)}
-                    style={styles?.content}
-                    data-tao-sonner-content=""
-                  >
-                    {toast.title ? (
-                      <div
-                        className={cx(classNames?.title)}
-                        style={styles?.title}
-                        data-tao-sonner-title=""
-                      >
-                        {toast.title}
-                      </div>
-                    ) : null}
-                    {toast.description ? (
-                      <div
-                        className={cx(classNames?.description)}
-                        style={styles?.description}
-                        data-tao-sonner-description=""
-                      >
-                        {toast.description}
-                      </div>
-                    ) : null}
-                  </div>
-                  {(toast.action || toast.cancel || showClose) && (
-                    <div
-                      className={cx(classNames?.actions)}
-                      style={styles?.actions}
-                      data-tao-sonner-actions=""
-                    >
-                      {toast.cancel ? (
-                        <Button
-                          variant="ghost"
-                          size="small"
-                          className={cx(classNames?.cancel)}
-                          style={styles?.cancel}
-                          onClick={() => {
-                            toast.cancel?.onClick?.();
-                            dismiss(toast.id);
-                          }}
-                        >
-                          {toast.cancel.label}
-                        </Button>
-                      ) : null}
-                      {toast.action ? (
-                        <Button
-                          variant="secondary"
-                          size="small"
-                          className={cx(classNames?.action)}
-                          style={styles?.action}
-                          onClick={() => {
-                            toast.action?.onClick?.();
-                            dismiss(toast.id);
-                          }}
-                        >
-                          {toast.action.label}
-                        </Button>
-                      ) : null}
-                      {showClose ? (
-                        <button
-                          type="button"
-                          aria-label="Close notification"
-                          className={cx(classNames?.close)}
-                          style={styles?.close}
-                          data-tao-sonner-close=""
-                          onClick={() => dismiss(toast.id)}
-                        >
-                          ×
-                        </button>
-                      ) : null}
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
+              toast={toast}
+              richColors={richColors}
+              showClose={showClose}
+              yPosition={yPosition}
+              index={index}
+              visibleToasts={visible.length}
+              expanded={expand}
+              gap={gap}
+              heights={heights}
+              frontToastHeight={frontToastHeight}
+              setHeights={setHeights}
+              classNames={classNames}
+              styles={styles}
+            />
           );
         })}
       </div>
     </TaoPortalScope>
+  );
+}
+
+interface ToastViewProps {
+  toast: SonnerToastItem;
+  richColors: boolean;
+  showClose: boolean;
+  yPosition: 'top' | 'bottom';
+  index: number;
+  visibleToasts: number;
+  expanded: boolean;
+  gap: number;
+  heights: ToastHeight[];
+  frontToastHeight: number;
+  setHeights: React.Dispatch<React.SetStateAction<ToastHeight[]>>;
+  classNames?: SemanticClassNames<SonnerSemanticPart>;
+  styles?: SemanticStyles<SonnerSemanticPart>;
+}
+
+function ToastView({
+  toast,
+  richColors,
+  showClose,
+  yPosition,
+  index,
+  visibleToasts,
+  expanded,
+  gap,
+  heights,
+  frontToastHeight,
+  setHeights,
+  classNames,
+  styles,
+}: ToastViewProps) {
+  const [mounted, setMounted] = useState(false);
+  const [offsetBeforeRemove, setOffsetBeforeRemove] = useState(0);
+  const ref = useRef<HTMLDivElement>(null);
+
+  const offset = useMemo(() => {
+    return heights.slice(0, index).reduce((sum, item) => sum + item.height, 0) + index * gap;
+  }, [gap, heights, index]);
+
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => setMounted(true));
+    return () => cancelAnimationFrame(frame);
+  }, []);
+
+  useEffect(() => {
+    if (toast.removing) setOffsetBeforeRemove(offset);
+  }, [offset, toast.removing]);
+
+  useLayoutEffect(() => {
+    const node = ref.current;
+    if (!node) return;
+
+    const nextHeight = node.getBoundingClientRect().height;
+    setHeights((current) => {
+      const filtered = current.filter((item) => item.id !== toast.id);
+      return [...filtered, { id: toast.id, height: nextHeight }];
+    });
+
+    return () => {
+      setHeights((current) => current.filter((item) => item.id !== toast.id));
+    };
+  }, [setHeights, toast.description, toast.id, toast.title, toast.action, toast.cancel, toast.custom]);
+
+  const isFront = index === 0;
+  const isVisible = index < visibleToasts;
+  const activeOffset = toast.removing ? offsetBeforeRemove : offset;
+
+  return (
+    <div
+      ref={ref}
+      className={cx(classNames?.toast)}
+      role="status"
+      aria-live="polite"
+      aria-label={getAriaLabel(toast.type)}
+      data-tao-sonner-toast=""
+      data-tao-type={resolveDataType(toast.type, richColors)}
+      data-tao-mounted={mounted}
+      data-tao-y-position={yPosition}
+      data-tao-removing={toast.removing ? 'true' : 'false'}
+      data-tao-front={isFront ? 'true' : 'false'}
+      data-tao-expanded={expanded ? 'true' : 'false'}
+      data-tao-visible={isVisible ? 'true' : 'false'}
+      style={{
+        ...styles?.toast,
+        ['--tao-sonner-toasts-before' as string]: String(index),
+        ['--tao-sonner-offset-y' as string]: `${activeOffset}px`,
+        ['--tao-sonner-front-height' as string]: `${frontToastHeight}px`,
+        ['--tao-sonner-z-index' as string]: String(visibleToasts - index),
+      }}
+    >
+      {toast.custom ? (
+        toast.custom
+      ) : (
+        <>
+          <div
+            className={cx(classNames?.content)}
+            style={styles?.content}
+            data-tao-sonner-content=""
+          >
+            {toast.title ? (
+              <div
+                className={cx(classNames?.title)}
+                style={styles?.title}
+                data-tao-sonner-title=""
+              >
+                {toast.title}
+              </div>
+            ) : null}
+            {toast.description ? (
+              <div
+                className={cx(classNames?.description)}
+                style={styles?.description}
+                data-tao-sonner-description=""
+              >
+                {toast.description}
+              </div>
+            ) : null}
+          </div>
+          {(toast.action || toast.cancel || showClose) && (
+            <div
+              className={cx(classNames?.actions)}
+              style={styles?.actions}
+              data-tao-sonner-actions=""
+              data-tao-close-only={!toast.action && !toast.cancel && showClose ? '' : undefined}
+            >
+              {toast.cancel ? (
+                <Button
+                  variant="ghost"
+                  size="small"
+                  className={cx(classNames?.cancel)}
+                  style={styles?.cancel}
+                  onClick={() => {
+                    toast.cancel?.onClick?.();
+                    dismiss(toast.id);
+                  }}
+                >
+                  {toast.cancel.label}
+                </Button>
+              ) : null}
+              {toast.action ? (
+                <Button
+                  variant="secondary"
+                  size="small"
+                  className={cx(classNames?.action)}
+                  style={styles?.action}
+                  onClick={() => {
+                    toast.action?.onClick?.();
+                    dismiss(toast.id);
+                  }}
+                >
+                  {toast.action.label}
+                </Button>
+              ) : null}
+              {showClose ? (
+                <button
+                  type="button"
+                  aria-label="Close notification"
+                  className={cx(classNames?.close)}
+                  style={styles?.close}
+                  data-tao-sonner-close=""
+                  onClick={() => dismiss(toast.id)}
+                >
+                  ×
+                </button>
+              ) : null}
+            </div>
+          )}
+        </>
+      )}
+    </div>
   );
 }
 

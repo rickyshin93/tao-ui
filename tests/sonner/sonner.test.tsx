@@ -1,5 +1,5 @@
 import { expect, test } from '@rstest/core';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { Sonner, toast } from '../../src/components/sonner';
 import { TaoProvider } from '../../src/provider/tao-provider';
@@ -30,8 +30,9 @@ test('loading toast stays visible until dismissed', async () => {
     node.closest('[data-tao-sonner-toast]')?.getAttribute('data-tao-type'),
   ).toBe('loading');
   toast.dismiss(id);
-  await Promise.resolve();
-  expect(screen.queryByText('Uploading')).toBeNull();
+  await waitFor(() => {
+    expect(screen.queryByText('Uploading')).toBeNull();
+  });
 });
 
 test('custom toast renders arbitrary react node', async () => {
@@ -51,8 +52,13 @@ test('close button dismisses toast', async () => {
   render(<Sonner closeButton />);
   toast({ title: 'Closable' });
   await screen.findByText('Closable');
-  await userEvent.click(screen.getByLabelText('Close notification'));
-  expect(screen.queryByText('Closable')).toBeNull();
+  const closeButton = screen.getAllByLabelText('Close notification').at(-1);
+  expect(closeButton).toBeTruthy();
+  expect(closeButton?.getAttribute('data-tao-sonner-close')).toBe('');
+  await userEvent.click(closeButton!);
+  await waitFor(() => {
+    expect(screen.queryByText('Closable')).toBeNull();
+  });
 });
 
 test('action click triggers callback and dismisses', async () => {
@@ -69,7 +75,9 @@ test('action click triggers callback and dismisses', async () => {
   });
   await userEvent.click(await screen.findByText('Undo'));
   expect(called).toBe(true);
-  expect(screen.queryByText('Undoable')).toBeNull();
+  await waitFor(() => {
+    expect(screen.queryByText('Undoable')).toBeNull();
+  });
 });
 
 test('promise toast resolves to success state', async () => {

@@ -30,6 +30,10 @@
 }
 
 [data-tao-sonner-toast] {
+  position: relative;
+  --tao-sonner-enter-y: 100%;
+  --tao-sonner-scale: 1;
+  --tao-sonner-y: translateY(var(--tao-sonner-enter-y));
   pointer-events: auto;
   display: flex;
   align-items: flex-start;
@@ -41,6 +45,72 @@
   box-shadow: var(--tao-box-shadow-secondary);
   padding: 14px;
   min-width: 320px;
+  opacity: 0;
+  height: auto;
+  z-index: var(--tao-sonner-z-index, 1);
+  transform: var(--tao-sonner-y) scale(var(--tao-sonner-scale));
+  transition:
+    transform var(--tao-motion-duration-slow) var(--tao-motion-ease-out-quint),
+    opacity var(--tao-motion-duration-slow) var(--tao-motion-ease-out-quint),
+    height var(--tao-motion-duration-slow) var(--tao-motion-ease-out-quint),
+    box-shadow var(--tao-motion-duration-mid) var(--tao-motion-ease-out);
+}
+
+[data-tao-sonner-toast][data-tao-y-position='top'] {
+  --tao-sonner-enter-y: -100%;
+}
+
+[data-tao-sonner-toast][data-tao-mounted='true'] {
+  opacity: 1;
+  --tao-sonner-y: translateY(0);
+}
+
+[data-tao-sonner-toast][data-tao-mounted='true'][data-tao-expanded='true'][data-tao-y-position='bottom'] {
+  --tao-sonner-y: translateY(0);
+}
+
+[data-tao-sonner-toast][data-tao-mounted='true'][data-tao-expanded='true'][data-tao-y-position='top'] {
+  --tao-sonner-y: translateY(0);
+}
+
+[data-tao-sonner-toast][data-tao-expanded='false'][data-tao-front='false'] {
+  height: var(--tao-sonner-front-height, auto);
+  --tao-sonner-scale: calc(1 - min(var(--tao-sonner-toasts-before), 2) * 0.03);
+  box-shadow: var(--tao-box-shadow-tertiary, var(--tao-box-shadow-secondary));
+}
+
+[data-tao-sonner-toast][data-tao-expanded='false'][data-tao-front='false'][data-tao-y-position='bottom'] {
+  --tao-sonner-y: translateY(calc(var(--tao-sonner-toasts-before) * -0.65 * var(--tao-sonner-gap, 12px)));
+}
+
+[data-tao-sonner-toast][data-tao-expanded='false'][data-tao-front='false'][data-tao-y-position='top'] {
+  --tao-sonner-y: translateY(calc(var(--tao-sonner-toasts-before) * 0.65 * var(--tao-sonner-gap, 12px)));
+}
+
+[data-tao-sonner-toast][data-tao-expanded='false'][data-tao-front='false'] > * {
+  opacity: 0.18;
+}
+
+[data-tao-sonner-toast][data-tao-visible='false'] {
+  opacity: 0;
+  pointer-events: none;
+}
+
+[data-tao-sonner-toast][data-tao-removing='true'] {
+  opacity: 0;
+}
+
+[data-tao-sonner-toast][data-tao-removing='true'][data-tao-front='true'][data-tao-y-position='top'] {
+  --tao-sonner-y: translateY(-100%);
+}
+
+[data-tao-sonner-toast][data-tao-removing='true'][data-tao-front='true'][data-tao-y-position='bottom'] {
+  --tao-sonner-y: translateY(100%);
+}
+
+[data-tao-sonner-toast][data-tao-removing='true'][data-tao-front='false'][data-tao-y-position='top'],
+[data-tao-sonner-toast][data-tao-removing='true'][data-tao-front='false'][data-tao-y-position='bottom'] {
+  --tao-sonner-y: translateY(40%);
 }
 
 [data-tao-sonner-toast][data-tao-type='success'] {
@@ -59,13 +129,24 @@
 }
 
 [data-tao-sonner-toast][data-tao-type='info'] {
-  background: color-mix(in oklch, var(--tao-color-primary) 6%, var(--tao-color-bg-base));
+  background: var(--tao-primary-bg);
   border-color: var(--tao-primary-border);
+  color: var(--tao-color-primary);
+}
+
+[data-tao-sonner-toast][data-tao-type='info'] [data-tao-sonner-description] {
+  color: inherit;
+}
+
+[data-tao-sonner-toast][data-tao-type='info'] [data-tao-sonner-close] {
+  color: var(--tao-color-primary);
 }
 
 [data-tao-sonner-content] {
   flex: 1;
   min-width: 0;
+  padding-right: 28px;
+  transition: opacity var(--tao-motion-duration-slow) var(--tao-motion-ease-out-quint);
 }
 
 [data-tao-sonner-title] {
@@ -83,28 +164,55 @@
 
 [data-tao-sonner-actions] {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 8px;
   flex-shrink: 0;
+  transition: opacity var(--tao-motion-duration-slow) var(--tao-motion-ease-out-quint);
+}
+
+[data-tao-sonner-actions]:not([data-tao-close-only]) {
+  position: relative;
+  padding-right: 22px;
+}
+
+[data-tao-sonner-actions][data-tao-close-only] {
+  position: absolute;
+  top: 12px;
+  right: 12px;
 }
 
 [data-tao-sonner-close] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   appearance: none;
   border: 0;
   background: transparent;
   color: var(--tao-color-text-tertiary);
-  width: 24px;
-  height: 24px;
-  border-radius: var(--tao-radius-sm);
+  width: 18px;
+  height: 18px;
+  min-width: 18px;
+  font-size: 18px;
+  line-height: 1;
   cursor: pointer;
-  transition:
-    color var(--tao-motion-duration-fast) var(--tao-motion-ease-out),
-    background-color var(--tao-motion-duration-fast) var(--tao-motion-ease-out);
+  padding: 0;
+  transition: color var(--tao-motion-duration-fast) var(--tao-motion-ease-out);
+}
+
+[data-tao-sonner-actions][data-tao-close-only] [data-tao-sonner-close] {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+[data-tao-sonner-actions]:not([data-tao-close-only]) [data-tao-sonner-close] {
+  position: absolute;
+  top: 1px;
+  right: 0;
 }
 
 [data-tao-sonner-close]:hover {
   color: var(--tao-color-text);
-  background: var(--tao-color-fill-secondary);
 }
 
 @media (max-width: 640px) {
