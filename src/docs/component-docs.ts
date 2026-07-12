@@ -20,6 +20,7 @@ import { radioDoc } from './components/radio.doc';
 import { rangePickerDoc } from './components/range-picker.doc';
 import { scrollAreaDoc } from './components/scroll-area.doc';
 import { selectDoc } from './components/select.doc';
+import { sonnerDoc } from './components/sonner.doc';
 import { spinnerDoc } from './components/spinner.doc';
 import { splitterDoc } from './components/splitter.doc';
 import { stackDoc } from './components/stack.doc';
@@ -52,6 +53,7 @@ export const componentDocs = [
   rangePickerDoc,
   scrollAreaDoc,
   selectDoc,
+  sonnerDoc,
   spinnerDoc,
   splitterDoc,
   stackDoc,

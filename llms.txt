@@ -23,7 +23,7 @@ Import from the package root. The package entry imports tao-ui CSS side effects 
 - Config: TaoProvider
 - Data Display: Collapsible, ScrollArea, Table, Tag
 - Data Entry: Checkbox, DatePicker, FormActions, FormField, FormSection, Input, InputNumber, Radio, RangePicker, Select, Switch, Textarea
-- Feedback: Drawer, Modal, Spinner
+- Feedback: Drawer, Modal, Sonner, Spinner
 - General: Button
 - Headless: HeadlessInputNumber
 - Layout: FormLayout, Splitter, Stack
@@ -301,6 +301,19 @@ Chooses one value from a compact list of options.
 - Semantic parts: `root`, `trigger`, `value`, `content`, `item`, `empty`
 
 Use Select when choices are known but too numerous or secondary to show as radios.
+
+### Sonner
+
+Displays temporary toast notifications with optional actions and provider-aware theming.
+
+- Category: Feedback
+- Exports: `Sonner`, `toast`
+- Source: `src/components/sonner/sonner.tsx`
+- Storybook: `stories/sonner.stories.tsx`
+- Tests: `tests/sonner/sonner.test.tsx`
+- Semantic parts: `viewport`, `toast`, `content`, `title`, `description`, `actions`, `action`, `cancel`, `close`
+
+Mount one Sonner near app root, then call toast() imperatively from event handlers. Supports toast.loading(), toast.promise(), and toast.custom() for richer async and custom notification flows.
 
 ### Spinner
 
