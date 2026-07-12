@@ -10,6 +10,7 @@
 - none
 
 ## Done
+- 2026-07-12 add Button `icon`/`loadingIcon` props with mount-stable icon slot to kill loading flicker
 - 2026-07-12 rework Sonner stack layout with front height compression and frozen removal offsets
 - 2026-07-12 use measured toast heights for Sonner expanded stack offsets
 - 2026-07-12 add Sonner enter/exit motion and stacked toast scale/lift behavior

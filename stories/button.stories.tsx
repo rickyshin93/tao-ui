@@ -32,3 +32,14 @@ export const Sizes: StoryObj = {
     </Stack>
   ),
 };
+
+export const WithIcon: StoryObj = {
+  render: () => (
+    <Stack direction="horizontal" gap="sm" align="center">
+      <Button icon={<span>⬇</span>}>Icon</Button>
+      <Button icon={<span>⬇</span>} loading>
+        Loading
+      </Button>
+    </Stack>
+  ),
+};

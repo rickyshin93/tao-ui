@@ -78,3 +78,48 @@ test('loading sets aria-busy and disables', () => {
   expect(btn.getAttribute('aria-busy')).toBe('true');
   expect(btn).toBeDisabled();
 });
+
+test('loading renders built-in spinner in a mounted icon slot', () => {
+  render(<Button loading>Save</Button>);
+  const slot = document.querySelector('[data-tao-button-icon]');
+  expect(slot).toBeTruthy();
+  expect(slot?.dataset.taoLoading).toBe('true');
+  expect(slot?.querySelector('[data-tao-button-spinner]')).toBeTruthy();
+});
+
+test('icon prop renders an idle icon, hidden layer absent when no loading', () => {
+  render(
+    <Button icon={<svg data-testid="my-icon" />}>
+      Save
+    </Button>,
+  );
+  const slot = document.querySelector('[data-tao-button-icon]');
+  expect(slot?.dataset.taoLoading).toBeUndefined();
+  expect(screen.getByTestId('my-icon')).toBeTruthy();
+  expect(slot?.querySelector('[data-tao-button-spinner]')).toBeTruthy();
+});
+
+test('loading with icon keeps both layers mounted (no DOM add/remove)', () => {
+  render(
+    <Button loading icon={<svg data-testid="my-icon" />}>
+      Save
+    </Button>,
+  );
+  const slot = document.querySelector('[data-tao-button-icon]');
+  expect(slot?.dataset.taoLoading).toBe('true');
+  // idle icon layer still mounted (just opacity:0), spinner present
+  expect(slot?.querySelector('[data-tao-button-icon-idle]')).toBeTruthy();
+  expect(slot?.querySelector('[data-tao-button-spinner]')).toBeTruthy();
+});
+
+test('loadingIcon overrides the built-in spinner', () => {
+  render(
+    <Button loading loadingIcon={<svg data-testid="custom" />}>
+      Save
+    </Button>,
+  );
+  expect(screen.getByTestId('custom')).toBeTruthy();
+  expect(
+    document.querySelector('[data-tao-button-spinner]'),
+  ).toBeNull();
+});

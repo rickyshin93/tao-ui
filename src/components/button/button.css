@@ -104,6 +104,63 @@ button[data-tao-button]:disabled {
   cursor: not-allowed;
 }
 
+/* ===========================
+   Icon slot — idle + spinner layers are stacked and only
+   opacity toggles, so toggling loading never reflows the button.
+   =========================== */
+[data-tao-button-icon] {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.25em;
+  height: 1.25em;
+  flex: none;
+}
+
+[data-tao-button-icon-idle],
+[data-tao-button-icon-spin] {
+  position: absolute;
+  inset: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+  transition: opacity var(--tao-motion-duration-fast) var(--tao-motion-ease-out);
+}
+
+[data-tao-button-icon-idle] > svg,
+[data-tao-button-spinner] {
+  width: 1.25em;
+  height: 1.25em;
+}
+
+/* Idle icon visible by default; spinner hidden. */
+[data-tao-button-icon]:not([data-tao-loading]) [data-tao-button-icon-spin] {
+  opacity: 0;
+}
+[data-tao-button-icon]:not([data-tao-loading]) [data-tao-button-icon-idle] {
+  opacity: 1;
+}
+
+/* Loading: fade idle out, spinner in. */
+[data-tao-button-icon][data-tao-loading] [data-tao-button-icon-idle] {
+  opacity: 0;
+}
+[data-tao-button-icon][data-tao-loading] [data-tao-button-icon-spin] {
+  opacity: 1;
+}
+
+[data-tao-button-spinner] {
+  animation: tao-button-spin 0.8s linear infinite;
+}
+
+@keyframes tao-button-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 /* Focus */
 button[data-tao-button]:focus-visible {
   box-shadow: 0 0 0 var(--tao-ring-width) var(--tao-control-outline);
