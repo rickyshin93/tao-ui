@@ -158,7 +158,7 @@
   left: 0;
   right: 0;
   height: 16px;
-  background: linear-gradient(to bottom, oklch(0 0 0 / 0.06), transparent);
+  background: linear-gradient(to bottom, var(--tao-color-shadow-hint), transparent);
 }
 
 [data-tao-scroll-shadow="bottom"] {
@@ -166,7 +166,7 @@
   left: 0;
   right: 0;
   height: 16px;
-  background: linear-gradient(to top, oklch(0 0 0 / 0.06), transparent);
+  background: linear-gradient(to top, var(--tao-color-shadow-hint), transparent);
 }
 
 [data-tao-scroll-shadow="left"] {
@@ -174,7 +174,7 @@
   bottom: 0;
   left: 0;
   width: 16px;
-  background: linear-gradient(to right, oklch(0 0 0 / 0.06), transparent);
+  background: linear-gradient(to right, var(--tao-color-shadow-hint), transparent);
 }
 
 [data-tao-scroll-shadow="right"] {
@@ -182,5 +182,5 @@
   bottom: 0;
   right: 0;
   width: 16px;
-  background: linear-gradient(to left, oklch(0 0 0 / 0.06), transparent);
+  background: linear-gradient(to left, var(--tao-color-shadow-hint), transparent);
 }

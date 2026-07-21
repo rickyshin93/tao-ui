@@ -1,4 +1,5 @@
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { expect, test } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
 import { type CSSProperties, useEffect, useRef } from 'react';
@@ -43,6 +44,7 @@ function declaredCustomProps(cssBody: string): Set<string> {
 // Seeds must live at :root ONLY — re-declaring a seed at [data-tao-provider]
 // would reset every un-overridden provider back to defaults, silently killing
 // the nested "child inherits parent's overrides" contract.
+// (Exception: the [data-tao-theme="dark"] scope — it IS the override mechanism.)
 test('seed tokens are declared at :root only, not at [data-tao-provider]', () => {
   const css = readFileSync('src/theme/theme.css', 'utf8');
   const SEEDS = [
@@ -62,7 +64,7 @@ test('seed tokens are declared at :root only, not at [data-tao-provider]', () =>
     '--tao-motion-unit',
   ];
   const providerBlockMatch = css.match(
-    /:root,\s*\n\s*\[data-tao-provider\]\s*\{([\s\S]*?)^\s*\}/m,
+    /:root,\s*\n\s*\[data-tao-provider\],\s*\n\s*\[data-tao-theme\]\s*\{([\s\S]*?)^\s*\}/m,
   );
   expect(providerBlockMatch).toBeTruthy();
   const declared = declaredCustomProps(providerBlockMatch![1]);
@@ -80,7 +82,7 @@ test('seed tokens are declared at :root only, not at [data-tao-provider]', () =>
 test('derived tokens are declared under [data-tao-provider] (cascade shape)', () => {
   const css = readFileSync('src/theme/theme.css', 'utf8');
   const providerBlockMatch = css.match(
-    /:root,\s*\n\s*\[data-tao-provider\]\s*\{([\s\S]*?)^\s*\}/m,
+    /:root,\s*\n\s*\[data-tao-provider\],\s*\n\s*\[data-tao-theme\]\s*\{([\s\S]*?)^\s*\}/m,
   );
   expect(providerBlockMatch).toBeTruthy();
   const declared = declaredCustomProps(providerBlockMatch![1]);
@@ -283,4 +285,141 @@ test('theme.token value-equality: same values → stable context value', () => {
 
   // Only the initial context should be recorded; later renders keep the same reference.
   expect(renderLog.length).toBe(1);
+});
+
+// ---- Dark mode ----
+
+test('theme.mode="dark" sets data-tao-theme on the provider element', () => {
+  render(
+    <TaoProvider theme={{ mode: 'dark' }}>
+      <span data-testid="child">x</span>
+    </TaoProvider>,
+  );
+  const provider = screen.getByTestId('child').parentElement!;
+  expect(provider.getAttribute('data-tao-theme')).toBe('dark');
+});
+
+test('default mode is light: no data-tao-theme attribute', () => {
+  render(
+    <TaoProvider>
+      <span data-testid="child">x</span>
+    </TaoProvider>,
+  );
+  const provider = screen.getByTestId('child').parentElement!;
+  expect(provider.hasAttribute('data-tao-theme')).toBe(false);
+});
+
+test('nested provider inherits parent dark mode', () => {
+  function ShowMode() {
+    const { mode } = useTaoConfig();
+    return <span data-testid="m">{mode}</span>;
+  }
+  render(
+    <TaoProvider theme={{ mode: 'dark' }}>
+      <TaoProvider size="small">
+        <ShowMode />
+      </TaoProvider>
+    </TaoProvider>,
+  );
+  expect(screen.getByTestId('m').textContent).toBe('dark');
+});
+
+// Portaled layers (Modal/Drawer/Select dropdown) render outside the provider
+// subtree — TaoPortalScope must re-apply data-tao-theme so the dark CSS scope
+// reaches the popup.
+test('portal scope re-applies dark theme', () => {
+  render(
+    <TaoProvider theme={{ mode: 'dark' }}>
+      <TaoPortalScope>
+        <span data-testid="portal-child">A</span>
+      </TaoPortalScope>
+    </TaoProvider>,
+  );
+  const portalScope = screen.getByTestId('portal-child').parentElement!;
+  expect(portalScope.getAttribute('data-tao-theme')).toBe('dark');
+});
+
+test('portal scope asChild re-applies dark theme without wrapper', () => {
+  render(
+    <TaoProvider theme={{ mode: 'dark' }}>
+      <TaoPortalScope asChild>
+        <span data-testid="portal-child">A</span>
+      </TaoPortalScope>
+    </TaoProvider>,
+  );
+  expect(screen.getByTestId('portal-child').getAttribute('data-tao-theme')).toBe(
+    'dark',
+  );
+});
+
+// Guard the CSS shape that makes dark mode work: the dark scope overrides
+// seeds and the few derived tokens whose direction flips.
+test('dark theme scope declares the flipped seeds + derived overrides', () => {
+  const css = readFileSync('src/theme/theme.css', 'utf8');
+  const darkBlockMatch = css.match(
+    /\[data-tao-theme="dark"\]\s*\{([\s\S]*?)^\s*\}/m,
+  );
+  expect(darkBlockMatch).toBeTruthy();
+  const declared = declaredCustomProps(darkBlockMatch![1]);
+  const DARK_MUST_DECLARE = [
+    // reversed neutral axis
+    '--tao-color-bg-base',
+    '--tao-color-text-base',
+    '--tao-color-bg-surface',
+    // near-black primary is invisible on dark bg → flips to near-white
+    '--tao-color-primary',
+    // hover/active direction differs for a light primary on dark bg
+    '--tao-primary-hover',
+    '--tao-primary-active',
+    // half-transparent black shadows are invisible on dark bg
+    '--tao-box-shadow',
+    // dim mask deepens on dark UI
+    '--tao-color-bg-mask',
+  ];
+  for (const key of DARK_MUST_DECLARE) {
+    expect(declared.has(key)).toBe(true);
+  }
+});
+
+// bg-surface MUST be a seed (declared at :root, overridable per scope):
+// if bg-container/elevated were hardcoded constants in the derived block,
+// a provider nested inside dark scope would reset surfaces back to white.
+test('bg-surface seed is declared at :root, container/elevated derive from it', () => {
+  const css = readFileSync('src/theme/theme.css', 'utf8');
+  const rootBlockMatch = css.match(/^\s*:root\s*\{([\s\S]*?)^\s*\}/m);
+  expect(rootBlockMatch).toBeTruthy();
+  const rootDeclared = declaredCustomProps(rootBlockMatch![1]);
+  expect(rootDeclared.has('--tao-color-bg-surface')).toBe(true);
+
+  const providerBlockMatch = css.match(
+    /:root,\s*\n\s*\[data-tao-provider\],\s*\n\s*\[data-tao-theme\]\s*\{([\s\S]*?)^\s*\}/m,
+  );
+  const body = providerBlockMatch![1];
+  expect(body).toContain('--tao-color-bg-container: var(--tao-color-bg-surface)');
+  expect(body).not.toMatch(/--tao-color-bg-container:\s*oklch\(1/);
+});
+
+// Token-escape regression: component CSS must consume derived tokens, never
+// hardcode color literals — a hardcoded #fafafa or oklch(0 0 0 / 0.05) breaks
+// the "re-derive everything from seeds" contract that dark mode relies on.
+// Allowed: literal values inside a component's own --tao-<comp>-* token default
+// is still discouraged; keep this list at zero.
+test('component CSS files contain no hardcoded color escapes', () => {
+  const componentsDir = 'src/components';
+  const COLOR_LITERAL =
+    /#[0-9a-fA-F]{3,8}\b|oklch\(\s*0\s|oklch\(\s*1\s|[^-]\brgba?\(|[^-]\bhsla?\(/;
+  const offenders: string[] = [];
+  for (const entry of readdirSync(componentsDir, { withFileTypes: true })) {
+    if (!entry.isDirectory()) continue;
+    const dir = join(componentsDir, entry.name);
+    for (const file of readdirSync(dir)) {
+      if (!file.endsWith('.css')) continue;
+      const path = join(dir, file);
+      const css = readFileSync(path, 'utf8');
+      css.split('\n').forEach((line, i) => {
+        if (COLOR_LITERAL.test(line)) offenders.push(`${path}:${i + 1}: ${line.trim()}`);
+      });
+    }
+  }
+  expect(offenders).toEqual([]);
 });

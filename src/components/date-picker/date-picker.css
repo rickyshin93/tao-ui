@@ -99,7 +99,7 @@ button[data-tao-picker-trigger][data-tao-size="large"] {
   overflow: hidden;
   width: auto;
   animation: tao-picker-in var(--tao-motion-duration-fast)
-    cubic-bezier(0.16, 1, 0.3, 1);
+    var(--tao-motion-ease-out-expo);
 }
 
 @keyframes tao-picker-in {

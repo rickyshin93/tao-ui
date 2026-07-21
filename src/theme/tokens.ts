@@ -8,6 +8,8 @@ export type TaoTokenName =
   | '--tao-color-bg-disabled'
   | '--tao-color-bg-elevated'
   | '--tao-color-bg-layout'
+  | '--tao-color-bg-mask'
+  | '--tao-color-bg-surface'
   | '--tao-color-border'
   | '--tao-color-border-secondary'
   | '--tao-color-error'
@@ -17,10 +19,12 @@ export type TaoTokenName =
   | '--tao-color-fill-secondary'
   | '--tao-color-fill-tertiary'
   | '--tao-color-primary'
+  | '--tao-color-shadow-hint'
   | '--tao-color-success'
   | '--tao-color-text'
   | '--tao-color-text-base'
   | '--tao-color-text-disabled'
+  | '--tao-color-text-light-solid'
   | '--tao-color-text-placeholder'
   | '--tao-color-text-quaternary'
   | '--tao-color-text-secondary'
@@ -61,6 +65,7 @@ export type TaoTokenName =
   | '--tao-motion-duration-slow'
   | '--tao-motion-ease-in-out'
   | '--tao-motion-ease-out'
+  | '--tao-motion-ease-out-expo'
   | '--tao-motion-ease-out-quint'
   | '--tao-motion-unit'
   | '--tao-opacity-loading'
@@ -112,6 +117,8 @@ export const taoTokenNames = [
   '--tao-color-bg-disabled',
   '--tao-color-bg-elevated',
   '--tao-color-bg-layout',
+  '--tao-color-bg-mask',
+  '--tao-color-bg-surface',
   '--tao-color-border',
   '--tao-color-border-secondary',
   '--tao-color-error',
@@ -121,10 +128,12 @@ export const taoTokenNames = [
   '--tao-color-fill-secondary',
   '--tao-color-fill-tertiary',
   '--tao-color-primary',
+  '--tao-color-shadow-hint',
   '--tao-color-success',
   '--tao-color-text',
   '--tao-color-text-base',
   '--tao-color-text-disabled',
+  '--tao-color-text-light-solid',
   '--tao-color-text-placeholder',
   '--tao-color-text-quaternary',
   '--tao-color-text-secondary',
@@ -165,6 +174,7 @@ export const taoTokenNames = [
   '--tao-motion-duration-slow',
   '--tao-motion-ease-in-out',
   '--tao-motion-ease-out',
+  '--tao-motion-ease-out-expo',
   '--tao-motion-ease-out-quint',
   '--tao-motion-unit',
   '--tao-opacity-loading',
