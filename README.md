@@ -28,13 +28,38 @@ import { TaoProvider, Input, Select, Switch } from '@rockshin/tao-ui';
 
 export default function App() {
   return (
-    <TaoProvider size="middle">
+    <TaoProvider size="medium">
       <Input placeholder="Search" />
       <Select options={[{ label: 'A', value: 'a' }]} />
       <Switch defaultChecked />
     </TaoProvider>
   );
 }
+```
+
+### Dark mode
+
+Pure-CSS dark algorithm — no JS runtime. One prop flips every component, including portaled popups (Modal, Drawer, Select dropdowns):
+
+```tsx
+<TaoProvider theme={{ mode: 'dark' }}>
+  <App />
+</TaoProvider>
+```
+
+### Fonts
+
+Like antd, tao-ui **does not bundle fonts**. The stack is Geist-first with a full system fallback (incl. CJK), so everything renders well out of the box. To get the designed Geist look:
+
+```bash
+pnpm add @fontsource/geist-sans @fontsource/geist-mono
+```
+
+```ts
+import '@fontsource/geist-sans/400.css';
+import '@fontsource/geist-sans/500.css';
+import '@fontsource/geist-sans/600.css';
+import '@fontsource/geist-mono/400.css';
 ```
 
 ### Customizing internal parts
@@ -52,10 +77,10 @@ export default function App() {
 |----------|-----------|
 | General | `Button` |
 | Layout | `Stack`, `FormLayout`, `Splitter` |
-| Navigation | `Tabs`, `Pagination` |
-| Data Entry | `Input`, `Select`, `Checkbox`, `Radio`, `Switch`, `DatePicker`, `RangePicker`, `FormField`, `FormSection`, `FormActions` |
-| Data Display | `Table`, `Tag`, `ScrollArea` |
-| Feedback | `Drawer` |
+| Navigation | `Tabs`, `Pagination`, `Breadcrumb`, `Menu`, `Dropdown`, `ContextMenu` |
+| Data Entry | `Input`, `Textarea`, `InputNumber`, `Select`, `Checkbox`, `Radio`, `Switch`, `DatePicker`, `RangePicker`, `FormField`, `FormSection`, `FormActions` |
+| Data Display | `Table`, `Tag`, `ScrollArea`, `Collapsible` |
+| Feedback | `Modal`, `Drawer`, `Sonner`, `Spinner` |
 | Config | `TaoProvider`, `useTaoConfig` |
 
 Headless utilities: `useNumberInput` / `NumberInput`, and the `cx` semantic-class helper.

@@ -39,6 +39,14 @@
     --tao-color-bg-base: oklch(0.985 0.004 70);
     --tao-color-text-base: oklch(0.155 0.01 70);
 
+    /* Surface seed — bg-container/elevated 的基准。亮色默认纯白（popover 融入白底
+       宿主）；dark scope 覆盖此 seed 为深灰。必须独立成 seed：派生规则会在嵌套
+       provider 上重算，若 container 写死常量，dark 内嵌 provider 会被重置回白。 */
+    --tao-color-bg-surface: oklch(1 0 0);
+    /* 语义色上的固定浅色文字（solid Tag、destructive Button）。不随模式翻转：
+       深浅模式下语义色背景上都应压浅色文字。 */
+    --tao-color-text-light-solid: oklch(0.985 0.004 70);
+
     /* Size seeds */
     --tao-radius: 10px; /* shadcn baseline */
     --tao-font-size: 14px;
@@ -50,11 +58,15 @@
     /* Focus ring width — shadcn uses 3px, more visible than antd's 2px */
     --tao-ring-width: 3px;
 
-    /* Font seeds */
+    /* Font seeds — 库不捆绑字体（与 antd 一致）：Geist 未安装时落到
+       antd 同款系统栈 + 显式 CJK。消费方启用 Geist 见 README「Fonts」。 */
     --tao-font-family:
-      "Geist Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
+      "Geist Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+      "Helvetica Neue", Arial, "Noto Sans", "PingFang SC", "Hiragino Sans GB",
+      "Microsoft YaHei", sans-serif;
     --tao-font-family-code:
-      "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+      "Geist Mono", ui-monospace, SFMono-Regular, Menlo, Consolas,
+      "Liberation Mono", monospace;
 
     /* Motion seeds */
     --tao-motion-unit: 0.1s;
@@ -73,7 +85,8 @@
      inherit the re-derived values). See file-header note.
      ═════════════════════════════════════════════════════════════════════ */
   :root,
-  [data-tao-provider] {
+  [data-tao-provider],
+  [data-tao-theme] {
     /* ===========================
        DERIVED: Primary color palette
        =========================== */
@@ -121,7 +134,8 @@
       var(--tao-color-error) 30%,
       var(--tao-color-bg-base)
     );
-    --tao-error-fg: var(--tao-color-bg-base);
+    /* 固定浅色而非 bg-base：dark 下 bg-base 变深，按钮文字必须保持浅 */
+    --tao-error-fg: var(--tao-color-text-light-solid);
 
     /* ===========================
        DERIVED: Success color palette
@@ -205,10 +219,15 @@
       var(--tao-color-text-base) 4%,
       var(--tao-color-bg-base)
     );
-    /* Surfaces are pure white so popovers/controls blend into white hosts.
-       bg-base stays the (warm) mix base for all neutral derivations below. */
-    --tao-color-bg-container: oklch(1 0 0);
-    --tao-color-bg-elevated: oklch(1 0 0);
+    /* 从 bg-surface seed 派生：亮色下 seed 为纯白（popover 融入白底宿主）；
+       dark scope 换 seed 而非换公式，嵌套 provider 重算时依旧正确。
+       elevated 向 white mix：亮色下无感（白+白），dark 下自动提亮一层。 */
+    --tao-color-bg-container: var(--tao-color-bg-surface);
+    --tao-color-bg-elevated: color-mix(
+      in oklch,
+      var(--tao-color-bg-surface) 94%,
+      white
+    );
 
     /* ===========================
        DERIVED: Border (2 levels)
@@ -219,7 +238,13 @@
       var(--tao-color-text-base) 12%,
       var(--tao-color-bg-base)
     );
-    --tao-color-border-secondary: #0000170b; /* gray-alpha-100：半透明冷灰，淡雅分隔线 */
+    /* 半透明而非不透明 mix：叠在任何底色上都不产生色阶断层；
+       dark 下 text-base 变浅，细分隔线自动翻转为浅色 */
+    --tao-color-border-secondary: color-mix(
+      in oklch,
+      var(--tao-color-text-base) 5%,
+      transparent
+    );
 
     /* ===========================
        DERIVED: Radius
@@ -279,6 +304,8 @@
     --tao-motion-ease-out: cubic-bezier(0.215, 0.61, 0.355, 1);
     --tao-motion-ease-in-out: cubic-bezier(0.645, 0.045, 0.355, 1);
     --tao-motion-ease-out-quint: cubic-bezier(0.23, 1, 0.32, 1);
+    /* 进场强调曲线（Modal/Drawer/DatePicker 弹出）：起步快、收尾长 */
+    --tao-motion-ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 
     /* ===========================
        DERIVED: Shadow
@@ -317,11 +344,84 @@
     /* ===========================
        ALIAS: Semantic shortcuts
        =========================== */
-    --tao-color-text-placeholder: var(--tao-color-text-quaternary);
+    /* placeholder 提到 tertiary：quaternary(30%) 对比度 ~2.2:1 偏飘；
+       与 disabled 区分（disabled 保持 quaternary 的"熄灭"感） */
+    --tao-color-text-placeholder: var(--tao-color-text-tertiary);
     --tao-color-text-disabled: var(--tao-color-text-quaternary);
     --tao-color-bg-disabled: var(--tao-color-fill-tertiary);
     --tao-control-item-bg-hover: var(--tao-color-fill-tertiary);
     --tao-control-item-bg-active: var(--tao-primary-bg);
     --tao-opacity-loading: 0.65;
+
+    /* Modal / Drawer / Sheet 的 dim 层。dark scope 加深 */
+    --tao-color-bg-mask: oklch(0 0 0 / 0.1);
+    /* 滚动溢出提示阴影（Table fixed 列、ScrollArea 边缘渐变） */
+    --tao-color-shadow-hint: oklch(0 0 0 / 0.05);
+  }
+
+  /* ═════════════════════════════════════════════════════════════════════
+     DARK THEME
+     纯 CSS 算法（无 JS runtime）：仅覆盖 seed 与少量「翻转方向不同」的
+     derived token，其余派生全部经 color-mix 自动适配。
+
+     翻转不自动的关键派生（此处显式覆盖）：
+       - shadows：亮色用黑投影，dark 改用纯黑深投影（半透明黑在暗底不可见）
+       - primary hover/active：浅色主色在暗背景上需要反向操作
+         （hover 向 white mix = 更亮，active 回收向 bg-base mix）
+       - error outline：alpha 提高以在暗底保持可见
+       - fill/border 梯度：text-base 已翻转为浅色，mix 公式不变自动生效
+
+     启用方式（等价于 DESIGN.md 的 algorithm: 'dark'）：
+       <TaoProvider theme={{ mode: 'dark' }}>          // React 推荐
+       <div data-tao-theme="dark">…</div>              // 纯 CSS 消费方
+     ═════════════════════════════════════════════════════════════════════ */
+  [data-tao-theme="dark"] {
+    /* ---- seeds（反向中性轴） ---- */
+    --tao-color-bg-base: oklch(0.165 0.005 70);
+    --tao-color-text-base: oklch(0.922 0.005 70);
+    --tao-color-bg-surface: oklch(0.21 0.005 70);
+    /* 近黑主色在暗底上不可见 → 翻成近白（shadcn dark 同款反转）；
+       primary-fg 仍引用 bg-base，自动变成深色文字压浅按钮 */
+    --tao-color-primary: oklch(0.922 0.005 70);
+
+    /* ---- derived：翻转方向不同的 ---- */
+    /* 浅色主色在暗底上：hover 向深色 mix（变灰），active 更深 */
+    --tao-primary-hover: color-mix(
+      in oklch,
+      var(--tao-color-primary) 85%,
+      var(--tao-color-bg-base)
+    );
+    --tao-primary-active: color-mix(
+      in oklch,
+      var(--tao-color-primary) 75%,
+      var(--tao-color-bg-base)
+    );
+    --tao-control-outline: color-mix(
+      in oklch,
+      var(--tao-color-primary) 35%,
+      transparent
+    );
+    --tao-color-error-outline: color-mix(
+      in oklch,
+      var(--tao-color-error) 35%,
+      transparent
+    );
+    --tao-color-warning-outline: color-mix(
+      in oklch,
+      var(--tao-color-warning) 35%,
+      transparent
+    );
+
+    /* shadows：暗底上半透明黑不可见，用更高 alpha + 更大的 blur 撑出层次 */
+    --tao-box-shadow-xs: 0 1px 2px 0 oklch(0 0 0 / 0.4);
+    --tao-box-shadow:
+      0 1px 2px oklch(0 0 0 / 0.35), 0 0 1px oklch(0 0 0 / 0.5);
+    --tao-box-shadow-secondary:
+      0 4px 12px oklch(0 0 0 / 0.4), 0 0 1px oklch(0 0 0 / 0.5);
+    --tao-box-shadow-tertiary: 0 1px 2px oklch(0 0 0 / 0.35);
+
+    /* mask 加深：暗 UI 上的浅灰遮罩会显得"起雾" */
+    --tao-color-bg-mask: oklch(0 0 0 / 0.55);
+    --tao-color-shadow-hint: oklch(0 0 0 / 0.35);
   }
 }

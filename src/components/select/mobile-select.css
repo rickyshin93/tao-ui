@@ -178,7 +178,7 @@
   border: none;
   border-radius: var(--tao-radius-md);
   background: var(--tao-primary);
-  color: #fff;
+  color: var(--tao-color-text-light-solid);
   font-family: var(--tao-font-family);
   font-size: var(--tao-font-size-base);
   font-weight: var(--tao-font-weight-medium);

@@ -190,14 +190,14 @@
 
 [data-tao-tag][data-tao-color="success"][data-tao-variant="solid"] {
   background: var(--tao-success);
-  color: #fff;
+  color: var(--tao-color-text-light-solid);
   border-color: transparent;
   box-shadow: var(--tao-box-shadow-xs);
 }
 
 [data-tao-tag][data-tao-color="warning"][data-tao-variant="solid"] {
   background: var(--tao-warning);
-  color: #fff;
+  color: var(--tao-color-text-light-solid);
   border-color: transparent;
   box-shadow: var(--tao-box-shadow-xs);
 }

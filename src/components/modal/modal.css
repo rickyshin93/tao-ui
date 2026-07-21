@@ -5,7 +5,7 @@
   position: fixed;
   inset: 0;
   z-index: var(--tao-z-index-modal);
-  background: oklch(0 0 0 / 0.1);
+  background: var(--tao-color-bg-mask);
   animation: tao-modal-fade-in var(--tao-motion-duration-mid) ease-out;
 }
 
@@ -29,13 +29,17 @@
    Wrap (positioning layer)
    =========================== */
 [data-tao-modal-wrap] {
+  /* 组件级 token（同 Table surface token 模式）：非居中时的顶部偏移，
+     消费方可按实例覆盖 --tao-modal-offset-top */
+  --tao-modal-offset-top: 100px;
   position: fixed;
   inset: 0;
   z-index: calc(var(--tao-z-index-modal) + 1);
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  padding: 100px var(--tao-padding-lg) var(--tao-padding-lg);
+  padding: var(--tao-modal-offset-top) var(--tao-padding-lg)
+    var(--tao-padding-lg);
   overflow: auto;
 }
 
@@ -67,7 +71,7 @@
   outline: none;
   font-family: var(--tao-font-family);
   animation: tao-modal-zoom-in var(--tao-motion-duration-mid)
-    cubic-bezier(0.16, 1, 0.3, 1);
+    var(--tao-motion-ease-out-expo);
 }
 
 @keyframes tao-modal-zoom-in {

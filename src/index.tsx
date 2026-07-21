@@ -226,6 +226,7 @@ export {
   type TaoSeedToken,
   type TaoSize,
   type TaoThemeConfig,
+  type TaoThemeMode,
   type TaoVariant,
   useTaoConfig,
 } from './provider/tao-provider';

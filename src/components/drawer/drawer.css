@@ -5,7 +5,7 @@
   position: fixed;
   inset: 0;
   z-index: var(--tao-z-index-drawer);
-  background: oklch(0 0 0 / 0.1);
+  background: var(--tao-color-bg-mask);
   animation: tao-fade-in var(--tao-motion-duration-mid) ease-out;
 }
 
@@ -53,7 +53,7 @@
   bottom: 0;
   width: 378px;
   animation: tao-slide-from-right var(--tao-motion-duration-slow)
-    cubic-bezier(0.16, 1, 0.3, 1);
+    var(--tao-motion-ease-out-expo);
 }
 
 @keyframes tao-slide-from-right {
@@ -72,7 +72,7 @@
   bottom: 0;
   width: 378px;
   animation: tao-slide-from-left var(--tao-motion-duration-slow)
-    cubic-bezier(0.16, 1, 0.3, 1);
+    var(--tao-motion-ease-out-expo);
 }
 
 @keyframes tao-slide-from-left {
@@ -92,7 +92,7 @@
   max-height: 85vh;
   border-radius: var(--tao-radius-xl) var(--tao-radius-xl) 0 0;
   animation: tao-slide-from-bottom var(--tao-motion-duration-slow)
-    cubic-bezier(0.16, 1, 0.3, 1);
+    var(--tao-motion-ease-out-expo);
 }
 
 @keyframes tao-slide-from-bottom {
@@ -112,7 +112,7 @@
   max-height: 85vh;
   border-radius: 0 0 var(--tao-radius-xl) var(--tao-radius-xl);
   animation: tao-slide-from-top var(--tao-motion-duration-slow)
-    cubic-bezier(0.16, 1, 0.3, 1);
+    var(--tao-motion-ease-out-expo);
 }
 
 @keyframes tao-slide-from-top {

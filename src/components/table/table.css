@@ -15,9 +15,13 @@
   --tao-table-cell-bg: transparent;
   --tao-table-header-bg: transparent;
   --tao-table-header-color: var(--tao-color-text-secondary);
-  --tao-table-row-hover-bg: #fafafa;
-  --tao-table-row-selected-bg: oklch(0 0 0 / 0.05);
-  --tao-table-row-selected-hover-bg: oklch(0 0 0 / 0.07);
+  --tao-table-row-hover-bg: var(--tao-color-fill-quaternary);
+  --tao-table-row-selected-bg: var(--tao-color-shadow-hint);
+  --tao-table-row-selected-hover-bg: color-mix(
+    in oklch,
+    var(--tao-color-text-base) 7%,
+    transparent
+  );
   --tao-table-border-color: var(--tao-color-border-secondary);
   --tao-table-frame-radius: var(--tao-radius-md);
   --tao-table-cell-padding-block: var(--tao-padding-sm);
@@ -38,7 +42,7 @@
 /* Filled / outlined: bring back the grey header + tinted interaction states */
 [data-tao-table-wrapper][data-tao-variant="filled"],
 [data-tao-table-wrapper][data-tao-variant="outlined"] {
-  --tao-table-header-bg: oklch(0.985 0 0); /* #FAFAFA */
+  --tao-table-header-bg: var(--tao-color-fill-quaternary);
   --tao-table-row-selected-bg: var(--tao-primary-bg);
   --tao-table-row-selected-hover-bg: var(--tao-primary-bg-hover);
 }
@@ -346,7 +350,7 @@
   right: -6px;
   bottom: 0;
   width: 6px;
-  background: linear-gradient(to right, oklch(0 0 0 / 0.04), transparent);
+  background: linear-gradient(to right, var(--tao-color-shadow-hint), transparent);
   pointer-events: none;
 }
 
@@ -360,7 +364,7 @@
   left: -6px;
   bottom: 0;
   width: 6px;
-  background: linear-gradient(to left, oklch(0 0 0 / 0.04), transparent);
+  background: linear-gradient(to left, var(--tao-color-shadow-hint), transparent);
   pointer-events: none;
 }
 

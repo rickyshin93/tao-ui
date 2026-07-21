@@ -10,6 +10,11 @@
 - none
 
 ## Done
+- 2026-07-21 Modal top offset 100px → component token `--tao-modal-offset-top`; provider stories add Dark Mode demo
+- 2026-07-21 dark mode: pure-CSS `[data-tao-theme="dark"]` algorithm (4 seeds + flipped derived), `theme.mode` on TaoProvider, portal propagation, Storybook toolbar toggle
+- 2026-07-21 eliminate all hardcoded color escapes (Table/Tag/Modal/Drawer/ScrollArea/mobile-select → tokens: bg-surface, text-light-solid, bg-mask, shadow-hint); regression test pins zero literals
+- 2026-07-21 sync DESIGN.md to implementation (radius 10, height 32, border 12%, ring 3px, motion-ease-out-expo token); README adds Dark mode + Fonts sections
+- 2026-07-21 fonts: follow antd (no bundled fonts), fallback stack upgraded with CJK; Storybook devDeps @fontsource/geist-{sans,mono}
 - 2026-07-12 add Button `icon`/`loadingIcon` props with mount-stable icon slot to kill loading flicker
 - 2026-07-12 rework Sonner stack layout with front height compression and frozen removal offsets
 - 2026-07-12 use measured toast heights for Sonner expanded stack offsets

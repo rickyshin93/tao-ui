@@ -319,6 +319,37 @@ export const PortalTheming: StoryObj = {
   ),
 };
 
+// ---------- new: dark mode ----------
+
+export const DarkMode: StoryObj = {
+  name: 'Dark Mode · theme.mode',
+  render: () => (
+    <Stack gap="lg">
+      <span style={swatchLabel}>
+        {'theme={{ mode: "dark" }}'} flips the whole scope via the pure-CSS
+        dark algorithm — compare with the Light/Dark toolbar toggle above.
+      </span>
+      <TaoProvider theme={{ mode: 'dark' }}>
+        <div
+          style={{
+            background: 'var(--tao-color-bg-base)',
+            border: '1px solid var(--tao-color-border)',
+            borderRadius: 'var(--tao-radius-lg)',
+            padding: 24,
+          }}
+        >
+          <Stack gap="md">
+            <ControlRow label="dark" />
+            <FormField label="Input in dark scope" style={{ maxWidth: 320 }}>
+              <Input placeholder="focus to see the ring" />
+            </FormField>
+          </Stack>
+        </div>
+      </TaoProvider>
+    </Stack>
+  ),
+};
+
 // ---------- new: dynamic switching (also stress-tests memoization) ----------
 
 export const DynamicSwitching: StoryObj = {

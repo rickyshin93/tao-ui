@@ -33,8 +33,20 @@ export interface TaoSeedToken {
 
 // ---- Theme Config ----
 
+export type TaoThemeMode = 'light' | 'dark';
+
 export interface TaoThemeConfig {
   token?: Partial<TaoSeedToken>;
+  /**
+   * 明暗模式。'dark' 在 provider 元素上输出 data-tao-theme="dark"，
+   * 激活 theme.css 的 dark scope（纯 CSS 算法，无 JS runtime）。
+   * 嵌套 provider 未声明 mode 时继承父级；portal 浮层经 context 透传。
+   *
+   * 已知限制：dark 内显式 mode: 'light' 不会翻回亮色——CSS 自定义属性
+   * 无法"撤销"祖先的 seed 覆盖（antd 靠 JS 重算 token 实现，tao-ui 为
+   * 零 runtime 放弃此路径）。需要亮/暗混排时，把亮部移出 dark provider。
+   */
+  mode?: TaoThemeMode;
   inherit?: boolean;
 }
 
@@ -47,6 +59,8 @@ interface TaoConfigContextValue {
   size: TaoSize;
   disabled: boolean;
   variant: TaoVariant;
+  /** Resolved 明暗模式，portal 浮层用它重建 data-tao-theme。 */
+  mode: TaoThemeMode;
   /**
    * Merged CSS custom-property overrides from this provider and all ancestors.
    * Carried through context so portaled layers (Modal/Drawer/Select dropdown…)
@@ -59,6 +73,7 @@ const TaoConfigContext = createContext<TaoConfigContextValue>({
   size: 'medium',
   disabled: false,
   variant: 'outlined',
+  mode: 'light',
   tokenStyle: {},
 });
 
@@ -88,10 +103,15 @@ export function TaoPortalScope({
   style?: CSSProperties;
   asChild?: boolean;
 }) {
-  const { tokenStyle } = useTaoConfig();
+  const { tokenStyle, mode } = useTaoConfig();
+  const themeAttr = mode === 'light' ? undefined : { 'data-tao-theme': mode };
   if (asChild) {
     return (
-      <Slot data-tao-provider="" style={{ ...tokenStyle, ...style }}>
+      <Slot
+        data-tao-provider=""
+        {...themeAttr}
+        style={{ ...tokenStyle, ...style }}
+      >
         {children}
       </Slot>
     );
@@ -99,6 +119,7 @@ export function TaoPortalScope({
   return (
     <div
       data-tao-provider=""
+      {...themeAttr}
       style={{ display: 'contents', ...tokenStyle, ...style }}
     >
       {children}
@@ -198,12 +219,15 @@ export function TaoProvider({
   const parentSize = parentConfig.size;
   const parentDisabled = parentConfig.disabled;
   const parentVariant = parentConfig.variant;
+  const parentMode = parentConfig.mode;
+  const mode = theme?.mode ?? (inherit ? parentMode : 'light');
 
   const config = useMemo<TaoConfigContextValue>(
     () => ({
       size: size ?? (inherit ? parentSize : 'medium'),
       disabled: disabled ?? (inherit ? parentDisabled : false),
       variant: variant ?? (inherit ? parentVariant : 'outlined'),
+      mode,
       tokenStyle,
     }),
     [
@@ -214,13 +238,18 @@ export function TaoProvider({
       parentSize,
       parentDisabled,
       parentVariant,
+      mode,
       tokenStyle,
     ],
   );
 
   return (
     <TaoConfigContext.Provider value={config}>
-      <div style={divStyle} data-tao-provider="">
+      <div
+        style={divStyle}
+        data-tao-provider=""
+        data-tao-theme={mode === 'light' ? undefined : mode}
+      >
         {children}
       </div>
     </TaoConfigContext.Provider>

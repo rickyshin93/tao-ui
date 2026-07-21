@@ -4,6 +4,9 @@
 
 本文档定义 tao-ui 的完整视觉语言。所有组件必须严格遵循这些 token，不允许硬编码值。
 
+> **真值源**：`src/theme/theme.css`。本文档的数值与实现对齐；
+> 若再次漂移，以 theme.css 为准并修文档。
+
 ---
 
 ## 1. 设计哲学
@@ -42,17 +45,19 @@ Component Token (可选的单组件覆盖)
 ```ts
 interface TaoSeedToken {
   // ---- 色彩种子 ----
-  colorPrimary: string;       // 品牌主色 (默认: oklch(0.205 0.010 70))
-  colorSuccess: string;       // 成功色   (默认: oklch(0.555 0.140 155))
-  colorWarning: string;       // 警告色   (默认: oklch(0.700 0.150 70))
-  colorError: string;         // 错误色   (默认: oklch(0.570 0.190 25))
+  colorPrimary: string;       // 品牌主色 (默认: oklch(0.205 0.01 70)，近黑暖调)
+  colorSuccess: string;       // 成功色   (默认: oklch(0.555 0.14 155))
+  colorWarning: string;       // 警告色   (默认: oklch(0.7 0.15 70))
+  colorError: string;         // 错误色   (默认: oklch(0.57 0.19 25))
   colorBgBase: string;        // 背景基色 (默认: oklch(0.985 0.004 70))
-  colorTextBase: string;      // 文字基色 (默认: oklch(0.155 0.010 70))
+  colorTextBase: string;      // 文字基色 (默认: oklch(0.155 0.01 70))
+  // colorBgSurface / colorTextLightSolid 目前仅 CSS 层种子
+  // （dark scope 覆盖用），未暴露到 JS token——有需求再加。
 
   // ---- 尺寸种子 ----
-  borderRadius: number;       // 基础圆角 px (默认: 6)
+  borderRadius: number;       // 基础圆角 px (默认: 10，shadcn 基线)
   fontSize: number;           // 基础字号 px (默认: 14)
-  controlHeight: number;      // 控件基础高度 px (默认: 36)
+  controlHeight: number;      // 控件基础高度 px (默认: 32)
   sizeUnit: number;           // 间距基础单位 px (默认: 4)
   sizeStep: number;           // 间距步长 (默认: 4)
   lineWidth: number;          // 边框宽度 px (默认: 1)
@@ -62,7 +67,7 @@ interface TaoSeedToken {
   fontFamilyCode: string;
 
   // ---- 动效种子 ----
-  motionUnit: number;         // 动效时长单位 (默认: 0.1)，0 表示关闭动画
+  motionUnit: number;         // 动效时长单位 (默认: 0.1s)，0 表示关闭动画
   motion: boolean;            // 动效开关 (默认: true)
 
   // ---- z-index ----
@@ -83,109 +88,101 @@ interface TaoSeedToken {
 ```css
 :root {
   /* == Seed == */
-  --tao-color-primary:   oklch(0.205 0.010 70);
-  --tao-color-success:   oklch(0.555 0.140 155);
-  --tao-color-warning:   oklch(0.700 0.150 70);
-  --tao-color-error:     oklch(0.570 0.190 25);
+  --tao-color-primary:   oklch(0.205 0.01 70);
+  --tao-color-success:   oklch(0.555 0.14 155);
+  --tao-color-warning:   oklch(0.7 0.15 70);
+  --tao-color-error:     oklch(0.57 0.19 25);
   --tao-color-bg-base:   oklch(0.985 0.004 70);
-  --tao-color-text-base: oklch(0.155 0.010 70);
+  --tao-color-text-base: oklch(0.155 0.01 70);
+  /* 仅 CSS 层的种子（JS token 未暴露） */
+  --tao-color-bg-surface: oklch(1 0 0);        /* dark scope 覆盖为深灰 */
+  --tao-color-text-light-solid: oklch(0.985 0.004 70); /* 语义色上的固定浅文字 */
 
-  /* == Primary 派生 (参考 antd colorPrimaryBg/Hover/Active) == */
+  /* == Primary 派生 == */
   --tao-primary:            var(--tao-color-primary);
   --tao-primary-hover:      color-mix(in oklch, var(--tao-color-primary) 80%, white);
   --tao-primary-active:     color-mix(in oklch, var(--tao-color-primary) 90%, black);
   --tao-primary-bg:         color-mix(in oklch, var(--tao-color-primary) 8%, var(--tao-color-bg-base));
   --tao-primary-bg-hover:   color-mix(in oklch, var(--tao-color-primary) 12%, var(--tao-color-bg-base));
   --tao-primary-border:     color-mix(in oklch, var(--tao-color-primary) 30%, var(--tao-color-bg-base));
-  --tao-primary-fg:         var(--tao-color-bg-base);  /* 文字反色 */
+  --tao-primary-fg:         var(--tao-color-bg-base);  /* 文字反色，随 bg-base 翻转 */
 
-  /* == Error 派生 (参考 antd colorErrorBg/Hover/Active) == */
+  /* == Error 派生 == */
   --tao-error:              var(--tao-color-error);
   --tao-error-hover:        color-mix(in oklch, var(--tao-color-error) 80%, white);
   --tao-error-active:       color-mix(in oklch, var(--tao-color-error) 90%, black);
   --tao-error-bg:           color-mix(in oklch, var(--tao-color-error) 6%, var(--tao-color-bg-base));
   --tao-error-border:       color-mix(in oklch, var(--tao-color-error) 30%, var(--tao-color-bg-base));
-  --tao-error-fg:           var(--tao-color-bg-base);
+  --tao-error-fg:           var(--tao-color-text-light-solid); /* 固定浅，不随模式翻转 */
 
-  /* == Success 派生 == */
+  /* == Success / Warning 派生 == */
   --tao-success:            var(--tao-color-success);
-  --tao-success-hover:      color-mix(in oklch, var(--tao-color-success) 80%, white);
   --tao-success-bg:         color-mix(in oklch, var(--tao-color-success) 6%, var(--tao-color-bg-base));
   --tao-success-border:     color-mix(in oklch, var(--tao-color-success) 30%, var(--tao-color-bg-base));
-
-  /* == Warning 派生 == */
   --tao-warning:            var(--tao-color-warning);
-  --tao-warning-hover:      color-mix(in oklch, var(--tao-color-warning) 80%, white);
   --tao-warning-bg:         color-mix(in oklch, var(--tao-color-warning) 6%, var(--tao-color-bg-base));
   --tao-warning-border:     color-mix(in oklch, var(--tao-color-warning) 30%, var(--tao-color-bg-base));
 
-  /* == 中性色派生 (参考 antd ColorNeutralMapToken) == */
-  /* 文字 4 级梯度 (antd: colorText/Secondary/Tertiary/Quaternary) */
+  /* == 中性色派生 == */
   --tao-color-text:              var(--tao-color-text-base);
   --tao-color-text-secondary:    color-mix(in oklch, var(--tao-color-text-base) 65%, var(--tao-color-bg-base));
   --tao-color-text-tertiary:     color-mix(in oklch, var(--tao-color-text-base) 45%, var(--tao-color-bg-base));
   --tao-color-text-quaternary:   color-mix(in oklch, var(--tao-color-text-base) 30%, var(--tao-color-bg-base));
 
-  /* 填充 4 级梯度 (antd: colorFill/Secondary/Tertiary/Quaternary) */
   --tao-color-fill:              color-mix(in oklch, var(--tao-color-text-base) 15%, var(--tao-color-bg-base));
   --tao-color-fill-secondary:    color-mix(in oklch, var(--tao-color-text-base) 10%, var(--tao-color-bg-base));
   --tao-color-fill-tertiary:     color-mix(in oklch, var(--tao-color-text-base) 6%, var(--tao-color-bg-base));
   --tao-color-fill-quaternary:   color-mix(in oklch, var(--tao-color-text-base) 3%, var(--tao-color-bg-base));
 
-  /* 背景 3 级 (antd: colorBgLayout/Container/Elevated) */
+  /* 背景 3 级：container/elevated 从 bg-surface 种子派生，
+     dark 换种子不换公式；elevated 向 white mix，暗色下自动提亮一层 */
   --tao-color-bg-layout:         color-mix(in oklch, var(--tao-color-text-base) 4%, var(--tao-color-bg-base));
-  --tao-color-bg-container:      var(--tao-color-bg-base);
-  --tao-color-bg-elevated:       var(--tao-color-bg-base);
-  --tao-color-bg-spotlight:      var(--tao-color-text-base);
+  --tao-color-bg-container:      var(--tao-color-bg-surface);
+  --tao-color-bg-elevated:       color-mix(in oklch, var(--tao-color-bg-surface) 94%, white);
 
-  /* 边框 2 级 (antd: colorBorder/Secondary) */
-  --tao-color-border:            color-mix(in oklch, var(--tao-color-text-base) 18%, var(--tao-color-bg-base));
-  --tao-color-border-secondary:  color-mix(in oklch, var(--tao-color-text-base) 10%, var(--tao-color-bg-base));
+  /* 边框 2 级（shadcn 式浅边框 12%；secondary 用半透明，跨底色无断层） */
+  --tao-color-border:            color-mix(in oklch, var(--tao-color-text-base) 12%, var(--tao-color-bg-base));
+  --tao-color-border-secondary:  color-mix(in oklch, var(--tao-color-text-base) 5%, transparent);
 }
 ```
 
 #### 2.3.2 圆角派生
 
-参考 antd `genRadius()` — 使用分段映射而非线性比例。
-antd 对不同 radiusBase 范围有不同的映射策略，确保视觉协调：
+shadcn 语义：sm/md/lg/xl 相对 base 递增，非等比（base=10 时 xs=2, sm=8, md=10, lg=12, xl=14）：
 
 ```css
 :root {
   /* == Seed == */
-  --tao-radius: 6px;
+  --tao-radius: 10px;   /* shadcn baseline */
 
-  /* == 派生 (antd genRadius 算法简化版) == */
-  /* antd: borderRadiusXS, borderRadiusSM, borderRadius, borderRadiusLG */
-  --tao-radius-xs:   2px;                               /* antd: 2 when base>=6 */
-  --tao-radius-sm:   calc(var(--tao-radius) - 2px);     /* antd: 4 when base=6 */
-  --tao-radius-md:   var(--tao-radius);                  /* 基准值 */
-  --tao-radius-lg:   calc(var(--tao-radius) + 2px);     /* antd: +2 when 6<=base<16 */
-  --tao-radius-xl:   calc(var(--tao-radius) * 2);       /* 扩展: dialog/popover */
-  --tao-radius-2xl:  calc(var(--tao-radius) * 2.67);    /* 扩展: 大型容器 */
+  /* == 派生 == */
+  --tao-radius-xs:   2px;
+  --tao-radius-sm:   calc(var(--tao-radius) - 2px);    /* 8 */
+  --tao-radius-md:   var(--tao-radius);                 /* 10 */
+  --tao-radius-lg:   calc(var(--tao-radius) + 2px);    /* 12 */
+  --tao-radius-xl:   calc(var(--tao-radius) + 4px);    /* 14 */
+  --tao-radius-2xl:  calc(var(--tao-radius) * 2);      /* 20 */
   --tao-radius-full: 9999px;
 }
 ```
 
-> 注意：CSS `calc()` 无法做 antd 那种 if/else 分段逻辑。如果用户设的 borderRadius 偏离默认值较大，`TaoProvider` 会在 JS 侧用 antd 同款 `genRadius()` 算法计算并注入正确值。
+> CSS `calc()` 无法做 antd `genRadius()` 的分段逻辑。当前接受线性偏差；
+> 若未来用户大改 borderRadius 需要精确映射，再在 TaoProvider JS 侧注入。
 
 #### 2.3.3 控件高度派生
 
-参考 antd `genControlHeight()` — 使用比例因子：
+±4px 阶梯（对齐 shadcn h-8/h-9/h-10，与 antd 32 中档一致）：
 
 ```css
 :root {
   /* == Seed == */
-  --tao-control-height: 36px;
+  --tao-control-height: 32px;
 
-  /* == 派生 (antd: *0.75, *1.25) == */
-  --tao-control-height-xs:  calc(var(--tao-control-height) * 0.5);    /* 18px — 极小控件 */
-  --tao-control-height-sm:  calc(var(--tao-control-height) * 0.875);  /* 32px (≈31.5 四舍五入) */
-  --tao-control-height-lg:  calc(var(--tao-control-height) * 1.11);   /* 40px (≈39.96) */
+  /* == 派生 == */
+  --tao-control-height-sm:  calc(var(--tao-control-height) - 4px);  /* 28 */
+  --tao-control-height-lg:  calc(var(--tao-control-height) + 4px);  /* 36 */
 }
 ```
-
-> 注：antd 的 `controlHeight` 默认 32，乘以 0.75=24, 1.25=40。tao-ui 默认 36，
-> 调整系数使 sm=32, lg=40 保持和 antd 同样的阶梯差距。
 
 #### 2.3.4 尺寸/间距派生
 
@@ -231,36 +228,25 @@ antd 对不同 radiusBase 范围有不同的映射策略，确保视觉协调：
 
 #### 2.3.5 字体派生
 
-参考 antd `genFontSizes()` — 使用自然对数阶梯 (`Math.E ** (i/5)`)。
-CSS 无法做指数运算，所以在 `TaoProvider` JS 侧计算后注入。
-
-默认值（fontSize=14 时）：
+固定阶梯（不做 antd 的自然对数阶梯——CSS 无法指数运算，
+而 14px 基线下的常用档位固定值即可覆盖）：
 
 ```css
 :root {
   /* == Seed == */
   --tao-font-size: 14px;
 
-  /* == 派生 (antd 自然对数阶梯) == */
-  --tao-font-size-sm:        12px;    /* antd fontSizeSM */
-  --tao-font-size-base:      14px;    /* antd fontSize (= seed) */
-  --tao-font-size-lg:        16px;    /* antd fontSizeLG */
-  --tao-font-size-xl:        20px;    /* antd fontSizeXL */
-  --tao-font-size-heading-5: 16px;    /* h5 */
-  --tao-font-size-heading-4: 20px;    /* h4 */
-  --tao-font-size-heading-3: 24px;    /* h3 */
-  --tao-font-size-heading-2: 30px;    /* h2 */
-  --tao-font-size-heading-1: 38px;    /* h1 */
+  /* == 派生 == */
+  --tao-font-size-xs:        12px;
+  --tao-font-size-sm:        13px;
+  --tao-font-size-base:      14px;   /* = seed */
+  --tao-font-size-lg:        16px;
+  --tao-font-size-xl:        20px;
 
   /* 行高 (antd: (fontSize + 8) / fontSize) */
   --tao-line-height:         1.5714;  /* (14+8)/14 */
   --tao-line-height-sm:      1.6667;  /* (12+8)/12 */
   --tao-line-height-lg:      1.5;     /* (16+8)/16 */
-  --tao-line-height-heading-5: 1.5;
-  --tao-line-height-heading-4: 1.4;
-  --tao-line-height-heading-3: 1.3333;
-  --tao-line-height-heading-2: 1.2667;
-  --tao-line-height-heading-1: 1.2105;
 }
 ```
 
@@ -278,28 +264,30 @@ CSS 无法做指数运算，所以在 `TaoProvider` JS 侧计算后注入。
   --tao-motion-duration-mid:  calc(var(--tao-motion-unit) * 2);  /* 0.2s */
   --tao-motion-duration-slow: calc(var(--tao-motion-unit) * 3);  /* 0.3s */
 
-  /* 缓动曲线 (参考 antd seed 中的预设) */
+  /* 缓动曲线 */
   --tao-motion-ease-out:          cubic-bezier(0.215, 0.61, 0.355, 1);
   --tao-motion-ease-in-out:       cubic-bezier(0.645, 0.045, 0.355, 1);
-  --tao-motion-ease-out-circ:     cubic-bezier(0.08, 0.82, 0.17, 1);
-  --tao-motion-ease-in-out-circ:  cubic-bezier(0.78, 0.14, 0.15, 0.86);
   --tao-motion-ease-out-quint:    cubic-bezier(0.23, 1, 0.32, 1);
+  /* 进场强调（Modal/Drawer/DatePicker 弹出）：起步快、收尾长 */
+  --tao-motion-ease-out-expo:     cubic-bezier(0.16, 1, 0.3, 1);
 }
 ```
 
 #### 2.3.7 阴影派生
 
-参考 antd `AliasToken` 的 `boxShadow` / `boxShadowSecondary` / `boxShadowTertiary`：
-
 ```css
 :root {
+  /* xs：按钮/输入的极细一道，让元素"浮起来一层"而不喧宾夺主 */
+  --tao-box-shadow-xs:        0 1px 2px 0 oklch(0 0 0 / 0.05);
   --tao-box-shadow:           0 1px 2px oklch(0 0 0 / 0.04),
                               0 0 1px oklch(0 0 0 / 0.08);
-  --tao-box-shadow-secondary: 0 2px 6px oklch(0 0 0 / 0.04),
+  --tao-box-shadow-secondary: 0 2px 8px oklch(0 0 0 / 0.06),
                               0 0 1px oklch(0 0 0 / 0.06);
   --tao-box-shadow-tertiary:  0 1px 2px oklch(0 0 0 / 0.04);
 }
 ```
+
+> dark scope 整体加深（0.35–0.5 alpha）：半透明黑在暗底上不可见。
 
 #### 2.3.8 语义别名 (Alias Token)
 
@@ -308,7 +296,9 @@ CSS 无法做指数运算，所以在 `TaoProvider` JS 侧计算后注入。
 ```css
 :root {
   /* 文字 (antd: colorTextPlaceholder, colorTextDisabled, colorTextHeading, colorTextLabel, colorTextDescription) */
-  --tao-color-text-placeholder:  var(--tao-color-text-quaternary);
+  /* placeholder 用 tertiary(45%)：quaternary 对比度 ~2.2:1 偏飘；
+     disabled 保持 quaternary 的"熄灭"感 */
+  --tao-color-text-placeholder:  var(--tao-color-text-tertiary);
   --tao-color-text-disabled:     var(--tao-color-text-quaternary);
   --tao-color-text-heading:      var(--tao-color-text);
   --tao-color-text-label:        var(--tao-color-text-secondary);
@@ -324,10 +314,14 @@ CSS 无法做指数运算，所以在 `TaoProvider` JS 侧计算后注入。
   --tao-control-item-bg-active:        var(--tao-primary-bg);
   --tao-control-item-bg-active-hover:  var(--tao-primary-bg-hover);
 
-  /* focus 环 (antd: controlOutline, colorWarningOutline, colorErrorOutline) */
-  --tao-control-outline:         color-mix(in oklch, var(--tao-color-primary) 16%, transparent);
-  --tao-color-warning-outline:   color-mix(in oklch, var(--tao-color-warning) 16%, transparent);
-  --tao-color-error-outline:     color-mix(in oklch, var(--tao-color-error) 16%, transparent);
+  /* focus 环 (antd: controlOutline) — 3px ring，暗中性主色用 20% α 更透气 */
+  --tao-control-outline:         color-mix(in oklch, var(--tao-color-primary) 20%, transparent);
+  --tao-color-warning-outline:   color-mix(in oklch, var(--tao-color-warning) 25%, transparent);
+  --tao-color-error-outline:     color-mix(in oklch, var(--tao-color-error) 25%, transparent);
+
+  /* 遮罩与滚动提示阴影 */
+  --tao-color-bg-mask:           oklch(0 0 0 / 0.1);   /* Modal/Drawer/Sheet dim 层 */
+  --tao-color-shadow-hint:       oklch(0 0 0 / 0.05);  /* Table fixed 列、ScrollArea 渐变 */
 
   /* 分割线 (antd: colorSplit) */
   --tao-color-split: var(--tao-color-border-secondary);
@@ -379,15 +373,12 @@ interface TaoThemeConfig {
   /** 覆盖 Seed Token */
   token?: Partial<TaoSeedToken>;
 
-  /** 主题算法 (参考 antd algorithm) */
-  algorithm?: 'default' | 'dark' | 'compact' | TaoAlgorithm | TaoAlgorithm[];
+  /** 明暗模式 (见 §3.5)。dark 输出 data-tao-theme="dark"，纯 CSS 算法 */
+  mode?: 'light' | 'dark';
 
-  /** 覆盖单个组件的 token (参考 antd ComponentsConfig) */
+  /** 覆盖单个组件的 token (参考 antd ComponentsConfig) — 未实现，规划中 */
   components?: {
     Button?: Partial<ButtonComponentToken>;
-    Input?: Partial<InputComponentToken>;
-    Select?: Partial<SelectComponentToken>;
-    FormField?: Partial<FormFieldComponentToken>;
     // ...
   };
 
@@ -462,64 +453,48 @@ tao-ui 支持 3 种 variant：
 | `filled` | 灰底填充，无边框 | 管理后台、紧凑布局 |
 | `borderless` | 透明底，无边框 | 表格内编辑、嵌入式 |
 
-### 3.5 主题算法（参考 antd algorithm）
+### 3.5 主题模式（已实现：dark）
 
-antd 暗色/紧凑不是硬编码另一套 token，而是切换"派生算法"。
-同样的 seed → 不同的 map 规则。算法可组合叠加。
+明暗模式不是硬编码另一套 token，而是**纯 CSS 算法**：`[data-tao-theme="dark"]`
+scope 只覆盖 4 个 seed（bg-base/text-base/bg-surface/primary）+ 少数「翻转方向
+不同」的 derived token（shadows、primary hover/active、mask），其余派生全部由
+`color-mix` 公式自动适配。零 JS runtime。
 
 ```tsx
-import { darkAlgorithm, compactAlgorithm } from 'tao-ui';
-
 // 暗色主题
-<TaoProvider theme={{ algorithm: 'dark' }}>
+<TaoProvider theme={{ mode: 'dark' }}>
   <App />
 </TaoProvider>
-
-// 暗色 + 紧凑 (组合算法，参考 antd [dark, compact])
-<TaoProvider theme={{ algorithm: [darkAlgorithm, compactAlgorithm] }}>
-  <DashboardApp />
-</TaoProvider>
 ```
 
-#### 3.5.1 Dark 算法（参考 antd dark/colors.js）
+实现机制：
+- `TaoProvider` 把 `mode: 'dark'` 输出为元素上的 `data-tao-theme="dark"` 属性
+- `mode` 经 context 继承（嵌套 provider 未声明时跟随父级），portal 浮层
+  （Modal/Drawer/Select 下拉）通过 `TaoPortalScope` 重建该属性，不会逃出暗色作用域
+- 已知限制：dark 内显式 `mode: 'light'` **不会**翻回亮色——CSS 自定义属性
+  无法"撤销"祖先的 seed 覆盖。需要亮/暗混排时，把亮部移出 dark provider。
 
-暗色算法核心差异（参考 antd `generateNeutralColorPalettes` 暗色版）：
-
-```ts
-// 亮色: text 梯度用透明度递减
-colorText = alpha(textBase, 0.88)
-colorTextSecondary = alpha(textBase, 0.65)
-
-// 暗色: 翻转 — bgBase=#000, textBase=#fff
-colorText = alpha(textBase, 0.85)
-colorBgContainer = lighten(bgBase, 8)   // 比纯黑提亮一点
-colorBgElevated = lighten(bgBase, 12)   // 浮层比容器更亮
-colorBorder = lighten(bgBase, 26)       // 边框更明显
-```
-
-tao-ui 用 `color-mix(in oklch)` 实现同样效果，无需 JS runtime：
+Dark scope 覆盖值（theme.css）：
 
 ```css
 [data-tao-theme="dark"] {
-  --tao-color-bg-base:  oklch(0.145 0.005 70);
-  --tao-color-text-base: oklch(0.93 0.004 70);
-  /* 其余 derived token 通过 color-mix 自动适应 */
+  --tao-color-bg-base:    oklch(0.165 0.005 70);
+  --tao-color-text-base:  oklch(0.922 0.005 70);
+  --tao-color-bg-surface: oklch(0.21  0.005 70);
+  --tao-color-primary:    oklch(0.922 0.005 70);  /* 近黑主色翻为近白 */
+  /* + shadows 加深、mask 加深、focus outline α 提高、
+     primary hover/active 改向深色 mix */
 }
 ```
 
-#### 3.5.2 Compact 算法（参考 antd compact/index.js）
+#### 3.5.2 Compact 算法（未实现）
 
-紧凑模式的核心（参考 antd `genCompactSizeMapToken`）：
+规划方向（参考 antd `genCompactSizeMapToken`）：
 
 ```ts
-// antd compact 算法：
-sizeStep = defaultSizeStep - 2;           // 4 → 2
-controlHeight = defaultControlHeight - 4; // 32 → 28
-fontSize = fontSizeSM;                    // 14 → 12
-
-// tao-ui compact 算法：
+// tao-ui compact 算法（规划）：
 --tao-size-step: 2;                       // 4 → 2
---tao-control-height: 32px;               // 36 → 32
+--tao-control-height: 32px;               // → 28
 --tao-font-size: 12px;                    // 14 → 12
 ```
 
@@ -782,11 +757,32 @@ function TaoProvider({ theme, size, disabled, variant, children }: TaoProviderPr
 | **UI/正文** | **Geist Sans** | 几何骨架 + 人文主义细节，13-16px 下极清晰 |
 | **等宽** | **Geist Mono** | 数字对齐完美，适合表格/代码/数值 |
 
+**库不捆绑字体文件**（与 antd 一致——antd seed 就是纯系统栈，零 @font-face）。
+字体加载策略（preload、子集化、display）是应用层决策，组件库强制下载字体
+对所有消费方是负担；且 Geist 无 CJK 字形，中文场景本就走系统回退。
+
 ```css
 :root {
-  --tao-font-family:      'Geist Sans', ui-sans-serif, system-ui, -apple-system, sans-serif;
-  --tao-font-family-code: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  /* Geist 未安装时落到 antd 同款系统栈 + 显式 CJK */
+  --tao-font-family: 'Geist Sans', -apple-system, BlinkMacSystemFont,
+    'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
+    'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  --tao-font-family-code: 'Geist Mono', ui-monospace, SFMono-Regular,
+    Menlo, Consolas, 'Liberation Mono', monospace;
 }
+```
+
+消费方启用 Geist（可选，一行安装）：
+
+```bash
+pnpm add @fontsource/geist-sans @fontsource/geist-mono
+```
+
+```ts
+import '@fontsource/geist-sans/400.css';
+import '@fontsource/geist-sans/500.css';
+import '@fontsource/geist-sans/600.css';
+import '@fontsource/geist-mono/400.css';
 ```
 
 ### 5.2 字重
@@ -884,12 +880,10 @@ function TaoProvider({ theme, size, disabled, variant, children }: TaoProviderPr
 
 ## 11. Focus 系统
 
-参考 antd `controlOutline` + `controlOutlineWidth`：
-
 ```css
-/* focus-visible 统一样式 */
-outline: 2px solid var(--tao-control-outline);
-outline-offset: 1px;
+/* focus-visible 统一样式：3px ring box-shadow（比 antd 2px outline 更可见） */
+box-shadow: 0 0 0 var(--tao-ring-width) var(--tao-control-outline);
+/* --tao-ring-width: 3px；--tao-control-outline = primary 20% α */
 ```
 
 规则：
@@ -905,22 +899,24 @@ outline-offset: 1px;
 
 ```
 尺寸 (消费 --tao-control-height 派生):
-  sm:   h=control-height-sm(32px), px=padding-xs(8px),   text=font-size-sm, radius-sm
-  md:   h=control-height(36px),    px=padding-sm(12px),   text=font-size-base, radius-md  (默认)
-  lg:   h=control-height-lg(40px), px=padding(16px),      text=font-size-base, radius-md
+  sm:   h=control-height-sm(28px), px=padding-xs(8px),  text=font-size-sm, radius-sm
+  md:   h=control-height(32px),    px=padding(16px),    text=font-size-base, radius-md  (默认)
+  lg:   h=control-height-lg(36px), px=padding(16px),    text=font-size-base, radius-md
 
 变体:
-  primary:     bg=primary, fg=primary-fg
-  secondary:   bg=transparent, border=color-border, fg=color-text
-  ghost:       bg=transparent, fg=color-text-secondary, hover:bg=color-bg-text-hover
-  destructive: bg=error, fg=error-fg
+  primary:     bg=primary, fg=primary-fg, shadow=xs
+  secondary:   bg=transparent, border=color-border, fg=color-text, shadow=xs
+  ghost:       bg=transparent, fg=color-text-secondary, hover:bg=fill-tertiary
+  destructive: bg=error, fg=error-fg, shadow=xs
 
 状态:
   hover:    bg=primary-hover (或 error-hover)
-  active:   bg=primary-active, scale(0.98)
-  disabled: opacity=opacity-loading, pointer-events none
-  loading:  spinner 替换文字，宽度锁定
+  active:   bg=primary-active
+  disabled: opacity=opacity-loading
+  loading:  icon 位 idle/spinner 双层 opacity 切换，无回流
 ```
+
+> 不做 `active: scale(0.98)`——按压缩放偏 C 端体感，与本库的克制语言不搭。
 
 API:
 ```tsx
@@ -931,15 +927,16 @@ API:
 
 ```
 尺寸 (消费 --tao-control-height 派生):
-  sm:   h=control-height-sm(32px), px=control-padding-horizontal-sm(8px), text=font-size-sm
-  md:   h=control-height(36px),    px=control-padding-horizontal(12px),    text=font-size-base  (默认)
-  lg:   h=control-height-lg(40px), px=control-padding-horizontal(12px),    text=font-size-lg
+  sm:   h=control-height-sm(28px), px=padding-xs(8px), text=font-size-sm
+  md:   h=control-height(32px),    px=padding-sm(12px), text=font-size-base  (默认)
+  lg:   h=control-height-lg(36px), px=padding-sm(12px), text=font-size-lg
 
 状态:
-  default:    border=color-border, bg=color-bg-container
-  focus:      outline=control-outline
-  error:      border=error-border, outline=color-error-outline
-  disabled:   bg=color-bg-container-disabled, fg=color-text-disabled
+  default:    border=color-border, bg=transparent
+  hover:      border 加深一档 (text-base 20%)
+  focus:      border=primary + 3px ring (control-outline)
+  error:      border=error, ring=color-error-outline
+  disabled:   bg=color-bg-disabled, fg=color-text-disabled
 
 结构:
   [prefix?] [input] [suffix?]
@@ -1012,6 +1009,9 @@ Props:
 | font-weight: 700 | 最重到 600 |
 | ALL CAPS 文字 | 不用 |
 
+> 例外：`--tao-color-bg-surface` 默认值为纯白 `oklch(1 0 0)`——刻意的，
+> 让 popover/控件融入消费方的白底宿主；暖调由 bg-base 派生的其余中性色承担。
+
 ---
 
 ## 15. 文件结构
@@ -1019,24 +1019,13 @@ Props:
 ```
 src/
   theme/
-    seed.ts              ← Seed Token 默认值 + 类型定义
-    derived.css          ← CSS 变量定义 (Seed + Derived)
-    gen-radius.ts        ← 圆角派生算法 (移植自 antd)
-    gen-font-sizes.ts    ← 字号派生算法 (移植自 antd)
-    gen-control-height.ts← 控件高度派生
-    gen-size-map.ts      ← 间距派生
+    theme.css            ← Seed + Derived token 定义（含 dark scope）
+    control.css          ← 表单控件共享交互态 (outlined/filled/borderless)
   provider/
-    tao-provider.tsx     ← TaoProvider 组件
-    context.ts           ← React Context
+    tao-provider.tsx     ← TaoProvider 组件 + TaoPortalScope + context
   components/
-    button/
-    input/
-    select/
-    form-field/
-    form-section/
-    form-actions/
+    button/  input/  select/  table/  tag/  modal/  drawer/  ...
   layouts/
-    stack/
-    form-layout/
+    stack/  form-layout/
   index.tsx
 ```
