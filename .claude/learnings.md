@@ -126,7 +126,7 @@
 
 ## [发布] tao-ui 发版流程：GitHub Release 触发 CI npm publish
 - **日期**: 2026-06-07
-- **正确做法**: ① 改 package.json version ② `bun install` 更新 bun.lockb ③ commit + push main ④ `gh release create vX.Y.Z`（tag 必须 = package.json version，否则 CI 的 verify 步骤报错）。release.yml 在 `release: published` 时跑 test→build→`npm publish`(NODE_AUTH_TOKEN=secrets.NPM_TOKEN)。包名 `@rockshin/tao-ui`
+- **正确做法**: ① 改 package.json version ② `bun install` 更新 bun.lockb ③ commit + push main ④ `gh release create vX.Y.Z`（tag 必须 = package.json version，否则 CI 的 verify 步骤报错）。`release.mjs` 必须在改版本后同步 lockfile，否则 CI 的 `bun install --frozen-lockfile` 会失败。release.yml 在 `release: published` 时跑 test→build→`npm publish`(NODE_AUTH_TOKEN=secrets.NPM_TOKEN)。包名 `@rockshin/tao-ui`
 - **适用场景**: 发新版本时照此走，不要本地手动 npm publish
 
 ## [工具链] AGENTS.md 的 lint 命令与 package.json 不一致
@@ -135,6 +135,13 @@
 - **真实行为**: 当前 `package.json` 没有 `lint` script，Biome 脚本名是 `check`，且自带 `--write`
 - **正确做法**: 只读校验指定文件时运行 `bun x biome check <files>`；需要自动修复时才运行 `bun run check`
 - **适用场景**: tao-ui 的格式和 lint 校验
+
+## [Bun] 普通 install 不会清理旧 pnpm symlink
+- **日期**: 2026-07-25
+- **错误假设**: `bun install` 会替换 `node_modules` 中其他包管理器留下的链接
+- **真实行为**: 旧 `.pnpm` symlink 仍可能被 Testing Library 解析，导致应用与 renderer 加载不同 React 实例并报 Invalid hook call
+- **正确做法**: 发现同一包解析到不同路径时运行 `bun install --force` 重建链接，再用 `bun install --frozen-lockfile` 验证 lockfile
+- **适用场景**: tao-ui 切换包管理器或 clean install 后出现批量 Invalid hook call
 
 ## [CSS] Input size 规则会覆盖低优先级的 prefix 间距规则
 - **日期**: 2026-07-25

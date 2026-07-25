@@ -93,6 +93,7 @@ assert(
 
 packageJson.version = version;
 writeFileSync(packageJsonPath, `${JSON.stringify(packageJson, null, 2)}\n`);
+run('bun', ['install']);
 
 console.log(`\nPreparing ${packageJson.name}@${version}`);
 
