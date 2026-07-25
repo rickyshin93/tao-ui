@@ -7,32 +7,78 @@ import { TaoProvider } from '../../src/provider/tao-provider';
 
 test('renders with placeholder', () => {
   render(<DatePicker />);
-  expect(screen.getByText('YYYY-MM-DD')).toBeTruthy();
+  expect(screen.getByRole('textbox')).toHaveAttribute(
+    'placeholder',
+    'YYYY-MM-DD',
+  );
 });
 
 test('renders custom placeholder', () => {
   render(<DatePicker placeholder="Pick a date" />);
-  expect(screen.getByText('Pick a date')).toBeTruthy();
+  expect(screen.getByRole('textbox')).toHaveAttribute(
+    'placeholder',
+    'Pick a date',
+  );
 });
 
 test('displays formatted value', () => {
   render(<DatePicker value={dayjs('2026-06-15')} />);
-  expect(screen.getByText('2026-06-15')).toBeTruthy();
+  expect(screen.getByRole('textbox')).toHaveValue('2026-06-15');
+});
+
+test('PC trigger accepts a typed date and commits it with Enter', async () => {
+  let result: string | null = null;
+  render(
+    <DatePicker
+      mobile={false}
+      onChange={(_, dateString) => {
+        result = dateString;
+      }}
+    />,
+  );
+
+  await userEvent.type(screen.getByRole('textbox'), '2026-07-25{Enter}');
+
+  expect(result).toBe('2026-07-25');
+});
+
+test('PC trigger rejects a typed date that does not match the format', async () => {
+  let changeCount = 0;
+  render(
+    <DatePicker
+      mobile={false}
+      onChange={() => {
+        changeCount += 1;
+      }}
+    />,
+  );
+
+  const input = screen.getByRole('textbox');
+  await userEvent.type(input, '2026-02-31{Enter}');
+
+  expect(changeCount).toBe(0);
+  expect(input).toHaveValue('');
+});
+
+test('mobile trigger remains a button', () => {
+  render(<DatePicker mobile />);
+  expect(screen.getByRole('button')).toBeTruthy();
+  expect(screen.queryByRole('textbox')).toBeNull();
 });
 
 test('picker=month shows month format', () => {
   render(<DatePicker picker="month" value={dayjs('2026-06-01')} />);
-  expect(screen.getByText('2026-06')).toBeTruthy();
+  expect(screen.getByRole('textbox')).toHaveValue('2026-06');
 });
 
 test('picker=year shows year format', () => {
   render(<DatePicker picker="year" value={dayjs('2026-01-01')} />);
-  expect(screen.getByText('2026')).toBeTruthy();
+  expect(screen.getByRole('textbox')).toHaveValue('2026');
 });
 
 test('click trigger opens popover with calendar', async () => {
   render(<DatePicker />);
-  await userEvent.click(screen.getByRole('button'));
+  await userEvent.click(screen.getByRole('textbox'));
   expect(screen.getByRole('grid')).toBeTruthy(); // calendar table
 });
 
@@ -84,12 +130,14 @@ test('inherits size from TaoProvider', () => {
       <DatePicker />
     </TaoProvider>,
   );
-  expect(screen.getByRole('button').dataset.taoSize).toBe('small');
+  expect(
+    screen.getByRole('textbox').closest('[data-tao-picker-trigger]'),
+  ).toHaveAttribute('data-tao-size', 'small');
 });
 
 test('disabled prevents opening', async () => {
   render(<DatePicker disabled />);
-  expect(screen.getByRole('button')).toBeDisabled();
+  expect(screen.getByRole('textbox')).toBeDisabled();
 });
 
 test('presets render as buttons', async () => {
@@ -101,7 +149,7 @@ test('presets render as buttons', async () => {
       ]}
     />,
   );
-  await userEvent.click(screen.getByRole('button'));
+  await userEvent.click(screen.getByRole('textbox'));
   expect(screen.getByText('Today')).toBeTruthy();
   expect(screen.getByText('Yesterday')).toBeTruthy();
 });

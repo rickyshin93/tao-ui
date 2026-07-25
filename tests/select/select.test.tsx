@@ -1,5 +1,5 @@
 import { expect, test } from '@rstest/core';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { Select } from '../../src/components/select/select';
 import { TaoProvider } from '../../src/provider/tao-provider';
@@ -204,22 +204,44 @@ test('showSearch: typing filters options', async () => {
     />,
   );
 
-  // Open the dropdown — the search input lives inside the content.
-  await user.click(screen.getByRole('combobox'));
-  const input = document.querySelector(
-    '[data-tao-select-search-input]',
-  ) as HTMLInputElement;
-  expect(input).toBeTruthy();
+  const input = screen.getByRole('combobox') as HTMLInputElement;
+  expect(input.tagName).toBe('INPUT');
+  expect(input).toHaveAttribute('data-tao-select-trigger-input');
   expect(input.readOnly).toBe(false);
 
   await user.click(input);
+  await waitFor(() => expect(input).toHaveFocus());
   await user.keyboard('app');
   expect(input.value).toBe('app');
+  expect(document.querySelector('[data-tao-select-search-input]')).toBeNull();
 
   // Only "Apple" should remain in the list.
   expect(screen.getByText('Apple')).toBeTruthy();
   expect(screen.queryByText('Banana')).toBeNull();
   expect(screen.queryByText('Cherry')).toBeNull();
+});
+
+test('showSearch: Enter selects the first filtered option', async () => {
+  const user = userEvent.setup();
+  let selected: string | undefined;
+  render(
+    <Select
+      options={[
+        { label: 'Apple', value: 'a' },
+        { label: 'Banana', value: 'b' },
+      ]}
+      showSearch
+      onChange={(value) => {
+        selected = value as string;
+      }}
+    />,
+  );
+
+  const input = screen.getByRole('combobox');
+  await user.click(input);
+  await user.keyboard('ban{Enter}');
+
+  expect(selected).toBe('b');
 });
 
 test('status sets data-tao-error / data-tao-warning on trigger', () => {
@@ -462,6 +484,51 @@ test('mode="multiple" shows placeholder when empty', () => {
     />,
   );
   expect(screen.getByText('Pick items')).toBeTruthy();
+});
+
+test('mode="multiple" + showSearch uses an inline PC input', async () => {
+  let received: string[] | null = null;
+  render(
+    <Select
+      mobile={false}
+      mode="multiple"
+      showSearch
+      options={[
+        { label: 'Apple', value: 'a' },
+        { label: 'Banana', value: 'b' },
+      ]}
+      onChange={(value) => {
+        received = value as string[];
+      }}
+    />,
+  );
+
+  const input = screen.getByRole('combobox') as HTMLInputElement;
+  expect(input.tagName).toBe('INPUT');
+  expect(input).toHaveAttribute('data-tao-select-trigger-input');
+
+  await userEvent.type(input, 'ban{Enter}');
+
+  expect(received).toEqual(['b']);
+  expect(screen.getByRole('listbox')).toBeTruthy();
+  expect(document.querySelector('[data-tao-select-search-input]')).toBeNull();
+});
+
+test('mode="tags" + showSearch creates a tag from the inline input', async () => {
+  render(
+    <Select
+      mobile={false}
+      mode="tags"
+      showSearch
+      options={[]}
+      defaultValue={[]}
+    />,
+  );
+
+  const input = screen.getByRole('combobox');
+  await userEvent.type(input, 'New tag{Enter}');
+
+  expect(screen.getByText('New tag')).toBeTruthy();
 });
 
 test('mode="multiple" renders tags from value array', () => {

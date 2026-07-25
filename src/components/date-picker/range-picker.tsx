@@ -1,7 +1,8 @@
 import * as Popover from '@radix-ui/react-popover';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
-import { type ReactNode, useCallback, useState } from 'react';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+import { type ReactNode, useCallback, useEffect, useState } from 'react';
 import {
   TaoPortalScope,
   type TaoSize,
@@ -11,10 +12,11 @@ import {
 import { Drawer } from '../drawer/drawer';
 import { useIsMobile } from '../select/use-is-mobile';
 import { CalendarGrid } from './calendar/calendar-grid';
-import { CalendarHeader } from './calendar/calendar-header';
 import './date-picker.css';
 import { Presets } from './presets';
 import { getDefaultFormat, type RangePresetItem } from './types';
+
+dayjs.extend(customParseFormat);
 
 type RangeValue = [Dayjs | null, Dayjs | null] | null;
 
@@ -43,6 +45,7 @@ export interface RangePickerProps {
 
 export function RangePicker({
   value,
+  defaultValue,
   onChange,
   picker = 'date',
   showTime,
@@ -72,9 +75,20 @@ export function RangePicker({
   const isMobile = mobile ?? autoMobile;
 
   const fmt = formatProp ?? getDefaultFormat(picker, showTime);
+  const isValueControlled = value !== undefined;
+  const [internalValue, setInternalValue] = useState<RangeValue>(
+    defaultValue ?? null,
+  );
+  const resolvedValue = isValueControlled ? value : internalValue;
+  const emitChange = useCallback(
+    (dates: RangeValue, dateStrings: [string, string]) => {
+      if (!isValueControlled) setInternalValue(dates);
+      onChange?.(dates, dateStrings);
+    },
+    [isValueControlled, onChange],
+  );
 
   const [internalOpen, setInternalOpen] = useState(false);
-  const [hovering, setHovering] = useState(false);
   const isOpen = controlledOpen ?? internalOpen;
   const setOpen = useCallback(
     (v: boolean) => {
@@ -85,7 +99,7 @@ export function RangePicker({
   );
 
   const [viewDateStart, setViewDateStart] = useState<Dayjs>(
-    () => value?.[0] ?? dayjs(),
+    () => resolvedValue?.[0] ?? dayjs(),
   );
   const viewDateEnd = viewDateStart.add(1, 'month');
 
@@ -94,8 +108,8 @@ export function RangePicker({
   // When selecting end, store the pending start separately so rangeEnd stays null for hover preview
   const [pendingStart, setPendingStart] = useState<Dayjs | null>(null);
 
-  const rangeStart = pendingStart ?? value?.[0] ?? null;
-  const rangeEnd = pendingStart ? null : (value?.[1] ?? null);
+  const rangeStart = pendingStart ?? resolvedValue?.[0] ?? null;
+  const rangeEnd = pendingStart ? null : (resolvedValue?.[1] ?? null);
 
   const handleDateSelect = useCallback(
     (date: Dayjs) => {
@@ -108,35 +122,97 @@ export function RangePicker({
         if (start && date.isBefore(start)) {
           [start, end] = [date, start];
         }
-        onChange?.([start, end], [start?.format(fmt) ?? '', end.format(fmt)]);
+        emitChange([start, end], [start?.format(fmt) ?? '', end.format(fmt)]);
         setPendingStart(null);
         setSelecting('start');
         setHoverDate(null);
         if (!showTime) setOpen(false);
       }
     },
-    [selecting, pendingStart, rangeStart, onChange, fmt, showTime, setOpen],
+    [selecting, pendingStart, rangeStart, emitChange, fmt, showTime, setOpen],
   );
 
   const handleClear = useCallback(
     (e: React.SyntheticEvent) => {
       e.stopPropagation();
-      onChange?.(null, ['', '']);
+      emitChange(null, ['', '']);
     },
-    [onChange],
+    [emitChange],
   );
 
   const handlePresetSelect = useCallback(
     (val: unknown) => {
       const [s, e] = val as [Dayjs, Dayjs];
-      onChange?.([s, e], [s.format(fmt), e.format(fmt)]);
+      emitChange([s, e], [s.format(fmt), e.format(fmt)]);
       setOpen(false);
     },
-    [onChange, fmt, setOpen],
+    [emitChange, fmt, setOpen],
   );
 
   const displayStart = rangeStart ? rangeStart.format(fmt) : '';
   const displayEnd = rangeEnd ? rangeEnd.format(fmt) : '';
+  const [inputStart, setInputStart] = useState(displayStart);
+  const [inputEnd, setInputEnd] = useState(displayEnd);
+
+  useEffect(() => setInputStart(displayStart), [displayStart]);
+  useEffect(() => setInputEnd(displayEnd), [displayEnd]);
+
+  const commitInputValue = useCallback(
+    (position: 'start' | 'end') => {
+      const text = (position === 'start' ? inputStart : inputEnd).trim();
+      const currentValue = position === 'start' ? displayStart : displayEnd;
+      const parsed = text ? dayjs(text, fmt, true) : null;
+      const isBlocked =
+        parsed != null &&
+        (!parsed.isValid() ||
+          disabledDate?.(parsed) ||
+          (minDate != null && parsed.isBefore(minDate, 'day')) ||
+          (maxDate != null && parsed.isAfter(maxDate, 'day')) ||
+          (position === 'start' &&
+            rangeEnd != null &&
+            parsed.isAfter(rangeEnd)) ||
+          (position === 'end' &&
+            rangeStart != null &&
+            parsed.isBefore(rangeStart)));
+
+      if (isBlocked) {
+        if (position === 'start') setInputStart(currentValue);
+        else setInputEnd(currentValue);
+        return;
+      }
+
+      const nextStart = position === 'start' ? parsed : rangeStart;
+      const nextEnd = position === 'end' ? parsed : rangeEnd;
+      const nextStrings: [string, string] = [
+        nextStart?.format(fmt) ?? '',
+        nextEnd?.format(fmt) ?? '',
+      ];
+      emitChange(
+        nextStart || nextEnd ? [nextStart, nextEnd] : null,
+        nextStrings,
+      );
+      setPendingStart(null);
+      if (parsed) setViewDateStart(parsed);
+      if (position === 'start') setInputStart(nextStrings[0]);
+      else setInputEnd(nextStrings[1]);
+      if (nextStart && nextEnd) setOpen(false);
+    },
+    [
+      disabledDate,
+      displayEnd,
+      displayStart,
+      emitChange,
+      fmt,
+      inputEnd,
+      inputStart,
+      maxDate,
+      minDate,
+      rangeEnd,
+      rangeStart,
+      setOpen,
+    ],
+  );
+
   const showClearBtn =
     allowClear && (rangeStart || rangeEnd) && !resolvedDisabled;
 
@@ -227,7 +303,40 @@ export function RangePicker({
     </div>
   );
 
-  const trigger = (
+  const triggerIcons = (
+    <span
+      data-tao-picker-icons=""
+      data-tao-clearable={showClearBtn || undefined}
+    >
+      {showClearBtn && (
+        // biome-ignore lint/a11y/useSemanticElements: shared by the mobile button trigger, where nesting a button would be invalid HTML.
+        <span
+          data-tao-picker-clear=""
+          onClick={(event) => {
+            event.stopPropagation();
+            handleClear(event);
+          }}
+          aria-label="Clear"
+          role="button"
+          tabIndex={0}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+              event.preventDefault();
+              event.stopPropagation();
+              handleClear(event);
+            }
+          }}
+        >
+          <CloseIcon />
+        </span>
+      )}
+      <span data-tao-picker-suffix="">
+        <CalendarIcon />
+      </span>
+    </span>
+  );
+
+  const mobileTrigger = (
     <button
       type="button"
       data-tao-control=""
@@ -236,9 +345,7 @@ export function RangePicker({
       data-tao-variant={resolvedVariant}
       data-tao-error={status === 'error' || undefined}
       disabled={resolvedDisabled}
-      onClick={isMobile ? () => setOpen(true) : undefined}
-      onMouseEnter={() => setHovering(true)}
-      onMouseLeave={() => setHovering(false)}
+      onClick={() => setOpen(true)}
     >
       <span
         data-tao-range-input=""
@@ -257,41 +364,72 @@ export function RangePicker({
           <span data-tao-picker-placeholder="">{placeholder[1]}</span>
         )}
       </span>
-      <span data-tao-picker-icons="">
-        {showClearBtn && hovering ? (
-          // biome-ignore lint/a11y/useSemanticElements: this control is inside the trigger button, so a nested button would be invalid HTML.
-          <span
-            data-tao-picker-clear=""
-            onClick={(event) => {
-              event.stopPropagation();
-              handleClear(event);
-            }}
-            aria-label="Clear"
-            role="button"
-            tabIndex={0}
-            onKeyDown={(event) => {
-              if (event.key === 'Enter' || event.key === ' ') {
-                event.preventDefault();
-                event.stopPropagation();
-                handleClear(event);
-              }
-            }}
-          >
-            <CloseIcon />
-          </span>
-        ) : (
-          <span data-tao-picker-suffix="">
-            <CalendarIcon />
-          </span>
-        )}
-      </span>
+      {triggerIcons}
     </button>
+  );
+
+  const desktopTrigger = (
+    <div
+      data-tao-control=""
+      data-tao-range-trigger=""
+      data-tao-size={resolvedSize}
+      data-tao-variant={resolvedVariant}
+      data-tao-error={status === 'error' || undefined}
+      data-disabled={resolvedDisabled || undefined}
+    >
+      <input
+        data-tao-range-input=""
+        data-tao-active={(selecting === 'start' && isOpen) || undefined}
+        value={inputStart}
+        placeholder={placeholder[0]}
+        disabled={resolvedDisabled}
+        aria-invalid={status === 'error' || undefined}
+        onFocus={() => {
+          setSelecting('start');
+        }}
+        onChange={(event) => setInputStart(event.target.value)}
+        onBlur={() => commitInputValue('start')}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter') {
+            event.preventDefault();
+            commitInputValue('start');
+          } else if (event.key === 'Escape') {
+            setInputStart(displayStart);
+            setOpen(false);
+          }
+        }}
+      />
+      <span data-tao-range-separator="">{separator}</span>
+      <input
+        data-tao-range-input=""
+        data-tao-active={(selecting === 'end' && isOpen) || undefined}
+        value={inputEnd}
+        placeholder={placeholder[1]}
+        disabled={resolvedDisabled}
+        aria-invalid={status === 'error' || undefined}
+        onFocus={() => {
+          setSelecting('end');
+        }}
+        onChange={(event) => setInputEnd(event.target.value)}
+        onBlur={() => commitInputValue('end')}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter') {
+            event.preventDefault();
+            commitInputValue('end');
+          } else if (event.key === 'Escape') {
+            setInputEnd(displayEnd);
+            setOpen(false);
+          }
+        }}
+      />
+      {triggerIcons}
+    </div>
   );
 
   if (isMobile) {
     return (
       <>
-        {trigger}
+        {mobileTrigger}
         <Drawer
           open={isOpen}
           onClose={() => setOpen(false)}
@@ -307,7 +445,7 @@ export function RangePicker({
 
   return (
     <Popover.Root open={isOpen} onOpenChange={setOpen}>
-      <Popover.Trigger asChild>{trigger}</Popover.Trigger>
+      <Popover.Trigger asChild>{desktopTrigger}</Popover.Trigger>
       <Popover.Portal>
         <TaoPortalScope asChild>
           <Popover.Content

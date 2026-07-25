@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { expect, test } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
@@ -5,15 +6,22 @@ import dayjs from 'dayjs';
 import { RangePicker } from '../../src/components/date-picker/range-picker';
 
 test('renders with placeholder', () => {
-  render(<RangePicker />);
-  expect(screen.getByText('Start date')).toBeTruthy();
-  expect(screen.getByText('End date')).toBeTruthy();
+  render(<RangePicker mobile={false} />);
+  const inputs = screen.getAllByRole('textbox');
+  expect(inputs[0]).toHaveAttribute('placeholder', 'Start date');
+  expect(inputs[1]).toHaveAttribute('placeholder', 'End date');
 });
 
 test('displays formatted range values', () => {
-  render(<RangePicker value={[dayjs('2026-06-01'), dayjs('2026-06-15')]} />);
-  expect(screen.getByText('2026-06-01')).toBeTruthy();
-  expect(screen.getByText('2026-06-15')).toBeTruthy();
+  render(
+    <RangePicker
+      mobile={false}
+      value={[dayjs('2026-06-01'), dayjs('2026-06-15')]}
+    />,
+  );
+  const inputs = screen.getAllByRole('textbox');
+  expect(inputs[0]).toHaveValue('2026-06-01');
+  expect(inputs[1]).toHaveValue('2026-06-15');
 });
 
 test('shows separator', () => {
@@ -21,12 +29,63 @@ test('shows separator', () => {
   expect(screen.getByText('→')).toBeTruthy();
 });
 
+test('range content aligns to the start without excess leading space', () => {
+  const css = readFileSync(
+    'src/components/date-picker/date-picker.css',
+    'utf8',
+  );
+  const rule = css.match(/\[data-tao-range-input\] \{([^}]+)\}/)?.[1];
+
+  expect(rule).toContain('text-align: start;');
+});
+
 test('click opens dual calendar panels', async () => {
-  render(<RangePicker />);
-  await userEvent.click(screen.getByRole('button'));
+  render(<RangePicker mobile={false} />);
+  await userEvent.click(screen.getAllByRole('textbox')[0]);
   // Should have 2 calendar grids
   const grids = screen.getAllByRole('grid');
   expect(grids.length).toBe(2);
+});
+
+test('PC inputs accept a typed range with strict formatting', async () => {
+  let result: [string, string] = ['', ''];
+  render(
+    <RangePicker
+      mobile={false}
+      value={[null, dayjs('2026-07-31')]}
+      onChange={(_, dateStrings) => {
+        result = dateStrings;
+      }}
+    />,
+  );
+
+  await userEvent.type(screen.getAllByRole('textbox')[0], '2026-07-01{Enter}');
+
+  expect(result).toEqual(['2026-07-01', '2026-07-31']);
+});
+
+test('PC inputs reject invalid dates', async () => {
+  let changeCount = 0;
+  render(
+    <RangePicker
+      mobile={false}
+      onChange={() => {
+        changeCount += 1;
+      }}
+    />,
+  );
+
+  const input = screen.getAllByRole('textbox')[0];
+  await userEvent.type(input, '2026-02-31{Enter}');
+
+  expect(changeCount).toBe(0);
+  expect(input).toHaveValue('');
+});
+
+test('mobile trigger remains a button', () => {
+  render(<RangePicker mobile />);
+  expect(screen.getByRole('button')).toBeTruthy();
+  expect(screen.queryByRole('textbox')).toBeNull();
 });
 
 test('clear button resets range', async () => {
@@ -49,6 +108,7 @@ test('clear button resets range', async () => {
 test('presets render in range picker', async () => {
   render(
     <RangePicker
+      mobile={false}
       presets={[
         {
           label: 'This week',
@@ -57,6 +117,6 @@ test('presets render in range picker', async () => {
       ]}
     />,
   );
-  await userEvent.click(screen.getByRole('button'));
+  await userEvent.click(screen.getAllByRole('textbox')[0]);
   expect(screen.getByText('This week')).toBeTruthy();
 });

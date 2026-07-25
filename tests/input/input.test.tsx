@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { expect, test } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
@@ -58,6 +59,15 @@ test('inherits variant from TaoProvider', () => {
 test('prefix renders before input', () => {
   render(<Input prefix={<span data-testid="pfx">$</span>} />);
   expect(screen.getByTestId('pfx').textContent).toBe('$');
+});
+
+test('prefix keeps a compact 4px gap before the input content', () => {
+  const css = readFileSync('src/components/input/input.css', 'utf8');
+  const rule = css.match(
+    /\[data-tao-input\] \[data-tao-prefix\] \+ input \{([^}]+)\}/,
+  )?.[1];
+
+  expect(rule).toContain('padding-inline-start: var(--tao-size-unit);');
 });
 
 test('suffix renders after input', () => {

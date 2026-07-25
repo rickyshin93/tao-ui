@@ -49,6 +49,43 @@
   line-height: inherit;
 }
 
+[data-tao-select-search-trigger] {
+  position: relative;
+  display: grid;
+  flex: 1;
+  min-width: 0;
+  align-items: center;
+}
+
+[data-tao-select-trigger-input],
+[data-tao-select-trigger-value] {
+  grid-area: 1 / 1;
+  min-width: 0;
+}
+
+[data-tao-select-trigger-input] {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  padding: 0;
+  background: transparent;
+  font: inherit;
+  line-height: inherit;
+  color: var(--tao-color-text);
+  cursor: text;
+}
+
+[data-tao-select-trigger-input]::placeholder {
+  color: var(--tao-color-text-placeholder);
+}
+
+[data-tao-select-trigger-value] {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
 [data-tao-select-placeholder] {
   color: var(--tao-color-text-placeholder);
   line-height: var(--tao-select-line-height);
@@ -138,6 +175,31 @@
   flex-shrink: 0;
 }
 
+button[data-tao-select-clear] {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  font: inherit;
+}
+
+[data-tao-select][data-tao-inline-search]
+  [data-tao-select-icons][data-tao-clearable]
+  [data-tao-select-clear] {
+  display: none;
+}
+
+[data-tao-select][data-tao-inline-search]:hover
+  [data-tao-select-icons][data-tao-clearable]
+  [data-tao-select-icon] {
+  display: none;
+}
+
+[data-tao-select][data-tao-inline-search]:hover
+  [data-tao-select-icons][data-tao-clearable]
+  [data-tao-select-clear] {
+  display: flex;
+}
+
 [data-tao-select-icon] {
   color: var(--tao-color-text-tertiary);
   transition: transform var(--tao-motion-duration-fast)
@@ -188,6 +250,7 @@
 /* Disabled — handled by control.css, add select-specific */
 [data-tao-select][data-disabled] {
   cursor: not-allowed;
+  pointer-events: none;
 }
 
 /* ===========================
@@ -267,6 +330,17 @@
   margin-block-start: var(--tao-padding-xxs);
 }
 
+fieldset[data-tao-select-group] {
+  min-inline-size: 0;
+  margin-inline: 0;
+  border: 0;
+  padding: 0;
+}
+
+legend[data-tao-select-group-label] {
+  width: 100%;
+}
+
 [data-tao-select-group-label] {
   padding: var(--tao-padding-xs) var(--tao-padding-sm) var(--tao-padding-xxs);
   font-size: var(--tao-font-size-xs);
@@ -278,6 +352,7 @@
 /* Item */
 [data-tao-select-item] {
   display: flex;
+  width: 100%;
   align-items: center;
   min-height: var(--tao-control-height);
   padding-inline: var(--tao-padding-sm);
@@ -285,6 +360,9 @@
   font-family: var(--tao-font-family);
   line-height: 1;
   color: var(--tao-color-text);
+  border: 0;
+  background: transparent;
+  text-align: start;
   border-radius: var(--tao-radius-sm);
   cursor: pointer;
   outline: none;
@@ -393,6 +471,12 @@
   flex: 1;
   min-width: 0;
   padding-block: 1px;
+}
+
+[data-tao-select][data-tao-inline-search][data-tao-multiple]
+  [data-tao-select-trigger-input] {
+  flex: 1 0 4ch;
+  width: 4ch;
 }
 
 /* Individual tag pill */

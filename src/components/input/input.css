@@ -74,6 +74,9 @@
 [data-tao-prefix] {
   padding-inline-start: var(--tao-padding-sm);
 }
+[data-tao-input] [data-tao-prefix] + input {
+  padding-inline-start: var(--tao-size-unit);
+}
 [data-tao-suffix] {
   padding-inline-end: var(--tao-padding-sm);
 }

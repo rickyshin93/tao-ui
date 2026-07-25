@@ -128,3 +128,31 @@
 - **日期**: 2026-06-07
 - **正确做法**: ① 改 package.json version ② `bun install` 更新 bun.lockb ③ commit + push main ④ `gh release create vX.Y.Z`（tag 必须 = package.json version，否则 CI 的 verify 步骤报错）。release.yml 在 `release: published` 时跑 test→build→`npm publish`(NODE_AUTH_TOKEN=secrets.NPM_TOKEN)。包名 `@rockshin/tao-ui`
 - **适用场景**: 发新版本时照此走，不要本地手动 npm publish
+
+## [工具链] AGENTS.md 的 lint 命令与 package.json 不一致
+- **日期**: 2026-07-25
+- **错误假设**: 按 AGENTS.md 使用 `bun run lint` 做校验
+- **真实行为**: 当前 `package.json` 没有 `lint` script，Biome 脚本名是 `check`，且自带 `--write`
+- **正确做法**: 只读校验指定文件时运行 `bun x biome check <files>`；需要自动修复时才运行 `bun run check`
+- **适用场景**: tao-ui 的格式和 lint 校验
+
+## [CSS] Input size 规则会覆盖低优先级的 prefix 间距规则
+- **日期**: 2026-07-25
+- **错误假设**: 把 `[data-tao-prefix] + input` 写在 size 规则后面，就能覆盖 input 的 12px padding
+- **真实行为**: size 规则选择器优先级更高；同时 DESIGN.md 中的 `--tao-margin-xxs` 未在 theme.css 实现，浏览器实际没有得到预期的 4px
+- **正确做法**: 用 `[data-tao-input] [data-tao-prefix] + input` 匹配 size 规则优先级，并消费已定义的 `--tao-size-unit`；用 headless Chrome 检查 computed style
+- **适用场景**: 调整带 prefix/suffix 的 Input、InputNumber 或类似组合控件间距时
+
+## [DatePicker] PC 与 mobile 需要不同的 trigger 语义
+- **日期**: 2026-07-25
+- **错误假设**: DatePicker 可以让 PC 与 mobile 共用 button trigger，仅切换 Popover/Drawer 容器
+- **真实行为**: button 内只有展示文本，PC 用户无法键盘输入日期
+- **正确做法**: PC 渲染真实 input，按 format 严格解析并在 Enter/blur 提交；mobile 保持 button + Drawer
+- **适用场景**: 修改 DatePicker/RangePicker trigger 或补充键盘交互时
+
+## [Radix Select] 可编辑 combobox 不能复用 Select Content
+- **日期**: 2026-07-25
+- **错误假设**: 在 Radix Select Trigger 内放 input，再把焦点拉回 input，就能实现 PC 可搜索 Select
+- **真实行为**: Select Content 打开后会强制聚焦 option、锁定 body pointer events，并对 trigger 区域 aria-hidden；focus hack 会得到不可访问的假 input
+- **正确做法**: PC `showSearch` 使用非 modal Radix Popover + 原生 combobox input/listbox（含 single/multiple/tags）；普通 Select 继续用 Radix Select，mobile 继续 Drawer
+- **适用场景**: 任何需要在 tao-ui Select trigger 内直接编辑文本的功能

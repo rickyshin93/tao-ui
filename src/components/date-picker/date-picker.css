@@ -1,7 +1,7 @@
 /* ===========================
    Trigger (shared with Input/Select)
    =========================== */
-button[data-tao-picker-trigger] {
+[data-tao-picker-trigger] {
   display: flex;
   width: 100%; /* antd DatePicker 对齐：默认撑满父容器 */
   align-items: center;
@@ -14,19 +14,19 @@ button[data-tao-picker-trigger] {
   text-align: start;
 }
 
-button[data-tao-picker-trigger][data-tao-size="small"] {
+[data-tao-picker-trigger][data-tao-size="small"] {
   height: var(--tao-control-height-sm);
   padding-inline: var(--tao-padding-xs);
   font-size: var(--tao-font-size-sm);
   border-radius: var(--tao-radius-sm);
 }
-button[data-tao-picker-trigger][data-tao-size="medium"] {
+[data-tao-picker-trigger][data-tao-size="medium"] {
   height: var(--tao-control-height);
   padding-inline: var(--tao-padding-sm);
   font-size: var(--tao-font-size-base);
   border-radius: var(--tao-radius-md);
 }
-button[data-tao-picker-trigger][data-tao-size="large"] {
+[data-tao-picker-trigger][data-tao-size="large"] {
   height: var(--tao-control-height-lg);
   padding-inline: var(--tao-padding-sm);
   font-size: var(--tao-font-size-lg);
@@ -40,6 +40,18 @@ button[data-tao-picker-trigger][data-tao-size="large"] {
   white-space: nowrap;
   min-width: 0;
   color: var(--tao-color-text);
+}
+
+input[data-tao-picker-input] {
+  border: 0;
+  outline: 0;
+  padding: 0;
+  background: transparent;
+  font: inherit;
+}
+
+input[data-tao-picker-input]::placeholder {
+  color: var(--tao-color-text-placeholder);
 }
 
 [data-tao-picker-placeholder] {
@@ -73,6 +85,22 @@ button[data-tao-picker-trigger][data-tao-size="large"] {
 
 [data-tao-picker-suffix] {
   color: var(--tao-color-text-tertiary);
+}
+
+[data-tao-picker-icons][data-tao-clearable] [data-tao-picker-clear] {
+  display: none;
+}
+
+[data-tao-picker-trigger]:hover
+  [data-tao-picker-icons][data-tao-clearable]
+  [data-tao-picker-suffix] {
+  display: none;
+}
+
+[data-tao-picker-trigger]:hover
+  [data-tao-picker-icons][data-tao-clearable]
+  [data-tao-picker-clear] {
+  display: flex;
 }
 
 [data-tao-picker-clear] {
@@ -621,7 +649,7 @@ button[data-tao-picker-footer-btn][data-tao-primary]:hover {
 /* ===========================
    RangePicker trigger
    =========================== */
-button[data-tao-range-trigger] {
+[data-tao-range-trigger] {
   display: flex;
   width: 100%; /* antd RangePicker 对齐：默认撑满父容器 */
   align-items: center;
@@ -634,19 +662,19 @@ button[data-tao-range-trigger] {
   text-align: start;
 }
 
-button[data-tao-range-trigger][data-tao-size="small"] {
+[data-tao-range-trigger][data-tao-size="small"] {
   height: var(--tao-control-height-sm);
   padding-inline: var(--tao-padding-xs);
   font-size: var(--tao-font-size-sm);
   border-radius: var(--tao-radius-sm);
 }
-button[data-tao-range-trigger][data-tao-size="medium"] {
+[data-tao-range-trigger][data-tao-size="medium"] {
   height: var(--tao-control-height);
   padding-inline: var(--tao-padding-sm);
   font-size: var(--tao-font-size-base);
   border-radius: var(--tao-radius-md);
 }
-button[data-tao-range-trigger][data-tao-size="large"] {
+[data-tao-range-trigger][data-tao-size="large"] {
   height: var(--tao-control-height-lg);
   padding-inline: var(--tao-padding-sm);
   font-size: var(--tao-font-size-lg);
@@ -660,7 +688,20 @@ button[data-tao-range-trigger][data-tao-size="large"] {
   text-overflow: ellipsis;
   white-space: nowrap;
   color: var(--tao-color-text);
-  text-align: center;
+  text-align: start;
+}
+
+input[data-tao-range-input] {
+  border: 0;
+  outline: 0;
+  padding: 0;
+  background: transparent;
+  font: inherit;
+  cursor: text;
+}
+
+input[data-tao-range-input]::placeholder {
+  color: var(--tao-color-text-placeholder);
 }
 
 [data-tao-range-input][data-tao-active] {

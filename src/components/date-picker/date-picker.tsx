@@ -1,6 +1,7 @@
 import * as Popover from '@radix-ui/react-popover';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
 import {
   type ReactNode,
   useCallback,
@@ -29,6 +30,8 @@ import {
   type PresetItem,
   type TimeConfig,
 } from './types';
+
+dayjs.extend(customParseFormat);
 
 export interface DatePickerProps {
   value?: Dayjs | null;
@@ -88,7 +91,8 @@ export function DatePicker({
   const drawerTitle = showTime ? 'Date & Time' : defaultPlaceholder;
 
   const [internalOpen, setInternalOpen] = useState(false);
-  const [hovering, setHovering] = useState(false);
+  const displayValue = value ? value.format(fmt) : '';
+  const [inputValue, setInputValue] = useState(displayValue);
   const isOpen = controlledOpen ?? internalOpen;
   const setOpen = useCallback(
     (v: boolean) => {
@@ -97,6 +101,10 @@ export function DatePicker({
     },
     [onOpenChange],
   );
+
+  useEffect(() => {
+    setInputValue(displayValue);
+  }, [displayValue]);
 
   const [viewDate, setViewDate] = useState<Dayjs>(() => value ?? dayjs());
   const [panelMode, setPanelMode] = useState<PanelMode>(
@@ -209,8 +217,43 @@ export function DatePicker({
     setTimeScrollKey((k) => k + 1);
   }, [onChange, fmt]);
 
-  const displayValue = value ? value.format(fmt) : '';
   const showClearBtn = allowClear && value && !resolvedDisabled;
+
+  const commitInputValue = useCallback(() => {
+    const text = inputValue.trim();
+    if (!text) {
+      onChange?.(null, '');
+      setInputValue('');
+      setOpen(false);
+      return;
+    }
+
+    const parsed = dayjs(text, fmt, true);
+    const isBlocked =
+      !parsed.isValid() ||
+      disabledDate?.(parsed) ||
+      (minDate != null && parsed.isBefore(minDate, 'day')) ||
+      (maxDate != null && parsed.isAfter(maxDate, 'day'));
+    if (isBlocked) {
+      setInputValue(displayValue);
+      return;
+    }
+
+    const formatted = parsed.format(fmt);
+    setInputValue(formatted);
+    setViewDate(parsed);
+    onChange?.(parsed, formatted);
+    setOpen(false);
+  }, [
+    disabledDate,
+    displayValue,
+    fmt,
+    inputValue,
+    maxDate,
+    minDate,
+    onChange,
+    setOpen,
+  ]);
 
   const showTimePanel = !!(showTime && panelMode === 'date');
 
@@ -306,8 +349,38 @@ export function DatePicker({
     </div>
   );
 
-  // Trigger button/input
-  const trigger = (
+  const pickerIcons = (
+    <span
+      data-tao-picker-icons=""
+      data-tao-clearable={showClearBtn || undefined}
+    >
+      {showClearBtn && (
+        // biome-ignore lint/a11y/useSemanticElements: nested buttons are invalid in the mobile trigger; the desktop trigger shares this content.
+        <span
+          data-tao-picker-clear=""
+          onClick={(event) => {
+            event.stopPropagation();
+            handleClear(event);
+          }}
+          aria-label="Clear"
+          role="button"
+          tabIndex={0}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+              event.preventDefault();
+              event.stopPropagation();
+              handleClear(event);
+            }
+          }}
+        >
+          <CloseIcon />
+        </span>
+      )}
+      <span data-tao-picker-suffix="">{suffixIcon ?? <CalendarIcon />}</span>
+    </span>
+  );
+
+  const mobileTrigger = (
     <button
       type="button"
       data-tao-control=""
@@ -316,9 +389,7 @@ export function DatePicker({
       data-tao-variant={resolvedVariant}
       data-tao-error={status === 'error' || undefined}
       disabled={resolvedDisabled}
-      onClick={isMobile ? () => setOpen(true) : undefined}
-      onMouseEnter={() => setHovering(true)}
-      onMouseLeave={() => setHovering(false)}
+      onClick={() => setOpen(true)}
     >
       {prefix != null && <span data-tao-picker-prefix="">{prefix}</span>}
       <span data-tao-picker-input="">
@@ -326,41 +397,46 @@ export function DatePicker({
           <span data-tao-picker-placeholder="">{defaultPlaceholder}</span>
         )}
       </span>
-      <span data-tao-picker-icons="">
-        {showClearBtn && hovering ? (
-          // biome-ignore lint/a11y/useSemanticElements: this control is inside the trigger button, so a nested button would be invalid HTML.
-          <span
-            data-tao-picker-clear=""
-            onClick={(event) => {
-              event.stopPropagation();
-              handleClear(event);
-            }}
-            aria-label="Clear"
-            role="button"
-            tabIndex={0}
-            onKeyDown={(event) => {
-              if (event.key === 'Enter' || event.key === ' ') {
-                event.preventDefault();
-                event.stopPropagation();
-                handleClear(event);
-              }
-            }}
-          >
-            <CloseIcon />
-          </span>
-        ) : (
-          <span data-tao-picker-suffix="">
-            {suffixIcon ?? <CalendarIcon />}
-          </span>
-        )}
-      </span>
+      {pickerIcons}
     </button>
+  );
+
+  const desktopTrigger = (
+    <div
+      data-tao-control=""
+      data-tao-picker-trigger=""
+      data-tao-size={resolvedSize}
+      data-tao-variant={resolvedVariant}
+      data-tao-error={status === 'error' || undefined}
+      data-disabled={resolvedDisabled || undefined}
+    >
+      {prefix != null && <span data-tao-picker-prefix="">{prefix}</span>}
+      <input
+        data-tao-picker-input=""
+        value={inputValue}
+        placeholder={defaultPlaceholder}
+        disabled={resolvedDisabled}
+        aria-invalid={status === 'error' || undefined}
+        onChange={(event) => setInputValue(event.target.value)}
+        onBlur={commitInputValue}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter') {
+            event.preventDefault();
+            commitInputValue();
+          } else if (event.key === 'Escape') {
+            setInputValue(displayValue);
+            setOpen(false);
+          }
+        }}
+      />
+      {pickerIcons}
+    </div>
   );
 
   if (isMobile) {
     return (
       <>
-        {trigger}
+        {mobileTrigger}
         <Drawer
           open={isOpen}
           onClose={() => setOpen(false)}
@@ -376,7 +452,7 @@ export function DatePicker({
 
   return (
     <Popover.Root open={isOpen} onOpenChange={setOpen}>
-      <Popover.Trigger asChild>{trigger}</Popover.Trigger>
+      <Popover.Trigger asChild>{desktopTrigger}</Popover.Trigger>
       <Popover.Portal>
         <TaoPortalScope asChild>
           <Popover.Content

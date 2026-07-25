@@ -10,6 +10,10 @@
 - none
 
 ## Done
+- 2026-07-25 make desktop RangePicker editable and inline-search multiple/tags Select
+- 2026-07-25 make desktop single Select with `showSearch` an editable combobox trigger
+- 2026-07-25 enable strict manual date entry for desktop DatePicker while preserving mobile Drawer trigger
+- 2026-07-25 tighten Input prefix gap to 4px and left-align RangePicker content
 - 2026-07-21 Modal top offset 100px → component token `--tao-modal-offset-top`; provider stories add Dark Mode demo
 - 2026-07-21 dark mode: pure-CSS `[data-tao-theme="dark"]` algorithm (4 seeds + flipped derived), `theme.mode` on TaoProvider, portal propagation, Storybook toolbar toggle
 - 2026-07-21 eliminate all hardcoded color escapes (Table/Tag/Modal/Drawer/ScrollArea/mobile-select → tokens: bg-surface, text-light-solid, bg-mask, shadow-hint); regression test pins zero literals

@@ -1,9 +1,11 @@
+import * as Popover from '@radix-ui/react-popover';
 import * as RadixSelect from '@radix-ui/react-select';
 import {
   type CSSProperties,
   Fragment,
   type ReactNode,
   useCallback,
+  useId,
   useMemo,
   useRef,
   useState,
@@ -272,8 +274,10 @@ export function Select(props: SelectProps) {
 
   const triggerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const searchListboxId = useId();
 
   const isMultiple = mode === 'multiple' || mode === 'tags';
+  const hasInlineSearch = !!showSearch && !isMobile;
 
   // value (controlled / uncontrolled)
   const isValueControlled = valueProp !== undefined;
@@ -301,6 +305,7 @@ export function Select(props: SelectProps) {
   const isSearchControlled = searchValueProp !== undefined;
   const [searchInternal, setSearchInternal] = useState('');
   const search = isSearchControlled ? searchValueProp : searchInternal;
+  const [activeSearchIndex, setActiveSearchIndex] = useState(0);
 
   const [hovering, setHovering] = useState(false);
 
@@ -343,7 +348,7 @@ export function Select(props: SelectProps) {
           }
         }
 
-        suppressCloseRef.current = true;
+        if (!hasInlineSearch) suppressCloseRef.current = true;
         const current = valueArray;
         const existed = current.includes(next);
         const nextArray = existed
@@ -381,6 +386,7 @@ export function Select(props: SelectProps) {
     },
     [
       isMultiple,
+      hasInlineSearch,
       valueArray,
       maxCount,
       tokenSeparators,
@@ -397,7 +403,7 @@ export function Select(props: SelectProps) {
   const handleOpenChange = useCallback(
     (next: boolean) => {
       // In multi mode, suppress the auto-close that Radix fires after selection.
-      if (isMultiple && !next && suppressCloseRef.current) {
+      if (isMultiple && !hasInlineSearch && !next && suppressCloseRef.current) {
         suppressCloseRef.current = false;
         return;
       }
@@ -412,6 +418,7 @@ export function Select(props: SelectProps) {
     },
     [
       isMultiple,
+      hasInlineSearch,
       isOpenControlled,
       isSearchControlled,
       onOpenChange,
@@ -464,7 +471,7 @@ export function Select(props: SelectProps) {
 
   // Remove a single tag
   const handleRemoveTag = useCallback(
-    (removedValue: string, e: React.MouseEvent) => {
+    (removedValue: string, e: React.SyntheticEvent) => {
       e.stopPropagation();
       e.preventDefault();
       if (!isMultiple) return;
@@ -564,10 +571,14 @@ export function Select(props: SelectProps) {
     () =>
       isMultiple
         ? (valueArray
-            .map((v) => allOptions.find((o) => o.value === v))
+            .map(
+              (v) =>
+                allOptions.find((o) => o.value === v) ??
+                (mode === 'tags' ? { label: v, value: v } : undefined),
+            )
             .filter(Boolean) as SelectOption[])
         : [],
-    [isMultiple, valueArray, allOptions],
+    [isMultiple, valueArray, allOptions, mode],
   );
 
   const statusProps = {
@@ -631,14 +642,21 @@ export function Select(props: SelectProps) {
                 {truncateLabel(opt)}
               </span>
               {closable && (
+                // biome-ignore lint/a11y/useSemanticElements: the tag lives inside a trigger, so a nested button would be invalid HTML.
                 <span
                   data-tao-select-tag-close=""
                   className={cx(classNames?.tagClose)}
                   style={styles?.tagClose}
                   role="button"
+                  tabIndex={0}
                   aria-label={`Remove ${typeof opt.label === 'string' ? opt.label : opt.value}`}
                   onPointerDown={(e) => e.stopPropagation()}
                   onClick={(e) => handleRemoveTag(opt.value, e)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      handleRemoveTag(opt.value, e);
+                    }
+                  }}
                 >
                   {removeIcon ?? <CloseSmallIcon />}
                 </span>
@@ -703,10 +721,48 @@ export function Select(props: SelectProps) {
     </span>
   );
 
+  const searchableTrailingIcons = (
+    <span
+      data-tao-select-icons=""
+      data-tao-clearable={showClearBtn || undefined}
+    >
+      {loading ? (
+        <span data-tao-select-icon="" data-tao-select-loading-slot="">
+          {loadingIcon ?? <LoadingIcon />}
+        </span>
+      ) : (
+        <>
+          {showClearBtn && (
+            <button
+              type="button"
+              data-tao-select-clear=""
+              className={cx(classNames?.clear)}
+              style={styles?.clear}
+              onPointerDown={(event) => event.stopPropagation()}
+              onClick={handleClear}
+              aria-label="Clear"
+            >
+              {clearIcon}
+            </button>
+          )}
+          <span
+            data-tao-select-icon=""
+            data-tao-custom-suffix={suffixIcon != null || undefined}
+            className={cx(classNames?.suffix)}
+            style={styles?.suffix}
+          >
+            {suffixIcon ?? <ChevronDownIcon />}
+          </span>
+        </>
+      )}
+    </span>
+  );
+
   // ---- Mobile: custom trigger + Drawer ----
   if (isMobile) {
     return (
       <>
+        {/* biome-ignore lint/a11y/useSemanticElements: this custom trigger contains removable tags, so it cannot be a native button. */}
         <div
           id={id}
           data-tao-control=""
@@ -933,10 +989,330 @@ export function Select(props: SelectProps) {
     </RadixSelect.Viewport>
   );
 
+  const isSearchableOptionDisabled = (option: SelectOption) =>
+    !!option.disabled || (overMaxCount && !valueArray.includes(option.value));
+  const searchableOptions = flattenOptions(filteredOptions).filter(
+    (option) => !isSearchableOptionDisabled(option),
+  );
+  const activeSearchOption =
+    searchableOptions[
+      Math.min(activeSearchIndex, Math.max(searchableOptions.length - 1, 0))
+    ];
+  let searchableItemIndex = 0;
+
+  const renderSearchableItem = (option: SelectOption): ReactNode => {
+    const renderIndex = searchableItemIndex++;
+    const optionIndex = searchableOptions.findIndex(
+      (candidate) => candidate.value === option.value,
+    );
+    const isSelected = valueArray.includes(option.value);
+    const itemDisabled = isSearchableOptionDisabled(option);
+
+    return (
+      <button
+        key={option.value}
+        id={`${searchListboxId}-option-${encodeURIComponent(option.value)}`}
+        type="button"
+        role="option"
+        aria-selected={isSelected}
+        disabled={itemDisabled}
+        data-disabled={itemDisabled || undefined}
+        data-tao-select-item=""
+        data-tao-selected={isMultiple && isSelected ? '' : undefined}
+        data-tao-has-desc={option.description != null || undefined}
+        data-state={isSelected ? 'checked' : 'unchecked'}
+        data-highlighted={
+          activeSearchOption?.value === option.value ? '' : undefined
+        }
+        className={cx(classNames?.item)}
+        style={styles?.item}
+        onPointerDown={(event) => event.preventDefault()}
+        onMouseMove={() => {
+          if (optionIndex >= 0) setActiveSearchIndex(optionIndex);
+        }}
+        onClick={() => {
+          if (itemDisabled) return;
+          handleValueChange(option.value);
+          if (!isMultiple) handleOpenChange(false);
+        }}
+      >
+        {optionRender ? (
+          optionRender(option, { index: renderIndex })
+        ) : (
+          <>
+            {option.icon != null && (
+              <span
+                data-tao-select-item-icon=""
+                className={cx(classNames?.itemIcon)}
+                style={styles?.itemIcon}
+              >
+                {option.icon}
+              </span>
+            )}
+            <span
+              data-tao-select-item-main=""
+              className={cx(classNames?.itemLabel)}
+              style={styles?.itemLabel}
+            >
+              <span>{option.label}</span>
+              {option.description != null && (
+                <span
+                  data-tao-select-item-desc=""
+                  className={cx(classNames?.itemDesc)}
+                  style={styles?.itemDesc}
+                >
+                  {option.description}
+                </span>
+              )}
+            </span>
+          </>
+        )}
+        {isSelected && (
+          <span data-tao-select-check="">
+            <CheckIcon />
+          </span>
+        )}
+      </button>
+    );
+  };
+
+  const renderSearchableTree = (items: SelectOption[]): ReactNode =>
+    items.map((option) =>
+      option.options ? (
+        <fieldset
+          key={option.value}
+          aria-label={String(option.label)}
+          data-tao-select-group=""
+          className={cx(classNames?.group)}
+          style={styles?.group}
+        >
+          <legend
+            data-tao-select-group-label=""
+            className={cx(classNames?.groupLabel)}
+            style={styles?.groupLabel}
+          >
+            {option.label}
+          </legend>
+          {renderSearchableTree(option.options)}
+        </fieldset>
+      ) : (
+        renderSearchableItem(option)
+      ),
+    );
+
+  const searchableMenuNode = (
+    <div
+      id={searchListboxId}
+      role="listbox"
+      aria-multiselectable={isMultiple || undefined}
+      data-tao-select-viewport=""
+      style={{ maxHeight: listHeight }}
+    >
+      {resultCount > 0 ? (
+        renderSearchableTree(filteredOptions)
+      ) : (
+        <div
+          data-tao-select-empty=""
+          className={cx(classNames?.empty)}
+          style={styles?.empty}
+        >
+          {notFoundContent}
+        </div>
+      )}
+    </div>
+  );
+
   const container =
     getPopupContainer && triggerRef.current
       ? getPopupContainer(triggerRef.current)
       : undefined;
+
+  const inlineSearchInput = (
+    <input
+      ref={inputRef}
+      id={id}
+      role="combobox"
+      data-tao-select-trigger-input=""
+      className={cx(classNames?.searchInput)}
+      style={styles?.searchInput}
+      value={search}
+      placeholder={
+        isMultiple && selectedOptions.length === 0 ? placeholder : undefined
+      }
+      disabled={resolvedDisabled}
+      aria-expanded={open}
+      aria-autocomplete="list"
+      aria-controls={open ? searchListboxId : undefined}
+      aria-invalid={status === 'error' || undefined}
+      aria-activedescendant={
+        open && activeSearchOption
+          ? `${searchListboxId}-option-${encodeURIComponent(activeSearchOption.value)}`
+          : undefined
+      }
+      aria-label={selectedOption ? String(selectedOption.label) : placeholder}
+      // biome-ignore lint/a11y/noAutofocus: Select exposes autoFocus to match native input-like controls.
+      autoFocus={autoFocus}
+      autoComplete="off"
+      onClick={(event) => {
+        if (open) event.stopPropagation();
+      }}
+      onChange={(event) => {
+        handleSearchChange(event.target.value);
+        setActiveSearchIndex(0);
+        if (!open) handleOpenChange(true);
+      }}
+      onKeyDown={(event) => {
+        event.stopPropagation();
+        handleSearchKeyDown(event);
+        if (event.defaultPrevented) return;
+        if (event.key === 'Escape') {
+          handleSearchChange('');
+          handleOpenChange(false);
+          return;
+        }
+        if (event.key === 'ArrowDown') {
+          event.preventDefault();
+          setActiveSearchIndex((index) =>
+            Math.min(index + 1, searchableOptions.length - 1),
+          );
+          if (!open) handleOpenChange(true);
+          return;
+        }
+        if (event.key === 'ArrowUp') {
+          event.preventDefault();
+          setActiveSearchIndex((index) => Math.max(index - 1, 0));
+          return;
+        }
+        const nextValue =
+          activeSearchOption?.value ??
+          (mode === 'tags' ? search.trim() : undefined);
+        if (event.key === 'Enter' && nextValue) {
+          event.preventDefault();
+          handleValueChange(nextValue);
+          if (!isMultiple) handleOpenChange(false);
+        }
+      }}
+    />
+  );
+
+  if (hasInlineSearch) {
+    const searchableContentStyle: CSSProperties = { ...contentStyle };
+    if (popupMatchSelectWidth === true) {
+      searchableContentStyle.minWidth = 'var(--radix-popover-trigger-width)';
+    } else if (popupMatchSelectWidth === false) {
+      searchableContentStyle.minWidth = 'max-content';
+    }
+
+    return (
+      <Popover.Root open={open} onOpenChange={handleOpenChange}>
+        <Popover.Trigger asChild>
+          <div
+            ref={triggerRef}
+            role="presentation"
+            data-tao-control=""
+            data-tao-select=""
+            data-tao-inline-search=""
+            data-tao-multiple={isMultiple || undefined}
+            data-tao-size={resolvedSize}
+            data-tao-variant={resolvedVariant}
+            data-disabled={resolvedDisabled || undefined}
+            data-tao-disabled={resolvedDisabled || undefined}
+            {...statusProps}
+            className={cx(classNames?.root, className)}
+            style={{ ...styles?.root, ...style }}
+          >
+            {prefix != null && (
+              <span
+                data-tao-select-prefix=""
+                className={cx(classNames?.prefix)}
+                style={styles?.prefix}
+              >
+                {prefix}
+              </span>
+            )}
+            {isMultiple ? (
+              <span
+                data-tao-select-values=""
+                className={cx(classNames?.values)}
+                style={styles?.values}
+              >
+                {renderTags()}
+                {inlineSearchInput}
+              </span>
+            ) : (
+              <>
+                {selectedOption?.icon != null && (
+                  <span data-tao-select-value-icon="">
+                    {selectedOption.icon}
+                  </span>
+                )}
+                <span
+                  data-tao-select-search-trigger=""
+                  className={cx(classNames?.search)}
+                  style={styles?.search}
+                >
+                  {inlineSearchInput}
+                  {!search && (
+                    <span
+                      data-tao-select-trigger-value=""
+                      data-tao-select-placeholder={
+                        selectedOption ? undefined : ''
+                      }
+                      className={cx(
+                        selectedOption ? undefined : classNames?.placeholder,
+                      )}
+                      style={selectedOption ? undefined : styles?.placeholder}
+                    >
+                      {selectedOption && labelRender
+                        ? labelRender(selectedOption)
+                        : selectedOption
+                          ? String(selectedOption.label)
+                          : placeholder}
+                    </span>
+                  )}
+                </span>
+              </>
+            )}
+            {searchableTrailingIcons}
+          </div>
+        </Popover.Trigger>
+
+        {name && !isMultiple && (
+          <input
+            type="hidden"
+            name={name}
+            value={(value as string) ?? ''}
+            disabled={resolvedDisabled}
+          />
+        )}
+
+        <Popover.Portal container={container}>
+          <TaoPortalScope asChild>
+            <Popover.Content
+              data-tao-select-content=""
+              data-tao-popup-width={
+                popupMatchSelectWidth === false ? 'content' : undefined
+              }
+              className={cx(classNames?.popup)}
+              style={searchableContentStyle}
+              side={side}
+              align={align}
+              sideOffset={4}
+              onOpenAutoFocus={(event) => event.preventDefault()}
+              onCloseAutoFocus={(event) => {
+                event.preventDefault();
+                inputRef.current?.focus();
+              }}
+            >
+              {popupRender
+                ? popupRender(searchableMenuNode)
+                : searchableMenuNode}
+            </Popover.Content>
+          </TaoPortalScope>
+        </Popover.Portal>
+      </Popover.Root>
+    );
+  }
 
   return (
     <RadixSelect.Root
@@ -948,6 +1324,7 @@ export function Select(props: SelectProps) {
       name={isMultiple ? undefined : name}
     >
       <RadixSelect.Trigger asChild>
+        {/* biome-ignore lint/a11y/noStaticElementInteractions: Radix adds combobox semantics and keyboard behavior to this trigger. */}
         <div
           ref={triggerRef}
           id={id}
@@ -1034,7 +1411,7 @@ export function Select(props: SelectProps) {
             align={align}
             sideOffset={4}
           >
-            {showSearch && !isMobile && (
+            {showSearch && !hasInlineSearch && (
               <div
                 data-tao-select-search=""
                 className={cx(classNames?.search)}
