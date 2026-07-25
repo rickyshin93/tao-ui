@@ -10,6 +10,7 @@
 - none
 
 ## Done
+- 2026-07-25 remove Input start padding when a prefix is present
 - 2026-07-25 make desktop RangePicker editable and inline-search multiple/tags Select
 - 2026-07-25 make desktop single Select with `showSearch` an editable combobox trigger
 - 2026-07-25 enable strict manual date entry for desktop DatePicker while preserving mobile Drawer trigger

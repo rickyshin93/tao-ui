@@ -61,13 +61,13 @@ test('prefix renders before input', () => {
   expect(screen.getByTestId('pfx').textContent).toBe('$');
 });
 
-test('prefix keeps a compact 4px gap before the input content', () => {
+test('prefix removes input start padding to avoid doubled spacing', () => {
   const css = readFileSync('src/components/input/input.css', 'utf8');
   const rule = css.match(
     /\[data-tao-input\] \[data-tao-prefix\] \+ input \{([^}]+)\}/,
   )?.[1];
 
-  expect(rule).toContain('padding-inline-start: var(--tao-size-unit);');
+  expect(rule).toContain('padding-inline-start: 0;');
 });
 
 test('suffix renders after input', () => {

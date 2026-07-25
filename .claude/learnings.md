@@ -147,7 +147,7 @@
 - **日期**: 2026-07-25
 - **错误假设**: 把 `[data-tao-prefix] + input` 写在 size 规则后面，就能覆盖 input 的 12px padding
 - **真实行为**: size 规则选择器优先级更高；同时 DESIGN.md 中的 `--tao-margin-xxs` 未在 theme.css 实现，浏览器实际没有得到预期的 4px
-- **正确做法**: 用 `[data-tao-input] [data-tao-prefix] + input` 匹配 size 规则优先级，并消费已定义的 `--tao-size-unit`；用 headless Chrome 检查 computed style
+- **正确做法**: 用 `[data-tao-input] [data-tao-prefix] + input` 匹配 size 规则优先级并把左 padding 清零，间距由 prefix 内容自身控制；用 headless Chrome 检查 computed style
 - **适用场景**: 调整带 prefix/suffix 的 Input、InputNumber 或类似组合控件间距时
 
 ## [DatePicker] PC 与 mobile 需要不同的 trigger 语义

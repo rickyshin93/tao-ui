@@ -940,7 +940,7 @@ API:
 
 结构:
   [prefix?] [input] [suffix?]
-  prefix 图标 ↔ input 内容: gap=size-unit(4px)，控件外沿 padding 不变
+  有 prefix 时 input 左 padding=0，由 prefix 内容自身控制间距；控件外沿 padding 不变
   RangePicker 起止内容: text-align=start，禁止居中制造无意义的左侧留白
   PC DatePicker: 使用真实 input，按 format 严格解析，Enter/blur 提交；mobile 保持 button + Drawer
 ```
