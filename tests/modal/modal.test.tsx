@@ -64,6 +64,69 @@ test('close button triggers onClose', async () => {
   expect(closed).toBe(true);
 });
 
+test('overlay click triggers onClose', async () => {
+  let closed = false;
+  render(
+    <Modal
+      open
+      onClose={() => {
+        closed = true;
+      }}
+    >
+      body
+    </Modal>,
+  );
+
+  const overlay = document.querySelector('[data-tao-modal-overlay]');
+  expect(overlay).toBeTruthy();
+  if (overlay) await userEvent.click(overlay);
+
+  expect(closed).toBe(true);
+});
+
+test('interaction outside the content does not close the modal', async () => {
+  let closed = false;
+  render(
+    <Modal
+      open
+      onClose={() => {
+        closed = true;
+      }}
+    >
+      body
+    </Modal>,
+  );
+  const outsideAction = document.createElement('button');
+  outsideAction.style.pointerEvents = 'auto';
+  document.body.append(outsideAction);
+
+  await userEvent.click(outsideAction);
+
+  expect(closed).toBe(false);
+  outsideAction.remove();
+});
+
+test('overlay click does not close when maskClosable=false', async () => {
+  let closed = false;
+  render(
+    <Modal
+      open
+      maskClosable={false}
+      onClose={() => {
+        closed = true;
+      }}
+    >
+      body
+    </Modal>,
+  );
+
+  const overlay = document.querySelector('[data-tao-modal-overlay]');
+  expect(overlay).toBeTruthy();
+  if (overlay) await userEvent.click(overlay);
+
+  expect(closed).toBe(false);
+});
+
 test('closable=false hides close button', () => {
   render(
     <Modal open closable={false} title="No Close">

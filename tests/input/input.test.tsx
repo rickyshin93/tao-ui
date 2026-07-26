@@ -57,17 +57,29 @@ test('inherits variant from TaoProvider', () => {
 });
 
 test('prefix renders before input', () => {
-  render(<Input prefix={<span data-testid="pfx">$</span>} />);
-  expect(screen.getByTestId('pfx').textContent).toBe('$');
+  const SearchIcon = () => <svg data-testid="pfx" />;
+  render(<Input prefix={<SearchIcon />} />);
+  expect(screen.getByTestId('pfx').closest('[data-tao-prefix]')).not.toBeNull();
 });
 
-test('prefix removes input start padding to avoid doubled spacing', () => {
+test('prefix keeps standard input start padding', () => {
   const css = readFileSync('src/components/input/input.css', 'utf8');
   const rule = css.match(
     /\[data-tao-input\] \[data-tao-prefix\] \+ input \{([^}]+)\}/,
   )?.[1];
 
-  expect(rule).toContain('padding-inline-start: 0;');
+  expect(rule).toContain('padding-inline-start: var(--tao-padding-sm);');
+});
+
+test('React SVG prefix becomes an overlay and reserves input space', () => {
+  const css = readFileSync('src/components/input/input.css', 'utf8');
+  const rule = css.match(
+    /\[data-tao-input\]:has\(\[data-tao-prefix\] svg\) input \{([^}]+)\}/,
+  )?.[1];
+
+  expect(rule).toMatch(
+    /padding-inline-start:\s*calc\(\s*var\(--tao-padding-sm\)\s*\+\s*16px\s*\+\s*var\(--tao-padding-sm\)\s*\);/,
+  );
 });
 
 test('suffix renders after input', () => {

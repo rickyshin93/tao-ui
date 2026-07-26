@@ -7,6 +7,7 @@ import {
   useRef,
 } from 'react';
 import { TaoPortalScope } from '../../provider/tao-provider';
+import { preventParentOutsideDismiss } from '../../utils/portal';
 import {
   cx,
   type SemanticClassNames,
@@ -154,6 +155,7 @@ export function Modal({
             data-tao-modal-overlay=""
             className={cx(classNames?.overlay)}
             style={stylesProp?.overlay}
+            onClick={maskClosable ? onClose : undefined}
           />
           <div
             data-tao-modal-wrap=""
@@ -169,12 +171,8 @@ export function Modal({
               onEscapeKeyDown={(e) => {
                 if (!keyboard) e.preventDefault();
               }}
-              onPointerDownOutside={(e) => {
-                if (!maskClosable) e.preventDefault();
-              }}
-              onInteractOutside={(e) => {
-                if (!maskClosable) e.preventDefault();
-              }}
+              onPointerDownOutside={preventParentOutsideDismiss}
+              onInteractOutside={preventParentOutsideDismiss}
             >
               {(title != null || closable) && (
                 <div

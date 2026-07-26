@@ -1,5 +1,19 @@
 # tao-ui 项目自我学习
 
+## [Radix Dialog] maskClosable 不能直接映射 outside-dismiss
+- **日期**: 2026-07-26
+- **错误假设**: `maskClosable=true` 可以直接放行 Radix Dialog 的 outside-dismiss，再对白名单 portal 特判。
+- **真实行为**: Antd 的语义是仅真实 mask 点击关闭；Radix outside-dismiss 还会覆盖 Select 等 portaled 内容，范围更宽。
+- **正确做法**: Drawer/Modal 始终阻止 outside-dismiss，只在自身 Overlay 的 click 上按 `maskClosable` 调用 `onClose`。
+- **适用场景**: Drawer/Modal 内嵌 Select、DatePicker、Dropdown 等 portaled popup。
+
+## [测试] Select 打开时 getByRole 看不到父 Drawer 不代表已关闭
+- **日期**: 2026-07-26
+- **错误假设**: 选择后 `getByRole('dialog')` 数量为 0，说明 Drawer 已关闭。
+- **真实行为**: Radix Select 打开时会把父 Drawer 标为 `aria-hidden`，可访问树查询返回 0，但 `[data-tao-drawer][data-state]` 仍是 `open`。
+- **正确做法**: 测真实关闭状态用 Drawer DOM 的 `data-state` 或受控 `open` 状态；可访问树只用于当前可访问性。
+- **适用场景**: 嵌套 modal/select 的浏览器和组件测试。
+
 ## [发布] npm 包名相似度校验比查询严格 + scoped 包发布
 - **日期**: 2026-06-06
 - **错误假设**: 以为 `npm view tao-ui` 返回 404（未占用）就一定能发布
@@ -147,7 +161,7 @@
 - **日期**: 2026-07-25
 - **错误假设**: 把 `[data-tao-prefix] + input` 写在 size 规则后面，就能覆盖 input 的 12px padding
 - **真实行为**: size 规则选择器优先级更高；同时 DESIGN.md 中的 `--tao-margin-xxs` 未在 theme.css 实现，浏览器实际没有得到预期的 4px
-- **正确做法**: 用 `[data-tao-input] [data-tao-prefix] + input` 匹配 size 规则优先级并把左 padding 清零，间距由 prefix 内容自身控制；用 headless Chrome 检查 computed style
+- **正确做法**: 普通 prefix 保持 padding-sm；prefix 渲染 SVG React 组件时自动改为 overlay，并为 input 预留 padding-sm + 16px + padding-sm；用 headless Chrome 检查 computed style
 - **适用场景**: 调整带 prefix/suffix 的 Input、InputNumber 或类似组合控件间距时
 
 ## [DatePicker] PC 与 mobile 需要不同的 trigger 语义

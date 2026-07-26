@@ -8,6 +8,7 @@ import {
   useState,
 } from 'react';
 import { TaoPortalScope } from '../../provider/tao-provider';
+import { preventParentOutsideDismiss } from '../../utils/portal';
 import {
   cx,
   type SemanticClassNames,
@@ -190,6 +191,7 @@ export function Drawer({
               data-tao-drawer-overlay=""
               className={cx(classNames?.overlay)}
               style={stylesProp?.overlay}
+              onClick={maskClosable ? onClose : undefined}
             />
           )}
           <Dialog.Content
@@ -203,12 +205,8 @@ export function Drawer({
             onEscapeKeyDown={(e) => {
               if (!keyboard) e.preventDefault();
             }}
-            onPointerDownOutside={(e) => {
-              if (!maskClosable) e.preventDefault();
-            }}
-            onInteractOutside={(e) => {
-              if (!maskClosable) e.preventDefault();
-            }}
+            onPointerDownOutside={preventParentOutsideDismiss}
+            onInteractOutside={preventParentOutsideDismiss}
           >
             {isResizable && (
               <div

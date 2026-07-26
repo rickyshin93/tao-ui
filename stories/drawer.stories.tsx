@@ -4,6 +4,7 @@ import {
   FormField,
   Input,
   RadioGroup,
+  Select,
   Stack,
 } from '@rockshin/tao-ui';
 import type { Meta, StoryObj } from '@storybook/react';
@@ -19,6 +20,7 @@ export const Basic: StoryObj = {
     function Demo() {
       const [right, setRight] = useState(false);
       const [bottom, setBottom] = useState(false);
+      const [perils, setPerils] = useState<string[]>([]);
       return (
         <Stack direction="horizontal" gap="md">
           <Button variant="secondary" onClick={() => setRight(true)}>
@@ -39,6 +41,17 @@ export const Basic: StoryObj = {
               </FormField>
               <FormField label="Email">
                 <Input placeholder="you@example.com" />
+              </FormField>
+              <FormField label="Covered perils">
+                <Select
+                  mode="multiple"
+                  value={perils}
+                  onChange={(value) => setPerils(value as string[])}
+                  options={[
+                    { label: 'Illness', value: 'illness' },
+                    { label: 'Accident', value: 'accident' },
+                  ]}
+                />
               </FormField>
             </Stack>
           </Drawer>

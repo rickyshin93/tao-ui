@@ -72,6 +72,49 @@ test('overlay click triggers onClose', async () => {
   expect(closed).toBe(true);
 });
 
+test('interaction outside the content does not close the drawer', async () => {
+  let closed = false;
+  render(
+    <Drawer
+      open
+      onClose={() => {
+        closed = true;
+      }}
+    >
+      body
+    </Drawer>,
+  );
+  const outsideAction = document.createElement('button');
+  outsideAction.style.pointerEvents = 'auto';
+  document.body.append(outsideAction);
+
+  await userEvent.click(outsideAction);
+
+  expect(closed).toBe(false);
+  outsideAction.remove();
+});
+
+test('overlay click does not close when maskClosable=false', async () => {
+  let closed = false;
+  render(
+    <Drawer
+      open
+      maskClosable={false}
+      onClose={() => {
+        closed = true;
+      }}
+    >
+      body
+    </Drawer>,
+  );
+
+  const overlay = document.querySelector('[data-tao-drawer-overlay]');
+  expect(overlay).toBeTruthy();
+  if (overlay) await userEvent.click(overlay);
+
+  expect(closed).toBe(false);
+});
+
 test('width prop applies to right placement', () => {
   render(
     <Drawer open placement="right" width={400}>

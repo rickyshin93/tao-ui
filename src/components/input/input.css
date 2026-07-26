@@ -75,14 +75,35 @@
   padding-inline-start: var(--tao-padding-sm);
 }
 [data-tao-input] [data-tao-prefix] + input {
-  padding-inline-start: 0;
-}
-[data-tao-suffix] {
-  padding-inline-end: var(--tao-padding-sm);
+  padding-inline-start: var(--tao-padding-sm);
 }
 
 [data-tao-prefix] svg,
 [data-tao-suffix] svg {
   width: 16px;
   height: 16px;
+}
+
+[data-tao-input]:has([data-tao-prefix] svg) [data-tao-prefix] {
+  position: absolute;
+  inset-inline-start: var(--tao-padding-sm);
+  top: 50%;
+  padding: 0;
+  transform: translateY(-50%);
+}
+
+[data-tao-input]:has([data-tao-prefix] svg) [data-tao-prefix] svg {
+  position: static;
+  transform: none;
+}
+
+[data-tao-input]:has([data-tao-prefix] svg) input {
+  padding-inline-start: calc(
+    var(--tao-padding-sm) +
+    16px +
+    var(--tao-padding-sm)
+  );
+}
+[data-tao-suffix] {
+  padding-inline-end: var(--tao-padding-sm);
 }
