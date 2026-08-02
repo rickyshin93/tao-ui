@@ -1,5 +1,13 @@
+// biome-ignore-all lint/a11y/noNoninteractiveElementToInteractiveRole: the calendar uses a table-shaped grid with interactive date buttons in cells.
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
+import {
+  type CSSProperties,
+  type KeyboardEvent,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { getCalendarWeeks } from './use-calendar';
 
 const WEEKDAYS = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
@@ -14,10 +22,15 @@ interface CalendarGridProps {
   /** Range mode: date currently being hovered */
   hoverDate?: Dayjs | null;
   onSelect: (date: Dayjs) => void;
+  onViewDateChange?: (date: Dayjs) => void;
   onHover?: (date: Dayjs | null) => void;
   disabledDate?: (date: Dayjs) => boolean;
   minDate?: Dayjs;
   maxDate?: Dayjs;
+  className?: string;
+  style?: CSSProperties;
+  cellClassName?: string;
+  cellStyle?: CSSProperties;
 }
 
 export function CalendarGrid({
@@ -27,10 +40,15 @@ export function CalendarGrid({
   rangeEnd,
   hoverDate,
   onSelect,
+  onViewDateChange,
   onHover,
   disabledDate,
   minDate,
   maxDate,
+  className,
+  style,
+  cellClassName,
+  cellStyle,
 }: CalendarGridProps) {
   const weeks = getCalendarWeeks(viewDate);
   const today = dayjs();
@@ -42,6 +60,75 @@ export function CalendarGrid({
     if (minDate && date.isBefore(minDate, 'day')) return true;
     if (maxDate && date.isAfter(maxDate, 'day')) return true;
     return false;
+  };
+  const dates = weeks.flat();
+  const preferredFocus =
+    value &&
+    dates.some((date) => date.isSame(value, 'day')) &&
+    !isDisabled(value)
+      ? value
+      : (dates.find((date) => !isDisabled(date)) ?? viewDate);
+  const [focusedDate, setFocusedDate] = useState(preferredFocus);
+  const focusedDateRef = useRef(focusedDate);
+  const buttonRefs = useRef(new Map<string, HTMLButtonElement>());
+  const shouldRestoreFocus = useRef(false);
+
+  useEffect(() => {
+    if (!dates.some((date) => date.isSame(focusedDateRef.current, 'day'))) {
+      focusedDateRef.current = preferredFocus;
+      setFocusedDate(preferredFocus);
+    }
+  }, [dates, preferredFocus]);
+
+  useEffect(() => {
+    if (!shouldRestoreFocus.current) return;
+    shouldRestoreFocus.current = false;
+    buttonRefs.current.get(focusedDate.format('YYYY-MM-DD'))?.focus();
+  }, [focusedDate]);
+
+  const moveFocus = (nextDate: Dayjs) => {
+    let next = nextDate;
+    const direction = next.isBefore(focusedDateRef.current, 'day') ? -1 : 1;
+    while (isDisabled(next)) {
+      next = next.add(direction, 'day');
+      if (minDate && next.isBefore(minDate, 'day')) return;
+      if (maxDate && next.isAfter(maxDate, 'day')) return;
+    }
+    const nextButton = buttonRefs.current.get(next.format('YYYY-MM-DD'));
+    if (nextButton) {
+      const currentButton = buttonRefs.current.get(
+        focusedDateRef.current.format('YYYY-MM-DD'),
+      );
+      if (currentButton) currentButton.tabIndex = -1;
+      nextButton.tabIndex = 0;
+      focusedDateRef.current = next;
+      nextButton.focus();
+      return;
+    }
+    focusedDateRef.current = next;
+    shouldRestoreFocus.current = true;
+    setFocusedDate(next);
+    if (!next.isSame(viewDate, 'month')) {
+      onViewDateChange?.(next.startOf('month'));
+    }
+  };
+
+  const handleKeyDown = (event: KeyboardEvent, date: Dayjs) => {
+    let next: Dayjs | undefined;
+    if (event.key === 'ArrowLeft') next = date.subtract(1, 'day');
+    else if (event.key === 'ArrowRight') next = date.add(1, 'day');
+    else if (event.key === 'ArrowUp') next = date.subtract(7, 'day');
+    else if (event.key === 'ArrowDown') next = date.add(7, 'day');
+    else if (event.key === 'Home')
+      next = date.subtract((date.day() + 6) % 7, 'day');
+    else if (event.key === 'End')
+      next = date.add(6 - ((date.day() + 6) % 7), 'day');
+    else if (event.key === 'PageUp') next = date.subtract(1, 'month');
+    else if (event.key === 'PageDown') next = date.add(1, 'month');
+    if (!next) return;
+    event.preventDefault();
+    event.stopPropagation();
+    moveFocus(next);
   };
 
   // Compute effective range (confirmed or hover preview)
@@ -74,8 +161,12 @@ export function CalendarGrid({
   };
 
   return (
-    // biome-ignore lint/a11y/noNoninteractiveElementToInteractiveRole: the calendar uses a table-shaped grid with interactive date buttons in cells.
-    <table data-tao-calendar-grid="" role="grid">
+    <table
+      data-tao-calendar-grid=""
+      role="grid"
+      className={className}
+      style={style}
+    >
       <thead>
         <tr>
           {WEEKDAYS.map((d) => (
@@ -102,7 +193,14 @@ export function CalendarGrid({
               return (
                 <td key={date.format('YYYY-MM-DD')} data-tao-calendar-cell="">
                   <button
+                    ref={(element) => {
+                      const key = date.format('YYYY-MM-DD');
+                      if (element) buttonRefs.current.set(key, element);
+                      else buttonRefs.current.delete(key);
+                    }}
                     type="button"
+                    className={cellClassName}
+                    style={cellStyle}
                     data-tao-calendar-cell-button=""
                     data-tao-selected={isSelected || undefined}
                     data-tao-today={isToday || undefined}
@@ -112,6 +210,13 @@ export function CalendarGrid({
                     data-tao-range-start={rStart || undefined}
                     data-tao-range-end={rEnd || undefined}
                     disabled={disabled}
+                    tabIndex={
+                      date.isSame(focusedDateRef.current, 'day') ? 0 : -1
+                    }
+                    onFocus={() => {
+                      focusedDateRef.current = date;
+                    }}
+                    onKeyDown={(event) => handleKeyDown(event, date)}
                     onClick={() => onSelect(date)}
                     onMouseEnter={() => onHover?.(date)}
                     onMouseLeave={() => onHover?.(null)}

@@ -235,7 +235,7 @@ button[data-tao-select-clear] {
 /* Loading spinner */
 [data-tao-select-loading] {
   color: var(--tao-color-text-tertiary);
-  animation: tao-spin 0.8s linear infinite;
+  animation: tao-spin calc(var(--tao-motion-unit) * 8) linear infinite;
 }
 
 @keyframes tao-spin {
@@ -353,6 +353,7 @@ legend[data-tao-select-group-label] {
 [data-tao-select-item] {
   display: flex;
   width: 100%;
+  box-sizing: border-box;
   align-items: center;
   min-height: var(--tao-control-height);
   padding-inline: var(--tao-padding-sm);

@@ -9,7 +9,7 @@ export const radioDoc = {
   source: 'src/components/radio/radio.tsx',
   story: 'stories/radio.stories.tsx',
   tests: ['tests/radio/radio.test.tsx'],
-  semanticParts: ['root', 'input', 'indicator', 'label', 'group', 'option'],
+  semanticParts: ['root', 'indicator', 'label'],
   keywords: ['radio', 'single choice', 'selection'],
   related: ['Checkbox', 'SegmentedControl'],
   usage: {

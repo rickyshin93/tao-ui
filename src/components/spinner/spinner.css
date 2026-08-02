@@ -19,7 +19,7 @@
 [data-tao-spinner-svg] {
   width: 1.25em;
   height: 1.25em;
-  animation: tao-spinner-rotate 0.8s linear infinite;
+  animation: tao-spinner-rotate calc(var(--tao-motion-unit) * 8) linear infinite;
 }
 
 /* Indicator size scales with font-size so a custom em-based indicator follows */

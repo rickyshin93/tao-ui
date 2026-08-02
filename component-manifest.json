@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "packageName": "@rockshin/tao-ui",
-  "generatedAt": "2026-07-12T10:40:10.749Z",
+  "generatedAt": "2026-08-02T15:18:03.266Z",
   "components": [
     {
       "name": "breadcrumb",
@@ -21,7 +21,9 @@
         "list",
         "item",
         "link",
-        "separator"
+        "page",
+        "separator",
+        "ellipsis"
       ],
       "keywords": [
         "navigation",
@@ -132,11 +134,8 @@
       ],
       "semanticParts": [
         "root",
-        "input",
-        "box",
-        "label",
-        "group",
-        "option"
+        "indicator",
+        "label"
       ],
       "keywords": [
         "checkbox",
@@ -228,10 +227,15 @@
       ],
       "semanticParts": [
         "root",
-        "trigger",
         "content",
         "item",
-        "separator"
+        "itemIcon",
+        "itemLabel",
+        "itemExtra",
+        "divider",
+        "groupLabel",
+        "subTrigger",
+        "subContent"
       ],
       "keywords": [
         "menu",
@@ -310,11 +314,13 @@
       "semanticParts": [
         "root",
         "overlay",
-        "content",
         "header",
+        "title",
+        "extra",
         "body",
         "footer",
-        "close"
+        "close",
+        "dragger"
       ],
       "keywords": [
         "panel",
@@ -350,11 +356,15 @@
       ],
       "semanticParts": [
         "root",
-        "trigger",
         "content",
         "item",
-        "group",
-        "divider"
+        "itemIcon",
+        "itemLabel",
+        "itemExtra",
+        "divider",
+        "groupLabel",
+        "subTrigger",
+        "subContent"
       ],
       "keywords": [
         "menu",
@@ -426,7 +436,6 @@
       "semanticParts": [
         "root",
         "label",
-        "control",
         "description",
         "error"
       ],
@@ -460,6 +469,9 @@
       "story": "stories/form-layout.stories.tsx",
       "tests": [
         "tests/layouts/form-layout/form-layout.test.tsx"
+      ],
+      "semanticParts": [
+        "root"
       ],
       "keywords": [
         "form",
@@ -496,7 +508,7 @@
         "header",
         "title",
         "description",
-        "content"
+        "body"
       ],
       "keywords": [
         "form",
@@ -567,8 +579,7 @@
         "root",
         "input",
         "prefix",
-        "suffix",
-        "clear"
+        "suffix"
       ],
       "keywords": [
         "text field",
@@ -603,9 +614,8 @@
       "semanticParts": [
         "root",
         "input",
-        "controls",
-        "increment",
-        "decrement"
+        "prefix",
+        "suffix"
       ],
       "keywords": [
         "number",
@@ -643,8 +653,8 @@
       "semanticParts": [
         "root",
         "overlay",
-        "content",
         "header",
+        "title",
         "body",
         "footer",
         "close"
@@ -685,9 +695,7 @@
       "semanticParts": [
         "root",
         "item",
-        "prev",
-        "next",
-        "sizeChanger"
+        "total"
       ],
       "keywords": [
         "pages",
@@ -721,11 +729,8 @@
       ],
       "semanticParts": [
         "root",
-        "input",
         "indicator",
-        "label",
-        "group",
-        "option"
+        "label"
       ],
       "keywords": [
         "radio",
@@ -764,10 +769,10 @@
       "semanticParts": [
         "root",
         "input",
+        "separator",
         "popup",
         "calendar",
-        "cell",
-        "footer"
+        "cell"
       ],
       "keywords": [
         "date range",
@@ -826,8 +831,7 @@
       "category": "Data Entry",
       "description": "Chooses one value from a compact list of options.",
       "exports": [
-        "Select",
-        "ChevronsUpDownIcon"
+        "Select"
       ],
       "source": "src/components/select/select.tsx",
       "story": "stories/select.stories.tsx",
@@ -836,11 +840,25 @@
       ],
       "semanticParts": [
         "root",
-        "trigger",
-        "value",
-        "content",
+        "prefix",
+        "suffix",
+        "placeholder",
+        "clear",
+        "popup",
+        "search",
+        "searchInput",
+        "group",
+        "groupLabel",
         "item",
-        "empty"
+        "itemIcon",
+        "itemLabel",
+        "itemDesc",
+        "empty",
+        "tag",
+        "tagLabel",
+        "tagClose",
+        "tagRest",
+        "values"
       ],
       "keywords": [
         "select",
@@ -922,7 +940,10 @@
         "tests/spinner/spinner.test.tsx"
       ],
       "semanticParts": [
-        "root"
+        "root",
+        "indicator",
+        "tip",
+        "overlay"
       ],
       "keywords": [
         "loading",
@@ -959,7 +980,7 @@
       "semanticParts": [
         "root",
         "panel",
-        "handle"
+        "dragger"
       ],
       "keywords": [
         "resizable",
@@ -990,6 +1011,9 @@
       "story": "stories/stack.stories.tsx",
       "tests": [
         "tests/layouts/stack/stack.test.tsx"
+      ],
+      "semanticParts": [
+        "root"
       ],
       "keywords": [
         "layout",
@@ -1023,8 +1047,7 @@
       ],
       "semanticParts": [
         "root",
-        "thumb",
-        "label"
+        "handle"
       ],
       "keywords": [
         "toggle",
@@ -1057,12 +1080,17 @@
       ],
       "semanticParts": [
         "root",
+        "scroll",
         "table",
-        "header",
+        "header.wrapper",
+        "header.row",
         "header.cell",
-        "body",
-        "row",
-        "cell",
+        "header.content",
+        "header.title",
+        "body.row",
+        "body.cell",
+        "selection.cell",
+        "empty",
         "pagination"
       ],
       "keywords": [
@@ -1102,8 +1130,9 @@
       ],
       "semanticParts": [
         "root",
-        "list",
+        "nav",
         "tab",
+        "indicator",
         "panel"
       ],
       "keywords": [
@@ -1142,6 +1171,7 @@
       "semanticParts": [
         "root",
         "icon",
+        "content",
         "close"
       ],
       "keywords": [
@@ -1171,8 +1201,7 @@
       "category": "Config",
       "description": "Provides global component defaults, portal scoping, and theme seed token overrides.",
       "exports": [
-        "TaoProvider",
-        "TaoPortalScope"
+        "TaoProvider"
       ],
       "source": "src/provider/tao-provider.tsx",
       "story": "stories/provider.stories.tsx",

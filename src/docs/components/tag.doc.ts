@@ -10,7 +10,7 @@ export const tagDoc = {
   source: 'src/components/tag/tag.tsx',
   story: 'stories/tag.stories.tsx',
   tests: ['tests/tag/tag.test.tsx'],
-  semanticParts: ['root', 'icon', 'close'],
+  semanticParts: ['root', 'icon', 'content', 'close'],
   keywords: ['badge', 'chip', 'status', 'label'],
   related: ['Checkbox', 'Table'],
   usage: {

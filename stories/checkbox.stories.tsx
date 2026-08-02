@@ -1,6 +1,5 @@
 import { Checkbox, CheckboxGroup, FormField, Stack } from '@rockshin/tao-ui';
 import type { Meta, StoryObj } from '@storybook/react';
-import { useState } from 'react';
 
 const meta: Meta = {
   title: '数据录入 Data Entry/Checkbox',

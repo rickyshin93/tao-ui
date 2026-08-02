@@ -9,7 +9,7 @@ export const tabsDoc = {
   source: 'src/components/tabs/tabs.tsx',
   story: 'stories/tabs.stories.tsx',
   tests: ['tests/tabs/tabs.test.tsx'],
-  semanticParts: ['root', 'list', 'tab', 'panel'],
+  semanticParts: ['root', 'nav', 'tab', 'indicator', 'panel'],
   keywords: ['tabs', 'sections', 'navigation'],
   related: ['Breadcrumb'],
   usage: {

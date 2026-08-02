@@ -100,7 +100,9 @@ const removeTimers = new Map<string, ReturnType<typeof setTimeout>>();
 const REMOVE_DELAY = 220;
 
 function emit() {
-  listeners.forEach((listener) => listener());
+  listeners.forEach((listener) => {
+    listener();
+  });
 }
 
 function subscribe(listener: Listener) {
@@ -130,8 +132,12 @@ function clearRemoveTimer(id: string) {
 
 function dismiss(id?: string) {
   if (!id) {
-    state.toasts.forEach((toast) => clearTimer(toast.id));
-    state.toasts.forEach((toast) => clearRemoveTimer(toast.id));
+    state.toasts.forEach((toast) => {
+      clearTimer(toast.id);
+    });
+    state.toasts.forEach((toast) => {
+      clearRemoveTimer(toast.id);
+    });
     state = {
       toasts: state.toasts.map((toast) => ({ ...toast, removing: true })),
     };
@@ -372,6 +378,7 @@ function ToastView({
     if (toast.removing) setOffsetBeforeRemove(offset);
   }, [offset, toast.removing]);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: toast content changes can change its measured height.
   useLayoutEffect(() => {
     const node = ref.current;
     if (!node) return;

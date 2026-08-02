@@ -21,6 +21,30 @@ test('label htmlFor links to child input via id', () => {
   expect(label.getAttribute('for')).toBe('email');
 });
 
+test('automatically links label and help text to a single control', () => {
+  const { rerender } = render(
+    <FormField label="Email" description="Work address">
+      <input />
+    </FormField>,
+  );
+
+  const input = screen.getByRole('textbox');
+  expect(screen.getByLabelText('Email')).toBe(input);
+  expect(input.getAttribute('aria-describedby')).toBe(
+    screen.getByText('Work address').id,
+  );
+
+  rerender(
+    <FormField label="Email" error="Invalid address">
+      <input />
+    </FormField>,
+  );
+  expect(input.getAttribute('aria-invalid')).toBe('true');
+  expect(input.getAttribute('aria-errormessage')).toBe(
+    screen.getByText('Invalid address').id,
+  );
+});
+
 test('required shows asterisk', () => {
   render(
     <FormField label="Name" required>

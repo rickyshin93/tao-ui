@@ -9,7 +9,7 @@ export const splitterDoc = {
   source: 'src/components/splitter/splitter.tsx',
   story: 'stories/splitter.stories.tsx',
   tests: ['tests/splitter/splitter.test.tsx'],
-  semanticParts: ['root', 'panel', 'handle'],
+  semanticParts: ['root', 'panel', 'dragger'],
   keywords: ['resizable', 'panes', 'layout'],
   related: ['Stack', 'FormLayout'],
   usage: {

@@ -12,7 +12,7 @@ export const rangePickerDoc = {
     'tests/date-picker/range-picker.test.tsx',
     'tests/date-picker/use-calendar.test.ts',
   ],
-  semanticParts: ['root', 'input', 'popup', 'calendar', 'cell', 'footer'],
+  semanticParts: ['root', 'input', 'separator', 'popup', 'calendar', 'cell'],
   keywords: ['date range', 'calendar', 'time range'],
   related: ['DatePicker'],
   usage: {

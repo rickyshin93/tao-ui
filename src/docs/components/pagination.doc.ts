@@ -10,7 +10,7 @@ export const paginationDoc = {
   source: 'src/components/pagination/pagination.tsx',
   story: 'stories/pagination.stories.tsx',
   tests: ['tests/pagination/pagination.test.tsx'],
-  semanticParts: ['root', 'item', 'prev', 'next', 'sizeChanger'],
+  semanticParts: ['root', 'item', 'total'],
   keywords: ['pages', 'table', 'navigation'],
   related: ['Table'],
   usage: {

@@ -115,6 +115,44 @@ test('theme.token.borderRadius sets --tao-radius CSS variable', () => {
   expect(provider.style.getPropertyValue('--tao-radius')).toBe('8px');
 });
 
+test('every declared theme seed changes its CSS variable', () => {
+  render(
+    <TaoProvider
+      theme={{
+        token: {
+          fontSize: 16,
+          sizeStep: 5,
+          motionUnit: 0.2,
+          zIndexBase: 10,
+          zIndexPopupBase: 2000,
+        },
+      }}
+    >
+      <span data-testid="child">x</span>
+    </TaoProvider>,
+  );
+
+  const provider = screen.getByTestId('child').parentElement!;
+  expect(provider.style.getPropertyValue('--tao-font-size')).toBe('16px');
+  expect(provider.style.getPropertyValue('--tao-size-step')).toBe('5');
+  expect(provider.style.getPropertyValue('--tao-motion-unit')).toBe('0.2s');
+  expect(provider.style.getPropertyValue('--tao-z-index-base')).toBe('10');
+  expect(provider.style.getPropertyValue('--tao-z-index-popup-base')).toBe(
+    '2000',
+  );
+});
+
+test('theme.token.motion=false disables motion for the provider scope', () => {
+  render(
+    <TaoProvider theme={{ token: { motion: false, motionUnit: 0.2 } }}>
+      <span data-testid="child">x</span>
+    </TaoProvider>,
+  );
+
+  const provider = screen.getByTestId('child').parentElement!;
+  expect(provider.style.getPropertyValue('--tao-motion-unit')).toBe('0s');
+});
+
 test('size prop is accessible via useTaoConfig', () => {
   function ShowSize() {
     const { size } = useTaoConfig();
@@ -154,6 +192,20 @@ test('variant prop is accessible via useTaoConfig', () => {
   expect(screen.getByTestId('v').textContent).toBe('filled');
 });
 
+test('useTaoConfig does not expose portal implementation state', () => {
+  let config: object = {};
+  function Probe() {
+    config = useTaoConfig();
+    return null;
+  }
+  render(
+    <TaoProvider>
+      <Probe />
+    </TaoProvider>,
+  );
+  expect('tokenStyle' in config).toBe(false);
+});
+
 test('nested provider: child overrides parent size', () => {
   function ShowSize() {
     const { size } = useTaoConfig();
@@ -182,6 +234,22 @@ test('nested provider: child inherits parent when not specified', () => {
     </TaoProvider>,
   );
   expect(screen.getByTestId('size').textContent).toBe('large');
+});
+
+test('nested provider with inherit=false resets parent theme seeds', () => {
+  render(
+    <TaoProvider theme={{ token: { colorPrimary: 'red', fontSize: 18 } }}>
+      <TaoProvider theme={{ inherit: false }}>
+        <span data-testid="child">x</span>
+      </TaoProvider>
+    </TaoProvider>,
+  );
+
+  const childProvider = screen.getByTestId('child').parentElement!;
+  expect(childProvider.style.getPropertyValue('--tao-color-primary')).toBe(
+    'oklch(0.205 0.01 70)',
+  );
+  expect(childProvider.style.getPropertyValue('--tao-font-size')).toBe('14px');
 });
 
 // Bug A regression: Provider must not collapse children into one grid/flex item.
@@ -407,7 +475,7 @@ test('bg-surface seed is declared at :root, container/elevated derive from it', 
 test('component CSS files contain no hardcoded color escapes', () => {
   const componentsDir = 'src/components';
   const COLOR_LITERAL =
-    /#[0-9a-fA-F]{3,8}\b|oklch\(\s*0\s|oklch\(\s*1\s|[^-]\brgba?\(|[^-]\bhsla?\(/;
+    /#[0-9a-fA-F]{3,8}\b|oklch\(|[^-]\brgba?\(|[^-]\bhsla?\(/;
   const offenders: string[] = [];
   for (const entry of readdirSync(componentsDir, { withFileTypes: true })) {
     if (!entry.isDirectory()) continue;

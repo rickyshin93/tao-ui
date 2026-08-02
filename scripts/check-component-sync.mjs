@@ -1,11 +1,27 @@
 #!/usr/bin/env node
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import ts from 'typescript';
 import { readComponentDocs, rootDir } from './read-component-docs.mjs';
 
 const docs = readComponentDocs();
 const indexSource = readFileSync(join(rootDir, 'src/index.tsx'), 'utf8');
 const violations = [];
+const semanticDomExemptions = new Set(['HeadlessInputNumber', 'TaoProvider']);
+const tsConfig = ts.readConfigFile(
+  join(rootDir, 'tsconfig.json'),
+  ts.sys.readFile,
+);
+const parsedTsConfig = ts.parseJsonConfigFileContent(
+  tsConfig.config,
+  ts.sys,
+  rootDir,
+);
+const program = ts.createProgram(
+  parsedTsConfig.fileNames,
+  parsedTsConfig.options,
+);
+const typeChecker = program.getTypeChecker();
 
 const ignoredValueExports = new Set([
   'cx',
@@ -54,6 +70,104 @@ function parseValueExports() {
   return values;
 }
 
+function memberName(member) {
+  if (!member.name) return undefined;
+  if (ts.isIdentifier(member.name) || ts.isStringLiteral(member.name)) {
+    return member.name.text;
+  }
+  return undefined;
+}
+
+function semanticPartsFromType(node) {
+  const type = typeChecker.getTypeFromTypeNode(node);
+  const types = type.isUnion() ? type.types : [type];
+  return types
+    .filter((candidate) => candidate.flags & ts.TypeFlags.StringLiteral)
+    .map((candidate) => candidate.value);
+}
+
+function exportedDeclaration(sourceFile, exportName, predicate) {
+  const moduleSymbol = typeChecker.getSymbolAtLocation(sourceFile);
+  if (!moduleSymbol) return undefined;
+  const exportedSymbol = typeChecker
+    .getExportsOfModule(moduleSymbol)
+    .find((symbol) => symbol.name === exportName);
+  if (!exportedSymbol) return undefined;
+  const symbol =
+    exportedSymbol.flags & ts.SymbolFlags.Alias
+      ? typeChecker.getAliasedSymbol(exportedSymbol)
+      : exportedSymbol;
+  return symbol.declarations?.find(predicate);
+}
+
+function checkSemanticContract(doc) {
+  if (!doc.semanticParts?.length) {
+    if (!semanticDomExemptions.has(doc.displayName)) {
+      addViolation(
+        doc.displayName,
+        'Rendered components must document a SemanticPart contract.',
+      );
+    }
+    return;
+  }
+
+  const sourceFile = program.getSourceFile(join(rootDir, doc.source));
+  if (!sourceFile) {
+    addViolation(doc.displayName, 'Source is missing from TypeScript program.');
+    return;
+  }
+  const semanticTypeName = `${doc.displayName}SemanticPart`;
+  const propsTypeName = `${doc.displayName}Props`;
+  const semanticType = exportedDeclaration(
+    sourceFile,
+    semanticTypeName,
+    ts.isTypeAliasDeclaration,
+  );
+  const propsType = exportedDeclaration(
+    sourceFile,
+    propsTypeName,
+    ts.isInterfaceDeclaration,
+  );
+
+  if (!semanticType) {
+    addViolation(doc.displayName, `Missing ${semanticTypeName} type.`);
+    return;
+  }
+
+  const implementedParts = new Set(semanticPartsFromType(semanticType.type));
+  const missingParts = doc.semanticParts.filter(
+    (part) => !implementedParts.has(part),
+  );
+  const undocumentedParts = [...implementedParts].filter(
+    (part) => !doc.semanticParts.includes(part),
+  );
+  if (missingParts.length > 0 || undocumentedParts.length > 0) {
+    addViolation(
+      doc.displayName,
+      `Semantic parts differ from ${semanticTypeName}. Unimplemented: ${
+        missingParts.join(', ') || 'none'
+      }. Undocumented: ${undocumentedParts.join(', ') || 'none'}.`,
+    );
+  }
+
+  if (!propsType) {
+    addViolation(doc.displayName, `Missing ${propsTypeName} interface.`);
+    return;
+  }
+
+  for (const propName of ['classNames', 'styles']) {
+    const member = propsType.members.find(
+      (candidate) => memberName(candidate) === propName,
+    );
+    if (!member?.type) {
+      addViolation(
+        doc.displayName,
+        `Missing ${propName} prop for ${semanticTypeName}.`,
+      );
+    }
+  }
+}
+
 const documentedExports = new Set(docs.flatMap((doc) => doc.exports));
 const valueExports = parseValueExports();
 
@@ -100,6 +214,8 @@ for (const doc of docs) {
       );
     }
   }
+
+  checkSemanticContract(doc);
 }
 
 if (violations.length > 0) {

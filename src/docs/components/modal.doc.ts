@@ -13,8 +13,8 @@ export const modalDoc = {
   semanticParts: [
     'root',
     'overlay',
-    'content',
     'header',
+    'title',
     'body',
     'footer',
     'close',

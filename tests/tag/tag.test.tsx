@@ -57,12 +57,12 @@ test('closeIcon={false} hides close button', () => {
 });
 
 test('disabled prevents close', () => {
-  let closed = false;
+  let closeCount = 0;
   const { container } = render(
     <Tag
       disabled
       onClose={() => {
-        closed = true;
+        closeCount += 1;
       }}
     >
       Disabled
@@ -70,6 +70,8 @@ test('disabled prevents close', () => {
   );
   const tag = container.querySelector('[data-tao-tag]') as HTMLElement;
   expect(tag.dataset.taoDisabled).toBeTruthy();
+  fireEvent.click(screen.getByLabelText('Close'));
+  expect(closeCount).toBe(0);
 });
 
 test('classNames applied to root', () => {

@@ -19,3 +19,19 @@ test('has data-tao-form-layout attribute', () => {
   );
   expect(container.querySelector('[data-tao-form-layout]')).toBeTruthy();
 });
+
+test('applies semantic root class and style', () => {
+  const { container } = render(
+    <FormLayout
+      className="consumer"
+      style={{ width: 320 }}
+      classNames={{ root: 'semantic-root' }}
+      styles={{ root: { maxWidth: 640 } }}
+    >
+      content
+    </FormLayout>,
+  );
+  const root = container.querySelector('[data-tao-form-layout]') as HTMLElement;
+  expect(root).toHaveClass('consumer', 'semantic-root');
+  expect(root).toHaveStyle({ width: '320px', maxWidth: '640px' });
+});

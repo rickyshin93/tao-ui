@@ -10,7 +10,7 @@ export const inputNumberDoc = {
   source: 'src/components/input-number/input-number.tsx',
   story: 'stories/input-number.stories.tsx',
   tests: ['tests/input-number/input-number.test.tsx'],
-  semanticParts: ['root', 'input', 'controls', 'increment', 'decrement'],
+  semanticParts: ['root', 'input', 'prefix', 'suffix'],
   keywords: ['number', 'numeric', 'stepper'],
   related: ['HeadlessInputNumber', 'Input'],
   usage: {

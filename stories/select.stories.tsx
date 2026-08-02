@@ -1,4 +1,4 @@
-import { ChevronsUpDownIcon, FormField, Select, Stack } from '@rockshin/tao-ui';
+import { FormField, Select, Stack } from '@rockshin/tao-ui';
 import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
 
@@ -6,6 +6,24 @@ const meta: Meta = {
   title: '数据录入 Data Entry/Select',
 };
 export default meta;
+
+function WorkspaceSwitcherIcon() {
+  return (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="m7 15 5 5 5-5M7 9l5-5 5 5" />
+    </svg>
+  );
+}
 
 export const Basic: StoryObj = {
   render: () => (
@@ -232,7 +250,7 @@ export const WorkspaceSwitcher: StoryObj = {
             value={val}
             onChange={setVal}
             placeholder="Select workspace"
-            suffixIcon={<ChevronsUpDownIcon />}
+            suffixIcon={<WorkspaceSwitcherIcon />}
           />
         </div>
       );
@@ -483,12 +501,18 @@ export const MultipleWithTagRender: StoryObj = {
                 >
                   #{p.label}
                   {p.closable && (
-                    <span
+                    <button
+                      type="button"
                       onClick={p.onClose}
-                      style={{ cursor: 'pointer', marginLeft: 2 }}
+                      style={{
+                        cursor: 'pointer',
+                        marginLeft: 2,
+                        border: 0,
+                        padding: 0,
+                      }}
                     >
                       ×
-                    </span>
+                    </button>
                   )}
                 </span>
               )}

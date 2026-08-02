@@ -9,7 +9,15 @@ export const breadcrumbDoc = {
   source: 'src/components/breadcrumb/breadcrumb.tsx',
   story: 'stories/breadcrumb.stories.tsx',
   tests: ['tests/breadcrumb/breadcrumb.test.tsx'],
-  semanticParts: ['root', 'list', 'item', 'link', 'separator'],
+  semanticParts: [
+    'root',
+    'list',
+    'item',
+    'link',
+    'page',
+    'separator',
+    'ellipsis',
+  ],
   keywords: ['navigation', 'path', 'hierarchy'],
   related: ['Tabs', 'Dropdown'],
   usage: {

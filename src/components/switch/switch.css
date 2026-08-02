@@ -82,7 +82,7 @@ button[data-tao-switch][disabled] {
   position: absolute;
   top: 2px;
   inset-inline-start: 2px;
-  transition: all var(--tao-motion-duration-mid) ease-in-out;
+  transition: transform var(--tao-motion-duration-mid) ease-in-out;
 }
 
 [data-tao-switch-handle]::before {
@@ -92,10 +92,12 @@ button[data-tao-switch][disabled] {
   inset-inline-start: 0;
   inset-inline-end: 0;
   bottom: 0;
-  background-color: white;
+  background-color: var(--tao-color-text-light-solid);
   border-radius: 9px;
-  box-shadow: 0 2px 4px 0 oklch(0.15 0.01 150 / 0.2);
-  transition: all var(--tao-motion-duration-mid) ease-in-out;
+  box-shadow: var(--tao-box-shadow);
+  transition:
+    inset-inline-start var(--tao-motion-duration-mid) ease-in-out,
+    inset-inline-end var(--tao-motion-duration-mid) ease-in-out;
 }
 
 /* Medium handle: 18×18 */
@@ -105,7 +107,7 @@ button[data-tao-switch][data-tao-size="medium"] [data-tao-switch-handle] {
 }
 button[data-tao-switch][data-tao-size="medium"][data-tao-checked]
   [data-tao-switch-handle] {
-  inset-inline-start: calc(100% - 18px - 2px);
+  transform: translateX(22px);
 }
 
 /* Small handle: 12×12 */
@@ -115,7 +117,18 @@ button[data-tao-switch][data-tao-size="small"] [data-tao-switch-handle] {
 }
 button[data-tao-switch][data-tao-size="small"][data-tao-checked]
   [data-tao-switch-handle] {
-  inset-inline-start: calc(100% - 12px - 2px);
+  transform: translateX(12px);
+}
+
+:dir(rtl)
+  button[data-tao-switch][data-tao-size="medium"][data-tao-checked]
+  [data-tao-switch-handle] {
+  transform: translateX(-22px);
+}
+:dir(rtl)
+  button[data-tao-switch][data-tao-size="small"][data-tao-checked]
+  [data-tao-switch-handle] {
+  transform: translateX(-12px);
 }
 
 /* Active: handle stretches (antd: inset -30%) */
@@ -135,8 +148,8 @@ button[data-tao-switch][data-tao-checked]:not([disabled]):active
   top: 50%;
   inset-inline-start: 50%;
   transform: translate(-50%, -50%);
-  animation: tao-spin 0.8s linear infinite;
-  color: oklch(0.4 0 0 / 0.65);
+  animation: tao-spin calc(var(--tao-motion-unit) * 8) linear infinite;
+  color: var(--tao-color-text-secondary);
   z-index: 1;
 }
 

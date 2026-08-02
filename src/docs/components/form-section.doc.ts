@@ -10,7 +10,7 @@ export const formSectionDoc = {
   source: 'src/components/form-section/form-section.tsx',
   story: 'stories/form.stories.tsx',
   tests: ['tests/form-section/form-section.test.tsx'],
-  semanticParts: ['root', 'header', 'title', 'description', 'content'],
+  semanticParts: ['root', 'header', 'title', 'description', 'body'],
   keywords: ['form', 'section', 'group'],
   related: ['FormField', 'FormLayout'],
   usage: {

@@ -231,7 +231,9 @@ button[data-tao-calendar-nav-btn] {
   margin: 0;
   outline: none;
   appearance: none;
-  transition: all var(--tao-motion-duration-fast) ease-out;
+  transition:
+    background-color var(--tao-motion-duration-fast) ease-out,
+    color var(--tao-motion-duration-fast) ease-out;
 }
 button[data-tao-calendar-nav-btn]:hover {
   background: var(--tao-color-fill-tertiary);
@@ -334,7 +336,9 @@ button[data-tao-calendar-title-btn]:hover {
   border-radius: var(--tao-radius-sm);
   font-size: var(--tao-font-size-sm);
   color: var(--tao-color-text);
-  transition: all var(--tao-motion-duration-fast) ease-out;
+  transition:
+    background-color var(--tao-motion-duration-fast) ease-out,
+    color var(--tao-motion-duration-fast) ease-out;
   line-height: 1;
 }
 
@@ -449,7 +453,9 @@ button[data-tao-year-cell] {
   margin: 0;
   outline: none;
   appearance: none;
-  transition: all var(--tao-motion-duration-fast) ease-out;
+  transition:
+    background-color var(--tao-motion-duration-fast) ease-out,
+    color var(--tao-motion-duration-fast) ease-out;
 }
 
 button[data-tao-month-cell]:hover:not(:disabled),
@@ -599,7 +605,9 @@ button[data-tao-preset-btn] {
   margin: 0;
   outline: none;
   appearance: none;
-  transition: all var(--tao-motion-duration-fast) ease-out;
+  transition:
+    border-color var(--tao-motion-duration-fast) ease-out,
+    color var(--tao-motion-duration-fast) ease-out;
 }
 button[data-tao-preset-btn]:hover {
   border-color: var(--tao-primary);
@@ -631,7 +639,10 @@ button[data-tao-picker-footer-btn] {
   margin: 0;
   outline: none;
   appearance: none;
-  transition: all var(--tao-motion-duration-fast) ease-out;
+  transition:
+    background-color var(--tao-motion-duration-fast) ease-out,
+    border-color var(--tao-motion-duration-fast) ease-out,
+    color var(--tao-motion-duration-fast) ease-out;
 }
 button[data-tao-picker-footer-btn]:hover {
   border-color: var(--tao-primary);

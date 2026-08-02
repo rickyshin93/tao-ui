@@ -1,10 +1,16 @@
 #!/usr/bin/env node
-import { writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { readComponentDocs, rootDir } from './read-component-docs.mjs';
 
 const docs = readComponentDocs();
-const generatedAt = new Date().toISOString();
+const check = process.argv.includes('--check');
+const manifestPath = join(rootDir, 'component-manifest.json');
+const llmsPath = join(rootDir, 'llms.txt');
+const currentManifest = check ? readFileSync(manifestPath, 'utf8') : undefined;
+const generatedAt = currentManifest
+  ? JSON.parse(currentManifest).generatedAt
+  : new Date().toISOString();
 
 const manifest = {
   schemaVersion: 1,
@@ -44,8 +50,8 @@ function renderLlmsTxt() {
     '',
     '- `TaoProvider` supplies size, disabled, variant, portal scope, and theme seed token defaults.',
     '- Components expose semantic DOM customization through `classNames` and `styles` props.',
-    '- Theme tokens are CSS custom properties prefixed with `--tao-*`; use `tokenVar(name)` and `taoTokenNames` from the package root for typed token references.',
-    '- `componentDocs` and `getComponentDoc(name)` expose machine-readable component metadata.',
+    '- Theme tokens are CSS custom properties prefixed with `--tao-*`; import `tokenVar(name)` and `taoTokenNames` from `@rockshin/tao-ui/tokens`.',
+    '- Import `componentDocs` and `getComponentDoc(name)` from `@rockshin/tao-ui/meta` for machine-readable component metadata.',
     '',
     '## Component Groups',
     '',
@@ -100,11 +106,26 @@ function renderLlmsTxt() {
   return `${lines.join('\n').trim()}\n`;
 }
 
-writeFileSync(
-  join(rootDir, 'component-manifest.json'),
-  `${JSON.stringify(manifest, null, 2)}\n`,
-);
-writeFileSync(join(rootDir, 'llms.txt'), renderLlmsTxt());
+const nextManifest = `${JSON.stringify(manifest, null, 2)}\n`;
+const nextLlms = renderLlmsTxt();
+
+if (check) {
+  const stale = [];
+  if (currentManifest !== nextManifest) stale.push('component-manifest.json');
+  if (readFileSync(llmsPath, 'utf8') !== nextLlms) stale.push('llms.txt');
+  if (stale.length > 0) {
+    console.error(
+      `Generated docs are stale: ${stale.join(', ')}. Run bun run docs:generate.`,
+    );
+    process.exit(1);
+  }
+
+  console.log(`Checked generated docs for ${docs.length} components.`);
+  process.exit(0);
+}
+
+writeFileSync(manifestPath, nextManifest);
+writeFileSync(llmsPath, nextLlms);
 
 console.log(
   `Generated component-manifest.json and llms.txt from ${docs.length} component docs.`,

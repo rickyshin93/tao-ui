@@ -91,7 +91,7 @@ test('showTotal renders total info', () => {
 });
 
 test('showSizeChanger renders select', () => {
-  render(<Pagination total={100} showSizeChanger onChange={(_p, ps) => {}} />);
+  render(<Pagination total={100} showSizeChanger onChange={() => {}} />);
   const select = screen.getByRole('combobox');
   expect(select).toBeTruthy();
   // Default value should be "10 / page"

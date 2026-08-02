@@ -9,7 +9,7 @@ export const switchDoc = {
   source: 'src/components/switch/switch.tsx',
   story: 'stories/switch.stories.tsx',
   tests: ['tests/switch/switch.test.tsx'],
-  semanticParts: ['root', 'thumb', 'label'],
+  semanticParts: ['root', 'handle'],
   keywords: ['toggle', 'setting', 'boolean'],
   related: ['Checkbox'],
   usage: {

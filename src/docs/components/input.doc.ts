@@ -9,7 +9,7 @@ export const inputDoc = {
   source: 'src/components/input/input.tsx',
   story: 'stories/input.stories.tsx',
   tests: ['tests/input/input.test.tsx'],
-  semanticParts: ['root', 'input', 'prefix', 'suffix', 'clear'],
+  semanticParts: ['root', 'input', 'prefix', 'suffix'],
   keywords: ['text field', 'input', 'search'],
   related: ['Textarea', 'FormField'],
   usage: {

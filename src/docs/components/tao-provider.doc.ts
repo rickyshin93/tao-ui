@@ -6,7 +6,7 @@ export const taoProviderDoc = {
   category: 'Config',
   description:
     'Provides global component defaults, portal scoping, and theme seed token overrides.',
-  exports: ['TaoProvider', 'TaoPortalScope'],
+  exports: ['TaoProvider'],
   source: 'src/provider/tao-provider.tsx',
   story: 'stories/provider.stories.tsx',
   tests: ['tests/provider/tao-provider.test.tsx'],

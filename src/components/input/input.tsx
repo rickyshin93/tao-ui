@@ -1,6 +1,7 @@
 import { forwardRef, type InputHTMLAttributes, type ReactNode } from 'react';
 import {
   type TaoSize,
+  type TaoStatus,
   type TaoVariant,
   useTaoConfig,
 } from '../../provider/tao-provider';
@@ -20,6 +21,7 @@ export interface InputProps
   prefix?: ReactNode;
   suffix?: ReactNode;
   error?: boolean;
+  status?: TaoStatus;
   classNames?: SemanticClassNames<InputSemanticPart>;
   styles?: SemanticStyles<InputSemanticPart>;
 }
@@ -31,6 +33,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
     prefix,
     suffix,
     error,
+    status,
     disabled,
     className,
     style,
@@ -53,7 +56,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
       data-tao-input=""
       data-tao-size={resolvedSize}
       data-tao-variant={resolvedVariant}
-      data-tao-error={error || undefined}
+      data-tao-error={status === 'error' || error || undefined}
+      data-tao-warning={status === 'warning' || undefined}
     >
       {prefix != null && (
         <span
@@ -70,7 +74,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
         className={classNames?.input}
         style={styles?.input}
         disabled={resolvedDisabled}
-        aria-invalid={error || undefined}
+        aria-invalid={status === 'error' || error || undefined}
       />
       {suffix != null && (
         <span

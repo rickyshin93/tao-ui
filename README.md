@@ -5,7 +5,7 @@ A modern React 19 component library with semantic DOM customization and OKLCH-ba
 ## Features
 
 - **React 19** — built for the latest React, ships with the React Compiler.
-- **Semantic DOM** — every component exposes `classNames` / `styles` props to style internal parts by semantic name, no fragile selector hacks.
+- **Semantic DOM** — every visual component exposes `classNames` / `styles` props to style internal parts by semantic name, no fragile selector hacks.
 - **OKLCH theming** — `TaoProvider` derives a full theme (radius, font scale, control heights) from a small seed token set; components inherit `size` / `disabled` / `variant`.
 - **Typed** — full `.d.ts`, every Props and SemanticPart type exported.
 
@@ -84,6 +84,13 @@ import '@fontsource/geist-mono/400.css';
 | Config | `TaoProvider`, `useTaoConfig` |
 
 Headless utilities: `useNumberInput` / `NumberInput`, and the `cx` semantic-class helper.
+
+Package metadata and token helpers use explicit subpath imports:
+
+```ts
+import { componentDocs, getComponentDoc } from '@rockshin/tao-ui/meta';
+import { taoTokenNames, tokenVar } from '@rockshin/tao-ui/tokens';
+```
 
 ## License
 

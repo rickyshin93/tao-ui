@@ -10,6 +10,7 @@ export const formLayoutDoc = {
   source: 'src/layouts/form-layout/form-layout.tsx',
   story: 'stories/form-layout.stories.tsx',
   tests: ['tests/layouts/form-layout/form-layout.test.tsx'],
+  semanticParts: ['root'],
   keywords: ['form', 'layout', 'labels'],
   related: ['FormField', 'FormSection'],
   usage: {

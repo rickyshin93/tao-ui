@@ -2,23 +2,50 @@ import * as Popover from '@radix-ui/react-popover';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
-import { type ReactNode, useCallback, useEffect, useState } from 'react';
+import {
+  type CSSProperties,
+  type ReactNode,
+  type Ref,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from 'react';
 import {
   TaoPortalScope,
   type TaoSize,
+  type TaoStatus,
   type TaoVariant,
   useTaoConfig,
 } from '../../provider/tao-provider';
+import {
+  cx,
+  type SemanticClassNames,
+  type SemanticStyles,
+} from '../../utils/semantic';
 import { Drawer } from '../drawer/drawer';
 import { useIsMobile } from '../select/use-is-mobile';
 import { CalendarGrid } from './calendar/calendar-grid';
 import './date-picker.css';
 import { Presets } from './presets';
-import { getDefaultFormat, type RangePresetItem } from './types';
+import {
+  getDefaultFormat,
+  type PickerRef,
+  type RangePresetItem,
+} from './types';
 
 dayjs.extend(customParseFormat);
 
 type RangeValue = [Dayjs | null, Dayjs | null] | null;
+
+export type RangePickerSemanticPart =
+  | 'root'
+  | 'input'
+  | 'separator'
+  | 'popup'
+  | 'calendar'
+  | 'cell';
 
 export interface RangePickerProps {
   value?: RangeValue;
@@ -37,10 +64,15 @@ export interface RangePickerProps {
   variant?: TaoVariant;
   disabled?: boolean | [boolean, boolean];
   allowClear?: boolean;
-  status?: 'error' | 'warning';
+  status?: TaoStatus;
+  ref?: Ref<PickerRef>;
   mobile?: boolean;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+  className?: string;
+  style?: CSSProperties;
+  classNames?: SemanticClassNames<RangePickerSemanticPart>;
+  styles?: SemanticStyles<RangePickerSemanticPart>;
 }
 
 export function RangePicker({
@@ -64,6 +96,11 @@ export function RangePicker({
   mobile,
   open: controlledOpen,
   onOpenChange,
+  className,
+  style,
+  classNames,
+  styles,
+  ref,
 }: RangePickerProps) {
   const ctx = useTaoConfig();
   const resolvedSize = size ?? ctx.size;
@@ -73,6 +110,31 @@ export function RangePicker({
   const resolvedDisabled = isDisabled ?? ctx.disabled;
   const autoMobile = useIsMobile();
   const isMobile = mobile ?? autoMobile;
+  const mobileTriggerRef = useRef<HTMLButtonElement>(null);
+  const startInputRef = useRef<HTMLInputElement>(null);
+  const endInputRef = useRef<HTMLInputElement>(null);
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      focus: (position = 'start') =>
+        (isMobile
+          ? mobileTriggerRef.current
+          : position === 'end'
+            ? endInputRef.current
+            : startInputRef.current
+        )?.focus(),
+      blur: () => {
+        mobileTriggerRef.current?.blur();
+        startInputRef.current?.blur();
+        endInputRef.current?.blur();
+      },
+      get nativeElement() {
+        return isMobile ? mobileTriggerRef.current : startInputRef.current;
+      },
+    }),
+    [isMobile],
+  );
 
   const fmt = formatProp ?? getDefaultFormat(picker, showTime);
   const isValueControlled = value !== undefined;
@@ -217,7 +279,11 @@ export function RangePicker({
     allowClear && (rangeStart || rangeEnd) && !resolvedDisabled;
 
   const panelContent = (
-    <div data-tao-range-panel="">
+    <div
+      data-tao-range-panel=""
+      className={isMobile ? classNames?.popup : undefined}
+      style={isMobile ? styles?.popup : undefined}
+    >
       {/* Shared header: << < [Left Month Year]  [Right Month Year] > >> */}
       <div data-tao-range-header="">
         <div data-tao-calendar-nav="">
@@ -273,10 +339,15 @@ export function RangePicker({
               rangeEnd={rangeEnd}
               hoverDate={hoverDate}
               onSelect={handleDateSelect}
+              onViewDateChange={setViewDateStart}
               onHover={setHoverDate}
               disabledDate={disabledDate}
               minDate={minDate}
               maxDate={maxDate}
+              className={classNames?.calendar}
+              style={styles?.calendar}
+              cellClassName={classNames?.cell}
+              cellStyle={styles?.cell}
             />
           </div>
         </div>
@@ -289,10 +360,17 @@ export function RangePicker({
               rangeEnd={rangeEnd}
               hoverDate={hoverDate}
               onSelect={handleDateSelect}
+              onViewDateChange={(date) =>
+                setViewDateStart(date.subtract(1, 'month'))
+              }
               onHover={setHoverDate}
               disabledDate={disabledDate}
               minDate={minDate}
               maxDate={maxDate}
+              className={classNames?.calendar}
+              style={styles?.calendar}
+              cellClassName={classNames?.cell}
+              cellStyle={styles?.cell}
             />
           </div>
         </div>
@@ -338,6 +416,7 @@ export function RangePicker({
 
   const mobileTrigger = (
     <button
+      ref={mobileTriggerRef}
       type="button"
       data-tao-control=""
       data-tao-range-trigger=""
@@ -346,19 +425,31 @@ export function RangePicker({
       data-tao-error={status === 'error' || undefined}
       disabled={resolvedDisabled}
       onClick={() => setOpen(true)}
+      className={cx(classNames?.root, className)}
+      style={{ ...styles?.root, ...style }}
     >
       <span
         data-tao-range-input=""
         data-tao-active={(selecting === 'start' && isOpen) || undefined}
+        className={classNames?.input}
+        style={styles?.input}
       >
         {displayStart || (
           <span data-tao-picker-placeholder="">{placeholder[0]}</span>
         )}
       </span>
-      <span data-tao-range-separator="">{separator}</span>
+      <span
+        data-tao-range-separator=""
+        className={classNames?.separator}
+        style={styles?.separator}
+      >
+        {separator}
+      </span>
       <span
         data-tao-range-input=""
         data-tao-active={(selecting === 'end' && isOpen) || undefined}
+        className={classNames?.input}
+        style={styles?.input}
       >
         {displayEnd || (
           <span data-tao-picker-placeholder="">{placeholder[1]}</span>
@@ -376,10 +467,15 @@ export function RangePicker({
       data-tao-variant={resolvedVariant}
       data-tao-error={status === 'error' || undefined}
       data-disabled={resolvedDisabled || undefined}
+      className={cx(classNames?.root, className)}
+      style={{ ...styles?.root, ...style }}
     >
       <input
+        ref={startInputRef}
         data-tao-range-input=""
         data-tao-active={(selecting === 'start' && isOpen) || undefined}
+        className={classNames?.input}
+        style={styles?.input}
         value={inputStart}
         placeholder={placeholder[0]}
         disabled={resolvedDisabled}
@@ -399,10 +495,19 @@ export function RangePicker({
           }
         }}
       />
-      <span data-tao-range-separator="">{separator}</span>
+      <span
+        data-tao-range-separator=""
+        className={classNames?.separator}
+        style={styles?.separator}
+      >
+        {separator}
+      </span>
       <input
+        ref={endInputRef}
         data-tao-range-input=""
         data-tao-active={(selecting === 'end' && isOpen) || undefined}
+        className={classNames?.input}
+        style={styles?.input}
         value={inputEnd}
         placeholder={placeholder[1]}
         disabled={resolvedDisabled}
@@ -452,6 +557,8 @@ export function RangePicker({
             data-tao-picker-dropdown=""
             sideOffset={4}
             align="start"
+            className={classNames?.popup}
+            style={styles?.popup}
             onOpenAutoFocus={(e) => e.preventDefault()}
           >
             {panelContent}

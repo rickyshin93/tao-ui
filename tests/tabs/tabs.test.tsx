@@ -84,6 +84,25 @@ test('keyboard nav: ArrowLeft wraps', () => {
   expect(screen.getByText('Content B')).toBeVisible();
 });
 
+test('tabs and panels have scoped, reciprocal ARIA ids', () => {
+  const { container } = render(
+    <>
+      <Tabs items={items} />
+      <Tabs items={items} />
+    </>,
+  );
+
+  const tabs = container.querySelectorAll('[role="tab"]');
+  const panels = container.querySelectorAll('[role="tabpanel"]');
+  const firstTab = tabs[0];
+  const firstPanel = panels[0];
+
+  expect(firstTab.id).not.toBe('');
+  expect(firstTab.getAttribute('aria-controls')).toBe(firstPanel.id);
+  expect(firstPanel.getAttribute('aria-labelledby')).toBe(firstTab.id);
+  expect(tabs[0].id).not.toBe(tabs[3].id);
+});
+
 test('destroyInactiveTabPane removes hidden panels', () => {
   render(<Tabs items={items} destroyInactiveTabPane />);
   expect(screen.getByText('Content A')).toBeVisible();

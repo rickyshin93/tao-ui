@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { type ReactNode, type Ref, useState } from 'react';
 import { useTaoConfig } from '../../provider/tao-provider';
 import {
   cx,
@@ -22,10 +22,12 @@ export interface SwitchProps {
   style?: React.CSSProperties;
   classNames?: SemanticClassNames<SwitchSemanticPart>;
   styles?: SemanticStyles<SwitchSemanticPart>;
+  ref?: Ref<HTMLButtonElement>;
 }
 
 export function Switch({
   checked,
+  defaultChecked,
   onChange,
   disabled,
   loading,
@@ -36,23 +38,36 @@ export function Switch({
   style,
   classNames,
   styles,
+  ref,
 }: SwitchProps) {
   const ctx = useTaoConfig();
   const resolvedDisabled = disabled ?? ctx.disabled ?? false;
   const isDisabled = resolvedDisabled || loading;
+  const controlled = checked !== undefined;
+  const [internalChecked, setInternalChecked] = useState(
+    defaultChecked ?? false,
+  );
+  const resolvedChecked = controlled ? checked : internalChecked;
+
+  const handleChange = () => {
+    const next = !resolvedChecked;
+    if (!controlled) setInternalChecked(next);
+    onChange?.(next);
+  };
 
   return (
     <button
+      ref={ref}
       type="button"
       role="switch"
-      aria-checked={!!checked}
+      aria-checked={resolvedChecked}
       disabled={isDisabled}
       className={cx(classNames?.root, className)}
       style={{ ...styles?.root, ...style }}
       data-tao-switch=""
       data-tao-size={size}
-      data-tao-checked={checked || undefined}
-      onClick={() => onChange?.(!checked)}
+      data-tao-checked={resolvedChecked || undefined}
+      onClick={handleChange}
     >
       {/* Handle: absolute positioned circle */}
       <div

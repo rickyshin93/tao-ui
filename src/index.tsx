@@ -1,3 +1,5 @@
+'use client';
+
 // Global theme — imported once here so consumers don't need a separate CSS import.
 // This entry's CSS side effects are preserved end-to-end via the `sideEffects`
 // whitelist in package.json (./dist/index.js + ./src/index.tsx). Without that
@@ -43,10 +45,13 @@ export {
 export {
   DatePicker,
   type DatePickerProps,
+  type DatePickerSemanticPart,
+  type PickerRef,
 } from './components/date-picker/date-picker';
 export {
   RangePicker,
   type RangePickerProps,
+  type RangePickerSemanticPart,
 } from './components/date-picker/range-picker';
 export {
   Drawer,
@@ -118,8 +123,22 @@ export {
   type RadioSemanticPart,
 } from './components/radio/radio';
 export {
+  ScrollArea,
+  type ScrollAreaProps,
+  type ScrollAreaSemanticPart,
+  type ScrollAreaType,
+} from './components/scroll-area/scroll-area';
+export {
+  Select,
+  type SelectOption,
+  type SelectPlacement,
+  type SelectProps,
+  type SelectRef,
+  type SelectSemanticPart,
+  type TagRenderProps,
+} from './components/select/select';
+export {
   Sonner,
-  toast,
   type SonnerAction,
   type SonnerPosition,
   type SonnerProps,
@@ -127,22 +146,8 @@ export {
   type SonnerToastItem,
   type SonnerToastOptions,
   type SonnerType,
+  toast,
 } from './components/sonner';
-export {
-  ScrollArea,
-  type ScrollAreaProps,
-  type ScrollAreaSemanticPart,
-  type ScrollAreaType,
-} from './components/scroll-area/scroll-area';
-export {
-  ChevronsUpDownIcon,
-  Select,
-  type SelectOption,
-  type SelectPlacement,
-  type SelectProps,
-  type SelectSemanticPart,
-  type TagRenderProps,
-} from './components/select/select';
 export {
   Spinner,
   type SpinnerProps,
@@ -193,19 +198,16 @@ export {
   type TextareaSemanticPart,
 } from './components/textarea/textarea';
 export {
-  type ComponentDoc,
-  type ComponentDocCategory,
-  type ComponentDocProp,
-  type ComponentDocUsage,
-  componentDocs,
-  getComponentDoc,
-} from './docs';
-export {
   FormLayout,
   type FormLayoutProps,
+  type FormLayoutSemanticPart,
 } from './layouts/form-layout/form-layout';
 // Layouts
-export { Stack, type StackProps } from './layouts/stack/stack';
+export {
+  Stack,
+  type StackProps,
+  type StackSemanticPart,
+} from './layouts/stack/stack';
 // Number input — headless component + hook (the styled InputNumber is above)
 export {
   type FormatOptions,
@@ -220,22 +222,17 @@ export {
   useNumberInput,
 } from './number-input';
 export {
-  TaoPortalScope,
+  type TaoConfig,
   TaoProvider,
   type TaoProviderProps,
   type TaoSeedToken,
   type TaoSize,
+  type TaoStatus,
   type TaoThemeConfig,
   type TaoThemeMode,
   type TaoVariant,
   useTaoConfig,
 } from './provider/tao-provider';
-export {
-  type TaoTokenName,
-  taoTokenNames,
-  taoTokenVars,
-  tokenVar,
-} from './theme/tokens';
 // Semantic DOM utilities
 export {
   cx,

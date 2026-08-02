@@ -82,6 +82,20 @@ test('click trigger opens popover with calendar', async () => {
   expect(screen.getByRole('grid')).toBeTruthy(); // calendar table
 });
 
+test('calendar exposes one date in the tab order', async () => {
+  render(<DatePicker value={dayjs('2026-06-15')} />);
+  await userEvent.click(screen.getByRole('textbox'));
+
+  const day15 = screen.getByRole('button', { name: '2026-06-15' });
+  const tabbableDays = screen
+    .getAllByRole('button')
+    .filter((button) => button.hasAttribute('data-tao-calendar-cell-button'))
+    .filter((button) => button.tabIndex === 0);
+
+  expect(tabbableDays).toHaveLength(1);
+  expect(tabbableDays[0]).toBe(day15);
+});
+
 test('selecting a date triggers onChange', async () => {
   let result: string | null = null;
   const { container } = render(
@@ -152,4 +166,65 @@ test('presets render as buttons', async () => {
   await userEvent.click(screen.getByRole('textbox'));
   expect(screen.getByText('Today')).toBeTruthy();
   expect(screen.getByText('Yesterday')).toBeTruthy();
+});
+
+test('applies semantic classes and styles to desktop parts', () => {
+  const { container } = render(
+    <DatePicker
+      mobile={false}
+      open
+      showTime
+      className="consumer-root"
+      style={{ width: 320 }}
+      classNames={{
+        root: 'semantic-root',
+        input: 'semantic-input',
+        popup: 'semantic-popup',
+        calendar: 'semantic-calendar',
+        cell: 'semantic-cell',
+        footer: 'semantic-footer',
+      }}
+      styles={{
+        root: { maxWidth: 640 },
+        input: { color: 'red' },
+        popup: { minWidth: 280 },
+        calendar: { tableLayout: 'fixed' },
+        cell: { opacity: 0.9 },
+        footer: { justifyContent: 'start' },
+      }}
+    />,
+  );
+
+  const root = container.querySelector(
+    '[data-tao-picker-trigger]',
+  ) as HTMLElement;
+  expect(root).toHaveClass('consumer-root', 'semantic-root');
+  expect(root).toHaveStyle({ width: '320px', maxWidth: '640px' });
+  expect(screen.getByRole('textbox')).toHaveClass('semantic-input');
+  expect(document.querySelector('.semantic-popup')).toHaveStyle({
+    minWidth: '280px',
+  });
+  expect(document.querySelector('.semantic-calendar')).toHaveStyle({
+    tableLayout: 'fixed',
+  });
+  expect(document.querySelector('.semantic-cell')).toHaveStyle({
+    opacity: '0.9',
+  });
+  expect(document.querySelector('.semantic-footer')).toHaveStyle({
+    justifyContent: 'start',
+  });
+});
+
+test('applies popup semantic customization in the mobile drawer', () => {
+  render(
+    <DatePicker
+      mobile
+      open
+      classNames={{ popup: 'semantic-mobile-popup' }}
+      styles={{ popup: { minWidth: 280 } }}
+    />,
+  );
+  expect(document.querySelector('.semantic-mobile-popup')).toHaveStyle({
+    minWidth: '280px',
+  });
 });

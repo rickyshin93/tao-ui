@@ -2,6 +2,7 @@ import {
   type ChangeEvent,
   createContext,
   type ReactNode,
+  type Ref,
   useCallback,
   useContext,
 } from 'react';
@@ -38,17 +39,20 @@ export interface RadioProps {
   name?: string;
   classNames?: SemanticClassNames<RadioSemanticPart>;
   styles?: SemanticStyles<RadioSemanticPart>;
+  ref?: Ref<HTMLInputElement>;
 }
 
 export function Radio({
   value,
   checked,
+  defaultChecked,
   disabled,
   onChange,
   children,
   name,
   classNames,
   styles,
+  ref,
 }: RadioProps) {
   const ctx = useTaoConfig();
   const groupCtx = useContext(RadioGroupContext);
@@ -78,10 +82,12 @@ export function Radio({
     >
       <span data-tao-radio-control="">
         <input
+          ref={ref}
           type="radio"
           name={resolvedName}
           value={value}
           checked={resolvedChecked}
+          defaultChecked={defaultChecked}
           disabled={resolvedDisabled}
           onChange={handleChange}
           data-tao-radio-input=""

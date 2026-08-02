@@ -10,6 +10,10 @@
 - none
 
 ## Done
+- 2026-08-03 keep Select option padding inside popup width so selected checks remain visible
+- 2026-08-03 align Button icon sizing and text spacing with antd
+- 2026-08-02 ship typed Semantic DOM contracts for all visual components and enforce docs/source parity
+- 2026-08-02 harden a11y/SSR/public types, split Select/Table internals, enforce strict CI gates, and clean package metadata
 - 2026-07-26 align Drawer/Modal mask closing with Antd: only real overlay clicks close; nested portals stay interactive
 - 2026-07-25 support React SVG Input prefixes with automatic overlay positioning and reserved padding
 - 2026-07-25 make desktop RangePicker editable and inline-search multiple/tags Select

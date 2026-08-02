@@ -33,6 +33,14 @@ test('click triggers onChange with toggled value', async () => {
   expect(val).toBe(true);
 });
 
+test('defaultChecked drives uncontrolled state', async () => {
+  render(<Switch defaultChecked />);
+  const control = screen.getByRole('switch');
+  expect(control.getAttribute('aria-checked')).toBe('true');
+  await userEvent.click(control);
+  expect(control.getAttribute('aria-checked')).toBe('false');
+});
+
 test('disabled prevents onChange', async () => {
   let val = false;
   render(

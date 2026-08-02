@@ -2,204 +2,43 @@ import * as Popover from '@radix-ui/react-popover';
 import * as RadixSelect from '@radix-ui/react-select';
 import {
   type CSSProperties,
-  Fragment,
   type ReactNode,
   useCallback,
   useId,
+  useImperativeHandle,
   useMemo,
   useRef,
   useState,
 } from 'react';
-import {
-  TaoPortalScope,
-  type TaoSize,
-  type TaoVariant,
-  useTaoConfig,
-} from '../../provider/tao-provider';
-import {
-  cx,
-  type SemanticClassNames,
-  type SemanticStyles,
-} from '../../utils/semantic';
+import { TaoPortalScope, useTaoConfig } from '../../provider/tao-provider';
+import { cx } from '../../utils/semantic';
 import { MobileSelectDrawer } from './mobile-select';
+import {
+  CheckIcon,
+  ChevronDownIcon,
+  CloseIcon,
+  LoadingIcon,
+  SearchIcon,
+} from './select-icons';
+import { defaultFilter, filterTree, flattenOptions } from './select-model';
+import { SearchableSelectList } from './select-searchable-list';
+import { SelectTags } from './select-tags';
 import './select.css';
+import type {
+  SelectOption,
+  SelectPlacement,
+  SelectProps,
+} from './select-types';
 import { useIsMobile } from './use-is-mobile';
 
-export interface SelectOption {
-  label: ReactNode;
-  value: string;
-  disabled?: boolean;
-  /** Leading icon/avatar shown in the option row and in the trigger when selected. */
-  icon?: ReactNode;
-  /** Secondary description line shown under the label in the option row. */
-  description?: ReactNode;
-  /** Nested options turn this entry into a group; `label` becomes the group title. */
-  options?: SelectOption[];
-}
-
-export type SelectSemanticPart =
-  | 'root'
-  | 'prefix'
-  | 'suffix'
-  | 'placeholder'
-  | 'clear'
-  | 'popup'
-  | 'search'
-  | 'searchInput'
-  | 'group'
-  | 'groupLabel'
-  | 'item'
-  | 'itemIcon'
-  | 'itemLabel'
-  | 'itemDesc'
-  | 'empty'
-  | 'tag'
-  | 'tagLabel'
-  | 'tagClose'
-  | 'tagRest'
-  | 'values';
-
-export type SelectPlacement =
-  | 'bottomLeft'
-  | 'bottomRight'
-  | 'topLeft'
-  | 'topRight';
-
-export interface TagRenderProps {
-  label: ReactNode;
-  value: string;
-  closable: boolean;
-  disabled: boolean;
-  onClose: (e: React.MouseEvent) => void;
-}
-
-export interface SelectProps {
-  options: SelectOption[];
-  value?: string | string[];
-  defaultValue?: string | string[];
-  /** Fired on selection or clear. Multi-mode receives `string[]`. */
-  onChange?: (
-    value: string | string[],
-    option?: SelectOption | SelectOption[],
-  ) => void;
-  /** Fired only when an option is picked (not on clear). Multi-mode receives a single value. */
-  onSelect?: (value: string, option: SelectOption) => void;
-  /** Fired when an option is deselected (multi-mode only). */
-  onDeselect?: (value: string, option: SelectOption) => void;
-  /** Fired when the value is cleared via the clear button. */
-  onClear?: () => void;
-  /** Selection mode. `multiple` for multi-select, `tags` for free-form tag input. */
-  mode?: 'multiple' | 'tags';
-  placeholder?: string;
-  size?: TaoSize;
-  variant?: TaoVariant;
-  disabled?: boolean;
-  /** Validation status. */
-  status?: 'error' | 'warning';
-  /** Show search input in dropdown */
-  showSearch?: boolean;
-  /** Custom filter function, default matches label string */
-  filterOption?: (input: string, option: SelectOption) => boolean;
-  /** Controlled search text. */
-  searchValue?: string;
-  /** Fired when the search text changes. */
-  onSearch?: (value: string) => void;
-  /** Allow clearing the value; pass an object to customize the clear icon. */
-  allowClear?: boolean | { clearIcon?: ReactNode };
-  /** Show loading spinner */
-  loading?: boolean;
-  /** Custom loading icon. */
-  loadingIcon?: ReactNode;
-  /** Content when no options match */
-  notFoundContent?: ReactNode;
-  /** Prefix icon/element */
-  prefix?: ReactNode;
-  /** Custom suffix (arrow) icon. */
-  suffixIcon?: ReactNode;
-  /** Custom remove icon for multi-select tags. */
-  removeIcon?: ReactNode;
-  autoFocus?: boolean;
-  id?: string;
-  /** Name for hidden form field (single mode only). */
-  name?: string;
-  /** Controlled open state of the dropdown. */
-  open?: boolean;
-  defaultOpen?: boolean;
-  onOpenChange?: (open: boolean) => void;
-  /** Dropdown position. Defaults to `bottomLeft`. */
-  placement?: SelectPlacement;
-  /** Match popup width to trigger (true), a fixed px width (number), or fit content (false). */
-  popupMatchSelectWidth?: boolean | number;
-  /** Max height of the option list. Defaults to 256. */
-  listHeight?: number;
-  /** Parent node the popup renders into. Defaults to body. */
-  getPopupContainer?: (trigger: HTMLElement) => HTMLElement;
-  /** Customize the rendering of each dropdown option. */
-  optionRender?: (option: SelectOption, info: { index: number }) => ReactNode;
-  /** Customize the selected label shown in the trigger (single mode only). */
-  labelRender?: (option: SelectOption) => ReactNode;
-  /** Wrap/customize the dropdown content. */
-  popupRender?: (menu: ReactNode) => ReactNode;
-  /** Custom tag rendering (multi-mode only). */
-  tagRender?: (props: TagRenderProps) => ReactNode;
-  /** Max visible tags before collapsing into "+N". */
-  maxTagCount?: number | 'responsive';
-  /** Placeholder for collapsed tags: node or `(omittedValues) => node`. */
-  maxTagPlaceholder?:
-    | ReactNode
-    | ((omittedValues: SelectOption[]) => ReactNode);
-  /** Truncate tag label text to this length. */
-  maxTagTextLength?: number;
-  /** Max selectable items (multi-mode only). */
-  maxCount?: number;
-  /** Auto-clear search text after selection (multi-mode only, default: true). */
-  autoClearSearchValue?: boolean;
-  /** Characters that split pasted/typed text into multiple selections. */
-  tokenSeparators?: string[];
-  /** Hide already-selected options from the dropdown (multi-mode only). */
-  hideSelected?: boolean;
-  /** Force mobile mode (bottom sheet) regardless of screen size */
-  mobile?: boolean;
-  /** Merged onto the trigger root; use to override width etc. */
-  className?: string;
-  style?: CSSProperties;
-  classNames?: SemanticClassNames<SelectSemanticPart>;
-  styles?: SemanticStyles<SelectSemanticPart>;
-}
-
-const defaultFilter = (input: string, option: SelectOption): boolean => {
-  const label =
-    typeof option.label === 'string' ? option.label : String(option.label);
-  return label.toLowerCase().includes(input.toLowerCase());
-};
-
-/** Collect all leaf (non-group) options, descending into groups. */
-function flattenOptions(options: SelectOption[]): SelectOption[] {
-  const out: SelectOption[] = [];
-  for (const o of options) {
-    if (o.options) out.push(...flattenOptions(o.options));
-    else out.push(o);
-  }
-  return out;
-}
-
-/** Filter while preserving group structure; empty groups are dropped. */
-function filterTree(
-  options: SelectOption[],
-  fn: (input: string, option: SelectOption) => boolean,
-  input: string,
-): SelectOption[] {
-  const result: SelectOption[] = [];
-  for (const o of options) {
-    if (o.options) {
-      const kids = filterTree(o.options, fn, input);
-      if (kids.length) result.push({ ...o, options: kids });
-    } else if (fn(input, o)) {
-      result.push(o);
-    }
-  }
-  return result;
-}
+export type {
+  SelectOption,
+  SelectPlacement,
+  SelectProps,
+  SelectRef,
+  SelectSemanticPart,
+  TagRenderProps,
+} from './select-types';
 
 const PLACEMENT_MAP: Record<
   SelectPlacement,
@@ -263,6 +102,7 @@ export function Select(props: SelectProps) {
     style,
     classNames,
     styles,
+    ref,
   } = props;
 
   const ctx = useTaoConfig();
@@ -278,6 +118,20 @@ export function Select(props: SelectProps) {
 
   const isMultiple = mode === 'multiple' || mode === 'tags';
   const hasInlineSearch = !!showSearch && !isMobile;
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      focus: () =>
+        (hasInlineSearch ? inputRef.current : triggerRef.current)?.focus(),
+      blur: () =>
+        (hasInlineSearch ? inputRef.current : triggerRef.current)?.blur(),
+      get nativeElement() {
+        return hasInlineSearch ? inputRef.current : triggerRef.current;
+      },
+    }),
+    [hasInlineSearch],
+  );
 
   // value (controlled / uncontrolled)
   const isValueControlled = valueProp !== undefined;
@@ -586,100 +440,20 @@ export function Select(props: SelectProps) {
     'data-tao-warning': status === 'warning' || undefined,
   };
 
-  // ---- Tag rendering for multi mode ----
-
-  const renderTags = (): ReactNode => {
-    if (!isMultiple || selectedOptions.length === 0) return null;
-
-    let visible = selectedOptions;
-    let omitted: SelectOption[] = [];
-
-    if (
-      typeof maxTagCount === 'number' &&
-      maxTagCount < selectedOptions.length
-    ) {
-      visible = selectedOptions.slice(0, maxTagCount);
-      omitted = selectedOptions.slice(maxTagCount);
-    }
-
-    const truncateLabel = (opt: SelectOption): ReactNode => {
-      const raw = typeof opt.label === 'string' ? opt.label : String(opt.label);
-      if (
-        maxTagTextLength != null &&
-        typeof raw === 'string' &&
-        raw.length > maxTagTextLength
-      ) {
-        return `${raw.slice(0, maxTagTextLength)}…`;
-      }
-      return opt.label;
-    };
-
-    return (
-      <>
-        {visible.map((opt) => {
-          const closable = !resolvedDisabled && !opt.disabled;
-          const tagNode = tagRender ? (
-            tagRender({
-              label: truncateLabel(opt),
-              value: opt.value,
-              closable,
-              disabled: !!opt.disabled,
-              onClose: (e) => handleRemoveTag(opt.value, e),
-            })
-          ) : (
-            <span
-              key={opt.value}
-              data-tao-select-tag=""
-              data-tao-disabled={opt.disabled || undefined}
-              className={cx(classNames?.tag)}
-              style={styles?.tag}
-            >
-              <span
-                data-tao-select-tag-label=""
-                className={cx(classNames?.tagLabel)}
-                style={styles?.tagLabel}
-              >
-                {truncateLabel(opt)}
-              </span>
-              {closable && (
-                // biome-ignore lint/a11y/useSemanticElements: the tag lives inside a trigger, so a nested button would be invalid HTML.
-                <span
-                  data-tao-select-tag-close=""
-                  className={cx(classNames?.tagClose)}
-                  style={styles?.tagClose}
-                  role="button"
-                  tabIndex={0}
-                  aria-label={`Remove ${typeof opt.label === 'string' ? opt.label : opt.value}`}
-                  onPointerDown={(e) => e.stopPropagation()}
-                  onClick={(e) => handleRemoveTag(opt.value, e)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      handleRemoveTag(opt.value, e);
-                    }
-                  }}
-                >
-                  {removeIcon ?? <CloseSmallIcon />}
-                </span>
-              )}
-            </span>
-          );
-          return <Fragment key={opt.value}>{tagNode}</Fragment>;
-        })}
-        {omitted.length > 0 && (
-          <span
-            data-tao-select-tag=""
-            data-tao-select-tag-rest=""
-            className={cx(classNames?.tagRest)}
-            style={styles?.tagRest}
-          >
-            {typeof maxTagPlaceholder === 'function'
-              ? maxTagPlaceholder(omitted)
-              : (maxTagPlaceholder ?? `+${omitted.length}…`)}
-          </span>
-        )}
-      </>
-    );
-  };
+  const tags = isMultiple ? (
+    <SelectTags
+      options={selectedOptions}
+      disabled={!!resolvedDisabled}
+      maxTagCount={maxTagCount}
+      maxTagPlaceholder={maxTagPlaceholder}
+      maxTagTextLength={maxTagTextLength}
+      removeIcon={removeIcon}
+      tagRender={tagRender}
+      classNames={classNames}
+      styles={styles}
+      onRemove={handleRemoveTag}
+    />
+  ) : null;
 
   const trailingIcons = (
     <span data-tao-select-icons="">
@@ -764,6 +538,7 @@ export function Select(props: SelectProps) {
       <>
         {/* biome-ignore lint/a11y/useSemanticElements: this custom trigger contains removable tags, so it cannot be a native button. */}
         <div
+          ref={triggerRef}
           id={id}
           data-tao-control=""
           data-tao-select=""
@@ -804,7 +579,7 @@ export function Select(props: SelectProps) {
               style={styles?.values}
             >
               {selectedOptions.length > 0 ? (
-                renderTags()
+                tags
               ) : (
                 <span
                   data-tao-select-placeholder=""
@@ -998,128 +773,25 @@ export function Select(props: SelectProps) {
     searchableOptions[
       Math.min(activeSearchIndex, Math.max(searchableOptions.length - 1, 0))
     ];
-  let searchableItemIndex = 0;
-
-  const renderSearchableItem = (option: SelectOption): ReactNode => {
-    const renderIndex = searchableItemIndex++;
-    const optionIndex = searchableOptions.findIndex(
-      (candidate) => candidate.value === option.value,
-    );
-    const isSelected = valueArray.includes(option.value);
-    const itemDisabled = isSearchableOptionDisabled(option);
-
-    return (
-      <button
-        key={option.value}
-        id={`${searchListboxId}-option-${encodeURIComponent(option.value)}`}
-        type="button"
-        role="option"
-        aria-selected={isSelected}
-        disabled={itemDisabled}
-        data-disabled={itemDisabled || undefined}
-        data-tao-select-item=""
-        data-tao-selected={isMultiple && isSelected ? '' : undefined}
-        data-tao-has-desc={option.description != null || undefined}
-        data-state={isSelected ? 'checked' : 'unchecked'}
-        data-highlighted={
-          activeSearchOption?.value === option.value ? '' : undefined
-        }
-        className={cx(classNames?.item)}
-        style={styles?.item}
-        onPointerDown={(event) => event.preventDefault()}
-        onMouseMove={() => {
-          if (optionIndex >= 0) setActiveSearchIndex(optionIndex);
-        }}
-        onClick={() => {
-          if (itemDisabled) return;
-          handleValueChange(option.value);
-          if (!isMultiple) handleOpenChange(false);
-        }}
-      >
-        {optionRender ? (
-          optionRender(option, { index: renderIndex })
-        ) : (
-          <>
-            {option.icon != null && (
-              <span
-                data-tao-select-item-icon=""
-                className={cx(classNames?.itemIcon)}
-                style={styles?.itemIcon}
-              >
-                {option.icon}
-              </span>
-            )}
-            <span
-              data-tao-select-item-main=""
-              className={cx(classNames?.itemLabel)}
-              style={styles?.itemLabel}
-            >
-              <span>{option.label}</span>
-              {option.description != null && (
-                <span
-                  data-tao-select-item-desc=""
-                  className={cx(classNames?.itemDesc)}
-                  style={styles?.itemDesc}
-                >
-                  {option.description}
-                </span>
-              )}
-            </span>
-          </>
-        )}
-        {isSelected && (
-          <span data-tao-select-check="">
-            <CheckIcon />
-          </span>
-        )}
-      </button>
-    );
-  };
-
-  const renderSearchableTree = (items: SelectOption[]): ReactNode =>
-    items.map((option) =>
-      option.options ? (
-        <fieldset
-          key={option.value}
-          aria-label={String(option.label)}
-          data-tao-select-group=""
-          className={cx(classNames?.group)}
-          style={styles?.group}
-        >
-          <legend
-            data-tao-select-group-label=""
-            className={cx(classNames?.groupLabel)}
-            style={styles?.groupLabel}
-          >
-            {option.label}
-          </legend>
-          {renderSearchableTree(option.options)}
-        </fieldset>
-      ) : (
-        renderSearchableItem(option)
-      ),
-    );
-
   const searchableMenuNode = (
-    <div
+    <SearchableSelectList
       id={searchListboxId}
-      role="listbox"
-      aria-multiselectable={isMultiple || undefined}
-      data-tao-select-viewport=""
-      style={{ maxHeight: listHeight }}
-    >
-      {resultCount > 0 ? (
-        renderSearchableTree(filteredOptions)
-      ) : (
-        <div
-          data-tao-select-empty=""
-          className={cx(classNames?.empty)}
-          style={styles?.empty}
-        >
-          {notFoundContent}
-        </div>
-      )}
-    </div>
+      options={filteredOptions}
+      resultCount={resultCount}
+      searchableOptions={searchableOptions}
+      activeValue={activeSearchOption?.value}
+      selectedValues={valueArray}
+      multiple={isMultiple}
+      maxCountReached={overMaxCount}
+      listHeight={listHeight}
+      notFoundContent={notFoundContent}
+      optionRender={optionRender}
+      classNames={classNames}
+      styles={styles}
+      onActiveIndexChange={setActiveSearchIndex}
+      onValueChange={handleValueChange}
+      onClose={() => handleOpenChange(false)}
+    />
   );
 
   const container =
@@ -1236,7 +908,7 @@ export function Select(props: SelectProps) {
                 className={cx(classNames?.values)}
                 style={styles?.values}
               >
-                {renderTags()}
+                {tags}
                 {inlineSearchInput}
               </span>
             ) : (
@@ -1356,7 +1028,7 @@ export function Select(props: SelectProps) {
               style={styles?.values}
             >
               {selectedOptions.length > 0 ? (
-                renderTags()
+                tags
               ) : (
                 <span
                   data-tao-select-placeholder=""
@@ -1443,147 +1115,5 @@ export function Select(props: SelectProps) {
         </TaoPortalScope>
       </RadixSelect.Portal>
     </RadixSelect.Root>
-  );
-}
-
-function ChevronDownIcon() {
-  return (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-      focusable="false"
-      role="presentation"
-    >
-      <path d="m6 9 6 6 6-6" />
-    </svg>
-  );
-}
-
-/** Double chevron (↕) for a switcher-style trigger. Pass to `suffixIcon`. */
-export function ChevronsUpDownIcon() {
-  return (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-      focusable="false"
-    >
-      <path d="m7 15 5 5 5-5M7 9l5-5 5 5" />
-    </svg>
-  );
-}
-
-function CheckIcon() {
-  return (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-      focusable="false"
-      role="presentation"
-    >
-      <polyline points="20 6 9 17 4 12" />
-    </svg>
-  );
-}
-
-function CloseIcon() {
-  return (
-    <svg
-      width="14"
-      height="14"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-      focusable="false"
-      role="presentation"
-    >
-      <path d="M18 6 6 18M6 6l12 12" />
-    </svg>
-  );
-}
-
-function CloseSmallIcon() {
-  return (
-    <svg
-      width="10"
-      height="10"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-      focusable="false"
-      role="presentation"
-    >
-      <path d="M18 6 6 18M6 6l12 12" />
-    </svg>
-  );
-}
-
-export function SearchIcon() {
-  return (
-    <svg
-      width="14"
-      height="14"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-      focusable="false"
-      role="presentation"
-    >
-      <circle cx="11" cy="11" r="8" />
-      <path d="m21 21-4.3-4.3" />
-    </svg>
-  );
-}
-
-function LoadingIcon() {
-  return (
-    <svg
-      data-tao-select-loading=""
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-      focusable="false"
-      role="presentation"
-    >
-      <path d="M21 12a9 9 0 1 1-6.219-8.56" />
-    </svg>
   );
 }

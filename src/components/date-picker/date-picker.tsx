@@ -3,18 +3,28 @@ import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import {
+  type CSSProperties,
   type ReactNode,
+  type Ref,
   useCallback,
   useEffect,
+  useImperativeHandle,
   useMemo,
+  useRef,
   useState,
 } from 'react';
 import {
   TaoPortalScope,
   type TaoSize,
+  type TaoStatus,
   type TaoVariant,
   useTaoConfig,
 } from '../../provider/tao-provider';
+import {
+  cx,
+  type SemanticClassNames,
+  type SemanticStyles,
+} from '../../utils/semantic';
 import { Drawer } from '../drawer/drawer';
 import { useIsMobile } from '../select/use-is-mobile';
 import { CalendarGrid } from './calendar/calendar-grid';
@@ -27,11 +37,22 @@ import { Presets } from './presets';
 import {
   getDefaultFormat,
   type PanelMode,
+  type PickerRef,
   type PresetItem,
   type TimeConfig,
 } from './types';
 
 dayjs.extend(customParseFormat);
+
+export type { PickerRef } from './types';
+
+export type DatePickerSemanticPart =
+  | 'root'
+  | 'input'
+  | 'popup'
+  | 'calendar'
+  | 'cell'
+  | 'footer';
 
 export interface DatePickerProps {
   value?: Dayjs | null;
@@ -51,10 +72,15 @@ export interface DatePickerProps {
   allowClear?: boolean;
   prefix?: ReactNode;
   suffixIcon?: ReactNode;
-  status?: 'error' | 'warning';
+  status?: TaoStatus;
+  ref?: Ref<PickerRef>;
   mobile?: boolean;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+  className?: string;
+  style?: CSSProperties;
+  classNames?: SemanticClassNames<DatePickerSemanticPart>;
+  styles?: SemanticStyles<DatePickerSemanticPart>;
 }
 
 export function DatePicker({
@@ -78,6 +104,11 @@ export function DatePicker({
   mobile,
   open: controlledOpen,
   onOpenChange,
+  className,
+  style,
+  classNames,
+  styles,
+  ref,
 }: DatePickerProps) {
   const ctx = useTaoConfig();
   const resolvedSize = size ?? ctx.size;
@@ -85,6 +116,24 @@ export function DatePicker({
   const resolvedDisabled = disabled ?? ctx.disabled;
   const autoMobile = useIsMobile();
   const isMobile = mobile ?? autoMobile;
+  const mobileTriggerRef = useRef<HTMLButtonElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      focus: () =>
+        (isMobile ? mobileTriggerRef.current : inputRef.current)?.focus(),
+      blur: () => {
+        mobileTriggerRef.current?.blur();
+        inputRef.current?.blur();
+      },
+      get nativeElement() {
+        return isMobile ? mobileTriggerRef.current : inputRef.current;
+      },
+    }),
+    [isMobile],
+  );
 
   const fmt = formatProp ?? getDefaultFormat(picker, showTime);
   const defaultPlaceholder = placeholder ?? fmt;
@@ -271,9 +320,14 @@ export function DatePicker({
             viewDate={viewDate}
             value={value}
             onSelect={handleDateSelect}
+            onViewDateChange={setViewDate}
             disabledDate={disabledDate}
             minDate={minDate}
             maxDate={maxDate}
+            className={classNames?.calendar}
+            style={styles?.calendar}
+            cellClassName={classNames?.cell}
+            cellStyle={styles?.cell}
           />
         )}
         {panelMode === 'month' && (
@@ -301,6 +355,8 @@ export function DatePicker({
     <div
       data-tao-picker-panel=""
       data-tao-has-time={showTimePanel || undefined}
+      className={isMobile ? classNames?.popup : undefined}
+      style={isMobile ? styles?.popup : undefined}
     >
       {showTimePanel ? (
         <div data-tao-picker-datetime="">
@@ -328,7 +384,11 @@ export function DatePicker({
         <Presets items={presets} onSelect={handlePresetSelect} />
       )}
       {showTimePanel && (
-        <div data-tao-picker-footer="">
+        <div
+          data-tao-picker-footer=""
+          className={classNames?.footer}
+          style={styles?.footer}
+        >
           <button
             type="button"
             data-tao-picker-footer-btn=""
@@ -382,6 +442,7 @@ export function DatePicker({
 
   const mobileTrigger = (
     <button
+      ref={mobileTriggerRef}
       type="button"
       data-tao-control=""
       data-tao-picker-trigger=""
@@ -390,9 +451,15 @@ export function DatePicker({
       data-tao-error={status === 'error' || undefined}
       disabled={resolvedDisabled}
       onClick={() => setOpen(true)}
+      className={cx(classNames?.root, className)}
+      style={{ ...styles?.root, ...style }}
     >
       {prefix != null && <span data-tao-picker-prefix="">{prefix}</span>}
-      <span data-tao-picker-input="">
+      <span
+        data-tao-picker-input=""
+        className={classNames?.input}
+        style={styles?.input}
+      >
         {displayValue || (
           <span data-tao-picker-placeholder="">{defaultPlaceholder}</span>
         )}
@@ -409,10 +476,15 @@ export function DatePicker({
       data-tao-variant={resolvedVariant}
       data-tao-error={status === 'error' || undefined}
       data-disabled={resolvedDisabled || undefined}
+      className={cx(classNames?.root, className)}
+      style={{ ...styles?.root, ...style }}
     >
       {prefix != null && <span data-tao-picker-prefix="">{prefix}</span>}
       <input
+        ref={inputRef}
         data-tao-picker-input=""
+        className={classNames?.input}
+        style={styles?.input}
         value={inputValue}
         placeholder={defaultPlaceholder}
         disabled={resolvedDisabled}
@@ -459,6 +531,8 @@ export function DatePicker({
             data-tao-picker-dropdown=""
             sideOffset={4}
             align="start"
+            className={classNames?.popup}
+            style={styles?.popup}
             onOpenAutoFocus={(e) => e.preventDefault()}
           >
             {panelContent}

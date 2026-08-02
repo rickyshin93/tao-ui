@@ -1,397 +1,54 @@
 import {
-  type CSSProperties,
-  type HTMLAttributes,
   type ReactNode,
-  type TdHTMLAttributes,
-  type ThHTMLAttributes,
   useCallback,
   useEffect,
   useMemo,
   useRef,
   useState,
 } from 'react';
-import {
-  type TaoSize,
-  type TaoVariant,
-  useTaoConfig,
-} from '../../provider/tao-provider';
-import {
-  cx,
-  type SemanticClassNames,
-  type SemanticStyles,
-} from '../../utils/semantic';
+import { useTaoConfig } from '../../provider/tao-provider';
+import { cx } from '../../utils/semantic';
 import { Pagination } from '../pagination/pagination';
+import { TableFilterDropdown } from './table-filter';
+import { SortIcon, TableLoadingSpinner } from './table-icons';
+import {
+  getCellValue,
+  getColKey,
+  getRowKey,
+  nextSortOrder,
+  resolveRowClassName,
+  resolveRowStyle,
+  resolveSemanticClassNames,
+  resolveSemanticStyles,
+} from './table-model';
+import type {
+  SorterResult,
+  SortOrder,
+  TableColumn,
+  TableProps,
+  TableRecord,
+  TableVariant,
+} from './table-types';
 import './table.css';
 
-// ---- Types ----
-
-export type TableSemanticPart =
-  | 'root'
-  | 'scroll'
-  | 'table'
-  | 'header.wrapper'
-  | 'header.row'
-  | 'header.cell'
-  | 'header.content'
-  | 'header.title'
-  | 'body.row'
-  | 'body.cell'
-  | 'selection.cell'
-  | 'empty'
-  | 'pagination';
-
-export type TableVariant = TaoVariant | 'modern';
-
-export type SortOrder = 'ascend' | 'descend' | null;
-
-export interface TableFilterItem {
-  text: ReactNode;
-  value: string;
-}
-
-export interface TableColumn<T = any> {
-  key?: string;
-  dataIndex?: string;
-  title?: ReactNode;
-  render?: (value: any, record: T, index: number) => ReactNode;
-  width?: number | string;
-  align?: 'left' | 'center' | 'right';
-  fixed?: 'left' | 'right';
-  ellipsis?: boolean;
-  onCell?: (record: T, index: number) => TdHTMLAttributes<HTMLTableCellElement>;
-  onHeaderCell?: (
-    column: TableColumn<T>,
-  ) => ThHTMLAttributes<HTMLTableCellElement>;
-
-  // Sorting
-  sorter?: ((a: T, b: T) => number) | boolean;
-  sortOrder?: SortOrder;
-  defaultSortOrder?: SortOrder;
-
-  // Filtering
-  filters?: TableFilterItem[];
-  onFilter?: (value: string, record: T) => boolean;
-  filteredValue?: string[];
-}
-
-export interface TableRowSelection<T = any> {
-  type?: 'checkbox' | 'radio';
-  selectedRowKeys?: React.Key[];
-  onChange?: (selectedKeys: React.Key[], selectedRows: T[]) => void;
-  getCheckboxProps?: (record: T) => { disabled?: boolean };
-  fixed?: boolean;
-  columnWidth?: number | string;
-}
-
-export interface TablePagination {
-  current?: number;
-  pageSize?: number;
-  total?: number;
-  defaultCurrent?: number;
-  defaultPageSize?: number;
-  showSizeChanger?: boolean;
-  pageSizeOptions?: number[];
-  showTotal?: (total: number, range: [number, number]) => ReactNode;
-}
-
-export interface SorterResult<T = any> {
-  column?: TableColumn<T>;
-  order: SortOrder;
-  field?: string;
-}
-
-export type TableSemanticInfo<T = any> = { props: TableProps<T> };
-export type TableSemanticClassNames<T = any> =
-  | SemanticClassNames<TableSemanticPart>
-  | ((info: TableSemanticInfo<T>) => SemanticClassNames<TableSemanticPart>);
-export type TableSemanticStyles<T = any> =
-  | SemanticStyles<TableSemanticPart>
-  | ((info: TableSemanticInfo<T>) => SemanticStyles<TableSemanticPart>);
-
-export interface TableProps<T = any> {
-  columns: TableColumn<T>[];
-  dataSource: T[];
-  rowKey: string | ((record: T) => React.Key);
-  loading?: boolean;
-  pagination?: TablePagination | false;
-  onChange?: (
-    pagination: { current: number; pageSize: number },
-    filters: Record<string, string[] | null>,
-    sorter: SorterResult<T>,
-  ) => void;
-  scroll?: { x?: number | string };
-  rowSelection?: TableRowSelection<T>;
-  rowClassName?: string | ((record: T, index: number) => string);
-  rowStyle?: CSSProperties | ((record: T, index: number) => CSSProperties);
-  onRow?: (record: T, index: number) => HTMLAttributes<HTMLTableRowElement>;
-  onHeaderRow?: (
-    columns: TableColumn<T>[],
-    index: number,
-  ) => HTMLAttributes<HTMLTableRowElement>;
-  size?: TaoSize;
-  /**
-   * 表面风格。
-   * - `borderless`（极简）：无表头底色、单元格透明、仅行底分隔线。
-   * - `filled`：表头灰底。
-   * - `outlined`：filled + 整体外框 + 列分隔线。
-   * - `modern`：轻外框、圆角、克制表头，更接近 shadcn 的表格视觉。
-   *
-   * 不传时继承 TaoProvider 的 variant；当继承到框架默认 `outlined` 时，
-   * Table 回落为 `modern`，让裸用 `<Table>` 默认呈现现代轻外框风格。
-   */
-  variant?: TableVariant;
-  /**
-   * 表头灰底开关，默认 `true`。设为 `false` 关掉表头底色（极简表头），
-   * 不影响外框 / 列分隔线等其它 variant 表现。
-   */
-  headerBackground?: boolean;
-  emptyText?: ReactNode;
-  bordered?: boolean;
-  className?: string;
-  style?: CSSProperties;
-  classNames?: TableSemanticClassNames<T>;
-  styles?: TableSemanticStyles<T>;
-}
-
-// ---- Helpers ----
-
-function getRowKey<T>(
-  record: T,
-  rowKey: string | ((record: T) => React.Key),
-): React.Key {
-  if (typeof rowKey === 'function') return rowKey(record);
-  return (record as any)[rowKey];
-}
-
-function getColKey<T>(col: TableColumn<T>, index: number): string {
-  return col.key ?? col.dataIndex ?? String(index);
-}
-
-function getCellValue<T>(record: T, dataIndex?: string): any {
-  if (!dataIndex) return undefined;
-  return (record as any)[dataIndex];
-}
-
-function resolveSemanticClassNames<T>(
-  classNames: TableSemanticClassNames<T> | undefined,
-  props: TableProps<T>,
-): SemanticClassNames<TableSemanticPart> {
-  return typeof classNames === 'function'
-    ? classNames({ props })
-    : (classNames ?? {});
-}
-
-function resolveSemanticStyles<T>(
-  styles: TableSemanticStyles<T> | undefined,
-  props: TableProps<T>,
-): SemanticStyles<TableSemanticPart> {
-  return typeof styles === 'function' ? styles({ props }) : (styles ?? {});
-}
-
-function resolveRowClassName<T>(
-  rowClassName: TableProps<T>['rowClassName'],
-  record: T,
-  index: number,
-) {
-  return typeof rowClassName === 'function'
-    ? rowClassName(record, index)
-    : rowClassName;
-}
-
-function resolveRowStyle<T>(
-  rowStyle: TableProps<T>['rowStyle'],
-  record: T,
-  index: number,
-) {
-  return typeof rowStyle === 'function' ? rowStyle(record, index) : rowStyle;
-}
-
-// ---- Icons ----
-
-function SortIcon({ order }: { order: SortOrder }) {
-  return (
-    <span data-tao-table-sort-icon="" data-tao-sort-order={order ?? undefined}>
-      <svg
-        width="14"
-        height="14"
-        viewBox="0 0 14 14"
-        fill="none"
-        aria-hidden="true"
-        focusable="false"
-      >
-        <path
-          d="M7 2.5L10 6H4L7 2.5Z"
-          fill="currentColor"
-          opacity={order === 'ascend' ? 1 : 0.3}
-        />
-        <path
-          d="M7 11.5L4 8H10L7 11.5Z"
-          fill="currentColor"
-          opacity={order === 'descend' ? 1 : 0.3}
-        />
-      </svg>
-    </span>
-  );
-}
-
-function FilterIcon({ active }: { active: boolean }) {
-  return (
-    <span data-tao-table-filter-icon="" data-tao-active={active || undefined}>
-      <svg
-        width="14"
-        height="14"
-        viewBox="0 0 14 14"
-        fill="none"
-        aria-hidden="true"
-        focusable="false"
-      >
-        <path
-          d="M2 3h10L8.5 7.5V11L5.5 12V7.5L2 3Z"
-          stroke="currentColor"
-          fill={active ? 'currentColor' : 'none'}
-          strokeWidth="1.2"
-          strokeLinejoin="round"
-        />
-      </svg>
-    </span>
-  );
-}
-
-function LoadingSpinner() {
-  return (
-    <div data-tao-table-loading="">
-      <svg
-        data-tao-table-spinner=""
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-        fill="none"
-        aria-hidden="true"
-        focusable="false"
-      >
-        <circle
-          cx="12"
-          cy="12"
-          r="10"
-          stroke="currentColor"
-          strokeWidth="2.5"
-          opacity="0.2"
-        />
-        <path
-          d="M12 2a10 10 0 019.8 8"
-          stroke="currentColor"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-        />
-      </svg>
-    </div>
-  );
-}
-
-function CheckIcon() {
-  return (
-    <svg
-      width="12"
-      height="12"
-      viewBox="0 0 12 12"
-      fill="none"
-      aria-hidden="true"
-      focusable="false"
-    >
-      <path
-        d="M2.5 6L5 8.5L9.5 3.5"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-// ---- Filter Dropdown ----
-
-function FilterDropdown({
-  filters,
-  activeValues,
-  onSelect,
-}: {
-  filters: TableFilterItem[];
-  activeValues: string[];
-  onSelect: (values: string[]) => void;
-}) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  // Close on outside click
-  useEffect(() => {
-    if (!open) return;
-    const handleClick = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClick);
-    return () => document.removeEventListener('mousedown', handleClick);
-  }, [open]);
-
-  const toggle = (val: string) => {
-    const next = activeValues.includes(val)
-      ? activeValues.filter((v) => v !== val)
-      : [...activeValues, val];
-    onSelect(next);
-  };
-
-  return (
-    <div data-tao-table-filter-dropdown="" ref={ref}>
-      <button
-        type="button"
-        data-tao-table-filter-trigger=""
-        onClick={() => setOpen(!open)}
-        aria-label="Filter"
-      >
-        <FilterIcon active={activeValues.length > 0} />
-      </button>
-      {open && (
-        <div data-tao-table-filter-panel="">
-          {filters.map((f) => {
-            const checked = activeValues.includes(f.value);
-            return (
-              <button
-                type="button"
-                key={f.value}
-                data-tao-table-filter-option=""
-                onClick={() => toggle(f.value)}
-                aria-pressed={checked}
-              >
-                <span
-                  data-tao-table-filter-check=""
-                  data-tao-checked={checked || undefined}
-                >
-                  {checked && <CheckIcon />}
-                </span>
-                <span>{f.text}</span>
-              </button>
-            );
-          })}
-          {activeValues.length > 0 && (
-            <button
-              type="button"
-              data-tao-table-filter-reset=""
-              onClick={() => onSelect([])}
-            >
-              Reset
-            </button>
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
+export type {
+  SorterResult,
+  SortOrder,
+  TableColumn,
+  TableFilterItem,
+  TablePagination,
+  TableProps,
+  TableRowSelection,
+  TableSemanticClassNames,
+  TableSemanticInfo,
+  TableSemanticPart,
+  TableSemanticStyles,
+  TableVariant,
+} from './table-types';
 
 // ---- Table ----
 
-export function Table<T = any>({
+export function Table<T extends TableRecord = Record<string, unknown>>({
   columns,
   dataSource,
   rowKey,
@@ -519,7 +176,8 @@ export function Table<T = any>({
         if (col.filters) {
           const key = getColKey(col, i);
           const vals = fv[key];
-          result[col.dataIndex ?? key] = vals && vals.length > 0 ? vals : null;
+          result[col.dataIndex == null ? key : String(col.dataIndex)] =
+            vals && vals.length > 0 ? vals : null;
         }
       }
       return result;
@@ -654,7 +312,7 @@ export function Table<T = any>({
   const selectedKeys = rowSelection?.selectedRowKeys ?? [];
 
   const handleSelectRow = useCallback(
-    (key: React.Key, record: T) => {
+    (key: React.Key) => {
       if (!rowSelection?.onChange) return;
       let nextKeys: React.Key[];
       if (selectionType === 'radio') {
@@ -803,7 +461,7 @@ export function Table<T = any>({
         className={resolvedClassNames.scroll}
         style={resolvedStyles.scroll}
       >
-        {loading && <LoadingSpinner />}
+        {loading && <TableLoadingSpinner />}
         <table
           data-tao-table=""
           className={resolvedClassNames.table}
@@ -850,6 +508,7 @@ export function Table<T = any>({
                       {selectionType === 'checkbox' && (
                         <input
                           type="checkbox"
+                          aria-label="Select all rows"
                           checked={isAllSelected}
                           ref={(el) => {
                             if (el) el.indeterminate = isIndeterminate;
@@ -880,6 +539,15 @@ export function Table<T = any>({
                         data-tao-table-header=""
                         data-tao-align={col.align}
                         data-tao-fixed={isFixed ? col.fixed : undefined}
+                        aria-sort={
+                          hasSorter
+                            ? resolvedOrder === 'ascend'
+                              ? 'ascending'
+                              : resolvedOrder === 'descend'
+                                ? 'descending'
+                                : 'none'
+                            : undefined
+                        }
                         className={cx(
                           resolvedClassNames['header.cell'],
                           headerCellProps.className,
@@ -907,24 +575,29 @@ export function Table<T = any>({
                           className={resolvedClassNames['header.content']}
                           style={resolvedStyles['header.content']}
                         >
-                          <button
-                            type="button"
-                            data-tao-table-header-title=""
-                            data-tao-sortable={hasSorter || undefined}
-                            className={resolvedClassNames['header.title']}
-                            style={resolvedStyles['header.title']}
-                            disabled={!hasSorter}
-                            onClick={
-                              hasSorter
-                                ? () => handleSort(colKey, col)
-                                : undefined
-                            }
-                          >
-                            {col.title}
-                            {hasSorter && <SortIcon order={resolvedOrder} />}
-                          </button>
+                          {hasSorter ? (
+                            <button
+                              type="button"
+                              data-tao-table-header-title=""
+                              data-tao-sortable=""
+                              className={resolvedClassNames['header.title']}
+                              style={resolvedStyles['header.title']}
+                              onClick={() => handleSort(colKey, col)}
+                            >
+                              {col.title}
+                              <SortIcon order={resolvedOrder} />
+                            </button>
+                          ) : (
+                            <span
+                              data-tao-table-header-title=""
+                              className={resolvedClassNames['header.title']}
+                              style={resolvedStyles['header.title']}
+                            >
+                              {col.title}
+                            </span>
+                          )}
                           {hasFilter && (
-                            <FilterDropdown
+                            <TableFilterDropdown
                               filters={col.filters!}
                               activeValues={activeFilterValues}
                               onSelect={(vals) => handleFilter(colKey, vals)}
@@ -997,8 +670,9 @@ export function Table<T = any>({
                             selectionType === 'radio' ? 'radio' : 'checkbox'
                           }
                           checked={isSelected}
+                          aria-label={`Select row ${String(key)}`}
                           disabled={checkboxProps?.disabled}
-                          onChange={() => handleSelectRow(key, record)}
+                          onChange={() => handleSelectRow(key)}
                           data-tao-table-checkbox=""
                         />
                       </td>
@@ -1041,7 +715,7 @@ export function Table<T = any>({
                         >
                           {col.render
                             ? col.render(value, record, rowIdx)
-                            : value}
+                            : (value as ReactNode)}
                         </td>
                       );
                     })}
@@ -1073,12 +747,4 @@ export function Table<T = any>({
       )}
     </div>
   );
-}
-
-// ---- Utils ----
-
-function nextSortOrder(current: SortOrder): SortOrder {
-  if (current === 'ascend') return 'descend';
-  if (current === 'descend') return null;
-  return 'ascend';
 }

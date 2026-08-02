@@ -1,6 +1,7 @@
 import { type ReactNode, useCallback, useMemo, useState } from 'react';
 import { Drawer } from '../drawer/drawer';
-import { SearchIcon, type SelectOption } from './select';
+import { SearchIcon } from './select-icons';
+import type { SelectOption } from './select-types';
 import './mobile-select.css';
 
 interface MobileSelectContentProps {

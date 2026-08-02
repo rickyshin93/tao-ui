@@ -92,6 +92,7 @@ export type TaoTokenName =
   | '--tao-radius-xl'
   | '--tao-radius-xs'
   | '--tao-ring-width'
+  | '--tao-size-step'
   | '--tao-size-unit'
   | '--tao-success'
   | '--tao-success-bg'
@@ -99,9 +100,11 @@ export type TaoTokenName =
   | '--tao-warning'
   | '--tao-warning-bg'
   | '--tao-warning-border'
+  | '--tao-z-index-base'
   | '--tao-z-index-drawer'
   | '--tao-z-index-modal'
-  | '--tao-z-index-popup';
+  | '--tao-z-index-popup'
+  | '--tao-z-index-popup-base';
 
 export function tokenVar(name: TaoTokenName | (string & {})): string {
   return `var(${name})`;
@@ -201,6 +204,7 @@ export const taoTokenNames = [
   '--tao-radius-xl',
   '--tao-radius-xs',
   '--tao-ring-width',
+  '--tao-size-step',
   '--tao-size-unit',
   '--tao-success',
   '--tao-success-bg',
@@ -208,9 +212,11 @@ export const taoTokenNames = [
   '--tao-warning',
   '--tao-warning-bg',
   '--tao-warning-border',
+  '--tao-z-index-base',
   '--tao-z-index-drawer',
   '--tao-z-index-modal',
   '--tao-z-index-popup',
+  '--tao-z-index-popup-base',
 ] as const satisfies readonly TaoTokenName[];
 
 export const taoTokenVars = Object.fromEntries(

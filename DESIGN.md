@@ -902,6 +902,7 @@ box-shadow: 0 0 0 var(--tao-ring-width) var(--tao-control-outline);
   sm:   h=control-height-sm(28px), px=padding-xs(8px),  text=font-size-sm, radius-sm
   md:   h=control-height(32px),    px=padding(16px),    text=font-size-base, radius-md  (默认)
   lg:   h=control-height-lg(36px), px=padding(16px),    text=font-size-base, radius-md
+  含 icon/loading 的 md/lg: px=padding-sm(12px)，补偿窄图标字框留白
 
 变体:
   primary:     bg=primary, fg=primary-fg, shadow=xs

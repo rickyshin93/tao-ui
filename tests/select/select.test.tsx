@@ -1,8 +1,16 @@
+import { readFileSync } from 'node:fs';
 import { expect, test } from '@rstest/core';
 import { render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { Select } from '../../src/components/select/select';
 import { TaoProvider } from '../../src/provider/tao-provider';
+
+test('desktop options include padding inside their popup width', () => {
+  const css = readFileSync('src/components/select/select.css', 'utf8');
+  const rule = css.match(/\[data-tao-select-item\] \{([^}]+)\}/)?.[1];
+
+  expect(rule).toContain('box-sizing: border-box;');
+});
 
 test('renders with placeholder', () => {
   render(<Select options={[]} placeholder="Pick one" />);
@@ -97,7 +105,6 @@ test('mobile: click trigger opens drawer', async () => {
 
 test('mobile: selecting item triggers onChange and closes', async () => {
   let val = '';
-  const onClose = () => {};
   render(
     <Select
       options={[

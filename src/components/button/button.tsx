@@ -1,4 +1,4 @@
-import type { ButtonHTMLAttributes, ReactNode } from 'react';
+import type { ButtonHTMLAttributes, ReactNode, Ref } from 'react';
 import { type TaoSize, useTaoConfig } from '../../provider/tao-provider';
 import {
   cx,
@@ -20,6 +20,7 @@ export interface ButtonProps
   /** Icon shown while loading. Defaults to a built-in spinner. */
   loadingIcon?: ReactNode;
   children?: ReactNode;
+  ref?: Ref<HTMLButtonElement>;
   classNames?: SemanticClassNames<ButtonSemanticPart>;
   styles?: SemanticStyles<ButtonSemanticPart>;
 }
@@ -32,6 +33,7 @@ export function Button({
   icon,
   loadingIcon,
   children,
+  ref,
   className,
   style,
   classNames,
@@ -49,6 +51,7 @@ export function Button({
 
   return (
     <button
+      ref={ref}
       type="button"
       {...rest}
       className={cx(classNames?.root, className)}
@@ -56,6 +59,7 @@ export function Button({
       disabled={isDisabled}
       aria-busy={loading || undefined}
       data-tao-button=""
+      data-tao-has-icon={hasIconSlot || undefined}
       data-tao-variant={variant}
       data-tao-size={resolvedSize}
     >

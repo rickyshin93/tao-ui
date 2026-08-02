@@ -195,11 +195,6 @@
 /* ===========================
    Filter icon + dropdown
    =========================== */
-[data-tao-table-filter-dropdown] {
-  position: relative;
-  display: inline-flex;
-}
-
 [data-tao-table-filter-trigger] {
   display: inline-flex;
   align-items: center;
@@ -222,10 +217,7 @@
 }
 
 [data-tao-table-filter-panel] {
-  position: absolute;
-  top: calc(100% + 4px);
-  right: 0;
-  z-index: 10;
+  z-index: var(--tao-z-index-popup);
   min-width: 140px;
   padding: var(--tao-padding-xxs);
   background: var(--tao-color-bg-container);
@@ -235,6 +227,7 @@
   display: flex;
   flex-direction: column;
   gap: 1px;
+  outline: none;
 }
 
 [data-tao-table-filter-option] {
@@ -255,8 +248,10 @@
     var(--tao-motion-ease-out);
 }
 
-[data-tao-table-filter-option]:hover {
+[data-tao-table-filter-option]:hover,
+[data-tao-table-filter-option][data-highlighted] {
   background: var(--tao-color-fill-tertiary);
+  outline: none;
 }
 
 [data-tao-table-filter-check] {
@@ -287,13 +282,15 @@
   color: var(--tao-primary);
   font-size: var(--tao-font-size-xs);
   cursor: pointer;
-  text-align: left;
+  text-align: start;
   border-top: var(--tao-line-width) solid var(--tao-color-border-secondary);
   font-family: inherit;
 }
 
-[data-tao-table-filter-reset]:hover {
+[data-tao-table-filter-reset]:hover,
+[data-tao-table-filter-reset][data-highlighted] {
   color: var(--tao-primary-hover);
+  outline: none;
 }
 
 /* ===========================
@@ -350,7 +347,11 @@
   right: -6px;
   bottom: 0;
   width: 6px;
-  background: linear-gradient(to right, var(--tao-color-shadow-hint), transparent);
+  background: linear-gradient(
+    to right,
+    var(--tao-color-shadow-hint),
+    transparent
+  );
   pointer-events: none;
 }
 
@@ -364,7 +365,11 @@
   left: -6px;
   bottom: 0;
   width: 6px;
-  background: linear-gradient(to left, var(--tao-color-shadow-hint), transparent);
+  background: linear-gradient(
+    to left,
+    var(--tao-color-shadow-hint),
+    transparent
+  );
   pointer-events: none;
 }
 
@@ -403,7 +408,7 @@
 }
 
 [data-tao-table-spinner] {
-  animation: tao-spin 0.8s linear infinite;
+  animation: tao-spin calc(var(--tao-motion-unit) * 8) linear infinite;
   color: var(--tao-primary);
 }
 

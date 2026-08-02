@@ -71,6 +71,15 @@ test('prefix keeps standard input start padding', () => {
   expect(rule).toContain('padding-inline-start: var(--tao-padding-sm);');
 });
 
+test('inner input resets native vertical metrics', () => {
+  const css = readFileSync('src/components/input/input.css', 'utf8');
+  const rule = css.match(/\[data-tao-input\] input \{([^}]+)\}/)?.[1];
+
+  expect(rule).toContain('box-sizing: border-box;');
+  expect(rule).toContain('padding-block: 0;');
+  expect(rule).toContain('line-height: var(--tao-input-line-height);');
+});
+
 test('React SVG prefix becomes an overlay and reserves input space', () => {
   const css = readFileSync('src/components/input/input.css', 'utf8');
   const rule = css.match(

@@ -12,7 +12,10 @@ class MockResizeObserver {
   disconnect() {}
   unobserve() {}
 }
-(globalThis as any).ResizeObserver = MockResizeObserver;
+Object.defineProperty(globalThis, 'ResizeObserver', {
+  configurable: true,
+  value: MockResizeObserver,
+});
 
 test('renders children', () => {
   render(

@@ -219,6 +219,33 @@ export function Splitter({
     startSizes: number[];
   } | null>(null);
 
+  const resizePanels = useCallback(
+    (index: number, delta: number, startSizes: number[]) => {
+      const draggerSpace = (panelCount - 1) * 1;
+      const available = containerSize - draggerSpace;
+      const leftIdx = index;
+      const rightIdx = index + 1;
+      const leftMin = parseSize(panels[leftIdx].min, available) ?? 0;
+      const leftMax = parseSize(panels[leftIdx].max, available);
+      const rightMin = parseSize(panels[rightIdx].min, available) ?? 0;
+      const rightMax = parseSize(panels[rightIdx].max, available);
+      const total = startSizes[leftIdx] + startSizes[rightIdx];
+      let newLeft = startSizes[leftIdx] + delta;
+
+      newLeft = Math.max(newLeft, leftMin);
+      if (leftMax !== undefined) newLeft = Math.min(newLeft, leftMax);
+      if (rightMin !== undefined) newLeft = Math.min(newLeft, total - rightMin);
+      if (rightMax !== undefined) newLeft = Math.max(newLeft, total - rightMax);
+      newLeft = Math.max(0, Math.min(newLeft, total));
+
+      const next = [...startSizes];
+      next[leftIdx] = newLeft;
+      next[rightIdx] = total - newLeft;
+      return next;
+    },
+    [containerSize, panelCount, panels],
+  );
+
   const handleDragStart = useCallback(
     (index: number, e: React.PointerEvent) => {
       e.preventDefault();
@@ -231,40 +258,7 @@ export function Splitter({
         const { index: idx, startPos, startSizes } = dragging.current;
         const delta = (isHorizontal ? ev.clientX : ev.clientY) - startPos;
 
-        const draggerSpace = (panelCount - 1) * 1;
-        const available = containerSize - draggerSpace;
-
-        const leftIdx = idx;
-        const rightIdx = idx + 1;
-
-        const leftMin = parseSize(panels[leftIdx].min, available) ?? 0;
-        const leftMax = parseSize(panels[leftIdx].max, available);
-        const rightMin = parseSize(panels[rightIdx].min, available) ?? 0;
-        const rightMax = parseSize(panels[rightIdx].max, available);
-
-        let newLeft = startSizes[leftIdx] + delta;
-        let newRight = startSizes[rightIdx] - delta;
-
-        // Clamp delta by both panels' constraints
-        const total = startSizes[leftIdx] + startSizes[rightIdx];
-
-        // Left panel constraints → bound newLeft
-        if (leftMin !== undefined) newLeft = Math.max(newLeft, leftMin);
-        if (leftMax !== undefined) newLeft = Math.min(newLeft, leftMax);
-        newLeft = Math.max(0, newLeft);
-
-        // Right panel constraints → bound newLeft from the other side
-        if (rightMin !== undefined)
-          newLeft = Math.min(newLeft, total - rightMin);
-        if (rightMax !== undefined)
-          newLeft = Math.max(newLeft, total - rightMax);
-        newLeft = Math.max(0, Math.min(newLeft, total));
-
-        newRight = total - newLeft;
-
-        const next = [...startSizes];
-        next[leftIdx] = newLeft;
-        next[rightIdx] = newRight;
+        const next = resizePanels(idx, delta, startSizes);
 
         setSizes(next);
         onResize?.(next);
@@ -288,13 +282,27 @@ export function Splitter({
     [
       isHorizontal,
       sizes,
-      panelCount,
-      containerSize,
-      panels,
       onResize,
       onResizeEnd,
       onResizeStart,
+      resizePanels,
     ],
+  );
+
+  const handleDraggerKeyDown = useCallback(
+    (index: number, event: React.KeyboardEvent<HTMLDivElement>) => {
+      const growKey = isHorizontal ? 'ArrowRight' : 'ArrowDown';
+      const shrinkKey = isHorizontal ? 'ArrowLeft' : 'ArrowUp';
+      if (event.key !== growKey && event.key !== shrinkKey) return;
+      event.preventDefault();
+      const delta = event.key === growKey ? 10 : -10;
+      onResizeStart?.(sizes);
+      const next = resizePanels(index, delta, sizes);
+      setSizes(next);
+      onResize?.(next);
+      onResizeEnd?.(next);
+    },
+    [isHorizontal, onResize, onResizeEnd, onResizeStart, resizePanels, sizes],
   );
 
   // ---- Collapse ----
@@ -378,6 +386,18 @@ export function Splitter({
           ? { width: sizes[i], flexShrink: 0, flexGrow: 0 }
           : { height: sizes[i], flexShrink: 0, flexGrow: 0 };
         const isCollapsed = sizes[i] <= 0;
+        const draggerResizable =
+          i < panelCount - 1 &&
+          (panel.resizable ?? true) &&
+          (panels[i + 1]?.resizable ?? true);
+        const available = containerSize - (panelCount - 1);
+        const pairSize = sizes[i] + (sizes[i + 1] ?? 0);
+        const valueMin = parseSize(panel.min, available) ?? 0;
+        const nextMin = parseSize(panels[i + 1]?.min, available) ?? 0;
+        const valueMax = Math.min(
+          parseSize(panel.max, available) ?? pairSize,
+          pairSize - nextMin,
+        );
 
         return (
           // biome-ignore lint/suspicious/noArrayIndexKey: Splitter panels are positional layout slots; their order defines resize handles.
@@ -391,18 +411,26 @@ export function Splitter({
               {panelChildren[i]}
             </div>
             {i < panelCount - 1 && (
+              // biome-ignore lint/a11y/useSemanticElements: an interactive splitter separator needs a focusable div with drag handlers.
               <div
                 data-tao-splitter-dragger=""
                 data-tao-orientation={orientation}
+                role="separator"
+                aria-label={`Resize panels ${i + 1} and ${i + 2}`}
+                aria-orientation={isHorizontal ? 'vertical' : 'horizontal'}
+                aria-valuemin={Math.round(valueMin)}
+                aria-valuemax={Math.round(valueMax)}
+                aria-valuenow={Math.round(sizes[i])}
+                tabIndex={draggerResizable ? 0 : undefined}
                 className={cx(classNames?.dragger)}
                 style={styles?.dragger}
                 onPointerDown={(e) => {
-                  if (
-                    (panel.resizable ?? true) &&
-                    (panels[i + 1]?.resizable ?? true)
-                  ) {
+                  if (draggerResizable) {
                     handleDragStart(i, e);
                   }
+                }}
+                onKeyDown={(event) => {
+                  if (draggerResizable) handleDraggerKeyDown(i, event);
                 }}
               >
                 <div data-tao-splitter-dragger-bar="" />

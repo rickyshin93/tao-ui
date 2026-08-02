@@ -9,7 +9,7 @@ export const spinnerDoc = {
   source: 'src/components/spinner/spinner.tsx',
   story: 'stories/spinner.stories.tsx',
   tests: ['tests/spinner/spinner.test.tsx'],
-  semanticParts: ['root'],
+  semanticParts: ['root', 'indicator', 'tip', 'overlay'],
   keywords: ['loading', 'progress', 'busy'],
   related: ['Button'],
   usage: {

@@ -1,4 +1,5 @@
 import {
+  type Ref,
   type TextareaHTMLAttributes,
   useCallback,
   useLayoutEffect,
@@ -6,9 +7,11 @@ import {
 } from 'react';
 import {
   type TaoSize,
+  type TaoStatus,
   type TaoVariant,
   useTaoConfig,
 } from '../../provider/tao-provider';
+import { mergeRefs } from '../../utils/refs';
 import {
   cx,
   type SemanticClassNames,
@@ -28,6 +31,8 @@ export interface TextareaProps
   size?: TaoSize;
   variant?: TaoVariant;
   error?: boolean;
+  status?: TaoStatus;
+  ref?: Ref<HTMLTextAreaElement>;
   /** Auto-grow height to fit content. `true` grows freely; pass min/max rows to clamp. */
   autoSize?: boolean | AutoSizeOptions;
   classNames?: SemanticClassNames<TextareaSemanticPart>;
@@ -38,6 +43,7 @@ export function Textarea({
   size,
   variant,
   error,
+  status,
   disabled,
   autoSize,
   className,
@@ -45,16 +51,17 @@ export function Textarea({
   classNames,
   styles,
   onChange,
+  ref,
   ...rest
 }: TextareaProps) {
   const ctx = useTaoConfig();
   const resolvedSize = size ?? ctx.size;
   const resolvedVariant = variant ?? ctx.variant;
   const resolvedDisabled = disabled ?? ctx.disabled;
-  const ref = useRef<HTMLTextAreaElement>(null);
+  const innerRef = useRef<HTMLTextAreaElement>(null);
 
   const resize = useCallback(() => {
-    const el = ref.current;
+    const el = innerRef.current;
     if (!el || !autoSize) return;
     el.style.height = 'auto';
     const cs = getComputedStyle(el);
@@ -91,16 +98,17 @@ export function Textarea({
       data-tao-textarea=""
       data-tao-size={resolvedSize}
       data-tao-variant={resolvedVariant}
-      data-tao-error={error || undefined}
+      data-tao-error={status === 'error' || error || undefined}
+      data-tao-warning={status === 'warning' || undefined}
       data-disabled={resolvedDisabled || undefined}
     >
       <textarea
         {...rest}
-        ref={ref}
+        ref={mergeRefs(innerRef, ref)}
         className={classNames?.textarea}
         style={styles?.textarea}
         disabled={resolvedDisabled}
-        aria-invalid={error || undefined}
+        aria-invalid={status === 'error' || error || undefined}
         data-tao-autosize={autoSize ? '' : undefined}
         onChange={(e) => {
           if (autoSize) resize();

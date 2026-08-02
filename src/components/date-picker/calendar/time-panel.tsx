@@ -91,13 +91,6 @@ function TimeColumn({
 }: TimeColumnProps) {
   const listRef = useRef<HTMLDivElement>(null);
 
-  const scrollToSelected = useCallback(() => {
-    const el = listRef.current;
-    if (!el) return;
-    const selectedEl = el.querySelector('[data-tao-selected]');
-    selectedEl?.scrollIntoView({ block: 'center', behavior: 'smooth' });
-  }, []);
-
   // Scroll on mount (no animation)
   const initRef = useCallback((el: HTMLDivElement | null) => {
     if (!el) return;
@@ -105,10 +98,15 @@ function TimeColumn({
     selectedEl?.scrollIntoView({ block: 'center' });
   }, []);
 
-  // scrollToSelected closes over selected and scrollKey.
   useEffect(() => {
-    scrollToSelected();
-  }, [scrollToSelected]);
+    // Props are dependencies because a new selection must re-center the list.
+    void selected;
+    void scrollKey;
+    const el = listRef.current;
+    if (!el) return;
+    const selectedEl = el.querySelector('[data-tao-selected]');
+    selectedEl?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  }, [selected, scrollKey]);
 
   return (
     <div data-tao-time-column="">

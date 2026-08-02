@@ -9,7 +9,7 @@ export const checkboxDoc = {
   source: 'src/components/checkbox/checkbox.tsx',
   story: 'stories/checkbox.stories.tsx',
   tests: ['tests/checkbox/checkbox.test.tsx'],
-  semanticParts: ['root', 'input', 'box', 'label', 'group', 'option'],
+  semanticParts: ['root', 'indicator', 'label'],
   keywords: ['checkbox', 'boolean', 'multi select'],
   related: ['Radio', 'Switch'],
   usage: {

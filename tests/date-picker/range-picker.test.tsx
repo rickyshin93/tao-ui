@@ -120,3 +120,63 @@ test('presets render in range picker', async () => {
   await userEvent.click(screen.getAllByRole('textbox')[0]);
   expect(screen.getByText('This week')).toBeTruthy();
 });
+
+test('applies semantic classes and styles to desktop parts', () => {
+  const { container } = render(
+    <RangePicker
+      mobile={false}
+      open
+      className="consumer-root"
+      style={{ width: 480 }}
+      classNames={{
+        root: 'semantic-root',
+        input: 'semantic-input',
+        separator: 'semantic-separator',
+        popup: 'semantic-popup',
+        calendar: 'semantic-calendar',
+        cell: 'semantic-cell',
+      }}
+      styles={{
+        root: { maxWidth: 640 },
+        input: { color: 'red' },
+        separator: { opacity: 0.8 },
+        popup: { minWidth: 560 },
+        calendar: { tableLayout: 'fixed' },
+        cell: { opacity: 0.9 },
+      }}
+    />,
+  );
+
+  const root = container.querySelector(
+    '[data-tao-range-trigger]',
+  ) as HTMLElement;
+  expect(root).toHaveClass('consumer-root', 'semantic-root');
+  expect(root).toHaveStyle({ width: '480px', maxWidth: '640px' });
+  expect(screen.getAllByRole('textbox')[0]).toHaveClass('semantic-input');
+  expect(container.querySelector('.semantic-separator')).toHaveStyle({
+    opacity: '0.8',
+  });
+  expect(document.querySelector('.semantic-popup')).toHaveStyle({
+    minWidth: '560px',
+  });
+  expect(document.querySelector('.semantic-calendar')).toHaveStyle({
+    tableLayout: 'fixed',
+  });
+  expect(document.querySelector('.semantic-cell')).toHaveStyle({
+    opacity: '0.9',
+  });
+});
+
+test('applies popup semantic customization in the mobile drawer', () => {
+  render(
+    <RangePicker
+      mobile
+      open
+      classNames={{ popup: 'semantic-mobile-popup' }}
+      styles={{ popup: { minWidth: 560 } }}
+    />,
+  );
+  expect(document.querySelector('.semantic-mobile-popup')).toHaveStyle({
+    minWidth: '560px',
+  });
+});

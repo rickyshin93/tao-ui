@@ -1,5 +1,19 @@
 # tao-ui 项目自我学习
 
+## [Biome] 多行 JSX 属性的 lint 抑制按诊断行匹配
+- **日期**: 2026-08-02
+- **错误假设**: 把 `biome-ignore` 放在多行 JSX 元素前即可抑制该元素任意属性上的诊断。
+- **真实行为**: 格式化把 `role` 移到后续行后，抑制只匹配元素起始行，属性诊断重新出现。
+- **正确做法**: 对文件内唯一的已论证例外使用文件级 `biome-ignore-all <rule>`，并写明语义原因。
+- **适用场景**: Biome 对格式化后的多行 JSX 属性报需要保留的 a11y 例外时。
+
+## [测试] Radix Popover 在 happy-dom 中脚本聚焦日期会回焦 trigger
+- **日期**: 2026-08-02
+- **错误假设**: DatePicker 打开后可在集成测试里调用日期按钮 `focus()`，再断言方向键移动后的 `document.activeElement`。
+- **真实行为**: happy-dom 下 Radix Popover 会把这次 portal 内聚焦判成关闭路径，关闭浮层并把焦点还给 trigger；浏览器中的键盘逻辑无法通过该集成断言稳定验证。
+- **正确做法**: DatePicker 集成层断言日期网格只有一个 tab stop；方向键/roving focus 在 `CalendarGrid` seam 直接测试。
+- **适用场景**: DatePicker、RangePicker 等 Radix Popover 内部焦点移动测试。
+
 ## [Radix Dialog] maskClosable 不能直接映射 outside-dismiss
 - **日期**: 2026-07-26
 - **错误假设**: `maskClosable=true` 可以直接放行 Radix Dialog 的 outside-dismiss，再对白名单 portal 特判。

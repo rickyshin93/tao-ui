@@ -1,4 +1,4 @@
-import { Button, Stack, TaoProvider } from '@rockshin/tao-ui';
+import { Button, Stack } from '@rockshin/tao-ui';
 import type { Meta, StoryObj } from '@storybook/react';
 
 const meta: Meta = {

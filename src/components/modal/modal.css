@@ -119,7 +119,9 @@ button[data-tao-modal-close] {
   padding: 0;
   margin: 0;
   margin-inline-start: auto;
-  transition: all var(--tao-motion-duration-fast) ease-out;
+  transition:
+    background-color var(--tao-motion-duration-fast) ease-out,
+    color var(--tao-motion-duration-fast) ease-out;
   outline: none;
   appearance: none;
 }

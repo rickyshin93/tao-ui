@@ -15,8 +15,8 @@ Import from the package root. The package entry imports tao-ui CSS side effects 
 
 - `TaoProvider` supplies size, disabled, variant, portal scope, and theme seed token defaults.
 - Components expose semantic DOM customization through `classNames` and `styles` props.
-- Theme tokens are CSS custom properties prefixed with `--tao-*`; use `tokenVar(name)` and `taoTokenNames` from the package root for typed token references.
-- `componentDocs` and `getComponentDoc(name)` expose machine-readable component metadata.
+- Theme tokens are CSS custom properties prefixed with `--tao-*`; import `tokenVar(name)` and `taoTokenNames` from `@rockshin/tao-ui/tokens`.
+- Import `componentDocs` and `getComponentDoc(name)` from `@rockshin/tao-ui/meta` for machine-readable component metadata.
 
 ## Component Groups
 
@@ -40,7 +40,7 @@ Renders the user location in a hierarchy of pages or views.
 - Source: `src/components/breadcrumb/breadcrumb.tsx`
 - Storybook: `stories/breadcrumb.stories.tsx`
 - Tests: `tests/breadcrumb/breadcrumb.test.tsx`
-- Semantic parts: `root`, `list`, `item`, `link`, `separator`
+- Semantic parts: `root`, `list`, `item`, `link`, `page`, `separator`, `ellipsis`
 
 Use Breadcrumb near the top of a page when users need to understand or move through nested context.
 
@@ -66,7 +66,7 @@ Selects one or more independent boolean options.
 - Source: `src/components/checkbox/checkbox.tsx`
 - Storybook: `stories/checkbox.stories.tsx`
 - Tests: `tests/checkbox/checkbox.test.tsx`
-- Semantic parts: `root`, `input`, `box`, `label`, `group`, `option`
+- Semantic parts: `root`, `indicator`, `label`
 
 Use Checkbox for independent choices, or CheckboxGroup when users can select multiple options from a set.
 
@@ -92,7 +92,7 @@ Displays contextual actions from a right click or long press interaction.
 - Source: `src/components/context-menu/context-menu.tsx`
 - Storybook: `stories/context-menu.stories.tsx`
 - Tests: `tests/context-menu/context-menu.test.tsx`
-- Semantic parts: `root`, `trigger`, `content`, `item`, `separator`
+- Semantic parts: `root`, `content`, `item`, `itemIcon`, `itemLabel`, `itemExtra`, `divider`, `groupLabel`, `subTrigger`, `subContent`
 
 Use ContextMenu for secondary actions attached to an object or region.
 
@@ -118,7 +118,7 @@ Opens a side panel for related tasks without leaving the current page.
 - Source: `src/components/drawer/drawer.tsx`
 - Storybook: `stories/drawer.stories.tsx`
 - Tests: `tests/drawer/drawer.test.tsx`
-- Semantic parts: `root`, `overlay`, `content`, `header`, `body`, `footer`, `close`
+- Semantic parts: `root`, `overlay`, `header`, `title`, `extra`, `body`, `footer`, `close`, `dragger`
 
 Use Drawer for inspection, editing, or supporting workflows that should stay connected to the current page.
 
@@ -131,7 +131,7 @@ Opens a menu of actions or navigation choices from a trigger.
 - Source: `src/components/dropdown/dropdown.tsx`
 - Storybook: `stories/dropdown.stories.tsx`
 - Tests: `tests/dropdown/dropdown.test.tsx`
-- Semantic parts: `root`, `trigger`, `content`, `item`, `group`, `divider`
+- Semantic parts: `root`, `content`, `item`, `itemIcon`, `itemLabel`, `itemExtra`, `divider`, `groupLabel`, `subTrigger`, `subContent`
 
 Use Dropdown for compact action sets that do not need to stay visible.
 
@@ -157,7 +157,7 @@ Associates labels, help text, validation state, and controls.
 - Source: `src/components/form-field/form-field.tsx`
 - Storybook: `stories/form.stories.tsx`
 - Tests: `tests/form-field/form-field.test.tsx`
-- Semantic parts: `root`, `label`, `control`, `description`, `error`
+- Semantic parts: `root`, `label`, `description`, `error`
 
 Use FormField to provide accessible labeling and status text around a single control.
 
@@ -170,6 +170,7 @@ Arranges form content with consistent label and control alignment.
 - Source: `src/layouts/form-layout/form-layout.tsx`
 - Storybook: `stories/form-layout.stories.tsx`
 - Tests: `tests/layouts/form-layout/form-layout.test.tsx`
+- Semantic parts: `root`
 
 Use FormLayout to keep dense forms aligned and predictable.
 
@@ -182,7 +183,7 @@ Groups related form fields with a title and optional description.
 - Source: `src/components/form-section/form-section.tsx`
 - Storybook: `stories/form.stories.tsx`
 - Tests: `tests/form-section/form-section.test.tsx`
-- Semantic parts: `root`, `header`, `title`, `description`, `content`
+- Semantic parts: `root`, `header`, `title`, `description`, `body`
 
 Use FormSection to break long forms into scannable groups.
 
@@ -207,7 +208,7 @@ Single-line text input for short freeform values.
 - Source: `src/components/input/input.tsx`
 - Storybook: `stories/input.stories.tsx`
 - Tests: `tests/input/input.test.tsx`
-- Semantic parts: `root`, `input`, `prefix`, `suffix`, `clear`
+- Semantic parts: `root`, `input`, `prefix`, `suffix`
 
 Use Input for short text values such as names, filters, search terms, and identifiers.
 
@@ -220,7 +221,7 @@ A styled numeric input built on tao-ui number formatting and validation behavior
 - Source: `src/components/input-number/input-number.tsx`
 - Storybook: `stories/input-number.stories.tsx`
 - Tests: `tests/input-number/input-number.test.tsx`
-- Semantic parts: `root`, `input`, `controls`, `increment`, `decrement`
+- Semantic parts: `root`, `input`, `prefix`, `suffix`
 
 Use InputNumber for numeric values that need min, max, step, precision, or formatted display.
 
@@ -233,7 +234,7 @@ Displays a focused dialog for decisions, forms, and interruptive information.
 - Source: `src/components/modal/modal.tsx`
 - Storybook: `stories/modal.stories.tsx`
 - Tests: `tests/modal/modal.test.tsx`
-- Semantic parts: `root`, `overlay`, `content`, `header`, `body`, `footer`, `close`
+- Semantic parts: `root`, `overlay`, `header`, `title`, `body`, `footer`, `close`
 
 Use Modal for focused tasks or decisions. Static helpers such as Modal.confirm mirror common confirmation flows.
 
@@ -246,7 +247,7 @@ Moves through paged data with current page and page-size controls.
 - Source: `src/components/pagination/pagination.tsx`
 - Storybook: `stories/pagination.stories.tsx`
 - Tests: `tests/pagination/pagination.test.tsx`
-- Semantic parts: `root`, `item`, `prev`, `next`, `sizeChanger`
+- Semantic parts: `root`, `item`, `total`
 
 Use Pagination when a collection is split into pages rather than infinitely loaded.
 
@@ -259,7 +260,7 @@ Selects exactly one option from a mutually exclusive set.
 - Source: `src/components/radio/radio.tsx`
 - Storybook: `stories/radio.stories.tsx`
 - Tests: `tests/radio/radio.test.tsx`
-- Semantic parts: `root`, `input`, `indicator`, `label`, `group`, `option`
+- Semantic parts: `root`, `indicator`, `label`
 
 Use RadioGroup when every option is visible and only one can be selected.
 
@@ -272,7 +273,7 @@ Lets users select a start and end date as one range value.
 - Source: `src/components/date-picker/range-picker.tsx`
 - Storybook: `stories/date-picker.stories.tsx`
 - Tests: `tests/date-picker/range-picker.test.tsx`, `tests/date-picker/use-calendar.test.ts`
-- Semantic parts: `root`, `input`, `popup`, `calendar`, `cell`, `footer`
+- Semantic parts: `root`, `input`, `separator`, `popup`, `calendar`, `cell`
 
 Use RangePicker for reporting windows, booking windows, and filters with start/end dates.
 
@@ -294,11 +295,11 @@ Use ScrollArea when a fixed region needs overflow behavior without changing page
 Chooses one value from a compact list of options.
 
 - Category: Data Entry
-- Exports: `Select`, `ChevronsUpDownIcon`
+- Exports: `Select`
 - Source: `src/components/select/select.tsx`
 - Storybook: `stories/select.stories.tsx`
 - Tests: `tests/select/select.test.tsx`
-- Semantic parts: `root`, `trigger`, `value`, `content`, `item`, `empty`
+- Semantic parts: `root`, `prefix`, `suffix`, `placeholder`, `clear`, `popup`, `search`, `searchInput`, `group`, `groupLabel`, `item`, `itemIcon`, `itemLabel`, `itemDesc`, `empty`, `tag`, `tagLabel`, `tagClose`, `tagRest`, `values`
 
 Use Select when choices are known but too numerous or secondary to show as radios.
 
@@ -324,7 +325,7 @@ Indicates indeterminate loading activity.
 - Source: `src/components/spinner/spinner.tsx`
 - Storybook: `stories/spinner.stories.tsx`
 - Tests: `tests/spinner/spinner.test.tsx`
-- Semantic parts: `root`
+- Semantic parts: `root`, `indicator`, `tip`, `overlay`
 
 Use Spinner for short indeterminate waits when progress cannot be measured.
 
@@ -337,7 +338,7 @@ Creates resizable panes separated by draggable handles.
 - Source: `src/components/splitter/splitter.tsx`
 - Storybook: `stories/splitter.stories.tsx`
 - Tests: `tests/splitter/splitter.test.tsx`
-- Semantic parts: `root`, `panel`, `handle`
+- Semantic parts: `root`, `panel`, `dragger`
 
 Use Splitter for work surfaces where users need to allocate space between adjacent panes.
 
@@ -350,6 +351,7 @@ Composes children in a flex row or column with consistent spacing.
 - Source: `src/layouts/stack/stack.tsx`
 - Storybook: `stories/stack.stories.tsx`
 - Tests: `tests/layouts/stack/stack.test.tsx`
+- Semantic parts: `root`
 
 Use Stack for simple one-dimensional layout and spacing.
 
@@ -362,7 +364,7 @@ Toggles a setting on or off with immediate effect.
 - Source: `src/components/switch/switch.tsx`
 - Storybook: `stories/switch.stories.tsx`
 - Tests: `tests/switch/switch.test.tsx`
-- Semantic parts: `root`, `thumb`, `label`
+- Semantic parts: `root`, `handle`
 
 Use Switch for settings that take effect immediately.
 
@@ -375,7 +377,7 @@ Displays structured row and column data with selection, sorting, filtering, and 
 - Source: `src/components/table/table.tsx`
 - Storybook: `stories/table.stories.tsx`
 - Tests: `tests/table/table.test.tsx`
-- Semantic parts: `root`, `table`, `header`, `header.cell`, `body`, `row`, `cell`, `pagination`
+- Semantic parts: `root`, `scroll`, `table`, `header.wrapper`, `header.row`, `header.cell`, `header.content`, `header.title`, `body.row`, `body.cell`, `selection.cell`, `empty`, `pagination`
 
 Use Table for dense, comparable records that benefit from aligned columns.
 
@@ -388,7 +390,7 @@ Switches between peer panels within the same page context.
 - Source: `src/components/tabs/tabs.tsx`
 - Storybook: `stories/tabs.stories.tsx`
 - Tests: `tests/tabs/tabs.test.tsx`
-- Semantic parts: `root`, `list`, `tab`, `panel`
+- Semantic parts: `root`, `nav`, `tab`, `indicator`, `panel`
 
 Use Tabs to separate peer views without navigating away from the current task.
 
@@ -401,7 +403,7 @@ Displays compact labels, statuses, categories, or checkable chips.
 - Source: `src/components/tag/tag.tsx`
 - Storybook: `stories/tag.stories.tsx`
 - Tests: `tests/tag/tag.test.tsx`
-- Semantic parts: `root`, `icon`, `close`
+- Semantic parts: `root`, `icon`, `content`, `close`
 
 Use Tag for lightweight metadata or status markers. Use CheckableTag for compact filter choices.
 
@@ -410,7 +412,7 @@ Use Tag for lightweight metadata or status markers. Use CheckableTag for compact
 Provides global component defaults, portal scoping, and theme seed token overrides.
 
 - Category: Config
-- Exports: `TaoProvider`, `TaoPortalScope`
+- Exports: `TaoProvider`
 - Source: `src/provider/tao-provider.tsx`
 - Storybook: `stories/provider.stories.tsx`
 - Tests: `tests/provider/tao-provider.test.tsx`

@@ -9,7 +9,7 @@ export const formFieldDoc = {
   source: 'src/components/form-field/form-field.tsx',
   story: 'stories/form.stories.tsx',
   tests: ['tests/form-field/form-field.test.tsx'],
-  semanticParts: ['root', 'label', 'control', 'description', 'error'],
+  semanticParts: ['root', 'label', 'description', 'error'],
   keywords: ['form', 'label', 'validation'],
   related: ['Input', 'Select', 'FormSection'],
   usage: {

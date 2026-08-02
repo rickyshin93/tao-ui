@@ -86,13 +86,15 @@
    =========================== */
 [data-tao-tabs-ink] {
   position: absolute;
+  left: 0;
   bottom: 0;
+  width: 1px;
   height: 2px;
   background: var(--tao-primary);
   border-radius: var(--tao-radius-full);
-  transition:
-    left var(--tao-motion-duration-mid) var(--tao-motion-ease-out-quint),
-    width var(--tao-motion-duration-mid) var(--tao-motion-ease-out-quint);
+  transform-origin: left center;
+  transition: transform var(--tao-motion-duration-mid)
+    var(--tao-motion-ease-out-quint);
 }
 
 /* ===========================

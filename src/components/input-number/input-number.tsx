@@ -1,9 +1,14 @@
-import type { ReactNode } from 'react';
+import type { ReactNode, Ref } from 'react';
 import {
   type UseNumberInputOptions,
   useNumberInput,
 } from '../../number-input/use-number-input';
-import type { TaoSize, TaoVariant } from '../../provider/tao-provider';
+import type {
+  TaoSize,
+  TaoStatus,
+  TaoVariant,
+} from '../../provider/tao-provider';
+import { mergeRefs } from '../../utils/refs';
 import type { SemanticClassNames, SemanticStyles } from '../../utils/semantic';
 import { Input, type InputSemanticPart } from '../input/input';
 
@@ -24,6 +29,8 @@ export interface InputNumberProps extends UseNumberInputOptions {
   size?: TaoSize;
   variant?: TaoVariant;
   error?: boolean;
+  status?: TaoStatus;
+  ref?: Ref<HTMLInputElement>;
   disabled?: boolean;
   placeholder?: string;
   id?: string;
@@ -40,6 +47,7 @@ export function InputNumber({
   size,
   variant,
   error,
+  status,
   disabled,
   placeholder,
   id,
@@ -48,18 +56,20 @@ export function InputNumber({
   className,
   classNames,
   styles,
+  ref: forwardedRef,
   ...hookOptions
 }: InputNumberProps) {
   const { inputProps } = useNumberInput(hookOptions);
   const { ref, ...inputRest } = inputProps;
   return (
     <Input
-      ref={ref}
+      ref={mergeRefs(ref, forwardedRef)}
       prefix={prefix}
       suffix={suffix}
       size={size}
       variant={variant}
       error={error}
+      status={status}
       disabled={disabled}
       placeholder={placeholder}
       id={id}

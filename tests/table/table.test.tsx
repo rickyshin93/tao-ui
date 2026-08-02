@@ -1,6 +1,11 @@
 import { expect, test } from '@rstest/core';
 import { fireEvent, render, screen } from '@testing-library/react';
-import { Table, type TableColumn } from '../../src/components/table/table';
+import { userEvent } from '@testing-library/user-event';
+import {
+  type SorterResult,
+  Table,
+  type TableColumn,
+} from '../../src/components/table/table';
 import { TaoProvider } from '../../src/provider/tao-provider';
 
 interface User {
@@ -385,7 +390,6 @@ test('client-side sort on click', () => {
   fireEvent.click(ageHeader);
 
   // After ascending sort, first row should be Eve (22)
-  const cells = screen.getAllByRole('cell');
   // Find the first age cell (column index 1 -> index 1 in each row)
   const rows = screen.getAllByRole('row');
   // rows[0] = header, rows[1] = first data row
@@ -402,7 +406,7 @@ test('sort cycles ascend -> descend -> null', () => {
       sorter: (a, b) => a.age - b.age,
     },
   ];
-  let lastSorter: any = null;
+  let lastSorter: SorterResult<User> = { order: null };
   render(
     <Table
       columns={sortColumns}
@@ -426,9 +430,36 @@ test('sort cycles ascend -> descend -> null', () => {
   expect(lastSorter.order).toBe(null);
 });
 
+test('sortable headers expose aria-sort and plain headers are not disabled buttons', () => {
+  render(
+    <Table
+      columns={[
+        { key: 'name', dataIndex: 'name', title: 'Name' },
+        {
+          key: 'age',
+          dataIndex: 'age',
+          title: 'Age',
+          sorter: (a, b) => a.age - b.age,
+        },
+      ]}
+      dataSource={data}
+      rowKey="id"
+      pagination={false}
+    />,
+  );
+
+  expect(screen.queryByRole('button', { name: 'Name' })).toBeNull();
+  const ageButton = screen.getByRole('button', { name: 'Age' });
+  const ageHeader = ageButton.closest('th')!;
+  expect(ageHeader.getAttribute('aria-sort')).toBe('none');
+
+  fireEvent.click(ageButton);
+  expect(ageHeader.getAttribute('aria-sort')).toBe('ascending');
+});
+
 // ---- Filtering ----
 
-test('client-side filter', () => {
+test('client-side filter', async () => {
   const filterColumns: TableColumn<User>[] = [
     { key: 'name', dataIndex: 'name', title: 'Name' },
     {
@@ -453,15 +484,43 @@ test('client-side filter', () => {
 
   // Click filter trigger
   const filterBtn = screen.getByLabelText('Filter');
-  fireEvent.click(filterBtn);
+  await userEvent.click(filterBtn);
 
   // Click "Admin" option
-  fireEvent.click(screen.getByText('Admin'));
+  await userEvent.click(screen.getByText('Admin'));
 
   // Should only show admins (Alice, Diana)
   expect(screen.getByText('Alice')).toBeTruthy();
   expect(screen.getByText('Diana')).toBeTruthy();
   expect(screen.queryByText('Bob')).toBeNull();
+});
+
+test('filter menu exposes keyboard menu semantics', async () => {
+  const filterColumns: TableColumn<User>[] = [
+    {
+      key: 'role',
+      dataIndex: 'role',
+      title: 'Role',
+      filters: [{ text: 'Admin', value: 'admin' }],
+    },
+  ];
+  render(
+    <Table
+      columns={filterColumns}
+      dataSource={data}
+      rowKey="id"
+      pagination={false}
+    />,
+  );
+
+  const trigger = screen.getByRole('button', { name: 'Filter' });
+  expect(trigger.getAttribute('aria-haspopup')).toBe('menu');
+  await userEvent.click(trigger);
+  expect(trigger.getAttribute('aria-expanded')).toBe('true');
+  expect(screen.getByRole('menuitemcheckbox', { name: 'Admin' })).toBeTruthy();
+
+  fireEvent.keyDown(screen.getByRole('menu'), { key: 'Escape' });
+  expect(trigger.getAttribute('aria-expanded')).toBe('false');
 });
 
 // ---- Pagination ----
@@ -557,6 +616,23 @@ test('select all checkbox', () => {
   const selectAll = screen.getAllByRole('checkbox')[0];
   fireEvent.click(selectAll);
   expect(keys).toEqual([1, 2, 3, 4, 5]);
+});
+
+test('selection checkboxes have accessible names', () => {
+  render(
+    <Table
+      columns={columns}
+      dataSource={data}
+      rowKey="id"
+      pagination={false}
+      rowSelection={{}}
+    />,
+  );
+
+  expect(
+    screen.getByRole('checkbox', { name: 'Select all rows' }),
+  ).toBeTruthy();
+  expect(screen.getByRole('checkbox', { name: 'Select row 1' })).toBeTruthy();
 });
 
 // ---- Loading ----

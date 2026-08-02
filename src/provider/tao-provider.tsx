@@ -54,13 +54,17 @@ export interface TaoThemeConfig {
 
 export type TaoSize = 'small' | 'medium' | 'large';
 export type TaoVariant = 'outlined' | 'filled' | 'borderless';
+export type TaoStatus = 'error' | 'warning';
 
-interface TaoConfigContextValue {
+export interface TaoConfig {
   size: TaoSize;
   disabled: boolean;
   variant: TaoVariant;
   /** Resolved 明暗模式，portal 浮层用它重建 data-tao-theme。 */
   mode: TaoThemeMode;
+}
+
+interface TaoConfigContextValue extends TaoConfig {
   /**
    * Merged CSS custom-property overrides from this provider and all ancestors.
    * Carried through context so portaled layers (Modal/Drawer/Select dropdown…)
@@ -77,7 +81,15 @@ const TaoConfigContext = createContext<TaoConfigContextValue>({
   tokenStyle: {},
 });
 
-export function useTaoConfig(): TaoConfigContextValue {
+export function useTaoConfig(): TaoConfig {
+  const { size, disabled, variant, mode } = useContext(TaoConfigContext);
+  return useMemo(
+    () => ({ size, disabled, variant, mode }),
+    [size, disabled, variant, mode],
+  );
+}
+
+function useTaoInternalConfig(): TaoConfigContextValue {
   return useContext(TaoConfigContext);
 }
 
@@ -103,7 +115,7 @@ export function TaoPortalScope({
   style?: CSSProperties;
   asChild?: boolean;
 }) {
-  const { tokenStyle, mode } = useTaoConfig();
+  const { tokenStyle, mode } = useTaoInternalConfig();
   const themeAttr = mode === 'light' ? undefined : { 'data-tao-theme': mode };
   if (asChild) {
     return (
@@ -156,6 +168,36 @@ const TOKEN_TO_VAR_PX: Record<string, string> = {
   lineWidth: '--tao-line-width',
 };
 
+const TOKEN_TO_VAR_NUMBER: Record<string, string> = {
+  sizeStep: '--tao-size-step',
+  zIndexBase: '--tao-z-index-base',
+  zIndexPopupBase: '--tao-z-index-popup-base',
+};
+
+const DEFAULT_TOKEN_STYLE = {
+  '--tao-color-primary': 'oklch(0.205 0.01 70)',
+  '--tao-color-success': 'oklch(0.555 0.14 155)',
+  '--tao-color-warning': 'oklch(0.7 0.15 70)',
+  '--tao-color-error': 'oklch(0.57 0.19 25)',
+  '--tao-color-bg-base': 'oklch(0.985 0.004 70)',
+  '--tao-color-text-base': 'oklch(0.155 0.01 70)',
+  '--tao-color-bg-surface': 'oklch(1 0 0)',
+  '--tao-color-text-light-solid': 'oklch(0.985 0.004 70)',
+  '--tao-radius': '10px',
+  '--tao-font-size': '14px',
+  '--tao-control-height': '32px',
+  '--tao-size-unit': '4px',
+  '--tao-size-step': '4',
+  '--tao-line-width': '1px',
+  '--tao-font-family':
+    '"Geist Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif',
+  '--tao-font-family-code':
+    '"Geist Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace',
+  '--tao-motion-unit': '0.1s',
+  '--tao-z-index-base': '0',
+  '--tao-z-index-popup-base': '1000',
+} as CSSProperties;
+
 /**
  * Stable memoization key for theme.token: users routinely inline
  * `theme={{ token: {...} }}` — a fresh object every render — which would
@@ -197,12 +239,31 @@ export function TaoProvider({
       if (val != null) vars[varName] = `${val}px`;
     }
 
+    for (const [key, varName] of Object.entries(TOKEN_TO_VAR_NUMBER)) {
+      const val = parsedToken[key as keyof TaoSeedToken];
+      if (val != null) vars[varName] = String(val);
+    }
+
+    if (parsedToken.motion === false) {
+      vars['--tao-motion-unit'] = '0s';
+    } else if (parsedToken.motionUnit != null) {
+      vars['--tao-motion-unit'] = `${parsedToken.motionUnit}s`;
+    }
+
     return vars;
   }, [tokenKey]);
 
+  const scopedVars = useMemo<CSSProperties>(
+    () => (inherit ? { ...ownVars } : { ...DEFAULT_TOKEN_STYLE, ...ownVars }),
+    [inherit, ownVars],
+  );
+
   const tokenStyle = useMemo<CSSProperties>(
-    () => ({ ...parentConfig.tokenStyle, ...ownVars }),
-    [parentConfig.tokenStyle, ownVars],
+    () =>
+      inherit
+        ? { ...parentConfig.tokenStyle, ...scopedVars }
+        : { ...scopedVars },
+    [inherit, parentConfig.tokenStyle, scopedVars],
   );
 
   /**
@@ -212,8 +273,8 @@ export function TaoProvider({
    * to descendants regardless of `display: contents`.
    */
   const divStyle = useMemo<CSSProperties>(
-    () => ({ display: 'contents', ...(ownVars as CSSProperties | undefined) }),
-    [ownVars],
+    () => ({ display: 'contents', ...scopedVars }),
+    [scopedVars],
   );
 
   const parentSize = parentConfig.size;

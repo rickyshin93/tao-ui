@@ -10,6 +10,7 @@ export const stackDoc = {
   source: 'src/layouts/stack/stack.tsx',
   story: 'stories/stack.stories.tsx',
   tests: ['tests/layouts/stack/stack.test.tsx'],
+  semanticParts: ['root'],
   keywords: ['layout', 'flex', 'spacing'],
   related: ['Splitter', 'FormLayout'],
   usage: {

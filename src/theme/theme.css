@@ -54,6 +54,7 @@
     --tao-control-width: 200px; /* default width for Input/Select/DatePicker; override per-instance or use 100% for full width */
     --tao-control-range-width: 360px; /* RangePicker holds two dates + separator */
     --tao-size-unit: 4px;
+    --tao-size-step: 4;
     --tao-line-width: 1px;
     /* Focus ring width — shadcn uses 3px, more visible than antd's 2px */
     --tao-ring-width: 3px;
@@ -73,9 +74,8 @@
 
     /* z-index layers: floating popups sit ABOVE modal/drawer so a Select/
        DatePicker/Dropdown opened inside a Modal is never clipped behind it. */
-    --tao-z-index-drawer: 1000;
-    --tao-z-index-modal: 1000;
-    --tao-z-index-popup: 1100;
+    --tao-z-index-base: 0;
+    --tao-z-index-popup-base: 1000;
   }
 
   /* ═════════════════════════════════════════════════════════════════════
@@ -178,7 +178,7 @@
     );
     --tao-color-text-tertiary: color-mix(
       in oklch,
-      var(--tao-color-text-base) 45%,
+      var(--tao-color-text-base) 55%,
       var(--tao-color-bg-base)
     );
     --tao-color-text-quaternary: color-mix(
@@ -268,11 +268,11 @@
     /* ===========================
        DERIVED: Font sizes
        =========================== */
-    --tao-font-size-xs: 12px;
-    --tao-font-size-sm: 13px;
+    --tao-font-size-xs: calc(var(--tao-font-size) - 2px);
+    --tao-font-size-sm: calc(var(--tao-font-size) - 1px);
     --tao-font-size-base: var(--tao-font-size);
-    --tao-font-size-lg: 16px;
-    --tao-font-size-xl: 20px;
+    --tao-font-size-lg: calc(var(--tao-font-size) + 2px);
+    --tao-font-size-xl: calc(var(--tao-font-size) + 6px);
 
     /* Font weight */
     --tao-font-weight-normal: 400;
@@ -288,12 +288,12 @@
        DERIVED: Spacing
        =========================== */
     --tao-padding-xxs: 2px;
-    --tao-padding-xs: calc(var(--tao-size-unit) * 2);
-    --tao-padding-sm: calc(var(--tao-size-unit) * 3);
-    --tao-padding: calc(var(--tao-size-unit) * 4);
-    --tao-padding-md: calc(var(--tao-size-unit) * 5);
-    --tao-padding-lg: calc(var(--tao-size-unit) * 6);
-    --tao-padding-xl: calc(var(--tao-size-unit) * 8);
+    --tao-padding-xs: calc(var(--tao-size-unit) * (var(--tao-size-step) - 2));
+    --tao-padding-sm: calc(var(--tao-size-unit) * (var(--tao-size-step) - 1));
+    --tao-padding: calc(var(--tao-size-unit) * var(--tao-size-step));
+    --tao-padding-md: calc(var(--tao-size-unit) * (var(--tao-size-step) + 1));
+    --tao-padding-lg: calc(var(--tao-size-unit) * (var(--tao-size-step) + 2));
+    --tao-padding-xl: calc(var(--tao-size-unit) * (var(--tao-size-step) + 4));
 
     /* ===========================
        DERIVED: Motion
@@ -301,6 +301,12 @@
     --tao-motion-duration-fast: calc(var(--tao-motion-unit) * 1);
     --tao-motion-duration-mid: calc(var(--tao-motion-unit) * 2);
     --tao-motion-duration-slow: calc(var(--tao-motion-unit) * 3);
+    --tao-z-index-drawer: calc(
+      var(--tao-z-index-base) +
+      var(--tao-z-index-popup-base)
+    );
+    --tao-z-index-modal: var(--tao-z-index-drawer);
+    --tao-z-index-popup: calc(var(--tao-z-index-drawer) + 100);
     --tao-motion-ease-out: cubic-bezier(0.215, 0.61, 0.355, 1);
     --tao-motion-ease-in-out: cubic-bezier(0.645, 0.045, 0.355, 1);
     --tao-motion-ease-out-quint: cubic-bezier(0.23, 1, 0.32, 1);
@@ -344,8 +350,8 @@
     /* ===========================
        ALIAS: Semantic shortcuts
        =========================== */
-    /* placeholder 提到 tertiary：quaternary(30%) 对比度 ~2.2:1 偏飘；
-       与 disabled 区分（disabled 保持 quaternary 的"熄灭"感） */
+    /* tertiary 保持 WCAG AA：亮色约 5.1:1、暗色约 4.5:1。
+       disabled 不受文本对比度要求，继续使用 quaternary 的"熄灭"感。 */
     --tao-color-text-placeholder: var(--tao-color-text-tertiary);
     --tao-color-text-disabled: var(--tao-color-text-quaternary);
     --tao-color-bg-disabled: var(--tao-color-fill-tertiary);
@@ -414,8 +420,7 @@
 
     /* shadows：暗底上半透明黑不可见，用更高 alpha + 更大的 blur 撑出层次 */
     --tao-box-shadow-xs: 0 1px 2px 0 oklch(0 0 0 / 0.4);
-    --tao-box-shadow:
-      0 1px 2px oklch(0 0 0 / 0.35), 0 0 1px oklch(0 0 0 / 0.5);
+    --tao-box-shadow: 0 1px 2px oklch(0 0 0 / 0.35), 0 0 1px oklch(0 0 0 / 0.5);
     --tao-box-shadow-secondary:
       0 4px 12px oklch(0 0 0 / 0.4), 0 0 1px oklch(0 0 0 / 0.5);
     --tao-box-shadow-tertiary: 0 1px 2px oklch(0 0 0 / 0.35);
@@ -423,5 +428,13 @@
     /* mask 加深：暗 UI 上的浅灰遮罩会显得"起雾" */
     --tao-color-bg-mask: oklch(0 0 0 / 0.55);
     --tao-color-shadow-hint: oklch(0 0 0 / 0.35);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root,
+  [data-tao-provider],
+  [data-tao-theme] {
+    --tao-motion-unit: 0s !important;
   }
 }

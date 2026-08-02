@@ -10,17 +10,20 @@ class MockResizeObserver {
   constructor(cb: ResizeObserverCallback) {
     this.callback = cb;
   }
-  observe(el: Element) {
+  observe(_element: Element) {
     // Simulate container size
     this.callback(
       [{ contentRect: { width: 600, height: 400 } } as ResizeObserverEntry],
-      this as any,
+      this as unknown as ResizeObserver,
     );
   }
   disconnect() {}
   unobserve() {}
 }
-(globalThis as any).ResizeObserver = MockResizeObserver;
+Object.defineProperty(globalThis, 'ResizeObserver', {
+  configurable: true,
+  value: MockResizeObserver,
+});
 
 test('renders panels', () => {
   render(
@@ -50,6 +53,27 @@ test('renders dragger between panels', () => {
   );
   const dragger = container.querySelector('[data-tao-splitter-dragger]');
   expect(dragger).toBeTruthy();
+});
+
+test('dragger exposes separator semantics and supports keyboard resize', () => {
+  let resized: number[] = [];
+  render(
+    <Splitter
+      onResize={(sizes) => {
+        resized = sizes;
+      }}
+    >
+      <Panel>Left</Panel>
+      <Panel>Right</Panel>
+    </Splitter>,
+  );
+
+  const separator = screen.getByRole('separator', { name: 'Resize panels 1 and 2' });
+  const before = Number(separator.getAttribute('aria-valuenow'));
+  expect(separator.getAttribute('aria-orientation')).toBe('vertical');
+
+  fireEvent.keyDown(separator, { key: 'ArrowRight' });
+  expect(resized[0]).toBeGreaterThan(before);
 });
 
 test('renders multiple panels with multiple draggers', () => {

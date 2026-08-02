@@ -2,12 +2,14 @@ import {
   type ChangeEvent,
   createContext,
   type ReactNode,
+  type Ref,
   useCallback,
   useContext,
   useEffect,
   useRef,
 } from 'react';
 import { type TaoSize, useTaoConfig } from '../../provider/tao-provider';
+import { mergeRefs } from '../../utils/refs';
 import {
   cx,
   type SemanticClassNames,
@@ -41,10 +43,12 @@ export interface CheckboxProps {
   children?: ReactNode;
   classNames?: SemanticClassNames<CheckboxSemanticPart>;
   styles?: SemanticStyles<CheckboxSemanticPart>;
+  ref?: Ref<HTMLInputElement>;
 }
 
 export function Checkbox({
   checked,
+  defaultChecked,
   indeterminate,
   disabled,
   onChange,
@@ -52,6 +56,7 @@ export function Checkbox({
   children,
   classNames,
   styles,
+  ref,
 }: CheckboxProps) {
   const ctx = useTaoConfig();
   const groupCtx = useContext(CheckboxGroupContext);
@@ -89,9 +94,10 @@ export function Checkbox({
     >
       <span data-tao-checkbox-control="">
         <input
-          ref={inputRef}
+          ref={mergeRefs(inputRef, ref)}
           type="checkbox"
           checked={resolvedChecked}
+          defaultChecked={defaultChecked}
           disabled={resolvedDisabled}
           onChange={handleChange}
           aria-checked={indeterminate ? 'mixed' : undefined}

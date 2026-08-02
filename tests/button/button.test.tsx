@@ -83,6 +83,7 @@ test('loading renders built-in spinner in a mounted icon slot', () => {
   render(<Button loading>Save</Button>);
   const slot = document.querySelector('[data-tao-button-icon]');
   expect(slot).toBeTruthy();
+  expect(slot?.closest('button')?.dataset.taoHasIcon).toBe('true');
   expect(slot?.dataset.taoLoading).toBe('true');
   expect(slot?.querySelector('[data-tao-button-spinner]')).toBeTruthy();
 });
@@ -95,6 +96,7 @@ test('icon prop renders an idle icon, hidden layer absent when no loading', () =
   );
   const slot = document.querySelector('[data-tao-button-icon]');
   expect(slot?.dataset.taoLoading).toBeUndefined();
+  expect(slot?.closest('button')?.dataset.taoHasIcon).toBe('true');
   expect(screen.getByTestId('my-icon')).toBeTruthy();
   expect(slot?.querySelector('[data-tao-button-spinner]')).toBeTruthy();
 });

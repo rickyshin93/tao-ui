@@ -1,4 +1,11 @@
 import type { Dayjs } from 'dayjs';
+
+export interface PickerRef {
+  focus: (position?: 'start' | 'end') => void;
+  blur: () => void;
+  nativeElement: HTMLElement | null;
+}
+
 import type { ReactNode } from 'react';
 import type { TaoSize, TaoVariant } from '../../provider/tao-provider';
 

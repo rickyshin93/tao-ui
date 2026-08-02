@@ -3,6 +3,7 @@ import {
   type ReactNode,
   useCallback,
   useEffect,
+  useId,
   useRef,
   useState,
 } from 'react';
@@ -53,6 +54,7 @@ export function Tabs({
   styles,
 }: TabsProps) {
   const ctx = useTaoConfig();
+  const id = useId();
   const resolvedSize = size ?? ctx.size;
 
   // Controlled / uncontrolled
@@ -147,13 +149,16 @@ export function Tabs({
         >
           {items.map((item) => {
             const isActive = item.key === currentKey;
+            const tabId = `${id}-tab-${item.key}`;
+            const panelId = `${id}-panel-${item.key}`;
             return (
               <button
                 key={item.key}
                 type="button"
                 role="tab"
+                id={tabId}
                 aria-selected={isActive}
-                aria-controls={`tabpanel-${item.key}`}
+                aria-controls={panelId}
                 aria-disabled={item.disabled || undefined}
                 tabIndex={isActive ? 0 : -1}
                 data-tao-tab=""
@@ -173,8 +178,7 @@ export function Tabs({
             <span
               data-tao-tabs-ink=""
               style={{
-                left: inkStyle.left,
-                width: inkStyle.width,
+                transform: `translateX(${inkStyle.left}px) scaleX(${inkStyle.width})`,
                 ...styles?.indicator,
               }}
               className={cx(classNames?.indicator)}
@@ -185,13 +189,15 @@ export function Tabs({
 
       {items.map((item) => {
         const isActive = item.key === currentKey;
+        const tabId = `${id}-tab-${item.key}`;
+        const panelId = `${id}-panel-${item.key}`;
         if (destroyInactiveTabPane && !isActive) return null;
         return (
           <div
             key={item.key}
             role="tabpanel"
-            id={`tabpanel-${item.key}`}
-            aria-labelledby={item.key}
+            id={panelId}
+            aria-labelledby={tabId}
             hidden={!isActive}
             data-tao-tabs-panel=""
             data-tao-active={isActive || undefined}
