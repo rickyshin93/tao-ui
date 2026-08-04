@@ -80,6 +80,19 @@ test('inner input resets native vertical metrics', () => {
   expect(rule).toContain('line-height: var(--tao-input-line-height);');
 });
 
+test('autofill paint stays inside the rounded control', () => {
+  const css = readFileSync('src/components/input/input.css', 'utf8');
+  const rootRule = css.match(/\[data-tao-input\] \{([^}]+)\}/)?.[1];
+  const autofillRule = css.match(
+    /\[data-tao-input\] input:-webkit-autofill \{([^}]+)\}/,
+  )?.[1];
+
+  expect(rootRule).toContain('overflow: hidden;');
+  expect(autofillRule).toContain('appearance: none;');
+  expect(autofillRule).toContain('font-family: inherit;');
+  expect(autofillRule).toContain('line-height: var(--tao-input-line-height);');
+});
+
 test('React SVG prefix becomes an overlay and reserves input space', () => {
   const css = readFileSync('src/components/input/input.css', 'utf8');
   const rule = css.match(

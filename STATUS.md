@@ -10,6 +10,7 @@
 - none
 
 ## Done
+- 2026-08-04 clip Input autofill paint to rounded controls and preserve autofill text metrics
 - 2026-08-03 keep Select option padding inside popup width so selected checks remain visible
 - 2026-08-03 align Button icon sizing and text spacing with antd
 - 2026-08-02 ship typed Semantic DOM contracts for all visual components and enforce docs/source parity
