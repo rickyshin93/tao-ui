@@ -10,6 +10,7 @@
 - none
 
 ## Done
+- 2026-08-04 center Input text and password discs independently without shifting password selection
 - 2026-08-04 optically center native Input text and password discs across the control height
 - 2026-08-04 clip Input autofill paint to rounded controls and preserve autofill text metrics
 - 2026-08-03 keep Select option padding inside popup width so selected checks remain visible
