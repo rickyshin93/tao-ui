@@ -1,5 +1,11 @@
 # tao-ui 项目自我学习
 
+## [Input CSS] 单行输入框用 antd 对称 padding 模型垂直居中
+- **日期**: 2026-08-04
+- **错误假设**: 原生 input 的文字偏下可以用密码专用或 `padding-bottom: 2px` 光学校正。
+- **正确做法**: 参考 antd，以 `(controlHeight - lineHeight) / 2 - lineWidth` 计算上下对称 padding；tao-ui 用 `1lh` 保持自定义字号、行高和控件高度联动。
+- **适用场景**: Input、InputNumber 等单行控件的文字、选区背景或密码圆点出现垂直偏移时。
+
 ## [Biome] 多行 JSX 属性的 lint 抑制按诊断行匹配
 - **日期**: 2026-08-02
 - **错误假设**: 把 `biome-ignore` 放在多行 JSX 元素前即可抑制该元素任意属性上的诊断。

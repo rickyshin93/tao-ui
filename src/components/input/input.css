@@ -15,6 +15,7 @@
 /* Sizes */
 [data-tao-input][data-tao-size="small"] {
   --tao-input-line-height: var(--tao-line-height-sm);
+  --tao-input-control-height: var(--tao-control-height-sm);
 
   height: var(--tao-control-height-sm);
   border-radius: var(--tao-radius-sm);
@@ -25,6 +26,8 @@
 }
 
 [data-tao-input][data-tao-size="medium"] {
+  --tao-input-control-height: var(--tao-control-height);
+
   height: var(--tao-control-height);
   border-radius: var(--tao-radius-md);
 }
@@ -35,6 +38,7 @@
 
 [data-tao-input][data-tao-size="large"] {
   --tao-input-line-height: var(--tao-line-height-lg);
+  --tao-input-control-height: var(--tao-control-height-lg);
 
   height: var(--tao-control-height-lg);
   border-radius: var(--tao-radius-md);
@@ -53,8 +57,11 @@
 [data-tao-input] input {
   flex: 1;
   box-sizing: border-box;
-  height: 100%;
-  padding-block: 0;
+  height: auto;
+  padding-block: max(
+    0px,
+    calc((var(--tao-input-control-height) - 1lh) / 2 - var(--tao-line-width))
+  );
   border: none;
   outline: none;
   background: transparent;

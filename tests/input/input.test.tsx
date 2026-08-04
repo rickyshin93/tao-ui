@@ -76,8 +76,25 @@ test('inner input resets native vertical metrics', () => {
   const rule = css.match(/\[data-tao-input\] input \{([^}]+)\}/)?.[1];
 
   expect(rule).toContain('box-sizing: border-box;');
-  expect(rule).toContain('padding-block: 0;');
+  expect(rule).toContain('height: auto;');
+  expect(rule).toMatch(
+    /padding-block:\s*max\(\s*0px,\s*calc\(\s*\(var\(--tao-input-control-height\) - 1lh\) \/ 2 - var\(--tao-line-width\)\s*\)\s*\);/,
+  );
   expect(rule).toContain('line-height: var(--tao-input-line-height);');
+});
+
+test('each size derives symmetric input padding from its control height', () => {
+  const css = readFileSync('src/components/input/input.css', 'utf8');
+
+  expect(css).toContain(
+    '--tao-input-control-height: var(--tao-control-height-sm);',
+  );
+  expect(css).toContain(
+    '--tao-input-control-height: var(--tao-control-height);',
+  );
+  expect(css).toContain(
+    '--tao-input-control-height: var(--tao-control-height-lg);',
+  );
 });
 
 test('autofill paint stays inside the rounded control', () => {
