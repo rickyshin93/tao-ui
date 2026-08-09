@@ -4,12 +4,27 @@
 - align Sonner stacking state machine more closely with reference behavior
 
 ## Next
+
 - refine animation/stacking behavior if more feedback patterns are added
 
 ## Backlog
 - none
 
 ## Done
+- 2026-08-09 add GitHub Pages CI: Rspress builds on every PR and deploys `doc_build` after pushes to `main`
+- 2026-08-09 restore interactive Rspress DatePicker, Radio, Checkbox, Select, and number-input demos without changing component borders or behavior
+- 2026-08-09 internationalize all 76 Rspress pages in English and Chinese, including navigation, search, API headings, descriptions, and per-locale llms outputs
+- 2026-08-09 publish categorized Rspress pages with 118 runnable examples, descriptions, and API tables for all 36 public components
+- 2026-08-09 expand Button docs with runnable sizes, states, icons, provider, and semantic customization examples
+- 2026-08-09 restore left-aligned Rspress API table headers and cells
+- 2026-08-09 replace separate install snippets with Rspress PackageManagerTabs for npm, yarn, pnpm, bun, and deno
+- 2026-08-09 expand the Rspress home with six source-backed advantages, stronger AI-native positioning, and a solid ink-teal light/dark theme
+- 2026-08-09 rebuild docs from Rspress v2 defaults: native home, auto nav/sidebar, Button Preview/API, responsive layout, and llms output
+- 2026-08-09 ship the AI-native homepage with animated Agent Runtime, seven evidence-backed advantage cards, editable Playgrounds, and left-aligned docs tables
+- 2026-08-09 ship the Rspress website vertical slice with branded home, Getting Started, Button demos/API, dark mode, search, and llms output
+- 2026-08-09 upgrade Rspress core and official docs plugins from 2.0.13 to 2.0.19 and validate the docs build
+- 2026-08-09 remove Storybook's global padded canvas and give Popover placements collision-safe test space
+- 2026-08-09 align Popover API, geometry, triggers, placements, arrow, shadow, and motion with local antd v6
 - 2026-08-04 center Input text and password discs independently without shifting password selection
 - 2026-08-04 optically center native Input text and password discs across the control height
 - 2026-08-04 clip Input autofill paint to rounded controls and preserve autofill text metrics
@@ -25,7 +40,7 @@
 - 2026-07-25 tighten Input prefix gap to 4px and left-align RangePicker content
 - 2026-07-21 Modal top offset 100px → component token `--tao-modal-offset-top`; provider stories add Dark Mode demo
 - 2026-07-21 dark mode: pure-CSS `[data-tao-theme="dark"]` algorithm (4 seeds + flipped derived), `theme.mode` on TaoProvider, portal propagation, Storybook toolbar toggle
-- 2026-07-21 eliminate all hardcoded color escapes (Table/Tag/Modal/Drawer/ScrollArea/mobile-select → tokens: bg-surface, text-light-solid, bg-mask, shadow-hint); regression test pins zero literals
+- 2026-08-09 eliminate all hardcoded color escapes (including Dropdown/Tooltip arrows → shadow-hint); regression test pins zero literals
 - 2026-07-21 sync DESIGN.md to implementation (radius 10, height 32, border 12%, ring 3px, motion-ease-out-expo token); README adds Dark mode + Fonts sections
 - 2026-07-21 fonts: follow antd (no bundled fonts), fallback stack upgraded with CJK; Storybook devDeps @fontsource/geist-{sans,mono}
 - 2026-07-12 add Button `icon`/`loadingIcon` props with mount-stable icon slot to kill loading flicker

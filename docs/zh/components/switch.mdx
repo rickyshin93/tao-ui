@@ -1,0 +1,80 @@
+---
+title: Switch
+description: 立即切换一个布尔设置，并展示当前开关状态。页面涵盖适用场景、设计建议、多组可运行示例、交互状态与完整 API 参考。
+---
+
+立即切换一个布尔设置，并展示当前开关状态。
+
+## 何时使用
+
+设置可立即生效且不需要额外提交时使用 Switch。
+
+**推荐**
+
+- 标签描述开启后的状态。
+- 异步切换期间使用 loading。
+
+**避免**
+
+- 需要提交确认或选择多个值时不要使用 Switch。
+
+## 基础用法
+
+```tsx preview
+import { Stack, Switch } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+function SwitchExample() {
+  const [enabled, setEnabled] = useState(true);
+
+  return (
+    <Stack direction="horizontal" gap="lg" align="center">
+      <Switch checked={enabled} onChange={setEnabled} />
+      <Switch checked loading />
+      <Switch disabled />
+    </Stack>
+  );
+}
+
+export default SwitchExample;
+```
+
+## 标签与尺寸
+
+```tsx preview
+import { Stack, Switch } from '@rockshin/tao-ui';
+
+function SwitchLabels() {
+  return (
+    <Stack direction="horizontal" gap="lg" align="center">
+      <Switch size="small" defaultChecked />
+      <Switch checkedChildren="ON" unCheckedChildren="OFF" defaultChecked />
+      <Switch checkedChildren="✓" unCheckedChildren="×" />
+    </Stack>
+  );
+}
+
+export default SwitchLabels;
+```
+
+## 加载与禁用状态
+
+```tsx preview
+import { Stack, Switch } from '@rockshin/tao-ui';
+
+function SwitchStates() {
+  return (
+    <Stack direction="horizontal" gap="lg" align="center">
+      <Switch loading checked />
+      <Switch disabled />
+      <Switch checked disabled />
+    </Stack>
+  );
+}
+
+export default SwitchStates;
+```
+
+## API
+
+<API moduleName="switch" />

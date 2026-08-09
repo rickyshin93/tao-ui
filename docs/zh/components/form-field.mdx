@@ -1,0 +1,87 @@
+---
+title: FormField
+description: 组合标签、输入控件、说明、必填标记与错误信息。页面涵盖适用场景、设计建议、多组可运行示例、交互状态与完整 API 参考。
+---
+
+组合标签、输入控件、说明、必填标记与错误信息。
+
+## 何时使用
+
+输入控件需要可访问标签和辅助或错误文本时使用 FormField。
+
+**推荐**
+
+- 标签简短并直接描述输入内容。
+- 错误信息同时说明问题与修复方式。
+
+**避免**
+
+- 不要仅用 placeholder 代替标签。
+
+## 基础用法
+
+```tsx preview
+import { FormField, Input } from '@rockshin/tao-ui';
+
+function FormFieldExample() {
+  return (
+    <FormField
+      label="Email"
+      required
+      description="Used for account notifications."
+    >
+      <Input placeholder="you@example.com" />
+    </FormField>
+  );
+}
+
+export default FormFieldExample;
+```
+
+## 说明与错误状态
+
+```tsx preview
+import { FormField, Input, Stack } from '@rockshin/tao-ui';
+
+function FormFieldStates() {
+  return (
+    <Stack gap="lg" style={{ maxWidth: 420 }}>
+      <FormField label="Workspace name" description="Visible to all members.">
+        <Input placeholder="Acme Design" />
+      </FormField>
+      <FormField label="Slug" required error="Use lowercase letters and hyphens only.">
+        <Input value="Acme Team" error readOnly />
+      </FormField>
+    </Stack>
+  );
+}
+
+export default FormFieldStates;
+```
+
+## 语义部件
+
+```tsx preview
+import { FormField, Input } from '@rockshin/tao-ui';
+
+function CustomizedFormField() {
+  return (
+    <FormField
+      label="API token"
+      description="Stored securely."
+      styles={{
+        label: { fontWeight: 600 },
+        description: { maxWidth: 320 },
+      }}
+    >
+      <Input type="password" value="secret-token" readOnly />
+    </FormField>
+  );
+}
+
+export default CustomizedFormField;
+```
+
+## API
+
+<API moduleName="form-field" />

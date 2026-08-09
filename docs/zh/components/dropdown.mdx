@@ -1,0 +1,117 @@
+---
+title: Dropdown
+description: 从触发器打开一组相关操作或选项。页面涵盖适用场景、设计建议、多组可运行示例、交互状态与完整 API 参考。
+---
+
+从触发器打开一组相关操作或选项。
+
+## 何时使用
+
+多个次要操作需要紧凑收纳在一个触发器后时使用 Dropdown。
+
+**推荐**
+
+- 菜单项按任务关系分组。
+- 危险操作使用 danger 语义。
+- 键盘可达并保持清晰焦点。
+
+**避免**
+
+- 不要隐藏唯一的主要操作。
+
+## 基础用法
+
+```tsx preview
+import { Button, Dropdown } from '@rockshin/tao-ui';
+
+function DropdownExample() {
+  return (
+    <Dropdown
+      menu={{
+        items: [
+          { key: 'edit', label: 'Edit' },
+          { key: 'duplicate', label: 'Duplicate' },
+          { type: 'divider' },
+          { key: 'archive', label: 'Archive' },
+        ],
+      }}
+    >
+      <Button variant="secondary">Actions</Button>
+    </Dropdown>
+  );
+}
+
+export default DropdownExample;
+```
+
+## 分组与子菜单
+
+```tsx preview
+import { Button, Dropdown } from '@rockshin/tao-ui';
+
+function DropdownGroups() {
+  return (
+    <Dropdown
+      menu={{
+        items: [
+          {
+            type: 'group',
+            label: 'Create',
+            children: [
+              { key: 'file', label: 'New file', extra: '⌘N' },
+              { key: 'folder', label: 'New folder' },
+            ],
+          },
+          { type: 'divider' },
+          {
+            key: 'share',
+            label: 'Share',
+            children: [
+              { key: 'link', label: 'Copy link' },
+              { key: 'invite', label: 'Invite people' },
+            ],
+          },
+          { key: 'delete', label: 'Delete', danger: true },
+        ],
+      }}
+    >
+      <Button variant="secondary">Project actions</Button>
+    </Dropdown>
+  );
+}
+
+export default DropdownGroups;
+```
+
+## 触发方式、箭头与组合按钮
+
+```tsx preview
+import { Button, Dropdown, Stack } from '@rockshin/tao-ui';
+
+const items = [
+  { key: 'edit', label: 'Edit' },
+  { key: 'duplicate', label: 'Duplicate' },
+];
+
+function DropdownTriggers() {
+  return (
+    <Stack direction="horizontal" gap="md">
+      <Dropdown trigger={['hover']} menu={{ items }}>
+        <Button variant="secondary">Hover</Button>
+      </Dropdown>
+      <Dropdown trigger={['click']} arrow menu={{ items }}>
+        <Button variant="secondary">Click with arrow</Button>
+      </Dropdown>
+      <Dropdown.Button menu={{ items }} onClick={() => console.log('save')}>
+        Save
+      </Dropdown.Button>
+    </Stack>
+  );
+}
+
+export default DropdownTriggers;
+```
+
+## API
+
+<API moduleName="dropdown" />

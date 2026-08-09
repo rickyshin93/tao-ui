@@ -1,0 +1,48 @@
+/* ===========================
+   Popconfirm body
+   (popup shell, z-index and animation come from Popover)
+   =========================== */
+[data-tao-popconfirm] {
+  box-sizing: border-box;
+  /* optical constant: keep one-line confirms narrow (matches Tooltip cap) */
+  max-width: 260px;
+  font-family: var(--tao-font-family);
+  font-size: var(--tao-font-size-base);
+  line-height: var(--tao-line-height);
+  color: var(--tao-color-text);
+}
+
+[data-tao-popconfirm-message] {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--tao-padding-xs);
+}
+
+[data-tao-popconfirm-icon] {
+  display: inline-flex;
+  flex-shrink: 0;
+  margin-block-start: 2px;
+  color: var(--tao-warning);
+}
+
+[data-tao-popconfirm-text] {
+  flex: 1;
+  min-width: 0;
+}
+
+[data-tao-popconfirm-title] {
+  font-weight: var(--tao-font-weight-strong);
+  color: var(--tao-color-text);
+}
+
+[data-tao-popconfirm-description] {
+  margin-block-start: var(--tao-padding-xs);
+  color: var(--tao-color-text-secondary);
+}
+
+[data-tao-popconfirm-footer] {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--tao-padding-xs);
+  margin-block-start: var(--tao-padding-sm);
+}

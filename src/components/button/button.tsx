@@ -11,17 +11,25 @@ export type ButtonSemanticPart = 'root';
 
 export interface ButtonProps
   extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'disabled'> {
+  /** Visual emphasis for the action. */
   variant?: 'primary' | 'secondary' | 'ghost' | 'destructive';
+  /** Control height and horizontal spacing. Inherits from TaoProvider. */
   size?: TaoSize;
+  /** Prevents interaction. Inherits from TaoProvider. */
   disabled?: boolean;
+  /** Shows the loading icon, sets aria-busy, and prevents interaction. */
   loading?: boolean;
   /** Left-leading decorative icon (non-loading state). */
   icon?: ReactNode;
   /** Icon shown while loading. Defaults to a built-in spinner. */
   loadingIcon?: ReactNode;
+  /** Button label or inline content. */
   children?: ReactNode;
+  /** Ref forwarded to the native button element. */
   ref?: Ref<HTMLButtonElement>;
+  /** Semantic class overrides keyed by ButtonSemanticPart. */
   classNames?: SemanticClassNames<ButtonSemanticPart>;
+  /** Semantic style overrides keyed by ButtonSemanticPart. */
   styles?: SemanticStyles<ButtonSemanticPart>;
 }
 

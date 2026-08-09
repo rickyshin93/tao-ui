@@ -1,0 +1,76 @@
+---
+title: Tooltip
+description: "Shows a brief informational popup when hovering or focusing an element. Includes usage guidance, a runnable example, and the complete API reference."
+---
+
+Shows a brief informational popup when hovering or focusing an element.
+
+## When to use
+
+Use Tooltip for short contextual hints on hover or focus. The popup is portaled and inherits the TaoProvider theme.
+
+**Recommended**
+
+- Keep tooltip text short and supplementary.
+- Wrap exactly one focusable trigger element.
+
+**Avoid**
+
+- Do not put critical information or interactive content inside a Tooltip.
+
+## Basic usage
+
+```tsx preview
+import { Button, Tooltip } from '@rockshin/tao-ui';
+
+function TooltipExample() {
+  return (
+    <Tooltip title="Copy to clipboard">
+      <Button variant="secondary">Hover or focus</Button>
+    </Tooltip>
+  );
+}
+
+export default TooltipExample;
+```
+
+## Placements
+
+```tsx preview
+import { Button, Stack, Tooltip } from '@rockshin/tao-ui';
+
+function TooltipPlacements() {
+  return (
+    <Stack direction="horizontal" gap="md">
+      <Tooltip title="Top" placement="top"><Button variant="secondary">Top</Button></Tooltip>
+      <Tooltip title="Bottom" placement="bottom"><Button variant="secondary">Bottom</Button></Tooltip>
+      <Tooltip title="Left" placement="left"><Button variant="secondary">Left</Button></Tooltip>
+      <Tooltip title="Right" placement="right"><Button variant="secondary">Right</Button></Tooltip>
+    </Stack>
+  );
+}
+
+export default TooltipPlacements;
+```
+
+## Arrow, color, and controlled visibility
+
+```tsx preview
+import { Button, Stack, Tooltip } from '@rockshin/tao-ui';
+
+function TooltipStyles() {
+  return (
+    <Stack direction="horizontal" gap="md">
+      <Tooltip title="No arrow" arrow={false}><Button variant="secondary">No arrow</Button></Tooltip>
+      <Tooltip title="Brand color" color="#245b57"><Button variant="secondary">Custom color</Button></Tooltip>
+      <Tooltip title="Always visible" open><Button variant="secondary">Controlled</Button></Tooltip>
+    </Stack>
+  );
+}
+
+export default TooltipStyles;
+```
+
+## API
+
+<API moduleName="tooltip" />

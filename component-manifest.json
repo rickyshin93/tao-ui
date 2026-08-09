@@ -1,8 +1,100 @@
 {
   "schemaVersion": 1,
   "packageName": "@rockshin/tao-ui",
-  "generatedAt": "2026-08-02T15:18:03.266Z",
+  "generatedAt": "2026-08-09T04:37:08.262Z",
   "components": [
+    {
+      "name": "alert",
+      "displayName": "Alert",
+      "category": "Feedback",
+      "description": "Displays important contextual feedback messages with semantic status types.",
+      "exports": [
+        "Alert"
+      ],
+      "source": "src/components/alert/alert.tsx",
+      "story": "stories/alert.stories.tsx",
+      "tests": [
+        "tests/alert/alert.test.tsx"
+      ],
+      "semanticParts": [
+        "root",
+        "icon",
+        "title",
+        "description",
+        "action",
+        "close"
+      ],
+      "keywords": [
+        "alert",
+        "banner",
+        "feedback",
+        "message",
+        "notification",
+        "status"
+      ],
+      "related": [
+        "Sonner",
+        "Modal",
+        "Tag"
+      ],
+      "usage": {
+        "description": "Use Alert for persistent, page-level feedback about a state or operation. Use Sonner toasts for transient notifications.",
+        "bestPractices": [
+          "Pick the semantic type that matches the severity of the message.",
+          "Keep the title short; put detail in the description.",
+          "Enable showIcon when the alert needs to be scannable at a glance."
+        ],
+        "avoid": [
+          "Do not stack many alerts in one view; prefer a single summary.",
+          "Do not use Alert for transient feedback; use a toast instead."
+        ]
+      },
+      "props": [
+        {
+          "name": "type",
+          "type": "'success' | 'info' | 'warning' | 'error'",
+          "description": "Semantic status type controlling colors and default icon.",
+          "defaultValue": "'info'"
+        },
+        {
+          "name": "title",
+          "type": "ReactNode",
+          "description": "Bold heading line of the alert."
+        },
+        {
+          "name": "description",
+          "type": "ReactNode",
+          "description": "Secondary text rendered below the title."
+        },
+        {
+          "name": "showIcon",
+          "type": "boolean",
+          "description": "Whether to render the per-type status icon.",
+          "defaultValue": "false"
+        },
+        {
+          "name": "icon",
+          "type": "ReactNode",
+          "description": "Custom icon overriding the per-type default."
+        },
+        {
+          "name": "closable",
+          "type": "boolean",
+          "description": "Whether to show a close button that dismisses the alert.",
+          "defaultValue": "false"
+        },
+        {
+          "name": "onClose",
+          "type": "(e: MouseEvent<HTMLElement>) => void",
+          "description": "Called when the close button is clicked."
+        },
+        {
+          "name": "action",
+          "type": "ReactNode",
+          "description": "Right-side action slot, e.g. a button."
+        }
+      ]
+    },
     {
       "name": "breadcrumb",
       "displayName": "Breadcrumb",
@@ -387,6 +479,76 @@
       }
     },
     {
+      "name": "form",
+      "displayName": "Form",
+      "category": "Data Entry",
+      "description": "Collects and validates field values with an antd-aligned API (rules, dependencies, Form.List) on top of the rc-form engine.",
+      "exports": [
+        "Form"
+      ],
+      "source": "src/components/form/form.tsx",
+      "story": "stories/form.stories.tsx",
+      "tests": [
+        "tests/form/form.test.tsx"
+      ],
+      "semanticParts": [
+        "root"
+      ],
+      "keywords": [
+        "form",
+        "validation",
+        "rules",
+        "submit"
+      ],
+      "related": [
+        "FormField",
+        "FormSection",
+        "FormActions",
+        "Input"
+      ],
+      "usage": {
+        "description": "Use Form with Form.Item when fields need a value store, rule validation, or submit handling. Use the lighter FormField when you manage state yourself.",
+        "bestPractices": [
+          "Declare validation as rules on Form.Item; the required mark is inferred from rules.",
+          "Use dependencies for cross-field rules such as password confirmation.",
+          "Use Form.useForm() for imperative control (setFieldsValue, resetFields, submit).",
+          "Set size or disabled on Form to cascade them to every control inside."
+        ],
+        "avoid": [
+          "Do not bind the same name in two mounted Form.Items.",
+          "Do not mix manual value/onChange props with a bound Form.Item on the same control."
+        ]
+      },
+      "props": [
+        {
+          "name": "initialValues",
+          "type": "Record<string, unknown>",
+          "description": "Seed values for the form store."
+        },
+        {
+          "name": "onFinish",
+          "type": "(values) => void",
+          "description": "Called with collected values after a valid submit."
+        },
+        {
+          "name": "layout",
+          "type": "'vertical' | 'horizontal'",
+          "description": "Label/control arrangement inherited by Form.Item.",
+          "defaultValue": "'vertical'"
+        },
+        {
+          "name": "Form.Item rules",
+          "type": "Rule[]",
+          "description": "Validation rules (required, pattern, min/max, validator, …), same engine as antd."
+        },
+        {
+          "name": "Form.Item help / extra",
+          "type": "ReactNode",
+          "description": "help overrides the rule message; extra renders a description below the control."
+        }
+      ]
+    },
+    {
       "name": "form-actions",
       "displayName": "FormActions",
       "category": "Data Entry",
@@ -677,7 +839,15 @@
         "avoid": [
           "Do not use nested modals for multi-step workflows."
         ]
-      }
+      },
+      "props": [
+        {
+          "name": "width",
+          "type": "number | string | TaoBreakpointMap<number | string>",
+          "description": "Dialog width; accepts a breakpoint map, largest matching breakpoint wins.",
+          "defaultValue": "520"
+        }
+      ]
     },
     {
       "name": "pagination",
@@ -712,6 +882,257 @@
           "Show total counts when they help users judge scope."
         ]
       }
+    },
+    {
+      "name": "popconfirm",
+      "displayName": "Popconfirm",
+      "category": "Feedback",
+      "description": "Shows a compact confirmation popup anchored to a trigger element, with OK and Cancel actions.",
+      "exports": [
+        "Popconfirm"
+      ],
+      "source": "src/components/popconfirm/popconfirm.tsx",
+      "story": "stories/popconfirm.stories.tsx",
+      "tests": [
+        "tests/popconfirm/popconfirm.test.tsx"
+      ],
+      "semanticParts": [
+        "content",
+        "title",
+        "description",
+        "footer",
+        "icon"
+      ],
+      "keywords": [
+        "popconfirm",
+        "confirm",
+        "popover",
+        "delete",
+        "warning"
+      ],
+      "related": [
+        "Popover",
+        "Modal",
+        "Button"
+      ],
+      "usage": {
+        "description": "Use Popconfirm for lightweight inline confirmations such as delete actions, where a full Modal would be too heavy. Use Modal.confirm for critical or complex confirmations.",
+        "bestPractices": [
+          "Keep the title to one short question; put detail in the description.",
+          "Use Popconfirm for reversible, low-risk actions anchored to the control that triggers them."
+        ],
+        "avoid": [
+          "Do not use Popconfirm for irreversible high-risk operations; use Modal.confirm instead.",
+          "Do not put forms or rich interactions inside a Popconfirm."
+        ]
+      },
+      "props": [
+        {
+          "name": "title",
+          "type": "ReactNode (required)",
+          "description": "Main question text of the confirm popup."
+        },
+        {
+          "name": "description",
+          "type": "ReactNode",
+          "description": "Secondary text shown under the title."
+        },
+        {
+          "name": "onConfirm",
+          "type": "(e?: MouseEvent<HTMLElement>) => void",
+          "description": "Called when OK is clicked; the popup also closes."
+        },
+        {
+          "name": "onCancel",
+          "type": "(e?: MouseEvent<HTMLElement>) => void",
+          "description": "Called when Cancel is clicked; the popup also closes."
+        },
+        {
+          "name": "okText",
+          "type": "ReactNode",
+          "description": "Text of the OK button.",
+          "defaultValue": "'OK'"
+        },
+        {
+          "name": "cancelText",
+          "type": "ReactNode",
+          "description": "Text of the Cancel button.",
+          "defaultValue": "'Cancel'"
+        },
+        {
+          "name": "okButtonProps",
+          "type": "ButtonProps",
+          "description": "Extra props forwarded to the OK button."
+        },
+        {
+          "name": "cancelButtonProps",
+          "type": "ButtonProps",
+          "description": "Extra props forwarded to the Cancel button."
+        },
+        {
+          "name": "icon",
+          "type": "ReactNode | null",
+          "description": "Icon shown before the title. Pass `null` to hide it. Defaults to a warning triangle."
+        },
+        {
+          "name": "disabled",
+          "type": "boolean",
+          "description": "When true, the trigger still renders but the popup never opens.",
+          "defaultValue": "false"
+        },
+        {
+          "name": "open",
+          "type": "boolean",
+          "description": "Controlled open state."
+        },
+        {
+          "name": "defaultOpen",
+          "type": "boolean",
+          "description": "Initial open state (uncontrolled).",
+          "defaultValue": "false"
+        },
+        {
+          "name": "onOpenChange",
+          "type": "(open: boolean) => void",
+          "description": "Called when the open state changes."
+        },
+        {
+          "name": "placement",
+          "type": "'top' | 'bottom' | 'left' | 'right'",
+          "description": "Popup side relative to the trigger.",
+          "defaultValue": "'top'"
+        },
+        {
+          "name": "classNames",
+          "type": "SemanticClassNames<'content' | 'title' | 'description' | 'footer' | 'icon'>",
+          "description": "Semantic per-part class name overrides."
+        },
+        {
+          "name": "styles",
+          "type": "SemanticStyles<'content' | 'title' | 'description' | 'footer' | 'icon'>",
+          "description": "Semantic per-part inline style overrides."
+        }
+      ]
+    },
+    {
+      "name": "popover",
+      "displayName": "Popover",
+      "category": "Data Display",
+      "description": "Displays a floating card with rich content anchored to a trigger element, opened by click or hover.",
+      "exports": [
+        "Popover"
+      ],
+      "source": "src/components/popover/popover.tsx",
+      "story": "stories/popover.stories.tsx",
+      "tests": [
+        "tests/popover/popover.test.tsx"
+      ],
+      "semanticParts": [
+        "root",
+        "container",
+        "title",
+        "content",
+        "arrow"
+      ],
+      "keywords": [
+        "popover",
+        "popup",
+        "floating",
+        "card",
+        "hover",
+        "click"
+      ],
+      "related": [
+        "Tooltip",
+        "Dropdown",
+        "Modal"
+      ],
+      "usage": {
+        "description": "Use Popover for rich, non-blocking contextual content behind a click or hover. Use Tooltip for short text-only hints and Modal for blocking interactions.",
+        "bestPractices": [
+          "Keep the title to one short line; put detail in the content.",
+          "Use the default hover trigger for read-only previews and trigger=\"click\" for interactive content.",
+          "Keep popup content compact; link out for long-form detail."
+        ],
+        "avoid": [
+          "Do not nest essential workflows inside a hover-only popover.",
+          "Do not chain popovers from inside another popover."
+        ]
+      },
+      "props": [
+        {
+          "name": "title",
+          "type": "ReactNode",
+          "description": "Header text of the popup."
+        },
+        {
+          "name": "content",
+          "type": "ReactNode",
+          "description": "Body content of the popup."
+        },
+        {
+          "name": "trigger",
+          "type": "'hover' | 'focus' | 'click' | 'contextMenu' | PopoverTrigger[]",
+          "description": "How the popup opens.",
+          "defaultValue": "'hover'"
+        },
+        {
+          "name": "placement",
+          "type": "'top' | 'topLeft' | 'topRight' | 'bottom' | 'bottomLeft' | 'bottomRight' | 'left' | 'leftTop' | 'leftBottom' | 'right' | 'rightTop' | 'rightBottom'",
+          "description": "Popup side relative to the trigger.",
+          "defaultValue": "'top'"
+        },
+        {
+          "name": "open",
+          "type": "boolean",
+          "description": "Controlled open state."
+        },
+        {
+          "name": "defaultOpen",
+          "type": "boolean",
+          "description": "Initial open state (uncontrolled).",
+          "defaultValue": "false"
+        },
+        {
+          "name": "onOpenChange",
+          "type": "(open: boolean) => void",
+          "description": "Called when the open state changes."
+        },
+        {
+          "name": "mouseEnterDelay",
+          "type": "number",
+          "description": "Delay in seconds before a hover opens the popup.",
+          "defaultValue": "0.1"
+        },
+        {
+          "name": "mouseLeaveDelay",
+          "type": "number",
+          "description": "Delay in seconds before a hover closes the popup.",
+          "defaultValue": "0.1"
+        },
+        {
+          "name": "arrow",
+          "type": "boolean | { pointAtCenter?: boolean }",
+          "description": "Whether to render a pointing arrow on the popup.",
+          "defaultValue": "true"
+        },
+        {
+          "name": "destroyOnHidden",
+          "type": "boolean",
+          "description": "Unmount the popup content while closed. When false, the content is kept mounted and hidden.",
+          "defaultValue": "false"
+        },
+        {
+          "name": "classNames",
+          "type": "SemanticClassNames<'root' | 'container' | 'title' | 'content' | 'arrow'>",
+          "description": "Semantic per-part class name overrides."
+        },
+        {
+          "name": "styles",
+          "type": "SemanticStyles<'root' | 'container' | 'title' | 'content' | 'arrow'>",
+          "description": "Semantic per-part inline style overrides."
+        }
+      ]
     },
     {
       "name": "radio",
@@ -1028,9 +1449,30 @@
         "description": "Use Stack for simple one-dimensional layout and spacing.",
         "bestPractices": [
           "Prefer Stack over one-off margin rules for repeated spacing.",
-          "Use semantic containers when the layout has richer meaning."
+          "Use semantic containers when the layout has richer meaning.",
+          "Pass breakpoint maps (e.g. direction={{ xs: 'vertical', md: 'horizontal' }}) for responsive layouts."
         ]
-      }
+      },
+      "props": [
+        {
+          "name": "direction",
+          "type": "TaoResponsiveValue<'vertical' | 'horizontal'>",
+          "description": "Flex direction; accepts a breakpoint map resolved via useBreakpoint.",
+          "defaultValue": "'vertical'"
+        },
+        {
+          "name": "gap",
+          "type": "TaoResponsiveValue<'sm' | 'md' | 'lg'>",
+          "description": "Spacing between children; accepts a breakpoint map.",
+          "defaultValue": "'md'"
+        },
+        {
+          "name": "align",
+          "type": "TaoResponsiveValue<'start' | 'center' | 'end' | 'stretch'>",
+          "description": "Cross-axis alignment; accepts a breakpoint map.",
+          "defaultValue": "'stretch'"
+        }
+      ]
     },
     {
       "name": "switch",
@@ -1108,7 +1550,8 @@
         "bestPractices": [
           "Keep columns focused on the task.",
           "Use stable row keys.",
-          "Control sorting and pagination when data is remote."
+          "Control sorting and pagination when data is remote.",
+          "Gate secondary columns with column.responsive (e.g. ['lg']) instead of hand-rolled media queries."
         ],
         "avoid": [
           "Do not use Table for card-like content where comparison is not important."
@@ -1249,7 +1692,17 @@
         {
           "name": "theme",
           "type": "TaoThemeConfig",
-          "description": "Seed token overrides for the provider scope."
+          "description": "Seed token overrides for the provider scope; also carries mode, compact density, and per-component token overrides."
+        },
+        {
+          "name": "theme.compact",
+          "type": "boolean",
+          "description": "Compact density: control height 32→28 and paddings one notch tighter, cascades like mode."
+        },
+        {
+          "name": "theme.components",
+          "type": "TaoComponentTokenMap",
+          "description": "Per-component token overrides (Button/Input/FormField), serialized to --tao-{component}-* CSS variables."
         }
       ]
     },
@@ -1286,6 +1739,81 @@
           "Use maxLength when limits are strict."
         ]
       }
+    },
+    {
+      "name": "tooltip",
+      "displayName": "Tooltip",
+      "category": "Data Display",
+      "description": "Shows a brief informational popup when hovering or focusing an element.",
+      "exports": [
+        "Tooltip"
+      ],
+      "source": "src/components/tooltip/tooltip.tsx",
+      "story": "stories/tooltip.stories.tsx",
+      "tests": [
+        "tests/tooltip/tooltip.test.tsx"
+      ],
+      "semanticParts": [
+        "content",
+        "arrow"
+      ],
+      "keywords": [
+        "hover",
+        "hint",
+        "popup",
+        "infotip"
+      ],
+      "related": [
+        "Dropdown",
+        "Modal"
+      ],
+      "usage": {
+        "description": "Use Tooltip for short contextual hints on hover or focus. The popup is portaled and inherits the TaoProvider theme.",
+        "bestPractices": [
+          "Keep tooltip text short and supplementary.",
+          "Wrap exactly one focusable trigger element."
+        ],
+        "avoid": [
+          "Do not put critical information or interactive content inside a Tooltip."
+        ]
+      },
+      "props": [
+        {
+          "name": "title",
+          "type": "ReactNode",
+          "description": "Tooltip content; null, undefined or empty string disables the tooltip.",
+          "required": true
+        },
+        {
+          "name": "placement",
+          "type": "'top' | 'bottom' | 'left' | 'right'",
+          "description": "Popup side relative to the trigger.",
+          "defaultValue": "'top'"
+        },
+        {
+          "name": "arrow",
+          "type": "boolean",
+          "description": "Show the arrow pointing at the trigger.",
+          "defaultValue": "true"
+        },
+        {
+          "name": "mouseEnterDelay",
+          "type": "number",
+          "description": "Hover delay in seconds before opening.",
+          "defaultValue": "0.1"
+        },
+        {
+          "name": "mouseLeaveDelay",
+          "type": "number",
+          "description": "Delay in seconds before a pointer-leave closes the tooltip; re-entering cancels the close. Esc/blur closes stay immediate.",
+          "defaultValue": "0.1"
+        },
+        {
+          "name": "color",
+          "type": "string",
+          "description": "Custom content background color."
+        }
+      ]
     }
   ]
 }

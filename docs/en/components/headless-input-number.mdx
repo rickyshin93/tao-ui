@@ -1,0 +1,97 @@
+---
+title: HeadlessInputNumber
+description: "Headless numeric input primitives and hook for custom number entry experiences. Includes usage guidance, a runnable example, and the complete API reference."
+---
+
+Headless numeric input primitives and hook for custom number entry experiences.
+
+## When to use
+
+Use the headless API when tao-ui styling is not appropriate but number formatting behavior should stay consistent.
+
+**Recommended**
+
+- Use useNumberInput for fully custom rendering.
+- Reuse the validation helpers for parity with the styled InputNumber.
+
+**Avoid**
+
+- Do not use the component outside its intended interaction model.
+
+## Basic usage
+
+```tsx preview
+import { HeadlessInputNumber } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+function HeadlessInputNumberExample() {
+  const [value, setValue] = useState('');
+
+  return (
+    <HeadlessInputNumber
+      value={value}
+      onChange={setValue}
+      prefix="$"
+      decimalPlaces={2}
+      thousandsSeparator=","
+      placeholder="Enter amount"
+    />
+  );
+}
+
+export default HeadlessInputNumberExample;
+```
+
+## Formatting and affixes
+
+```tsx preview
+import { HeadlessInputNumber, Stack } from '@rockshin/tao-ui';
+
+function HeadlessNumberFormats() {
+  return (
+    <Stack gap="md">
+      <HeadlessInputNumber
+        defaultValue="1234567.5"
+        prefix="$"
+        suffix="USD"
+        decimalPlaces={2}
+        thousandsSeparator=","
+      />
+      <HeadlessInputNumber
+        defaultValue="0.275"
+        isPercentage
+        suffix="%"
+        decimalPlaces={1}
+      />
+    </Stack>
+  );
+}
+
+export default HeadlessNumberFormats;
+```
+
+## Locale separators and bounds
+
+```tsx preview
+import { HeadlessInputNumber, Stack } from '@rockshin/tao-ui';
+
+function HeadlessNumberConstraints() {
+  return (
+    <Stack gap="md">
+      <HeadlessInputNumber
+        defaultValue="1234.5"
+        thousandsSeparator="."
+        decimalSeparator=","
+        decimalPlaces={2}
+      />
+      <HeadlessInputNumber defaultValue="50" min={0} max={100} suffix=" units" />
+    </Stack>
+  );
+}
+
+export default HeadlessNumberConstraints;
+```
+
+## API
+
+<API moduleName="headless-input-number" />

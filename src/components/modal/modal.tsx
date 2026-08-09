@@ -7,6 +7,11 @@ import {
   useRef,
 } from 'react';
 import { TaoPortalScope } from '../../provider/tao-provider';
+import {
+  resolveResponsiveValue,
+  type TaoBreakpointMap,
+  useBreakpoint,
+} from '../../utils/breakpoint';
 import { preventParentOutsideDismiss } from '../../utils/portal';
 import {
   cx,
@@ -50,7 +55,12 @@ export interface ModalProps {
   okButtonProps?: ButtonProps;
   /** Extra props forwarded to the default Cancel button. */
   cancelButtonProps?: ButtonProps;
-  width?: number | string;
+  /**
+   * Dialog width. Accepts a breakpoint map, e.g.
+   * `width={{ xs: '100%', md: 640 }}` — the largest matching breakpoint wins,
+   * falling back to the 520px default when no entry matches.
+   */
+  width?: number | string | TaoBreakpointMap<number | string>;
   /** Vertically center the dialog. Defaults to true. */
   centered?: boolean;
   /** Show the close (×) button. Defaults to true. */
@@ -99,8 +109,12 @@ export function Modal({
     prevOpen.current = open;
   }, [open, afterClose]);
 
+  const screens = useBreakpoint();
+  const resolvedWidth = resolveResponsiveValue(width, screens) ?? 520;
+
   const contentStyle: CSSProperties = {
-    width: typeof width === 'number' ? `${width}px` : width,
+    width:
+      typeof resolvedWidth === 'number' ? `${resolvedWidth}px` : resolvedWidth,
     ...stylesProp?.root,
   };
 

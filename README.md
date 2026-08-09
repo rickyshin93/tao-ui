@@ -78,18 +78,29 @@ import '@fontsource/geist-mono/400.css';
 | General | `Button` |
 | Layout | `Stack`, `FormLayout`, `Splitter` |
 | Navigation | `Tabs`, `Pagination`, `Breadcrumb`, `Menu`, `Dropdown`, `ContextMenu` |
-| Data Entry | `Input`, `Textarea`, `InputNumber`, `Select`, `Checkbox`, `Radio`, `Switch`, `DatePicker`, `RangePicker`, `FormField`, `FormSection`, `FormActions` |
-| Data Display | `Table`, `Tag`, `ScrollArea`, `Collapsible` |
-| Feedback | `Modal`, `Drawer`, `Sonner`, `Spinner` |
-| Config | `TaoProvider`, `useTaoConfig` |
+| Data Entry | `Form`, `Input`, `Textarea`, `InputNumber`, `Select`, `Checkbox`, `Radio`, `Switch`, `DatePicker`, `RangePicker`, `FormField`, `FormSection`, `FormActions` |
+| Data Display | `Table`, `Tag`, `ScrollArea`, `Collapsible`, `Tooltip`, `Popover` |
+| Feedback | `Modal`, `Drawer`, `Sonner`, `Spinner`, `Alert`, `Popconfirm` |
+| Config | `TaoProvider`, `useTaoConfig`, `useTaoToken` |
+
+Responsive helpers: `useBreakpoint`, `useIsMobile`, plus breakpoint-map props on
+`Stack` (`direction`/`gap`/`align`), `Modal` (`width`), and `Table` (column
+`responsive`). `Select` / `DatePicker` / `RangePicker` render as bottom drawers
+on phones automatically.
 
 Headless utilities: `useNumberInput` / `NumberInput`, and the `cx` semantic-class helper.
 
-Package metadata and token helpers use explicit subpath imports:
+Token helpers are available from the package root or the dedicated subpath:
+
+```ts
+import { tokenVar, taoTokenNames, useTaoToken } from '@rockshin/tao-ui';
+// or: import { taoTokenNames, tokenVar } from '@rockshin/tao-ui/tokens';
+```
+
+Package metadata uses an explicit subpath import:
 
 ```ts
 import { componentDocs, getComponentDoc } from '@rockshin/tao-ui/meta';
-import { taoTokenNames, tokenVar } from '@rockshin/tao-ui/tokens';
 ```
 
 ## License

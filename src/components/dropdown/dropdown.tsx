@@ -232,9 +232,7 @@ export function Dropdown(props: DropdownProps) {
             sideOffset={4}
             {...hoverProps}
           >
-            {arrow && (
-              <RD.Arrow data-tao-dropdown-arrow="" width={12} height={6} />
-            )}
+            {arrow && <RD.Arrow asChild><span data-tao-dropdown-arrow="" /></RD.Arrow>}
             {content}
           </RD.Content>
         </TaoPortalScope>

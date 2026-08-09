@@ -1,0 +1,95 @@
+---
+title: Splitter
+description: 通过可拖动分隔条调整相邻面板尺寸。页面涵盖适用场景、设计建议、多组可运行示例、交互状态与完整 API 参考。
+---
+
+通过可拖动分隔条调整相邻面板尺寸。
+
+## 何时使用
+
+用户需要在多个工作区域之间动态分配空间时使用 Splitter。
+
+**推荐**
+
+- 设置合理的最小尺寸。
+- 可折叠面板必须保留可发现入口。
+
+**避免**
+
+- 移动端或简单阅读页不要滥用分隔面板。
+
+## 基础用法
+
+```tsx preview
+import { Splitter } from '@rockshin/tao-ui';
+
+function SplitterExample() {
+  return (
+    <div style={{ height: 220, border: '1px solid var(--tao-color-border-secondary)' }}>
+      <Splitter>
+        <Splitter.Panel defaultSize="40%">
+          <div style={{ padding: 16 }}>Navigation</div>
+        </Splitter.Panel>
+        <Splitter.Panel>
+          <div style={{ padding: 16 }}>Content</div>
+        </Splitter.Panel>
+      </Splitter>
+    </div>
+  );
+}
+
+export default SplitterExample;
+```
+
+## 垂直与多面板
+
+```tsx preview
+import { Splitter } from '@rockshin/tao-ui';
+
+function SplitterLayouts() {
+  return (
+    <div style={{ height: 280, border: '1px solid var(--tao-color-border-secondary)' }}>
+      <Splitter orientation="vertical">
+        <Splitter.Panel defaultSize="35%" min={60}>
+          <div style={{ padding: 16 }}>Preview</div>
+        </Splitter.Panel>
+        <Splitter.Panel min={80}>
+          <div style={{ padding: 16 }}>Editor</div>
+        </Splitter.Panel>
+        <Splitter.Panel defaultSize="25%" min={60}>
+          <div style={{ padding: 16 }}>Console</div>
+        </Splitter.Panel>
+      </Splitter>
+    </div>
+  );
+}
+
+export default SplitterLayouts;
+```
+
+## 可折叠面板
+
+```tsx preview
+import { Splitter } from '@rockshin/tao-ui';
+
+function CollapsibleSplitter() {
+  return (
+    <div style={{ height: 220, border: '1px solid var(--tao-color-border-secondary)' }}>
+      <Splitter>
+        <Splitter.Panel defaultSize="30%" collapsible min={0}>
+          <div style={{ padding: 16 }}>Collapsible navigation</div>
+        </Splitter.Panel>
+        <Splitter.Panel>
+          <div style={{ padding: 16 }}>Main content</div>
+        </Splitter.Panel>
+      </Splitter>
+    </div>
+  );
+}
+
+export default CollapsibleSplitter;
+```
+
+## API
+
+<API moduleName="splitter" />

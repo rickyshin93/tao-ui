@@ -1,0 +1,103 @@
+---
+title: DatePicker
+description: 输入或选择单个日期，并可选择时间。页面涵盖适用场景、设计建议、多组可运行示例、交互状态与完整 API 参考。
+---
+
+输入或选择单个日期，并可选择时间。
+
+## 何时使用
+
+自由文本日期容易出错，或用户需要日历上下文时使用 DatePicker。
+
+**推荐**
+
+- 熟悉日期的用户应能直接键盘输入。
+- 常用相对日期可以提供预设。
+
+**避免**
+
+- 选择久远日期时，不要强迫用户只能逐月翻阅日历。
+
+## 基础用法
+
+```tsx preview
+import { DatePicker, FormField } from '@rockshin/tao-ui';
+import type { Dayjs } from 'dayjs';
+import { useState } from 'react';
+
+function DatePickerExample() {
+  const [value, setValue] = useState<Dayjs | null>(null);
+
+  return (
+    <FormField label="Start date">
+      <DatePicker value={value} onChange={setValue} placeholder="Select a date" />
+    </FormField>
+  );
+}
+
+export default DatePickerExample;
+```
+
+## 选择模式
+
+```tsx preview
+import { DatePicker, Stack } from '@rockshin/tao-ui';
+import type { Dayjs } from 'dayjs';
+import { useState } from 'react';
+
+function DatePickerModes() {
+  const [date, setDate] = useState<Dayjs | null>(null);
+  const [month, setMonth] = useState<Dayjs | null>(null);
+  const [year, setYear] = useState<Dayjs | null>(null);
+
+  return (
+    <Stack gap="md" style={{ maxWidth: 320 }}>
+      <DatePicker value={date} onChange={setDate} picker="date" placeholder="Select date" />
+      <DatePicker value={month} onChange={setMonth} picker="month" placeholder="Select month" />
+      <DatePicker value={year} onChange={setYear} picker="year" placeholder="Select year" />
+    </Stack>
+  );
+}
+
+export default DatePickerModes;
+```
+
+## 时间、预设与禁用日期
+
+```tsx preview
+import { DatePicker, Stack } from '@rockshin/tao-ui';
+import dayjs, { type Dayjs } from 'dayjs';
+import { useState } from 'react';
+
+function AdvancedDatePicker() {
+  const [dateTime, setDateTime] = useState<Dayjs | null>(null);
+  const [preset, setPreset] = useState<Dayjs | null>(null);
+  const [future, setFuture] = useState<Dayjs | null>(null);
+
+  return (
+    <Stack gap="md" style={{ maxWidth: 320 }}>
+      <DatePicker value={dateTime} onChange={setDateTime} showTime placeholder="Select date and time" />
+      <DatePicker
+        value={preset}
+        onChange={setPreset}
+        presets={[
+          { label: 'Today', value: dayjs() },
+          { label: 'Tomorrow', value: dayjs().add(1, 'day') },
+        ]}
+      />
+      <DatePicker
+        value={future}
+        onChange={setFuture}
+        disabledDate={(current) => current.isBefore(dayjs().startOf('day'))}
+        placeholder="Future dates only"
+      />
+    </Stack>
+  );
+}
+
+export default AdvancedDatePicker;
+```
+
+## API
+
+<API moduleName="date-picker" />

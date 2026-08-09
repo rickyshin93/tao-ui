@@ -7,6 +7,7 @@ import type {
   ThHTMLAttributes,
 } from 'react';
 import type { TaoSize, TaoVariant } from '../../provider/tao-provider';
+import type { TaoBreakpoint } from '../../utils/breakpoint';
 import type { SemanticClassNames, SemanticStyles } from '../../utils/semantic';
 
 export type TableRecord = object;
@@ -53,6 +54,12 @@ export interface TableColumn<T extends TableRecord = Record<string, unknown>> {
   filters?: TableFilterItem[];
   onFilter?: (value: string, record: T) => boolean;
   filteredValue?: string[];
+  /**
+   * Show this column only when at least one listed breakpoint matches the
+   * current viewport (antd `ColumnType.responsive` semantics), e.g.
+   * `responsive: ['lg']` hides the column on small screens.
+   */
+  responsive?: TaoBreakpoint[];
 }
 
 export interface TableRowSelection<

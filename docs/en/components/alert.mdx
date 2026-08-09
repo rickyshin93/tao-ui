@@ -1,0 +1,93 @@
+---
+title: Alert
+description: "Displays important contextual feedback messages with semantic status types. Includes usage guidance, a runnable example, and the complete API reference."
+---
+
+Displays important contextual feedback messages with semantic status types.
+
+## When to use
+
+Use Alert for persistent, page-level feedback about a state or operation. Use Sonner toasts for transient notifications.
+
+**Recommended**
+
+- Pick the semantic type that matches the severity of the message.
+- Keep the title short; put detail in the description.
+- Enable showIcon when the alert needs to be scannable at a glance.
+
+**Avoid**
+
+- Do not stack many alerts in one view; prefer a single summary.
+- Do not use Alert for transient feedback; use a toast instead.
+
+## Basic usage
+
+```tsx preview
+import { Alert, Stack } from '@rockshin/tao-ui';
+
+function AlertExample() {
+  return (
+    <Stack gap="md">
+      <Alert type="success" title="Changes saved" showIcon />
+      <Alert type="info" title="New version available" description="Refresh when you are ready." showIcon />
+      <Alert type="warning" title="Subscription expires soon" showIcon />
+      <Alert type="error" title="Could not save changes" showIcon />
+    </Stack>
+  );
+}
+
+export default AlertExample;
+```
+
+## Descriptions and icons
+
+```tsx preview
+import { Alert, Stack } from '@rockshin/tao-ui';
+
+function DetailedAlerts() {
+  return (
+    <Stack gap="md">
+      <Alert type="success" title="Deployment complete" description="Production is running version 0.0.25." showIcon />
+      <Alert type="info" title="Update available" description="Refresh when you are ready." showIcon />
+      <Alert type="warning" title="Quota almost reached" description="Storage is 92% full." showIcon />
+      <Alert type="error" title="Build failed" description="Fix the type errors and run again." showIcon />
+    </Stack>
+  );
+}
+
+export default DetailedAlerts;
+```
+
+## Closable alerts and actions
+
+```tsx preview
+import { Alert, Button, Stack } from '@rockshin/tao-ui';
+
+function ActionAlerts() {
+  return (
+    <Stack gap="md">
+      <Alert type="info" title="Closable message" closable showIcon />
+      <Alert
+        type="warning"
+        title="Payment method expires soon"
+        description="Update it before the next billing date."
+        showIcon
+        action={<Button size="small" variant="secondary">Update</Button>}
+      />
+      <Alert
+        type="error"
+        title="Connection lost"
+        action={<Button size="small">Retry</Button>}
+        closable
+        showIcon
+      />
+    </Stack>
+  );
+}
+
+export default ActionAlerts;
+```
+
+## API
+
+<API moduleName="alert" />

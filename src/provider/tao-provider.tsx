@@ -7,6 +7,7 @@ import {
   useMemo,
   useRef,
 } from 'react';
+import { type TaoTokenName, taoTokenVars } from '../theme/tokens';
 
 // ---- Seed Token ----
 
@@ -35,6 +36,61 @@ export interface TaoSeedToken {
 
 export type TaoThemeMode = 'light' | 'dark';
 
+// ---- Component Tokens (DESIGN.md §3.6) ----
+// Serialized to `--tao-{component}-{kebab-key}` CSS custom properties;
+// component CSS consumes them via `var(--tao-button-x, <default>)` chains.
+// Number values are emitted in px, except unitless props (fontWeight).
+
+export interface ButtonComponentToken {
+  fontWeight?: CSSProperties['fontWeight'];
+  borderRadius?: number;
+  paddingInline?: number;
+  paddingInlineSM?: number;
+  paddingInlineLG?: number;
+  primaryColor?: string;
+  primaryShadow?: string;
+  defaultColor?: string;
+  defaultBg?: string;
+  defaultBorderColor?: string;
+  defaultHoverBg?: string;
+  defaultHoverColor?: string;
+  defaultHoverBorderColor?: string;
+  contentFontSize?: number;
+  contentFontSizeSM?: number;
+  contentFontSizeLG?: number;
+}
+
+export interface InputComponentToken {
+  paddingInline?: number;
+  paddingInlineSM?: number;
+  paddingInlineLG?: number;
+  hoverBorderColor?: string;
+  activeBorderColor?: string;
+  activeShadow?: string;
+  errorActiveShadow?: string;
+  hoverBg?: string;
+  activeBg?: string;
+  inputFontSize?: number;
+  inputFontSizeSM?: number;
+  inputFontSizeLG?: number;
+}
+
+export interface FormFieldComponentToken {
+  labelColor?: string;
+  labelFontSize?: number;
+  labelRequiredMarkColor?: string;
+  itemGap?: number;
+  descriptionColor?: string;
+  errorColor?: string;
+  errorFontSize?: number;
+}
+
+export interface TaoComponentTokenMap {
+  Button?: ButtonComponentToken;
+  Input?: InputComponentToken;
+  FormField?: FormFieldComponentToken;
+}
+
 export interface TaoThemeConfig {
   token?: Partial<TaoSeedToken>;
   /**
@@ -47,6 +103,14 @@ export interface TaoThemeConfig {
    * 零 runtime 放弃此路径）。需要亮/暗混排时，把亮部移出 dark provider。
    */
   mode?: TaoThemeMode;
+  /**
+   * 紧凑密度。true 时输出 data-tao-density="compact"，激活 theme.css 的
+   * compact scope（控件高度 32→28、padding/margin 各降一档）。经 context
+   * 级联，portal 浮层透传。与 antd compactAlgorithm 对应，纯 CSS 实现。
+   */
+  compact?: boolean;
+  /** Per-component token overrides (DESIGN.md §3.6). */
+  components?: TaoComponentTokenMap;
   inherit?: boolean;
 }
 
@@ -62,6 +126,8 @@ export interface TaoConfig {
   variant: TaoVariant;
   /** Resolved 明暗模式，portal 浮层用它重建 data-tao-theme。 */
   mode: TaoThemeMode;
+  /** Resolved 紧凑密度，portal 浮层用它重建 data-tao-density。 */
+  compact: boolean;
 }
 
 interface TaoConfigContextValue extends TaoConfig {
@@ -78,19 +144,35 @@ const TaoConfigContext = createContext<TaoConfigContextValue>({
   disabled: false,
   variant: 'outlined',
   mode: 'light',
+  compact: false,
   tokenStyle: {},
 });
 
 export function useTaoConfig(): TaoConfig {
-  const { size, disabled, variant, mode } = useContext(TaoConfigContext);
+  const { size, disabled, variant, mode, compact } = useContext(TaoConfigContext);
   return useMemo(
-    () => ({ size, disabled, variant, mode }),
-    [size, disabled, variant, mode],
+    () => ({ size, disabled, variant, mode, compact }),
+    [size, disabled, variant, mode, compact],
   );
 }
 
 function useTaoInternalConfig(): TaoConfigContextValue {
   return useContext(TaoConfigContext);
+}
+
+/**
+ * antd `theme.useToken` counterpart, zero-runtime edition: returns every
+ * design token as a `var(--tao-*)` reference string, so custom components can
+ * stay visually consistent with tao-ui and still resolve in the browser
+ * against the live theme (dark mode, seed overrides, compact density):
+ *
+ * ```tsx
+ * const { token } = useTaoToken();
+ * <div style={{ borderRadius: token['--tao-radius-lg'], padding: token['--tao-padding-lg'] }} />
+ * ```
+ */
+export function useTaoToken(): { token: Record<TaoTokenName, string> } {
+  return useMemo(() => ({ token: taoTokenVars }), []);
 }
 
 /**
@@ -115,13 +197,15 @@ export function TaoPortalScope({
   style?: CSSProperties;
   asChild?: boolean;
 }) {
-  const { tokenStyle, mode } = useTaoInternalConfig();
+  const { tokenStyle, mode, compact } = useTaoInternalConfig();
   const themeAttr = mode === 'light' ? undefined : { 'data-tao-theme': mode };
+  const densityAttr = compact ? { 'data-tao-density': 'compact' } : undefined;
   if (asChild) {
     return (
       <Slot
         data-tao-provider=""
         {...themeAttr}
+        {...densityAttr}
         style={{ ...tokenStyle, ...style }}
       >
         {children}
@@ -132,6 +216,7 @@ export function TaoPortalScope({
     <div
       data-tao-provider=""
       {...themeAttr}
+      {...densityAttr}
       style={{ display: 'contents', ...tokenStyle, ...style }}
     >
       {children}
@@ -199,17 +284,30 @@ const DEFAULT_TOKEN_STYLE = {
 } as CSSProperties;
 
 /**
- * Stable memoization key for theme.token: users routinely inline
+ * Stable memoization key for theme.token/components: users routinely inline
  * `theme={{ token: {...} }}` — a fresh object every render — which would
  * otherwise cascade through ownVars → tokenStyle → config and force every
  * `useTaoConfig()` consumer to rerender on every parent render.
  */
-function useStableTokenKey(token: Partial<TaoSeedToken> | undefined): string {
-  const key = JSON.stringify(token ?? null);
+function useStableThemeKey(
+  token: Partial<TaoSeedToken> | undefined,
+  components: TaoComponentTokenMap | undefined,
+): string {
+  const key = JSON.stringify({ token: token ?? null, components: components ?? null });
   const ref = useRef(key);
   if (ref.current !== key) ref.current = key;
   return ref.current;
 }
+
+/** camelCase / PascalCase → kebab-case (`paddingInlineSM` → `padding-inline-sm`). */
+function kebabCase(key: string): string {
+  return key
+    .replace(/[A-Z]+/g, (match) => `-${match.toLowerCase()}`)
+    .replace(/^-/, '');
+}
+
+/** Component token keys whose numeric values stay unitless. */
+const UNITLESS_COMPONENT_TOKEN_KEYS = new Set(['fontWeight']);
 
 export function TaoProvider({
   theme,
@@ -220,38 +318,58 @@ export function TaoProvider({
 }: TaoProviderProps) {
   const parentConfig = useContext(TaoConfigContext);
   const inherit = theme?.inherit ?? true;
-  const token = theme?.token;
-  const tokenKey = useStableTokenKey(token);
+  const themeKey = useStableThemeKey(theme?.token, theme?.components);
 
   const ownVars = useMemo(() => {
-    const parsedToken = JSON.parse(tokenKey) as Partial<TaoSeedToken> | null;
-    if (!parsedToken) return undefined;
+    const parsedTheme = JSON.parse(themeKey) as {
+      token: Partial<TaoSeedToken> | null;
+      components: TaoComponentTokenMap | null;
+    };
+    const parsedToken = parsedTheme.token;
+    if (!parsedToken && !parsedTheme.components) return undefined;
 
     const vars: Record<string, string> = {};
 
-    for (const [key, varName] of Object.entries(TOKEN_TO_VAR)) {
-      const val = parsedToken[key as keyof TaoSeedToken];
-      if (val != null) vars[varName] = String(val);
+    if (parsedToken) {
+      for (const [key, varName] of Object.entries(TOKEN_TO_VAR)) {
+        const val = parsedToken[key as keyof TaoSeedToken];
+        if (val != null) vars[varName] = String(val);
+      }
+
+      for (const [key, varName] of Object.entries(TOKEN_TO_VAR_PX)) {
+        const val = parsedToken[key as keyof TaoSeedToken];
+        if (val != null) vars[varName] = `${val}px`;
+      }
+
+      for (const [key, varName] of Object.entries(TOKEN_TO_VAR_NUMBER)) {
+        const val = parsedToken[key as keyof TaoSeedToken];
+        if (val != null) vars[varName] = String(val);
+      }
+
+      if (parsedToken.motion === false) {
+        vars['--tao-motion-unit'] = '0s';
+      } else if (parsedToken.motionUnit != null) {
+        vars['--tao-motion-unit'] = `${parsedToken.motionUnit}s`;
+      }
     }
 
-    for (const [key, varName] of Object.entries(TOKEN_TO_VAR_PX)) {
-      const val = parsedToken[key as keyof TaoSeedToken];
-      if (val != null) vars[varName] = `${val}px`;
-    }
-
-    for (const [key, varName] of Object.entries(TOKEN_TO_VAR_NUMBER)) {
-      const val = parsedToken[key as keyof TaoSeedToken];
-      if (val != null) vars[varName] = String(val);
-    }
-
-    if (parsedToken.motion === false) {
-      vars['--tao-motion-unit'] = '0s';
-    } else if (parsedToken.motionUnit != null) {
-      vars['--tao-motion-unit'] = `${parsedToken.motionUnit}s`;
+    // Component tokens → `--tao-button-border-radius` style overrides
+    if (parsedTheme.components) {
+      for (const [component, tokens] of Object.entries(parsedTheme.components)) {
+        if (!tokens) continue;
+        for (const [key, value] of Object.entries(tokens)) {
+          if (value == null) continue;
+          const varName = `--tao-${kebabCase(component)}-${kebabCase(key)}`;
+          vars[varName] =
+            typeof value === 'number' && !UNITLESS_COMPONENT_TOKEN_KEYS.has(key)
+              ? `${value}px`
+              : String(value);
+        }
+      }
     }
 
     return vars;
-  }, [tokenKey]);
+  }, [themeKey]);
 
   const scopedVars = useMemo<CSSProperties>(
     () => (inherit ? { ...ownVars } : { ...DEFAULT_TOKEN_STYLE, ...ownVars }),
@@ -281,7 +399,9 @@ export function TaoProvider({
   const parentDisabled = parentConfig.disabled;
   const parentVariant = parentConfig.variant;
   const parentMode = parentConfig.mode;
+  const parentCompact = parentConfig.compact;
   const mode = theme?.mode ?? (inherit ? parentMode : 'light');
+  const compact = theme?.compact ?? (inherit ? parentCompact : false);
 
   const config = useMemo<TaoConfigContextValue>(
     () => ({
@@ -289,6 +409,7 @@ export function TaoProvider({
       disabled: disabled ?? (inherit ? parentDisabled : false),
       variant: variant ?? (inherit ? parentVariant : 'outlined'),
       mode,
+      compact,
       tokenStyle,
     }),
     [
@@ -300,6 +421,7 @@ export function TaoProvider({
       parentDisabled,
       parentVariant,
       mode,
+      compact,
       tokenStyle,
     ],
   );
@@ -310,6 +432,7 @@ export function TaoProvider({
         style={divStyle}
         data-tao-provider=""
         data-tao-theme={mode === 'light' ? undefined : mode}
+        data-tao-density={compact ? 'compact' : undefined}
       >
         {children}
       </div>

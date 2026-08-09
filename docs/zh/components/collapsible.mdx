@@ -1,0 +1,93 @@
+---
+title: Collapsible
+description: 以无障碍方式展开或收起一段内容区域。页面涵盖适用场景、设计建议、多组可运行示例、交互状态与完整 API 参考。
+---
+
+以无障碍方式展开或收起一段内容区域。
+
+## 何时使用
+
+需要隐藏次要细节，同时保持页面结构轻量时使用 Collapsible。
+
+**推荐**
+
+- 触发器标签应说明被隐藏的内容。
+- 需要与其他界面状态协调时使用受控模式。
+
+**避免**
+
+- 不要把必填表单项隐藏在没有明确提示的折叠区域中。
+
+## 基础用法
+
+```tsx preview
+import { Collapsible } from '@rockshin/tao-ui';
+
+function CollapsibleExample() {
+  return (
+    <Collapsible defaultOpen>
+      <Collapsible.Trigger>Toggle implementation details</Collapsible.Trigger>
+      <Collapsible.Content>
+        <p style={{ margin: '12px 0 0' }}>
+          The content remains mounted while its accessible disclosure state changes.
+        </p>
+      </Collapsible.Content>
+    </Collapsible>
+  );
+}
+
+export default CollapsibleExample;
+```
+
+## 受控状态
+
+```tsx preview
+import { Button, Collapsible, Stack } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+function ControlledCollapsible() {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <Stack gap="sm">
+      <Button variant="secondary" onClick={() => setOpen((value) => !value)}>
+        {open ? 'Hide' : 'Show'} release notes
+      </Button>
+      <Collapsible open={open} onOpenChange={setOpen}>
+        <Collapsible.Content>
+          Version 0.0.25 improves semantic DOM customization.
+        </Collapsible.Content>
+      </Collapsible>
+    </Stack>
+  );
+}
+
+export default ControlledCollapsible;
+```
+
+## 禁用折叠
+
+```tsx preview
+import { Collapsible, Stack } from '@rockshin/tao-ui';
+
+function DisabledCollapsible() {
+  return (
+    <Stack gap="md">
+      <Collapsible disabled>
+        <Collapsible.Trigger>Unavailable details</Collapsible.Trigger>
+        <Collapsible.Content>This content cannot be opened.</Collapsible.Content>
+      </Collapsible>
+      <Collapsible defaultOpen>
+        <Collapsible.Trigger>Open by default</Collapsible.Trigger>
+        <Collapsible.Content>Visible supporting information.</Collapsible.Content>
+      </Collapsible>
+    </Stack>
+  );
+}
+
+export default DisabledCollapsible;
+```
+
+## API
+
+<API moduleName="collapsible" />

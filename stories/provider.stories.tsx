@@ -446,3 +446,49 @@ export const LayoutTransparent: StoryObj = {
     </Stack>
   ),
 };
+
+export const ComponentTokens: StoryObj = {
+  render: () => (
+    <Stack gap="md">
+      <div style={{ fontSize: 12, color: 'var(--tao-color-text-tertiary)' }}>
+        theme.components.Button — pill radius + custom padding/font weight
+      </div>
+      <TaoProvider
+        theme={{
+          components: {
+            Button: { borderRadius: 9999, paddingInline: 24, fontWeight: 500 },
+          },
+        }}
+      >
+        <Stack direction="horizontal" gap="sm">
+          <Button variant="primary">Pill Primary</Button>
+          <Button variant="secondary">Pill Secondary</Button>
+        </Stack>
+      </TaoProvider>
+    </Stack>
+  ),
+};
+
+export const CompactDensity: StoryObj = {
+  render: () => (
+    <Stack gap="md">
+      <div style={{ fontSize: 12, color: 'var(--tao-color-text-tertiary)' }}>
+        theme.compact: control height 32→28, paddings one notch tighter
+      </div>
+      <Stack direction="horizontal" gap="lg" align="start">
+        <Stack gap="sm">
+          <b>Default</b>
+          <Input placeholder="Input" />
+          <Button variant="primary">Button</Button>
+        </Stack>
+        <TaoProvider theme={{ compact: true }}>
+          <Stack gap="sm">
+            <b>Compact</b>
+            <Input placeholder="Input" />
+            <Button variant="primary">Button</Button>
+          </Stack>
+        </TaoProvider>
+      </Stack>
+    </Stack>
+  ),
+};

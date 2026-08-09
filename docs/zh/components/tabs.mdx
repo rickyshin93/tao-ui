@@ -1,0 +1,91 @@
+---
+title: Tabs
+description: 在同一上下文中切换多个同级内容面板。页面涵盖适用场景、设计建议、多组可运行示例、交互状态与完整 API 参考。
+---
+
+在同一上下文中切换多个同级内容面板。
+
+## 何时使用
+
+内容类别同级且用户只需查看其中一个面板时使用 Tabs。
+
+**推荐**
+
+- 标签短且互不重叠。
+- 默认激活最常用或最安全的面板。
+
+**避免**
+
+- 不要用 Tabs 隐藏必须按顺序完成的步骤。
+
+## 基础用法
+
+```tsx preview
+import { Tabs } from '@rockshin/tao-ui';
+
+function TabsExample() {
+  return (
+    <Tabs
+      items={[
+        { key: 'general', label: 'General', children: 'General settings.' },
+        { key: 'security', label: 'Security', children: 'Security settings.' },
+        { key: 'billing', label: 'Billing', children: 'Billing settings.' },
+      ]}
+    />
+  );
+}
+
+export default TabsExample;
+```
+
+## 卡片变体与尺寸
+
+```tsx preview
+import { Stack, Tabs } from '@rockshin/tao-ui';
+
+const items = [
+  { key: 'general', label: 'General', children: 'General settings.' },
+  { key: 'security', label: 'Security', children: 'Security settings.' },
+];
+
+function TabVariants() {
+  return (
+    <Stack gap="lg">
+      <Tabs items={items} size="small" />
+      <Tabs items={items} variant="card" size="medium" />
+      <Tabs items={items} variant="card" size="large" />
+    </Stack>
+  );
+}
+
+export default TabVariants;
+```
+
+## 受控与禁用标签页
+
+```tsx preview
+import { Tabs } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+function ControlledTabs() {
+  const [activeKey, setActiveKey] = useState('general');
+
+  return (
+    <Tabs
+      activeKey={activeKey}
+      onChange={setActiveKey}
+      items={[
+        { key: 'general', label: 'General', children: 'General settings.' },
+        { key: 'security', label: 'Security', children: 'Security settings.' },
+        { key: 'billing', label: 'Billing', children: 'Unavailable.', disabled: true },
+      ]}
+    />
+  );
+}
+
+export default ControlledTabs;
+```
+
+## API
+
+<API moduleName="tabs" />

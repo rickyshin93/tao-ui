@@ -42,7 +42,20 @@ export const taoProviderDoc = {
     {
       name: 'theme',
       type: 'TaoThemeConfig',
-      description: 'Seed token overrides for the provider scope.',
+      description:
+        'Seed token overrides for the provider scope; also carries mode, compact density, and per-component token overrides.',
+    },
+    {
+      name: 'theme.compact',
+      type: 'boolean',
+      description:
+        'Compact density: control height 32→28 and paddings one notch tighter, cascades like mode.',
+    },
+    {
+      name: 'theme.components',
+      type: 'TaoComponentTokenMap',
+      description:
+        'Per-component token overrides (Button/Input/FormField), serialized to --tao-{component}-* CSS variables.',
     },
   ],
 } satisfies ComponentDoc;

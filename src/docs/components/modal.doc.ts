@@ -30,4 +30,13 @@ export const modalDoc = {
     ],
     avoid: ['Do not use nested modals for multi-step workflows.'],
   },
+  props: [
+    {
+      name: 'width',
+      type: 'number | string | TaoBreakpointMap<number | string>',
+      description:
+        'Dialog width; accepts a breakpoint map, largest matching breakpoint wins.',
+      defaultValue: '520',
+    },
+  ],
 } satisfies ComponentDoc;

@@ -1,0 +1,182 @@
+---
+title: Button
+description: 触发提交、保存、打开界面等即时操作。页面涵盖适用场景、设计建议、多组可运行示例、交互状态与完整 API 参考。
+---
+
+触发提交、保存、打开界面等即时操作。
+
+## 何时使用
+
+需要表达明确操作时使用 Button；它可以从 TaoProvider 继承尺寸与禁用状态。
+
+**推荐**
+
+- 每个视图或决策区域只保留一个主按钮。
+- 操作进行中使用 loading 状态。
+- 表单内显式传入原生 type。
+
+**避免**
+
+- 纯导航场景应使用链接，不要伪装成按钮。
+
+## 变体
+
+每个视图或决策区域只保留一个主操作。Secondary、ghost 与 destructive 变体用于降低或明确操作层级。
+
+```tsx preview
+import { Button } from '@rockshin/tao-ui';
+
+function ButtonVariants() {
+  return (
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
+      <Button>Primary</Button>
+      <Button variant="secondary">Secondary</Button>
+      <Button variant="ghost">Ghost</Button>
+      <Button variant="destructive">Delete</Button>
+    </div>
+  );
+}
+
+export default ButtonVariants;
+```
+
+## 尺寸
+
+密集工具栏使用 `small`，常规操作使用 `medium`，需要突出时使用 `large`。
+
+```tsx preview
+import { Button } from '@rockshin/tao-ui';
+
+function ButtonSizes() {
+  return (
+    <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 12 }}>
+      <Button size="small">Small</Button>
+      <Button>Medium</Button>
+      <Button size="large">Large</Button>
+    </div>
+  );
+}
+
+export default ButtonSizes;
+```
+
+## 加载与禁用
+
+加载按钮会设置 `aria-busy` 并阻止重复操作。图标插槽始终挂载，因此状态切换不会造成内容位移。
+
+```tsx preview
+import { useState } from 'react';
+import { Button } from '@rockshin/tao-ui';
+
+function ButtonStates() {
+  const [saving, setSaving] = useState(false);
+
+  function save() {
+    setSaving(true);
+    window.setTimeout(() => setSaving(false), 1200);
+  }
+
+  return (
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
+      <Button loading>Loading</Button>
+      <Button loading variant="secondary">Loading</Button>
+      <Button disabled>Disabled</Button>
+      <Button loading={saving} onClick={save}>Save changes</Button>
+    </div>
+  );
+}
+
+export default ButtonStates;
+```
+
+## 图标与自定义加载
+
+通过 `icon` 传入装饰性前置图标。只有内置 spinner 不符合周围视觉语言时才使用 `loadingIcon`。
+
+```tsx preview
+import { Button } from '@rockshin/tao-ui';
+
+function DownloadIcon() {
+  return (
+    <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <path d="M8 2v8m0 0 3-3m-3 3L5 7M3 13h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function ProgressIcon() {
+  return (
+    <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+      <circle cx="3" cy="8" r="1.25" />
+      <circle cx="8" cy="8" r="1.25" opacity="0.65" />
+      <circle cx="13" cy="8" r="1.25" opacity="0.35" />
+    </svg>
+  );
+}
+
+function ButtonIcons() {
+  return (
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
+      <Button icon={<DownloadIcon />}>Download</Button>
+      <Button variant="secondary" icon={<DownloadIcon />}>Export</Button>
+      <Button loading loadingIcon={<ProgressIcon />}>Processing</Button>
+    </div>
+  );
+}
+
+export default ButtonIcons;
+```
+
+## Provider 默认值
+
+Button 会从 `TaoProvider` 继承 `size` 与 `disabled`，局部属性可以覆盖继承的尺寸。
+
+```tsx preview
+import { Button, TaoProvider } from '@rockshin/tao-ui';
+
+function ButtonProviderDefaults() {
+  return (
+    <div style={{ display: 'grid', gap: 12 }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 12 }}>
+        <TaoProvider size="small">
+          <Button>Inherited small</Button>
+          <Button size="large" variant="secondary">Local large</Button>
+        </TaoProvider>
+      </div>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
+        <TaoProvider disabled>
+          <Button>Provider disabled</Button>
+          <Button variant="secondary">Also disabled</Button>
+        </TaoProvider>
+      </div>
+    </div>
+  );
+}
+
+export default ButtonProviderDefaults;
+```
+
+## 语义化定制
+
+通过稳定的 `root` 部件定制样式，无需依赖私有选择器。
+
+```tsx preview
+import { Button } from '@rockshin/tao-ui';
+
+function CustomizedButton() {
+  return (
+    <Button
+      classNames={{ root: 'checkout-button' }}
+      styles={{ root: { minWidth: 160 } }}
+    >
+      Checkout
+    </Button>
+  );
+}
+
+export default CustomizedButton;
+```
+
+## API
+
+<API moduleName="button" />

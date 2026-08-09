@@ -197,3 +197,113 @@
 - **真实行为**: Select Content 打开后会强制聚焦 option、锁定 body pointer events，并对 trigger 区域 aria-hidden；focus hack 会得到不可访问的假 input
 - **正确做法**: PC `showSearch` 使用非 modal Radix Popover + 原生 combobox input/listbox（含 single/multiple/tags）；普通 Select 继续用 Radix Select，mobile 继续 Drawer
 - **适用场景**: 任何需要在 tao-ui Select trigger 内直接编辑文本的功能
+
+## [Rspress MDX] 多行内联 JSX 文本会生成段落子节点
+- **日期**: 2026-08-09
+- **错误假设**: `<a>` 或自定义 Link 内换行书写的短文本，编译后仍是普通文本子节点。
+- **真实行为**: Rspress MDX 会把该文本包装成 `<p>`，产生 `<a><p>…</p></a>` 这类无效交互标记。
+- **正确做法**: 短链接文案与 JSX 开闭标签保持同一行，或显式传字符串表达式。
+- **适用场景**: `.mdx` 中手写链接及其他只允许 phrasing content 的 JSX 元素。
+
+## [Rspress] 生成的 llms.txt 不参与构建期路由校验
+- **日期**: 2026-08-09
+- **错误假设**: `llms: true` 生成 `/llms.txt` 后，可以在 MDX 中把它写成普通站内 Markdown 链接。
+- **真实行为**: Rspress 的 dead-link 检查只认页面路由，构建期会把 `/llms.txt` 判为死链，即使最终产物会生成该文件。
+- **正确做法**: 在文档中用代码文本标识 `/llms.txt`；若必须提供可点击入口，先单独验证不会触发路由检查的实现方式。
+- **适用场景**: Rspress `llms: true` 站点引用生成的 `llms.txt` / `llms-full.txt` 文件。
+
+## [Rspress Playground] 外部 Demo 的包依赖需要显式 include
+- **日期**: 2026-08-09
+- **错误假设**: `pluginPlayground` 会自动扫描 `file="./_demo.tsx"` 指向文件里的 import，并把 workspace 包加入浏览器运行时。
+- **真实行为**: Rspress 2.0.19 的 Playground import 扫描只覆盖内联代码块；外部 file code block 中的 `@rockshin/tao-ui` 不会进入 import map，运行时显示 `Module @rockshin/tao-ui not found`。
+- **正确做法**: 在 `pluginPlayground({ include: ['@rockshin/tao-ui'] })` 中显式加入外部 Demo 使用的包依赖。
+- **适用场景**: Rspress Playground 通过 `file=` 引用独立 Demo 文件，且 Demo import npm/workspace 包时。
+
+## [Rspress] dev 与 production build 不要共享缓存并发运行
+- **日期**: 2026-08-09
+- **错误假设**: `rspress dev` 运行时可以并发执行 `rspress build`，两者会隔离各自的 Rspack 状态。
+- **真实行为**: 两个进程会竞争同一缓存和 Playground 虚拟模块；dev 热更新可能出现 cache lock mismatch 或无法解析 `_rspress_playground_imports`。
+- **正确做法**: 浏览器验收结束后先停止 dev server，再串行执行 `bun run doc:build`；需要复验时重新冷启动 dev。
+- **适用场景**: tao-ui 文档站的 Rspress dev、production build 和 Playground 验证流程。
+
+## [Rspress] 配置热重启时不要同时停止 dev
+- **日期**: 2026-08-09
+- **错误假设**: 修改 `rspress.config.ts` 后可以立即向 `bun run doc` 发送停止信号，热重启和退出会自然串行。
+- **真实行为**: Rspress 正在重启监听器时收到停止信号，旧进程可能短暂继续占用 3000，重启进程报 `EADDRINUSE`。
+- **正确做法**: 配置变更后先等待热重启完成并确认端口稳定，再停止 dev；若已竞态，检查精确 PID/端口并等待旧监听器退出，不要盲目再次启动。
+- **适用场景**: tao-ui 修改 `rspress.config.ts` 后需要从 dev 切换到 production build 时。
+
+## [Rspress IA] Components 入口直达首个组件
+- **日期**: 2026-08-09
+- **错误假设**: 修复 `/components` 入口就该新增一个组件目录首页。
+- **真实行为**: tao-ui 当前只有 Button 文档，额外目录页增加一次无意义跳转，也偏离 Rspress 官网的直接导航方式。
+- **正确做法**: 顶栏 Components 直接链接 `/components/button`；组件未形成足够规模前不创建中间 catalog 页。
+- **适用场景**: 组件库文档的信息架构与顶栏入口设计。
+
+## [Rspress Redirect] 路由规则需要锚定
+- **日期**: 2026-08-09
+- **错误假设**: `pluginClientRedirects` 的 `from: '/components'` 只匹配完整路径。
+- **真实行为**: 规则按正则/前缀语义匹配，也会命中 `/components/button`，导致目标路径反复追加 `/button`。
+- **正确做法**: 单一路径重定向使用 `^/components/?$` 这类首尾锚定规则。
+- **适用场景**: Rspress `@rspress/plugin-client-redirects` 的精确路径跳转。
+
+## [Rspress Layout] Outline 不进入正文滚动容器
+- **日期**: 2026-08-09
+- **错误假设**: 让 `.rp-doc-layout__container` 统一滚动，能同时满足单滚动容器与三栏布局。
+- **真实行为**: Outline 是该容器的子元素，会随正文一起滚走，偏离 Rspress 官网的视口驻留行为。
+- **正确做法**: 三栏容器 `overflow: hidden`；仅中间 `.rp-doc-layout__doc` 纵向滚动，左右栏作为正常 Flex 兄弟留在视口内。
+- **适用场景**: tao-ui Rspress 文档页的左侧导航、正文和右侧目录布局。
+
+## [Rspress Layout] 全高 Flex 只用于文档页
+- **日期**: 2026-08-09
+- **错误假设**: `#__rspress_root` 可以在所有 pageType 上统一设为纵向 Flex，再分别配置滚动。
+- **真实行为**: Rspress HomeLayout 直接输出 Hero、Feature、Footer；它们成为 Flex item 后默认收缩，Feature 被压到约 20px 并裁切，首页无法完整滚动。
+- **正确做法**: 根节点默认保持普通文档流并自行滚动；仅在 `:has(.rp-doc-layout__container)` 的文档页启用全高 Flex，正文列单独滚动。
+- **适用场景**: 同时包含 `pageType: home` 与三栏 doc 页的 tao-ui Rspress 站点。
+
+## [Rspress] 默认主题是重建基线
+- **日期**: 2026-08-09
+- **错误假设**: 为了匹配官网体验，需要先重写全高滚动、导航、搜索、首页组件和文档运行时，再逐个修补差异。
+- **真实行为**: Rspress v2 默认主题已经提供首页、三栏文档、响应式导航、搜索和滚动行为；多层覆盖会制造与官网相反的布局及可访问性问题。
+- **正确做法**: 从 `pageType: home`、`_nav.json`、`_meta.json`、Preview 和 API Docgen 起步；只在明确需求且官方配置不足时按 CSS variables → BEM → Layout slots → eject 逐级扩展。
+- **适用场景**: tao-ui 文档站新建、重建及后续任何 Rspress 主题改动。
+
+## [Rspress API] API docgen 表格对齐是内联样式
+
+- **日期**: 2026-08-09
+- **错误假设**: Rspress 默认主题的 `th { text-align: left }` 足以控制 API 表格。
+- **真实行为**: `@rspress/plugin-api-docgen` 给 API 表格的 `th` 和 `td` 写入 `style="text-align: center"`，普通主题规则无法覆盖。
+- **正确做法**: 在 `.rp-doc` 内对 API 表格单元格做带 `!important` 的窄范围左对齐覆盖，避免影响组件 Demo。
+- **适用场景**: tao-ui 使用 `<API moduleName="..." />` 生成属性表格时。
+
+## [Rspress MDX] JSX 对象示例必须进入代码语境
+
+- **日期**: 2026-08-09
+- **错误假设**: 组件元数据里的 `direction={{ xs: 'vertical', md: 'horizontal' }}` 可以原样写入 MDX 正文。
+- **真实行为**: MDX 会把花括号解析为表达式，并尝试把 `{ xs, md }` 对象渲染成 React child，导致 SSG 失败。
+- **正确做法**: 正文中的 JSX prop 示例必须包在行内代码或代码块中；批量生成后扫描代码块外的 `{}`。
+- **适用场景**: 从组件元数据、Storybook 或清单批量生成 Rspress MDX 页面。
+
+## [Rspress i18n] 默认语言也必须进入语言目录
+
+- **日期**: 2026-08-09
+- **错误假设**: 默认英文文档可以继续放在 `docs/` 根目录，只为中文新增 `docs/zh/`。
+- **真实行为**: Rspress 自动导航会按每个 locale 扫描 `docs/<lang>/`；默认语言缺少对应目录时无法生成完整导航。
+- **正确做法**: 中英文分别放入 `docs/en/**`、`docs/zh/**`；配置 `lang: 'en'` 后，Rspress 会自动移除默认语言 URL 前缀，并为中文保留 `/zh/`。
+- **适用场景**: 使用 Rspress locales、自动导航、搜索索引和 llms 输出的多语言文档站。
+
+## [Rspress Preview] 可运行示例必须真实维护状态
+
+- **日期**: 2026-08-09
+- **错误假设**: Preview 中用固定 `value` / `checked` 展示初始状态，同时省略状态更新也算可运行示例。
+- **真实行为**: click 事件会正常到达组件，但 React 会立即把值恢复为固定 prop，用户看到的结果就是“无法点击”。
+- **正确做法**: Preview 优先使用局部 `useState` 和 `onChange` 明确维护状态；只有在组件已验证支持 uncontrolled 行为时才使用 `defaultValue` / `defaultChecked`。
+- **适用场景**: tao-ui 的 Rspress Preview、Storybook stories 和任何复制为文档的交互示例。
+
+## [Scope] Rspress 问题只在文档层解决
+
+- **日期**: 2026-08-09
+- **错误假设**: Rspress Preview 暴露的交互或视觉问题可以直接通过修改组件实现和全局主题解决。
+- **真实行为**: 组件本体是独立产品面；用户明确要求 Rspress 问题不得改动组件，输入边框与 focus 样式也必须保持组件原貌。
+- **正确做法**: 先对照 Storybook/组件测试确认组件行为；文档问题只改 `docs/**`、Rspress 配置或文档主题。没有明确授权不得修改 `src/components/**`、`src/theme/**` 和组件契约。
+- **适用场景**: tao-ui 文档站的 Preview、样式覆盖、示例状态与交互问题。

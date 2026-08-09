@@ -1,0 +1,120 @@
+---
+title: Tag
+description: "Displays compact labels, statuses, categories, or checkable chips. Includes usage guidance, a runnable example, and the complete API reference."
+---
+
+Displays compact labels, statuses, categories, or checkable chips.
+
+## When to use
+
+Use Tag for lightweight metadata or status markers. Use CheckableTag for compact filter choices.
+
+**Recommended**
+
+- Use semantic colors consistently.
+- Keep tag text short.
+
+**Avoid**
+
+- Do not encode critical state by color alone.
+
+## Basic usage
+
+```tsx preview
+import { Stack, Tag } from '@rockshin/tao-ui';
+
+function TagExample() {
+  return (
+    <Stack direction="horizontal" gap="sm">
+      <Tag>Default</Tag>
+      <Tag color="primary">Primary</Tag>
+      <Tag color="success">Success</Tag>
+      <Tag color="warning">Warning</Tag>
+      <Tag color="error">Error</Tag>
+    </Stack>
+  );
+}
+
+export default TagExample;
+```
+
+## Variants
+
+```tsx preview
+import { Stack, Tag } from '@rockshin/tao-ui';
+
+function TagVariants() {
+  return (
+    <Stack gap="md">
+      <Stack direction="horizontal" gap="sm">
+        <Tag variant="filled" color="primary">Filled</Tag>
+        <Tag variant="filled" color="success">Success</Tag>
+        <Tag variant="filled" color="warning">Warning</Tag>
+      </Stack>
+      <Stack direction="horizontal" gap="sm">
+        <Tag variant="solid" color="primary">Solid</Tag>
+        <Tag variant="solid" color="success">Success</Tag>
+        <Tag variant="solid" color="error">Error</Tag>
+      </Stack>
+      <Stack direction="horizontal" gap="sm">
+        <Tag variant="outlined" color="primary">Outlined</Tag>
+        <Tag variant="outlined" color="warning">Warning</Tag>
+      </Stack>
+    </Stack>
+  );
+}
+
+export default TagVariants;
+```
+
+## Custom colors and closable tags
+
+```tsx preview
+import { Stack, Tag } from '@rockshin/tao-ui';
+
+function CustomTags() {
+  return (
+    <Stack direction="horizontal" gap="sm">
+      <Tag color="#245b57" variant="solid">Custom teal</Tag>
+      <Tag color="#8a5a21" variant="outlined">Custom ochre</Tag>
+      <Tag color="primary" closeIcon onClose={() => console.log('closed')}>Closable</Tag>
+      <Tag disabled color="primary" variant="solid">Disabled</Tag>
+    </Stack>
+  );
+}
+
+export default CustomTags;
+```
+
+## Checkable tags
+
+```tsx preview
+import { CheckableTag, Stack } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+function CheckableTags() {
+  const [selected, setSelected] = useState(['Design']);
+
+  return (
+    <Stack direction="horizontal" gap="sm">
+      {['Design', 'Engineering', 'Research'].map((label) => (
+        <CheckableTag
+          key={label}
+          checked={selected.includes(label)}
+          onChange={(checked) =>
+            setSelected((items) => checked ? [...items, label] : items.filter((item) => item !== label))
+          }
+        >
+          {label}
+        </CheckableTag>
+      ))}
+    </Stack>
+  );
+}
+
+export default CheckableTags;
+```
+
+## API
+
+<API moduleName="tag" />

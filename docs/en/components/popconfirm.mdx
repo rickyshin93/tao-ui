@@ -1,0 +1,100 @@
+---
+title: Popconfirm
+description: "Shows a compact confirmation popup anchored to a trigger element, with OK and Cancel actions. Usage guidance, runnable example, and API reference."
+---
+
+Shows a compact confirmation popup anchored to a trigger element, with OK and Cancel actions.
+
+## When to use
+
+Use Popconfirm for lightweight inline confirmations such as delete actions, where a full Modal would be too heavy. Use Modal.confirm for critical or complex confirmations.
+
+**Recommended**
+
+- Keep the title to one short question; put detail in the description.
+- Use Popconfirm for reversible, low-risk actions anchored to the control that triggers them.
+
+**Avoid**
+
+- Do not use Popconfirm for irreversible high-risk operations; use Modal.confirm instead.
+- Do not put forms or rich interactions inside a Popconfirm.
+
+## Basic usage
+
+```tsx preview
+import { Button, Popconfirm } from '@rockshin/tao-ui';
+
+function PopconfirmExample() {
+  return (
+    <Popconfirm
+      title="Delete this item?"
+      description="This action cannot be undone."
+      onConfirm={() => console.log('confirmed')}
+    >
+      <Button variant="destructive">Delete</Button>
+    </Popconfirm>
+  );
+}
+
+export default PopconfirmExample;
+```
+
+## Description and custom labels
+
+```tsx preview
+import { Button, Popconfirm, Stack } from '@rockshin/tao-ui';
+
+function PopconfirmVariants() {
+  return (
+    <Stack direction="horizontal" gap="md">
+      <Popconfirm
+        title="Delete item?"
+        description="This action cannot be undone."
+        onConfirm={() => console.log('delete')}
+      >
+        <Button variant="destructive">Delete</Button>
+      </Popconfirm>
+      <Popconfirm
+        title="Leave this page?"
+        description="Unsaved changes will be lost."
+        okText="Leave"
+        cancelText="Stay"
+        onConfirm={() => console.log('leave')}
+      >
+        <Button variant="secondary">Leave page</Button>
+      </Popconfirm>
+    </Stack>
+  );
+}
+
+export default PopconfirmVariants;
+```
+
+## Button props and disabled state
+
+```tsx preview
+import { Button, Popconfirm, Stack } from '@rockshin/tao-ui';
+
+function PopconfirmStates() {
+  return (
+    <Stack direction="horizontal" gap="md">
+      <Popconfirm
+        title="Archive project?"
+        okButtonProps={{ loading: true }}
+        cancelButtonProps={{ disabled: true }}
+      >
+        <Button variant="secondary">Loading confirm</Button>
+      </Popconfirm>
+      <Popconfirm title="Unavailable" disabled>
+        <Button disabled>Disabled</Button>
+      </Popconfirm>
+    </Stack>
+  );
+}
+
+export default PopconfirmStates;
+```
+
+## API
+
+<API moduleName="popconfirm" />

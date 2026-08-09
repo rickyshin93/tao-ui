@@ -1,8 +1,36 @@
 /* ===========================
    Arrow (dropdown only)
+   antd-style rotated square straddling the menu edge: its inner half
+   covers the border segment at the base, the two tip-facing edges carry
+   the border (secondary token, matching the menu border).
    =========================== */
 [data-tao-dropdown-arrow] {
-  fill: var(--tao-color-bg-elevated);
+  position: relative;
+  display: block;
+  /* optical constants: 12×6 arrow window */
+  width: 12px;
+  height: 6px;
+  overflow: visible;
+}
+
+[data-tao-dropdown-arrow]::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  /* 8px square; center lands on the border center line after rotation */
+  top: -4.5px;
+  width: 8px;
+  height: 8px;
+  box-sizing: border-box;
+  background: var(--tao-color-bg-elevated);
+  border: var(--tao-line-width) solid var(--tao-color-border-secondary);
+  /* keep only the two tip-facing borders (tip = bottom-right corner
+     of the unrotated square) */
+  border-top: none;
+  border-left: none;
+  border-bottom-right-radius: 2px; /* rounded tip */
+  transform: translateX(-50%) rotate(45deg);
+  box-shadow: 2px 2px 4px var(--tao-color-shadow-hint);
 }
 
 /* ===========================

@@ -1,0 +1,107 @@
+---
+title: Checkbox
+description: 选择一个或多个相互独立的布尔选项。页面涵盖适用场景、设计建议、多组可运行示例、交互状态与完整 API 参考。
+---
+
+选择一个或多个相互独立的布尔选项。
+
+## 何时使用
+
+独立选择使用 Checkbox；从一组选项中多选时使用 CheckboxGroup。
+
+**推荐**
+
+- 标签应准确描述选中后的状态。
+- 相关选项使用 CheckboxGroup 组织。
+
+**避免**
+
+- 只能选一个选项时不要使用 CheckboxGroup，应改用 RadioGroup。
+
+## 基础用法
+
+```tsx preview
+import { Checkbox, CheckboxGroup, Stack } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+function CheckboxExample() {
+  const [updates, setUpdates] = useState(true);
+  const [channels, setChannels] = useState(['email', 'push']);
+
+  return (
+    <Stack gap="md">
+      <Checkbox checked={updates} onChange={(event) => setUpdates(event.target.checked)}>
+        Send product updates
+      </Checkbox>
+      <CheckboxGroup
+        value={channels}
+        onChange={setChannels}
+        options={[
+          { label: 'Email', value: 'email' },
+          { label: 'Push', value: 'push' },
+          { label: 'SMS', value: 'sms', disabled: true },
+        ]}
+      />
+    </Stack>
+  );
+}
+
+export default CheckboxExample;
+```
+
+## 独立状态
+
+```tsx preview
+import { Checkbox, Stack } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+function CheckboxStates() {
+  const [unchecked, setUnchecked] = useState(false);
+  const [checked, setChecked] = useState(true);
+  const [mixed, setMixed] = useState(false);
+
+  return (
+    <Stack direction="horizontal" gap="lg">
+      <Checkbox checked={unchecked} onChange={(event) => setUnchecked(event.target.checked)}>Unchecked</Checkbox>
+      <Checkbox checked={checked} onChange={(event) => setChecked(event.target.checked)}>Checked</Checkbox>
+      <Checkbox checked={mixed} indeterminate={!mixed} onChange={(event) => setMixed(event.target.checked)}>Indeterminate</Checkbox>
+      <Checkbox disabled>Disabled</Checkbox>
+      <Checkbox checked disabled onChange={() => {}}>Checked disabled</Checkbox>
+    </Stack>
+  );
+}
+
+export default CheckboxStates;
+```
+
+## 纵向选项组
+
+```tsx preview
+import { CheckboxGroup, FormField } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+function VerticalCheckboxGroup() {
+  const [value, setValue] = useState(['email']);
+
+  return (
+    <FormField label="Notifications">
+      <CheckboxGroup
+        direction="vertical"
+        value={value}
+        onChange={setValue}
+        options={[
+          { label: 'Email updates', value: 'email' },
+          { label: 'Push notifications', value: 'push' },
+          { label: 'SMS alerts', value: 'sms', disabled: true },
+        ]}
+      />
+    </FormField>
+  );
+}
+
+export default VerticalCheckboxGroup;
+```
+
+## API
+
+<API moduleName="checkbox" />

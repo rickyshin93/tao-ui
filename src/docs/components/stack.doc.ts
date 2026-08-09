@@ -18,6 +18,28 @@ export const stackDoc = {
     bestPractices: [
       'Prefer Stack over one-off margin rules for repeated spacing.',
       'Use semantic containers when the layout has richer meaning.',
+      'Pass breakpoint maps (e.g. direction={{ xs: \'vertical\', md: \'horizontal\' }}) for responsive layouts.',
     ],
   },
+  props: [
+    {
+      name: 'direction',
+      type: "TaoResponsiveValue<'vertical' | 'horizontal'>",
+      description:
+        'Flex direction; accepts a breakpoint map resolved via useBreakpoint.',
+      defaultValue: "'vertical'",
+    },
+    {
+      name: 'gap',
+      type: "TaoResponsiveValue<'sm' | 'md' | 'lg'>",
+      description: 'Spacing between children; accepts a breakpoint map.',
+      defaultValue: "'md'",
+    },
+    {
+      name: 'align',
+      type: "TaoResponsiveValue<'start' | 'center' | 'end' | 'stretch'>",
+      description: 'Cross-axis alignment; accepts a breakpoint map.',
+      defaultValue: "'stretch'",
+    },
+  ],
 } satisfies ComponentDoc;

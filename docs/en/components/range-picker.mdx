@@ -1,0 +1,78 @@
+---
+title: RangePicker
+description: "Lets users select a start and end date as one range value. Includes usage guidance, a runnable example, and the complete API reference."
+---
+
+Lets users select a start and end date as one range value.
+
+## When to use
+
+Use RangePicker for reporting windows, booking windows, and filters with start/end dates.
+
+**Recommended**
+
+- Use presets for common ranges such as today, this week, or last 30 days.
+- Make inclusive/exclusive range behavior clear when it matters.
+
+**Avoid**
+
+- Do not use the component outside its intended interaction model.
+
+## Basic usage
+
+```tsx preview
+import { FormField, RangePicker } from '@rockshin/tao-ui';
+
+function RangePickerExample() {
+  return (
+    <FormField label="Reporting period">
+      <RangePicker />
+    </FormField>
+  );
+}
+
+export default RangePickerExample;
+```
+
+## Controlled range
+
+```tsx preview
+import { RangePicker } from '@rockshin/tao-ui';
+import dayjs from 'dayjs';
+import { useState } from 'react';
+
+function ControlledRangePicker() {
+  const [value, setValue] = useState([dayjs().startOf('week'), dayjs().endOf('week')]);
+
+  return <RangePicker value={value} onChange={setValue} />;
+}
+
+export default ControlledRangePicker;
+```
+
+## Presets and time
+
+```tsx preview
+import { RangePicker, Stack } from '@rockshin/tao-ui';
+import dayjs from 'dayjs';
+
+function RangePickerPresets() {
+  return (
+    <Stack gap="md">
+      <RangePicker
+        presets={[
+          { label: 'This week', value: [dayjs().startOf('week'), dayjs().endOf('week')] },
+          { label: 'This month', value: [dayjs().startOf('month'), dayjs().endOf('month')] },
+        ]}
+      />
+      <RangePicker showTime />
+    </Stack>
+  );
+}
+
+export default RangePickerPresets;
+```
+
+## API
+
+<API moduleName="range-picker" />

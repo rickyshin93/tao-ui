@@ -1,0 +1,38 @@
+---
+title: 快速开始
+description: 安装 tao-ui、接入 TaoProvider，并渲染首个继承主题配置的无障碍 React 19 组件。
+---
+
+import { PackageManagerTabs } from '@rspress/core/theme';
+
+使用你偏好的包管理器安装 tao-ui。
+
+<PackageManagerTabs command="install @rockshin/tao-ui" />
+
+## 添加 Provider
+
+在应用根部包裹一次 `TaoProvider`。组件会继承尺寸、禁用状态与主题模式等设置。
+
+```tsx
+import { Button, TaoProvider } from '@rockshin/tao-ui';
+
+export default function App() {
+  return (
+    <TaoProvider size="medium">
+      <Button>继续</Button>
+    </TaoProvider>
+  );
+}
+```
+
+## 使用深色模式
+
+在 Provider 上设置主题模式。通过 Portal 渲染的组件也会继承同一主题。
+
+```tsx
+<TaoProvider theme={{ mode: 'dark' }}>
+  <App />
+</TaoProvider>
+```
+
+继续阅读 [Button 组件](/zh/components/button)。

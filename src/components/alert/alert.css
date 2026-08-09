@@ -1,0 +1,143 @@
+/* ===========================
+   Alert Base
+   =========================== */
+[data-tao-alert] {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--tao-padding-xs);
+  box-sizing: border-box;
+  padding: var(--tao-padding-xs) var(--tao-padding-sm);
+  font-family: var(--tao-font-family);
+  font-size: var(--tao-font-size-base);
+  line-height: var(--tao-line-height);
+  color: var(--tao-color-text);
+  border-radius: var(--tao-radius-md);
+  border: var(--tao-line-width) solid transparent;
+  transition:
+    background-color var(--tao-motion-duration-fast) var(--tao-motion-ease-out),
+    border-color var(--tao-motion-duration-fast) var(--tao-motion-ease-out),
+    color var(--tao-motion-duration-fast) var(--tao-motion-ease-out),
+    opacity var(--tao-motion-duration-fast) var(--tao-motion-ease-out);
+}
+
+/* ===========================
+   Icon
+   =========================== */
+[data-tao-alert-icon] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  font-size: var(--tao-font-size-base);
+  line-height: var(--tao-line-height);
+}
+
+[data-tao-alert][data-tao-with-description] [data-tao-alert-icon] {
+  font-size: var(--tao-font-size-lg);
+}
+
+/* ===========================
+   Content
+   =========================== */
+[data-tao-alert-content] {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+[data-tao-alert-title] {
+  color: var(--tao-color-text);
+}
+
+[data-tao-alert][data-tao-with-description] [data-tao-alert-title] {
+  font-weight: var(--tao-font-weight-strong);
+}
+
+[data-tao-alert-description] {
+  color: var(--tao-color-text-secondary);
+}
+
+/* ===========================
+   Action
+   =========================== */
+[data-tao-alert-action] {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  margin-inline-start: var(--tao-padding-xs);
+}
+
+/* ===========================
+   Close button
+   =========================== */
+[data-tao-alert-close] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: calc(var(--tao-font-size-base) * var(--tao-line-height));
+  height: calc(var(--tao-font-size-base) * var(--tao-line-height));
+  padding: 0;
+  border: 0;
+  cursor: pointer;
+  border-radius: var(--tao-radius-sm);
+  background: transparent;
+  color: var(--tao-color-text-secondary);
+  font: inherit;
+  line-height: 1;
+  transition:
+    background-color var(--tao-motion-duration-fast) var(--tao-motion-ease-out),
+    color var(--tao-motion-duration-fast) var(--tao-motion-ease-out);
+}
+
+[data-tao-alert-close]:hover {
+  background: var(--tao-color-fill-secondary);
+  color: var(--tao-color-text);
+}
+
+[data-tao-alert-close]:focus-visible {
+  box-shadow: 0 0 0 var(--tao-ring-width) var(--tao-control-outline);
+  outline: none;
+}
+
+/* ===========================
+   Types
+   =========================== */
+[data-tao-alert][data-tao-type="success"] {
+  background: var(--tao-success-bg);
+  border-color: var(--tao-success-border);
+}
+
+[data-tao-alert][data-tao-type="success"] [data-tao-alert-icon],
+[data-tao-alert][data-tao-type="success"] [data-tao-alert-title] {
+  color: var(--tao-success);
+}
+
+[data-tao-alert][data-tao-type="info"] {
+  background: var(--tao-primary-bg);
+  border-color: var(--tao-primary-border);
+}
+
+[data-tao-alert][data-tao-type="info"] [data-tao-alert-icon],
+[data-tao-alert][data-tao-type="info"] [data-tao-alert-title] {
+  color: var(--tao-primary);
+}
+
+[data-tao-alert][data-tao-type="warning"] {
+  background: var(--tao-warning-bg);
+  border-color: var(--tao-warning-border);
+}
+
+[data-tao-alert][data-tao-type="warning"] [data-tao-alert-icon],
+[data-tao-alert][data-tao-type="warning"] [data-tao-alert-title] {
+  color: var(--tao-warning);
+}
+
+[data-tao-alert][data-tao-type="error"] {
+  background: var(--tao-error-bg);
+  border-color: var(--tao-error-border);
+}
+
+[data-tao-alert][data-tao-type="error"] [data-tao-alert-icon],
+[data-tao-alert][data-tao-type="error"] [data-tao-alert-title] {
+  color: var(--tao-error);
+}

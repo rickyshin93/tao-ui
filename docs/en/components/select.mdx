@@ -1,0 +1,131 @@
+---
+title: Select
+description: "Chooses one value from a compact list of options. Includes usage guidance, a runnable example, and the complete API reference."
+---
+
+Chooses one value from a compact list of options.
+
+## When to use
+
+Use Select when choices are known but too numerous or secondary to show as radios.
+
+**Recommended**
+
+- Use RadioGroup when there are only a few important choices.
+- Keep option labels stable and easy to scan.
+
+**Avoid**
+
+- Do not use Select for arbitrary text entry.
+
+## Basic usage
+
+```tsx preview
+import { FormField, Select } from '@rockshin/tao-ui';
+
+function SelectExample() {
+  return (
+    <FormField label="Framework">
+      <Select
+        showSearch
+        placeholder="Choose a framework"
+        options={[
+          { label: 'React', value: 'react' },
+          { label: 'Vue', value: 'vue' },
+          { label: 'Svelte', value: 'svelte' },
+        ]}
+      />
+    </FormField>
+  );
+}
+
+export default SelectExample;
+```
+
+## Search, clear, and status
+
+```tsx preview
+import { Select, Stack } from '@rockshin/tao-ui';
+
+const options = [
+  { label: 'React', value: 'react' },
+  { label: 'Vue', value: 'vue' },
+  { label: 'Svelte', value: 'svelte' },
+];
+
+function SelectStates() {
+  return (
+    <Stack gap="md" style={{ maxWidth: 420 }}>
+      <Select showSearch allowClear options={options} placeholder="Search frameworks" />
+      <Select status="error" options={options} placeholder="Error state" />
+      <Select status="warning" options={options} placeholder="Warning state" />
+      <Select loading options={[]} placeholder="Loading options" />
+    </Stack>
+  );
+}
+
+export default SelectStates;
+```
+
+## Multiple selection
+
+```tsx preview
+import { Select, Stack } from '@rockshin/tao-ui';
+
+const options = [
+  { label: 'Design', value: 'design' },
+  { label: 'Engineering', value: 'engineering' },
+  { label: 'Research', value: 'research' },
+  { label: 'Operations', value: 'operations' },
+];
+
+function MultipleSelect() {
+  return (
+    <Stack gap="md" style={{ maxWidth: 520 }}>
+      <Select
+        mode="multiple"
+        defaultValue={['design', 'engineering']}
+        options={options}
+        placeholder="Choose teams"
+      />
+      <Select
+        mode="multiple"
+        maxTagCount={2}
+        allowClear
+        defaultValue={['design', 'engineering', 'research']}
+        options={options}
+      />
+    </Stack>
+  );
+}
+
+export default MultipleSelect;
+```
+
+## Disabled options and placement
+
+```tsx preview
+import { Select, Stack } from '@rockshin/tao-ui';
+
+const options = [
+  { label: 'Production', value: 'production' },
+  { label: 'Staging', value: 'staging' },
+  { label: 'Legacy', value: 'legacy', disabled: true },
+];
+
+function AdvancedSelect() {
+  return (
+    <Stack gap="md" style={{ maxWidth: 420 }}>
+      <Select options={options} defaultValue="staging" />
+      <Select placement="topRight" options={options} placeholder="Opens upward" />
+      <Select disabled options={options} defaultValue="production" />
+    </Stack>
+  );
+}
+
+export default AdvancedSelect;
+```
+
+## API
+
+<API moduleName="select" />

@@ -1,0 +1,85 @@
+---
+title: Spinner
+description: 展示局部、内容覆盖或全屏加载状态。页面涵盖适用场景、设计建议、多组可运行示例、交互状态与完整 API 参考。
+---
+
+展示局部、内容覆盖或全屏加载状态。
+
+## 何时使用
+
+系统正在等待且无法立即展示最终内容时使用 Spinner。
+
+**推荐**
+
+- 快速操作使用 delay 避免闪烁。
+- 较长等待提供说明文字。
+
+**避免**
+
+- 不要用 Spinner 掩盖没有结束条件的流程。
+
+## 基础用法
+
+```tsx preview
+import { Spinner, Stack } from '@rockshin/tao-ui';
+
+function SpinnerExample() {
+  return (
+    <Stack direction="horizontal" gap="lg" align="center">
+      <Spinner size="small" />
+      <Spinner size="medium" tip="Loading" />
+      <Spinner size="large" />
+    </Stack>
+  );
+}
+
+export default SpinnerExample;
+```
+
+## 提示与自定义指示器
+
+```tsx preview
+import { Spinner, Stack } from '@rockshin/tao-ui';
+
+function SpinnerIndicators() {
+  return (
+    <Stack direction="horizontal" gap="lg" align="center">
+      <Spinner tip="Loading data" />
+      <Spinner indicator={<span style={{ fontSize: 24 }}>◌</span>} tip="Custom" />
+      <Spinner size="large" tip="Preparing preview" />
+    </Stack>
+  );
+}
+
+export default SpinnerIndicators;
+```
+
+## 内容覆盖与延迟
+
+```tsx preview
+import { Button, Spinner, Stack } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+function SpinnerOverlay() {
+  const [spinning, setSpinning] = useState(true);
+
+  return (
+    <Stack gap="md" style={{ maxWidth: 420 }}>
+      <Button variant="secondary" onClick={() => setSpinning((value) => !value)}>
+        {spinning ? 'Stop' : 'Start'} loading
+      </Button>
+      <Spinner spinning={spinning} delay={200} tip="Loading content">
+        <div style={{ minHeight: 120, padding: 20, border: '1px solid var(--tao-color-border)' }}>
+          Content remains mounted below the overlay.
+        </div>
+      </Spinner>
+    </Stack>
+  );
+}
+
+export default SpinnerOverlay;
+```
+
+## API
+
+<API moduleName="spinner" />

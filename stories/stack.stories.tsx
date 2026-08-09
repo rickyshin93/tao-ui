@@ -75,3 +75,26 @@ export const Vertical: StoryObj = {
     </Stack>
   ),
 };
+
+export const Responsive: StoryObj = {
+  render: () => (
+    <Stack
+      direction={{ xs: 'vertical', md: 'horizontal' }}
+      gap={{ xs: 'sm', md: 'lg' }}
+      align="start"
+    >
+      {['Alpha', 'Beta', 'Gamma'].map((label) => (
+        <div
+          key={label}
+          style={{
+            padding: 16,
+            background: 'var(--tao-color-fill-tertiary)',
+            borderRadius: 6,
+          }}
+        >
+          {label}
+        </div>
+      ))}
+    </Stack>
+  ),
+};

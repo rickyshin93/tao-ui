@@ -1,0 +1,76 @@
+---
+title: Tooltip
+description: 在悬停或键盘聚焦时展示简短补充说明。页面涵盖适用场景、设计建议、多组可运行示例、交互状态与完整 API 参考。
+---
+
+在悬停或键盘聚焦时展示简短补充说明。
+
+## 何时使用
+
+图标、缩写或控件需要一行辅助解释时使用 Tooltip。
+
+**推荐**
+
+- 内容保持简短。
+- 确保键盘聚焦也能触发。
+
+**避免**
+
+- 关键说明或交互内容不要只放在 Tooltip 中。
+
+## 基础用法
+
+```tsx preview
+import { Button, Tooltip } from '@rockshin/tao-ui';
+
+function TooltipExample() {
+  return (
+    <Tooltip title="Copy to clipboard">
+      <Button variant="secondary">Hover or focus</Button>
+    </Tooltip>
+  );
+}
+
+export default TooltipExample;
+```
+
+## 弹出位置
+
+```tsx preview
+import { Button, Stack, Tooltip } from '@rockshin/tao-ui';
+
+function TooltipPlacements() {
+  return (
+    <Stack direction="horizontal" gap="md">
+      <Tooltip title="Top" placement="top"><Button variant="secondary">Top</Button></Tooltip>
+      <Tooltip title="Bottom" placement="bottom"><Button variant="secondary">Bottom</Button></Tooltip>
+      <Tooltip title="Left" placement="left"><Button variant="secondary">Left</Button></Tooltip>
+      <Tooltip title="Right" placement="right"><Button variant="secondary">Right</Button></Tooltip>
+    </Stack>
+  );
+}
+
+export default TooltipPlacements;
+```
+
+## 箭头、颜色与受控显示
+
+```tsx preview
+import { Button, Stack, Tooltip } from '@rockshin/tao-ui';
+
+function TooltipStyles() {
+  return (
+    <Stack direction="horizontal" gap="md">
+      <Tooltip title="No arrow" arrow={false}><Button variant="secondary">No arrow</Button></Tooltip>
+      <Tooltip title="Brand color" color="#245b57"><Button variant="secondary">Custom color</Button></Tooltip>
+      <Tooltip title="Always visible" open><Button variant="secondary">Controlled</Button></Tooltip>
+    </Stack>
+  );
+}
+
+export default TooltipStyles;
+```
+
+## API
+
+<API moduleName="tooltip" />

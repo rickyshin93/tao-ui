@@ -1,0 +1,91 @@
+---
+title: Popover
+description: 在触发器附近展示补充信息或轻量交互内容。页面涵盖适用场景、设计建议、多组可运行示例、交互状态与完整 API 参考。
+---
+
+在触发器附近展示补充信息或轻量交互内容。
+
+## 何时使用
+
+内容比 Tooltip 更丰富，但不需要完整 Modal 时使用 Popover。
+
+**推荐**
+
+- 选择与触发方式匹配的交互。
+- 内容保持紧凑并靠近触发器。
+
+**避免**
+
+- 不要在 Popover 中承载长流程。
+
+## 基础用法
+
+```tsx preview
+import { Button, Popover } from '@rockshin/tao-ui';
+
+function PopoverExample() {
+  return (
+    <Popover
+      trigger="click"
+      title="Deployment"
+      content="Production was updated 2 minutes ago."
+    >
+      <Button variant="secondary">View status</Button>
+    </Popover>
+  );
+}
+
+export default PopoverExample;
+```
+
+## 悬停、聚焦与点击
+
+```tsx preview
+import { Button, Popover, Stack } from '@rockshin/tao-ui';
+
+function PopoverTriggers() {
+  return (
+    <Stack direction="horizontal" gap="md">
+      <Popover title="Hover" content="Opens on pointer hover.">
+        <Button variant="secondary">Hover</Button>
+      </Popover>
+      <Popover trigger="focus" title="Focus" content="Opens from keyboard focus.">
+        <Button variant="secondary">Focus</Button>
+      </Popover>
+      <Popover trigger="click" title="Click" content="Opens and closes on click.">
+        <Button variant="secondary">Click</Button>
+      </Popover>
+    </Stack>
+  );
+}
+
+export default PopoverTriggers;
+```
+
+## 弹出位置与箭头
+
+```tsx preview
+import { Button, Popover, Stack } from '@rockshin/tao-ui';
+
+function PopoverPlacements() {
+  return (
+    <Stack direction="horizontal" gap="md">
+      <Popover placement="topLeft" title="Top left" content="Aligned to the left edge.">
+        <Button variant="secondary">Top left</Button>
+      </Popover>
+      <Popover placement="bottom" title="Bottom" content="Centered below the trigger.">
+        <Button variant="secondary">Bottom</Button>
+      </Popover>
+      <Popover placement="right" arrow={false} title="No arrow" content="Arrow disabled.">
+        <Button variant="secondary">Right</Button>
+      </Popover>
+    </Stack>
+  );
+}
+
+export default PopoverPlacements;
+```
+
+## API
+
+<API moduleName="popover" />

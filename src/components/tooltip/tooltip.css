@@ -1,0 +1,109 @@
+/* ===========================
+   Tooltip content
+   =========================== */
+[data-tao-tooltip-content] {
+  box-sizing: border-box;
+  /* optical constants: antd-tooltips cap long text; 6px vertical padding
+     optically balances the xs font (off 4px grid, intentional) */
+  max-width: 260px;
+  padding-block: 6px;
+  padding-inline: var(--tao-padding-xs);
+  font-family: var(--tao-font-family);
+  font-size: var(--tao-font-size-xs);
+  line-height: var(--tao-line-height-sm);
+  color: var(--tao-color-text);
+  background: var(--tao-color-bg-elevated);
+  border: var(--tao-line-width) solid var(--tao-color-border);
+  border-radius: var(--tao-radius-sm);
+  box-shadow: var(--tao-box-shadow-secondary);
+  /* same popup layer as menu/select/date-picker: above modal/drawer */
+  z-index: var(--tao-z-index-popup);
+
+  animation-duration: var(--tao-motion-duration-fast);
+  animation-timing-function: var(--tao-motion-ease-out-quint);
+}
+
+[data-tao-tooltip-content][data-state="delayed-open"],
+[data-tao-tooltip-content][data-state="instant-open"] {
+  animation-name: tao-tooltip-in;
+}
+
+[data-tao-tooltip-content][data-state="closed"] {
+  animation-name: tao-tooltip-out;
+}
+
+[data-tao-tooltip-content][data-side="top"] {
+  --tao-tooltip-from-y: 4px;
+}
+[data-tao-tooltip-content][data-side="bottom"] {
+  --tao-tooltip-from-y: -4px;
+}
+[data-tao-tooltip-content][data-side="left"] {
+  --tao-tooltip-from-x: 4px;
+}
+[data-tao-tooltip-content][data-side="right"] {
+  --tao-tooltip-from-x: -4px;
+}
+
+@keyframes tao-tooltip-in {
+  from {
+    opacity: 0;
+    transform: translate(
+      var(--tao-tooltip-from-x, 0),
+      var(--tao-tooltip-from-y, 0)
+    );
+  }
+  to {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+}
+
+@keyframes tao-tooltip-out {
+  from {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+  to {
+    opacity: 0;
+    transform: translate(
+      var(--tao-tooltip-from-x, 0),
+      var(--tao-tooltip-from-y, 0)
+    );
+  }
+}
+
+/* ===========================
+   Arrow
+   antd-style rotated square straddling the chip edge: its inner half
+   covers the border segment at the base, the two tip-facing edges carry
+   the border, so the border visually travels around the triangle.
+   =========================== */
+[data-tao-tooltip-arrow] {
+  position: relative;
+  display: block;
+  /* optical constants: 10×5 arrow window (smaller than popover's) */
+  width: 10px;
+  height: 5px;
+  overflow: visible;
+}
+
+[data-tao-tooltip-arrow]::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  /* 7px square; center lands on the border center line after rotation */
+  top: -4px;
+  width: 7px;
+  height: 7px;
+  box-sizing: border-box;
+  background: var(--tao-tooltip-arrow-bg, var(--tao-color-bg-elevated));
+  border: var(--tao-line-width) solid var(--tao-color-border);
+  /* keep only the two tip-facing borders (tip = bottom-right corner
+     of the unrotated square) */
+  border-top: none;
+  border-left: none;
+  border-bottom-right-radius: 2px; /* rounded tip */
+  transform: translateX(-50%) rotate(45deg);
+  box-shadow: 2px 2px 4px var(--tao-color-shadow-hint);
+}

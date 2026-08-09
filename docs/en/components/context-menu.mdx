@@ -1,0 +1,124 @@
+---
+title: ContextMenu
+description: "Displays contextual actions from a right click or long press interaction. Includes usage guidance, a runnable example, and the complete API reference."
+---
+
+Displays contextual actions from a right click or long press interaction.
+
+## When to use
+
+Use ContextMenu for secondary actions attached to an object or region.
+
+**Recommended**
+
+- Keep items short and action-oriented.
+- Provide another reachable path for critical actions.
+
+**Avoid**
+
+- Do not put primary workflows only inside a context menu.
+
+## Basic usage
+
+```tsx preview
+import { ContextMenu } from '@rockshin/tao-ui';
+
+function ContextMenuExample() {
+  return (
+    <ContextMenu
+      menu={{
+        items: [
+          { key: 'cut', label: 'Cut', extra: '⌘X' },
+          { key: 'copy', label: 'Copy', extra: '⌘C' },
+          { key: 'paste', label: 'Paste', extra: '⌘V' },
+          { type: 'divider' },
+          { key: 'delete', label: 'Delete', danger: true },
+        ],
+      }}
+    >
+      <div style={{ padding: 32, border: '1px dashed var(--tao-color-border)', borderRadius: 8 }}>
+        Right-click this area
+      </div>
+    </ContextMenu>
+  );
+}
+
+export default ContextMenuExample;
+```
+
+## Groups, disabled items, and submenus
+
+```tsx preview
+import { ContextMenu } from '@rockshin/tao-ui';
+
+function ContextMenuGroups() {
+  return (
+    <ContextMenu
+      menu={{
+        items: [
+          {
+            type: 'group',
+            label: 'View',
+            children: [
+              { key: 'zoom-in', label: 'Zoom in' },
+              { key: 'zoom-out', label: 'Zoom out' },
+            ],
+          },
+          { type: 'divider' },
+          {
+            key: 'share',
+            label: 'Share',
+            children: [
+              { key: 'copy-link', label: 'Copy link' },
+              { key: 'email', label: 'Email' },
+            ],
+          },
+          { key: 'locked', label: 'Locked action', disabled: true },
+        ],
+      }}
+    >
+      <div style={{ padding: 32, border: '1px dashed var(--tao-color-border)', borderRadius: 8 }}>
+        Right-click for grouped actions
+      </div>
+    </ContextMenu>
+  );
+}
+
+export default ContextMenuGroups;
+```
+
+## Selectable menu items
+
+```tsx preview
+import { ContextMenu } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+function SelectableContextMenu() {
+  const [selected, setSelected] = useState(['comfortable']);
+
+  return (
+    <ContextMenu
+      menu={{
+        selectable: true,
+        selectedKeys: selected,
+        onSelect: ({ selectedKeys }) => setSelected(selectedKeys),
+        items: [
+          { key: 'compact', label: 'Compact' },
+          { key: 'comfortable', label: 'Comfortable' },
+          { key: 'spacious', label: 'Spacious' },
+        ],
+      }}
+    >
+      <div style={{ padding: 32, border: '1px dashed var(--tao-color-border)', borderRadius: 8 }}>
+        Current density: {selected[0]}
+      </div>
+    </ContextMenu>
+  );
+}
+
+export default SelectableContextMenu;
+```
+
+## API
+
+<API moduleName="context-menu" />

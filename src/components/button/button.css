@@ -9,7 +9,7 @@ button[data-tao-button] {
   justify-content: center;
   gap: var(--tao-padding-xs);
   font-family: var(--tao-font-family);
-  font-weight: var(--tao-font-weight-medium);
+  font-weight: var(--tao-button-font-weight, var(--tao-font-weight-medium));
   line-height: 1;
   border: var(--tao-line-width) solid transparent;
   cursor: pointer;
@@ -22,26 +22,27 @@ button[data-tao-button] {
     box-shadow var(--tao-motion-duration-fast) var(--tao-motion-ease-out);
 }
 
-/* Sizes */
+/* Sizes — borderRadius is a single token, applied per size with that
+   size's own radius as the fallback. */
 button[data-tao-button][data-tao-size="small"] {
   height: var(--tao-control-height-sm);
-  padding-inline: var(--tao-padding-xs);
-  font-size: var(--tao-font-size-sm);
-  border-radius: var(--tao-radius-sm);
+  padding-inline: var(--tao-button-padding-inline-sm, var(--tao-padding-xs));
+  font-size: var(--tao-button-content-font-size-sm, var(--tao-font-size-sm));
+  border-radius: var(--tao-button-border-radius, var(--tao-radius-sm));
 }
 
 button[data-tao-button][data-tao-size="medium"] {
   height: var(--tao-control-height);
-  padding-inline: var(--tao-padding);
-  font-size: var(--tao-font-size-base);
-  border-radius: var(--tao-radius-md);
+  padding-inline: var(--tao-button-padding-inline, var(--tao-padding));
+  font-size: var(--tao-button-content-font-size, var(--tao-font-size-base));
+  border-radius: var(--tao-button-border-radius, var(--tao-radius-md));
 }
 
 button[data-tao-button][data-tao-size="large"] {
   height: var(--tao-control-height-lg);
-  padding-inline: var(--tao-padding);
-  font-size: var(--tao-font-size-base);
-  border-radius: var(--tao-radius-md);
+  padding-inline: var(--tao-button-padding-inline-lg, var(--tao-padding));
+  font-size: var(--tao-button-content-font-size-lg, var(--tao-font-size-base));
+  border-radius: var(--tao-button-border-radius, var(--tao-radius-md));
 }
 
 button[data-tao-button][data-tao-has-icon][data-tao-size="medium"],
@@ -52,8 +53,8 @@ button[data-tao-button][data-tao-has-icon][data-tao-size="large"] {
 /* Variant: primary */
 button[data-tao-button][data-tao-variant="primary"] {
   background: var(--tao-primary);
-  color: var(--tao-primary-fg);
-  box-shadow: var(--tao-box-shadow-xs);
+  color: var(--tao-button-primary-color, var(--tao-primary-fg));
+  box-shadow: var(--tao-button-primary-shadow, var(--tao-box-shadow-xs));
 }
 button[data-tao-button][data-tao-variant="primary"]:hover:not(:disabled) {
   background: var(--tao-primary-hover);
@@ -62,16 +63,28 @@ button[data-tao-button][data-tao-variant="primary"]:active:not(:disabled) {
   background: var(--tao-primary-active);
 }
 
-/* Variant: secondary */
+/* Variant: secondary — the antd "default" button; wired to default* tokens. */
 button[data-tao-button][data-tao-variant="secondary"] {
-  background: transparent;
-  color: var(--tao-color-text);
-  border-color: var(--tao-color-border);
+  background: var(--tao-button-default-bg, transparent);
+  color: var(--tao-button-default-color, var(--tao-color-text));
+  border-color: var(--tao-button-default-border-color, var(--tao-color-border));
   box-shadow: var(--tao-box-shadow-xs);
 }
 button[data-tao-button][data-tao-variant="secondary"]:hover:not(:disabled) {
-  background: var(--tao-color-fill-tertiary);
-  border-color: var(--tao-color-border);
+  background: var(
+    --tao-button-default-hover-bg,
+    var(--tao-color-fill-tertiary)
+  );
+  /* hover color currently inherits the base rule; chain defaultColor so a
+     lone defaultColor override still paints the hover state as before. */
+  color: var(
+    --tao-button-default-hover-color,
+    var(--tao-button-default-color, var(--tao-color-text))
+  );
+  border-color: var(
+    --tao-button-default-hover-border-color,
+    var(--tao-color-border)
+  );
 }
 button[data-tao-button][data-tao-variant="secondary"]:active:not(:disabled) {
   background: var(--tao-color-fill-secondary);

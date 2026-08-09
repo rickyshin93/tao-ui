@@ -1,0 +1,131 @@
+---
+title: Table
+description: "Displays structured row and column data with selection, sorting, filtering, and pagination hooks. Usage guidance, runnable example, and API reference."
+---
+
+Displays structured row and column data with selection, sorting, filtering, and pagination hooks.
+
+## When to use
+
+Use Table for dense, comparable records that benefit from aligned columns.
+
+**Recommended**
+
+- Keep columns focused on the task.
+- Use stable row keys.
+- Control sorting and pagination when data is remote.
+- Gate secondary columns with column.responsive (e.g. ['lg']) instead of hand-rolled media queries.
+
+**Avoid**
+
+- Do not use Table for card-like content where comparison is not important.
+
+## Basic usage
+
+```tsx preview
+import { Table } from '@rockshin/tao-ui';
+
+const columns = [
+  { key: 'name', dataIndex: 'name', title: 'Name' },
+  { key: 'role', dataIndex: 'role', title: 'Role' },
+];
+
+const users = [
+  { id: 1, name: 'Ada Lovelace', role: 'Engineer' },
+  { id: 2, name: 'Grace Hopper', role: 'Scientist' },
+];
+
+function TableExample() {
+  return <Table columns={columns} dataSource={users} rowKey="id" pagination={false} />;
+}
+
+export default TableExample;
+```
+
+## Variants
+
+```tsx preview
+import { Stack, Table } from '@rockshin/tao-ui';
+
+const columns = [
+  { key: 'name', dataIndex: 'name', title: 'Name' },
+  { key: 'role', dataIndex: 'role', title: 'Role' },
+];
+
+const data = [
+  { id: 1, name: 'Ada', role: 'Engineer' },
+  { id: 2, name: 'Grace', role: 'Scientist' },
+];
+
+function TableVariants() {
+  return (
+    <Stack gap="lg">
+      <Table columns={columns} dataSource={data} rowKey="id" variant="filled" pagination={false} />
+      <Table columns={columns} dataSource={data} rowKey="id" variant="outlined" pagination={false} />
+      <Table columns={columns} dataSource={data} rowKey="id" variant="modern" pagination={false} />
+      <Table columns={columns} dataSource={data} rowKey="id" variant="borderless" pagination={false} />
+    </Stack>
+  );
+}
+
+export default TableVariants;
+```
+
+## Sizes and borders
+
+```tsx preview
+import { Stack, Table } from '@rockshin/tao-ui';
+
+const columns = [
+  { key: 'name', dataIndex: 'name', title: 'Name' },
+  { key: 'status', dataIndex: 'status', title: 'Status' },
+];
+const data = [{ id: 1, name: 'Build', status: 'Passing' }];
+
+function TableSizes() {
+  return (
+    <Stack gap="lg">
+      <Table size="small" columns={columns} dataSource={data} rowKey="id" pagination={false} />
+      <Table size="medium" bordered columns={columns} dataSource={data} rowKey="id" pagination={false} />
+      <Table size="large" columns={columns} dataSource={data} rowKey="id" pagination={false} />
+    </Stack>
+  );
+}
+
+export default TableSizes;
+```
+
+## Loading, empty, and pagination
+
+```tsx preview
+import { Stack, Table } from '@rockshin/tao-ui';
+
+const columns = [{ key: 'name', dataIndex: 'name', title: 'Name' }];
+
+function TableStates() {
+  return (
+    <Stack gap="lg">
+      <Table loading columns={columns} dataSource={[]} rowKey="id" />
+      <Table
+        columns={columns}
+        dataSource={[]}
+        rowKey="id"
+        emptyText="No matching users."
+        pagination={false}
+      />
+      <Table
+        columns={columns}
+        dataSource={Array.from({ length: 12 }, (_, index) => ({ id: index, name: 'User ' + (index + 1) }))}
+        rowKey="id"
+        pagination={{ pageSize: 5 }}
+      />
+    </Stack>
+  );
+}
+
+export default TableStates;
+```
+
+## API
+
+<API moduleName="table" />

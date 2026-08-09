@@ -7,6 +7,7 @@ import {
   TaoPortalScope,
   TaoProvider,
   useTaoConfig,
+  useTaoToken,
 } from '../../src/provider/tao-provider';
 
 test('renders children', () => {
@@ -490,4 +491,107 @@ test('component CSS files contain no hardcoded color escapes', () => {
     }
   }
   expect(offenders).toEqual([]);
+});
+
+// ---- Component tokens ----
+
+test('theme.components serializes to kebab-case component CSS variables', () => {
+  render(
+    <TaoProvider
+      theme={{
+        components: {
+          Button: { borderRadius: 9999, fontWeight: 600, paddingInlineSM: 10 },
+          FormField: { labelColor: 'oklch(0.5 0.1 260)' },
+        },
+      }}
+    >
+      <span data-testid="child">x</span>
+    </TaoProvider>,
+  );
+  const provider = screen.getByTestId('child').parentElement!;
+  expect(provider.style.getPropertyValue('--tao-button-border-radius')).toBe(
+    '9999px',
+  );
+  // fontWeight is unitless
+  expect(provider.style.getPropertyValue('--tao-button-font-weight')).toBe(
+    '600',
+  );
+  expect(provider.style.getPropertyValue('--tao-button-padding-inline-sm')).toBe(
+    '10px',
+  );
+  expect(
+    provider.style.getPropertyValue('--tao-form-field-label-color'),
+  ).toBe('oklch(0.5 0.1 260)');
+});
+
+test('component tokens cascade to nested providers and merge with their own', () => {
+  render(
+    <TaoProvider theme={{ components: { Button: { borderRadius: 2 } } }}>
+      <TaoProvider theme={{ components: { Button: { fontWeight: 500 } } }}>
+        <span data-testid="child">x</span>
+      </TaoProvider>
+    </TaoProvider>,
+  );
+  const inner = screen.getByTestId('child').parentElement!;
+  // inner provider only declares its own override…
+  expect(inner.style.getPropertyValue('--tao-button-font-weight')).toBe('500');
+  // …while the parent's override still applies through DOM inheritance
+  expect(inner.style.getPropertyValue('--tao-button-border-radius')).toBe('');
+});
+
+// ---- Compact density ----
+
+test('theme.compact outputs data-tao-density="compact"', () => {
+  render(
+    <TaoProvider theme={{ compact: true }}>
+      <span data-testid="child">x</span>
+    </TaoProvider>,
+  );
+  expect(
+    screen.getByTestId('child').parentElement!.dataset.taoDensity,
+  ).toBe('compact');
+});
+
+test('compact cascades to nested providers by default', () => {
+  render(
+    <TaoProvider theme={{ compact: true }}>
+      <TaoProvider>
+        <span data-testid="child">x</span>
+      </TaoProvider>
+    </TaoProvider>,
+  );
+  expect(
+    screen.getByTestId('child').parentElement!.dataset.taoDensity,
+  ).toBe('compact');
+});
+
+test('TaoPortalScope re-applies the density attribute for portaled layers', () => {
+  function Probe() {
+    return <TaoPortalScope>portal</TaoPortalScope>;
+  }
+  const { container } = render(
+    <TaoProvider theme={{ compact: true }}>
+      <Probe />
+    </TaoProvider>,
+  );
+  const scope = Array.from(container.querySelectorAll('[data-tao-provider]'))
+    .map((el) => el as HTMLElement)
+    .find((el) => el.textContent === 'portal')!;
+  expect(scope.dataset.taoDensity).toBe('compact');
+});
+
+// ---- useTaoToken ----
+
+test('useTaoToken exposes var() references for all design tokens', () => {
+  let captured: Record<string, string> | undefined;
+  function Probe() {
+    const { token } = useTaoToken();
+    captured = token;
+    return null;
+  }
+  render(<Probe />);
+  expect(captured).toBeTruthy();
+  expect(captured!['--tao-color-primary']).toBe('var(--tao-color-primary)');
+  expect(captured!['--tao-radius-lg']).toBe('var(--tao-radius-lg)');
+  expect(Object.keys(captured!).length).toBeGreaterThan(100);
 });
