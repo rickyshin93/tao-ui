@@ -288,3 +288,29 @@ export const UseModalHook: StoryObj = {
     return <Demo />;
   },
 };
+
+export const ResponsiveWidth: StoryObj = {
+  render: () => {
+    function Demo() {
+      const [open, setOpen] = useState(false);
+      return (
+        <>
+          <Button variant="secondary" onClick={() => setOpen(true)}>
+            Open Responsive Modal
+          </Button>
+          <Modal
+            open={open}
+            title="Responsive Width"
+            width={{ xs: 'calc(100vw - 32px)', md: 640, xl: 800 }}
+            onClose={() => setOpen(false)}
+            onOk={() => setOpen(false)}
+          >
+            Resize the viewport: full-width on phones, 640px from md up,
+            800px from xl up.
+          </Modal>
+        </>
+      );
+    }
+    return <Demo />;
+  },
+};

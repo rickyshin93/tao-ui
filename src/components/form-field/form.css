@@ -6,29 +6,42 @@
   flex-direction: column;
 }
 
+[data-tao-form-control] {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+[data-tao-form-error][data-tao-status="warning"] {
+  color: var(--tao-warning);
+}
+
 [data-tao-form-label] {
-  font-size: var(--tao-font-size-sm);
+  font-size: var(--tao-form-field-label-font-size, var(--tao-font-size-sm));
   font-weight: var(--tao-font-weight-medium);
-  color: var(--tao-color-text);
+  color: var(--tao-form-field-label-color, var(--tao-color-text));
   margin-block-end: 6px;
   line-height: var(--tao-line-height);
 }
 
 [data-tao-required] {
-  color: var(--tao-error);
+  color: var(--tao-form-field-label-required-mark-color, var(--tao-error));
   margin-inline-start: 2px;
 }
 
 [data-tao-form-description] {
   font-size: var(--tao-font-size-xs);
-  color: var(--tao-color-text-tertiary);
+  color: var(
+    --tao-form-field-description-color,
+    var(--tao-color-text-tertiary)
+  );
   margin-block-start: 4px;
   line-height: var(--tao-line-height-sm);
 }
 
 [data-tao-form-error] {
-  font-size: var(--tao-font-size-xs);
-  color: var(--tao-error);
+  font-size: var(--tao-form-field-error-font-size, var(--tao-font-size-xs));
+  color: var(--tao-form-field-error-color, var(--tao-error));
   margin-block-start: 4px;
   line-height: var(--tao-line-height-sm);
 }
@@ -68,7 +81,8 @@
 [data-tao-form-section-body] {
   display: flex;
   flex-direction: column;
-  gap: var(--tao-padding-md);
+  /* stacks FormFields — antd Form `itemGap` maps here */
+  gap: var(--tao-form-field-item-gap, var(--tao-padding-md));
 }
 
 /* ===========================

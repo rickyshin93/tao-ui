@@ -1,0 +1,86 @@
+---
+title: Stack
+description: "Composes children in a flex row or column with consistent spacing. Includes usage guidance, a runnable example, and the complete API reference."
+---
+
+Composes children in a flex row or column with consistent spacing.
+
+## When to use
+
+Use Stack for simple one-dimensional layout and spacing.
+
+**Recommended**
+
+- Prefer Stack over one-off margin rules for repeated spacing.
+- Use semantic containers when the layout has richer meaning.
+- Pass breakpoint maps (for example, `direction={{ xs: 'vertical', md: 'horizontal' }}`) for responsive layouts.
+
+**Avoid**
+
+- Do not use the component outside its intended interaction model.
+
+## Basic usage
+
+```tsx preview
+import { Stack, Tag } from '@rockshin/tao-ui';
+
+function StackExample() {
+  return (
+    <Stack direction="horizontal" gap="md" align="center">
+      <Tag>Design</Tag>
+      <Tag>Engineering</Tag>
+      <Tag>Research</Tag>
+    </Stack>
+  );
+}
+
+export default StackExample;
+```
+
+## Direction, spacing, and alignment
+
+```tsx preview
+import { Stack, Tag } from '@rockshin/tao-ui';
+
+function StackVariants() {
+  return (
+    <Stack gap="lg">
+      <Stack direction="horizontal" gap="sm" align="center">
+        <Tag>Small gap</Tag>
+        <Tag>Centered</Tag>
+      </Stack>
+      <Stack direction="horizontal" gap="lg" align="end">
+        <Tag>Large gap</Tag>
+        <Tag>End aligned</Tag>
+      </Stack>
+    </Stack>
+  );
+}
+
+export default StackVariants;
+```
+
+## Responsive direction
+
+```tsx preview
+import { Button, Stack } from '@rockshin/tao-ui';
+
+function ResponsiveStack() {
+  return (
+    <Stack
+      direction={{ xs: 'vertical', md: 'horizontal' }}
+      gap={{ xs: 'sm', md: 'lg' }}
+    >
+      <Button>Save</Button>
+      <Button variant="secondary">Preview</Button>
+      <Button variant="ghost">Cancel</Button>
+    </Stack>
+  );
+}
+
+export default ResponsiveStack;
+```
+
+## API
+
+<API moduleName="stack" />

@@ -5,6 +5,7 @@ import {
   type SemanticStyles,
 } from '../../utils/semantic';
 import { Button, type ButtonProps } from '../button/button';
+import { StatusIcon } from '../status-icon/status-icon';
 import { Modal, type ModalSemanticPart } from './modal';
 
 export type ConfirmType = 'info' | 'success' | 'error' | 'warning' | 'confirm';
@@ -96,7 +97,7 @@ export function ConfirmDialog({
   const handleOk = () => runAndClose(onOk, true);
   const handleCancel = () => runAndClose(onCancel, false);
 
-  const iconNode = icon === null ? null : (icon ?? <StatusIcon type={type} />);
+  const iconNode = icon === null ? null : (icon ?? <StatusIconFor type={type} />);
 
   const mergedClassNames = className
     ? { ...classNames, root: cx(classNames?.root, className) }
@@ -154,47 +155,12 @@ export function ConfirmDialog({
   );
 }
 
-function StatusIcon({ type }: { type: ConfirmType }) {
-  const common = {
-    width: 22,
-    height: 22,
-    viewBox: '0 0 24 24',
-    fill: 'none',
-    stroke: 'currentColor',
-    strokeWidth: 2,
-    strokeLinecap: 'round' as const,
-    strokeLinejoin: 'round' as const,
-    'aria-hidden="true"': true,
-  };
-  switch (type) {
-    case 'success':
-      return (
-        <svg aria-hidden="true" focusable="false" {...common}>
-          <circle cx="12" cy="12" r="9" />
-          <path d="m8.5 12 2.5 2.5 4.5-5" />
-        </svg>
-      );
-    case 'error':
-      return (
-        <svg aria-hidden="true" focusable="false" {...common}>
-          <circle cx="12" cy="12" r="9" />
-          <path d="M15 9 9 15M9 9l6 6" />
-        </svg>
-      );
-    case 'warning':
-    case 'confirm':
-      return (
-        <svg aria-hidden="true" focusable="false" {...common}>
-          <path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" />
-          <path d="M12 9v4M12 17h.01" />
-        </svg>
-      );
-    default: // info
-      return (
-        <svg aria-hidden="true" focusable="false" {...common}>
-          <circle cx="12" cy="12" r="9" />
-          <path d="M12 16v-4M12 8h.01" />
-        </svg>
-      );
-  }
+function StatusIconFor({ type }: { type: ConfirmType }) {
+  // 'confirm' uses the warning triangle; the rest map 1:1 onto the shared set.
+  return (
+    <StatusIcon
+      type={type === 'confirm' ? 'warning' : type}
+      size={22}
+    />
+  );
 }

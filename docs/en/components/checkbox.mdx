@@ -1,0 +1,107 @@
+---
+title: Checkbox
+description: "Selects one or more independent boolean options. Includes usage guidance, a runnable example, and the complete API reference."
+---
+
+Selects one or more independent boolean options.
+
+## When to use
+
+Use Checkbox for independent choices, or CheckboxGroup when users can select multiple options from a set.
+
+**Recommended**
+
+- Use clear labels that describe the checked state.
+- Group related options with CheckboxGroup.
+
+**Avoid**
+
+- Do not use CheckboxGroup when only one option may be selected; use RadioGroup instead.
+
+## Basic usage
+
+```tsx preview
+import { Checkbox, CheckboxGroup, Stack } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+function CheckboxExample() {
+  const [updates, setUpdates] = useState(true);
+  const [channels, setChannels] = useState(['email', 'push']);
+
+  return (
+    <Stack gap="md">
+      <Checkbox checked={updates} onChange={(event) => setUpdates(event.target.checked)}>
+        Send product updates
+      </Checkbox>
+      <CheckboxGroup
+        value={channels}
+        onChange={setChannels}
+        options={[
+          { label: 'Email', value: 'email' },
+          { label: 'Push', value: 'push' },
+          { label: 'SMS', value: 'sms', disabled: true },
+        ]}
+      />
+    </Stack>
+  );
+}
+
+export default CheckboxExample;
+```
+
+## Standalone states
+
+```tsx preview
+import { Checkbox, Stack } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+function CheckboxStates() {
+  const [unchecked, setUnchecked] = useState(false);
+  const [checked, setChecked] = useState(true);
+  const [mixed, setMixed] = useState(false);
+
+  return (
+    <Stack direction="horizontal" gap="lg">
+      <Checkbox checked={unchecked} onChange={(event) => setUnchecked(event.target.checked)}>Unchecked</Checkbox>
+      <Checkbox checked={checked} onChange={(event) => setChecked(event.target.checked)}>Checked</Checkbox>
+      <Checkbox checked={mixed} indeterminate={!mixed} onChange={(event) => setMixed(event.target.checked)}>Indeterminate</Checkbox>
+      <Checkbox disabled>Disabled</Checkbox>
+      <Checkbox checked disabled onChange={() => {}}>Checked disabled</Checkbox>
+    </Stack>
+  );
+}
+
+export default CheckboxStates;
+```
+
+## Vertical groups
+
+```tsx preview
+import { CheckboxGroup, FormField } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+function VerticalCheckboxGroup() {
+  const [value, setValue] = useState(['email']);
+
+  return (
+    <FormField label="Notifications">
+      <CheckboxGroup
+        direction="vertical"
+        value={value}
+        onChange={setValue}
+        options={[
+          { label: 'Email updates', value: 'email' },
+          { label: 'Push notifications', value: 'push' },
+          { label: 'SMS alerts', value: 'sms', disabled: true },
+        ]}
+      />
+    </FormField>
+  );
+}
+
+export default VerticalCheckboxGroup;
+```
+
+## API
+
+<API moduleName="checkbox" />

@@ -45,18 +45,24 @@
 [data-tao-control][data-tao-variant="outlined"]:hover:not([data-disabled]):not(
   :focus-within
 ):not([data-state="open"]) {
-  border-color: color-mix(
-    in oklch,
-    var(--tao-color-text-base) 20%,
-    var(--tao-color-bg-base)
+  border-color: var(
+    --tao-input-hover-border-color,
+    color-mix(
+      in oklch,
+      var(--tao-color-text-base) 20%,
+      var(--tao-color-bg-base)
+    )
   );
 }
 
 /* Outlined: focus / open */
 [data-tao-control][data-tao-variant="outlined"]:focus-within,
 [data-tao-control][data-tao-variant="outlined"][data-state="open"] {
-  border-color: var(--tao-primary);
-  box-shadow: 0 0 0 var(--tao-ring-width) var(--tao-control-outline);
+  border-color: var(--tao-input-active-border-color, var(--tao-primary));
+  box-shadow: var(
+    --tao-input-active-shadow,
+    0 0 0 var(--tao-ring-width) var(--tao-control-outline)
+  );
   outline: none;
 }
 
@@ -76,7 +82,10 @@
 [data-tao-control][data-tao-variant="outlined"][data-tao-error]:focus-within,
 [data-tao-control][data-tao-variant="outlined"][data-tao-error][data-state="open"] {
   border-color: var(--tao-error);
-  box-shadow: 0 0 0 var(--tao-ring-width) var(--tao-color-error-outline);
+  box-shadow: var(
+    --tao-input-error-active-shadow,
+    0 0 0 var(--tao-ring-width) var(--tao-color-error-outline)
+  );
 }
 
 /* Outlined: warning */
@@ -120,15 +129,18 @@
 [data-tao-control][data-tao-variant="filled"]:hover:not([data-disabled]):not(
   :focus-within
 ):not([data-state="open"]) {
-  background: var(--tao-color-fill-secondary);
+  background: var(--tao-input-hover-bg, var(--tao-color-fill-secondary));
 }
 
 /* Filled: focus / open */
 [data-tao-control][data-tao-variant="filled"]:focus-within,
 [data-tao-control][data-tao-variant="filled"][data-state="open"] {
-  background: var(--tao-color-bg-container);
-  border-color: var(--tao-primary);
-  box-shadow: 0 0 0 var(--tao-ring-width) var(--tao-control-outline);
+  background: var(--tao-input-active-bg, var(--tao-color-bg-container));
+  border-color: var(--tao-input-active-border-color, var(--tao-primary));
+  box-shadow: var(
+    --tao-input-active-shadow,
+    0 0 0 var(--tao-ring-width) var(--tao-control-outline)
+  );
   outline: none;
 }
 
@@ -151,9 +163,12 @@
 /* Filled: error + focus */
 [data-tao-control][data-tao-variant="filled"][data-tao-error]:focus-within,
 [data-tao-control][data-tao-variant="filled"][data-tao-error][data-state="open"] {
-  background: var(--tao-color-bg-container);
+  background: var(--tao-input-active-bg, var(--tao-color-bg-container));
   border-color: var(--tao-error);
-  box-shadow: 0 0 0 var(--tao-ring-width) var(--tao-color-error-outline);
+  box-shadow: var(
+    --tao-input-error-active-shadow,
+    0 0 0 var(--tao-ring-width) var(--tao-color-error-outline)
+  );
 }
 
 /* Filled: warning */

@@ -1,0 +1,96 @@
+---
+title: ScrollArea
+description: "Provides a styled scroll container for overflow content. Includes usage guidance, a runnable example, and the complete API reference."
+---
+
+Provides a styled scroll container for overflow content.
+
+## When to use
+
+Use ScrollArea when a fixed region needs overflow behavior without changing page scroll.
+
+**Recommended**
+
+- Constrain height explicitly.
+- Avoid hiding important actions below a small scroll region.
+
+**Avoid**
+
+- Do not use the component outside its intended interaction model.
+
+## Basic usage
+
+```tsx preview
+import { ScrollArea } from '@rockshin/tao-ui';
+
+function ScrollAreaExample() {
+  return (
+    <ScrollArea
+      maxHeight={180}
+      style={{ border: '1px solid var(--tao-color-border-secondary)', borderRadius: 8 }}
+    >
+      <div style={{ padding: 16 }}>
+        {Array.from({ length: 12 }, (_, index) => (
+          <p key={index}>Activity item {index + 1}</p>
+        ))}
+      </div>
+    </ScrollArea>
+  );
+}
+
+export default ScrollAreaExample;
+```
+
+## Horizontal and two-axis scrolling
+
+```tsx preview
+import { ScrollArea, Stack } from '@rockshin/tao-ui';
+
+function ScrollDirections() {
+  return (
+    <Stack gap="lg">
+      <ScrollArea direction="horizontal" maxWidth={400}>
+        <div style={{ width: 760, padding: 16, whiteSpace: 'nowrap' }}>
+          A long horizontal timeline that remains inside its own scroll area.
+        </div>
+      </ScrollArea>
+      <ScrollArea direction="both" maxWidth={360} maxHeight={140}>
+        <div style={{ width: 680, height: 260, padding: 16 }}>
+          Content that can scroll on both axes.
+        </div>
+      </ScrollArea>
+    </Stack>
+  );
+}
+
+export default ScrollDirections;
+```
+
+## Persistent scrollbars and custom size
+
+```tsx preview
+import { ScrollArea, Stack } from '@rockshin/tao-ui';
+
+function ScrollbarStyles() {
+  const content = Array.from({ length: 10 }, (_, index) => (
+    <p key={index}>Scrollable row {index + 1}</p>
+  ));
+
+  return (
+    <Stack direction="horizontal" gap="lg">
+      <ScrollArea type="always" scrollbarSize={4} maxHeight={160}>
+        <div style={{ padding: 12 }}>{content}</div>
+      </ScrollArea>
+      <ScrollArea type="always" scrollbarSize={10} maxHeight={160}>
+        <div style={{ padding: 12 }}>{content}</div>
+      </ScrollArea>
+    </Stack>
+  );
+}
+
+export default ScrollbarStyles;
+```
+
+## API
+
+<API moduleName="scroll-area" />

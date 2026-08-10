@@ -1,0 +1,137 @@
+---
+title: Drawer
+description: 在不离开当前页面的情况下打开侧边任务面板。页面涵盖适用场景、设计建议、多组可运行示例、交互状态与完整 API 参考。
+---
+
+在不离开当前页面的情况下打开侧边任务面板。
+
+## 何时使用
+
+检查、编辑或辅助工作流需要保留当前页面上下文时使用 Drawer。
+
+**推荐**
+
+- 提供清晰标题和可预测的关闭入口。
+- 破坏性操作应保留独立确认步骤。
+
+**避免**
+
+- 不要在同一工作流中连续堆叠多个 Drawer。
+
+## 基础用法
+
+```tsx preview
+import { Button, Drawer } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+function DrawerExample() {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <>
+      <Button variant="secondary" onClick={() => setOpen(true)}>Open drawer</Button>
+      <Drawer open={open} onClose={() => setOpen(false)} title="Project settings">
+        Update settings without leaving the current page.
+      </Drawer>
+    </>
+  );
+}
+
+export default DrawerExample;
+```
+
+## 位置与尺寸
+
+```tsx preview
+import { Button, Drawer, Stack } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+function DrawerPlacement() {
+  const [placement, setPlacement] = useState(null);
+
+  return (
+    <>
+      <Stack direction="horizontal" gap="md">
+        <Button variant="secondary" onClick={() => setPlacement('right')}>Right</Button>
+        <Button variant="secondary" onClick={() => setPlacement('bottom')}>Bottom</Button>
+      </Stack>
+      <Drawer
+        open={placement !== null}
+        placement={placement || 'right'}
+        size={placement === 'bottom' ? 'large' : 'default'}
+        title="Placement demo"
+        onClose={() => setPlacement(null)}
+      >
+        Drawer content follows the selected edge.
+      </Drawer>
+    </>
+  );
+}
+
+export default DrawerPlacement;
+```
+
+## 页脚与额外操作
+
+```tsx preview
+import { Button, Drawer, Stack } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+function DrawerFooter() {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <>
+      <Button variant="secondary" onClick={() => setOpen(true)}>Edit settings</Button>
+      <Drawer
+        open={open}
+        title="Settings"
+        extra={<Button size="small" variant="ghost">Help</Button>}
+        footer={
+          <Stack direction="horizontal" gap="sm">
+            <Button variant="ghost" onClick={() => setOpen(false)}>Cancel</Button>
+            <Button onClick={() => setOpen(false)}>Save</Button>
+          </Stack>
+        }
+        onClose={() => setOpen(false)}
+      >
+        Drawer footer actions stay attached to the workflow.
+      </Drawer>
+    </>
+  );
+}
+
+export default DrawerFooter;
+```
+
+## 可调整尺寸的抽屉
+
+```tsx preview
+import { Button, Drawer } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+function ResizableDrawer() {
+  const [open, setOpen] = useState(false);
+  const [width, setWidth] = useState(null);
+
+  return (
+    <>
+      <Button variant="secondary" onClick={() => setOpen(true)}>Open resizable drawer</Button>
+      <Drawer
+        open={open}
+        title="Resizable"
+        resizable={{ onResize: (size) => setWidth(Math.round(size)) }}
+        onClose={() => setOpen(false)}
+      >
+        Current width: {width === null ? 'default' : width + 'px'}
+      </Drawer>
+    </>
+  );
+}
+
+export default ResizableDrawer;
+```
+
+## API
+
+<API moduleName="drawer" />

@@ -1,0 +1,99 @@
+---
+title: Radio
+description: 从一组互斥选项中选择一个值。页面涵盖适用场景、设计建议、多组可运行示例、交互状态与完整 API 参考。
+---
+
+从一组互斥选项中选择一个值。
+
+## 何时使用
+
+选项数量较少且用户需要同时比较时使用 RadioGroup。
+
+**推荐**
+
+- 默认值应安全且合理。
+- 选项标签描述结果而非动作。
+
+**避免**
+
+- 允许多选时不要使用 Radio，应使用 Checkbox。
+
+## 基础用法
+
+```tsx preview
+import { RadioGroup } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+function RadioExample() {
+  const [value, setValue] = useState('pro');
+
+  return (
+    <RadioGroup
+      value={value}
+      onChange={setValue}
+      options={[
+        { label: 'Free', value: 'free' },
+        { label: 'Pro', value: 'pro' },
+        { label: 'Enterprise', value: 'enterprise', disabled: true },
+      ]}
+    />
+  );
+}
+
+export default RadioExample;
+```
+
+## 独立状态
+
+```tsx preview
+import { Radio, RadioGroup, Stack } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+function RadioStates() {
+  const [value, setValue] = useState('selected');
+
+  return (
+    <RadioGroup value={value} onChange={setValue}>
+      <Stack direction="horizontal" gap="lg">
+        <Radio value="selected">Selected</Radio>
+        <Radio value="idle">Unselected</Radio>
+        <Radio value="disabled" disabled>Disabled</Radio>
+      </Stack>
+    </RadioGroup>
+  );
+}
+
+export default RadioStates;
+```
+
+## 纵向选项组
+
+```tsx preview
+import { FormField, RadioGroup } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+function VerticalRadioGroup() {
+  const [value, setValue] = useState('monthly');
+
+  return (
+    <FormField label="Billing frequency">
+      <RadioGroup
+        direction="vertical"
+        value={value}
+        onChange={setValue}
+        options={[
+          { label: 'Monthly', value: 'monthly' },
+          { label: 'Yearly — save 20%', value: 'yearly' },
+          { label: 'Enterprise contract', value: 'enterprise', disabled: true },
+        ]}
+      />
+    </FormField>
+  );
+}
+
+export default VerticalRadioGroup;
+```
+
+## API
+
+<API moduleName="radio" />

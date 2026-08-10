@@ -1,0 +1,87 @@
+---
+title: InputNumber
+description: "A styled numeric input built on tao-ui number formatting and validation behavior. Includes usage guidance, a runnable example, and the complete API reference."
+---
+
+A styled numeric input built on tao-ui number formatting and validation behavior.
+
+## When to use
+
+Use InputNumber for numeric values that need min, max, step, precision, or formatted display.
+
+**Recommended**
+
+- Set min and max when the domain is bounded.
+- Use the headless API when custom rendering is required.
+
+**Avoid**
+
+- Do not use a numeric input for identifiers such as account numbers.
+
+## Basic usage
+
+```tsx preview
+import { InputNumber } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+function InputNumberExample() {
+  const [value, setValue] = useState('1500');
+
+  return (
+    <InputNumber
+      value={value}
+      onChange={setValue}
+      prefix="$"
+      suffix="USD"
+      decimalPlaces={2}
+      thousandsSeparator=","
+    />
+  );
+}
+
+export default InputNumberExample;
+```
+
+## Currency and percentage
+
+```tsx preview
+import { InputNumber, Stack } from '@rockshin/tao-ui';
+
+function InputNumberFormats() {
+  return (
+    <Stack gap="md">
+      <InputNumber
+        defaultValue="150000"
+        prefix="€"
+        decimalPlaces={2}
+        thousandsSeparator=","
+      />
+      <InputNumber defaultValue="0.42" isPercentage suffix="%" decimalPlaces={1} />
+    </Stack>
+  );
+}
+
+export default InputNumberFormats;
+```
+
+## Sizes, variants, and bounds
+
+```tsx preview
+import { InputNumber, Stack } from '@rockshin/tao-ui';
+
+function InputNumberStates() {
+  return (
+    <Stack gap="md">
+      <InputNumber size="small" variant="outlined" placeholder="Small" />
+      <InputNumber size="medium" variant="filled" min={0} max={100} defaultValue="50" />
+      <InputNumber size="large" variant="borderless" error defaultValue="120" />
+    </Stack>
+  );
+}
+
+export default InputNumberStates;
+```
+
+## API
+
+<API moduleName="input-number" />

@@ -1,0 +1,29 @@
+/* ===========================
+   Form — horizontal layout
+   (activated per item via Form layout="horizontal" → data-tao-layout)
+   =========================== */
+[data-tao-form-field][data-tao-layout="horizontal"] {
+  flex-direction: row;
+  align-items: flex-start;
+  gap: var(--tao-padding-sm);
+}
+
+[data-tao-form-field][data-tao-layout="horizontal"] [data-tao-form-label] {
+  /* optical constant: fixed label column keeps controls aligned */
+  flex: 0 0 160px;
+  margin-block-end: 0;
+  /* optically center the label against the control height */
+  padding-block-start: calc(
+    (
+      var(--tao-control-height) -
+      var(--tao-form-field-label-font-size, var(--tao-font-size-sm)) *
+      var(--tao-line-height-sm)
+    ) /
+    2
+  );
+  text-align: end;
+}
+
+[data-tao-form-field][data-tao-layout="horizontal"] [data-tao-form-control] {
+  flex: 1;
+}

@@ -1,0 +1,91 @@
+---
+title: Tabs
+description: "Switches between peer panels within the same page context. Includes usage guidance, a runnable example, and the complete API reference."
+---
+
+Switches between peer panels within the same page context.
+
+## When to use
+
+Use Tabs to separate peer views without navigating away from the current task.
+
+**Recommended**
+
+- Use short tab labels.
+- Keep tab panels at comparable hierarchy.
+
+**Avoid**
+
+- Do not use Tabs for sequential steps.
+
+## Basic usage
+
+```tsx preview
+import { Tabs } from '@rockshin/tao-ui';
+
+function TabsExample() {
+  return (
+    <Tabs
+      items={[
+        { key: 'general', label: 'General', children: 'General settings.' },
+        { key: 'security', label: 'Security', children: 'Security settings.' },
+        { key: 'billing', label: 'Billing', children: 'Billing settings.' },
+      ]}
+    />
+  );
+}
+
+export default TabsExample;
+```
+
+## Card variant and sizes
+
+```tsx preview
+import { Stack, Tabs } from '@rockshin/tao-ui';
+
+const items = [
+  { key: 'general', label: 'General', children: 'General settings.' },
+  { key: 'security', label: 'Security', children: 'Security settings.' },
+];
+
+function TabVariants() {
+  return (
+    <Stack gap="lg">
+      <Tabs items={items} size="small" />
+      <Tabs items={items} variant="card" size="medium" />
+      <Tabs items={items} variant="card" size="large" />
+    </Stack>
+  );
+}
+
+export default TabVariants;
+```
+
+## Controlled and disabled tabs
+
+```tsx preview
+import { Tabs } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+function ControlledTabs() {
+  const [activeKey, setActiveKey] = useState('general');
+
+  return (
+    <Tabs
+      activeKey={activeKey}
+      onChange={setActiveKey}
+      items={[
+        { key: 'general', label: 'General', children: 'General settings.' },
+        { key: 'security', label: 'Security', children: 'Security settings.' },
+        { key: 'billing', label: 'Billing', children: 'Unavailable.', disabled: true },
+      ]}
+    />
+  );
+}
+
+export default ControlledTabs;
+```
+
+## API
+
+<API moduleName="tabs" />

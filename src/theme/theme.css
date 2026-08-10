@@ -324,6 +324,9 @@
     --tao-box-shadow-secondary:
       0 2px 8px oklch(0 0 0 / 0.06), 0 0 1px oklch(0 0 0 / 0.06);
     --tao-box-shadow-tertiary: 0 1px 2px oklch(0 0 0 / 0.04);
+    --tao-drop-shadow-popover: drop-shadow(0 6px 16px oklch(0 0 0 / 0.08))
+      drop-shadow(0 3px 6px oklch(0 0 0 / 0.12))
+      drop-shadow(0 9px 28px oklch(0 0 0 / 0.05));
 
     /* ===========================
        DERIVED: Focus ring
@@ -363,6 +366,40 @@
     --tao-color-bg-mask: oklch(0 0 0 / 0.1);
     /* 滚动溢出提示阴影（Table fixed 列、ScrollArea 边缘渐变） */
     --tao-color-shadow-hint: oklch(0 0 0 / 0.05);
+  }
+
+  /* ═════════════════════════════════════════════════════════════════════
+     COMPACT DENSITY
+     对应 antd compactAlgorithm，纯 CSS 实现：控件高度 32→28（sm/lg 经
+     calc 自动跟随），padding/margin 各降一档（4px 网格不动）。
+     fontSize 不动（antd compact 同样不动字号）。
+
+     与 derived 块同为 (0,1,0) 优先级，靠后写胜出；须放在 derived 之后。
+     已知限制（与 dark 同理）：compact 覆盖的是固定档位而非公式，且
+     内层无 compact 的 provider 会在自己元素上重算 derived，覆盖掉
+     继承来的 compact 值。
+
+     启用方式：
+       <TaoProvider theme={{ compact: true }}>     // React 推荐
+       <div data-tao-density="compact">…</div>     // 纯 CSS 消费方
+     ═════════════════════════════════════════════════════════════════════ */
+  [data-tao-density="compact"] {
+    --tao-control-height: 28px;
+
+    --tao-padding-xs: 4px;
+    --tao-padding-sm: 8px;
+    --tao-padding: 12px;
+    --tao-padding-md: 16px;
+    --tao-padding-lg: 20px;
+    --tao-padding-xl: 28px;
+
+    --tao-margin-xs: 4px;
+    --tao-margin-sm: 8px;
+    --tao-margin: 12px;
+    --tao-margin-md: 16px;
+    --tao-margin-lg: 20px;
+    --tao-margin-xl: 28px;
+    --tao-margin-xxl: 40px;
   }
 
   /* ═════════════════════════════════════════════════════════════════════
@@ -424,6 +461,9 @@
     --tao-box-shadow-secondary:
       0 4px 12px oklch(0 0 0 / 0.4), 0 0 1px oklch(0 0 0 / 0.5);
     --tao-box-shadow-tertiary: 0 1px 2px oklch(0 0 0 / 0.35);
+    --tao-drop-shadow-popover: drop-shadow(0 6px 16px oklch(0 0 0 / 0.32))
+      drop-shadow(0 3px 6px oklch(0 0 0 / 0.4))
+      drop-shadow(0 9px 28px oklch(0 0 0 / 0.24));
 
     /* mask 加深：暗 UI 上的浅灰遮罩会显得"起雾" */
     --tao-color-bg-mask: oklch(0 0 0 / 0.55);

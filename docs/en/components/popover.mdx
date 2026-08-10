@@ -1,0 +1,93 @@
+---
+title: Popover
+description: "Displays a floating card with rich content anchored to a trigger element, opened by click or hover. Usage guidance, runnable example, and API reference."
+---
+
+Displays a floating card with rich content anchored to a trigger element, opened by click or hover.
+
+## When to use
+
+Use Popover for rich, non-blocking contextual content behind a click or hover. Use Tooltip for short text-only hints and Modal for blocking interactions.
+
+**Recommended**
+
+- Keep the title to one short line; put detail in the content.
+- Use the default hover trigger for read-only previews and trigger="click" for interactive content.
+- Keep popup content compact; link out for long-form detail.
+
+**Avoid**
+
+- Do not nest essential workflows inside a hover-only popover.
+- Do not chain popovers from inside another popover.
+
+## Basic usage
+
+```tsx preview
+import { Button, Popover } from '@rockshin/tao-ui';
+
+function PopoverExample() {
+  return (
+    <Popover
+      trigger="click"
+      title="Deployment"
+      content="Production was updated 2 minutes ago."
+    >
+      <Button variant="secondary">View status</Button>
+    </Popover>
+  );
+}
+
+export default PopoverExample;
+```
+
+## Hover, focus, and click
+
+```tsx preview
+import { Button, Popover, Stack } from '@rockshin/tao-ui';
+
+function PopoverTriggers() {
+  return (
+    <Stack direction="horizontal" gap="md">
+      <Popover title="Hover" content="Opens on pointer hover.">
+        <Button variant="secondary">Hover</Button>
+      </Popover>
+      <Popover trigger="focus" title="Focus" content="Opens from keyboard focus.">
+        <Button variant="secondary">Focus</Button>
+      </Popover>
+      <Popover trigger="click" title="Click" content="Opens and closes on click.">
+        <Button variant="secondary">Click</Button>
+      </Popover>
+    </Stack>
+  );
+}
+
+export default PopoverTriggers;
+```
+
+## Placement and arrow
+
+```tsx preview
+import { Button, Popover, Stack } from '@rockshin/tao-ui';
+
+function PopoverPlacements() {
+  return (
+    <Stack direction="horizontal" gap="md">
+      <Popover placement="topLeft" title="Top left" content="Aligned to the left edge.">
+        <Button variant="secondary">Top left</Button>
+      </Popover>
+      <Popover placement="bottom" title="Bottom" content="Centered below the trigger.">
+        <Button variant="secondary">Bottom</Button>
+      </Popover>
+      <Popover placement="right" arrow={false} title="No arrow" content="Arrow disabled.">
+        <Button variant="secondary">Right</Button>
+      </Popover>
+    </Stack>
+  );
+}
+
+export default PopoverPlacements;
+```
+
+## API
+
+<API moduleName="popover" />

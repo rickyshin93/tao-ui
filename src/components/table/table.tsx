@@ -7,6 +7,7 @@ import {
   useState,
 } from 'react';
 import { useTaoConfig } from '../../provider/tao-provider';
+import { useBreakpoint } from '../../utils/breakpoint';
 import { cx } from '../../utils/semantic';
 import { Pagination } from '../pagination/pagination';
 import { TableFilterDropdown } from './table-filter';
@@ -49,7 +50,7 @@ export type {
 // ---- Table ----
 
 export function Table<T extends TableRecord = Record<string, unknown>>({
-  columns,
+  columns: columnsProp,
   dataSource,
   rowKey,
   loading = false,
@@ -73,6 +74,20 @@ export function Table<T extends TableRecord = Record<string, unknown>>({
 }: TableProps<T>) {
   const ctx = useTaoConfig();
   const resolvedSize = size ?? ctx.size;
+  const screens = useBreakpoint();
+  // Columns with a `responsive` list render only when one of its breakpoints
+  // matches; filtering here keeps sorting/filtering/colgroup/fixed-shadow
+  // logic downstream untouched.
+  const columns = useMemo(
+    () =>
+      columnsProp.some((col) => col.responsive)
+        ? columnsProp.filter(
+            (col) =>
+              !col.responsive || col.responsive.some((bp) => screens[bp]),
+          )
+        : columnsProp,
+    [columnsProp, screens],
+  );
   // Inherit variant from provider, but treat the framework default `outlined`
   // as `modern` so a bare <Table> uses the modern table skin by default.
   const resolvedVariant: TableVariant =

@@ -1,0 +1,78 @@
+---
+title: Input
+description: 输入单行文本，并支持前后缀、状态、尺寸与视觉变体。页面涵盖适用场景、设计建议、多组可运行示例、交互状态与完整 API 参考。
+---
+
+输入单行文本，并支持前后缀、状态、尺寸与视觉变体。
+
+## 何时使用
+
+用户需要输入短文本、搜索词或密码等单行内容时使用 Input。
+
+**推荐**
+
+- 提供可见标签或通过 FormField 关联标签。
+- 错误状态搭配具体错误信息。
+
+**避免**
+
+- 多行内容不要使用 Input，应使用 Textarea。
+
+## 基础用法
+
+```tsx preview
+import { Input, Stack } from '@rockshin/tao-ui';
+
+function InputExample() {
+  return (
+    <Stack gap="md" style={{ maxWidth: 400 }}>
+      <Input placeholder="Default input" />
+      <Input prefix={<span aria-hidden="true">⌕</span>} placeholder="Search" />
+      <Input value="Invalid value" error readOnly />
+      <Input placeholder="Disabled" disabled />
+    </Stack>
+  );
+}
+
+export default InputExample;
+```
+
+## 变体
+
+```tsx preview
+import { Input, Stack } from '@rockshin/tao-ui';
+
+function InputVariants() {
+  return (
+    <Stack gap="md" style={{ maxWidth: 400 }}>
+      <Input variant="outlined" placeholder="Outlined" />
+      <Input variant="filled" placeholder="Filled" />
+      <Input variant="borderless" placeholder="Borderless" />
+    </Stack>
+  );
+}
+
+export default InputVariants;
+```
+
+## 尺寸与前后缀
+
+```tsx preview
+import { Input, Stack } from '@rockshin/tao-ui';
+
+function InputSizes() {
+  return (
+    <Stack gap="md" style={{ maxWidth: 400 }}>
+      <Input size="small" prefix={<span aria-hidden="true">⌕</span>} placeholder="Small search" />
+      <Input size="medium" suffix={<span>USD</span>} placeholder="Medium amount" />
+      <Input size="large" placeholder="Large input" />
+    </Stack>
+  );
+}
+
+export default InputSizes;
+```
+
+## API
+
+<API moduleName="input" />

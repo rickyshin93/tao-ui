@@ -1,0 +1,120 @@
+---
+title: Tag
+description: 使用紧凑标签展示类别、状态或可选择筛选条件。页面涵盖适用场景、设计建议、多组可运行示例、交互状态与完整 API 参考。
+---
+
+使用紧凑标签展示类别、状态或可选择筛选条件。
+
+## 何时使用
+
+需要在较小空间表达状态、分类或轻量选择时使用 Tag。
+
+**推荐**
+
+- 语义颜色保持一致。
+- 可关闭与可选择标签提供明确交互反馈。
+
+**避免**
+
+- 不要用大量彩色 Tag 制造视觉噪音。
+
+## 基础用法
+
+```tsx preview
+import { Stack, Tag } from '@rockshin/tao-ui';
+
+function TagExample() {
+  return (
+    <Stack direction="horizontal" gap="sm">
+      <Tag>Default</Tag>
+      <Tag color="primary">Primary</Tag>
+      <Tag color="success">Success</Tag>
+      <Tag color="warning">Warning</Tag>
+      <Tag color="error">Error</Tag>
+    </Stack>
+  );
+}
+
+export default TagExample;
+```
+
+## 变体
+
+```tsx preview
+import { Stack, Tag } from '@rockshin/tao-ui';
+
+function TagVariants() {
+  return (
+    <Stack gap="md">
+      <Stack direction="horizontal" gap="sm">
+        <Tag variant="filled" color="primary">Filled</Tag>
+        <Tag variant="filled" color="success">Success</Tag>
+        <Tag variant="filled" color="warning">Warning</Tag>
+      </Stack>
+      <Stack direction="horizontal" gap="sm">
+        <Tag variant="solid" color="primary">Solid</Tag>
+        <Tag variant="solid" color="success">Success</Tag>
+        <Tag variant="solid" color="error">Error</Tag>
+      </Stack>
+      <Stack direction="horizontal" gap="sm">
+        <Tag variant="outlined" color="primary">Outlined</Tag>
+        <Tag variant="outlined" color="warning">Warning</Tag>
+      </Stack>
+    </Stack>
+  );
+}
+
+export default TagVariants;
+```
+
+## 自定义颜色与可关闭标签
+
+```tsx preview
+import { Stack, Tag } from '@rockshin/tao-ui';
+
+function CustomTags() {
+  return (
+    <Stack direction="horizontal" gap="sm">
+      <Tag color="#245b57" variant="solid">Custom teal</Tag>
+      <Tag color="#8a5a21" variant="outlined">Custom ochre</Tag>
+      <Tag color="primary" closeIcon onClose={() => console.log('closed')}>Closable</Tag>
+      <Tag disabled color="primary" variant="solid">Disabled</Tag>
+    </Stack>
+  );
+}
+
+export default CustomTags;
+```
+
+## 可选择标签
+
+```tsx preview
+import { CheckableTag, Stack } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+function CheckableTags() {
+  const [selected, setSelected] = useState(['Design']);
+
+  return (
+    <Stack direction="horizontal" gap="sm">
+      {['Design', 'Engineering', 'Research'].map((label) => (
+        <CheckableTag
+          key={label}
+          checked={selected.includes(label)}
+          onChange={(checked) =>
+            setSelected((items) => checked ? [...items, label] : items.filter((item) => item !== label))
+          }
+        >
+          {label}
+        </CheckableTag>
+      ))}
+    </Stack>
+  );
+}
+
+export default CheckableTags;
+```
+
+## API
+
+<API moduleName="tag" />

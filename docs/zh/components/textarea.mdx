@@ -1,0 +1,77 @@
+---
+title: Textarea
+description: 输入多行文本，并支持状态、尺寸、变体与自动高度。页面涵盖适用场景、设计建议、多组可运行示例、交互状态与完整 API 参考。
+---
+
+输入多行文本，并支持状态、尺寸、变体与自动高度。
+
+## 何时使用
+
+用户需要输入说明、备注或其他多行内容时使用 Textarea。
+
+**推荐**
+
+- 通过 FormField 提供标签与错误信息。
+- 合理限制自动高度范围。
+
+**避免**
+
+- 短单行内容应使用 Input。
+
+## 基础用法
+
+```tsx preview
+import { Stack, Textarea } from '@rockshin/tao-ui';
+
+function TextareaExample() {
+  return (
+    <Stack gap="md" style={{ maxWidth: 420 }}>
+      <Textarea placeholder="Write a description" />
+      <Textarea defaultValue="Autosize grows with its content." autoSize={{ minRows: 2, maxRows: 5 }} />
+      <Textarea value="Invalid content" error readOnly />
+    </Stack>
+  );
+}
+
+export default TextareaExample;
+```
+
+## 变体
+
+```tsx preview
+import { Stack, Textarea } from '@rockshin/tao-ui';
+
+function TextareaVariants() {
+  return (
+    <Stack gap="md" style={{ maxWidth: 420 }}>
+      <Textarea variant="outlined" placeholder="Outlined" />
+      <Textarea variant="filled" placeholder="Filled" />
+      <Textarea variant="borderless" placeholder="Borderless" />
+    </Stack>
+  );
+}
+
+export default TextareaVariants;
+```
+
+## 尺寸与自动高度
+
+```tsx preview
+import { Stack, Textarea } from '@rockshin/tao-ui';
+
+function TextareaSizes() {
+  return (
+    <Stack gap="md" style={{ maxWidth: 420 }}>
+      <Textarea size="small" placeholder="Small" />
+      <Textarea size="medium" autoSize={{ minRows: 2, maxRows: 5 }} defaultValue="Autosize grows with content." />
+      <Textarea size="large" placeholder="Large" />
+    </Stack>
+  );
+}
+
+export default TextareaSizes;
+```
+
+## API
+
+<API moduleName="textarea" />

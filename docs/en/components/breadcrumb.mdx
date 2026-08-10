@@ -1,0 +1,100 @@
+---
+title: Breadcrumb
+description: "Renders the user location in a hierarchy of pages or views. Includes usage guidance, a runnable example, and the complete API reference."
+---
+
+Renders the user location in a hierarchy of pages or views.
+
+## When to use
+
+Use Breadcrumb near the top of a page when users need to understand or move through nested context.
+
+**Recommended**
+
+- Keep labels short and recognizable.
+- Use links for ancestors and plain text for the current item.
+
+**Avoid**
+
+- Do not use Breadcrumb as primary navigation.
+
+## Basic usage
+
+```tsx preview
+import { Breadcrumb } from '@rockshin/tao-ui';
+
+function BreadcrumbExample() {
+  return (
+    <Breadcrumb
+      items={[
+        { title: 'Home', href: '/' },
+        { title: 'Components', href: '/components/button' },
+        { title: 'Breadcrumb' },
+      ]}
+    />
+  );
+}
+
+export default BreadcrumbExample;
+```
+
+## Separators and collapsed paths
+
+```tsx preview
+import { Breadcrumb, Stack } from '@rockshin/tao-ui';
+
+function BreadcrumbSeparators() {
+  const items = [
+    { title: 'Home', href: '/' },
+    { title: 'Settings', href: '/settings' },
+    { title: 'Profile' },
+  ];
+
+  return (
+    <Stack gap="md">
+      <Breadcrumb separator="/" items={items} />
+      <Breadcrumb separator="›" items={items} />
+      <Breadcrumb
+        maxItems={3}
+        items={[
+          { title: 'Home', href: '/' },
+          { title: 'Workspace', href: '/workspace' },
+          { title: 'Projects', href: '/projects' },
+          { title: 'tao-ui', href: '/projects/tao-ui' },
+          { title: 'Settings' },
+        ]}
+      />
+    </Stack>
+  );
+}
+
+export default BreadcrumbSeparators;
+```
+
+## Disabled items and sizes
+
+```tsx preview
+import { Breadcrumb, Stack } from '@rockshin/tao-ui';
+
+function BreadcrumbStates() {
+  const items = [
+    { title: 'Home', href: '/' },
+    { title: 'Archived', href: '/archived', disabled: true },
+    { title: 'Item' },
+  ];
+
+  return (
+    <Stack gap="md">
+      <Breadcrumb size="small" items={items} />
+      <Breadcrumb size="medium" items={items} />
+      <Breadcrumb size="large" items={items} />
+    </Stack>
+  );
+}
+
+export default BreadcrumbStates;
+```
+
+## API
+
+<API moduleName="breadcrumb" />

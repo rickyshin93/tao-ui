@@ -1,0 +1,38 @@
+---
+title: Getting Started
+description: Install tao-ui, add TaoProvider, and render your first accessible React 19 component with inherited theme settings.
+---
+
+import { PackageManagerTabs } from '@rspress/core/theme';
+
+Install the package with your preferred package manager.
+
+<PackageManagerTabs command="install @rockshin/tao-ui" />
+
+## Add the provider
+
+Wrap your application once with `TaoProvider`. Components inherit settings such as size, disabled state, and theme mode.
+
+```tsx
+import { Button, TaoProvider } from '@rockshin/tao-ui';
+
+export default function App() {
+  return (
+    <TaoProvider size="medium">
+      <Button>Continue</Button>
+    </TaoProvider>
+  );
+}
+```
+
+## Use dark mode
+
+Set the theme mode on the provider. Portaled components inherit the same theme.
+
+```tsx
+<TaoProvider theme={{ mode: 'dark' }}>
+  <App />
+</TaoProvider>
+```
+
+Continue with the [Button component](/components/button).

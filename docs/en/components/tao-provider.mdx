@@ -1,0 +1,131 @@
+---
+title: TaoProvider
+description: "Provides global defaults, portal scoping, and theme seed token overrides, with usage guidance, runnable examples, and a complete API reference."
+---
+
+Provides global component defaults, portal scoping, and theme seed token overrides.
+
+## When to use
+
+Wrap an app or subtree with TaoProvider to set size, disabled, variant, and theme defaults.
+
+**Recommended**
+
+- Prefer provider-level defaults for app-wide decisions.
+- Use nested providers for scoped theme overrides.
+
+**Avoid**
+
+- Do not override derived CSS variables directly unless a theme token cannot express the change.
+
+## Basic usage
+
+```tsx preview
+import { Button, Input, Stack, TaoProvider } from '@rockshin/tao-ui';
+
+function TaoProviderExample() {
+  return (
+    <TaoProvider
+      size="large"
+      theme={{ token: { colorPrimary: 'oklch(0.42 0.08 210)' } }}
+    >
+      <Stack direction="horizontal" gap="md" align="center">
+        <Button>Inherited button</Button>
+        <Input placeholder="Inherited input" />
+      </Stack>
+    </TaoProvider>
+  );
+}
+
+export default TaoProviderExample;
+```
+
+## Global sizes
+
+```tsx preview
+import { Button, Input, Stack, TaoProvider } from '@rockshin/tao-ui';
+
+function ProviderSizes() {
+  return (
+    <Stack gap="lg">
+      {(['small', 'medium', 'large']).map((size) => (
+        <TaoProvider key={size} size={size}>
+          <Stack direction="horizontal" gap="md" align="center">
+            <Button>{size} button</Button>
+            <Input placeholder={size + ' input'} />
+          </Stack>
+        </TaoProvider>
+      ))}
+    </Stack>
+  );
+}
+
+export default ProviderSizes;
+```
+
+## Brand tokens and component tokens
+
+```tsx preview
+import { Button, Stack, TaoProvider } from '@rockshin/tao-ui';
+
+function ProviderTokens() {
+  return (
+    <TaoProvider
+      theme={{
+        token: {
+          colorPrimary: 'oklch(0.42 0.08 210)',
+          borderRadius: 8,
+        },
+        components: {
+          Button: {
+            fontWeight: 600,
+            paddingInline: 20,
+          },
+        },
+      }}
+    >
+      <Stack direction="horizontal" gap="md">
+        <Button>Branded primary</Button>
+        <Button variant="secondary">Secondary</Button>
+      </Stack>
+    </TaoProvider>
+  );
+}
+
+export default ProviderTokens;
+```
+
+## Dark mode, compact density, and isolation
+
+```tsx preview
+import { Button, Input, Stack, TaoProvider } from '@rockshin/tao-ui';
+
+function ProviderModes() {
+  return (
+    <Stack gap="lg">
+      <TaoProvider theme={{ compact: true }}>
+        <Stack direction="horizontal" gap="md">
+          <Button>Compact</Button>
+          <Input placeholder="Compact input" />
+        </Stack>
+      </TaoProvider>
+      <TaoProvider theme={{ mode: 'dark', inherit: false }}>
+        <Stack
+          direction="horizontal"
+          gap="md"
+          style={{ padding: 20, background: 'var(--tao-color-bg-base)' }}
+        >
+          <Button>Dark mode</Button>
+          <Input placeholder="Dark input" />
+        </Stack>
+      </TaoProvider>
+    </Stack>
+  );
+}
+
+export default ProviderModes;
+```
+
+## API
+
+<API moduleName="tao-provider" />

@@ -74,9 +74,9 @@
     "@rsbuild/plugin-babel": "^1.2.1",
     "@rsbuild/plugin-react": "^2.0.1",
     "@rslib/core": "^0.23.2",
-    "@rspress/core": "^2.0.13",
-    "@rspress/plugin-api-docgen": "^2.0.13",
-    "@rspress/plugin-preview": "^2.0.13",
+    "@rspress/core": "^2.0.19",
+    "@rspress/plugin-api-docgen": "^2.0.19",
+    "@rspress/plugin-preview": "^2.0.19",
     "@rstest/adapter-rslib": "^0.10.6",
     "@rstest/core": "^0.10.6",
     "@storybook/addon-docs": "^10.5.3",
@@ -114,6 +114,8 @@
     "@radix-ui/react-popover": "^1.1.15",
     "@radix-ui/react-select": "^2.2.6",
     "@radix-ui/react-slot": "^1.2.3",
+    "@radix-ui/react-tooltip": "^1.2.16",
+    "@rc-component/form": "~1.8.5",
     "dayjs": "^1.11.21"
   }
 }

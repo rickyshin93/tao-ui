@@ -1,0 +1,100 @@
+---
+title: Breadcrumb
+description: 展示用户当前所处的页面或视图层级。页面涵盖适用场景、设计建议、多组可运行示例、交互状态与完整 API 参考。
+---
+
+展示用户当前所处的页面或视图层级。
+
+## 何时使用
+
+当用户需要理解并返回多层级上下文时，将 Breadcrumb 放在页面内容顶部。
+
+**推荐**
+
+- 标签保持简短且易识别。
+- 祖先节点使用链接，当前节点使用普通文本。
+
+**避免**
+
+- 不要把 Breadcrumb 当作主导航。
+
+## 基础用法
+
+```tsx preview
+import { Breadcrumb } from '@rockshin/tao-ui';
+
+function BreadcrumbExample() {
+  return (
+    <Breadcrumb
+      items={[
+        { title: 'Home', href: '/' },
+        { title: 'Components', href: '/components/button' },
+        { title: 'Breadcrumb' },
+      ]}
+    />
+  );
+}
+
+export default BreadcrumbExample;
+```
+
+## 分隔符与路径折叠
+
+```tsx preview
+import { Breadcrumb, Stack } from '@rockshin/tao-ui';
+
+function BreadcrumbSeparators() {
+  const items = [
+    { title: 'Home', href: '/' },
+    { title: 'Settings', href: '/settings' },
+    { title: 'Profile' },
+  ];
+
+  return (
+    <Stack gap="md">
+      <Breadcrumb separator="/" items={items} />
+      <Breadcrumb separator="›" items={items} />
+      <Breadcrumb
+        maxItems={3}
+        items={[
+          { title: 'Home', href: '/' },
+          { title: 'Workspace', href: '/workspace' },
+          { title: 'Projects', href: '/projects' },
+          { title: 'tao-ui', href: '/projects/tao-ui' },
+          { title: 'Settings' },
+        ]}
+      />
+    </Stack>
+  );
+}
+
+export default BreadcrumbSeparators;
+```
+
+## 禁用项与尺寸
+
+```tsx preview
+import { Breadcrumb, Stack } from '@rockshin/tao-ui';
+
+function BreadcrumbStates() {
+  const items = [
+    { title: 'Home', href: '/' },
+    { title: 'Archived', href: '/archived', disabled: true },
+    { title: 'Item' },
+  ];
+
+  return (
+    <Stack gap="md">
+      <Breadcrumb size="small" items={items} />
+      <Breadcrumb size="medium" items={items} />
+      <Breadcrumb size="large" items={items} />
+    </Stack>
+  );
+}
+
+export default BreadcrumbStates;
+```
+
+## API
+
+<API moduleName="breadcrumb" />

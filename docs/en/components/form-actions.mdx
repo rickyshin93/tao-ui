@@ -1,0 +1,75 @@
+---
+title: FormActions
+description: "Lays out submit, cancel, and secondary actions for forms. Includes usage guidance, a runnable example, and the complete API reference."
+---
+
+Lays out submit, cancel, and secondary actions for forms.
+
+## When to use
+
+Use FormActions at the end of a form or section to align the final actions consistently.
+
+**Recommended**
+
+- Keep action order consistent across forms.
+- Use a single submit action unless the workflow truly branches.
+
+**Avoid**
+
+- Do not use the component outside its intended interaction model.
+
+## Basic usage
+
+```tsx preview
+import { Button, FormActions } from '@rockshin/tao-ui';
+
+function FormActionsExample() {
+  return (
+    <FormActions>
+      <Button variant="ghost">Cancel</Button>
+      <Button>Save changes</Button>
+    </FormActions>
+  );
+}
+
+export default FormActionsExample;
+```
+
+## Secondary and destructive actions
+
+```tsx preview
+import { Button, FormActions } from '@rockshin/tao-ui';
+
+function FormActionVariants() {
+  return (
+    <FormActions>
+      <Button variant="destructive">Delete</Button>
+      <Button variant="ghost">Cancel</Button>
+      <Button>Save</Button>
+    </FormActions>
+  );
+}
+
+export default FormActionVariants;
+```
+
+## Semantic alignment
+
+```tsx preview
+import { Button, FormActions } from '@rockshin/tao-ui';
+
+function CustomizedFormActions() {
+  return (
+    <FormActions styles={{ root: { justifyContent: 'space-between' } }}>
+      <Button variant="ghost">Back</Button>
+      <Button>Continue</Button>
+    </FormActions>
+  );
+}
+
+export default CustomizedFormActions;
+```
+
+## API
+
+<API moduleName="form-actions" />

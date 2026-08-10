@@ -1,0 +1,77 @@
+---
+title: Textarea
+description: "Multi-line text input with optional auto sizing. Includes usage guidance, a runnable example, and the complete API reference."
+---
+
+Multi-line text input with optional auto sizing.
+
+## When to use
+
+Use Textarea for longer freeform content such as descriptions, notes, and comments.
+
+**Recommended**
+
+- Set rows or autoSize based on expected content length.
+- Use maxLength when limits are strict.
+
+**Avoid**
+
+- Do not use the component outside its intended interaction model.
+
+## Basic usage
+
+```tsx preview
+import { Stack, Textarea } from '@rockshin/tao-ui';
+
+function TextareaExample() {
+  return (
+    <Stack gap="md" style={{ maxWidth: 420 }}>
+      <Textarea placeholder="Write a description" />
+      <Textarea defaultValue="Autosize grows with its content." autoSize={{ minRows: 2, maxRows: 5 }} />
+      <Textarea value="Invalid content" error readOnly />
+    </Stack>
+  );
+}
+
+export default TextareaExample;
+```
+
+## Variants
+
+```tsx preview
+import { Stack, Textarea } from '@rockshin/tao-ui';
+
+function TextareaVariants() {
+  return (
+    <Stack gap="md" style={{ maxWidth: 420 }}>
+      <Textarea variant="outlined" placeholder="Outlined" />
+      <Textarea variant="filled" placeholder="Filled" />
+      <Textarea variant="borderless" placeholder="Borderless" />
+    </Stack>
+  );
+}
+
+export default TextareaVariants;
+```
+
+## Sizes and autosize
+
+```tsx preview
+import { Stack, Textarea } from '@rockshin/tao-ui';
+
+function TextareaSizes() {
+  return (
+    <Stack gap="md" style={{ maxWidth: 420 }}>
+      <Textarea size="small" placeholder="Small" />
+      <Textarea size="medium" autoSize={{ minRows: 2, maxRows: 5 }} defaultValue="Autosize grows with content." />
+      <Textarea size="large" placeholder="Large" />
+    </Stack>
+  );
+}
+
+export default TextareaSizes;
+```
+
+## API
+
+<API moduleName="textarea" />

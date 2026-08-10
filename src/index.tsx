@@ -11,6 +11,12 @@ import './theme/control.css';
 // Provider
 
 export {
+  Alert,
+  type AlertProps,
+  type AlertSemanticPart,
+  type AlertType,
+} from './components/alert/alert';
+export {
   Breadcrumb,
   type BreadcrumbItemType,
   type BreadcrumbProps,
@@ -80,6 +86,21 @@ export {
   type FormActionsSemanticPart,
 } from './components/form-actions/form-actions';
 export {
+  Form,
+  type FormItemChildren,
+  type FormItemProps,
+  type FormItemSemanticPart,
+  type FormItemValidateStatus,
+  type FormProps,
+  type FormSemanticPart,
+} from './components/form';
+export type {
+  FormInstance,
+  NamePath,
+  Rule,
+  RuleObject,
+} from '@rc-component/form';
+export {
   FormField,
   type FormFieldProps,
   type FormFieldSemanticPart,
@@ -114,6 +135,18 @@ export {
   type PaginationProps,
   type PaginationSemanticPart,
 } from './components/pagination/pagination';
+export {
+  Popconfirm,
+  type PopconfirmProps,
+  type PopconfirmSemanticPart,
+} from './components/popconfirm/popconfirm';
+export {
+  Popover,
+  type PopoverPlacement,
+  type PopoverProps,
+  type PopoverSemanticPart,
+  type PopoverTrigger,
+} from './components/popover/popover';
 export {
   Radio,
   RadioGroup,
@@ -198,6 +231,12 @@ export {
   type TextareaSemanticPart,
 } from './components/textarea/textarea';
 export {
+  Tooltip,
+  type TooltipPlacement,
+  type TooltipProps,
+  type TooltipSemanticPart,
+} from './components/tooltip/tooltip';
+export {
   FormLayout,
   type FormLayoutProps,
   type FormLayoutSemanticPart,
@@ -222,6 +261,10 @@ export {
   useNumberInput,
 } from './number-input';
 export {
+  type ButtonComponentToken,
+  type FormFieldComponentToken,
+  type InputComponentToken,
+  type TaoComponentTokenMap,
   type TaoConfig,
   TaoProvider,
   type TaoProviderProps,
@@ -232,7 +275,19 @@ export {
   type TaoThemeMode,
   type TaoVariant,
   useTaoConfig,
+  useTaoToken,
 } from './provider/tao-provider';
+// Theme token utilities
+export { type TaoTokenName, taoTokenNames, tokenVar } from './theme/tokens';
+// Responsive utilities
+export {
+  resolveResponsiveValue,
+  type TaoBreakpoint,
+  type TaoBreakpointMap,
+  type TaoResponsiveValue,
+  useBreakpoint,
+  useIsMobile,
+} from './utils/breakpoint';
 // Semantic DOM utilities
 export {
   cx,

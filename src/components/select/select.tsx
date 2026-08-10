@@ -29,7 +29,7 @@ import type {
   SelectPlacement,
   SelectProps,
 } from './select-types';
-import { useIsMobile } from './use-is-mobile';
+import { useIsMobile } from '../../utils/breakpoint';
 
 export type {
   SelectOption,

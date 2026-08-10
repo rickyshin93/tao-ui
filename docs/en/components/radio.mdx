@@ -1,0 +1,99 @@
+---
+title: Radio
+description: "Selects exactly one option from a mutually exclusive set. Includes usage guidance, a runnable example, and the complete API reference."
+---
+
+Selects exactly one option from a mutually exclusive set.
+
+## When to use
+
+Use RadioGroup when every option is visible and only one can be selected.
+
+**Recommended**
+
+- Use concise labels.
+- Provide a default value when one option is recommended or required.
+
+**Avoid**
+
+- Do not use RadioGroup for very long option lists; use Select instead.
+
+## Basic usage
+
+```tsx preview
+import { RadioGroup } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+function RadioExample() {
+  const [value, setValue] = useState('pro');
+
+  return (
+    <RadioGroup
+      value={value}
+      onChange={setValue}
+      options={[
+        { label: 'Free', value: 'free' },
+        { label: 'Pro', value: 'pro' },
+        { label: 'Enterprise', value: 'enterprise', disabled: true },
+      ]}
+    />
+  );
+}
+
+export default RadioExample;
+```
+
+## Standalone states
+
+```tsx preview
+import { Radio, RadioGroup, Stack } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+function RadioStates() {
+  const [value, setValue] = useState('selected');
+
+  return (
+    <RadioGroup value={value} onChange={setValue}>
+      <Stack direction="horizontal" gap="lg">
+        <Radio value="selected">Selected</Radio>
+        <Radio value="idle">Unselected</Radio>
+        <Radio value="disabled" disabled>Disabled</Radio>
+      </Stack>
+    </RadioGroup>
+  );
+}
+
+export default RadioStates;
+```
+
+## Vertical group
+
+```tsx preview
+import { FormField, RadioGroup } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+function VerticalRadioGroup() {
+  const [value, setValue] = useState('monthly');
+
+  return (
+    <FormField label="Billing frequency">
+      <RadioGroup
+        direction="vertical"
+        value={value}
+        onChange={setValue}
+        options={[
+          { label: 'Monthly', value: 'monthly' },
+          { label: 'Yearly — save 20%', value: 'yearly' },
+          { label: 'Enterprise contract', value: 'enterprise', disabled: true },
+        ]}
+      />
+    </FormField>
+  );
+}
+
+export default VerticalRadioGroup;
+```
+
+## API
+
+<API moduleName="radio" />

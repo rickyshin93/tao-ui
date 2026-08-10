@@ -1,0 +1,78 @@
+---
+title: Input
+description: "Single-line text input for short freeform values. Includes usage guidance, a runnable example, and the complete API reference."
+---
+
+Single-line text input for short freeform values.
+
+## When to use
+
+Use Input for short text values such as names, filters, search terms, and identifiers.
+
+**Recommended**
+
+- Pair with FormField for labels and validation.
+- Use type, inputMode, and autoComplete when applicable.
+
+**Avoid**
+
+- Do not use the component outside its intended interaction model.
+
+## Basic usage
+
+```tsx preview
+import { Input, Stack } from '@rockshin/tao-ui';
+
+function InputExample() {
+  return (
+    <Stack gap="md" style={{ maxWidth: 400 }}>
+      <Input placeholder="Default input" />
+      <Input prefix={<span aria-hidden="true">⌕</span>} placeholder="Search" />
+      <Input value="Invalid value" error readOnly />
+      <Input placeholder="Disabled" disabled />
+    </Stack>
+  );
+}
+
+export default InputExample;
+```
+
+## Variants
+
+```tsx preview
+import { Input, Stack } from '@rockshin/tao-ui';
+
+function InputVariants() {
+  return (
+    <Stack gap="md" style={{ maxWidth: 400 }}>
+      <Input variant="outlined" placeholder="Outlined" />
+      <Input variant="filled" placeholder="Filled" />
+      <Input variant="borderless" placeholder="Borderless" />
+    </Stack>
+  );
+}
+
+export default InputVariants;
+```
+
+## Sizes and affixes
+
+```tsx preview
+import { Input, Stack } from '@rockshin/tao-ui';
+
+function InputSizes() {
+  return (
+    <Stack gap="md" style={{ maxWidth: 400 }}>
+      <Input size="small" prefix={<span aria-hidden="true">⌕</span>} placeholder="Small search" />
+      <Input size="medium" suffix={<span>USD</span>} placeholder="Medium amount" />
+      <Input size="large" placeholder="Large input" />
+    </Stack>
+  );
+}
+
+export default InputSizes;
+```
+
+## API
+
+<API moduleName="input" />

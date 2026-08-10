@@ -542,3 +542,18 @@ export const FullFeature: StoryObj = {
     return <Demo />;
   },
 };
+
+export const ResponsiveColumns: StoryObj = {
+  render: () => (
+    <Table
+      columns={[
+        { key: 'name', dataIndex: 'name', title: 'Name' },
+        { key: 'email', dataIndex: 'email', title: 'Email', responsive: ['md'] },
+        { key: 'department', dataIndex: 'department', title: 'Department', responsive: ['lg'] },
+      ]}
+      dataSource={users.slice(0, 5)}
+      rowKey="id"
+      pagination={false}
+    />
+  ),
+};

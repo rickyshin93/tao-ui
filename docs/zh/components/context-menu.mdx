@@ -1,0 +1,124 @@
+---
+title: ContextMenu
+description: 通过右键或长按为对象提供上下文操作菜单。页面涵盖适用场景、设计建议、多组可运行示例、交互状态与完整 API 参考。
+---
+
+通过右键或长按为对象提供上下文操作菜单。
+
+## 何时使用
+
+对象或区域需要提供次要操作时使用 ContextMenu。
+
+**推荐**
+
+- 菜单项使用简短、动作导向的文案。
+- 关键操作必须提供其他可访问入口。
+
+**避免**
+
+- 不要把主要工作流只放进上下文菜单。
+
+## 基础用法
+
+```tsx preview
+import { ContextMenu } from '@rockshin/tao-ui';
+
+function ContextMenuExample() {
+  return (
+    <ContextMenu
+      menu={{
+        items: [
+          { key: 'cut', label: 'Cut', extra: '⌘X' },
+          { key: 'copy', label: 'Copy', extra: '⌘C' },
+          { key: 'paste', label: 'Paste', extra: '⌘V' },
+          { type: 'divider' },
+          { key: 'delete', label: 'Delete', danger: true },
+        ],
+      }}
+    >
+      <div style={{ padding: 32, border: '1px dashed var(--tao-color-border)', borderRadius: 8 }}>
+        Right-click this area
+      </div>
+    </ContextMenu>
+  );
+}
+
+export default ContextMenuExample;
+```
+
+## 分组、禁用项与子菜单
+
+```tsx preview
+import { ContextMenu } from '@rockshin/tao-ui';
+
+function ContextMenuGroups() {
+  return (
+    <ContextMenu
+      menu={{
+        items: [
+          {
+            type: 'group',
+            label: 'View',
+            children: [
+              { key: 'zoom-in', label: 'Zoom in' },
+              { key: 'zoom-out', label: 'Zoom out' },
+            ],
+          },
+          { type: 'divider' },
+          {
+            key: 'share',
+            label: 'Share',
+            children: [
+              { key: 'copy-link', label: 'Copy link' },
+              { key: 'email', label: 'Email' },
+            ],
+          },
+          { key: 'locked', label: 'Locked action', disabled: true },
+        ],
+      }}
+    >
+      <div style={{ padding: 32, border: '1px dashed var(--tao-color-border)', borderRadius: 8 }}>
+        Right-click for grouped actions
+      </div>
+    </ContextMenu>
+  );
+}
+
+export default ContextMenuGroups;
+```
+
+## 可选择菜单项
+
+```tsx preview
+import { ContextMenu } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+function SelectableContextMenu() {
+  const [selected, setSelected] = useState(['comfortable']);
+
+  return (
+    <ContextMenu
+      menu={{
+        selectable: true,
+        selectedKeys: selected,
+        onSelect: ({ selectedKeys }) => setSelected(selectedKeys),
+        items: [
+          { key: 'compact', label: 'Compact' },
+          { key: 'comfortable', label: 'Comfortable' },
+          { key: 'spacious', label: 'Spacious' },
+        ],
+      }}
+    >
+      <div style={{ padding: 32, border: '1px dashed var(--tao-color-border)', borderRadius: 8 }}>
+        Current density: {selected[0]}
+      </div>
+    </ContextMenu>
+  );
+}
+
+export default SelectableContextMenu;
+```
+
+## API
+
+<API moduleName="context-menu" />

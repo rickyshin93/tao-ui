@@ -1,0 +1,96 @@
+---
+title: ScrollArea
+description: 为受限区域提供跨浏览器一致的滚动条与阴影提示。页面涵盖适用场景、设计建议、多组可运行示例、交互状态与完整 API 参考。
+---
+
+为受限区域提供跨浏览器一致的滚动条与阴影提示。
+
+## 何时使用
+
+局部内容必须限制尺寸并独立滚动时使用 ScrollArea。
+
+**推荐**
+
+- 明确滚动方向和尺寸上限。
+- 触摸与键盘用户都应能访问内容。
+
+**避免**
+
+- 不要制造不必要的嵌套滚动区域。
+
+## 基础用法
+
+```tsx preview
+import { ScrollArea } from '@rockshin/tao-ui';
+
+function ScrollAreaExample() {
+  return (
+    <ScrollArea
+      maxHeight={180}
+      style={{ border: '1px solid var(--tao-color-border-secondary)', borderRadius: 8 }}
+    >
+      <div style={{ padding: 16 }}>
+        {Array.from({ length: 12 }, (_, index) => (
+          <p key={index}>Activity item {index + 1}</p>
+        ))}
+      </div>
+    </ScrollArea>
+  );
+}
+
+export default ScrollAreaExample;
+```
+
+## 水平与双轴滚动
+
+```tsx preview
+import { ScrollArea, Stack } from '@rockshin/tao-ui';
+
+function ScrollDirections() {
+  return (
+    <Stack gap="lg">
+      <ScrollArea direction="horizontal" maxWidth={400}>
+        <div style={{ width: 760, padding: 16, whiteSpace: 'nowrap' }}>
+          A long horizontal timeline that remains inside its own scroll area.
+        </div>
+      </ScrollArea>
+      <ScrollArea direction="both" maxWidth={360} maxHeight={140}>
+        <div style={{ width: 680, height: 260, padding: 16 }}>
+          Content that can scroll on both axes.
+        </div>
+      </ScrollArea>
+    </Stack>
+  );
+}
+
+export default ScrollDirections;
+```
+
+## 常驻滚动条与自定义尺寸
+
+```tsx preview
+import { ScrollArea, Stack } from '@rockshin/tao-ui';
+
+function ScrollbarStyles() {
+  const content = Array.from({ length: 10 }, (_, index) => (
+    <p key={index}>Scrollable row {index + 1}</p>
+  ));
+
+  return (
+    <Stack direction="horizontal" gap="lg">
+      <ScrollArea type="always" scrollbarSize={4} maxHeight={160}>
+        <div style={{ padding: 12 }}>{content}</div>
+      </ScrollArea>
+      <ScrollArea type="always" scrollbarSize={10} maxHeight={160}>
+        <div style={{ padding: 12 }}>{content}</div>
+      </ScrollArea>
+    </Stack>
+  );
+}
+
+export default ScrollbarStyles;
+```
+
+## API
+
+<API moduleName="scroll-area" />

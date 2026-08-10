@@ -1,0 +1,132 @@
+---
+title: Select
+description: 从选项列表中选择单个或多个值，并支持搜索与移动端交互。页面涵盖适用场景、设计建议、多组可运行示例、交互状态与完整 API 参考。
+---
+
+从选项列表中选择单个或多个值，并支持搜索与移动端交互。
+
+## 何时使用
+
+选项较多、不适合全部展开，或需要搜索和多选时使用 Select。
+
+**推荐**
+
+- 选项标签简洁且可区分。
+- 大量选项启用搜索。
+- 多选时限制标签数量以避免撑破布局。
+
+**避免**
+
+- 少量互斥选项优先使用 RadioGroup。
+
+## 基础用法
+
+```tsx preview
+import { FormField, Select } from '@rockshin/tao-ui';
+
+function SelectExample() {
+  return (
+    <FormField label="Framework">
+      <Select
+        showSearch
+        placeholder="Choose a framework"
+        options={[
+          { label: 'React', value: 'react' },
+          { label: 'Vue', value: 'vue' },
+          { label: 'Svelte', value: 'svelte' },
+        ]}
+      />
+    </FormField>
+  );
+}
+
+export default SelectExample;
+```
+
+## 搜索、清除与状态
+
+```tsx preview
+import { Select, Stack } from '@rockshin/tao-ui';
+
+const options = [
+  { label: 'React', value: 'react' },
+  { label: 'Vue', value: 'vue' },
+  { label: 'Svelte', value: 'svelte' },
+];
+
+function SelectStates() {
+  return (
+    <Stack gap="md" style={{ maxWidth: 420 }}>
+      <Select showSearch allowClear options={options} placeholder="Search frameworks" />
+      <Select status="error" options={options} placeholder="Error state" />
+      <Select status="warning" options={options} placeholder="Warning state" />
+      <Select loading options={[]} placeholder="Loading options" />
+    </Stack>
+  );
+}
+
+export default SelectStates;
+```
+
+## 多选
+
+```tsx preview
+import { Select, Stack } from '@rockshin/tao-ui';
+
+const options = [
+  { label: 'Design', value: 'design' },
+  { label: 'Engineering', value: 'engineering' },
+  { label: 'Research', value: 'research' },
+  { label: 'Operations', value: 'operations' },
+];
+
+function MultipleSelect() {
+  return (
+    <Stack gap="md" style={{ maxWidth: 520 }}>
+      <Select
+        mode="multiple"
+        defaultValue={['design', 'engineering']}
+        options={options}
+        placeholder="Choose teams"
+      />
+      <Select
+        mode="multiple"
+        maxTagCount={2}
+        allowClear
+        defaultValue={['design', 'engineering', 'research']}
+        options={options}
+      />
+    </Stack>
+  );
+}
+
+export default MultipleSelect;
+```
+
+## 禁用选项与弹出位置
+
+```tsx preview
+import { Select, Stack } from '@rockshin/tao-ui';
+
+const options = [
+  { label: 'Production', value: 'production' },
+  { label: 'Staging', value: 'staging' },
+  { label: 'Legacy', value: 'legacy', disabled: true },
+];
+
+function AdvancedSelect() {
+  return (
+    <Stack gap="md" style={{ maxWidth: 420 }}>
+      <Select options={options} defaultValue="staging" />
+      <Select placement="topRight" options={options} placeholder="Opens upward" />
+      <Select disabled options={options} defaultValue="production" />
+    </Stack>
+  );
+}
+
+export default AdvancedSelect;
+```
+
+## API
+
+<API moduleName="select" />

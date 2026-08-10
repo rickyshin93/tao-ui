@@ -1,0 +1,92 @@
+---
+title: Pagination
+description: 在较大数据集合的分页之间导航。页面涵盖适用场景、设计建议、多组可运行示例、交互状态与完整 API 参考。
+---
+
+在较大数据集合的分页之间导航。
+
+## 何时使用
+
+列表或表格无法一次有效展示全部结果时使用 Pagination。
+
+**推荐**
+
+- 在数据变化时保持当前页有效。
+- 需要时展示总数和每页数量。
+
+**避免**
+
+- 少量内容不需要分页。
+
+## 基础用法
+
+```tsx preview
+import { Pagination } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+function PaginationExample() {
+  const [page, setPage] = useState(1);
+
+  return (
+    <Pagination
+      total={95}
+      current={page}
+      pageSize={10}
+      onChange={setPage}
+      showTotal={(total, range) => range[0] + '-' + range[1] + ' of ' + total}
+    />
+  );
+}
+
+export default PaginationExample;
+```
+
+## 尺寸
+
+```tsx preview
+import { Pagination, Stack } from '@rockshin/tao-ui';
+
+function PaginationSizes() {
+  return (
+    <Stack gap="md">
+      <Pagination total={50} size="small" />
+      <Pagination total={50} size="medium" />
+      <Pagination total={50} size="large" />
+    </Stack>
+  );
+}
+
+export default PaginationSizes;
+```
+
+## 每页数量与总数
+
+```tsx preview
+import { Pagination } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+function PaginationPageSize() {
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+
+  return (
+    <Pagination
+      total={200}
+      current={page}
+      pageSize={pageSize}
+      showSizeChanger
+      showTotal={(total, range) => range[0] + '-' + range[1] + ' of ' + total}
+      onChange={(nextPage, nextPageSize) => {
+        setPage(nextPage);
+        setPageSize(nextPageSize);
+      }}
+    />
+  );
+}
+
+export default PaginationPageSize;
+```
+
+## API
+
+<API moduleName="pagination" />

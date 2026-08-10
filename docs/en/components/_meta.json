@@ -1,0 +1,210 @@
+[
+  {
+    "type": "section-header",
+    "label": "General"
+  },
+  {
+    "type": "file",
+    "name": "button",
+    "label": "Button"
+  },
+  {
+    "type": "section-header",
+    "label": "Layout"
+  },
+  {
+    "type": "file",
+    "name": "form-layout",
+    "label": "FormLayout"
+  },
+  {
+    "type": "file",
+    "name": "splitter",
+    "label": "Splitter"
+  },
+  {
+    "type": "file",
+    "name": "stack",
+    "label": "Stack"
+  },
+  {
+    "type": "section-header",
+    "label": "Navigation"
+  },
+  {
+    "type": "file",
+    "name": "breadcrumb",
+    "label": "Breadcrumb"
+  },
+  {
+    "type": "file",
+    "name": "context-menu",
+    "label": "ContextMenu"
+  },
+  {
+    "type": "file",
+    "name": "dropdown",
+    "label": "Dropdown"
+  },
+  {
+    "type": "file",
+    "name": "pagination",
+    "label": "Pagination"
+  },
+  {
+    "type": "file",
+    "name": "tabs",
+    "label": "Tabs"
+  },
+  {
+    "type": "section-header",
+    "label": "Data Entry"
+  },
+  {
+    "type": "file",
+    "name": "checkbox",
+    "label": "Checkbox"
+  },
+  {
+    "type": "file",
+    "name": "date-picker",
+    "label": "DatePicker"
+  },
+  {
+    "type": "file",
+    "name": "form",
+    "label": "Form"
+  },
+  {
+    "type": "file",
+    "name": "form-actions",
+    "label": "FormActions"
+  },
+  {
+    "type": "file",
+    "name": "form-field",
+    "label": "FormField"
+  },
+  {
+    "type": "file",
+    "name": "form-section",
+    "label": "FormSection"
+  },
+  {
+    "type": "file",
+    "name": "headless-input-number",
+    "label": "HeadlessInputNumber"
+  },
+  {
+    "type": "file",
+    "name": "input",
+    "label": "Input"
+  },
+  {
+    "type": "file",
+    "name": "input-number",
+    "label": "InputNumber"
+  },
+  {
+    "type": "file",
+    "name": "radio",
+    "label": "Radio"
+  },
+  {
+    "type": "file",
+    "name": "range-picker",
+    "label": "RangePicker"
+  },
+  {
+    "type": "file",
+    "name": "select",
+    "label": "Select"
+  },
+  {
+    "type": "file",
+    "name": "switch",
+    "label": "Switch"
+  },
+  {
+    "type": "file",
+    "name": "textarea",
+    "label": "Textarea"
+  },
+  {
+    "type": "section-header",
+    "label": "Data Display"
+  },
+  {
+    "type": "file",
+    "name": "collapsible",
+    "label": "Collapsible"
+  },
+  {
+    "type": "file",
+    "name": "popover",
+    "label": "Popover"
+  },
+  {
+    "type": "file",
+    "name": "scroll-area",
+    "label": "ScrollArea"
+  },
+  {
+    "type": "file",
+    "name": "table",
+    "label": "Table"
+  },
+  {
+    "type": "file",
+    "name": "tag",
+    "label": "Tag"
+  },
+  {
+    "type": "file",
+    "name": "tooltip",
+    "label": "Tooltip"
+  },
+  {
+    "type": "section-header",
+    "label": "Feedback"
+  },
+  {
+    "type": "file",
+    "name": "alert",
+    "label": "Alert"
+  },
+  {
+    "type": "file",
+    "name": "drawer",
+    "label": "Drawer"
+  },
+  {
+    "type": "file",
+    "name": "modal",
+    "label": "Modal"
+  },
+  {
+    "type": "file",
+    "name": "popconfirm",
+    "label": "Popconfirm"
+  },
+  {
+    "type": "file",
+    "name": "sonner",
+    "label": "Sonner"
+  },
+  {
+    "type": "file",
+    "name": "spinner",
+    "label": "Spinner"
+  },
+  {
+    "type": "section-header",
+    "label": "Config"
+  },
+  {
+    "type": "file",
+    "name": "tao-provider",
+    "label": "TaoProvider"
+  }
+]

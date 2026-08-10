@@ -1,0 +1,95 @@
+---
+title: FormLayout
+description: "Arranges form content with consistent label and control alignment. Includes usage guidance, a runnable example, and the complete API reference."
+---
+
+Arranges form content with consistent label and control alignment.
+
+## When to use
+
+Use FormLayout to keep dense forms aligned and predictable.
+
+**Recommended**
+
+- Use one layout strategy per form.
+- Prefer vertical layout on narrow screens.
+
+**Avoid**
+
+- Do not use the component outside its intended interaction model.
+
+## Basic usage
+
+```tsx preview
+import { Button, FormActions, FormField, FormLayout, FormSection, Input } from '@rockshin/tao-ui';
+
+function FormLayoutExample() {
+  return (
+    <FormLayout>
+      <FormSection title="Account" description="Your login details.">
+        <FormField label="Email" required>
+          <Input placeholder="you@example.com" />
+        </FormField>
+      </FormSection>
+      <FormActions>
+        <Button variant="ghost">Cancel</Button>
+        <Button>Create account</Button>
+      </FormActions>
+    </FormLayout>
+  );
+}
+
+export default FormLayoutExample;
+```
+
+## Multiple sections
+
+```tsx preview
+import { Button, FormActions, FormField, FormLayout, FormSection, Input } from '@rockshin/tao-ui';
+
+function CompleteFormLayout() {
+  return (
+    <FormLayout>
+      <FormSection title="Profile" description="Visible to your teammates.">
+        <FormField label="Display name" required>
+          <Input placeholder="Rihua Chen" />
+        </FormField>
+      </FormSection>
+      <FormSection title="Contact" description="Used for account notifications.">
+        <FormField label="Email" required>
+          <Input placeholder="you@example.com" />
+        </FormField>
+      </FormSection>
+      <FormActions>
+        <Button variant="ghost">Cancel</Button>
+        <Button>Save profile</Button>
+      </FormActions>
+    </FormLayout>
+  );
+}
+
+export default CompleteFormLayout;
+```
+
+## Semantic customization
+
+```tsx preview
+import { Button, FormActions, FormLayout } from '@rockshin/tao-ui';
+
+function CustomizedFormLayout() {
+  return (
+    <FormLayout styles={{ root: { maxWidth: 520 } }}>
+      <p>Layout width is customized through the stable root part.</p>
+      <FormActions>
+        <Button>Continue</Button>
+      </FormActions>
+    </FormLayout>
+  );
+}
+
+export default CustomizedFormLayout;
+```
+
+## API
+
+<API moduleName="form-layout" />

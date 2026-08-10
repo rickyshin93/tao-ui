@@ -1,0 +1,85 @@
+---
+title: Spinner
+description: "Indicates indeterminate loading activity. Includes usage guidance, a runnable example, and the complete API reference."
+---
+
+Indicates indeterminate loading activity.
+
+## When to use
+
+Use Spinner for short indeterminate waits when progress cannot be measured.
+
+**Recommended**
+
+- Prefer inline placement near the content that is loading.
+- Use aria labels for standalone spinners.
+
+**Avoid**
+
+- Do not use Spinner for determinate progress.
+
+## Basic usage
+
+```tsx preview
+import { Spinner, Stack } from '@rockshin/tao-ui';
+
+function SpinnerExample() {
+  return (
+    <Stack direction="horizontal" gap="lg" align="center">
+      <Spinner size="small" />
+      <Spinner size="medium" tip="Loading" />
+      <Spinner size="large" />
+    </Stack>
+  );
+}
+
+export default SpinnerExample;
+```
+
+## Tips and custom indicators
+
+```tsx preview
+import { Spinner, Stack } from '@rockshin/tao-ui';
+
+function SpinnerIndicators() {
+  return (
+    <Stack direction="horizontal" gap="lg" align="center">
+      <Spinner tip="Loading data" />
+      <Spinner indicator={<span style={{ fontSize: 24 }}>◌</span>} tip="Custom" />
+      <Spinner size="large" tip="Preparing preview" />
+    </Stack>
+  );
+}
+
+export default SpinnerIndicators;
+```
+
+## Content overlay and delay
+
+```tsx preview
+import { Button, Spinner, Stack } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+function SpinnerOverlay() {
+  const [spinning, setSpinning] = useState(true);
+
+  return (
+    <Stack gap="md" style={{ maxWidth: 420 }}>
+      <Button variant="secondary" onClick={() => setSpinning((value) => !value)}>
+        {spinning ? 'Stop' : 'Start'} loading
+      </Button>
+      <Spinner spinning={spinning} delay={200} tip="Loading content">
+        <div style={{ minHeight: 120, padding: 20, border: '1px solid var(--tao-color-border)' }}>
+          Content remains mounted below the overlay.
+        </div>
+      </Spinner>
+    </Stack>
+  );
+}
+
+export default SpinnerOverlay;
+```
+
+## API
+
+<API moduleName="spinner" />

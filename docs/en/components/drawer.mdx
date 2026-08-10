@@ -1,0 +1,137 @@
+---
+title: Drawer
+description: "Opens a side panel for related tasks without leaving the current page. Includes usage guidance, a runnable example, and the complete API reference."
+---
+
+Opens a side panel for related tasks without leaving the current page.
+
+## When to use
+
+Use Drawer for inspection, editing, or supporting workflows that should stay connected to the current page.
+
+**Recommended**
+
+- Use a clear title and predictable close affordance.
+- Keep destructive confirmations in a dedicated confirmation step.
+
+**Avoid**
+
+- Do not stack multiple drawers for a single workflow.
+
+## Basic usage
+
+```tsx preview
+import { Button, Drawer } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+function DrawerExample() {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <>
+      <Button variant="secondary" onClick={() => setOpen(true)}>Open drawer</Button>
+      <Drawer open={open} onClose={() => setOpen(false)} title="Project settings">
+        Update settings without leaving the current page.
+      </Drawer>
+    </>
+  );
+}
+
+export default DrawerExample;
+```
+
+## Placement and size
+
+```tsx preview
+import { Button, Drawer, Stack } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+function DrawerPlacement() {
+  const [placement, setPlacement] = useState(null);
+
+  return (
+    <>
+      <Stack direction="horizontal" gap="md">
+        <Button variant="secondary" onClick={() => setPlacement('right')}>Right</Button>
+        <Button variant="secondary" onClick={() => setPlacement('bottom')}>Bottom</Button>
+      </Stack>
+      <Drawer
+        open={placement !== null}
+        placement={placement || 'right'}
+        size={placement === 'bottom' ? 'large' : 'default'}
+        title="Placement demo"
+        onClose={() => setPlacement(null)}
+      >
+        Drawer content follows the selected edge.
+      </Drawer>
+    </>
+  );
+}
+
+export default DrawerPlacement;
+```
+
+## Footer and extra actions
+
+```tsx preview
+import { Button, Drawer, Stack } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+function DrawerFooter() {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <>
+      <Button variant="secondary" onClick={() => setOpen(true)}>Edit settings</Button>
+      <Drawer
+        open={open}
+        title="Settings"
+        extra={<Button size="small" variant="ghost">Help</Button>}
+        footer={
+          <Stack direction="horizontal" gap="sm">
+            <Button variant="ghost" onClick={() => setOpen(false)}>Cancel</Button>
+            <Button onClick={() => setOpen(false)}>Save</Button>
+          </Stack>
+        }
+        onClose={() => setOpen(false)}
+      >
+        Drawer footer actions stay attached to the workflow.
+      </Drawer>
+    </>
+  );
+}
+
+export default DrawerFooter;
+```
+
+## Resizable drawer
+
+```tsx preview
+import { Button, Drawer } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+function ResizableDrawer() {
+  const [open, setOpen] = useState(false);
+  const [width, setWidth] = useState(null);
+
+  return (
+    <>
+      <Button variant="secondary" onClick={() => setOpen(true)}>Open resizable drawer</Button>
+      <Drawer
+        open={open}
+        title="Resizable"
+        resizable={{ onResize: (size) => setWidth(Math.round(size)) }}
+        onClose={() => setOpen(false)}
+      >
+        Current width: {width === null ? 'default' : width + 'px'}
+      </Drawer>
+    </>
+  );
+}
+
+export default ResizableDrawer;
+```
+
+## API
+
+<API moduleName="drawer" />

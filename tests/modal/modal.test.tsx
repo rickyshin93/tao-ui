@@ -1,7 +1,12 @@
-import { expect, test } from '@rstest/core';
-import { render, screen } from '@testing-library/react';
+import { afterEach, expect, test } from '@rstest/core';
+import { render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { Modal } from '../../src/components/modal';
+import { restoreViewport, setViewportWidth } from '../utils/mock-viewport';
+
+afterEach(() => {
+  restoreViewport();
+});
 
 test('renders children when open', () => {
   render(<Modal open>hello modal</Modal>);
@@ -304,4 +309,23 @@ test('Modal.confirm onOk fires on OK click', async () => {
   await userEvent.click(screen.getByText('OK'));
   expect(ok).toBe(true);
   Modal.destroyAll();
+});
+
+test('responsive width resolves the largest matching breakpoint', async () => {
+  setViewportWidth(1024);
+  render(
+    <Modal open width={{ xs: '100%', md: 640 }}>
+      body
+    </Modal>,
+  );
+  const content = screen.getByRole('dialog');
+  await waitFor(() => expect(content.style.width).toBe('640px'));
+});
+
+test('responsive width falls back to the 520px default without a match', async () => {
+  setViewportWidth(400);
+  render(<Modal open width={{ md: 640 }}>body</Modal>);
+  const content = screen.getByRole('dialog');
+  await new Promise((resolve) => setTimeout(resolve, 20));
+  expect(content.style.width).toBe('520px');
 });

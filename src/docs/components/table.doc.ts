@@ -34,6 +34,7 @@ export const tableDoc = {
       'Keep columns focused on the task.',
       'Use stable row keys.',
       'Control sorting and pagination when data is remote.',
+      'Gate secondary columns with column.responsive (e.g. [\'lg\']) instead of hand-rolled media queries.',
     ],
     avoid: [
       'Do not use Table for card-like content where comparison is not important.',

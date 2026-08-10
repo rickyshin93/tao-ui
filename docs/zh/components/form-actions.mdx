@@ -1,0 +1,75 @@
+---
+title: FormActions
+description: 统一排列表单中的提交、取消与次要操作。页面涵盖适用场景、设计建议、多组可运行示例、交互状态与完整 API 参考。
+---
+
+统一排列表单中的提交、取消与次要操作。
+
+## 何时使用
+
+表单底部需要稳定、可预测的操作区域时使用 FormActions。
+
+**推荐**
+
+- 主操作保持唯一并放在一致位置。
+- 取消与破坏性操作使用正确语义层级。
+
+**避免**
+
+- 不要把无关操作混入表单操作区。
+
+## 基础用法
+
+```tsx preview
+import { Button, FormActions } from '@rockshin/tao-ui';
+
+function FormActionsExample() {
+  return (
+    <FormActions>
+      <Button variant="ghost">Cancel</Button>
+      <Button>Save changes</Button>
+    </FormActions>
+  );
+}
+
+export default FormActionsExample;
+```
+
+## 次要与破坏性操作
+
+```tsx preview
+import { Button, FormActions } from '@rockshin/tao-ui';
+
+function FormActionVariants() {
+  return (
+    <FormActions>
+      <Button variant="destructive">Delete</Button>
+      <Button variant="ghost">Cancel</Button>
+      <Button>Save</Button>
+    </FormActions>
+  );
+}
+
+export default FormActionVariants;
+```
+
+## 语义化对齐
+
+```tsx preview
+import { Button, FormActions } from '@rockshin/tao-ui';
+
+function CustomizedFormActions() {
+  return (
+    <FormActions styles={{ root: { justifyContent: 'space-between' } }}>
+      <Button variant="ghost">Back</Button>
+      <Button>Continue</Button>
+    </FormActions>
+  );
+}
+
+export default CustomizedFormActions;
+```
+
+## API
+
+<API moduleName="form-actions" />

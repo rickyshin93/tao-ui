@@ -1,0 +1,116 @@
+---
+title: Dropdown
+description: "Opens a menu of actions or navigation choices from a trigger. Includes usage guidance, a runnable example, and the complete API reference."
+---
+
+Opens a menu of actions or navigation choices from a trigger.
+
+## When to use
+
+Use Dropdown for compact action sets that do not need to stay visible.
+
+**Recommended**
+
+- Order frequent actions first.
+- Use destructive styling only for destructive items.
+
+**Avoid**
+
+- Do not use Dropdown as a replacement for visible primary navigation.
+
+## Basic usage
+
+```tsx preview
+import { Button, Dropdown } from '@rockshin/tao-ui';
+
+function DropdownExample() {
+  return (
+    <Dropdown
+      menu={{
+        items: [
+          { key: 'edit', label: 'Edit' },
+          { key: 'duplicate', label: 'Duplicate' },
+          { type: 'divider' },
+          { key: 'archive', label: 'Archive' },
+        ],
+      }}
+    >
+      <Button variant="secondary">Actions</Button>
+    </Dropdown>
+  );
+}
+
+export default DropdownExample;
+```
+
+## Groups and submenus
+
+```tsx preview
+import { Button, Dropdown } from '@rockshin/tao-ui';
+
+function DropdownGroups() {
+  return (
+    <Dropdown
+      menu={{
+        items: [
+          {
+            type: 'group',
+            label: 'Create',
+            children: [
+              { key: 'file', label: 'New file', extra: '⌘N' },
+              { key: 'folder', label: 'New folder' },
+            ],
+          },
+          { type: 'divider' },
+          {
+            key: 'share',
+            label: 'Share',
+            children: [
+              { key: 'link', label: 'Copy link' },
+              { key: 'invite', label: 'Invite people' },
+            ],
+          },
+          { key: 'delete', label: 'Delete', danger: true },
+        ],
+      }}
+    >
+      <Button variant="secondary">Project actions</Button>
+    </Dropdown>
+  );
+}
+
+export default DropdownGroups;
+```
+
+## Trigger, arrow, and split button
+
+```tsx preview
+import { Button, Dropdown, Stack } from '@rockshin/tao-ui';
+
+const items = [
+  { key: 'edit', label: 'Edit' },
+  { key: 'duplicate', label: 'Duplicate' },
+];
+
+function DropdownTriggers() {
+  return (
+    <Stack direction="horizontal" gap="md">
+      <Dropdown trigger={['hover']} menu={{ items }}>
+        <Button variant="secondary">Hover</Button>
+      </Dropdown>
+      <Dropdown trigger={['click']} arrow menu={{ items }}>
+        <Button variant="secondary">Click with arrow</Button>
+      </Dropdown>
+      <Dropdown.Button menu={{ items }} onClick={() => console.log('save')}>
+        Save
+      </Dropdown.Button>
+    </Stack>
+  );
+}
+
+export default DropdownTriggers;
+```
+
+## API
+
+<API moduleName="dropdown" />

@@ -1,0 +1,99 @@
+---
+title: Popconfirm
+description: 在触发器附近确认一个简短且有风险的操作。页面涵盖适用场景、设计建议、多组可运行示例、交互状态与完整 API 参考。
+---
+
+在触发器附近确认一个简短且有风险的操作。
+
+## 何时使用
+
+删除、离开或覆盖等操作需要轻量确认时使用 Popconfirm。
+
+**推荐**
+
+- 标题直接说明将要发生的动作。
+- 不可逆后果放入说明。
+
+**避免**
+
+- 复杂决策或大量说明应使用 Modal。
+
+## 基础用法
+
+```tsx preview
+import { Button, Popconfirm } from '@rockshin/tao-ui';
+
+function PopconfirmExample() {
+  return (
+    <Popconfirm
+      title="Delete this item?"
+      description="This action cannot be undone."
+      onConfirm={() => console.log('confirmed')}
+    >
+      <Button variant="destructive">Delete</Button>
+    </Popconfirm>
+  );
+}
+
+export default PopconfirmExample;
+```
+
+## 说明与自定义文案
+
+```tsx preview
+import { Button, Popconfirm, Stack } from '@rockshin/tao-ui';
+
+function PopconfirmVariants() {
+  return (
+    <Stack direction="horizontal" gap="md">
+      <Popconfirm
+        title="Delete item?"
+        description="This action cannot be undone."
+        onConfirm={() => console.log('delete')}
+      >
+        <Button variant="destructive">Delete</Button>
+      </Popconfirm>
+      <Popconfirm
+        title="Leave this page?"
+        description="Unsaved changes will be lost."
+        okText="Leave"
+        cancelText="Stay"
+        onConfirm={() => console.log('leave')}
+      >
+        <Button variant="secondary">Leave page</Button>
+      </Popconfirm>
+    </Stack>
+  );
+}
+
+export default PopconfirmVariants;
+```
+
+## 按钮属性与禁用状态
+
+```tsx preview
+import { Button, Popconfirm, Stack } from '@rockshin/tao-ui';
+
+function PopconfirmStates() {
+  return (
+    <Stack direction="horizontal" gap="md">
+      <Popconfirm
+        title="Archive project?"
+        okButtonProps={{ loading: true }}
+        cancelButtonProps={{ disabled: true }}
+      >
+        <Button variant="secondary">Loading confirm</Button>
+      </Popconfirm>
+      <Popconfirm title="Unavailable" disabled>
+        <Button disabled>Disabled</Button>
+      </Popconfirm>
+    </Stack>
+  );
+}
+
+export default PopconfirmStates;
+```
+
+## API
+
+<API moduleName="popconfirm" />

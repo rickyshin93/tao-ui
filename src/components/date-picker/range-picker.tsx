@@ -25,7 +25,7 @@ import {
   type SemanticStyles,
 } from '../../utils/semantic';
 import { Drawer } from '../drawer/drawer';
-import { useIsMobile } from '../select/use-is-mobile';
+import { useIsMobile } from '../../utils/breakpoint';
 import { CalendarGrid } from './calendar/calendar-grid';
 import './date-picker.css';
 import { Presets } from './presets';

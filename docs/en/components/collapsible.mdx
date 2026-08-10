@@ -1,0 +1,93 @@
+---
+title: Collapsible
+description: "Shows and hides a region of content while keeping disclosure state accessible. Includes usage guidance, a runnable example, and the complete API reference."
+---
+
+Shows and hides a region of content while keeping disclosure state accessible.
+
+## When to use
+
+Use Collapsible to hide secondary details while preserving a lightweight page layout.
+
+**Recommended**
+
+- Make the trigger label describe the hidden content.
+- Use controlled open state when it must coordinate with other UI.
+
+**Avoid**
+
+- Do not hide required form inputs in a collapsed region without a clear cue.
+
+## Basic usage
+
+```tsx preview
+import { Collapsible } from '@rockshin/tao-ui';
+
+function CollapsibleExample() {
+  return (
+    <Collapsible defaultOpen>
+      <Collapsible.Trigger>Toggle implementation details</Collapsible.Trigger>
+      <Collapsible.Content>
+        <p style={{ margin: '12px 0 0' }}>
+          The content remains mounted while its accessible disclosure state changes.
+        </p>
+      </Collapsible.Content>
+    </Collapsible>
+  );
+}
+
+export default CollapsibleExample;
+```
+
+## Controlled state
+
+```tsx preview
+import { Button, Collapsible, Stack } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+function ControlledCollapsible() {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <Stack gap="sm">
+      <Button variant="secondary" onClick={() => setOpen((value) => !value)}>
+        {open ? 'Hide' : 'Show'} release notes
+      </Button>
+      <Collapsible open={open} onOpenChange={setOpen}>
+        <Collapsible.Content>
+          Version 0.0.25 improves semantic DOM customization.
+        </Collapsible.Content>
+      </Collapsible>
+    </Stack>
+  );
+}
+
+export default ControlledCollapsible;
+```
+
+## Disabled disclosure
+
+```tsx preview
+import { Collapsible, Stack } from '@rockshin/tao-ui';
+
+function DisabledCollapsible() {
+  return (
+    <Stack gap="md">
+      <Collapsible disabled>
+        <Collapsible.Trigger>Unavailable details</Collapsible.Trigger>
+        <Collapsible.Content>This content cannot be opened.</Collapsible.Content>
+      </Collapsible>
+      <Collapsible defaultOpen>
+        <Collapsible.Trigger>Open by default</Collapsible.Trigger>
+        <Collapsible.Content>Visible supporting information.</Collapsible.Content>
+      </Collapsible>
+    </Stack>
+  );
+}
+
+export default DisabledCollapsible;
+```
+
+## API
+
+<API moduleName="collapsible" />

@@ -1,0 +1,146 @@
+---
+title: Sonner
+description: "Displays temporary toast notifications with optional actions and provider-aware theming. Usage guidance, runnable example, and API reference."
+---
+
+Displays temporary toast notifications with optional actions and provider-aware theming.
+
+## When to use
+
+Mount one Sonner near app root, then call toast() imperatively from event handlers. Supports toast.loading(), toast.promise(), and toast.custom() for richer async and custom notification flows.
+
+**Recommended**
+
+- Prefer short, status-oriented messages with one primary action at most.
+- Enable richColors when semantic status color should be visible.
+
+**Avoid**
+
+- Do not use toast notifications for blocking confirmations.
+
+## Basic usage
+
+```tsx preview
+import { Button, Sonner, toast } from '@rockshin/tao-ui';
+
+function SonnerExample() {
+  return (
+    <>
+      <Button
+        onClick={() =>
+          toast.success({
+            title: 'Saved',
+            description: 'Your profile has been updated.',
+          })
+        }
+      >
+        Show toast
+      </Button>
+      <Sonner />
+    </>
+  );
+}
+
+export default SonnerExample;
+```
+
+## Semantic and rich-color toasts
+
+```tsx preview
+import { Button, Sonner, Stack, toast } from '@rockshin/tao-ui';
+
+function SemanticToasts() {
+  return (
+    <>
+      <Stack direction="horizontal" gap="sm">
+        <Button variant="secondary" onClick={() => toast.info({ title: 'Info', description: 'A new version is ready.' })}>Info</Button>
+        <Button variant="secondary" onClick={() => toast.success({ title: 'Saved' })}>Success</Button>
+        <Button variant="secondary" onClick={() => toast.warning({ title: 'Almost full' })}>Warning</Button>
+        <Button variant="secondary" onClick={() => toast.error({ title: 'Build failed' })}>Error</Button>
+      </Stack>
+      <Sonner richColors closeButton />
+    </>
+  );
+}
+
+export default SemanticToasts;
+```
+
+## Loading and promise lifecycle
+
+```tsx preview
+import { Button, Sonner, Stack, toast } from '@rockshin/tao-ui';
+
+const wait = (duration) => new Promise((resolve) => window.setTimeout(resolve, duration));
+
+function AsyncToasts() {
+  return (
+    <>
+      <Stack direction="horizontal" gap="sm">
+        <Button
+          onClick={() => {
+            const id = toast.loading({ title: 'Syncing workspace' });
+            window.setTimeout(() => {
+              toast.dismiss(id);
+              toast.success({ title: 'Workspace synced' });
+            }, 1200);
+          }}
+        >
+          Loading
+        </Button>
+        <Button
+          variant="secondary"
+          onClick={() =>
+            toast.promise(wait(1200), {
+              loading: { title: 'Publishing' },
+              success: { title: 'Published' },
+              error: { title: 'Publish failed' },
+            })
+          }
+        >
+          Promise
+        </Button>
+      </Stack>
+      <Sonner richColors />
+    </>
+  );
+}
+
+export default AsyncToasts;
+```
+
+## Actions, positions, and stack limits
+
+```tsx preview
+import { Button, Sonner, Stack, toast } from '@rockshin/tao-ui';
+
+function ActionToasts() {
+  return (
+    <>
+      <Stack direction="horizontal" gap="sm">
+        <Button
+          onClick={() =>
+            toast({
+              title: 'Message sent',
+              action: { label: 'Undo', onClick: () => toast.success({ title: 'Send reverted' }) },
+            })
+          }
+        >
+          With action
+        </Button>
+        <Button variant="secondary" onClick={() => toast.info({ title: 'Top right' })}>
+          Positioned
+        </Button>
+        <Button variant="ghost" onClick={() => toast.dismiss()}>Dismiss all</Button>
+      </Stack>
+      <Sonner position="top-right" visibleToasts={3} closeButton />
+    </>
+  );
+}
+
+export default ActionToasts;
+```
+
+## API
+
+<API moduleName="sonner" />

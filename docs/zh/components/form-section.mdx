@@ -1,0 +1,93 @@
+---
+title: FormSection
+description: 使用标题和说明组织一组相关表单字段。页面涵盖适用场景、设计建议、多组可运行示例、交互状态与完整 API 参考。
+---
+
+使用标题和说明组织一组相关表单字段。
+
+## 何时使用
+
+复杂表单需要按用户可理解的主题分组时使用 FormSection。
+
+**推荐**
+
+- 区段标题使用用户语言。
+- 说明只补充区段目的，不重复字段标签。
+
+**避免**
+
+- 不要为每个单独字段创建区段。
+
+## 基础用法
+
+```tsx preview
+import { FormField, FormSection, Input } from '@rockshin/tao-ui';
+
+function FormSectionExample() {
+  return (
+    <FormSection title="Profile" description="Information shown to teammates.">
+      <FormField label="Display name">
+        <Input placeholder="Rihua Chen" />
+      </FormField>
+      <FormField label="Role">
+        <Input placeholder="Product engineer" />
+      </FormField>
+    </FormSection>
+  );
+}
+
+export default FormSectionExample;
+```
+
+## 多组字段
+
+```tsx preview
+import { FormField, FormSection, Input, Stack } from '@rockshin/tao-ui';
+
+function FormSectionGroups() {
+  return (
+    <Stack gap="lg">
+      <FormSection title="Identity" description="How teammates recognize you.">
+        <FormField label="Display name">
+          <Input placeholder="Rihua Chen" />
+        </FormField>
+      </FormSection>
+      <FormSection title="Contact" description="Where account notices are sent.">
+        <FormField label="Email">
+          <Input placeholder="you@example.com" />
+        </FormField>
+      </FormSection>
+    </Stack>
+  );
+}
+
+export default FormSectionGroups;
+```
+
+## 语义部件
+
+```tsx preview
+import { FormSection } from '@rockshin/tao-ui';
+
+function CustomizedFormSection() {
+  return (
+    <FormSection
+      title="Advanced"
+      description="Settings for experienced users."
+      styles={{
+        root: { maxWidth: 520 },
+        title: { fontWeight: 600 },
+        body: { paddingTop: 12 },
+      }}
+    >
+      Advanced configuration belongs here.
+    </FormSection>
+  );
+}
+
+export default CustomizedFormSection;
+```
+
+## API
+
+<API moduleName="form-section" />

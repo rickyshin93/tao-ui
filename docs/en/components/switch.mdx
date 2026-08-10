@@ -1,0 +1,80 @@
+---
+title: Switch
+description: "Toggles a setting on or off with immediate effect. Includes usage guidance, a runnable example, and the complete API reference."
+---
+
+Toggles a setting on or off with immediate effect.
+
+## When to use
+
+Use Switch for settings that take effect immediately.
+
+**Recommended**
+
+- Use labels that describe the enabled state.
+- Use Checkbox when the value is submitted with a form.
+
+**Avoid**
+
+- Do not use the component outside its intended interaction model.
+
+## Basic usage
+
+```tsx preview
+import { Stack, Switch } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+function SwitchExample() {
+  const [enabled, setEnabled] = useState(true);
+
+  return (
+    <Stack direction="horizontal" gap="lg" align="center">
+      <Switch checked={enabled} onChange={setEnabled} />
+      <Switch checked loading />
+      <Switch disabled />
+    </Stack>
+  );
+}
+
+export default SwitchExample;
+```
+
+## Labels and sizes
+
+```tsx preview
+import { Stack, Switch } from '@rockshin/tao-ui';
+
+function SwitchLabels() {
+  return (
+    <Stack direction="horizontal" gap="lg" align="center">
+      <Switch size="small" defaultChecked />
+      <Switch checkedChildren="ON" unCheckedChildren="OFF" defaultChecked />
+      <Switch checkedChildren="✓" unCheckedChildren="×" />
+    </Stack>
+  );
+}
+
+export default SwitchLabels;
+```
+
+## Loading and disabled states
+
+```tsx preview
+import { Stack, Switch } from '@rockshin/tao-ui';
+
+function SwitchStates() {
+  return (
+    <Stack direction="horizontal" gap="lg" align="center">
+      <Switch loading checked />
+      <Switch disabled />
+      <Switch checked disabled />
+    </Stack>
+  );
+}
+
+export default SwitchStates;
+```
+
+## API
+
+<API moduleName="switch" />

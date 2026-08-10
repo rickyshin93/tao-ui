@@ -1,0 +1,132 @@
+---
+title: TaoProvider
+description: 为组件树提供主题 seed、组件 token、尺寸、密度与禁用状态。页面涵盖适用场景、设计建议、多组可运行示例、交互状态与完整 API 参考。
+---
+
+为组件树提供主题 seed、组件 token、尺寸、密度与禁用状态。
+
+## 何时使用
+
+应用或局部区域需要统一配置 tao-ui 组件时使用 TaoProvider。
+
+**推荐**
+
+- 在应用根部只设置稳定的全局 seed。
+- 局部覆盖使用嵌套 Provider。
+- Portal 内容应继承同一主题作用域。
+
+**避免**
+
+- 不要在每个组件外重复创建 Provider。
+
+## 基础用法
+
+```tsx preview
+import { Button, Input, Stack, TaoProvider } from '@rockshin/tao-ui';
+
+function TaoProviderExample() {
+  return (
+    <TaoProvider
+      size="large"
+      theme={{ token: { colorPrimary: 'oklch(0.42 0.08 210)' } }}
+    >
+      <Stack direction="horizontal" gap="md" align="center">
+        <Button>Inherited button</Button>
+        <Input placeholder="Inherited input" />
+      </Stack>
+    </TaoProvider>
+  );
+}
+
+export default TaoProviderExample;
+```
+
+## 全局尺寸
+
+```tsx preview
+import { Button, Input, Stack, TaoProvider } from '@rockshin/tao-ui';
+
+function ProviderSizes() {
+  return (
+    <Stack gap="lg">
+      {(['small', 'medium', 'large']).map((size) => (
+        <TaoProvider key={size} size={size}>
+          <Stack direction="horizontal" gap="md" align="center">
+            <Button>{size} button</Button>
+            <Input placeholder={size + ' input'} />
+          </Stack>
+        </TaoProvider>
+      ))}
+    </Stack>
+  );
+}
+
+export default ProviderSizes;
+```
+
+## 品牌 Token 与组件 Token
+
+```tsx preview
+import { Button, Stack, TaoProvider } from '@rockshin/tao-ui';
+
+function ProviderTokens() {
+  return (
+    <TaoProvider
+      theme={{
+        token: {
+          colorPrimary: 'oklch(0.42 0.08 210)',
+          borderRadius: 8,
+        },
+        components: {
+          Button: {
+            fontWeight: 600,
+            paddingInline: 20,
+          },
+        },
+      }}
+    >
+      <Stack direction="horizontal" gap="md">
+        <Button>Branded primary</Button>
+        <Button variant="secondary">Secondary</Button>
+      </Stack>
+    </TaoProvider>
+  );
+}
+
+export default ProviderTokens;
+```
+
+## 深色模式、紧凑密度与隔离
+
+```tsx preview
+import { Button, Input, Stack, TaoProvider } from '@rockshin/tao-ui';
+
+function ProviderModes() {
+  return (
+    <Stack gap="lg">
+      <TaoProvider theme={{ compact: true }}>
+        <Stack direction="horizontal" gap="md">
+          <Button>Compact</Button>
+          <Input placeholder="Compact input" />
+        </Stack>
+      </TaoProvider>
+      <TaoProvider theme={{ mode: 'dark', inherit: false }}>
+        <Stack
+          direction="horizontal"
+          gap="md"
+          style={{ padding: 20, background: 'var(--tao-color-bg-base)' }}
+        >
+          <Button>Dark mode</Button>
+          <Input placeholder="Dark input" />
+        </Stack>
+      </TaoProvider>
+    </Stack>
+  );
+}
+
+export default ProviderModes;
+```
+
+## API
+
+<API moduleName="tao-provider" />

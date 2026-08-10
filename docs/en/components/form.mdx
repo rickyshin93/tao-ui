@@ -1,0 +1,108 @@
+---
+title: Form
+description: "Collects and validates field values with an antd-aligned API for rules, dependencies, and Form.List, backed by the rc-form engine."
+---
+
+Collects and validates field values with an antd-aligned API (rules, dependencies, Form.List) on top of the rc-form engine.
+
+## When to use
+
+Use Form with Form.Item when fields need a value store, rule validation, or submit handling. Use the lighter FormField when you manage state yourself.
+
+**Recommended**
+
+- Declare validation as rules on Form.Item; the required mark is inferred from rules.
+- Use dependencies for cross-field rules such as password confirmation.
+- Use Form.useForm() for imperative control (setFieldsValue, resetFields, submit).
+- Set size or disabled on Form to cascade them to every control inside.
+
+**Avoid**
+
+- Do not bind the same name in two mounted Form.Items.
+- Do not mix manual value/onChange props with a bound Form.Item on the same control.
+
+## Basic usage
+
+```tsx preview
+import { Button, Form, Input } from '@rockshin/tao-ui';
+
+function FormExample() {
+  return (
+    <Form
+      initialValues={{ email: '' }}
+      onFinish={(values) => console.log(values)}
+      style={{ maxWidth: 400 }}
+    >
+      <Form.Item
+        name="email"
+        label="Email"
+        rules={[{ required: true, message: 'Enter your email.' }]}
+      >
+        <Input placeholder="you@example.com" />
+      </Form.Item>
+      <Button type="submit">Create account</Button>
+    </Form>
+  );
+}
+
+export default FormExample;
+```
+
+## Validation
+
+```tsx preview
+import { Button, Form, Input } from '@rockshin/tao-ui';
+
+function ValidatedForm() {
+  return (
+    <Form onFinish={(values) => console.log(values)} style={{ maxWidth: 420 }}>
+      <Form.Item
+        name="username"
+        label="Username"
+        rules={[
+          { required: true, message: 'Enter a username.' },
+          { min: 3, message: 'Use at least 3 characters.' },
+        ]}
+      >
+        <Input placeholder="username" />
+      </Form.Item>
+      <Form.Item
+        name="email"
+        label="Email"
+        rules={[{ required: true, message: 'Enter an email.' }]}
+      >
+        <Input type="email" placeholder="you@example.com" />
+      </Form.Item>
+      <Button type="submit">Submit</Button>
+    </Form>
+  );
+}
+
+export default ValidatedForm;
+```
+
+## Horizontal layout
+
+```tsx preview
+import { Button, Form, Input } from '@rockshin/tao-ui';
+
+function HorizontalForm() {
+  return (
+    <Form layout="horizontal" style={{ maxWidth: 560 }}>
+      <Form.Item name="name" label="Name">
+        <Input placeholder="Project name" />
+      </Form.Item>
+      <Form.Item name="slug" label="Slug">
+        <Input placeholder="project-name" />
+      </Form.Item>
+      <Button type="submit">Create project</Button>
+    </Form>
+  );
+}
+
+export default HorizontalForm;
+```
+
+## API
+
+<API moduleName="form" />

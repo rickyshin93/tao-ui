@@ -343,6 +343,25 @@ shadcn 语义：sm/md/lg/xl 相对 base 递增，非等比（base=10 时 xs=2, s
 
 ---
 
+## 2.4 响应式断点（JS-only，已实现）
+
+断点值对齐 antd v6：`xs <576 / sm ≥576 / md ≥768 / lg ≥992 / xl ≥1200 / xxl ≥1600`。
+
+CSS 自定义属性无法用于 @media 查询，因此断点不做成 token，而是 JS 常量 +
+`useBreakpoint()` hook（`src/utils/breakpoint.ts`，单例 matchMedia observer，
+SSR 安全：首渲染返回 `{}` 桌面优先，hydration 后应用真实匹配）。
+
+消费方式：
+- `useBreakpoint()` / `useIsMobile()`（`< sm` 即手机）从包根导出。
+- 响应式 prop 约定：接受 `Partial<Record<TaoBreakpoint, T>>` 的对象，
+  匹配断点中最大者有定义值者胜出（`resolveResponsiveValue`）。
+  已接入：`Stack direction/gap/align`、`Modal width`。
+- 列显隐：`Table` 列 `responsive: TaoBreakpoint[]`（仅列出的断点匹配时渲染）。
+- Select / DatePicker / RangePicker 的移动端底部 Drawer 路径即由
+  `useIsMobile()` 驱动（可用 `mobile` prop 强制覆盖）。
+
+---
+
 ## 3. TaoProvider（参考 antd ConfigProvider）
 
 ### 3.1 完整 API
@@ -376,10 +395,15 @@ interface TaoThemeConfig {
   /** 明暗模式 (见 §3.5)。dark 输出 data-tao-theme="dark"，纯 CSS 算法 */
   mode?: 'light' | 'dark';
 
-  /** 覆盖单个组件的 token (参考 antd ComponentsConfig) — 未实现，规划中 */
+  /** 紧凑密度 (见 §3.5.2)。输出 data-tao-density="compact"，纯 CSS 算法 */
+  compact?: boolean;
+
+  /** 覆盖单个组件的 token (参考 antd ComponentsConfig) — 已实现，
+      试点 Button / Input / FormField (见 §3.6) */
   components?: {
     Button?: Partial<ButtonComponentToken>;
-    // ...
+    Input?: Partial<InputComponentToken>;
+    FormField?: Partial<FormFieldComponentToken>;
   };
 
   /** 是否继承外层 TaoProvider 的主题 (默认 true) */
@@ -487,20 +511,32 @@ Dark scope 覆盖值（theme.css）：
 }
 ```
 
-#### 3.5.2 Compact 算法（未实现）
+#### 3.5.2 Compact 算法（已实现）
 
-规划方向（参考 antd `genCompactSizeMapToken`）：
+对应 antd `compactAlgorithm`，纯 CSS 实现：`theme.compact: true` 输出
+`data-tao-density="compact"`（经 context 级联、portal 透传，与 mode 同机制），
+theme.css 的 compact scope 覆盖一组精选档位：
 
-```ts
-// tao-ui compact 算法（规划）：
---tao-size-step: 2;                       // 4 → 2
---tao-control-height: 32px;               // → 28
---tao-font-size: 12px;                    // 14 → 12
+```css
+[data-tao-density='compact'] {
+  --tao-control-height: 28px;   /* 32 → 28，sm/lg 经 calc 自动跟随 (24/32) */
+  /* padding/margin 各降一档：xs 4, sm 8, base 12, md 16, lg 20, xl 28 (xxl 40) */
+}
 ```
 
-### 3.6 Component Token（参考 antd ComponentTokenMap）
+决策记录：
+- **不动 fontSize**（antd compact 同样不动字号；12px 对 CJK 过小）。
+- **不动 size-step**（草稿曾计划 sizeStep 4→2，但 `calc(4px*(2-3))` 会产生
+  负值破坏派生公式；compact 改为直接覆盖精选 derived 档位而非改 seed）。
+- 已知限制：compact 覆盖的是固定档位而非公式；内层未声明 compact 的
+  provider 会在自己元素上重算 derived，覆盖掉继承来的 compact 值
+  （与 dark 的"无法撤销祖先覆盖"同源）。
 
-每个组件有自己的 token，组件内部 `var(--tao-{component}-{token}, fallback)`：
+### 3.6 Component Token（参考 antd ComponentTokenMap）— 已实现
+
+每个组件有自己的 token，Provider 序列化为 `--tao-{component}-{kebab-key}`
+CSS 变量（数字自动加 px 后缀，`fontWeight` 等无量纲键除外），组件 CSS 以
+`var(--tao-button-x, <默认值>)` 回退链消费：
 
 ```tsx
 // 让某个区域的 Button 变成 pill 形
@@ -513,6 +549,11 @@ Dark scope 覆盖值（theme.css）：
 </TaoProvider>
 ```
 
+当前试点：Button / Input / FormField。其余组件按同模式增量接入
+（先在组件 CSS 把声明改为回退链，再把键加进接口）。
+
+只收录真实接线到 CSS 的 token；下列接口即真值源。
+
 #### Button ComponentToken（参考 antd ButtonToken）
 
 ```ts
@@ -524,7 +565,7 @@ interface ButtonComponentToken {
   paddingInlineLG?: number;
   primaryColor?: string;          // 主按钮文字色
   primaryShadow?: string;
-  defaultColor?: string;          // 默认按钮文字色
+  defaultColor?: string;          // secondary 按钮文字色
   defaultBg?: string;
   defaultBorderColor?: string;
   defaultHoverBg?: string;
@@ -533,7 +574,6 @@ interface ButtonComponentToken {
   contentFontSize?: number;
   contentFontSizeSM?: number;
   contentFontSizeLG?: number;
-  onlyIconSize?: number;          // 纯图标按钮图标尺寸
 }
 ```
 
@@ -544,21 +584,21 @@ interface InputComponentToken {
   paddingInline?: number;
   paddingInlineSM?: number;
   paddingInlineLG?: number;
-  paddingBlock?: number;
-  paddingBlockSM?: number;
-  paddingBlockLG?: number;
-  addonBg?: string;               // 前/后置标签背景色
   hoverBorderColor?: string;
   activeBorderColor?: string;
-  activeShadow?: string;
+  activeShadow?: string;          // focus ring
   errorActiveShadow?: string;
-  hoverBg?: string;
-  activeBg?: string;
+  hoverBg?: string;               // filled 变体
+  activeBg?: string;              // filled 变体 focus
   inputFontSize?: number;
   inputFontSizeSM?: number;
   inputFontSizeLG?: number;
 }
 ```
+
+> 注：状态色 token 接线在 control.css 的共享 `[data-tao-control]` 规则上，
+> 因此对 Textarea/InputNumber/Select 触发器同样生效。`paddingBlock*` 未收录：
+> 内层输入的纵向 padding 是由控件高度光学推导的 calc，没有可覆盖的固定声明。
 
 #### FormField ComponentToken（参考 antd FormToken）
 
@@ -566,11 +606,8 @@ interface InputComponentToken {
 interface FormFieldComponentToken {
   labelColor?: string;
   labelFontSize?: number;
-  labelHeight?: number | string;
   labelRequiredMarkColor?: string;  // 必填 * 号颜色
-  labelColonMarginStart?: number;   // 冒号前间距
-  labelColonMarginEnd?: number;     // 冒号后间距
-  itemGap?: number;                 // FormField 之间的间距
+  itemGap?: number;                 // FormSection 内 FormField 之间的间距
   descriptionColor?: string;
   errorColor?: string;
   errorFontSize?: number;
@@ -612,30 +649,34 @@ function useTaoConfig(): {
 
 组件内部用来读取 Provider 传递的全局配置。
 
-#### `useTaoToken()`（参考 antd theme.useToken）
+#### `useTaoToken()`（参考 antd theme.useToken）— 已实现
 
 ```tsx
 function useTaoToken(): {
-  token: ResolvedTaoToken;  // 当前生效的所有 token 值
+  token: Record<TaoTokenName, string>;  // 所有 token 的 var() 引用
 }
 ```
 
-用户在自定义组件中读取当前主题 token，确保和 tao-ui 组件视觉一致：
+零 runtime 形态：返回的不是 JS 计算值，而是 `var(--tao-*)` 引用字符串，
+可直接用于 inline style，由浏览器按当前作用域（dark / seed 覆盖 /
+compact）实时解析：
 
 ```tsx
 function CustomCard({ children }: { children: React.ReactNode }) {
   const { token } = useTaoToken();
   return (
     <div style={{
-      borderRadius: token.borderRadiusLG,
-      border: `${token.lineWidth}px solid ${token.colorBorder}`,
-      padding: token.paddingLG,
+      borderRadius: token['--tao-radius-lg'],
+      border: `var(--tao-line-width) solid ${token['--tao-color-border']}`,
+      padding: token['--tao-padding-lg'],
     }}>
       {children}
     </div>
   );
 }
 ```
+
+另有 `tokenVar(name)` / `taoTokenNames` 从包根导出（同 `@rockshin/tao-ui/tokens`）。
 
 ### 3.9 实现原理
 
@@ -826,6 +867,11 @@ import '@fontsource/geist-mono/400.css';
 - 层级越高，间距越大
 - 间距只从 token 里选
 
+> 例外（光学常量）：少数为视觉对齐/阅读上限服务的固定值允许存在，
+> 但必须在 CSS 里以 `/* optical constant */` 注释标注。当前清单：
+> Tooltip/Popconfirm `max-width: 260px`、Popover title `min-width: 177px`、
+> Tooltip `padding-block: 6px`、Form horizontal label 列 `160px`。
+
 ---
 
 ## 7. 圆角系统
@@ -845,6 +891,7 @@ import '@fontsource/geist-mono/400.css';
   --tao-box-shadow:           /* 默认阴影 */;
   --tao-box-shadow-secondary: /* 浮层阴影 */;
   --tao-box-shadow-tertiary:  /* 微弱阴影 */;
+  --tao-drop-shadow-popover:  /* 包含箭头轮廓的 Popover 阴影 */;
 }
 ```
 
@@ -1035,3 +1082,30 @@ src/
     stack/  form-layout/
   index.tsx
 ```
+
+---
+
+## 16. 文档站首页世界（curved-crease · 一道弧）
+
+> 适用于 `docs/index.mdx` + `theme/index.css` 的 `.tao-home` 范围，不影响组件库 token。
+> 真值源：`theme/index.css` 顶部的方向契约注释 + `.impeccable/surfaces/docs-index-mdx.md`。
+
+首页是 Persuade 表面，采用与组件库不同但同源克制的「曲面折纸」世界：
+
+- **核心隐喻**：一道弧线让平纸获得刚性；一颗 Seed 让松散组件获得系统。布局由一支
+  超大半径圆规弧（r ≈ 1.3× 视口宽）统治——区块分界不用直线，用同一圆规族的弧。
+- **纸墨**：暖棉纸底 `oklch(0.956 0.02 86)`，暖近黑墨 `oklch(0.19 0.01 61)`；
+  发丝线 = 墨的 12–18% α；无点缀色（组件自身的语义色除外）。石墨阴影偏暖
+  （hue 75–87），过渡极软（200–400px），光从左上来。
+- **字体三声部**：EB Garamond italic = 几何学家的展示声部（仅展示行与图注）；
+  Geist Sans = UI 与正文；Geist Mono = 度量与读数（半径值、token 名、fig 编号）。
+  meta 标签用 tracked lowercase，不用全大写（PRODUCT.md 禁令覆盖世界语法）。
+- **图版语法**：区块即图版，编号 fig. i–v；引线 1px、40–45° 斜向、指向真实语义部件；
+  页边注记录真实产品事实（token 值、状态名）。每页至多一块炭黑板
+  （`oklch(0.27 0.008 280)`，反白骨色文字）——保留给 agent 契约。
+- **动效（编排级）**：弧线描画入场（stroke-dashoffset + pathLength=1）、
+  图版滚动揭示（opacity/translate/blur，ease-out-expo）、读数计数、
+  首屏折弯自动锁定到 `--tao-radius: 10px`。`prefers-reduced-motion` 直接呈现终态，
+  交互装置保持可用。
+- **暗色 = 夜间图版**：纸墨翻转（纸 `oklch(0.20 0.012 75)`，墨 `oklch(0.93 0.014 85)`），
+  弧与炭黑板延续，不另立世界。

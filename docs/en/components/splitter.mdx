@@ -1,0 +1,95 @@
+---
+title: Splitter
+description: "Creates resizable panes separated by draggable handles. Includes usage guidance, a runnable example, and the complete API reference."
+---
+
+Creates resizable panes separated by draggable handles.
+
+## When to use
+
+Use Splitter for work surfaces where users need to allocate space between adjacent panes.
+
+**Recommended**
+
+- Set sensible min sizes.
+- Persist sizes only when the layout is user-specific.
+
+**Avoid**
+
+- Do not use the component outside its intended interaction model.
+
+## Basic usage
+
+```tsx preview
+import { Splitter } from '@rockshin/tao-ui';
+
+function SplitterExample() {
+  return (
+    <div style={{ height: 220, border: '1px solid var(--tao-color-border-secondary)' }}>
+      <Splitter>
+        <Splitter.Panel defaultSize="40%">
+          <div style={{ padding: 16 }}>Navigation</div>
+        </Splitter.Panel>
+        <Splitter.Panel>
+          <div style={{ padding: 16 }}>Content</div>
+        </Splitter.Panel>
+      </Splitter>
+    </div>
+  );
+}
+
+export default SplitterExample;
+```
+
+## Vertical and multiple panels
+
+```tsx preview
+import { Splitter } from '@rockshin/tao-ui';
+
+function SplitterLayouts() {
+  return (
+    <div style={{ height: 280, border: '1px solid var(--tao-color-border-secondary)' }}>
+      <Splitter orientation="vertical">
+        <Splitter.Panel defaultSize="35%" min={60}>
+          <div style={{ padding: 16 }}>Preview</div>
+        </Splitter.Panel>
+        <Splitter.Panel min={80}>
+          <div style={{ padding: 16 }}>Editor</div>
+        </Splitter.Panel>
+        <Splitter.Panel defaultSize="25%" min={60}>
+          <div style={{ padding: 16 }}>Console</div>
+        </Splitter.Panel>
+      </Splitter>
+    </div>
+  );
+}
+
+export default SplitterLayouts;
+```
+
+## Collapsible panel
+
+```tsx preview
+import { Splitter } from '@rockshin/tao-ui';
+
+function CollapsibleSplitter() {
+  return (
+    <div style={{ height: 220, border: '1px solid var(--tao-color-border-secondary)' }}>
+      <Splitter>
+        <Splitter.Panel defaultSize="30%" collapsible min={0}>
+          <div style={{ padding: 16 }}>Collapsible navigation</div>
+        </Splitter.Panel>
+        <Splitter.Panel>
+          <div style={{ padding: 16 }}>Main content</div>
+        </Splitter.Panel>
+      </Splitter>
+    </div>
+  );
+}
+
+export default CollapsibleSplitter;
+```
+
+## API
+
+<API moduleName="splitter" />

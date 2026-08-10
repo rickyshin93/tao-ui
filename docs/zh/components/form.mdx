@@ -1,0 +1,105 @@
+---
+title: Form
+description: 管理表单值、校验规则、提交状态与字段布局。页面涵盖适用场景、设计建议、多组可运行示例、交互状态与完整 API 参考。
+---
+
+管理表单值、校验规则、提交状态与字段布局。
+
+## 何时使用
+
+多个字段需要统一的数据收集、校验和提交生命周期时使用 Form。
+
+**推荐**
+
+- 校验消息说明问题和恢复方式。
+- 按用户任务组织字段，而不是按数据模型机械排列。
+
+**避免**
+
+- 不要为单个无校验输入引入完整 Form。
+
+## 基础用法
+
+```tsx preview
+import { Button, Form, Input } from '@rockshin/tao-ui';
+
+function FormExample() {
+  return (
+    <Form
+      initialValues={{ email: '' }}
+      onFinish={(values) => console.log(values)}
+      style={{ maxWidth: 400 }}
+    >
+      <Form.Item
+        name="email"
+        label="Email"
+        rules={[{ required: true, message: 'Enter your email.' }]}
+      >
+        <Input placeholder="you@example.com" />
+      </Form.Item>
+      <Button type="submit">Create account</Button>
+    </Form>
+  );
+}
+
+export default FormExample;
+```
+
+## 表单校验
+
+```tsx preview
+import { Button, Form, Input } from '@rockshin/tao-ui';
+
+function ValidatedForm() {
+  return (
+    <Form onFinish={(values) => console.log(values)} style={{ maxWidth: 420 }}>
+      <Form.Item
+        name="username"
+        label="Username"
+        rules={[
+          { required: true, message: 'Enter a username.' },
+          { min: 3, message: 'Use at least 3 characters.' },
+        ]}
+      >
+        <Input placeholder="username" />
+      </Form.Item>
+      <Form.Item
+        name="email"
+        label="Email"
+        rules={[{ required: true, message: 'Enter an email.' }]}
+      >
+        <Input type="email" placeholder="you@example.com" />
+      </Form.Item>
+      <Button type="submit">Submit</Button>
+    </Form>
+  );
+}
+
+export default ValidatedForm;
+```
+
+## 水平布局
+
+```tsx preview
+import { Button, Form, Input } from '@rockshin/tao-ui';
+
+function HorizontalForm() {
+  return (
+    <Form layout="horizontal" style={{ maxWidth: 560 }}>
+      <Form.Item name="name" label="Name">
+        <Input placeholder="Project name" />
+      </Form.Item>
+      <Form.Item name="slug" label="Slug">
+        <Input placeholder="project-name" />
+      </Form.Item>
+      <Button type="submit">Create project</Button>
+    </Form>
+  );
+}
+
+export default HorizontalForm;
+```
+
+## API
+
+<API moduleName="form" />

@@ -1,5 +1,5 @@
-import { expect, test } from '@rstest/core';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { afterEach, expect, test } from '@rstest/core';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import {
   type SorterResult,
@@ -7,6 +7,11 @@ import {
   type TableColumn,
 } from '../../src/components/table/table';
 import { TaoProvider } from '../../src/provider/tao-provider';
+import { restoreViewport, setViewportWidth } from '../utils/mock-viewport';
+
+afterEach(() => {
+  restoreViewport();
+});
 
 interface User {
   id: number;
@@ -648,4 +653,44 @@ test('loading shows spinner overlay', () => {
     />,
   );
   expect(container.querySelector('[data-tao-table-loading]')).toBeTruthy();
+});
+
+// ---- Responsive columns ----
+
+test('column with responsive list renders only when a breakpoint matches', async () => {
+  setViewportWidth(400);
+  const responsiveColumns: TableColumn<User>[] = [
+    { key: 'name', dataIndex: 'name', title: 'Name' },
+    { key: 'role', dataIndex: 'role', title: 'Role', responsive: ['lg'] },
+  ];
+  render(
+    <Table
+      columns={responsiveColumns}
+      dataSource={data}
+      rowKey="id"
+      pagination={false}
+    />,
+  );
+  // 400px matches xs only — the lg-gated column stays hidden after hydration
+  await waitFor(() => expect(screen.getByText('Alice')).toBeTruthy());
+  expect(screen.queryByText('Role')).toBeNull();
+  expect(screen.queryByText('admin')).toBeNull();
+});
+
+test('responsive column appears once its breakpoint matches', async () => {
+  setViewportWidth(1200);
+  const responsiveColumns: TableColumn<User>[] = [
+    { key: 'name', dataIndex: 'name', title: 'Name' },
+    { key: 'role', dataIndex: 'role', title: 'Role', responsive: ['lg'] },
+  ];
+  render(
+    <Table
+      columns={responsiveColumns}
+      dataSource={data}
+      rowKey="id"
+      pagination={false}
+    />,
+  );
+  await waitFor(() => expect(screen.getByText('Role')).toBeTruthy());
+  expect(screen.getAllByText('admin').length).toBeGreaterThan(0);
 });

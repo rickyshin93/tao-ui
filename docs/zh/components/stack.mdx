@@ -1,0 +1,85 @@
+---
+title: Stack
+description: 以一致间距在行或列中排列子元素。页面涵盖适用场景、设计建议、多组可运行示例、交互状态与完整 API 参考。
+---
+
+以一致间距在行或列中排列子元素。
+
+## 何时使用
+
+一维布局与间距不值得单独编写 CSS 时使用 Stack。
+
+**推荐**
+
+- 优先使用 Stack 代替重复 margin。
+- 响应式方向使用断点映射。
+
+**避免**
+
+- 具有更丰富语义的布局应使用对应容器。
+
+## 基础用法
+
+```tsx preview
+import { Stack, Tag } from '@rockshin/tao-ui';
+
+function StackExample() {
+  return (
+    <Stack direction="horizontal" gap="md" align="center">
+      <Tag>Design</Tag>
+      <Tag>Engineering</Tag>
+      <Tag>Research</Tag>
+    </Stack>
+  );
+}
+
+export default StackExample;
+```
+
+## 方向、间距与对齐
+
+```tsx preview
+import { Stack, Tag } from '@rockshin/tao-ui';
+
+function StackVariants() {
+  return (
+    <Stack gap="lg">
+      <Stack direction="horizontal" gap="sm" align="center">
+        <Tag>Small gap</Tag>
+        <Tag>Centered</Tag>
+      </Stack>
+      <Stack direction="horizontal" gap="lg" align="end">
+        <Tag>Large gap</Tag>
+        <Tag>End aligned</Tag>
+      </Stack>
+    </Stack>
+  );
+}
+
+export default StackVariants;
+```
+
+## 响应式方向
+
+```tsx preview
+import { Button, Stack } from '@rockshin/tao-ui';
+
+function ResponsiveStack() {
+  return (
+    <Stack
+      direction={{ xs: 'vertical', md: 'horizontal' }}
+      gap={{ xs: 'sm', md: 'lg' }}
+    >
+      <Button>Save</Button>
+      <Button variant="secondary">Preview</Button>
+      <Button variant="ghost">Cancel</Button>
+    </Stack>
+  );
+}
+
+export default ResponsiveStack;
+```
+
+## API
+
+<API moduleName="stack" />

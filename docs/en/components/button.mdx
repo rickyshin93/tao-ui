@@ -1,0 +1,168 @@
+---
+title: Button
+description: Trigger actions with accessible Button variants, sizes, loading states, and semantic class or style customization.
+---
+
+Use `Button` for immediate actions such as submitting a form, saving changes, or opening a surface.
+
+## Variants
+
+Use one primary action per view or decision area. Secondary, ghost, and destructive variants reduce or clarify emphasis.
+
+```tsx preview
+import { Button } from '@rockshin/tao-ui';
+
+function ButtonVariants() {
+  return (
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
+      <Button>Primary</Button>
+      <Button variant="secondary">Secondary</Button>
+      <Button variant="ghost">Ghost</Button>
+      <Button variant="destructive">Delete</Button>
+    </div>
+  );
+}
+
+export default ButtonVariants;
+```
+
+## Sizes
+
+Use `small` for dense toolbars, `medium` for most actions, and `large` for prominent calls to action.
+
+```tsx preview
+import { Button } from '@rockshin/tao-ui';
+
+function ButtonSizes() {
+  return (
+    <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 12 }}>
+      <Button size="small">Small</Button>
+      <Button>Medium</Button>
+      <Button size="large">Large</Button>
+    </div>
+  );
+}
+
+export default ButtonSizes;
+```
+
+## Loading and disabled
+
+Loading buttons set `aria-busy` and prevent repeated interaction. Their icon slot stays mounted, so switching states does not shift the content.
+
+```tsx preview
+import { useState } from 'react';
+import { Button } from '@rockshin/tao-ui';
+
+function ButtonStates() {
+  const [saving, setSaving] = useState(false);
+
+  function save() {
+    setSaving(true);
+    window.setTimeout(() => setSaving(false), 1200);
+  }
+
+  return (
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
+      <Button loading>Loading</Button>
+      <Button loading variant="secondary">Loading</Button>
+      <Button disabled>Disabled</Button>
+      <Button loading={saving} onClick={save}>Save changes</Button>
+    </div>
+  );
+}
+
+export default ButtonStates;
+```
+
+## Icons and custom loading
+
+Pass a decorative leading icon with `icon`. Use `loadingIcon` only when the built-in spinner does not match the surrounding visual language.
+
+```tsx preview
+import { Button } from '@rockshin/tao-ui';
+
+function DownloadIcon() {
+  return (
+    <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <path d="M8 2v8m0 0 3-3m-3 3L5 7M3 13h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function ProgressIcon() {
+  return (
+    <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+      <circle cx="3" cy="8" r="1.25" />
+      <circle cx="8" cy="8" r="1.25" opacity="0.65" />
+      <circle cx="13" cy="8" r="1.25" opacity="0.35" />
+    </svg>
+  );
+}
+
+function ButtonIcons() {
+  return (
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
+      <Button icon={<DownloadIcon />}>Download</Button>
+      <Button variant="secondary" icon={<DownloadIcon />}>Export</Button>
+      <Button loading loadingIcon={<ProgressIcon />}>Processing</Button>
+    </div>
+  );
+}
+
+export default ButtonIcons;
+```
+
+## Provider defaults
+
+Buttons inherit `size` and `disabled` from `TaoProvider`. A local prop can override the inherited size.
+
+```tsx preview
+import { Button, TaoProvider } from '@rockshin/tao-ui';
+
+function ButtonProviderDefaults() {
+  return (
+    <div style={{ display: 'grid', gap: 12 }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 12 }}>
+        <TaoProvider size="small">
+          <Button>Inherited small</Button>
+          <Button size="large" variant="secondary">Local large</Button>
+        </TaoProvider>
+      </div>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
+        <TaoProvider disabled>
+          <Button>Provider disabled</Button>
+          <Button variant="secondary">Also disabled</Button>
+        </TaoProvider>
+      </div>
+    </div>
+  );
+}
+
+export default ButtonProviderDefaults;
+```
+
+## Semantic customization
+
+Customize the stable `root` part without depending on private selectors.
+
+```tsx preview
+import { Button } from '@rockshin/tao-ui';
+
+function CustomizedButton() {
+  return (
+    <Button
+      classNames={{ root: 'checkout-button' }}
+      styles={{ root: { minWidth: 160 } }}
+    >
+      Checkout
+    </Button>
+  );
+}
+
+export default CustomizedButton;
+```
+
+## API
+
+<API moduleName="button" />

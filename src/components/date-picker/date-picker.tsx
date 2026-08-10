@@ -26,7 +26,7 @@ import {
   type SemanticStyles,
 } from '../../utils/semantic';
 import { Drawer } from '../drawer/drawer';
-import { useIsMobile } from '../select/use-is-mobile';
+import { useIsMobile } from '../../utils/breakpoint';
 import { CalendarGrid } from './calendar/calendar-grid';
 import { CalendarHeader } from './calendar/calendar-header';
 import { MonthGrid } from './calendar/month-grid';

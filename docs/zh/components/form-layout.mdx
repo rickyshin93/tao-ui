@@ -1,0 +1,95 @@
+---
+title: FormLayout
+description: 为产品级表单提供一致的宽度、区段与操作布局。页面涵盖适用场景、设计建议、多组可运行示例、交互状态与完整 API 参考。
+---
+
+为产品级表单提供一致的宽度、区段与操作布局。
+
+## 何时使用
+
+页面需要由多个字段区段与操作区组成完整表单时使用 FormLayout。
+
+**推荐**
+
+- 使用 FormSection 分组相关字段。
+- 使用 FormActions 保持操作位置一致。
+
+**避免**
+
+- 不要用 FormLayout 包裹与表单无关的页面内容。
+
+## 基础用法
+
+```tsx preview
+import { Button, FormActions, FormField, FormLayout, FormSection, Input } from '@rockshin/tao-ui';
+
+function FormLayoutExample() {
+  return (
+    <FormLayout>
+      <FormSection title="Account" description="Your login details.">
+        <FormField label="Email" required>
+          <Input placeholder="you@example.com" />
+        </FormField>
+      </FormSection>
+      <FormActions>
+        <Button variant="ghost">Cancel</Button>
+        <Button>Create account</Button>
+      </FormActions>
+    </FormLayout>
+  );
+}
+
+export default FormLayoutExample;
+```
+
+## 多个区段
+
+```tsx preview
+import { Button, FormActions, FormField, FormLayout, FormSection, Input } from '@rockshin/tao-ui';
+
+function CompleteFormLayout() {
+  return (
+    <FormLayout>
+      <FormSection title="Profile" description="Visible to your teammates.">
+        <FormField label="Display name" required>
+          <Input placeholder="Rihua Chen" />
+        </FormField>
+      </FormSection>
+      <FormSection title="Contact" description="Used for account notifications.">
+        <FormField label="Email" required>
+          <Input placeholder="you@example.com" />
+        </FormField>
+      </FormSection>
+      <FormActions>
+        <Button variant="ghost">Cancel</Button>
+        <Button>Save profile</Button>
+      </FormActions>
+    </FormLayout>
+  );
+}
+
+export default CompleteFormLayout;
+```
+
+## 语义化定制
+
+```tsx preview
+import { Button, FormActions, FormLayout } from '@rockshin/tao-ui';
+
+function CustomizedFormLayout() {
+  return (
+    <FormLayout styles={{ root: { maxWidth: 520 } }}>
+      <p>Layout width is customized through the stable root part.</p>
+      <FormActions>
+        <Button>Continue</Button>
+      </FormActions>
+    </FormLayout>
+  );
+}
+
+export default CustomizedFormLayout;
+```
+
+## API
+
+<API moduleName="form-layout" />

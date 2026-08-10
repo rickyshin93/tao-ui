@@ -1,0 +1,136 @@
+---
+title: Modal
+description: 在受保护的焦点上下文中展示需要用户处理的对话框。页面涵盖适用场景、设计建议、多组可运行示例、交互状态与完整 API 参考。
+---
+
+在受保护的焦点上下文中展示需要用户处理的对话框。
+
+## 何时使用
+
+任务需要中断当前流程、确认重要决策或集中完成短任务时使用 Modal。
+
+**推荐**
+
+- 标题说明用户需要完成的任务。
+- 确认按钮文案使用具体动作。
+- 异步确认期间展示 loading。
+
+**避免**
+
+- 不需要中断或焦点保护的内容不要放进 Modal。
+
+## 基础用法
+
+```tsx preview
+import { Button, Modal } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+function ModalExample() {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <>
+      <Button variant="secondary" onClick={() => setOpen(true)}>Open modal</Button>
+      <Modal
+        open={open}
+        title="Archive project?"
+        onClose={() => setOpen(false)}
+        onOk={() => setOpen(false)}
+      >
+        You can restore the project later.
+      </Modal>
+    </>
+  );
+}
+
+export default ModalExample;
+```
+
+## 确认加载状态
+
+```tsx preview
+import { Button, Modal } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+function LoadingModal() {
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  function confirm() {
+    setLoading(true);
+    window.setTimeout(() => {
+      setLoading(false);
+      setOpen(false);
+    }, 1200);
+  }
+
+  return (
+    <>
+      <Button variant="secondary" onClick={() => setOpen(true)}>Publish</Button>
+      <Modal
+        open={open}
+        title="Publish changes?"
+        confirmLoading={loading}
+        onOk={confirm}
+        onClose={() => setOpen(false)}
+      >
+        The production site will update immediately.
+      </Modal>
+    </>
+  );
+}
+
+export default LoadingModal;
+```
+
+## 自定义与无页脚
+
+```tsx preview
+import { Button, Modal, Stack } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+function ModalFooters() {
+  const [mode, setMode] = useState(null);
+
+  return (
+    <>
+      <Stack direction="horizontal" gap="md">
+        <Button variant="secondary" onClick={() => setMode('custom')}>Custom footer</Button>
+        <Button variant="secondary" onClick={() => setMode('none')}>No footer</Button>
+      </Stack>
+      <Modal
+        open={mode !== null}
+        title={mode === 'custom' ? 'Custom footer' : 'Informational modal'}
+        footer={mode === 'custom' ? <Button onClick={() => setMode(null)}>Done</Button> : null}
+        onClose={() => setMode(null)}
+      >
+        Footer content is optional and can be replaced.
+      </Modal>
+    </>
+  );
+}
+
+export default ModalFooters;
+```
+
+## 命令式对话框
+
+```tsx preview
+import { Button, Modal, Stack } from '@rockshin/tao-ui';
+
+function ImperativeModals() {
+  return (
+    <Stack direction="horizontal" gap="md">
+      <Button variant="secondary" onClick={() => Modal.info({ title: 'Information', content: 'Your export is ready.' })}>Info</Button>
+      <Button variant="secondary" onClick={() => Modal.success({ title: 'Saved', content: 'Changes were saved.' })}>Success</Button>
+      <Button variant="destructive" onClick={() => Modal.confirm({ title: 'Delete project?', content: 'This cannot be undone.' })}>Confirm</Button>
+    </Stack>
+  );
+}
+
+export default ImperativeModals;
+```
+
+## API
+
+<API moduleName="modal" />

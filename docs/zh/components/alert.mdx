@@ -1,0 +1,93 @@
+---
+title: Alert
+description: 用于展示带有明确语义状态的重要上下文反馈信息。页面涵盖适用场景、设计建议、多组可运行示例、交互状态与完整 API 参考。
+---
+
+用于展示带有明确语义状态的重要上下文反馈信息。
+
+## 何时使用
+
+页面需要持续展示某个状态、风险或操作结果时使用 Alert；短暂通知应使用 Sonner。
+
+**推荐**
+
+- 根据消息严重程度选择对应的语义类型。
+- 标题保持简短，将补充信息放入说明。
+- 需要快速扫读时开启状态图标。
+
+**避免**
+
+- 避免在同一视图堆叠大量 Alert。
+- 不要用 Alert 承载短暂反馈，改用 toast。
+
+## 基础用法
+
+```tsx preview
+import { Alert, Stack } from '@rockshin/tao-ui';
+
+function AlertExample() {
+  return (
+    <Stack gap="md">
+      <Alert type="success" title="Changes saved" showIcon />
+      <Alert type="info" title="New version available" description="Refresh when you are ready." showIcon />
+      <Alert type="warning" title="Subscription expires soon" showIcon />
+      <Alert type="error" title="Could not save changes" showIcon />
+    </Stack>
+  );
+}
+
+export default AlertExample;
+```
+
+## 说明与图标
+
+```tsx preview
+import { Alert, Stack } from '@rockshin/tao-ui';
+
+function DetailedAlerts() {
+  return (
+    <Stack gap="md">
+      <Alert type="success" title="Deployment complete" description="Production is running version 0.0.25." showIcon />
+      <Alert type="info" title="Update available" description="Refresh when you are ready." showIcon />
+      <Alert type="warning" title="Quota almost reached" description="Storage is 92% full." showIcon />
+      <Alert type="error" title="Build failed" description="Fix the type errors and run again." showIcon />
+    </Stack>
+  );
+}
+
+export default DetailedAlerts;
+```
+
+## 可关闭提示与操作
+
+```tsx preview
+import { Alert, Button, Stack } from '@rockshin/tao-ui';
+
+function ActionAlerts() {
+  return (
+    <Stack gap="md">
+      <Alert type="info" title="Closable message" closable showIcon />
+      <Alert
+        type="warning"
+        title="Payment method expires soon"
+        description="Update it before the next billing date."
+        showIcon
+        action={<Button size="small" variant="secondary">Update</Button>}
+      />
+      <Alert
+        type="error"
+        title="Connection lost"
+        action={<Button size="small">Retry</Button>}
+        closable
+        showIcon
+      />
+    </Stack>
+  );
+}
+
+export default ActionAlerts;
+```
+
+## API
+
+<API moduleName="alert" />

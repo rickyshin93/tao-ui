@@ -1,0 +1,92 @@
+---
+title: Pagination
+description: "Moves through paged data with current page and page-size controls. Includes usage guidance, a runnable example, and the complete API reference."
+---
+
+Moves through paged data with current page and page-size controls.
+
+## When to use
+
+Use Pagination when a collection is split into pages rather than infinitely loaded.
+
+**Recommended**
+
+- Keep the current page controlled when data is loaded remotely.
+- Show total counts when they help users judge scope.
+
+**Avoid**
+
+- Do not use the component outside its intended interaction model.
+
+## Basic usage
+
+```tsx preview
+import { Pagination } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+function PaginationExample() {
+  const [page, setPage] = useState(1);
+
+  return (
+    <Pagination
+      total={95}
+      current={page}
+      pageSize={10}
+      onChange={setPage}
+      showTotal={(total, range) => range[0] + '-' + range[1] + ' of ' + total}
+    />
+  );
+}
+
+export default PaginationExample;
+```
+
+## Sizes
+
+```tsx preview
+import { Pagination, Stack } from '@rockshin/tao-ui';
+
+function PaginationSizes() {
+  return (
+    <Stack gap="md">
+      <Pagination total={50} size="small" />
+      <Pagination total={50} size="medium" />
+      <Pagination total={50} size="large" />
+    </Stack>
+  );
+}
+
+export default PaginationSizes;
+```
+
+## Page size and totals
+
+```tsx preview
+import { Pagination } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+function PaginationPageSize() {
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+
+  return (
+    <Pagination
+      total={200}
+      current={page}
+      pageSize={pageSize}
+      showSizeChanger
+      showTotal={(total, range) => range[0] + '-' + range[1] + ' of ' + total}
+      onChange={(nextPage, nextPageSize) => {
+        setPage(nextPage);
+        setPageSize(nextPageSize);
+      }}
+    />
+  );
+}
+
+export default PaginationPageSize;
+```
+
+## API
+
+<API moduleName="pagination" />
