@@ -307,3 +307,17 @@
 - **真实行为**: 组件本体是独立产品面；用户明确要求 Rspress 问题不得改动组件，输入边框与 focus 样式也必须保持组件原貌。
 - **正确做法**: 先对照 Storybook/组件测试确认组件行为；文档问题只改 `docs/**`、Rspress 配置或文档主题。没有明确授权不得修改 `src/components/**`、`src/theme/**` 和组件契约。
 - **适用场景**: tao-ui 文档站的 Preview、样式覆盖、示例状态与交互问题。
+
+## [GitHub Pages] 私有仓库先检查套餐，再启用 Pages 和授予读取权限
+- **日期**: 2026-08-10
+- **错误假设**: 提交 Pages workflow 后，`actions/configure-pages` 能用默认 `GITHUB_TOKEN` 自动完成首次启用，且任意 GitHub 套餐都支持私有仓库 Pages。
+- **真实行为**: 未启用时 Pages API 返回 404；当前套餐创建私有仓库 Pages 会返回 422。`configure-pages` 的 `enablement: true` 还要求非 `GITHUB_TOKEN` 的管理员 token，私有仓库读取 Pages 配置需要 `pages: read`。
+- **正确做法**: 先检查仓库 visibility 与套餐是否支持 Pages；再由管理员在 Settings/API 一次性把 publishing source 设为 GitHub Actions。build job 授予 `contents: read` + `pages: read`，deploy job 保留 `pages: write` + `id-token: write`。
+- **适用场景**: 私有仓库首次部署自定义 GitHub Pages workflow。
+
+## [Button] Flex 居中时不要把文字行高固定为 1
+- **日期**: 2026-08-19
+- **错误假设**: Button 使用 `inline-flex + align-items: center` 后，再设 `line-height: 1` 能让不同字体的字形都视觉居中。
+- **真实行为**: `line-height: 1` 只压缩行盒；消费方切换字体后会放大字形墨迹与行盒中心的偏差。antd Button 保留正常的内容行高，由固定控件高度和 Flex 负责几何居中。
+- **正确做法**: Button 使用主题的 `--tao-line-height`，图标槽继续独立使用 `line-height: 0`；跨应用用真实消费字体截图验收。
+- **适用场景**: Button、Tag 等固定高度控件在宿主应用切换字体后出现文字上下偏移时。

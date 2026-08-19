@@ -11,6 +11,7 @@
 - none
 
 ## Done
+- 2026-08-19 align Button text line box with antd for vertical centering across consumer fonts
 - 2026-08-09 add GitHub Pages CI: Rspress builds on every PR and deploys `doc_build` after pushes to `main`
 - 2026-08-09 restore interactive Rspress DatePicker, Radio, Checkbox, Select, and number-input demos without changing component borders or behavior
 - 2026-08-09 internationalize all 76 Rspress pages in English and Chinese, including navigation, search, API headings, descriptions, and per-locale llms outputs
@@ -51,4 +52,4 @@
 - 2026-07-12 add Sonner toast component with imperative `toast()` API, story, docs, tests
 
 ## Known issues
-- none
+- GitHub Pages deployment is blocked while the repository is private on the current account plan; make it public or upgrade the plan before enabling Pages

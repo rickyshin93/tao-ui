@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { expect, test } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
@@ -7,6 +8,13 @@ import { TaoProvider } from '../../src/provider/tao-provider';
 test('renders children text', () => {
   render(<Button>Submit</Button>);
   expect(screen.getByRole('button', { name: 'Submit' })).toBeTruthy();
+});
+
+test('keeps a typographic line box while flex-centering content', () => {
+  const css = readFileSync('src/components/button/button.css', 'utf8');
+  const rootRule = css.match(/button\[data-tao-button\] \{([^}]+)\}/)?.[1];
+
+  expect(rootRule).toContain('line-height: var(--tao-line-height);');
 });
 
 test('variant prop sets data-tao-variant', () => {

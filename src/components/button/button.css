@@ -10,7 +10,7 @@ button[data-tao-button] {
   gap: var(--tao-padding-xs);
   font-family: var(--tao-font-family);
   font-weight: var(--tao-button-font-weight, var(--tao-font-weight-medium));
-  line-height: 1;
+  line-height: var(--tao-line-height);
   border: var(--tao-line-width) solid transparent;
   cursor: pointer;
   outline: none;
