@@ -26,6 +26,38 @@ test('displays formatted value', () => {
   expect(screen.getByRole('textbox')).toHaveValue('2026-06-15');
 });
 
+test('defaultValue seeds an uncontrolled picker', () => {
+  render(<DatePicker defaultValue={dayjs('2026-06-15')} />);
+  expect(screen.getByRole('textbox')).toHaveValue('2026-06-15');
+});
+
+test('uncontrolled selection updates the displayed value', async () => {
+  render(<DatePicker defaultValue={dayjs('2026-06-15')} />);
+  await userEvent.click(screen.getByRole('textbox'));
+  await userEvent.click(screen.getByRole('button', { name: '2026-06-20' }));
+  expect(screen.getByRole('textbox')).toHaveValue('2026-06-20');
+});
+
+test('controlled input restores the value when its change is rejected', async () => {
+  let result = '';
+  render(
+    <DatePicker
+      mobile={false}
+      value={dayjs('2026-06-15')}
+      onChange={(_, dateString) => {
+        result = dateString;
+      }}
+    />,
+  );
+
+  const input = screen.getByRole('textbox');
+  await userEvent.clear(input);
+  await userEvent.type(input, '2026-06-20{Enter}');
+
+  expect(result).toBe('2026-06-20');
+  expect(input).toHaveValue('2026-06-15');
+});
+
 test('PC trigger accepts a typed date and commits it with Enter', async () => {
   let result: string | null = null;
   render(

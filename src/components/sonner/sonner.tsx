@@ -1,3 +1,12 @@
+import type { CSSProperties, ReactNode } from 'react';
+import {
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from 'react';
 import { TaoPortalScope, useTaoConfig } from '../../provider/tao-provider';
 import {
   cx,
@@ -5,8 +14,6 @@ import {
   type SemanticStyles,
 } from '../../utils/semantic';
 import { Button } from '../button/button';
-import { useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
-import type { CSSProperties, ReactNode } from 'react';
 import './sonner.css';
 
 export type SonnerSemanticPart =
@@ -53,8 +60,14 @@ export interface SonnerToastOptions {
 
 export interface SonnerPromiseMessages<T> {
   loading: SonnerToastOptions | ReactNode;
-  success?: SonnerToastOptions | ReactNode | ((value: T) => SonnerToastOptions | ReactNode);
-  error?: SonnerToastOptions | ReactNode | ((error: unknown) => SonnerToastOptions | ReactNode);
+  success?:
+    | SonnerToastOptions
+    | ReactNode
+    | ((value: T) => SonnerToastOptions | ReactNode);
+  error?:
+    | SonnerToastOptions
+    | ReactNode
+    | ((error: unknown) => SonnerToastOptions | ReactNode);
 }
 
 export interface SonnerToastItem extends SonnerToastOptions {
@@ -62,6 +75,7 @@ export interface SonnerToastItem extends SonnerToastOptions {
   type: SonnerType;
   createdAt: number;
   custom?: ReactNode;
+  /** @deprecated Toast lifecycle state is internal and no longer exposed. */
   removing?: boolean;
 }
 
@@ -83,20 +97,23 @@ export interface SonnerProps {
 type Listener = () => void;
 
 interface SonnerStoreState {
-  toasts: SonnerToastItem[];
+  toasts: StoredToast[];
 }
 
-interface ToastHeight {
-  id: string;
-  height: number;
-  frontHeight?: number;
+type StoredToast = Omit<SonnerToastItem, 'removing'> &
+  ({ phase: 'active' } | { phase: 'exiting' });
+
+interface ToastRuntime {
+  generation: number;
+  dismissTimer?: ReturnType<typeof setTimeout>;
+  removeTimer?: ReturnType<typeof setTimeout>;
 }
 
 const listeners = new Set<Listener>();
 let state: SonnerStoreState = { toasts: [] };
 let seed = 0;
-const timers = new Map<string, ReturnType<typeof setTimeout>>();
-const removeTimers = new Map<string, ReturnType<typeof setTimeout>>();
+let generationSeed = 0;
+const runtimes = new Map<string, ToastRuntime>();
 const REMOVE_DELAY = 220;
 
 function emit() {
@@ -114,76 +131,55 @@ function getSnapshot() {
   return state;
 }
 
-function clearTimer(id: string) {
-  const timer = timers.get(id);
-  if (timer) {
-    clearTimeout(timer);
-    timers.delete(id);
-  }
+function clearRuntimeTimers(runtime: ToastRuntime) {
+  if (runtime.dismissTimer) clearTimeout(runtime.dismissTimer);
+  if (runtime.removeTimer) clearTimeout(runtime.removeTimer);
+  runtime.dismissTimer = undefined;
+  runtime.removeTimer = undefined;
 }
 
-function clearRemoveTimer(id: string) {
-  const timer = removeTimers.get(id);
-  if (timer) {
-    clearTimeout(timer);
-    removeTimers.delete(id);
-  }
-}
-
-function dismiss(id?: string) {
-  if (!id) {
-    state.toasts.forEach((toast) => {
-      clearTimer(toast.id);
-    });
-    state.toasts.forEach((toast) => {
-      clearRemoveTimer(toast.id);
-    });
-    state = {
-      toasts: state.toasts.map((toast) => ({ ...toast, removing: true })),
-    };
-    emit();
-    state.toasts.forEach((toast) => {
-      removeTimers.set(
-        toast.id,
-        setTimeout(() => {
-          removeTimers.delete(toast.id);
-          state = { toasts: state.toasts.filter((item) => item.id !== toast.id) };
-          emit();
-        }, REMOVE_DELAY),
-      );
-    });
-    return;
-  }
-  clearTimer(id);
-  clearRemoveTimer(id);
+function beginExit(id: string) {
+  const runtime = runtimes.get(id);
+  if (!runtime || !state.toasts.some((toast) => toast.id === id)) return;
+  clearRuntimeTimers(runtime);
   state = {
     toasts: state.toasts.map((toast) =>
-      toast.id === id ? { ...toast, removing: true } : toast,
+      toast.id === id ? { ...toast, phase: 'exiting' } : toast,
     ),
   };
   emit();
-  removeTimers.set(
-    id,
-    setTimeout(() => {
-      removeTimers.delete(id);
-      state = { toasts: state.toasts.filter((toast) => toast.id !== id) };
-      emit();
-    }, REMOVE_DELAY),
-  );
+  const generation = runtime.generation;
+  runtime.removeTimer = setTimeout(() => {
+    const current = runtimes.get(id);
+    if (!current || current.generation !== generation) return;
+    runtimes.delete(id);
+    state = { toasts: state.toasts.filter((toast) => toast.id !== id) };
+    emit();
+  }, REMOVE_DELAY);
 }
 
-function scheduleDismiss(id: string, duration?: number) {
-  clearTimer(id);
+function dismiss(id?: string) {
+  if (id) {
+    beginExit(id);
+    return;
+  }
+  for (const toast of state.toasts) beginExit(toast.id);
+}
+
+function scheduleDismiss(id: string, duration: number | undefined) {
+  const runtime = runtimes.get(id);
+  if (!runtime) return;
+  if (runtime.dismissTimer) clearTimeout(runtime.dismissTimer);
   if (duration == null || duration <= 0) return;
-  timers.set(
-    id,
-    setTimeout(() => {
-      dismiss(id);
-    }, duration),
-  );
+  const generation = runtime.generation;
+  runtime.dismissTimer = setTimeout(() => {
+    if (runtimes.get(id)?.generation === generation) beginExit(id);
+  }, duration);
 }
 
-function isToastOptions(value: SonnerToastOptions | ReactNode): value is SonnerToastOptions {
+function isToastOptions(
+  value: SonnerToastOptions | ReactNode,
+): value is SonnerToastOptions {
   return (
     value != null &&
     typeof value === 'object' &&
@@ -192,21 +188,32 @@ function isToastOptions(value: SonnerToastOptions | ReactNode): value is SonnerT
   );
 }
 
-function normalizeOptions(options: SonnerToastOptions | ReactNode): SonnerToastOptions {
+function normalizeOptions(
+  options: SonnerToastOptions | ReactNode,
+): SonnerToastOptions {
   return isToastOptions(options)
     ? options
     : ({ title: options } as SonnerToastOptions);
 }
 
-function create(type: SonnerType, options: SonnerToastOptions | ReactNode, custom?: ReactNode) {
+function create(
+  type: SonnerType,
+  options: SonnerToastOptions | ReactNode,
+  custom?: ReactNode,
+) {
   const normalized = normalizeOptions(options);
   const id = normalized.id ?? `toast-${Date.now()}-${seed++}`;
-  const next: SonnerToastItem = {
+  const previousRuntime = runtimes.get(id);
+  if (previousRuntime) clearRuntimeTimers(previousRuntime);
+  const runtime: ToastRuntime = { generation: generationSeed++ };
+  runtimes.set(id, runtime);
+  const next: StoredToast = {
     ...normalized,
     id,
     type,
     createdAt: Date.now(),
     custom,
+    phase: 'active',
   };
 
   state = {
@@ -215,6 +222,15 @@ function create(type: SonnerType, options: SonnerToastOptions | ReactNode, custo
   emit();
   scheduleDismiss(id, normalized.duration);
   return id;
+}
+
+function replacePromiseToast(
+  id: string,
+  type: 'success' | 'error',
+  options: SonnerToastOptions | ReactNode,
+) {
+  const normalized = normalizeOptions(options);
+  create(type, { ...normalized, id });
 }
 
 function resolveDataType(type: SonnerType, richColors: boolean) {
@@ -273,11 +289,14 @@ export function Sonner({
 }: SonnerProps) {
   useTaoConfig();
   const snapshot = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
-  const [heights, setHeights] = useState<ToastHeight[]>([]);
+  const [heights, setHeights] = useState<Map<string, number>>(() => new Map());
 
   useEffect(() => {
     for (const toast of snapshot.toasts) {
-      if (!timers.has(toast.id)) scheduleDismiss(toast.id, toast.duration ?? duration);
+      const runtime = runtimes.get(toast.id);
+      if (toast.phase === 'active' && runtime && !runtime.dismissTimer) {
+        scheduleDismiss(toast.id, toast.duration ?? duration);
+      }
     }
   }, [duration, snapshot.toasts]);
 
@@ -287,7 +306,8 @@ export function Sonner({
     return sliced.slice(-visibleToasts).reverse();
   }, [expand, snapshot.toasts, visibleToasts]);
 
-  const frontToastHeight = heights[0]?.height ?? 0;
+  const frontToastHeight = heights.get(visible[0]?.id ?? '') ?? 0;
+  let nextOffset = 0;
 
   return (
     <TaoPortalScope>
@@ -306,6 +326,8 @@ export function Sonner({
         {visible.map((toast, index) => {
           const showClose = toast.closable ?? closeButton;
           const yPosition = position.startsWith('top') ? 'top' : 'bottom';
+          const toastOffset = nextOffset;
+          nextOffset += (heights.get(toast.id) ?? 0) + gap;
           return (
             <ToastView
               key={toast.id}
@@ -316,8 +338,7 @@ export function Sonner({
               index={index}
               visibleToasts={visible.length}
               expanded={expand}
-              gap={gap}
-              heights={heights}
+              offset={toastOffset}
               frontToastHeight={frontToastHeight}
               setHeights={setHeights}
               classNames={classNames}
@@ -331,17 +352,16 @@ export function Sonner({
 }
 
 interface ToastViewProps {
-  toast: SonnerToastItem;
+  toast: StoredToast;
   richColors: boolean;
   showClose: boolean;
   yPosition: 'top' | 'bottom';
   index: number;
   visibleToasts: number;
   expanded: boolean;
-  gap: number;
-  heights: ToastHeight[];
+  offset: number;
   frontToastHeight: number;
-  setHeights: React.Dispatch<React.SetStateAction<ToastHeight[]>>;
+  setHeights: React.Dispatch<React.SetStateAction<Map<string, number>>>;
   classNames?: SemanticClassNames<SonnerSemanticPart>;
   styles?: SemanticStyles<SonnerSemanticPart>;
 }
@@ -354,8 +374,7 @@ function ToastView({
   index,
   visibleToasts,
   expanded,
-  gap,
-  heights,
+  offset,
   frontToastHeight,
   setHeights,
   classNames,
@@ -365,18 +384,14 @@ function ToastView({
   const [offsetBeforeRemove, setOffsetBeforeRemove] = useState(0);
   const ref = useRef<HTMLDivElement>(null);
 
-  const offset = useMemo(() => {
-    return heights.slice(0, index).reduce((sum, item) => sum + item.height, 0) + index * gap;
-  }, [gap, heights, index]);
-
   useEffect(() => {
     const frame = requestAnimationFrame(() => setMounted(true));
     return () => cancelAnimationFrame(frame);
   }, []);
 
   useEffect(() => {
-    if (toast.removing) setOffsetBeforeRemove(offset);
-  }, [offset, toast.removing]);
+    if (toast.phase === 'exiting') setOffsetBeforeRemove(offset);
+  }, [offset, toast.phase]);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: toast content changes can change its measured height.
   useLayoutEffect(() => {
@@ -385,18 +400,33 @@ function ToastView({
 
     const nextHeight = node.getBoundingClientRect().height;
     setHeights((current) => {
-      const filtered = current.filter((item) => item.id !== toast.id);
-      return [...filtered, { id: toast.id, height: nextHeight }];
+      if (current.get(toast.id) === nextHeight) return current;
+      const next = new Map(current);
+      next.set(toast.id, nextHeight);
+      return next;
     });
 
     return () => {
-      setHeights((current) => current.filter((item) => item.id !== toast.id));
+      setHeights((current) => {
+        if (!current.has(toast.id)) return current;
+        const next = new Map(current);
+        next.delete(toast.id);
+        return next;
+      });
     };
-  }, [setHeights, toast.description, toast.id, toast.title, toast.action, toast.cancel, toast.custom]);
+  }, [
+    setHeights,
+    toast.description,
+    toast.id,
+    toast.title,
+    toast.action,
+    toast.cancel,
+    toast.custom,
+  ]);
 
   const isFront = index === 0;
   const isVisible = index < visibleToasts;
-  const activeOffset = toast.removing ? offsetBeforeRemove : offset;
+  const activeOffset = toast.phase === 'exiting' ? offsetBeforeRemove : offset;
 
   return (
     <div
@@ -409,7 +439,7 @@ function ToastView({
       data-tao-type={resolveDataType(toast.type, richColors)}
       data-tao-mounted={mounted}
       data-tao-y-position={yPosition}
-      data-tao-removing={toast.removing ? 'true' : 'false'}
+      data-tao-removing={toast.phase === 'exiting' ? 'true' : 'false'}
       data-tao-front={isFront ? 'true' : 'false'}
       data-tao-expanded={expanded ? 'true' : 'false'}
       data-tao-visible={isVisible ? 'true' : 'false'}
@@ -454,7 +484,9 @@ function ToastView({
               className={cx(classNames?.actions)}
               style={styles?.actions}
               data-tao-sonner-actions=""
-              data-tao-close-only={!toast.action && !toast.cancel && showClose ? '' : undefined}
+              data-tao-close-only={
+                !toast.action && !toast.cancel && showClose ? '' : undefined
+              }
             >
               {toast.cancel ? (
                 <Button
@@ -508,17 +540,23 @@ const baseToast = (options: SonnerToastOptions | ReactNode) =>
   create('default', options);
 
 export const toast = Object.assign(baseToast, {
-  success: (options: SonnerToastOptions | ReactNode) => create('success', options),
+  success: (options: SonnerToastOptions | ReactNode) =>
+    create('success', options),
   error: (options: SonnerToastOptions | ReactNode) => create('error', options),
-  warning: (options: SonnerToastOptions | ReactNode) => create('warning', options),
+  warning: (options: SonnerToastOptions | ReactNode) =>
+    create('warning', options),
   info: (options: SonnerToastOptions | ReactNode) => create('info', options),
   loading: (options: SonnerToastOptions | ReactNode) =>
     create(
       'loading',
-      isToastOptions(options) ? { ...options, duration: options.duration ?? 0 } : { title: options, duration: 0 },
+      isToastOptions(options)
+        ? { ...options, duration: options.duration ?? 0 }
+        : { title: options, duration: 0 },
     ),
-  custom: (node: ReactNode, options: Omit<SonnerToastOptions, 'title' | 'description'> = {}) =>
-    create('custom', options, node),
+  custom: (
+    node: ReactNode,
+    options: Omit<SonnerToastOptions, 'title' | 'description'> = {},
+  ) => create('custom', options, node),
   promise: async <T,>(
     promise: Promise<T>,
     messages: SonnerPromiseMessages<T>,
@@ -532,14 +570,14 @@ export const toast = Object.assign(baseToast, {
 
     try {
       const value = await promise;
-      dismiss(id);
       const success = renderPromiseState(messages.success, value);
-      if (success) create('success', success);
+      if (success) replacePromiseToast(id, 'success', success);
+      else dismiss(id);
       return value;
     } catch (error) {
-      dismiss(id);
       const failure = renderPromiseState(messages.error, error);
-      if (failure) create('error', failure);
+      if (failure) replacePromiseToast(id, 'error', failure);
+      else dismiss(id);
       throw error;
     }
   },

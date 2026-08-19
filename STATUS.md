@@ -1,7 +1,7 @@
 # STATUS
 
 ## Doing
-- align Sonner stacking state machine more closely with reference behavior
+- none
 
 ## Next
 
@@ -11,6 +11,8 @@
 - none
 
 ## Done
+- 2026-08-19 harden controlled picker transitions, Select duplicate precedence/index allocation, and Sonner promise lifecycle compatibility
+- 2026-08-19 unify component metadata generation, picker state ownership, Select indexing, and Sonner lifecycle/geometry
 - 2026-08-19 align Button text line box with antd for vertical centering across consumer fonts
 - 2026-08-09 add GitHub Pages CI: Rspress builds on every PR and deploys `doc_build` after pushes to `main`
 - 2026-08-09 restore interactive Rspress DatePicker, Radio, Checkbox, Select, and number-input demos without changing component borders or behavior

@@ -19,13 +19,13 @@ import {
   type TaoVariant,
   useTaoConfig,
 } from '../../provider/tao-provider';
+import { useIsMobile } from '../../utils/breakpoint';
 import {
   cx,
   type SemanticClassNames,
   type SemanticStyles,
 } from '../../utils/semantic';
 import { Drawer } from '../drawer/drawer';
-import { useIsMobile } from '../../utils/breakpoint';
 import { CalendarGrid } from './calendar/calendar-grid';
 import './date-picker.css';
 import { Presets } from './presets';
@@ -38,6 +38,14 @@ import {
 dayjs.extend(customParseFormat);
 
 type RangeValue = [Dayjs | null, Dayjs | null] | null;
+type RangeInteraction =
+  | { phase: 'idle'; activeInput: 'start' | 'end' }
+  | {
+      phase: 'pickingEnd';
+      activeInput: 'end';
+      start: Dayjs;
+      hover: Dayjs | null;
+    };
 
 export type RangePickerSemanticPart =
   | 'root'
@@ -152,6 +160,13 @@ export function RangePicker({
 
   const [internalOpen, setInternalOpen] = useState(false);
   const isOpen = controlledOpen ?? internalOpen;
+  const [interaction, setInteraction] = useState<RangeInteraction>({
+    phase: 'idle',
+    activeInput: 'start',
+  });
+  const controlledValueKey = isValueControlled
+    ? `${resolvedValue?.[0]?.valueOf() ?? 'null'}:${resolvedValue?.[1]?.valueOf() ?? 'null'}`
+    : undefined;
   const setOpen = useCallback(
     (v: boolean) => {
       setInternalOpen(v);
@@ -159,45 +174,65 @@ export function RangePicker({
     },
     [onOpenChange],
   );
+  useEffect(() => {
+    if (!isOpen) {
+      setInteraction({ phase: 'idle', activeInput: 'start' });
+    }
+  }, [isOpen]);
+  useEffect(() => {
+    if (controlledValueKey !== undefined) {
+      setInteraction({ phase: 'idle', activeInput: 'start' });
+    }
+  }, [controlledValueKey]);
 
   const [viewDateStart, setViewDateStart] = useState<Dayjs>(
     () => resolvedValue?.[0] ?? dayjs(),
   );
   const viewDateEnd = viewDateStart.add(1, 'month');
 
-  const [selecting, setSelecting] = useState<'start' | 'end'>('start');
-  const [hoverDate, setHoverDate] = useState<Dayjs | null>(null);
-  // When selecting end, store the pending start separately so rangeEnd stays null for hover preview
-  const [pendingStart, setPendingStart] = useState<Dayjs | null>(null);
-
-  const rangeStart = pendingStart ?? resolvedValue?.[0] ?? null;
-  const rangeEnd = pendingStart ? null : (resolvedValue?.[1] ?? null);
+  const rangeStart =
+    interaction.phase === 'pickingEnd'
+      ? interaction.start
+      : (resolvedValue?.[0] ?? null);
+  const rangeEnd =
+    interaction.phase === 'pickingEnd' ? null : (resolvedValue?.[1] ?? null);
+  const hoverDate =
+    interaction.phase === 'pickingEnd' ? interaction.hover : null;
+  const setHoverDate = useCallback((hover: Dayjs | null) => {
+    setInteraction((current) =>
+      current.phase === 'pickingEnd' ? { ...current, hover } : current,
+    );
+  }, []);
 
   const handleDateSelect = useCallback(
     (date: Dayjs) => {
-      if (selecting === 'start') {
-        setPendingStart(date);
-        setSelecting('end');
+      if (interaction.phase === 'idle' && interaction.activeInput === 'start') {
+        setInteraction({
+          phase: 'pickingEnd',
+          activeInput: 'end',
+          start: date,
+          hover: null,
+        });
       } else {
-        let start = pendingStart ?? rangeStart;
+        let start =
+          interaction.phase === 'pickingEnd' ? interaction.start : rangeStart;
         let end = date;
         if (start && date.isBefore(start)) {
           [start, end] = [date, start];
         }
         emitChange([start, end], [start?.format(fmt) ?? '', end.format(fmt)]);
-        setPendingStart(null);
-        setSelecting('start');
-        setHoverDate(null);
+        setInteraction({ phase: 'idle', activeInput: 'start' });
         if (!showTime) setOpen(false);
       }
     },
-    [selecting, pendingStart, rangeStart, emitChange, fmt, showTime, setOpen],
+    [interaction, rangeStart, emitChange, fmt, showTime, setOpen],
   );
 
   const handleClear = useCallback(
     (e: React.SyntheticEvent) => {
       e.stopPropagation();
       emitChange(null, ['', '']);
+      setInteraction({ phase: 'idle', activeInput: 'start' });
     },
     [emitChange],
   );
@@ -206,6 +241,7 @@ export function RangePicker({
     (val: unknown) => {
       const [s, e] = val as [Dayjs, Dayjs];
       emitChange([s, e], [s.format(fmt), e.format(fmt)]);
+      setInteraction({ phase: 'idle', activeInput: 'start' });
       setOpen(false);
     },
     [emitChange, fmt, setOpen],
@@ -253,7 +289,7 @@ export function RangePicker({
         nextStart || nextEnd ? [nextStart, nextEnd] : null,
         nextStrings,
       );
-      setPendingStart(null);
+      setInteraction({ phase: 'idle', activeInput: position });
       if (parsed) setViewDateStart(parsed);
       if (position === 'start') setInputStart(nextStrings[0]);
       else setInputEnd(nextStrings[1]);
@@ -430,7 +466,9 @@ export function RangePicker({
     >
       <span
         data-tao-range-input=""
-        data-tao-active={(selecting === 'start' && isOpen) || undefined}
+        data-tao-active={
+          (interaction.activeInput === 'start' && isOpen) || undefined
+        }
         className={classNames?.input}
         style={styles?.input}
       >
@@ -447,7 +485,9 @@ export function RangePicker({
       </span>
       <span
         data-tao-range-input=""
-        data-tao-active={(selecting === 'end' && isOpen) || undefined}
+        data-tao-active={
+          (interaction.activeInput === 'end' && isOpen) || undefined
+        }
         className={classNames?.input}
         style={styles?.input}
       >
@@ -473,7 +513,9 @@ export function RangePicker({
       <input
         ref={startInputRef}
         data-tao-range-input=""
-        data-tao-active={(selecting === 'start' && isOpen) || undefined}
+        data-tao-active={
+          (interaction.activeInput === 'start' && isOpen) || undefined
+        }
         className={classNames?.input}
         style={styles?.input}
         value={inputStart}
@@ -481,7 +523,7 @@ export function RangePicker({
         disabled={resolvedDisabled}
         aria-invalid={status === 'error' || undefined}
         onFocus={() => {
-          setSelecting('start');
+          setInteraction({ phase: 'idle', activeInput: 'start' });
         }}
         onChange={(event) => setInputStart(event.target.value)}
         onBlur={() => commitInputValue('start')}
@@ -505,7 +547,9 @@ export function RangePicker({
       <input
         ref={endInputRef}
         data-tao-range-input=""
-        data-tao-active={(selecting === 'end' && isOpen) || undefined}
+        data-tao-active={
+          (interaction.activeInput === 'end' && isOpen) || undefined
+        }
         className={classNames?.input}
         style={styles?.input}
         value={inputEnd}
@@ -513,7 +557,7 @@ export function RangePicker({
         disabled={resolvedDisabled}
         aria-invalid={status === 'error' || undefined}
         onFocus={() => {
-          setSelecting('end');
+          setInteraction({ phase: 'idle', activeInput: 'end' });
         }}
         onChange={(event) => setInputEnd(event.target.value)}
         onBlur={() => commitInputValue('end')}

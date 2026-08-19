@@ -20,16 +20,21 @@ import {
   LoadingIcon,
   SearchIcon,
 } from './select-icons';
-import { defaultFilter, filterTree, flattenOptions } from './select-model';
+import {
+  buildSelectIndex,
+  defaultFilter,
+  filterTree,
+  flattenLeafOptions,
+} from './select-model';
 import { SearchableSelectList } from './select-searchable-list';
 import { SelectTags } from './select-tags';
 import './select.css';
+import { useIsMobile } from '../../utils/breakpoint';
 import type {
   SelectOption,
   SelectPlacement,
   SelectProps,
 } from './select-types';
-import { useIsMobile } from '../../utils/breakpoint';
 
 export type {
   SelectOption,
@@ -166,7 +171,11 @@ export function Select(props: SelectProps) {
   // Prevents Radix from auto-closing the dropdown after a multi-select toggle.
   const suppressCloseRef = useRef(false);
 
-  const allOptions = useMemo(() => flattenOptions(options), [options]);
+  const { optionByToken, optionByValue } = useMemo(
+    () => buildSelectIndex(options),
+    [options],
+  );
+  const selectedValueSet = useMemo(() => new Set(valueArray), [valueArray]);
 
   const handleValueChange = useCallback(
     (next: string) => {
@@ -180,21 +189,19 @@ export function Select(props: SelectProps) {
               .map((t) => t.trim())
               .filter(Boolean);
             const toAdd = tokens.filter((t) => {
-              const opt = allOptions.find(
-                (o) => o.value === t || o.label === t,
-              );
-              return opt && !valueArray.includes(opt.value);
+              const opt = optionByToken.get(t);
+              return opt && !selectedValueSet.has(opt.value);
             });
             if (toAdd.length > 0) {
               const nextArray = [...valueArray, ...toAdd];
               if (maxCount != null && nextArray.length > maxCount) return;
               if (!isValueControlled) setValueInternal(nextArray);
               const selectedOpts = nextArray
-                .map((v) => allOptions.find((o) => o.value === v))
+                .map((v) => optionByValue.get(v))
                 .filter(Boolean) as SelectOption[];
               onChange?.(nextArray, selectedOpts);
               for (const v of toAdd) {
-                const opt = allOptions.find((o) => o.value === v);
+                const opt = optionByValue.get(v);
                 if (opt) onSelect?.(v, opt);
               }
             }
@@ -204,7 +211,7 @@ export function Select(props: SelectProps) {
 
         if (!hasInlineSearch) suppressCloseRef.current = true;
         const current = valueArray;
-        const existed = current.includes(next);
+        const existed = selectedValueSet.has(next);
         const nextArray = existed
           ? current.filter((v) => v !== next)
           : [...current, next];
@@ -213,11 +220,11 @@ export function Select(props: SelectProps) {
 
         if (!isValueControlled) setValueInternal(nextArray);
         const selectedOpts = nextArray
-          .map((v) => allOptions.find((o) => o.value === v))
+          .map((v) => optionByValue.get(v))
           .filter(Boolean) as SelectOption[];
         onChange?.(nextArray, selectedOpts);
 
-        const opt = allOptions.find((o) => o.value === next);
+        const opt = optionByValue.get(next);
         if (opt) {
           if (existed) {
             onDeselect?.(next, opt);
@@ -233,7 +240,7 @@ export function Select(props: SelectProps) {
       }
 
       // Single mode
-      const opt = allOptions.find((o) => o.value === next);
+      const opt = optionByValue.get(next);
       if (!isValueControlled) setValueInternal(next);
       onChange?.(next, opt);
       if (opt) onSelect?.(next, opt);
@@ -245,7 +252,9 @@ export function Select(props: SelectProps) {
       maxCount,
       tokenSeparators,
       isValueControlled,
-      allOptions,
+      optionByToken,
+      optionByValue,
+      selectedValueSet,
       onChange,
       onSelect,
       onDeselect,
@@ -332,17 +341,17 @@ export function Select(props: SelectProps) {
       const nextArray = valueArray.filter((v) => v !== removedValue);
       if (!isValueControlled) setValueInternal(nextArray);
       const selectedOpts = nextArray
-        .map((v) => allOptions.find((o) => o.value === v))
+        .map((v) => optionByValue.get(v))
         .filter(Boolean) as SelectOption[];
       onChange?.(nextArray, selectedOpts);
-      const opt = allOptions.find((o) => o.value === removedValue);
+      const opt = optionByValue.get(removedValue);
       if (opt) onDeselect?.(removedValue, opt);
     },
     [
       isMultiple,
       valueArray,
       isValueControlled,
-      allOptions,
+      optionByValue,
       onChange,
       onDeselect,
     ],
@@ -353,26 +362,35 @@ export function Select(props: SelectProps) {
     (nextArray: string[]) => {
       if (!isValueControlled) setValueInternal(nextArray);
       const selectedOpts = nextArray
-        .map((v) => allOptions.find((o) => o.value === v))
+        .map((v) => optionByValue.get(v))
         .filter(Boolean) as SelectOption[];
       onChange?.(nextArray, selectedOpts);
 
       // Fire onSelect for newly added, onDeselect for removed.
       const prev = valueArray;
+      const nextSet = new Set(nextArray);
       for (const v of nextArray) {
-        if (!prev.includes(v)) {
-          const opt = allOptions.find((o) => o.value === v);
+        if (!selectedValueSet.has(v)) {
+          const opt = optionByValue.get(v);
           if (opt) onSelect?.(v, opt);
         }
       }
       for (const v of prev) {
-        if (!nextArray.includes(v)) {
-          const opt = allOptions.find((o) => o.value === v);
+        if (!nextSet.has(v)) {
+          const opt = optionByValue.get(v);
           if (opt) onDeselect?.(v, opt);
         }
       }
     },
-    [valueArray, isValueControlled, allOptions, onChange, onSelect, onDeselect],
+    [
+      valueArray,
+      selectedValueSet,
+      isValueControlled,
+      optionByValue,
+      onChange,
+      onSelect,
+      onDeselect,
+    ],
   );
 
   const filteredOptions = useMemo(() => {
@@ -384,7 +402,7 @@ export function Select(props: SelectProps) {
           if (o.options) {
             const kids = filterSelected(o.options);
             if (kids.length) result.push({ ...o, options: kids });
-          } else if (!valueArray.includes(o.value)) {
+          } else if (!selectedValueSet.has(o.value)) {
             result.push(o);
           }
         }
@@ -402,8 +420,13 @@ export function Select(props: SelectProps) {
     filterOption,
     hideSelected,
     isMultiple,
-    valueArray,
+    selectedValueSet,
+    valueArray.length,
   ]);
+  const filteredFlatOptions = useMemo(
+    () => flattenLeafOptions(filteredOptions),
+    [filteredOptions],
+  );
 
   const allowClearEnabled = !!allowClear;
   const clearIcon = (typeof allowClear === 'object' &&
@@ -415,10 +438,8 @@ export function Select(props: SelectProps) {
 
   const selectedOption = useMemo(
     () =>
-      !isMultiple && value
-        ? allOptions.find((o) => o.value === value)
-        : undefined,
-    [isMultiple, value, allOptions],
+      !isMultiple && value ? optionByValue.get(value as string) : undefined,
+    [isMultiple, value, optionByValue],
   );
 
   const selectedOptions = useMemo(
@@ -427,12 +448,12 @@ export function Select(props: SelectProps) {
         ? (valueArray
             .map(
               (v) =>
-                allOptions.find((o) => o.value === v) ??
+                optionByValue.get(v) ??
                 (mode === 'tags' ? { label: v, value: v } : undefined),
             )
             .filter(Boolean) as SelectOption[])
         : [],
-    [isMultiple, valueArray, allOptions, mode],
+    [isMultiple, valueArray, optionByValue, mode],
   );
 
   const statusProps = {
@@ -647,7 +668,7 @@ export function Select(props: SelectProps) {
   // In multi mode, Radix doesn't manage our value — we render our own checkmarks.
   const radixValue = isMultiple ? '' : (value as string) || undefined;
 
-  const resultCount = flattenOptions(filteredOptions).length;
+  const resultCount = filteredFlatOptions.length;
 
   const overMaxCount =
     isMultiple && maxCount != null && valueArray.length >= maxCount;
@@ -657,7 +678,7 @@ export function Select(props: SelectProps) {
     const index = optIndex++;
     const textLabel =
       typeof opt.label === 'string' ? opt.label : String(opt.label);
-    const isSelected = valueArray.includes(opt.value);
+    const isSelected = selectedValueSet.has(opt.value);
     const itemDisabled = opt.disabled || (!isSelected && overMaxCount);
 
     return (
@@ -765,8 +786,8 @@ export function Select(props: SelectProps) {
   );
 
   const isSearchableOptionDisabled = (option: SelectOption) =>
-    !!option.disabled || (overMaxCount && !valueArray.includes(option.value));
-  const searchableOptions = flattenOptions(filteredOptions).filter(
+    !!option.disabled || (overMaxCount && !selectedValueSet.has(option.value));
+  const searchableOptions = filteredFlatOptions.filter(
     (option) => !isSearchableOptionDisabled(option),
   );
   const activeSearchOption =

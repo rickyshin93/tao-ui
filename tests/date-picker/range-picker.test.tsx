@@ -47,6 +47,81 @@ test('click opens dual calendar panels', async () => {
   expect(grids.length).toBe(2);
 });
 
+test('closing cancels an unfinished calendar range selection', async () => {
+  let changeCount = 0;
+  const view = render(
+    <RangePicker
+      mobile={false}
+      open
+      defaultValue={[dayjs('2026-06-15'), null]}
+      onChange={() => {
+        changeCount += 1;
+      }}
+    />,
+  );
+
+  await userEvent.click(
+    screen.getAllByRole('button', { name: '2026-06-18' })[0],
+  );
+  view.rerender(
+    <RangePicker
+      mobile={false}
+      open={false}
+      defaultValue={[dayjs('2026-06-15'), null]}
+      onChange={() => {
+        changeCount += 1;
+      }}
+    />,
+  );
+  view.rerender(
+    <RangePicker
+      mobile={false}
+      open
+      defaultValue={[dayjs('2026-06-15'), null]}
+      onChange={() => {
+        changeCount += 1;
+      }}
+    />,
+  );
+  await userEvent.click(
+    screen.getAllByRole('button', { name: '2026-06-20' })[0],
+  );
+
+  expect(changeCount).toBe(0);
+});
+
+test('external value updates cancel an unfinished range selection', async () => {
+  let changeCount = 0;
+  const onChange = () => {
+    changeCount += 1;
+  };
+  const view = render(
+    <RangePicker
+      mobile={false}
+      open
+      value={[dayjs('2026-06-01'), dayjs('2026-06-10')]}
+      onChange={onChange}
+    />,
+  );
+
+  await userEvent.click(
+    screen.getAllByRole('button', { name: '2026-06-18' })[0],
+  );
+  view.rerender(
+    <RangePicker
+      mobile={false}
+      open
+      value={[dayjs('2026-07-01'), dayjs('2026-07-10')]}
+      onChange={onChange}
+    />,
+  );
+  await userEvent.click(
+    screen.getAllByRole('button', { name: '2026-07-20' })[0],
+  );
+
+  expect(changeCount).toBe(0);
+});
+
 test('PC inputs accept a typed range with strict formatting', async () => {
   let result: [string, string] = ['', ''];
   render(

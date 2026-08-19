@@ -20,13 +20,13 @@ import {
   type TaoVariant,
   useTaoConfig,
 } from '../../provider/tao-provider';
+import { useIsMobile } from '../../utils/breakpoint';
 import {
   cx,
   type SemanticClassNames,
   type SemanticStyles,
 } from '../../utils/semantic';
 import { Drawer } from '../drawer/drawer';
-import { useIsMobile } from '../../utils/breakpoint';
 import { CalendarGrid } from './calendar/calendar-grid';
 import { CalendarHeader } from './calendar/calendar-header';
 import { MonthGrid } from './calendar/month-grid';
@@ -85,6 +85,7 @@ export interface DatePickerProps {
 
 export function DatePicker({
   value,
+  defaultValue,
   onChange,
   picker = 'date',
   showTime,
@@ -139,8 +140,21 @@ export function DatePicker({
   const defaultPlaceholder = placeholder ?? fmt;
   const drawerTitle = showTime ? 'Date & Time' : defaultPlaceholder;
 
+  const isValueControlled = value !== undefined;
+  const [internalValue, setInternalValue] = useState<Dayjs | null>(
+    defaultValue ?? null,
+  );
+  const resolvedValue = isValueControlled ? value : internalValue;
+  const emitChange = useCallback(
+    (next: Dayjs | null, dateString: string) => {
+      if (!isValueControlled) setInternalValue(next);
+      onChange?.(next, dateString);
+    },
+    [isValueControlled, onChange],
+  );
+
   const [internalOpen, setInternalOpen] = useState(false);
-  const displayValue = value ? value.format(fmt) : '';
+  const displayValue = resolvedValue ? resolvedValue.format(fmt) : '';
   const [inputValue, setInputValue] = useState(displayValue);
   const isOpen = controlledOpen ?? internalOpen;
   const setOpen = useCallback(
@@ -155,7 +169,9 @@ export function DatePicker({
     setInputValue(displayValue);
   }, [displayValue]);
 
-  const [viewDate, setViewDate] = useState<Dayjs>(() => value ?? dayjs());
+  const [viewDate, setViewDate] = useState<Dayjs>(
+    () => resolvedValue ?? dayjs(),
+  );
   const [panelMode, setPanelMode] = useState<PanelMode>(
     picker === 'year' ? 'year' : picker === 'month' ? 'month' : 'date',
   );
@@ -164,94 +180,94 @@ export function DatePicker({
   // Reset panel state when opening
   useEffect(() => {
     if (isOpen) {
-      setViewDate(value ?? dayjs());
+      setViewDate(resolvedValue ?? dayjs());
       setPanelMode(
         picker === 'year' ? 'year' : picker === 'month' ? 'month' : 'date',
       );
       setTimeScrollKey((k) => k + 1);
     }
-  }, [isOpen, picker, value]);
+  }, [isOpen, picker, resolvedValue]);
 
   // Time state
   const timeValue = useMemo(
     () => ({
-      hour: value?.hour() ?? 0,
-      minute: value?.minute() ?? 0,
-      second: value?.second() ?? 0,
+      hour: resolvedValue?.hour() ?? 0,
+      minute: resolvedValue?.minute() ?? 0,
+      second: resolvedValue?.second() ?? 0,
     }),
-    [value],
+    [resolvedValue],
   );
 
   const handleDateSelect = useCallback(
     (date: Dayjs) => {
       let result = date;
-      if (showTime && value) {
+      if (showTime && resolvedValue) {
         result = date
-          .hour(value.hour())
-          .minute(value.minute())
-          .second(value.second());
+          .hour(resolvedValue.hour())
+          .minute(resolvedValue.minute())
+          .second(resolvedValue.second());
       }
       if (!showTime) {
-        onChange?.(result, result.format(fmt));
+        emitChange(result, result.format(fmt));
         setOpen(false);
       } else {
-        onChange?.(result, result.format(fmt));
+        emitChange(result, result.format(fmt));
         // Keep open for time selection
       }
     },
-    [onChange, fmt, showTime, value, setOpen],
+    [emitChange, fmt, showTime, resolvedValue, setOpen],
   );
 
   const handleMonthSelect = useCallback(
     (date: Dayjs) => {
       if (picker === 'month') {
-        onChange?.(date, date.format(fmt));
+        emitChange(date, date.format(fmt));
         setOpen(false);
       } else {
         setViewDate(date);
         setPanelMode('date');
       }
     },
-    [picker, onChange, fmt, setOpen],
+    [picker, emitChange, fmt, setOpen],
   );
 
   const handleYearSelect = useCallback(
     (date: Dayjs) => {
       if (picker === 'year') {
-        onChange?.(date, date.format(fmt));
+        emitChange(date, date.format(fmt));
         setOpen(false);
       } else {
         setViewDate(date);
         setPanelMode(picker === 'month' ? 'month' : 'date');
       }
     },
-    [picker, onChange, fmt, setOpen],
+    [picker, emitChange, fmt, setOpen],
   );
 
   const handleTimeChange = useCallback(
     (h: number, m: number, s: number) => {
-      const base = value ?? dayjs();
+      const base = resolvedValue ?? dayjs();
       const result = base.hour(h).minute(m).second(s);
-      onChange?.(result, result.format(fmt));
+      emitChange(result, result.format(fmt));
     },
-    [value, onChange, fmt],
+    [resolvedValue, emitChange, fmt],
   );
 
   const handleClear = useCallback(
     (e: React.SyntheticEvent) => {
       e.stopPropagation();
-      onChange?.(null, '');
+      emitChange(null, '');
     },
-    [onChange],
+    [emitChange],
   );
 
   const handlePresetSelect = useCallback(
     (val: unknown) => {
       const d = val as Dayjs;
-      onChange?.(d, d.format(fmt));
+      emitChange(d, d.format(fmt));
       setOpen(false);
     },
-    [onChange, fmt, setOpen],
+    [emitChange, fmt, setOpen],
   );
 
   const handleOk = useCallback(() => {
@@ -260,19 +276,19 @@ export function DatePicker({
 
   const handleNow = useCallback(() => {
     const now = dayjs();
-    onChange?.(now, now.format(fmt));
+    emitChange(now, now.format(fmt));
     setViewDate(now);
     setPanelMode('date');
     setTimeScrollKey((k) => k + 1);
-  }, [onChange, fmt]);
+  }, [emitChange, fmt]);
 
-  const showClearBtn = allowClear && value && !resolvedDisabled;
+  const showClearBtn = allowClear && resolvedValue && !resolvedDisabled;
 
   const commitInputValue = useCallback(() => {
     const text = inputValue.trim();
     if (!text) {
-      onChange?.(null, '');
-      setInputValue('');
+      if (displayValue) emitChange(null, '');
+      setInputValue(isValueControlled ? displayValue : '');
       setOpen(false);
       return;
     }
@@ -289,18 +305,19 @@ export function DatePicker({
     }
 
     const formatted = parsed.format(fmt);
-    setInputValue(formatted);
+    setInputValue(isValueControlled ? displayValue : formatted);
     setViewDate(parsed);
-    onChange?.(parsed, formatted);
+    if (formatted !== displayValue) emitChange(parsed, formatted);
     setOpen(false);
   }, [
     disabledDate,
     displayValue,
     fmt,
     inputValue,
+    isValueControlled,
     maxDate,
     minDate,
-    onChange,
+    emitChange,
     setOpen,
   ]);
 
@@ -318,7 +335,7 @@ export function DatePicker({
         {panelMode === 'date' && (
           <CalendarGrid
             viewDate={viewDate}
-            value={value}
+            value={resolvedValue}
             onSelect={handleDateSelect}
             onViewDateChange={setViewDate}
             disabledDate={disabledDate}
@@ -333,7 +350,7 @@ export function DatePicker({
         {panelMode === 'month' && (
           <MonthGrid
             viewDate={viewDate}
-            value={value}
+            value={resolvedValue}
             onSelect={handleMonthSelect}
             disabledDate={disabledDate}
           />
@@ -341,7 +358,7 @@ export function DatePicker({
         {(panelMode === 'year' || panelMode === 'decade') && (
           <YearGrid
             viewDate={viewDate}
-            value={value}
+            value={resolvedValue}
             onSelect={handleYearSelect}
             disabledDate={disabledDate}
           />
@@ -490,7 +507,15 @@ export function DatePicker({
         disabled={resolvedDisabled}
         aria-invalid={status === 'error' || undefined}
         onChange={(event) => setInputValue(event.target.value)}
-        onBlur={commitInputValue}
+        onBlur={(event) => {
+          if (
+            event.relatedTarget instanceof HTMLElement &&
+            event.relatedTarget.closest('[data-tao-picker-dropdown]')
+          ) {
+            return;
+          }
+          commitInputValue();
+        }}
         onKeyDown={(event) => {
           if (event.key === 'Enter') {
             event.preventDefault();

@@ -21,3 +21,10 @@ test('token helpers are available from both the root and the tokens subpath', ()
     'var(--tao-color-primary)',
   );
 });
+
+test('metadata registry contains every documented component', () => {
+  expect(metadataExports.componentDocs).toHaveLength(36);
+  for (const name of ['alert', 'form', 'popconfirm', 'popover', 'tooltip']) {
+    expect(metadataExports.getComponentDoc(name)?.name).toBe(name);
+  }
+});

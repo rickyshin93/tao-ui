@@ -35,6 +35,60 @@ test('loading toast stays visible until dismissed', async () => {
   });
 });
 
+test('recreating an exiting id is not removed by the stale exit timer', async () => {
+  render(<Sonner />);
+  toast({ id: 'stable', title: 'Old', duration: 0 });
+  toast.dismiss('stable');
+  toast({ id: 'stable', title: 'New', duration: 0 });
+
+  await new Promise((resolve) => setTimeout(resolve, 260));
+  expect(screen.getByText('New')).toBeTruthy();
+  toast.dismiss();
+  await new Promise((resolve) => setTimeout(resolve, 240));
+});
+
+test('front height follows toast id after its content changes', async () => {
+  const original = HTMLElement.prototype.getBoundingClientRect;
+  HTMLElement.prototype.getBoundingClientRect =
+    function getBoundingClientRect() {
+      const height = this.textContent?.includes('Front updated')
+        ? 90
+        : this.textContent?.includes('Front')
+          ? 20
+          : 40;
+      return {
+        width: 100,
+        height,
+        top: 0,
+        right: 100,
+        bottom: height,
+        left: 0,
+        x: 0,
+        y: 0,
+        toJSON: () => ({}),
+      };
+    };
+
+  try {
+    const { container } = render(<Sonner visibleToasts={2} />);
+    toast({ id: 'back', title: 'Back', duration: 0 });
+    toast({ id: 'front', title: 'Front', duration: 0 });
+    toast({ id: 'front', title: 'Front updated', duration: 0 });
+
+    await waitFor(() =>
+      expect(
+        (
+          container.querySelector('[data-tao-sonner-viewport]') as HTMLElement
+        ).style.getPropertyValue('--tao-sonner-front-height'),
+      ).toBe('90px'),
+    );
+  } finally {
+    HTMLElement.prototype.getBoundingClientRect = original;
+    toast.dismiss();
+    await new Promise((resolve) => setTimeout(resolve, 240));
+  }
+});
+
 test('custom toast renders arbitrary react node', async () => {
   render(<Sonner />);
   toast.custom(
@@ -87,6 +141,18 @@ test('promise toast resolves to success state', async () => {
     success: (value) => ({ title: `Published ${value}` }),
   });
   expect(await screen.findByText('Published v1.2.3')).toBeTruthy();
+  toast.dismiss();
+});
+
+test('promise result id does not orphan the loading toast', async () => {
+  render(<Sonner />);
+  await toast.promise(Promise.resolve('done'), {
+    loading: { title: 'Still loading' },
+    success: { id: 'result-id', title: 'Finished' },
+  });
+
+  expect(await screen.findByText('Finished')).toBeTruthy();
+  expect(screen.queryByText('Still loading')).toBeNull();
   toast.dismiss();
 });
 

@@ -1,6 +1,7 @@
 import { type ReactNode, useCallback, useMemo, useState } from 'react';
 import { Drawer } from '../drawer/drawer';
 import { SearchIcon } from './select-icons';
+import { countLeafOptions, defaultFilter, filterTree } from './select-model';
 import type { SelectOption } from './select-types';
 import './mobile-select.css';
 
@@ -18,37 +19,6 @@ interface MobileSelectContentProps {
   onClose: () => void;
   /** Enable multi-select checkboxes + Done button flow. */
   multiple?: boolean;
-}
-
-const defaultFilter = (input: string, option: SelectOption): boolean => {
-  const label =
-    typeof option.label === 'string' ? option.label : String(option.label);
-  return label.toLowerCase().includes(input.toLowerCase());
-};
-
-/** Filter while preserving group structure; empty groups are dropped. */
-function filterTree(
-  options: SelectOption[],
-  fn: (input: string, option: SelectOption) => boolean,
-  input: string,
-): SelectOption[] {
-  const result: SelectOption[] = [];
-  for (const o of options) {
-    if (o.options) {
-      const kids = filterTree(o.options, fn, input);
-      if (kids.length) result.push({ ...o, options: kids });
-    } else if (fn(input, o)) {
-      result.push(o);
-    }
-  }
-  return result;
-}
-
-function countLeaves(options: SelectOption[]): number {
-  return options.reduce(
-    (n, o) => n + (o.options ? countLeaves(o.options) : 1),
-    0,
-  );
 }
 
 function MobileSelectContentInner({
@@ -71,12 +41,17 @@ function MobileSelectContentInner({
   }, [multiple, value]);
 
   const [draft, setDraft] = useState<string[]>(valueArray);
+  const draftSet = useMemo(() => new Set(draft), [draft]);
 
   const filteredOptions = useMemo(() => {
     if (!showSearch || !search) return options;
     const fn = filterOption ?? defaultFilter;
     return filterTree(options, fn, search);
   }, [options, search, showSearch, filterOption]);
+  const resultCount = useMemo(
+    () => countLeafOptions(filteredOptions),
+    [filteredOptions],
+  );
 
   const handleSelect = useCallback(
     (optValue: string) => {
@@ -102,9 +77,7 @@ function MobileSelectContentInner({
   let optIndex = 0;
   const renderItem = (opt: SelectOption): ReactNode => {
     const index = optIndex++;
-    const isSelected = multiple
-      ? draft.includes(opt.value)
-      : opt.value === value;
+    const isSelected = multiple ? draftSet.has(opt.value) : opt.value === value;
     return (
       <button
         type="button"
@@ -168,7 +141,7 @@ function MobileSelectContentInner({
         </div>
       )}
       <div data-tao-sheet-list="">
-        {countLeaves(filteredOptions) > 0 ? (
+        {resultCount > 0 ? (
           renderTree(filteredOptions)
         ) : (
           <div data-tao-sheet-empty="">{notFoundContent}</div>
