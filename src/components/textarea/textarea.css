@@ -3,104 +3,106 @@
    Border / background / focus ring come from theme/control.css
    (shared [data-tao-control] variant styles). Layout + inner reset here.
    =========================== */
-[data-tao-textarea] {
-  display: block;
-  width: 100%; /* antd Textarea 对齐：默认撑满父容器 */
-  font-family: var(--tao-font-family);
-}
+@layer components {
+  [data-tao-textarea] {
+    display: block;
+    width: 100%; /* antd Textarea 对齐：默认撑满父容器 */
+    font-family: var(--tao-font-family);
+  }
 
-/* Sizes — radius on wrapper; padding-block derived from
+  /* Sizes — radius on wrapper; padding-block derived from
    (controlHeight - fontSize*lineHeight)/2 - border, so a single-row
    textarea equals the matching Input height. minHeight = controlHeight
    keeps a scrunched textarea aligned with Input. */
-[data-tao-textarea][data-tao-size="small"] {
-  border-radius: var(--tao-radius-sm);
-}
-[data-tao-textarea][data-tao-size="small"] textarea {
-  padding-inline: var(--tao-padding-xs);
-  padding-block: calc(
-    (
-      var(--tao-control-height-sm) -
-      var(--tao-font-size-sm) *
-      var(--tao-line-height-sm)
-    ) /
-    2 -
-    1px
-  );
-  font-size: var(--tao-font-size-sm);
-  line-height: var(--tao-line-height-sm);
-  min-height: var(--tao-control-height-sm);
-}
+  [data-tao-textarea][data-tao-size="small"] {
+    border-radius: var(--tao-radius-sm);
+  }
+  :where([data-tao-textarea][data-tao-size="small"] textarea) {
+    padding-inline: var(--tao-padding-xs);
+    padding-block: calc(
+      (
+        var(--tao-control-height-sm) -
+        var(--tao-font-size-sm) *
+        var(--tao-line-height-sm)
+      ) /
+      2 -
+      1px
+    );
+    font-size: var(--tao-font-size-sm);
+    line-height: var(--tao-line-height-sm);
+    min-height: var(--tao-control-height-sm);
+  }
 
-[data-tao-textarea][data-tao-size="medium"] {
-  border-radius: var(--tao-radius-md);
-}
-[data-tao-textarea][data-tao-size="medium"] textarea {
-  padding-inline: var(--tao-padding-sm);
-  padding-block: calc(
-    (
-      var(--tao-control-height) -
-      var(--tao-font-size-base) *
-      var(--tao-line-height)
-    ) /
-    2 -
-    1px
-  );
-  font-size: var(--tao-font-size-base);
-  line-height: var(--tao-line-height);
-  min-height: var(--tao-control-height);
-}
+  [data-tao-textarea][data-tao-size="medium"] {
+    border-radius: var(--tao-radius-md);
+  }
+  :where([data-tao-textarea][data-tao-size="medium"] textarea) {
+    padding-inline: var(--tao-padding-sm);
+    padding-block: calc(
+      (
+        var(--tao-control-height) -
+        var(--tao-font-size-base) *
+        var(--tao-line-height)
+      ) /
+      2 -
+      1px
+    );
+    font-size: var(--tao-font-size-base);
+    line-height: var(--tao-line-height);
+    min-height: var(--tao-control-height);
+  }
 
-[data-tao-textarea][data-tao-size="large"] {
-  border-radius: var(--tao-radius-md);
-}
-[data-tao-textarea][data-tao-size="large"] textarea {
-  padding-inline: var(--tao-padding-sm);
-  padding-block: calc(
-    (
-      var(--tao-control-height-lg) -
-      var(--tao-font-size-lg) *
-      var(--tao-line-height-lg)
-    ) /
-    2 -
-    1px
-  );
-  font-size: var(--tao-font-size-lg);
-  line-height: var(--tao-line-height-lg);
-  min-height: var(--tao-control-height-lg);
-}
+  [data-tao-textarea][data-tao-size="large"] {
+    border-radius: var(--tao-radius-md);
+  }
+  :where([data-tao-textarea][data-tao-size="large"] textarea) {
+    padding-inline: var(--tao-padding-sm);
+    padding-block: calc(
+      (
+        var(--tao-control-height-lg) -
+        var(--tao-font-size-lg) *
+        var(--tao-line-height-lg)
+      ) /
+      2 -
+      1px
+    );
+    font-size: var(--tao-font-size-lg);
+    line-height: var(--tao-line-height-lg);
+    min-height: var(--tao-control-height-lg);
+  }
 
-/* Borderless: override radius from size rules */
-[data-tao-textarea][data-tao-variant="borderless"] {
-  border-radius: 0 !important;
-}
+  /* Borderless: override radius from size rules */
+  [data-tao-textarea][data-tao-variant="borderless"] {
+    border-radius: 0 !important;
+  }
 
-/* Inner textarea reset */
-[data-tao-textarea] textarea {
-  display: block;
-  width: 100%;
-  box-sizing: border-box;
-  margin: 0;
-  border: none;
-  outline: none;
-  background: transparent;
-  font-family: inherit;
-  color: var(--tao-color-text);
-  resize: vertical;
-}
+  /* Inner textarea reset */
+  :where([data-tao-textarea] textarea) {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    margin: 0;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-family: inherit;
+    color: var(--tao-color-text);
+    resize: vertical;
+  }
 
-/* autoSize controls its own height — disable manual resize + size floor */
-[data-tao-textarea] textarea[data-tao-autosize] {
-  resize: none;
-  overflow-y: hidden;
-  min-height: 0;
-}
+  /* autoSize controls its own height — disable manual resize + size floor */
+  :where([data-tao-textarea] textarea[data-tao-autosize]) {
+    resize: none;
+    overflow-y: hidden;
+    min-height: 0;
+  }
 
-[data-tao-textarea] textarea::placeholder {
-  color: var(--tao-color-text-placeholder);
-}
+  :where([data-tao-textarea] textarea)::placeholder {
+    color: var(--tao-color-text-placeholder);
+  }
 
-[data-tao-textarea] textarea:disabled {
-  color: var(--tao-color-text-disabled);
-  cursor: not-allowed;
+  :where([data-tao-textarea] textarea:disabled) {
+    color: var(--tao-color-text-disabled);
+    cursor: not-allowed;
+  }
 }

@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { expect, test } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
@@ -96,4 +98,20 @@ test('semantic classNames merge onto parts', () => {
   const wrapper = el.closest('[data-tao-textarea]') as HTMLElement;
   expect(wrapper.className).toContain('r');
   expect(wrapper.className).toContain('rootExtra');
+});
+
+test('nested textarea defaults have zero specificity', () => {
+  const css = readFileSync(
+    resolve(process.cwd(), 'src/components/textarea/textarea.css'),
+    'utf8',
+  ).replace(/\/\*[\s\S]*?\*\//g, '');
+  const nestedSelectors = Array.from(css.matchAll(/([^{}]+)\{/g), (match) =>
+    match[1].trim(),
+  ).filter((selector) => selector.includes(' textarea'));
+
+  expect(css).toContain('@layer components');
+  expect(nestedSelectors.length).toBeGreaterThan(0);
+  expect(
+    nestedSelectors.every((selector) => selector.startsWith(':where(')),
+  ).toBe(true);
 });

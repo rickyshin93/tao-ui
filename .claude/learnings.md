@@ -321,3 +321,10 @@
 - **真实行为**: `line-height: 1` 只压缩行盒；消费方切换字体后会放大字形墨迹与行盒中心的偏差。antd Button 保留正常的内容行高，由固定控件高度和 Flex 负责几何居中。
 - **正确做法**: Button 使用主题的 `--tao-line-height`，图标槽继续独立使用 `line-height: 0`；跨应用用真实消费字体截图验收。
 - **适用场景**: Button、Tag 等固定高度控件在宿主应用切换字体后出现文字上下偏移时。
+
+## [测试] rstest 组件 CSS 不进入 happy-dom cascade
+- **日期**: 2026-08-25
+- **错误假设**: 在 rstest 中给 Semantic DOM 部件追加消费方 `<style>`，再用 `getComputedStyle` 就能验证组件 CSS 与消费方 CSS 的 specificity 关系。
+- **真实行为**: 组件 CSS 由构建链处理但未作为 stylesheet 注入 happy-dom，测试会在缺少组件默认规则时假绿。
+- **正确做法**: 组件测试锁定 CSS selector/layer 契约，构建后再用真实浏览器验证 cascade；不要用 happy-dom computed style 证明组件 CSS 覆盖关系。
+- **适用场景**: Textarea、Input 等需要验证 CSS layer、specificity 或真实尺寸覆盖时。
