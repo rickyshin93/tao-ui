@@ -328,3 +328,10 @@
 - **真实行为**: 组件 CSS 由构建链处理但未作为 stylesheet 注入 happy-dom，测试会在缺少组件默认规则时假绿。
 - **正确做法**: 组件测试锁定 CSS selector/layer 契约，构建后再用真实浏览器验证 cascade；不要用 happy-dom computed style 证明组件 CSS 覆盖关系。
 - **适用场景**: Textarea、Input 等需要验证 CSS layer、specificity 或真实尺寸覆盖时。
+
+## [发布] npm 校验必须绕过本地镜像缓存
+- **日期**: 2026-08-25
+- **错误假设**: GitHub Actions 发布成功后，直接执行 `npm view` 一定能立即读到新版本。
+- **真实行为**: 本机 npm registry 指向 `npmmirror`；镜像同步滞后会让 release 脚本在官方 npm 已发布成功后误报旧版本。
+- **正确做法**: 发布后的权威校验显式使用 `--registry=https://registry.npmjs.org/ --prefer-online`；镜像只用于日常安装加速。
+- **适用场景**: release workflow 已成功，但本地版本校验仍返回上一版本。

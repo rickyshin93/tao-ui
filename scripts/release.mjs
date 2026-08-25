@@ -166,6 +166,8 @@ const finalPublishedVersion = read('npm', [
   'view',
   packageJson.name,
   'version',
+  '--registry=https://registry.npmjs.org/',
+  '--prefer-online',
 ]);
 assert(
   finalPublishedVersion === version,
