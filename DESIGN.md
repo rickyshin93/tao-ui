@@ -1,4 +1,79 @@
-# tao-ui 设计规范
+---
+name: tao-ui
+description: 克制、有序、AI-native 的 React 19 组件设计系统
+colors:
+  primary: "oklch(0.205 0.01 70)"
+  success: "oklch(0.555 0.14 155)"
+  warning: "oklch(0.7 0.15 70)"
+  error: "oklch(0.57 0.19 25)"
+  canvas: "oklch(0.985 0.004 70)"
+  surface: "oklch(1 0 0)"
+  ink: "oklch(0.155 0.01 70)"
+typography:
+  body:
+    fontFamily: "Geist Sans, system-ui, sans-serif"
+    fontSize: "14px"
+    fontWeight: 400
+    lineHeight: 1.5714
+  label:
+    fontFamily: "Geist Sans, system-ui, sans-serif"
+    fontSize: "13px"
+    fontWeight: 500
+    lineHeight: 1.6667
+  code:
+    fontFamily: "Geist Mono, ui-monospace, monospace"
+    fontSize: "14px"
+    fontWeight: 400
+    lineHeight: 1.5714
+rounded:
+  xs: "2px"
+  sm: "8px"
+  md: "10px"
+  lg: "12px"
+  xl: "14px"
+spacing:
+  xs: "8px"
+  sm: "12px"
+  md: "16px"
+  lg: "24px"
+  xl: "32px"
+components:
+  button-primary:
+    backgroundColor: "{colors.primary}"
+    textColor: "{colors.canvas}"
+    rounded: "{rounded.md}"
+    padding: "0 16px"
+    height: "32px"
+  button-secondary:
+    backgroundColor: "transparent"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.md}"
+    padding: "0 16px"
+    height: "32px"
+  input-outlined:
+    backgroundColor: "transparent"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.md}"
+    padding: "0 12px"
+    height: "32px"
+  tag-solid:
+    backgroundColor: "{colors.primary}"
+    textColor: "{colors.canvas}"
+    rounded: "{rounded.sm}"
+    padding: "2px 8px"
+  tabs-active:
+    backgroundColor: "transparent"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.sm}"
+    padding: "8px 12px"
+  popover-elevated:
+    backgroundColor: "{colors.surface}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.lg}"
+    padding: "12px"
+---
+
+# Design System: tao-ui
 
 > 道法自然 — 克制的、有序的、笃定的
 
@@ -9,7 +84,7 @@
 
 ---
 
-## 1. 设计哲学
+## Overview
 
 **约束即自由**。tao-ui 通过严格的 token 系统消除视觉决策，让 AI（和人类）只需选择"用哪个组件"，而非"用什么颜色/间距/圆角"。
 
@@ -769,7 +844,7 @@ function TaoProvider({ theme, size, disabled, variant, children }: TaoProviderPr
 
 ---
 
-## 4. 色彩系统
+## Colors
 
 ### 4.1 色彩空间
 
@@ -789,7 +864,7 @@ function TaoProvider({ theme, size, disabled, variant, children }: TaoProviderPr
 
 ---
 
-## 5. 字体系统
+## Typography
 
 ### 5.1 字体选择
 
@@ -847,7 +922,7 @@ import '@fontsource/geist-mono/400.css';
 
 ---
 
-## 6. 间距系统
+## Layout
 
 由 Seed Token `sizeUnit`(4) + `sizeStep`(4) 自动派生。详见 §2.3.4。
 
@@ -874,17 +949,7 @@ import '@fontsource/geist-mono/400.css';
 
 ---
 
-## 7. 圆角系统
-
-由 Seed Token `borderRadius`(6) 自动派生。详见 §2.3.2。
-
-规则：
-- 嵌套元素的圆角 = 外层圆角 - padding
-- 一个组件内所有圆角来自同一级别或差一级
-
----
-
-## 8. 阴影系统
+## Elevation & Depth
 
 ```css
 :root {
@@ -898,6 +963,16 @@ import '@fontsource/geist-mono/400.css';
 规则：
 - 默认不加阴影。只有浮层（dropdown, popover, dialog）使用阴影
 - Input/Button 不用 box-shadow 做装饰（focus ring 除外）
+
+---
+
+## Shapes
+
+由 Seed Token `borderRadius`(10) 自动派生。详见 §2.3.2。
+
+规则：
+- 嵌套元素的圆角 = 外层圆角 - padding
+- 一个组件内所有圆角来自同一级别或差一级
 
 ---
 
@@ -940,7 +1015,7 @@ box-shadow: 0 0 0 var(--tao-ring-width) var(--tao-control-outline);
 
 ---
 
-## 12. 组件规范
+## Components
 
 ### 12.1 Button
 
@@ -1048,7 +1123,7 @@ Props:
 
 ---
 
-## 14. 不做清单
+## Do's and Don'ts
 
 | 不做 | 理由 |
 |------|------|

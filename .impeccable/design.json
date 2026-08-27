@@ -1,0 +1,136 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-08-27T14:20:18Z",
+  "title": "Design System: tao-ui",
+  "extensions": {
+    "colorMeta": {
+      "primary": {
+        "role": "primary",
+        "displayName": "Warm Ink",
+        "canonical": "oklch(0.205 0.01 70)",
+        "tonalRamp": ["oklch(0.15 0.01 70)", "oklch(0.25 0.01 70)", "oklch(0.35 0.01 70)", "oklch(0.45 0.01 70)", "oklch(0.58 0.01 70)", "oklch(0.7 0.008 70)", "oklch(0.83 0.006 70)", "oklch(0.95 0.003 70)"]
+      },
+      "success": {
+        "role": "secondary",
+        "displayName": "Verdant Signal",
+        "canonical": "oklch(0.555 0.14 155)",
+        "tonalRamp": ["oklch(0.15 0.05 155)", "oklch(0.25 0.08 155)", "oklch(0.35 0.11 155)", "oklch(0.45 0.13 155)", "oklch(0.555 0.14 155)", "oklch(0.68 0.11 155)", "oklch(0.82 0.07 155)", "oklch(0.95 0.025 155)"]
+      },
+      "warning": {
+        "role": "secondary",
+        "displayName": "Amber Signal",
+        "canonical": "oklch(0.7 0.15 70)",
+        "tonalRamp": ["oklch(0.15 0.04 70)", "oklch(0.25 0.07 70)", "oklch(0.35 0.1 70)", "oklch(0.48 0.13 70)", "oklch(0.6 0.15 70)", "oklch(0.7 0.15 70)", "oklch(0.83 0.1 70)", "oklch(0.95 0.035 70)"]
+      },
+      "error": {
+        "role": "secondary",
+        "displayName": "Ember Error",
+        "canonical": "oklch(0.57 0.19 25)",
+        "tonalRamp": ["oklch(0.15 0.055 25)", "oklch(0.25 0.09 25)", "oklch(0.35 0.13 25)", "oklch(0.46 0.17 25)", "oklch(0.57 0.19 25)", "oklch(0.69 0.15 25)", "oklch(0.82 0.09 25)", "oklch(0.95 0.03 25)"]
+      },
+      "canvas": {
+        "role": "neutral",
+        "displayName": "Warm Canvas",
+        "canonical": "oklch(0.985 0.004 70)",
+        "tonalRamp": ["oklch(0.15 0.004 70)", "oklch(0.27 0.004 70)", "oklch(0.39 0.004 70)", "oklch(0.51 0.004 70)", "oklch(0.63 0.004 70)", "oklch(0.75 0.004 70)", "oklch(0.87 0.004 70)", "oklch(0.985 0.004 70)"]
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "Clean Surface",
+        "canonical": "oklch(1 0 0)",
+        "tonalRamp": ["oklch(0.15 0 0)", "oklch(0.27 0 0)", "oklch(0.39 0 0)", "oklch(0.51 0 0)", "oklch(0.63 0 0)", "oklch(0.75 0 0)", "oklch(0.87 0 0)", "oklch(1 0 0)"]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Deep Warm Ink",
+        "canonical": "oklch(0.155 0.01 70)",
+        "tonalRamp": ["oklch(0.15 0.01 70)", "oklch(0.27 0.01 70)", "oklch(0.39 0.009 70)", "oklch(0.51 0.008 70)", "oklch(0.63 0.007 70)", "oklch(0.75 0.006 70)", "oklch(0.87 0.004 70)", "oklch(0.95 0.002 70)"]
+      }
+    },
+    "typographyMeta": {
+      "body": { "displayName": "UI Body", "purpose": "Default component and documentation copy." },
+      "label": { "displayName": "Compact Label", "purpose": "Form labels, navigation, and dense control text." },
+      "code": { "displayName": "Code and Measures", "purpose": "Code, aligned numerals, and technical measurements only." }
+    },
+    "shadows": [
+      { "name": "control-xs", "value": "0 1px 2px 0 oklch(0 0 0 / 0.05)", "purpose": "Subtle lift for bordered controls and buttons." },
+      { "name": "surface", "value": "0 1px 2px oklch(0 0 0 / 0.04), 0 0 1px oklch(0 0 0 / 0.08)", "purpose": "Default raised surface." },
+      { "name": "popup", "value": "0 2px 8px oklch(0 0 0 / 0.06), 0 0 1px oklch(0 0 0 / 0.06)", "purpose": "Dropdown, popover, and dialog elevation." }
+    ],
+    "motion": [
+      { "name": "fast", "value": "0.1s", "purpose": "Direct hover and pressed-state feedback." },
+      { "name": "mid", "value": "0.2s", "purpose": "Default component state transition." },
+      { "name": "slow", "value": "0.3s", "purpose": "Modal and drawer orchestration." },
+      { "name": "ease-out-expo", "value": "cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "Fast-starting, long-settling entrances." }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "576px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "992px" },
+      { "name": "xl", "value": "1200px" },
+      { "name": "xxl", "value": "1600px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The decisive action: compact, warm-ink, and stable across loading states.",
+      "html": "<button class=\"ds-btn-primary\">Save changes</button>",
+      "css": ".ds-btn-primary { height: 32px; padding: 0 16px; border: 0; border-radius: var(--tao-radius-md, 10px); background: var(--tao-primary, oklch(0.205 0.01 70)); color: var(--tao-primary-fg, oklch(0.985 0.004 70)); font: 600 14px/1.5714 var(--tao-font-family, system-ui); box-shadow: var(--tao-box-shadow-xs, 0 1px 2px oklch(0 0 0 / 0.05)); transition: background .1s cubic-bezier(.215,.61,.355,1); } .ds-btn-primary:hover { background: var(--tao-primary-hover); } .ds-btn-primary:active { background: var(--tao-primary-active); } .ds-btn-primary:focus-visible { outline: 3px solid var(--tao-control-outline); outline-offset: 1px; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "A quiet bordered action that retains the same geometry as primary.",
+      "html": "<button class=\"ds-btn-secondary\">Cancel</button>",
+      "css": ".ds-btn-secondary { height: 32px; padding: 0 16px; border: 1px solid var(--tao-color-border); border-radius: var(--tao-radius-md, 10px); background: transparent; color: var(--tao-color-text); font: 600 14px/1.5714 var(--tao-font-family, system-ui); box-shadow: var(--tao-box-shadow-xs); transition: background .1s cubic-bezier(.215,.61,.355,1); } .ds-btn-secondary:hover { background: var(--tao-color-fill-tertiary); } .ds-btn-secondary:active { background: var(--tao-color-fill-secondary); } .ds-btn-secondary:focus-visible { outline: 3px solid var(--tao-control-outline); outline-offset: 1px; }"
+    },
+    {
+      "name": "Outlined Input",
+      "kind": "input",
+      "refersTo": "input-outlined",
+      "description": "A transparent, host-friendly field with a visible native focus path.",
+      "html": "<label class=\"ds-field\"><span class=\"ds-field-label\">Project name</span><input class=\"ds-input\" value=\"tao-ui\" /></label>",
+      "css": ".ds-field { display: grid; gap: 6px; color: var(--tao-color-text); font-family: var(--tao-font-family, system-ui); } .ds-field-label { font-size: 13px; font-weight: 500; } .ds-input { height: 32px; padding: 0 12px; border: 1px solid var(--tao-color-border); border-radius: var(--tao-radius-md, 10px); background: transparent; color: var(--tao-color-text); font: 400 14px/1.5714 var(--tao-font-family, system-ui); transition: border-color .2s cubic-bezier(.215,.61,.355,1), box-shadow .2s cubic-bezier(.215,.61,.355,1); } .ds-input:hover { border-color: color-mix(in oklch, var(--tao-color-text-base) 20%, var(--tao-color-bg-base)); } .ds-input:focus { border-color: var(--tao-primary); box-shadow: 0 0 0 3px var(--tao-control-outline); outline: none; }"
+    },
+    {
+      "name": "Solid Tag",
+      "kind": "chip",
+      "refersTo": "tag-solid",
+      "description": "A compact semantic marker; color communicates status without changing geometry.",
+      "html": "<span class=\"ds-tag\">Stable</span>",
+      "css": ".ds-tag { display: inline-flex; align-items: center; min-height: 22px; padding: 2px 8px; border-radius: var(--tao-radius-sm, 8px); background: var(--tao-primary); color: var(--tao-primary-fg); font: 500 13px/1.4 var(--tao-font-family, system-ui); }"
+    },
+    {
+      "name": "Tabs Navigation",
+      "kind": "nav",
+      "refersTo": "tabs-active",
+      "description": "Text-first local navigation with a restrained active indicator.",
+      "html": "<nav class=\"ds-tabs\"><button class=\"ds-tab ds-tab-active\">Overview</button><button class=\"ds-tab\">API</button></nav>",
+      "css": ".ds-tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--tao-color-border-secondary); } .ds-tab { position: relative; padding: 8px 12px; border: 0; background: transparent; color: var(--tao-color-text-secondary); font: 500 13px/1.5 var(--tao-font-family, system-ui); } .ds-tab:hover { color: var(--tao-color-text); } .ds-tab-active { color: var(--tao-color-text); } .ds-tab-active::after { position: absolute; right: 12px; bottom: -1px; left: 12px; height: 2px; background: var(--tao-primary); content: \"\"; } .ds-tab:focus-visible { outline: 3px solid var(--tao-control-outline); outline-offset: -2px; }"
+    },
+    {
+      "name": "Elevated Popover",
+      "kind": "custom",
+      "refersTo": "popover-elevated",
+      "description": "A white task surface separated by restrained border and popup elevation.",
+      "html": "<section class=\"ds-popover\"><strong>Component contract</strong><p>Semantic parts remain stable across releases.</p></section>",
+      "css": ".ds-popover { width: 260px; padding: 12px; border: 1px solid var(--tao-color-border); border-radius: var(--tao-radius-lg, 12px); background: var(--tao-color-bg-elevated, white); color: var(--tao-color-text); box-shadow: var(--tao-box-shadow-secondary); font: 400 14px/1.5714 var(--tao-font-family, system-ui); } .ds-popover strong { font-weight: 600; } .ds-popover p { margin: 6px 0 0; color: var(--tao-color-text-secondary); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "道法自然",
+    "overview": "约束即自由。tao-ui 通过严格的 token 系统消除重复视觉决策，让 AI 和人类选择组件，而非反复选择颜色、间距与圆角。克制、有序、笃定；界面服务任务，不用装饰争夺注意力。",
+    "keyCharacteristics": ["能用间距解决的不用线条", "能用灰度解决的不用颜色", "能用留白解决的不用装饰", "一个 token 值只出现一次定义"],
+    "rules": [
+      { "name": "Token Truth", "body": "src/theme/theme.css 是视觉数值的真值源；文档漂移时修文档。", "section": "colors" },
+      { "name": "Flat by Default", "body": "默认表面不加阴影；只有浮层和交互状态使用深度。", "section": "elevation" },
+      { "name": "Readable Weight", "body": "正文 400、标签 500、强调 600；不使用 700。", "section": "typography" }
+    ],
+    "dos": ["Do 从 Seed → Derived token 系统消费颜色、尺寸、圆角和间距。", "Do 保留清晰键盘 focus、错误、禁用和 reduced-motion 状态。", "Do 使用 typed Semantic DOM 定制组件内部部件。"],
+    "donts": ["Don't 使用渐变文字、彩色粗侧边条或装饰性毛玻璃。", "Don't 嵌套卡片或用阴影代替信息层级。", "Don't 使用 bounce、elastic、全大写或 700 字重。"]
+  }
+}

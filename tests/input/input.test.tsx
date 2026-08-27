@@ -71,17 +71,20 @@ test('prefix keeps standard input start padding', () => {
   expect(rule).toContain('padding-inline-start: var(--tao-padding-sm);');
 });
 
-test('inner input applies a one-pixel optical correction to native vertical metrics', () => {
+test('inner input geometrically centers its native line box', () => {
   const css = readFileSync('src/components/input/input.css', 'utf8');
   const rule = css.match(/\[data-tao-input\] input \{([^}]+)\}/)?.[1];
 
   expect(rule).toContain('box-sizing: border-box;');
   expect(rule).toContain('height: auto;');
-  expect(rule).toContain('--tao-input-optical-offset: 1px;');
   expect(rule).toContain('padding-block-start:');
-  expect(rule).toMatch(/-\s+var\(--tao-input-optical-offset\)/);
   expect(rule).toContain('padding-block-end:');
-  expect(rule).toMatch(/\+\s+var\(--tao-input-optical-offset\)/);
+  expect(
+    rule?.match(
+      /calc\(\(var\(--tao-input-control-height\) - 1lh\) \/ 2 - var\(--tao-line-width\)\)/g,
+    ),
+  ).toHaveLength(2);
+  expect(rule).not.toContain('optical-offset');
   expect(rule).toContain('line-height: var(--tao-input-line-height);');
 });
 
@@ -91,7 +94,7 @@ test('password input centers its mask glyph without moving the selection line bo
     /\[data-tao-input\] input\[type="password"\] \{([^}]+)\}/,
   )?.[1];
 
-  expect(rule).toContain('--tao-input-optical-offset: 0px;');
+  expect(rule).not.toContain('optical-offset');
   expect(rule).toContain('font-family: Arial, sans-serif;');
   expect(css.indexOf('input[type="password"]')).toBeGreaterThan(
     css.indexOf('input:-webkit-autofill'),

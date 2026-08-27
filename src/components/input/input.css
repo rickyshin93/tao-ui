@@ -55,24 +55,16 @@
 
 /* Inner input reset */
 [data-tao-input] input {
-  --tao-input-optical-offset: 1px;
-
   flex: 1;
   box-sizing: border-box;
   height: auto;
   padding-block-start: max(
     0px,
-    calc(
-      (var(--tao-input-control-height) - 1lh) / 2 - var(--tao-line-width) -
-        var(--tao-input-optical-offset)
-    )
+    calc((var(--tao-input-control-height) - 1lh) / 2 - var(--tao-line-width))
   );
   padding-block-end: max(
     0px,
-    calc(
-      (var(--tao-input-control-height) - 1lh) / 2 - var(--tao-line-width) +
-        var(--tao-input-optical-offset)
-    )
+    calc((var(--tao-input-control-height) - 1lh) / 2 - var(--tao-line-width))
   );
   border: none;
   outline: none;
@@ -91,11 +83,9 @@
   line-height: var(--tao-input-line-height);
 }
 
-/* Password discs use the font glyph's baseline. Arial keeps that glyph
-   optically centered, while zero offset keeps the selection line box centered. */
+/* Arial keeps password discs optically centered without shifting the native
+   line box, caret, or selection away from the control's geometric center. */
 [data-tao-input] input[type="password"] {
-  --tao-input-optical-offset: 0px;
-
   font-family: Arial, sans-serif;
 }
 

@@ -1,18 +1,11 @@
 ---
 version: 1
 slug: "docs-index-mdx"
-primary_target: "docs/index.mdx"
-related_targets: ["docs/guide/getting-started.mdx","docs/components/button/index.mdx","theme/index.css"]
+primary_target: "docs/en/index.mdx"
+related_targets: ["docs/zh/index.mdx","docs/en/guide/getting-started.mdx","docs/zh/guide/getting-started.mdx","docs/en/components/button.mdx","docs/zh/components/button.mdx","src/theme/theme.css"]
 ---
 
----
-version: 1
-slug: "docs-index-mdx"
-primary_target: "docs/index.mdx"
-related_targets: ["docs/guide/getting-started.mdx","docs/components/button/index.mdx","theme/index.css"]
----
-
-Scope: tao-ui public Rspress documentation, beginning with the home route, Getting Started, and Button reference.
+Scope: tao-ui public bilingual Rspress documentation, beginning with the English and Chinese home routes, Getting Started, and Button reference.
 Mode: Persuade on the home route; documentation pages remain Read surfaces.
 Audience: React 19 application developers, design-system maintainers, and AI agents composing product interfaces.
 Job: Feel the seed-to-system derivation physically, verify the AI-native contract is real, then install or open a component reference.

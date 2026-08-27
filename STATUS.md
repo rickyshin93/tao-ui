@@ -11,6 +11,8 @@
 - none
 
 ## Done
+- 2026-08-27 refresh Impeccable product/design schemas, record code-first workflow, and migrate the bilingual docs surface brief
+- 2026-08-27 geometrically center Input text line boxes so native carets and selections no longer sit high
 - 2026-08-25 let Textarea Semantic DOM classes override component defaults through the components cascade layer and zero-specificity inner selectors
 - 2026-08-19 harden controlled picker transitions, Select duplicate precedence/index allocation, and Sonner promise lifecycle compatibility
 - 2026-08-19 unify component metadata generation, picker state ownership, Select indexing, and Sonner lifecycle/geometry
