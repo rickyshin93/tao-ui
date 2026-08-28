@@ -21,7 +21,7 @@ description: 触发提交、保存、打开界面等即时操作。页面涵盖�
 
 ## 变体
 
-每个视图或决策区域只保留一个主操作。Secondary、ghost 与 destructive 变体用于降低或明确操作层级。
+每个视图或决策区域只保留一个主操作。Secondary、ghost 与 destructive 变体用于降低或明确操作层级。Bare 保留按钮行为，同时把视觉样式交给消费方的 class 或 style。
 
 ```tsx preview
 import { Button } from '@rockshin/tao-ui';
@@ -32,6 +32,7 @@ function ButtonVariants() {
       <Button>Primary</Button>
       <Button variant="secondary">Secondary</Button>
       <Button variant="ghost">Ghost</Button>
+      <Button variant="bare">Bare</Button>
       <Button variant="destructive">Delete</Button>
     </div>
   );

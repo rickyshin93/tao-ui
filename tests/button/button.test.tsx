@@ -12,9 +12,30 @@ test('renders children text', () => {
 
 test('keeps a typographic line box while flex-centering content', () => {
   const css = readFileSync('src/components/button/button.css', 'utf8');
-  const rootRule = css.match(/button\[data-tao-button\] \{([^}]+)\}/)?.[1];
+  const rootRule = css.match(
+    /:where\(button\[data-tao-button\]\) \{([^}]+)\}/,
+  )?.[1];
 
   expect(rootRule).toContain('line-height: var(--tao-line-height);');
+});
+
+test('bare variant keeps behavior while leaving visual styling to the caller', () => {
+  render(<Button variant="bare">Bare</Button>);
+  expect(screen.getByRole('button')).toHaveAttribute(
+    'data-tao-variant',
+    'bare',
+  );
+});
+
+test('component-layer zero-specificity rules let consumer classes override visuals', () => {
+  const css = readFileSync('src/components/button/button.css', 'utf8');
+
+  expect(css).toContain('@layer components');
+  expect(css).toContain(':where(button[data-tao-button]) {');
+  expect(css).toContain(
+    ':where(button[data-tao-button][data-tao-variant="bare"]) {',
+  );
+  expect(css).not.toMatch(/^button\[data-tao-button\]/m);
 });
 
 test('variant prop sets data-tao-variant', () => {
@@ -97,11 +118,7 @@ test('loading renders built-in spinner in a mounted icon slot', () => {
 });
 
 test('icon prop renders an idle icon, hidden layer absent when no loading', () => {
-  render(
-    <Button icon={<svg data-testid="my-icon" />}>
-      Save
-    </Button>,
-  );
+  render(<Button icon={<svg data-testid="my-icon" />}>Save</Button>);
   const slot = document.querySelector('[data-tao-button-icon]');
   expect(slot?.dataset.taoLoading).toBeUndefined();
   expect(slot?.closest('button')?.dataset.taoHasIcon).toBe('true');
@@ -129,7 +146,5 @@ test('loadingIcon overrides the built-in spinner', () => {
     </Button>,
   );
   expect(screen.getByTestId('custom')).toBeTruthy();
-  expect(
-    document.querySelector('[data-tao-button-spinner]'),
-  ).toBeNull();
+  expect(document.querySelector('[data-tao-button-spinner]')).toBeNull();
 });

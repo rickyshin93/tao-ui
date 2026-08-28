@@ -1030,6 +1030,7 @@ box-shadow: 0 0 0 var(--tao-ring-width) var(--tao-control-outline);
   primary:     bg=primary, fg=primary-fg, shadow=xs
   secondary:   bg=transparent, border=color-border, fg=color-text, shadow=xs
   ghost:       bg=transparent, fg=color-text-secondary, hover:bg=fill-tertiary
+  bare:        保留语义/focus/disabled/loading，视觉由消费方 classNames/styles 控制
   destructive: bg=error, fg=error-fg, shadow=xs
 
 状态:

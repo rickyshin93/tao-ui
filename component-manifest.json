@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "packageName": "@rockshin/tao-ui",
-  "generatedAt": "2026-08-09T04:37:08.262Z",
+  "generatedAt": "2026-08-28T13:28:20.611Z",
   "components": [
     {
       "name": "alert",
@@ -189,7 +189,7 @@
       "props": [
         {
           "name": "variant",
-          "type": "'primary' | 'secondary' | 'ghost' | 'destructive'",
+          "type": "'primary' | 'secondary' | 'ghost' | 'destructive' | 'bare'",
           "description": "Visual emphasis.",
           "defaultValue": "'primary'"
         },

@@ -12,6 +12,7 @@ export const Variants: StoryObj = {
       <Button variant="primary">Primary</Button>
       <Button variant="secondary">Secondary</Button>
       <Button variant="ghost">Ghost</Button>
+      <Button variant="bare">Bare</Button>
       <Button variant="destructive">Destructive</Button>
       <Button variant="primary" disabled>
         Disabled

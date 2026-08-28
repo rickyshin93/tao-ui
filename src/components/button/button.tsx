@@ -12,7 +12,7 @@ export type ButtonSemanticPart = 'root';
 export interface ButtonProps
   extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'disabled'> {
   /** Visual emphasis for the action. */
-  variant?: 'primary' | 'secondary' | 'ghost' | 'destructive';
+  variant?: 'primary' | 'secondary' | 'ghost' | 'destructive' | 'bare';
   /** Control height and horizontal spacing. Inherits from TaoProvider. */
   size?: TaoSize;
   /** Prevents interaction. Inherits from TaoProvider. */

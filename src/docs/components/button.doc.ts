@@ -28,7 +28,7 @@ export const buttonDoc = {
   props: [
     {
       name: 'variant',
-      type: "'primary' | 'secondary' | 'ghost' | 'destructive'",
+      type: "'primary' | 'secondary' | 'ghost' | 'destructive' | 'bare'",
       description: 'Visual emphasis.',
       defaultValue: "'primary'",
     },

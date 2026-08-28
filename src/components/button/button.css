@@ -3,180 +3,241 @@
    polluting other <button> elements (e.g. mobile select trigger).
    =========================== */
 
-button[data-tao-button] {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--tao-padding-xs);
-  font-family: var(--tao-font-family);
-  font-weight: var(--tao-button-font-weight, var(--tao-font-weight-medium));
-  line-height: var(--tao-line-height);
-  border: var(--tao-line-width) solid transparent;
-  cursor: pointer;
-  outline: none;
-  user-select: none;
-  white-space: nowrap;
-  transition:
-    background-color var(--tao-motion-duration-fast) var(--tao-motion-ease-out),
-    border-color var(--tao-motion-duration-fast) var(--tao-motion-ease-out),
-    box-shadow var(--tao-motion-duration-fast) var(--tao-motion-ease-out);
-}
+@layer components {
+  :where(button[data-tao-button]) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--tao-padding-xs);
+    font-family: var(--tao-font-family);
+    font-weight: var(--tao-button-font-weight, var(--tao-font-weight-medium));
+    line-height: var(--tao-line-height);
+    border: var(--tao-line-width) solid transparent;
+    cursor: pointer;
+    outline: none;
+    user-select: none;
+    white-space: nowrap;
+    transition:
+      background-color var(--tao-motion-duration-fast)
+      var(--tao-motion-ease-out),
+      border-color var(--tao-motion-duration-fast) var(--tao-motion-ease-out),
+      box-shadow var(--tao-motion-duration-fast) var(--tao-motion-ease-out);
+  }
 
-/* Sizes — borderRadius is a single token, applied per size with that
+  /* Sizes — borderRadius is a single token, applied per size with that
    size's own radius as the fallback. */
-button[data-tao-button][data-tao-size="small"] {
-  height: var(--tao-control-height-sm);
-  padding-inline: var(--tao-button-padding-inline-sm, var(--tao-padding-xs));
-  font-size: var(--tao-button-content-font-size-sm, var(--tao-font-size-sm));
-  border-radius: var(--tao-button-border-radius, var(--tao-radius-sm));
-}
+  :where(
+    button[data-tao-button][data-tao-size="small"]:not(
+      [data-tao-variant="bare"]
+    )
+  ) {
+    height: var(--tao-control-height-sm);
+    padding-inline: var(--tao-button-padding-inline-sm, var(--tao-padding-xs));
+    font-size: var(--tao-button-content-font-size-sm, var(--tao-font-size-sm));
+    border-radius: var(--tao-button-border-radius, var(--tao-radius-sm));
+  }
 
-button[data-tao-button][data-tao-size="medium"] {
-  height: var(--tao-control-height);
-  padding-inline: var(--tao-button-padding-inline, var(--tao-padding));
-  font-size: var(--tao-button-content-font-size, var(--tao-font-size-base));
-  border-radius: var(--tao-button-border-radius, var(--tao-radius-md));
-}
+  :where(
+    button[data-tao-button][data-tao-size="medium"]:not(
+      [data-tao-variant="bare"]
+    )
+  ) {
+    height: var(--tao-control-height);
+    padding-inline: var(--tao-button-padding-inline, var(--tao-padding));
+    font-size: var(--tao-button-content-font-size, var(--tao-font-size-base));
+    border-radius: var(--tao-button-border-radius, var(--tao-radius-md));
+  }
 
-button[data-tao-button][data-tao-size="large"] {
-  height: var(--tao-control-height-lg);
-  padding-inline: var(--tao-button-padding-inline-lg, var(--tao-padding));
-  font-size: var(--tao-button-content-font-size-lg, var(--tao-font-size-base));
-  border-radius: var(--tao-button-border-radius, var(--tao-radius-md));
-}
+  :where(
+    button[data-tao-button][data-tao-size="large"]:not(
+      [data-tao-variant="bare"]
+    )
+  ) {
+    height: var(--tao-control-height-lg);
+    padding-inline: var(--tao-button-padding-inline-lg, var(--tao-padding));
+    font-size: var(
+      --tao-button-content-font-size-lg,
+      var(--tao-font-size-base)
+    );
+    border-radius: var(--tao-button-border-radius, var(--tao-radius-md));
+  }
 
-button[data-tao-button][data-tao-has-icon][data-tao-size="medium"],
-button[data-tao-button][data-tao-has-icon][data-tao-size="large"] {
-  padding-inline: var(--tao-padding-sm);
-}
+  :where(
+    button[data-tao-button][data-tao-has-icon][data-tao-size="medium"]:not(
+      [data-tao-variant="bare"]
+    )
+  ),
+  :where(
+    button[data-tao-button][data-tao-has-icon][data-tao-size="large"]:not(
+      [data-tao-variant="bare"]
+    )
+  ) {
+    padding-inline: var(--tao-padding-sm);
+  }
 
-/* Variant: primary */
-button[data-tao-button][data-tao-variant="primary"] {
-  background: var(--tao-primary);
-  color: var(--tao-button-primary-color, var(--tao-primary-fg));
-  box-shadow: var(--tao-button-primary-shadow, var(--tao-box-shadow-xs));
-}
-button[data-tao-button][data-tao-variant="primary"]:hover:not(:disabled) {
-  background: var(--tao-primary-hover);
-}
-button[data-tao-button][data-tao-variant="primary"]:active:not(:disabled) {
-  background: var(--tao-primary-active);
-}
+  /* Variant: primary */
+  :where(button[data-tao-button][data-tao-variant="primary"]) {
+    background: var(--tao-primary);
+    color: var(--tao-button-primary-color, var(--tao-primary-fg));
+    box-shadow: var(--tao-button-primary-shadow, var(--tao-box-shadow-xs));
+  }
+  :where(
+    button[data-tao-button][data-tao-variant="primary"]:hover:not(:disabled)
+  ) {
+    background: var(--tao-primary-hover);
+  }
+  :where(
+    button[data-tao-button][data-tao-variant="primary"]:active:not(:disabled)
+  ) {
+    background: var(--tao-primary-active);
+  }
 
-/* Variant: secondary — the antd "default" button; wired to default* tokens. */
-button[data-tao-button][data-tao-variant="secondary"] {
-  background: var(--tao-button-default-bg, transparent);
-  color: var(--tao-button-default-color, var(--tao-color-text));
-  border-color: var(--tao-button-default-border-color, var(--tao-color-border));
-  box-shadow: var(--tao-box-shadow-xs);
-}
-button[data-tao-button][data-tao-variant="secondary"]:hover:not(:disabled) {
-  background: var(
-    --tao-button-default-hover-bg,
-    var(--tao-color-fill-tertiary)
-  );
-  /* hover color currently inherits the base rule; chain defaultColor so a
+  /* Variant: secondary — the antd "default" button; wired to default* tokens. */
+  :where(button[data-tao-button][data-tao-variant="secondary"]) {
+    background: var(--tao-button-default-bg, transparent);
+    color: var(--tao-button-default-color, var(--tao-color-text));
+    border-color: var(
+      --tao-button-default-border-color,
+      var(--tao-color-border)
+    );
+    box-shadow: var(--tao-box-shadow-xs);
+  }
+  :where(
+    button[data-tao-button][data-tao-variant="secondary"]:hover:not(:disabled)
+  ) {
+    background: var(
+      --tao-button-default-hover-bg,
+      var(--tao-color-fill-tertiary)
+    );
+    /* hover color currently inherits the base rule; chain defaultColor so a
      lone defaultColor override still paints the hover state as before. */
-  color: var(
-    --tao-button-default-hover-color,
-    var(--tao-button-default-color, var(--tao-color-text))
-  );
-  border-color: var(
-    --tao-button-default-hover-border-color,
-    var(--tao-color-border)
-  );
-}
-button[data-tao-button][data-tao-variant="secondary"]:active:not(:disabled) {
-  background: var(--tao-color-fill-secondary);
-}
+    color: var(
+      --tao-button-default-hover-color,
+      var(--tao-button-default-color, var(--tao-color-text))
+    );
+    border-color: var(
+      --tao-button-default-hover-border-color,
+      var(--tao-color-border)
+    );
+  }
+  :where(
+    button[data-tao-button][data-tao-variant="secondary"]:active:not(:disabled)
+  ) {
+    background: var(--tao-color-fill-secondary);
+  }
 
-/* Variant: ghost */
-button[data-tao-button][data-tao-variant="ghost"] {
-  background: transparent;
-  color: var(--tao-color-text-secondary);
-}
-button[data-tao-button][data-tao-variant="ghost"]:hover:not(:disabled) {
-  background: var(--tao-color-fill-tertiary);
-  color: var(--tao-color-text);
-}
-button[data-tao-button][data-tao-variant="ghost"]:active:not(:disabled) {
-  background: var(--tao-color-fill-secondary);
-}
+  /* Variant: ghost */
+  :where(button[data-tao-button][data-tao-variant="ghost"]) {
+    background: transparent;
+    color: var(--tao-color-text-secondary);
+  }
+  :where(
+    button[data-tao-button][data-tao-variant="ghost"]:hover:not(:disabled)
+  ) {
+    background: var(--tao-color-fill-tertiary);
+    color: var(--tao-color-text);
+  }
+  :where(
+    button[data-tao-button][data-tao-variant="ghost"]:active:not(:disabled)
+  ) {
+    background: var(--tao-color-fill-secondary);
+  }
 
-/* Variant: destructive */
-button[data-tao-button][data-tao-variant="destructive"] {
-  background: var(--tao-error);
-  color: var(--tao-error-fg);
-  box-shadow: var(--tao-box-shadow-xs);
-}
-button[data-tao-button][data-tao-variant="destructive"]:hover:not(:disabled) {
-  background: var(--tao-error-hover);
-}
-button[data-tao-button][data-tao-variant="destructive"]:active:not(:disabled) {
-  background: var(--tao-error-active);
-}
+  /* Variant: destructive */
+  /* Variant: bare — preserves button semantics, focus, disabled and loading
+   behavior while leaving visual styling to the consumer. */
+  :where(button[data-tao-button][data-tao-variant="bare"]) {
+    height: auto;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: inherit;
+    box-shadow: none;
+    font-size: inherit;
+  }
 
-/* Disabled */
-button[data-tao-button]:disabled {
-  opacity: var(--tao-opacity-loading);
-  cursor: not-allowed;
-}
+  :where(button[data-tao-button][data-tao-variant="destructive"]) {
+    background: var(--tao-error);
+    color: var(--tao-error-fg);
+    box-shadow: var(--tao-box-shadow-xs);
+  }
+  :where(
+    button[data-tao-button][data-tao-variant="destructive"]:hover:not(:disabled)
+  ) {
+    background: var(--tao-error-hover);
+  }
+  :where(
+    button[data-tao-button][data-tao-variant="destructive"]:active:not(
+      :disabled
+    )
+  ) {
+    background: var(--tao-error-active);
+  }
 
-/* ===========================
+  /* Disabled */
+  :where(button[data-tao-button]:disabled) {
+    opacity: var(--tao-opacity-loading);
+    cursor: not-allowed;
+  }
+
+  /* ===========================
    Icon slot — idle + spinner layers are stacked and only
    opacity toggles, so toggling loading never reflows the button.
    =========================== */
-[data-tao-button-icon] {
-  display: inline-grid;
-  place-items: center;
-  flex: none;
-  line-height: 0;
-}
-
-[data-tao-button-icon-idle],
-[data-tao-button-icon-spin] {
-  grid-area: 1 / 1;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  line-height: 0;
-  transition: opacity var(--tao-motion-duration-fast) var(--tao-motion-ease-out);
-}
-
-[data-tao-button-icon-idle] > svg,
-[data-tao-button-spinner] {
-  width: 1em;
-  height: 1em;
-}
-
-/* Idle icon visible by default; spinner hidden. */
-[data-tao-button-icon]:not([data-tao-loading]) [data-tao-button-icon-spin] {
-  opacity: 0;
-}
-[data-tao-button-icon]:not([data-tao-loading]) [data-tao-button-icon-idle] {
-  opacity: 1;
-}
-
-/* Loading: fade idle out, spinner in. */
-[data-tao-button-icon][data-tao-loading] [data-tao-button-icon-idle] {
-  opacity: 0;
-}
-[data-tao-button-icon][data-tao-loading] [data-tao-button-icon-spin] {
-  opacity: 1;
-}
-
-[data-tao-button-spinner] {
-  animation: tao-button-spin calc(var(--tao-motion-unit) * 8) linear infinite;
-}
-
-@keyframes tao-button-spin {
-  to {
-    transform: rotate(360deg);
+  [data-tao-button-icon] {
+    display: inline-grid;
+    place-items: center;
+    flex: none;
+    line-height: 0;
   }
-}
 
-/* Focus */
-button[data-tao-button]:focus-visible {
-  box-shadow: 0 0 0 var(--tao-ring-width) var(--tao-control-outline);
-  outline: none;
+  [data-tao-button-icon-idle],
+  [data-tao-button-icon-spin] {
+    grid-area: 1 / 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 0;
+    transition: opacity var(--tao-motion-duration-fast)
+      var(--tao-motion-ease-out);
+  }
+
+  [data-tao-button-icon-idle] > svg,
+  [data-tao-button-spinner] {
+    width: 1em;
+    height: 1em;
+  }
+
+  /* Idle icon visible by default; spinner hidden. */
+  [data-tao-button-icon]:not([data-tao-loading]) [data-tao-button-icon-spin] {
+    opacity: 0;
+  }
+  [data-tao-button-icon]:not([data-tao-loading]) [data-tao-button-icon-idle] {
+    opacity: 1;
+  }
+
+  /* Loading: fade idle out, spinner in. */
+  [data-tao-button-icon][data-tao-loading] [data-tao-button-icon-idle] {
+    opacity: 0;
+  }
+  [data-tao-button-icon][data-tao-loading] [data-tao-button-icon-spin] {
+    opacity: 1;
+  }
+
+  [data-tao-button-spinner] {
+    animation: tao-button-spin calc(var(--tao-motion-unit) * 8) linear infinite;
+  }
+
+  @keyframes tao-button-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* Focus */
+  :where(button[data-tao-button]:focus-visible) {
+    box-shadow: 0 0 0 var(--tao-ring-width) var(--tao-control-outline);
+    outline: none;
+  }
 }
