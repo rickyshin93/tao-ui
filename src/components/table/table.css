@@ -334,6 +334,7 @@
 
 [data-tao-table-thead] [data-tao-table-cell][data-tao-fixed] {
   z-index: 3;
+  background: var(--tao-table-header-bg);
 }
 
 /* Shadow indicators */
@@ -344,14 +345,12 @@
   content: "";
   position: absolute;
   top: 0;
-  right: -6px;
+  right: -30px;
   bottom: 0;
-  width: 6px;
-  background: linear-gradient(
-    to right,
-    var(--tao-color-shadow-hint),
-    transparent
-  );
+  width: 30px;
+  box-shadow: inset 10px 0 8px -8px var(--tao-table-border-color);
+  transition: box-shadow var(--tao-motion-duration-slow)
+    var(--tao-motion-ease-out);
   pointer-events: none;
 }
 
@@ -362,14 +361,12 @@
   content: "";
   position: absolute;
   top: 0;
-  left: -6px;
+  left: -30px;
   bottom: 0;
-  width: 6px;
-  background: linear-gradient(
-    to left,
-    var(--tao-color-shadow-hint),
-    transparent
-  );
+  width: 30px;
+  box-shadow: inset -10px 0 8px -8px var(--tao-table-border-color);
+  transition: box-shadow var(--tao-motion-duration-slow)
+    var(--tao-motion-ease-out);
   pointer-events: none;
 }
 

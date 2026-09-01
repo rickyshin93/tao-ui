@@ -11,6 +11,7 @@
 - none
 
 ## Done
+- 2026-09-01 keep fixed Table headers on the active variant background and add antd-style shadows at fixed-column edges
 - 2026-08-28 add Button `bare` variant and move root visuals into a zero-specificity components layer so consumer classes reliably override color, spacing, shape, and state styles
 - 2026-08-27 refresh Impeccable product/design schemas, record code-first workflow, and migrate the bilingual docs surface brief
 - 2026-08-27 geometrically center Input text line boxes so native carets and selections no longer sit high
