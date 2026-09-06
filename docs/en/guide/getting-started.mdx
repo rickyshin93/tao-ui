@@ -1,11 +1,11 @@
 ---
 title: Getting Started
-description: Install tao-ui, add TaoProvider, and render your first accessible React 19 component with inherited theme settings.
+description: Install tao-ui with React 18.2 or React 19, add TaoProvider, and render your first accessible component with inherited theme settings.
 ---
 
 import { PackageManagerTabs } from '@rspress/core/theme';
 
-Install the package with your preferred package manager.
+Requires React and React DOM 18.2 at minimum and also supports React 19. Both peer dependency ranges are `^18.2.0 || ^19.0.0`. The date pickers' `dayjs` dependency is installed automatically. Install tao-ui with your preferred package manager.
 
 <PackageManagerTabs command="install @rockshin/tao-ui" />
 
@@ -24,6 +24,21 @@ export default function App() {
   );
 }
 ```
+
+## Component imports
+
+Component entries load only their component dependencies and shared theme styles. No separate CSS import is needed. The root entry remains available and includes all component styles.
+
+```tsx
+import { Button, type ButtonProps } from '@rockshin/tao-ui/button';
+import { TaoProvider } from '@rockshin/tao-ui/provider';
+```
+
+Entry names use kebab-case, such as `/input-number`, `/range-picker`, and `/form-layout`. Related exports share an entry: `CheckboxGroup` uses `/checkbox`, and `HeadlessInputNumber` uses `/number-input`.
+
+## Control field values
+
+For Input, Textarea, InputNumber, Select, DatePicker, and RangePicker, an explicit `value={undefined}` is a controlled empty value. Omit `value` and use `defaultValue` for an uncontrolled field. Form fields can be cleared with `form.setFieldsValue({ field: undefined })` without remounting the control.
 
 ## Use dark mode
 

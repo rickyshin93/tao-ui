@@ -21,6 +21,8 @@ interface MonthGridProps {
   value?: Dayjs | null;
   onSelect: (date: Dayjs) => void;
   disabledDate?: (date: Dayjs) => boolean;
+  minDate?: Dayjs;
+  maxDate?: Dayjs;
 }
 
 export function MonthGrid({
@@ -28,6 +30,8 @@ export function MonthGrid({
   value,
   onSelect,
   disabledDate,
+  minDate,
+  maxDate,
 }: MonthGridProps) {
   const months = getMonths(viewDate.year());
 
@@ -36,7 +40,10 @@ export function MonthGrid({
       {months.map((m, i) => {
         const isSelected =
           value && value.month() === i && value.year() === viewDate.year();
-        const disabled = disabledDate?.(m) ?? false;
+        const disabled =
+          disabledDate?.(m) ||
+          (minDate != null && m.isBefore(minDate, 'month')) ||
+          (maxDate != null && m.isAfter(maxDate, 'month'));
         return (
           <button
             key={m.format('YYYY-MM')}

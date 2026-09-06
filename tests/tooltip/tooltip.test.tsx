@@ -1,5 +1,6 @@
 import { expect, test } from '@rstest/core';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { Fragment } from 'react';
 import { Tooltip } from '../../src/components/tooltip/tooltip';
 
 // Mock ResizeObserver (floating-ui's autoUpdate uses it when available)
@@ -26,6 +27,19 @@ test('renders trigger; tooltip not in document until triggered', () => {
   expect(screen.getByText('Hover me')).toBeTruthy();
   expect(screen.queryByText('Tip')).toBeNull();
   expect(document.querySelector('[data-tao-tooltip-content]')).toBeNull();
+});
+
+test('a Fragment trigger opens the tooltip on focus', async () => {
+  render(
+    <Tooltip title="Fragment tooltip">
+      <Fragment key="trigger">
+        <span aria-hidden="true">+</span>
+        <button type="button">Fragment trigger</button>
+      </Fragment>
+    </Tooltip>,
+  );
+  fireEvent.focus(screen.getByRole('button', { name: 'Fragment trigger' }));
+  expect(await screen.findByText('Fragment tooltip')).toBeTruthy();
 });
 
 test('opens on trigger focus', async () => {
@@ -156,6 +170,32 @@ test('classNames and styles apply to content and arrow', () => {
   ) as SVGElement;
   expect(arrow.getAttribute('class')).toContain('my-arrow');
 });
+
+for (const reason of ['Escape', 'blur']) {
+  test(`${reason} closes immediately during the pointer-leave delay`, () => {
+    const changes: boolean[] = [];
+    render(
+      <Tooltip
+        defaultOpen
+        title="Pending tooltip"
+        mouseLeaveDelay={1}
+        onOpenChange={(open) => changes.push(open)}
+      >
+        <button type="button">Trigger</button>
+      </Tooltip>,
+    );
+    const trigger = screen.getByRole('button', { name: 'Trigger' });
+    fireEvent.pointerLeave(trigger);
+    expect(screen.getByText('Pending tooltip')).toBeTruthy();
+
+    if (reason === 'Escape')
+      fireEvent.keyDown(document.body, { key: 'Escape' });
+    else fireEvent.blur(trigger);
+
+    expect(screen.queryByText('Pending tooltip')).toBeNull();
+    expect(changes).toEqual([false]);
+  });
+}
 
 test('pointer-leave close is deferred by mouseLeaveDelay', async () => {
   render(

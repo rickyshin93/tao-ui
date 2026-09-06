@@ -1,6 +1,13 @@
 import { expect, rstest, test } from '@rstest/core';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
+import { createRef, Fragment } from 'react';
 import { Popover } from '../../src/components/popover/popover';
 
 test('click trigger opens and closes the popup', async () => {
@@ -19,6 +26,45 @@ test('click trigger opens and closes the popup', async () => {
   // Keep-alive (default): closed popup stays mounted with data-state="closed"
   await userEvent.click(screen.getByRole('button', { name: 'Open' }));
   expect(popup.dataset.state).toBe('closed');
+});
+
+test('a Fragment trigger opens the popup on click', async () => {
+  render(
+    <Popover trigger="click" content="Fragment popup">
+      <Fragment key="trigger">
+        <span aria-hidden="true">+</span>
+        <button type="button">Fragment trigger</button>
+      </Fragment>
+    </Popover>,
+  );
+  await userEvent.click(
+    screen.getByRole('button', { name: 'Fragment trigger' }),
+  );
+  expect(document.querySelector('[data-tao-popover]')).toHaveAttribute(
+    'data-state',
+    'open',
+  );
+});
+
+test('a single Fragment trigger regains focus after keyboard dismissal', async () => {
+  render(
+    <Popover
+      trigger="click"
+      destroyOnHidden
+      content={<button type="button">Popup action</button>}
+    >
+      <Fragment key="trigger">
+        <button type="button">Keyboard trigger</button>
+      </Fragment>
+    </Popover>,
+  );
+  const trigger = screen.getByRole('button', { name: 'Keyboard trigger' });
+  trigger.focus();
+  await userEvent.keyboard('{Enter}');
+  await userEvent.tab();
+  expect(screen.getByRole('button', { name: 'Popup action' })).toHaveFocus();
+  await userEvent.keyboard('{Escape}');
+  await waitFor(() => expect(trigger).toHaveFocus());
 });
 
 test('controlled open renders the popup', () => {
@@ -258,6 +304,136 @@ test('focus trigger opens the popup', () => {
   expect(
     document.querySelector('[data-tao-popover]')?.getAttribute('data-state'),
   ).toBe('open');
+});
+
+test('focusing a mixed hover/focus trigger cancels its pending hover close', async () => {
+  render(
+    <Popover
+      trigger={['hover', 'focus']}
+      mouseEnterDelay={0}
+      mouseLeaveDelay={0.03}
+      content="Mixed help"
+    >
+      <button type="button">Help</button>
+    </Popover>,
+  );
+  const trigger = screen.getByRole('button', { name: 'Help' });
+  fireEvent.pointerEnter(trigger);
+  const popup = document.querySelector('[data-tao-popover]');
+  fireEvent.pointerLeave(trigger);
+  act(() => trigger.focus());
+  await act(async () => {
+    await new Promise((resolve) => setTimeout(resolve, 60));
+  });
+  expect(trigger).toHaveFocus();
+  expect(popup).toHaveAttribute('data-state', 'open');
+});
+
+test.each([
+  0, 0.03,
+])('mixed triggers keep focused content open after pointer leave (delay=%s)', async (mouseLeaveDelay) => {
+  render(
+    <Popover
+      trigger={['hover', 'focus']}
+      mouseEnterDelay={0}
+      mouseLeaveDelay={mouseLeaveDelay}
+      content={<input aria-label="Help details" />}
+    >
+      <button type="button">Help</button>
+    </Popover>,
+  );
+  act(() => screen.getByRole('button', { name: 'Help' }).focus());
+  const input = screen.getByRole('textbox', { name: 'Help details' });
+  act(() => input.focus());
+  const popup = document.querySelector('[data-tao-popover]');
+  expect(popup).toBeTruthy();
+  if (popup) fireEvent.pointerLeave(popup);
+  await act(async () => {
+    await new Promise((resolve) => setTimeout(resolve, 60));
+  });
+  expect(input).toHaveFocus();
+  expect(popup).toHaveAttribute('data-state', 'open');
+});
+
+test('focus can return from the popup to its trigger and closes only when leaving both', () => {
+  const onOpenChange = rstest.fn();
+  render(
+    <>
+      <Popover
+        trigger={['hover', 'focus']}
+        onOpenChange={onOpenChange}
+        content={<input aria-label="Help details" />}
+      >
+        <button type="button">Help</button>
+      </Popover>
+      <button type="button">Outside</button>
+    </>,
+  );
+  const trigger = screen.getByRole('button', { name: 'Help' });
+  act(() => trigger.focus());
+  act(() => screen.getByRole('textbox', { name: 'Help details' }).focus());
+  onOpenChange.mockClear();
+  act(() => trigger.focus());
+  expect(onOpenChange).not.toHaveBeenCalledWith(false);
+  expect(document.querySelector('[data-tao-popover]')).toHaveAttribute(
+    'data-state',
+    'open',
+  );
+  act(() => screen.getByRole('button', { name: 'Outside' }).focus());
+  expect(onOpenChange).toHaveBeenCalledWith(false);
+  expect(document.querySelector('[data-tao-popover]')).toHaveAttribute(
+    'data-state',
+    'closed',
+  );
+});
+
+test('hover-only popovers still close on pointer leave with a focused trigger', () => {
+  render(
+    <Popover
+      trigger="hover"
+      mouseEnterDelay={0}
+      mouseLeaveDelay={0}
+      content="Hover-only help"
+    >
+      <button type="button">Help</button>
+    </Popover>,
+  );
+  const trigger = screen.getByRole('button', { name: 'Help' });
+  act(() => trigger.focus());
+  fireEvent.pointerEnter(trigger);
+  fireEvent.pointerLeave(trigger);
+  expect(document.querySelector('[data-tao-popover]')).toHaveAttribute(
+    'data-state',
+    'closed',
+  );
+});
+
+test.each([
+  'focus',
+  'click',
+] as const)('%s trigger preserves and releases child refs', (trigger) => {
+  const firstRef = createRef<HTMLButtonElement>();
+  const nextRef = createRef<HTMLButtonElement>();
+  const { rerender, unmount } = render(
+    <Popover trigger={trigger} content="Ref content">
+      <button ref={firstRef} type="button">
+        Ref trigger
+      </button>
+    </Popover>,
+  );
+  const button = screen.getByRole('button', { name: 'Ref trigger' });
+  expect(firstRef.current).toBe(button);
+  rerender(
+    <Popover trigger={trigger} content="Ref content">
+      <button ref={nextRef} type="button">
+        Ref trigger
+      </button>
+    </Popover>,
+  );
+  expect(firstRef.current).toBeNull();
+  expect(nextRef.current).toBe(button);
+  unmount();
+  expect(nextRef.current).toBeNull();
 });
 
 test('empty title and content disable the popup', () => {

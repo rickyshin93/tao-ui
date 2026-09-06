@@ -4,6 +4,8 @@ import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import {
   type CSSProperties,
+  type ForwardedRef,
+  forwardRef,
   type ReactNode,
   type Ref,
   useCallback,
@@ -83,34 +85,37 @@ export interface DatePickerProps {
   styles?: SemanticStyles<DatePickerSemanticPart>;
 }
 
-export function DatePicker({
-  value,
-  defaultValue,
-  onChange,
-  picker = 'date',
-  showTime,
-  format: formatProp,
-  disabledDate,
-  minDate,
-  maxDate,
-  presets,
-  placeholder,
-  size,
-  variant,
-  disabled,
-  allowClear = true,
-  prefix,
-  suffixIcon,
-  status,
-  mobile,
-  open: controlledOpen,
-  onOpenChange,
-  className,
-  style,
-  classNames,
-  styles,
-  ref,
-}: DatePickerProps) {
+export const DatePicker = forwardRef(function DatePicker(
+  props: DatePickerProps,
+  ref: ForwardedRef<PickerRef>,
+) {
+  const {
+    value,
+    defaultValue,
+    onChange,
+    picker = 'date',
+    showTime,
+    format: formatProp,
+    disabledDate,
+    minDate,
+    maxDate,
+    presets,
+    placeholder,
+    size,
+    variant,
+    disabled,
+    allowClear = true,
+    prefix,
+    suffixIcon,
+    status,
+    mobile,
+    open: controlledOpen,
+    onOpenChange,
+    className,
+    style,
+    classNames,
+    styles,
+  } = props;
   const ctx = useTaoConfig();
   const resolvedSize = size ?? ctx.size;
   const resolvedVariant = variant ?? ctx.variant;
@@ -140,11 +145,24 @@ export function DatePicker({
   const defaultPlaceholder = placeholder ?? fmt;
   const drawerTitle = showTime ? 'Date & Time' : defaultPlaceholder;
 
-  const isValueControlled = value !== undefined;
+  const isDateBlocked = useCallback(
+    (date: Dayjs) => {
+      const granularity = picker === 'date' ? 'day' : picker;
+      return (
+        !date.isValid() ||
+        Boolean(disabledDate?.(date)) ||
+        (minDate != null && date.isBefore(minDate, granularity)) ||
+        (maxDate != null && date.isAfter(maxDate, granularity))
+      );
+    },
+    [picker, disabledDate, minDate, maxDate],
+  );
+
+  const isValueControlled = 'value' in props;
   const [internalValue, setInternalValue] = useState<Dayjs | null>(
     defaultValue ?? null,
   );
-  const resolvedValue = isValueControlled ? value : internalValue;
+  const resolvedValue = isValueControlled ? (value ?? null) : internalValue;
   const emitChange = useCallback(
     (next: Dayjs | null, dateString: string) => {
       if (!isValueControlled) setInternalValue(next);
@@ -264,10 +282,11 @@ export function DatePicker({
   const handlePresetSelect = useCallback(
     (val: unknown) => {
       const d = val as Dayjs;
+      if (isDateBlocked(d)) return;
       emitChange(d, d.format(fmt));
       setOpen(false);
     },
-    [emitChange, fmt, setOpen],
+    [emitChange, fmt, setOpen, isDateBlocked],
   );
 
   const handleOk = useCallback(() => {
@@ -294,12 +313,7 @@ export function DatePicker({
     }
 
     const parsed = dayjs(text, fmt, true);
-    const isBlocked =
-      !parsed.isValid() ||
-      disabledDate?.(parsed) ||
-      (minDate != null && parsed.isBefore(minDate, 'day')) ||
-      (maxDate != null && parsed.isAfter(maxDate, 'day'));
-    if (isBlocked) {
+    if (isDateBlocked(parsed)) {
       setInputValue(displayValue);
       return;
     }
@@ -310,13 +324,11 @@ export function DatePicker({
     if (formatted !== displayValue) emitChange(parsed, formatted);
     setOpen(false);
   }, [
-    disabledDate,
     displayValue,
     fmt,
     inputValue,
     isValueControlled,
-    maxDate,
-    minDate,
+    isDateBlocked,
     emitChange,
     setOpen,
   ]);
@@ -353,6 +365,8 @@ export function DatePicker({
             value={resolvedValue}
             onSelect={handleMonthSelect}
             disabledDate={disabledDate}
+            minDate={minDate}
+            maxDate={maxDate}
           />
         )}
         {(panelMode === 'year' || panelMode === 'decade') && (
@@ -361,6 +375,8 @@ export function DatePicker({
             value={resolvedValue}
             onSelect={handleYearSelect}
             disabledDate={disabledDate}
+            minDate={minDate}
+            maxDate={maxDate}
           />
         )}
       </div>
@@ -566,7 +582,7 @@ export function DatePicker({
       </Popover.Portal>
     </Popover.Root>
   );
-}
+});
 
 function CalendarIcon() {
   return (

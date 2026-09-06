@@ -107,3 +107,44 @@ test('inherits size from TaoProvider', () => {
   const nav = screen.getByRole('navigation');
   expect((nav as HTMLElement).dataset.taoSize).toBe('large');
 });
+
+test('uncontrolled current is clamped when total shrinks and stays there when total grows', () => {
+  const { rerender } = render(<Pagination total={21} defaultCurrent={3} />);
+  rerender(<Pagination total={11} defaultCurrent={3} />);
+  expect(screen.getByLabelText('Page 2')).toHaveAttribute(
+    'aria-current',
+    'page',
+  );
+  rerender(<Pagination total={21} defaultCurrent={3} />);
+  expect(screen.getByLabelText('Page 2')).toHaveAttribute(
+    'aria-current',
+    'page',
+  );
+  rerender(<Pagination total={0} defaultCurrent={3} />);
+  expect(screen.getByLabelText('Page 1')).toHaveAttribute(
+    'aria-current',
+    'page',
+  );
+});
+
+test('uncontrolled current is clamped when controlled page size increases', () => {
+  const { rerender } = render(
+    <Pagination total={30} defaultCurrent={3} pageSize={10} />,
+  );
+  rerender(<Pagination total={30} defaultCurrent={3} pageSize={20} />);
+  expect(screen.getByLabelText('Page 2')).toHaveAttribute(
+    'aria-current',
+    'page',
+  );
+});
+
+test('controlled current remains parent-owned after total changes', () => {
+  const { rerender } = render(<Pagination total={21} current={3} />);
+  rerender(<Pagination total={11} current={3} />);
+  expect(document.querySelector('[aria-current="page"]')).toBeNull();
+  rerender(<Pagination total={21} current={3} />);
+  expect(screen.getByLabelText('Page 3')).toHaveAttribute(
+    'aria-current',
+    'page',
+  );
+});

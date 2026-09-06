@@ -4,6 +4,8 @@ import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import {
   type CSSProperties,
+  type ForwardedRef,
+  forwardRef,
   type ReactNode,
   type Ref,
   useCallback,
@@ -83,39 +85,44 @@ export interface RangePickerProps {
   styles?: SemanticStyles<RangePickerSemanticPart>;
 }
 
-export function RangePicker({
-  value,
-  defaultValue,
-  onChange,
-  picker = 'date',
-  showTime,
-  format: formatProp,
-  disabledDate,
-  minDate,
-  maxDate,
-  presets,
-  placeholder = ['Start date', 'End date'],
-  separator = '~',
-  size,
-  variant,
-  disabled,
-  allowClear = true,
-  status,
-  mobile,
-  open: controlledOpen,
-  onOpenChange,
-  className,
-  style,
-  classNames,
-  styles,
-  ref,
-}: RangePickerProps) {
+export const RangePicker = forwardRef(function RangePicker(
+  props: RangePickerProps,
+  ref: ForwardedRef<PickerRef>,
+) {
+  const {
+    value,
+    defaultValue,
+    onChange,
+    picker = 'date',
+    showTime,
+    format: formatProp,
+    disabledDate,
+    minDate,
+    maxDate,
+    presets,
+    placeholder = ['Start date', 'End date'],
+    separator = '~',
+    size,
+    variant,
+    disabled,
+    allowClear = true,
+    status,
+    mobile,
+    open: controlledOpen,
+    onOpenChange,
+    className,
+    style,
+    classNames,
+    styles,
+  } = props;
   const ctx = useTaoConfig();
   const resolvedSize = size ?? ctx.size;
   const resolvedVariant = variant ?? ctx.variant;
-  const isDisabled =
-    typeof disabled === 'boolean' ? disabled : disabled?.[0] && disabled?.[1];
-  const resolvedDisabled = isDisabled ?? ctx.disabled;
+  const startDisabled =
+    (Array.isArray(disabled) ? disabled[0] : disabled) ?? ctx.disabled;
+  const endDisabled =
+    (Array.isArray(disabled) ? disabled[1] : disabled) ?? ctx.disabled;
+  const resolvedDisabled = startDisabled && endDisabled;
   const autoMobile = useIsMobile();
   const isMobile = mobile ?? autoMobile;
   const mobileTriggerRef = useRef<HTMLButtonElement>(null);
@@ -145,17 +152,40 @@ export function RangePicker({
   );
 
   const fmt = formatProp ?? getDefaultFormat(picker, showTime);
-  const isValueControlled = value !== undefined;
+  const isDateBlocked = useCallback(
+    (date: Dayjs) =>
+      !date.isValid() ||
+      Boolean(disabledDate?.(date)) ||
+      (minDate != null && date.isBefore(minDate, 'day')) ||
+      (maxDate != null && date.isAfter(maxDate, 'day')),
+    [disabledDate, minDate, maxDate],
+  );
+  const isValueControlled = 'value' in props;
   const [internalValue, setInternalValue] = useState<RangeValue>(
     defaultValue ?? null,
   );
-  const resolvedValue = isValueControlled ? value : internalValue;
+  const resolvedValue = isValueControlled ? (value ?? null) : internalValue;
   const emitChange = useCallback(
-    (dates: RangeValue, dateStrings: [string, string]) => {
-      if (!isValueControlled) setInternalValue(dates);
-      onChange?.(dates, dateStrings);
+    (dates: RangeValue) => {
+      if (resolvedDisabled) return false;
+      const start = (startDisabled ? resolvedValue?.[0] : dates?.[0]) ?? null;
+      const end = (endDisabled ? resolvedValue?.[1] : dates?.[1]) ?? null;
+      if ((startDisabled || endDisabled) && start && end && start.isAfter(end))
+        return false;
+      const nextValue: RangeValue = start || end ? [start, end] : null;
+      if (!isValueControlled) setInternalValue(nextValue);
+      onChange?.(nextValue, [start?.format(fmt) ?? '', end?.format(fmt) ?? '']);
+      return true;
     },
-    [isValueControlled, onChange],
+    [
+      isValueControlled,
+      onChange,
+      startDisabled,
+      endDisabled,
+      resolvedDisabled,
+      resolvedValue,
+      fmt,
+    ],
   );
 
   const [internalOpen, setInternalOpen] = useState(false);
@@ -169,10 +199,11 @@ export function RangePicker({
     : undefined;
   const setOpen = useCallback(
     (v: boolean) => {
+      if (v && resolvedDisabled) return;
       setInternalOpen(v);
       onOpenChange?.(v);
     },
-    [onOpenChange],
+    [onOpenChange, resolvedDisabled],
   );
   useEffect(() => {
     if (!isOpen) {
@@ -186,8 +217,15 @@ export function RangePicker({
   }, [controlledValueKey]);
 
   const [viewDateStart, setViewDateStart] = useState<Dayjs>(
-    () => resolvedValue?.[0] ?? dayjs(),
+    () => resolvedValue?.[0] ?? resolvedValue?.[1] ?? dayjs(),
   );
+  const wasOpenRef = useRef(false);
+  useEffect(() => {
+    if (isOpen && !wasOpenRef.current) {
+      setViewDateStart(resolvedValue?.[0] ?? resolvedValue?.[1] ?? dayjs());
+    }
+    wasOpenRef.current = isOpen;
+  }, [isOpen, resolvedValue]);
   const viewDateEnd = viewDateStart.add(1, 'month');
 
   const rangeStart =
@@ -206,6 +244,16 @@ export function RangePicker({
 
   const handleDateSelect = useCallback(
     (date: Dayjs) => {
+      if (startDisabled || endDisabled) {
+        if (!emitChange(startDisabled ? [rangeStart, date] : [date, rangeEnd]))
+          return;
+        setInteraction({
+          phase: 'idle',
+          activeInput: startDisabled ? 'end' : 'start',
+        });
+        if (!showTime) setOpen(false);
+        return;
+      }
       if (interaction.phase === 'idle' && interaction.activeInput === 'start') {
         setInteraction({
           phase: 'pickingEnd',
@@ -220,18 +268,27 @@ export function RangePicker({
         if (start && date.isBefore(start)) {
           [start, end] = [date, start];
         }
-        emitChange([start, end], [start?.format(fmt) ?? '', end.format(fmt)]);
+        emitChange([start, end]);
         setInteraction({ phase: 'idle', activeInput: 'start' });
         if (!showTime) setOpen(false);
       }
     },
-    [interaction, rangeStart, emitChange, fmt, showTime, setOpen],
+    [
+      interaction,
+      rangeStart,
+      rangeEnd,
+      emitChange,
+      startDisabled,
+      endDisabled,
+      showTime,
+      setOpen,
+    ],
   );
 
   const handleClear = useCallback(
     (e: React.SyntheticEvent) => {
       e.stopPropagation();
-      emitChange(null, ['', '']);
+      emitChange(null);
       setInteraction({ phase: 'idle', activeInput: 'start' });
     },
     [emitChange],
@@ -240,11 +297,17 @@ export function RangePicker({
   const handlePresetSelect = useCallback(
     (val: unknown) => {
       const [s, e] = val as [Dayjs, Dayjs];
-      emitChange([s, e], [s.format(fmt), e.format(fmt)]);
+      if (
+        (!startDisabled && isDateBlocked(s)) ||
+        (!endDisabled && isDateBlocked(e)) ||
+        (!startDisabled && !endDisabled && s.isAfter(e))
+      )
+        return;
+      if (!emitChange([s, e])) return;
       setInteraction({ phase: 'idle', activeInput: 'start' });
       setOpen(false);
     },
-    [emitChange, fmt, setOpen],
+    [emitChange, setOpen, isDateBlocked, startDisabled, endDisabled],
   );
 
   const displayStart = rangeStart ? rangeStart.format(fmt) : '';
@@ -257,15 +320,13 @@ export function RangePicker({
 
   const commitInputValue = useCallback(
     (position: 'start' | 'end') => {
+      if (position === 'start' ? startDisabled : endDisabled) return;
       const text = (position === 'start' ? inputStart : inputEnd).trim();
       const currentValue = position === 'start' ? displayStart : displayEnd;
       const parsed = text ? dayjs(text, fmt, true) : null;
       const isBlocked =
         parsed != null &&
-        (!parsed.isValid() ||
-          disabledDate?.(parsed) ||
-          (minDate != null && parsed.isBefore(minDate, 'day')) ||
-          (maxDate != null && parsed.isAfter(maxDate, 'day')) ||
+        (isDateBlocked(parsed) ||
           (position === 'start' &&
             rangeEnd != null &&
             parsed.isAfter(rangeEnd)) ||
@@ -285,26 +346,27 @@ export function RangePicker({
         nextStart?.format(fmt) ?? '',
         nextEnd?.format(fmt) ?? '',
       ];
-      emitChange(
-        nextStart || nextEnd ? [nextStart, nextEnd] : null,
-        nextStrings,
-      );
+      if (nextStrings[0] !== displayStart || nextStrings[1] !== displayEnd) {
+        emitChange(nextStart || nextEnd ? [nextStart, nextEnd] : null);
+      }
       setInteraction({ phase: 'idle', activeInput: position });
       if (parsed) setViewDateStart(parsed);
-      if (position === 'start') setInputStart(nextStrings[0]);
-      else setInputEnd(nextStrings[1]);
+      if (position === 'start')
+        setInputStart(isValueControlled ? displayStart : nextStrings[0]);
+      else setInputEnd(isValueControlled ? displayEnd : nextStrings[1]);
       if (nextStart && nextEnd) setOpen(false);
     },
     [
-      disabledDate,
+      isDateBlocked,
+      startDisabled,
+      endDisabled,
       displayEnd,
       displayStart,
       emitChange,
       fmt,
       inputEnd,
       inputStart,
-      maxDate,
-      minDate,
+      isValueControlled,
       rangeEnd,
       rangeStart,
       setOpen,
@@ -312,7 +374,16 @@ export function RangePicker({
   );
 
   const showClearBtn =
-    allowClear && (rangeStart || rangeEnd) && !resolvedDisabled;
+    allowClear &&
+    ((!startDisabled && rangeStart) || (!endDisabled && rangeEnd));
+
+  const isDateDisabled = (date: Dayjs) =>
+    Boolean(
+      resolvedDisabled ||
+        disabledDate?.(date) ||
+        (startDisabled && rangeStart && date.isBefore(rangeStart, 'day')) ||
+        (endDisabled && rangeEnd && date.isAfter(rangeEnd, 'day')),
+    );
 
   const panelContent = (
     <div
@@ -377,7 +448,7 @@ export function RangePicker({
               onSelect={handleDateSelect}
               onViewDateChange={setViewDateStart}
               onHover={setHoverDate}
-              disabledDate={disabledDate}
+              disabledDate={isDateDisabled}
               minDate={minDate}
               maxDate={maxDate}
               className={classNames?.calendar}
@@ -400,7 +471,7 @@ export function RangePicker({
                 setViewDateStart(date.subtract(1, 'month'))
               }
               onHover={setHoverDate}
-              disabledDate={disabledDate}
+              disabledDate={isDateDisabled}
               minDate={minDate}
               maxDate={maxDate}
               className={classNames?.calendar}
@@ -520,7 +591,7 @@ export function RangePicker({
         style={styles?.input}
         value={inputStart}
         placeholder={placeholder[0]}
-        disabled={resolvedDisabled}
+        disabled={startDisabled}
         aria-invalid={status === 'error' || undefined}
         onFocus={() => {
           setInteraction({ phase: 'idle', activeInput: 'start' });
@@ -554,7 +625,7 @@ export function RangePicker({
         style={styles?.input}
         value={inputEnd}
         placeholder={placeholder[1]}
-        disabled={resolvedDisabled}
+        disabled={endDisabled}
         aria-invalid={status === 'error' || undefined}
         onFocus={() => {
           setInteraction({ phase: 'idle', activeInput: 'end' });
@@ -611,7 +682,7 @@ export function RangePicker({
       </Popover.Portal>
     </Popover.Root>
   );
-}
+});
 
 function CalendarIcon() {
   return (

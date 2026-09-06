@@ -1,4 +1,6 @@
 import {
+  type ForwardedRef,
+  forwardRef,
   type Ref,
   type TextareaHTMLAttributes,
   useCallback,
@@ -39,21 +41,23 @@ export interface TextareaProps
   styles?: SemanticStyles<TextareaSemanticPart>;
 }
 
-export function Textarea({
-  size,
-  variant,
-  error,
-  status,
-  disabled,
-  autoSize,
-  className,
-  style,
-  classNames,
-  styles,
-  onChange,
-  ref,
-  ...rest
-}: TextareaProps) {
+export const Textarea = forwardRef(function Textarea(
+  {
+    size,
+    variant,
+    error,
+    status,
+    disabled,
+    autoSize,
+    className,
+    style,
+    classNames,
+    styles,
+    onChange,
+    ...rest
+  }: TextareaProps,
+  ref: ForwardedRef<HTMLTextAreaElement>,
+) {
   const ctx = useTaoConfig();
   const resolvedSize = size ?? ctx.size;
   const resolvedVariant = variant ?? ctx.variant;
@@ -90,6 +94,24 @@ export function Textarea({
     resize();
   }, [resize, rest.value, rest.defaultValue]);
 
+  useLayoutEffect(() => {
+    const el = innerRef.current;
+    if (!el || !autoSize) return;
+    let width: number | undefined;
+    let frame = 0;
+    const observer = new ResizeObserver(([entry]) => {
+      if (entry.contentRect.width === width) return;
+      width = entry.contentRect.width;
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(resize);
+    });
+    observer.observe(el);
+    return () => {
+      observer.disconnect();
+      cancelAnimationFrame(frame);
+    };
+  }, [autoSize, resize]);
+
   return (
     <div
       className={cx(classNames?.root, className)}
@@ -104,6 +126,7 @@ export function Textarea({
     >
       <textarea
         {...rest}
+        value={'value' in rest ? (rest.value ?? '') : undefined}
         ref={mergeRefs(innerRef, ref)}
         className={classNames?.textarea}
         style={styles?.textarea}
@@ -117,4 +140,4 @@ export function Textarea({
       />
     </div>
   );
-}
+});

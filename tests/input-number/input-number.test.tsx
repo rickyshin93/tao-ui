@@ -1,7 +1,57 @@
 import { expect, rstest, test } from '@rstest/core';
-import { fireEvent, render } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
+import { userEvent } from '@testing-library/user-event';
+import { Form } from '../../src/components/form';
 import { InputNumber } from '../../src/components/input-number/input-number';
 import { TaoProvider } from '../../src/provider/tao-provider';
+
+test.each([
+  'typing',
+  'programmatic',
+] as const)('Form clears a numeric field with undefined after %s entry without remounting', async (entry) => {
+  function Demo() {
+    const [form] = Form.useForm();
+    return (
+      <>
+        <Form form={form}>
+          <Form.Item name="amount">
+            <InputNumber />
+          </Form.Item>
+        </Form>
+        <button
+          type="button"
+          onClick={() => form.setFieldsValue({ amount: '1234' })}
+        >
+          Fill field
+        </button>
+        <button
+          type="button"
+          onClick={() => form.setFieldsValue({ amount: undefined })}
+        >
+          Clear field
+        </button>
+      </>
+    );
+  }
+  render(<Demo />);
+  const input = screen.getByRole('textbox');
+  if (entry === 'typing') await userEvent.type(input, '1234');
+  else
+    await userEvent.click(screen.getByRole('button', { name: 'Fill field' }));
+  expect(input).toHaveValue('1,234');
+  await userEvent.click(screen.getByRole('button', { name: 'Clear field' }));
+  expect(screen.getByRole('textbox')).toBe(input);
+  expect(input).toHaveValue('');
+});
+
+test('defaultValue remains editable when value is omitted', async () => {
+  const { rerender } = render(<InputNumber defaultValue="12" />);
+  const input = screen.getByRole('textbox');
+  await userEvent.type(input, '3');
+  expect(input).toHaveValue('123');
+  rerender(<InputNumber defaultValue="99" />);
+  expect(input).toHaveValue('123');
+});
 
 test('IN.1 — renders the Input surface (data-tao-control / input / size / variant)', () => {
   const { container } = render(<InputNumber value="" />);

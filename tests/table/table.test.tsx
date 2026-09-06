@@ -5,6 +5,7 @@ import {
   type SorterResult,
   Table,
   type TableColumn,
+  type TableProps,
 } from '../../src/components/table/table';
 import { TaoProvider } from '../../src/provider/tao-provider';
 import { restoreViewport, setViewportWidth } from '../utils/mock-viewport';
@@ -545,6 +546,71 @@ test('paginates data by default (10 per page)', () => {
   expect(screen.queryByText('User 10')).toBeNull();
 });
 
+test('pagination callbacks preserve current controlled sorting and filters', () => {
+  const changes: {
+    filters: Record<string, string[] | null>;
+    sorter: SorterResult<User>;
+  }[] = [];
+  const onChange: NonNullable<TableProps<User>['onChange']> = (
+    _,
+    filters,
+    sorter,
+  ) => {
+    changes.push({ filters, sorter });
+  };
+  const controlledColumns = (
+    order: 'ascend' | 'descend',
+    role: string,
+  ): TableColumn<User>[] => [
+    {
+      key: 'age',
+      dataIndex: 'age',
+      title: 'Age',
+      sorter: (a, b) => a.age - b.age,
+      sortOrder: order,
+    },
+    {
+      key: 'role',
+      dataIndex: 'role',
+      title: 'Role',
+      filters: [
+        { text: 'Admin', value: 'admin' },
+        { text: 'User', value: 'user' },
+      ],
+      filteredValue: [role],
+    },
+  ];
+  const { rerender } = render(
+    <Table
+      columns={controlledColumns('descend', 'admin')}
+      dataSource={data}
+      rowKey="id"
+      pagination={{ current: 1, pageSize: 2 }}
+      onChange={onChange}
+    />,
+  );
+  fireEvent.click(screen.getByRole('button', { name: 'Page 2' }));
+  expect(changes[0]).toMatchObject({
+    filters: { role: ['admin'] },
+    sorter: { field: 'age', order: 'descend' },
+  });
+
+  rerender(
+    <Table
+      columns={controlledColumns('ascend', 'user')}
+      dataSource={data}
+      rowKey="id"
+      pagination={{ current: 1, pageSize: 2 }}
+      onChange={onChange}
+    />,
+  );
+  fireEvent.click(screen.getByRole('button', { name: 'Page 2' }));
+  expect(changes[1]).toMatchObject({
+    filters: { role: ['user'] },
+    sorter: { field: 'age', order: 'ascend' },
+  });
+});
+
 test('pagination: false shows all data', () => {
   const bigData = Array.from({ length: 25 }, (_, i) => ({
     id: i,
@@ -579,6 +645,105 @@ test('rowSelection renders checkboxes', () => {
   const checkboxes = screen.getAllByRole('checkbox');
   // 1 header checkbox + 5 row checkboxes
   expect(checkboxes.length).toBe(6);
+});
+
+test('uncontrolled selection works without a change callback', () => {
+  render(
+    <Table
+      columns={columns}
+      dataSource={data}
+      rowKey="id"
+      pagination={false}
+      rowSelection={{}}
+    />,
+  );
+  const first = screen.getByRole('checkbox', { name: 'Select row 1' });
+  const all = screen.getByRole('checkbox', { name: 'Select all rows' });
+  fireEvent.click(first);
+  expect(first).toBeChecked();
+  expect(all).toBePartiallyChecked();
+  fireEvent.click(first);
+  expect(first).not.toBeChecked();
+  fireEvent.click(all);
+  for (const input of screen.getAllByRole('checkbox'))
+    expect(input).toBeChecked();
+  fireEvent.click(all);
+  expect(first).not.toBeChecked();
+});
+
+test('uncontrolled selection accumulates across pages and skips disabled rows', () => {
+  let selectedKeys: React.Key[] = [];
+  let selectedRows: User[] = [];
+  render(
+    <Table
+      columns={columns}
+      dataSource={data}
+      rowKey="id"
+      pagination={{ pageSize: 2 }}
+      rowSelection={{
+        getCheckboxProps: (record) => ({ disabled: record.id === 3 }),
+        onChange: (keys, rows) => {
+          selectedKeys = keys;
+          selectedRows = rows;
+        },
+      }}
+    />,
+  );
+  fireEvent.click(screen.getByRole('checkbox', { name: 'Select row 1' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Next page' }));
+  fireEvent.click(screen.getByRole('checkbox', { name: 'Select all rows' }));
+  expect(selectedKeys).toEqual([1, 4]);
+  expect(selectedRows).toEqual([data[0], data[3]]);
+  expect(
+    screen.getByRole('checkbox', { name: 'Select row 3' }),
+  ).not.toBeChecked();
+  fireEvent.click(screen.getByRole('checkbox', { name: 'Select all rows' }));
+  expect(selectedKeys).toEqual([1]);
+  fireEvent.click(screen.getByRole('button', { name: 'Previous page' }));
+  expect(screen.getByRole('checkbox', { name: 'Select row 1' })).toBeChecked();
+});
+
+test('uncontrolled radio selection replaces the previous row', () => {
+  render(
+    <Table
+      columns={columns}
+      dataSource={data}
+      rowKey="id"
+      pagination={false}
+      rowSelection={{ type: 'radio' }}
+    />,
+  );
+  const radios = screen.getAllByRole('radio');
+  fireEvent.click(radios[0]);
+  expect(radios[0]).toBeChecked();
+  fireEvent.click(radios[1]);
+  expect(radios[0]).not.toBeChecked();
+  expect(radios[1]).toBeChecked();
+});
+
+test('controlled selection waits for its parent to accept the change', () => {
+  let selectedKeys: React.Key[] = [];
+  render(
+    <Table
+      columns={columns}
+      dataSource={data}
+      rowKey="id"
+      pagination={false}
+      rowSelection={{
+        selectedRowKeys: [],
+        onChange: (keys) => {
+          selectedKeys = keys;
+        },
+      }}
+    />,
+  );
+  const first = screen.getByRole('checkbox', { name: 'Select row 1' });
+  fireEvent.click(first);
+  expect(selectedKeys).toEqual([1]);
+  expect(first).not.toBeChecked();
+  fireEvent.click(screen.getByRole('checkbox', { name: 'Select all rows' }));
+  expect(selectedKeys).toEqual(data.map((record) => record.id));
+  expect(first).not.toBeChecked();
 });
 
 test('rowSelection onChange fires', () => {
@@ -621,6 +786,132 @@ test('select all checkbox', () => {
   const selectAll = screen.getAllByRole('checkbox')[0];
   fireEvent.click(selectAll);
   expect(keys).toEqual([1, 2, 3, 4, 5]);
+});
+
+test('selecting and clearing a page preserves other pages and disabled selections', () => {
+  let keys: React.Key[] = [1, 3];
+  let rows: User[] = [];
+  const table = () => (
+    <Table
+      columns={columns}
+      dataSource={data}
+      rowKey="id"
+      pagination={{ current: 2, pageSize: 2 }}
+      rowSelection={{
+        selectedRowKeys: keys,
+        getCheckboxProps: (record) => ({ disabled: record.id === 3 }),
+        onChange: (nextKeys, nextRows) => {
+          keys = nextKeys;
+          rows = nextRows;
+        },
+      }}
+    />
+  );
+  const { rerender } = render(table());
+  fireEvent.click(screen.getByRole('checkbox', { name: 'Select all rows' }));
+  expect(keys).toEqual([1, 3, 4]);
+  expect(rows.map((row) => row.id)).toEqual([1, 3, 4]);
+  rerender(table());
+  expect(
+    screen.getByRole('checkbox', { name: 'Select all rows' }),
+  ).toBeChecked();
+  fireEvent.click(screen.getByRole('checkbox', { name: 'Select all rows' }));
+  expect(keys).toEqual([1, 3]);
+  expect(rows.map((row) => row.id)).toEqual([1, 3]);
+  keys = [1];
+  rerender(table());
+  fireEvent.click(screen.getByRole('checkbox', { name: 'Select all rows' }));
+  expect(keys).toEqual([1, 4]);
+  expect(rows.map((row) => row.id)).toEqual([1, 4]);
+});
+
+test('large controlled selection preserves key and row order across updates', () => {
+  const rows = Array.from({ length: 1000 }, (_, id) => ({
+    id: `row-${id}`,
+    name: `Row ${id}`,
+  }));
+  let keys = [
+    'outside',
+    ...rows
+      .slice(0, 800)
+      .map((row) => row.id)
+      .reverse(),
+  ];
+  let selectedRows: typeof rows = [];
+  const table = () => (
+    <Table
+      dataSource={rows}
+      columns={[{ dataIndex: 'name', title: 'Name' }]}
+      rowKey="id"
+      rowSelection={{
+        selectedRowKeys: keys,
+        onChange: (nextKeys, nextRows) => {
+          keys = nextKeys as string[];
+          selectedRows = nextRows;
+        },
+      }}
+    />
+  );
+  const { rerender } = render(table());
+  const originalKeys = [...keys];
+  fireEvent.click(screen.getAllByRole('checkbox')[1]);
+  expect(keys).toEqual(originalKeys.filter((key) => key !== 'row-0'));
+  expect(selectedRows).toEqual(rows.slice(1, 800));
+  rerender(table());
+  expect(screen.getAllByRole('checkbox')[1]).not.toBeChecked();
+  fireEvent.click(screen.getAllByRole('checkbox')[1]);
+  expect(keys).toEqual([
+    ...originalKeys.filter((key) => key !== 'row-0'),
+    'row-0',
+  ]);
+  expect(selectedRows).toEqual(rows.slice(0, 800));
+  rerender(table());
+  expect(screen.getAllByRole('checkbox')[1]).toBeChecked();
+});
+
+test('selection header reflects only selectable rows on the current page', () => {
+  const table = (keys: React.Key[], disabled: boolean, current = 1) => (
+    <Table
+      columns={columns}
+      dataSource={data}
+      rowKey="id"
+      pagination={{ current, pageSize: 2 }}
+      rowSelection={{
+        selectedRowKeys: keys,
+        getCheckboxProps: (record) => ({
+          disabled: disabled || record.id === 3,
+        }),
+      }}
+    />
+  );
+  const { rerender } = render(table([1, 3], false));
+  expect(
+    screen.getByRole('checkbox', { name: 'Select all rows' }),
+  ).toBePartiallyChecked();
+  rerender(table([1, 3], false, 2));
+  expect(
+    screen.getByRole('checkbox', { name: 'Select all rows' }),
+  ).not.toBeChecked();
+  expect(
+    screen.getByRole('checkbox', { name: 'Select all rows' }),
+  ).not.toBePartiallyChecked();
+  rerender(table([1, 3, 4], false, 2));
+  expect(
+    screen.getByRole('checkbox', { name: 'Select all rows' }),
+  ).toBeChecked();
+  expect(
+    screen.getByRole('checkbox', { name: 'Select all rows' }),
+  ).not.toBePartiallyChecked();
+  rerender(table([1, 3, 4], true, 2));
+  expect(
+    screen.getByRole('checkbox', { name: 'Select all rows' }),
+  ).not.toBeChecked();
+  expect(
+    screen.getByRole('checkbox', { name: 'Select all rows' }),
+  ).not.toBePartiallyChecked();
+  expect(
+    screen.getByRole('checkbox', { name: 'Select all rows' }),
+  ).toBeDisabled();
 });
 
 test('selection checkboxes have accessible names', () => {
@@ -693,4 +984,92 @@ test('responsive column appears once its breakpoint matches', async () => {
   );
   await waitFor(() => expect(screen.getByText('Role')).toBeTruthy());
   expect(screen.getAllByText('admin').length).toBeGreaterThan(0);
+});
+
+test('uncontrolled local pagination clamps after data shrinks without reviving the old page', () => {
+  const rows = Array.from({ length: 11 }, (_, i) => ({
+    key: i + 1,
+    name: `Row ${i + 1}`,
+  }));
+  const cols = [{ dataIndex: 'name', title: 'Name' }];
+  const { rerender } = render(
+    <Table
+      columns={cols}
+      dataSource={rows}
+      pagination={{ defaultCurrent: 2 }}
+    />,
+  );
+  expect(screen.getByText('Row 11')).toBeTruthy();
+  rerender(
+    <Table
+      columns={cols}
+      dataSource={rows.slice(0, 10)}
+      pagination={{ defaultCurrent: 2 }}
+    />,
+  );
+  expect(screen.getByText('Row 1')).toBeTruthy();
+  expect(screen.getByLabelText('Page 1')).toHaveAttribute(
+    'aria-current',
+    'page',
+  );
+  rerender(
+    <Table
+      columns={cols}
+      dataSource={rows}
+      pagination={{ defaultCurrent: 2 }}
+    />,
+  );
+  expect(screen.queryByText('Row 11')).toBeNull();
+});
+
+test('remote pagination clamps by total rather than the current page row count', () => {
+  const cols = [{ dataIndex: 'name', title: 'Name' }];
+  const rows = [{ key: 1, name: 'Remote row' }];
+  const { rerender } = render(
+    <Table
+      columns={cols}
+      dataSource={rows}
+      pagination={{ defaultCurrent: 3, total: 30 }}
+    />,
+  );
+  expect(screen.getByLabelText('Page 3')).toHaveAttribute(
+    'aria-current',
+    'page',
+  );
+  expect(screen.getByText('Remote row')).toBeTruthy();
+  rerender(
+    <Table
+      columns={cols}
+      dataSource={rows}
+      pagination={{ defaultCurrent: 3, total: 20 }}
+    />,
+  );
+  expect(screen.getByLabelText('Page 2')).toHaveAttribute(
+    'aria-current',
+    'page',
+  );
+  expect(screen.getByText('Remote row')).toBeTruthy();
+});
+
+test('controlled local pagination retains the page requested by its parent', () => {
+  const cols = [{ dataIndex: 'name', title: 'Name' }];
+  const rows = Array.from({ length: 11 }, (_, i) => ({
+    key: i + 1,
+    name: `Controlled ${i + 1}`,
+  }));
+  const { rerender } = render(
+    <Table columns={cols} dataSource={rows} pagination={{ current: 2 }} />,
+  );
+  rerender(
+    <Table
+      columns={cols}
+      dataSource={rows.slice(0, 10)}
+      pagination={{ current: 2 }}
+    />,
+  );
+  expect(screen.queryByText('Controlled 1')).toBeNull();
+  rerender(
+    <Table columns={cols} dataSource={rows} pagination={{ current: 2 }} />,
+  );
+  expect(screen.getByText('Controlled 11')).toBeTruthy();
 });

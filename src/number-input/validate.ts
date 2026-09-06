@@ -1,4 +1,13 @@
+import { shiftDecimal } from './percentage';
+
 const CANONICAL_REGEX = /^-?\d*\.?\d*$/;
+
+function toCanonical(value: number): string {
+  const [coefficient, exponent] = String(value).split('e');
+  return exponent === undefined
+    ? coefficient
+    : shiftDecimal(coefficient, Number(exponent));
+}
 
 export function isValidCanonical(canonical: string): boolean {
   return CANONICAL_REGEX.test(canonical);
@@ -20,7 +29,7 @@ export function clampToRange(
   if (canonical === '' || canonical === '-') return canonical;
   const n = Number(canonical);
   if (!Number.isFinite(n)) return canonical;
-  if (min !== undefined && n < min) return String(min);
-  if (max !== undefined && n > max) return String(max);
+  if (min !== undefined && n < min) return toCanonical(min);
+  if (max !== undefined && n > max) return toCanonical(max);
   return canonical;
 }

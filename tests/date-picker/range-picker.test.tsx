@@ -1,9 +1,10 @@
 import { readFileSync } from 'node:fs';
-import { expect, test } from '@rstest/core';
-import { render, screen } from '@testing-library/react';
+import { expect, rstest, test } from '@rstest/core';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import dayjs from 'dayjs';
 import { RangePicker } from '../../src/components/date-picker/range-picker';
+import { Form } from '../../src/components/form';
 
 test('renders with placeholder', () => {
   render(<RangePicker mobile={false} />);
@@ -120,6 +121,37 @@ test('external value updates cancel an unfinished range selection', async () => 
   );
 
   expect(changeCount).toBe(0);
+});
+
+test('Form can clear a range with undefined after user entry without remounting', async () => {
+  function Demo() {
+    const [form] = Form.useForm();
+    return (
+      <>
+        <Form form={form}>
+          <Form.Item name="dates">
+            <RangePicker mobile={false} />
+          </Form.Item>
+        </Form>
+        <button
+          type="button"
+          onClick={() => form.setFieldsValue({ dates: undefined })}
+        >
+          Clear field
+        </button>
+      </>
+    );
+  }
+  render(<Demo />);
+  const [start, end] = screen.getAllByRole('textbox');
+  await userEvent.type(start, '2026-06-01{Enter}');
+  await userEvent.type(end, '2026-06-15{Enter}');
+  expect(start).toHaveValue('2026-06-01');
+  expect(end).toHaveValue('2026-06-15');
+  await userEvent.click(screen.getByRole('button', { name: 'Clear field' }));
+  expect(screen.getAllByRole('textbox')).toEqual([start, end]);
+  expect(start).toHaveValue('');
+  expect(end).toHaveValue('');
 });
 
 test('PC inputs accept a typed range with strict formatting', async () => {
@@ -254,4 +286,340 @@ test('applies popup semantic customization in the mobile drawer', () => {
   expect(document.querySelector('.semantic-mobile-popup')).toHaveStyle({
     minWidth: '560px',
   });
+});
+
+test.each([
+  { position: 0, text: '2026-06-02' },
+  { position: 1, text: '2026-06-14' },
+  { position: 0, text: '' },
+  { position: 1, text: '' },
+])('controlled ranges restore rejected input after blur (%#)', ({
+  position,
+  text,
+}) => {
+  const onChange = rstest.fn();
+  render(
+    <RangePicker
+      mobile={false}
+      value={[dayjs('2026-06-01'), dayjs('2026-06-15')]}
+      onChange={onChange}
+    />,
+  );
+  const input = screen.getAllByRole('textbox')[position];
+  fireEvent.change(input, { target: { value: text } });
+  fireEvent.blur(input);
+  expect(onChange).toHaveBeenCalledTimes(1);
+  expect(onChange.mock.calls.at(-1)?.[1][position]).toBe(text);
+  expect(input).toHaveValue(position === 0 ? '2026-06-01' : '2026-06-15');
+});
+
+test('Enter followed by blur does not resubmit a rejected range value', () => {
+  const onChange = rstest.fn();
+  render(
+    <RangePicker
+      mobile={false}
+      value={[null, dayjs('2026-07-31')]}
+      onChange={onChange}
+    />,
+  );
+  const input = screen.getAllByRole('textbox')[0];
+  fireEvent.change(input, { target: { value: '2026-07-01' } });
+  fireEvent.keyDown(input, { key: 'Enter' });
+  fireEvent.blur(input);
+  expect(onChange).toHaveBeenCalledTimes(1);
+  expect(onChange.mock.calls[0][1]).toEqual(['2026-07-01', '2026-07-31']);
+  expect(input).toHaveValue('');
+});
+
+test('uncontrolled range edits replace default values on blur', () => {
+  const onChange = rstest.fn();
+  render(
+    <RangePicker
+      mobile={false}
+      defaultValue={[dayjs('2026-06-01'), dayjs('2026-06-15')]}
+      onChange={onChange}
+    />,
+  );
+  const [start, end] = screen.getAllByRole('textbox');
+  fireEvent.change(start, { target: { value: '2026-06-02' } });
+  fireEvent.blur(start);
+  expect(start).toHaveValue('2026-06-02');
+  expect(end).toHaveValue('2026-06-15');
+  expect(onChange.mock.calls.at(-1)?.[1]).toEqual(['2026-06-02', '2026-06-15']);
+});
+
+test.each([
+  'start',
+  'end',
+] as const)('disabled %s endpoint stays fixed while the other input is editable', async (position) => {
+  const onChange = rstest.fn();
+  render(
+    <RangePicker
+      mobile={false}
+      disabled={position === 'start' ? [true, false] : [false, true]}
+      defaultValue={[dayjs('2026-06-01'), dayjs('2026-06-30')]}
+      onChange={onChange}
+    />,
+  );
+  const inputs = screen.getAllByRole('textbox');
+  expect(inputs[position === 'start' ? 0 : 1]).toBeDisabled();
+  const editable = inputs[position === 'start' ? 1 : 0];
+  await userEvent.clear(editable);
+  await userEvent.type(editable, '2026-06-15');
+  await userEvent.keyboard('{Enter}');
+  expect(onChange).toHaveBeenLastCalledWith(
+    expect.anything(),
+    position === 'start'
+      ? ['2026-06-01', '2026-06-15']
+      : ['2026-06-15', '2026-06-30'],
+  );
+});
+
+test.each([
+  { position: 'start', action: 'clear' },
+  { position: 'end', action: 'clear' },
+  { position: 'start', action: 'calendar' },
+  { position: 'end', action: 'calendar' },
+  { position: 'start', action: 'preset' },
+  { position: 'end', action: 'preset' },
+] as const)('$action preserves the disabled $position endpoint', async ({
+  position,
+  action,
+}) => {
+  const onChange = rstest.fn();
+  render(
+    <RangePicker
+      mobile={false}
+      open={action !== 'clear'}
+      disabled={position === 'start' ? [true, false] : [false, true]}
+      defaultValue={[dayjs('2026-06-01'), dayjs('2026-06-30')]}
+      onChange={onChange}
+      presets={[
+        {
+          label: 'Middle range',
+          value: [dayjs('2026-06-10'), dayjs('2026-06-20')],
+        },
+      ]}
+    />,
+  );
+  if (action === 'clear')
+    await userEvent.click(screen.getByRole('button', { name: /Clear/ }));
+  else if (action === 'calendar')
+    await userEvent.click(
+      screen.getAllByRole('button', { name: '2026-06-15', exact: true })[0],
+    );
+  else
+    await userEvent.click(screen.getByRole('button', { name: 'Middle range' }));
+  const next =
+    action === 'clear'
+      ? ''
+      : action === 'calendar'
+        ? '2026-06-15'
+        : position === 'start'
+          ? '2026-06-20'
+          : '2026-06-10';
+  expect(onChange).toHaveBeenLastCalledWith(
+    expect.anything(),
+    position === 'start' ? ['2026-06-01', next] : [next, '2026-06-30'],
+  );
+});
+
+test.each([
+  'start',
+  'end',
+] as const)('calendar and presets cannot cross the disabled %s endpoint', async (position) => {
+  const onChange = rstest.fn();
+  render(
+    <RangePicker
+      mobile={false}
+      open
+      disabled={position === 'start' ? [true, false] : [false, true]}
+      defaultValue={[dayjs('2026-06-10'), dayjs('2026-06-20')]}
+      onChange={onChange}
+      presets={[
+        {
+          label: 'Outside range',
+          value:
+            position === 'start'
+              ? [dayjs('2026-06-01'), dayjs('2026-06-05')]
+              : [dayjs('2026-06-25'), dayjs('2026-06-30')],
+        },
+      ]}
+    />,
+  );
+  const day = screen.getAllByRole('button', {
+    name: position === 'start' ? '2026-06-05' : '2026-06-25',
+    exact: true,
+  })[0];
+  expect(day).toBeDisabled();
+  await userEvent.click(screen.getByRole('button', { name: 'Outside range' }));
+  expect(onChange).not.toHaveBeenCalled();
+});
+
+test.each([
+  'start',
+  'end',
+] as const)('mobile calendar changes only the editable endpoint with %s disabled', async (position) => {
+  const onChange = rstest.fn();
+  render(
+    <RangePicker
+      mobile
+      open
+      disabled={position === 'start' ? [true, false] : [false, true]}
+      defaultValue={[dayjs('2026-06-01'), dayjs('2026-06-30')]}
+      onChange={onChange}
+    />,
+  );
+  await userEvent.click(
+    screen.getAllByRole('button', { name: '2026-06-15', exact: true })[0],
+  );
+  expect(onChange).toHaveBeenLastCalledWith(
+    expect.anything(),
+    position === 'start'
+      ? ['2026-06-01', '2026-06-15']
+      : ['2026-06-15', '2026-06-30'],
+  );
+});
+
+test.each([
+  {
+    name: 'minDate',
+    start: '2026-01-01',
+    end: '2026-01-20',
+    props: { minDate: dayjs('2026-01-10') },
+  },
+  {
+    name: 'maxDate',
+    start: '2026-01-10',
+    end: '2026-01-31',
+    props: { maxDate: dayjs('2026-01-25') },
+  },
+  {
+    name: 'disabledDate',
+    start: '2026-01-10',
+    end: '2026-01-20',
+    props: { disabledDate: (date: dayjs.Dayjs) => date.date() === 20 },
+  },
+  { name: 'invalid date', start: 'invalid', end: '2026-01-20', props: {} },
+  {
+    name: 'reversed endpoints',
+    start: '2026-01-20',
+    end: '2026-01-10',
+    props: {},
+  },
+])('range presets reject $name without changing or closing the picker', async ({
+  start,
+  end,
+  props,
+}) => {
+  const onChange = rstest.fn();
+  const onOpenChange = rstest.fn();
+  render(
+    <RangePicker
+      mobile={false}
+      open
+      defaultValue={[dayjs('2026-01-10'), dayjs('2026-01-15')]}
+      {...props}
+      presets={[{ label: 'Blocked range', value: [dayjs(start), dayjs(end)] }]}
+      onChange={onChange}
+      onOpenChange={onOpenChange}
+    />,
+  );
+  await userEvent.click(screen.getByRole('button', { name: 'Blocked range' }));
+  expect(onChange).not.toHaveBeenCalled();
+  expect(onOpenChange).not.toHaveBeenCalled();
+  expect(screen.getAllByRole('textbox')[0]).toHaveValue('2026-01-10');
+  expect(screen.getAllByRole('textbox')[1]).toHaveValue('2026-01-15');
+});
+
+test.each([
+  'start',
+  'end',
+] as const)('preset validation preserves an existing disabled %s outside new boundaries', async (position) => {
+  const onChange = rstest.fn();
+  render(
+    <RangePicker
+      mobile={false}
+      open
+      disabled={position === 'start' ? [true, false] : [false, true]}
+      defaultValue={[dayjs('2026-01-01'), dayjs('2026-01-31')]}
+      minDate={dayjs('2026-01-10')}
+      maxDate={dayjs('2026-01-20')}
+      presets={[
+        {
+          label: 'Editable endpoint',
+          value:
+            position === 'start'
+              ? [dayjs('invalid'), dayjs('2026-01-15')]
+              : [dayjs('2026-01-15'), dayjs('invalid')],
+        },
+      ]}
+      onChange={onChange}
+    />,
+  );
+  await userEvent.click(
+    screen.getByRole('button', { name: 'Editable endpoint' }),
+  );
+  expect(onChange).toHaveBeenCalledWith(
+    expect.anything(),
+    position === 'start'
+      ? ['2026-01-01', '2026-01-15']
+      : ['2026-01-15', '2026-01-31'],
+  );
+});
+
+test.each([
+  'start',
+  'end',
+] as const)('reopening a controlled range locates its updated %s value', (position) => {
+  const original: [dayjs.Dayjs | null, dayjs.Dayjs | null] = [
+    dayjs('2025-01-10'),
+    dayjs('2025-01-20'),
+  ];
+  const next: [dayjs.Dayjs | null, dayjs.Dayjs | null] = [
+    position === 'start' ? dayjs('2026-09-10') : null,
+    dayjs('2026-09-20'),
+  ];
+  const { rerender } = render(
+    <RangePicker mobile={false} open={false} value={original} />,
+  );
+  rerender(<RangePicker mobile={false} open={false} value={next} />);
+  rerender(<RangePicker mobile={false} open value={next} />);
+  expect(
+    screen.getAllByRole('button', { name: '2026-09-20', exact: true }).length,
+  ).toBeGreaterThan(0);
+});
+
+test('range value updates and parent rerenders do not interrupt navigation while open', async () => {
+  const value: [dayjs.Dayjs, dayjs.Dayjs] = [
+    dayjs('2026-01-10'),
+    dayjs('2026-01-20'),
+  ];
+  const onChange = rstest.fn();
+  const { rerender } = render(
+    <RangePicker mobile={false} open value={value} onChange={onChange} />,
+  );
+  await userEvent.click(
+    screen.getByRole('button', { name: 'Next month', exact: true }),
+  );
+  expect(screen.getByText('Feb 2026')).toBeTruthy();
+  rerender(
+    <RangePicker
+      mobile={false}
+      open
+      value={[dayjs('2026-01-10'), dayjs('2026-01-20')]}
+      onChange={onChange}
+    />,
+  );
+  expect(screen.getByText('Feb 2026')).toBeTruthy();
+  rerender(
+    <RangePicker
+      mobile={false}
+      open
+      value={[dayjs('2026-09-10'), dayjs('2026-09-20')]}
+      onChange={onChange}
+    />,
+  );
+  expect(screen.getByText('Feb 2026')).toBeTruthy();
+  expect(onChange).not.toHaveBeenCalled();
 });

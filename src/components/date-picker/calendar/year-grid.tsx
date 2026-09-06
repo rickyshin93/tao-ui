@@ -6,6 +6,8 @@ interface YearGridProps {
   value?: Dayjs | null;
   onSelect: (date: Dayjs) => void;
   disabledDate?: (date: Dayjs) => boolean;
+  minDate?: Dayjs;
+  maxDate?: Dayjs;
 }
 
 export function YearGrid({
@@ -13,6 +15,8 @@ export function YearGrid({
   value,
   onSelect,
   disabledDate,
+  minDate,
+  maxDate,
 }: YearGridProps) {
   const years = getYears(viewDate.year());
   const decadeStart = Math.floor(viewDate.year() / 10) * 10;
@@ -23,7 +27,10 @@ export function YearGrid({
         const yr = y.year();
         const isSelected = value && value.year() === yr;
         const isOutside = yr < decadeStart || yr > decadeStart + 9;
-        const disabled = disabledDate?.(y) ?? false;
+        const disabled =
+          disabledDate?.(y) ||
+          (minDate != null && y.isBefore(minDate, 'year')) ||
+          (maxDate != null && y.isAfter(maxDate, 'year'));
         return (
           <button
             key={yr}

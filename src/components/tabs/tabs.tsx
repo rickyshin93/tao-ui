@@ -59,12 +59,31 @@ export function Tabs({
 
   // Controlled / uncontrolled
   const isControlled = activeKeyProp !== undefined;
-  const firstEnabledKey =
-    items.find((t) => !t.disabled)?.key ?? items[0]?.key ?? '';
+  const firstEnabledKey = items.find((item) => !item.disabled)?.key;
   const [internalKey, setInternalKey] = useState(
     defaultActiveKey ?? firstEnabledKey,
   );
-  const currentKey = isControlled ? activeKeyProp : internalKey;
+  const isInternalKeyEnabled = items.some(
+    (item) => item.key === internalKey && !item.disabled,
+  );
+  if (
+    !isControlled &&
+    !isInternalKeyEnabled &&
+    firstEnabledKey !== undefined &&
+    internalKey !== firstEnabledKey
+  ) {
+    setInternalKey(firstEnabledKey);
+  }
+  const currentKey = isControlled
+    ? activeKeyProp
+    : isInternalKeyEnabled
+      ? internalKey
+      : firstEnabledKey;
+  const focusKey = items.some(
+    (item) => item.key === currentKey && !item.disabled,
+  )
+    ? currentKey
+    : firstEnabledKey;
 
   const handleSelect = useCallback(
     (key: string) => {
@@ -85,19 +104,27 @@ export function Tabs({
     if (variant !== 'line') return;
     const list = tablistRef.current;
     if (!list) return;
-    const active = list.querySelector<HTMLElement>(
-      `[data-tao-tab-key="${CSS.escape(currentKey)}"]`,
+    const activeItem = items.find((item) => item.key === currentKey);
+    const active = activeItem
+      ? list.querySelector<HTMLElement>(
+          `[data-tao-tab-key="${CSS.escape(activeItem.key)}"]`,
+        )
+      : null;
+    setInkStyle(
+      active ? { left: active.offsetLeft, width: active.offsetWidth } : null,
     );
-    if (active) {
-      setInkStyle({ left: active.offsetLeft, width: active.offsetWidth });
-    }
-  }, [currentKey, variant]);
+  }, [currentKey, variant, items]);
 
   // Keyboard nav
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
       const enabledItems = items.filter((t) => !t.disabled);
-      const idx = enabledItems.findIndex((t) => t.key === currentKey);
+      if (enabledItems.length === 0) return;
+      const focusedKey =
+        (e.target as HTMLElement)
+          .closest('[data-tao-tab-key]')
+          ?.getAttribute('data-tao-tab-key') ?? focusKey;
+      const idx = enabledItems.findIndex((item) => item.key === focusedKey);
       let next: TabItem | undefined;
 
       if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
@@ -125,7 +152,7 @@ export function Tabs({
         btn?.focus();
       }
     },
-    [items, currentKey, handleSelect],
+    [items, focusKey, handleSelect],
   );
 
   return (
@@ -160,7 +187,7 @@ export function Tabs({
                 aria-selected={isActive}
                 aria-controls={panelId}
                 aria-disabled={item.disabled || undefined}
-                tabIndex={isActive ? 0 : -1}
+                tabIndex={!item.disabled && item.key === focusKey ? 0 : -1}
                 data-tao-tab=""
                 data-tao-tab-key={item.key}
                 data-tao-active={isActive || undefined}

@@ -1,10 +1,10 @@
 # tao-ui
 
-A modern React 19 component library with semantic DOM customization and OKLCH-based theming.
+A component library for React 18.2 and 19 with semantic DOM customization and OKLCH-based theming.
 
 ## Features
 
-- **React 19** — built for the latest React, ships with the React Compiler.
+- **React 18.2 and 19** — supports React 18.2 as the minimum version and React 19, with React Compiler optimizations.
 - **Semantic DOM** — every visual component exposes `classNames` / `styles` props to style internal parts by semantic name, no fragile selector hacks.
 - **OKLCH theming** — `TaoProvider` derives a full theme (radius, font scale, control heights) from a small seed token set; components inherit `size` / `disabled` / `variant`.
 - **Typed** — full `.d.ts`, every Props and SemanticPart type exported.
@@ -17,7 +17,7 @@ npm install @rockshin/tao-ui
 bun add @rockshin/tao-ui
 ```
 
-Peer dependencies: `react >=19`, `react-dom >=19`, `dayjs >=1.11` (for the date pickers).
+Peer dependencies: `react ^18.2.0 || ^19.0.0`, `react-dom ^18.2.0 || ^19.0.0`. The minimum version is 18.2; React 19 is also supported. The date pickers' `dayjs` dependency is installed automatically.
 
 ## Usage
 
@@ -36,6 +36,17 @@ export default function App() {
   );
 }
 ```
+
+### Component imports
+
+Use component entries to include only their styles and shared theme styles. No separate CSS import is needed. The root entry remains available and includes all component styles.
+
+```tsx
+import { Button, type ButtonProps } from '@rockshin/tao-ui/button';
+import { TaoProvider } from '@rockshin/tao-ui/provider';
+```
+
+Entry names use kebab-case, such as `/input-number`, `/range-picker`, and `/form-layout`. Related exports share an entry: `CheckboxGroup` uses `/checkbox`, and `HeadlessInputNumber` uses `/number-input`.
 
 ### Dark mode
 

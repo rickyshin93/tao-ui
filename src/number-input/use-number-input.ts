@@ -2,14 +2,19 @@ import {
   type ChangeEvent,
   type FocusEvent,
   type KeyboardEvent,
-  type RefObject,
+  type MutableRefObject,
   useEffect,
   useLayoutEffect,
   useMemo,
   useRef,
   useState,
 } from 'react';
-import { isThousandSepBeforeCursor, reposition } from './cursor';
+import {
+  countAnchored,
+  findCursorAt,
+  isThousandSepBeforeCursor,
+  reposition,
+} from './cursor';
 import { format, padOnBlur, parse, truncateDecimals } from './format';
 import { fromPercent, toPercent } from './percentage';
 import type { FormatOptions, PadDecimalsOnBlur } from './types';
@@ -41,7 +46,7 @@ export interface UseNumberInputReturn {
     onBlur: (e: FocusEvent<HTMLInputElement>) => void;
     onFocus: (e: FocusEvent<HTMLInputElement>) => void;
     onKeyDown: (e: KeyboardEvent<HTMLInputElement>) => void;
-    ref: RefObject<HTMLInputElement | null>;
+    ref: MutableRefObject<HTMLInputElement | null>;
     inputMode: 'decimal' | 'numeric';
   };
   value: string;
@@ -76,29 +81,98 @@ export function useNumberInput(
     return format(canonical, fmtOpts);
   };
 
-  const [displayBuffer, setDisplayBuffer] = useState<string>(() =>
-    canonicalToDisplay(value ?? defaultValue ?? ''),
-  );
+  const isValueControlled = 'value' in opts;
+  const [buffer, setBuffer] = useState(() => ({
+    display: canonicalToDisplay(
+      isValueControlled ? (value ?? '') : (defaultValue ?? ''),
+    ),
+    format: fmtOpts,
+    isPercentage,
+  }));
+  const displayBuffer = buffer.display;
+  const setDisplayBuffer = (display: string) =>
+    setBuffer({ display, format: fmtOpts, isPercentage });
 
   const isFocusedRef = useRef(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
-  const pendingCursorRef = useRef<number | null>(null);
+  const pendingCursorRef = useRef<{
+    display: string;
+    start: number;
+    end: number;
+  } | null>(null);
+
+  useLayoutEffect(() => {
+    if (buffer.format === fmtOpts && buffer.isPercentage === isPercentage)
+      return;
+    const previousCanonical = parse(buffer.display, buffer.format);
+    const useExternalValue = isValueControlled && !isFocusedRef.current;
+    const actual = useExternalValue
+      ? (value ?? '')
+      : buffer.isPercentage
+        ? fromPercent(previousCanonical)
+        : previousCanonical;
+    let canonical = isPercentage ? toPercent(actual) : actual;
+    if (
+      !useExternalValue &&
+      previousCanonical.endsWith('.') &&
+      !canonical.includes('.')
+    )
+      canonical += '.';
+    const display = format(canonical, fmtOpts);
+    const input = inputRef.current;
+    if (isFocusedRef.current && input && display !== buffer.display) {
+      const beforeCount = countAnchored(
+        buffer.display,
+        buffer.display.length,
+        buffer.format.thousandsSeparator,
+      );
+      const afterCount = countAnchored(
+        display,
+        display.length,
+        thousandsSeparator,
+      );
+      const mapCursor = (position: number) =>
+        findCursorAt(
+          display,
+          afterCount -
+            beforeCount +
+            countAnchored(
+              buffer.display,
+              position,
+              buffer.format.thousandsSeparator,
+            ),
+          thousandsSeparator,
+        );
+      pendingCursorRef.current = {
+        display,
+        start: mapCursor(input.selectionStart ?? buffer.display.length),
+        end: mapCursor(input.selectionEnd ?? buffer.display.length),
+      };
+    }
+    setBuffer({ display, format: fmtOpts, isPercentage });
+  }, [
+    buffer,
+    fmtOpts,
+    isPercentage,
+    isValueControlled,
+    value,
+    thousandsSeparator,
+  ]);
 
   // External value sync (controlled, not focused).
   // biome-ignore lint/correctness/useExhaustiveDependencies: intentional — only react to external value changes
   useEffect(() => {
-    if (value === undefined) return;
+    if (!isValueControlled) return;
     if (isFocusedRef.current) return;
-    const display = canonicalToDisplay(value);
-    setDisplayBuffer((prev) => (prev === display ? prev : display));
-  }, [value]);
+    const display = canonicalToDisplay(value ?? '');
+    if (displayBuffer !== display) setDisplayBuffer(display);
+  }, [value, isValueControlled]);
 
   // Apply pending cursor after buffer commit.
-  // biome-ignore lint/correctness/useExhaustiveDependencies: displayBuffer is the trigger, not a closure value
   useLayoutEffect(() => {
-    if (pendingCursorRef.current === null) return;
-    const pos = pendingCursorRef.current;
-    inputRef.current?.setSelectionRange(pos, pos);
+    const pending = pendingCursorRef.current;
+    if (pending?.display !== displayBuffer) return;
+    inputRef.current?.setSelectionRange(pending.start, pending.end);
     pendingCursorRef.current = null;
   }, [displayBuffer]);
 
@@ -110,12 +184,17 @@ export function useNumberInput(
     canonical = truncateDecimals(canonical, decimalPlaces);
     if (!isValidCanonical(canonical)) return;
     const newDisplay = format(canonical, fmtOpts);
-    pendingCursorRef.current = reposition({
+    const cursorPosition = reposition({
       before: raw,
       beforeCursor: cursor,
       after: newDisplay,
       thousandsSeparator,
     });
+    pendingCursorRef.current = {
+      display: newDisplay,
+      start: cursorPosition,
+      end: cursorPosition,
+    };
     setDisplayBuffer(newDisplay);
     const actual = isPercentage ? fromPercent(canonical) : canonical;
     onChange?.(actual);
@@ -123,7 +202,9 @@ export function useNumberInput(
 
   const handleBlur = () => {
     isFocusedRef.current = false;
-    const raw = inputRef.current?.value ?? displayBuffer;
+    const raw = isValueControlled
+      ? canonicalToDisplay(value ?? '')
+      : (inputRef.current?.value ?? displayBuffer);
     let canonical = parse(raw, fmtOpts);
     canonical = padOnBlur(canonical, decimalPlaces, padMode);
     let actual = isPercentage ? fromPercent(canonical) : canonical;
@@ -153,9 +234,9 @@ export function useNumberInput(
   };
 
   const derivedActual = useMemo(() => {
-    const canonical = parse(displayBuffer, fmtOpts);
-    return isPercentage ? fromPercent(canonical) : canonical;
-  }, [displayBuffer, isPercentage, fmtOpts]);
+    const canonical = parse(buffer.display, buffer.format);
+    return buffer.isPercentage ? fromPercent(canonical) : canonical;
+  }, [buffer]);
 
   return {
     inputProps: {

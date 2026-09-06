@@ -1,4 +1,10 @@
-import { type ReactNode, type Ref, useState } from 'react';
+import {
+  type ForwardedRef,
+  forwardRef,
+  type ReactNode,
+  type Ref,
+  useState,
+} from 'react';
 import { useTaoConfig } from '../../provider/tao-provider';
 import {
   cx,
@@ -25,21 +31,23 @@ export interface SwitchProps {
   ref?: Ref<HTMLButtonElement>;
 }
 
-export function Switch({
-  checked,
-  defaultChecked,
-  onChange,
-  disabled,
-  loading,
-  size = 'medium',
-  checkedChildren,
-  unCheckedChildren,
-  className,
-  style,
-  classNames,
-  styles,
-  ref,
-}: SwitchProps) {
+export const Switch = forwardRef(function Switch(
+  {
+    checked,
+    defaultChecked,
+    onChange,
+    disabled,
+    loading,
+    size = 'medium',
+    checkedChildren,
+    unCheckedChildren,
+    className,
+    style,
+    classNames,
+    styles,
+  }: SwitchProps,
+  ref: ForwardedRef<HTMLButtonElement>,
+) {
   const ctx = useTaoConfig();
   const resolvedDisabled = disabled ?? ctx.disabled ?? false;
   const isDisabled = resolvedDisabled || loading;
@@ -84,7 +92,7 @@ export function Switch({
       </span>
     </button>
   );
-}
+});
 
 function LoadingIcon() {
   return (

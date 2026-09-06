@@ -1,4 +1,4 @@
-import type { ReactNode, Ref } from 'react';
+import { type ForwardedRef, forwardRef, type ReactNode, type Ref } from 'react';
 import {
   type UseNumberInputOptions,
   useNumberInput,
@@ -41,24 +41,26 @@ export interface InputNumberProps extends UseNumberInputOptions {
   styles?: SemanticStyles<InputNumberSemanticPart>;
 }
 
-export function InputNumber({
-  prefix,
-  suffix,
-  size,
-  variant,
-  error,
-  status,
-  disabled,
-  placeholder,
-  id,
-  name,
-  'aria-label': ariaLabel,
-  className,
-  classNames,
-  styles,
-  ref: forwardedRef,
-  ...hookOptions
-}: InputNumberProps) {
+export const InputNumber = forwardRef(function InputNumber(
+  {
+    prefix,
+    suffix,
+    size,
+    variant,
+    error,
+    status,
+    disabled,
+    placeholder,
+    id,
+    name,
+    'aria-label': ariaLabel,
+    className,
+    classNames,
+    styles,
+    ...hookOptions
+  }: InputNumberProps,
+  forwardedRef: ForwardedRef<HTMLInputElement>,
+) {
   const { inputProps } = useNumberInput(hookOptions);
   const { ref, ...inputRest } = inputProps;
   return (
@@ -81,4 +83,4 @@ export function InputNumber({
       {...inputRest}
     />
   );
-}
+});

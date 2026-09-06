@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { expect, test } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
@@ -155,4 +156,32 @@ test('RadioGroup disabled disables all radios', () => {
   for (const radio of screen.getAllByRole('radio')) {
     expect(radio).toBeDisabled();
   }
+});
+
+test('radio indicator styling follows the native checked state', () => {
+  const css = readFileSync('src/components/radio/radio.css', 'utf8');
+  expect(css).toMatch(
+    /\[data-tao-radio-input\]:checked\s*\+\s*\[data-tao-radio\]\s*\{/,
+  );
+  expect(css).toMatch(
+    /\[data-tao-radio-input\]:checked\s*\+\s*\[data-tao-radio\]::after\s*\{/,
+  );
+});
+
+test('uncontrolled radios preserve default selection and native same-name mutual exclusion', async () => {
+  render(
+    <>
+      <Radio name="native-group" defaultChecked>
+        Alpha
+      </Radio>
+      <Radio name="native-group">Beta</Radio>
+    </>,
+  );
+  const alpha = screen.getByRole('radio', { name: 'Alpha' });
+  const beta = screen.getByRole('radio', { name: 'Beta' });
+  expect(alpha).toBeChecked();
+  expect(beta).not.toBeChecked();
+  await userEvent.click(beta);
+  expect(alpha).not.toBeChecked();
+  expect(beta).toBeChecked();
 });

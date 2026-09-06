@@ -2,6 +2,8 @@ import * as Popover from '@radix-ui/react-popover';
 import * as RadixSelect from '@radix-ui/react-select';
 import {
   type CSSProperties,
+  type ForwardedRef,
+  forwardRef,
   type ReactNode,
   useCallback,
   useId,
@@ -34,6 +36,7 @@ import type {
   SelectOption,
   SelectPlacement,
   SelectProps,
+  SelectRef,
 } from './select-types';
 
 export type {
@@ -55,7 +58,10 @@ const PLACEMENT_MAP: Record<
   topRight: { side: 'top', align: 'end' },
 };
 
-export function Select(props: SelectProps) {
+export const Select = forwardRef(function Select(
+  props: SelectProps,
+  ref: ForwardedRef<SelectRef>,
+) {
   const {
     options,
     value: valueProp,
@@ -107,7 +113,6 @@ export function Select(props: SelectProps) {
     style,
     classNames,
     styles,
-    ref,
   } = props;
 
   const ctx = useTaoConfig();
@@ -139,7 +144,7 @@ export function Select(props: SelectProps) {
   );
 
   // value (controlled / uncontrolled)
-  const isValueControlled = valueProp !== undefined;
+  const isValueControlled = 'value' in props;
   const [valueInternal, setValueInternal] = useState<
     string | string[] | undefined
   >(
@@ -165,6 +170,18 @@ export function Select(props: SelectProps) {
   const [searchInternal, setSearchInternal] = useState('');
   const search = isSearchControlled ? searchValueProp : searchInternal;
   const [activeSearchIndex, setActiveSearchIndex] = useState(0);
+  const composingRef = useRef(false);
+  const isComposingKey = useCallback(
+    (event: KeyboardEvent) =>
+      composingRef.current || event.isComposing || event.keyCode === 229,
+    [],
+  );
+  const handleEscapeKeyDown = useCallback(
+    (event: KeyboardEvent) => {
+      if (isComposingKey(event)) event.preventDefault();
+    },
+    [isComposingKey],
+  );
 
   const [hovering, setHovering] = useState(false);
 
@@ -179,19 +196,34 @@ export function Select(props: SelectProps) {
 
   const handleValueChange = useCallback(
     (next: string) => {
+      if (resolvedDisabled) return;
       if (isMultiple) {
         // Token separators: split on separator chars
         if (tokenSeparators && tokenSeparators.length > 0) {
-          const sep = tokenSeparators.find((s) => next.includes(s));
-          if (sep) {
-            const tokens = next
-              .split(sep)
-              .map((t) => t.trim())
+          const hasSeparator = tokenSeparators.some(
+            (separator) => separator && next.includes(separator),
+          );
+          if (hasSeparator) {
+            const tokens = tokenSeparators
+              .reduce(
+                (parts, separator) =>
+                  separator
+                    ? parts.flatMap((part) => part.split(separator))
+                    : parts,
+                [next],
+              )
+              .map((token) => token.trim())
               .filter(Boolean);
-            const toAdd = tokens.filter((t) => {
-              const opt = optionByToken.get(t);
-              return opt && !selectedValueSet.has(opt.value);
-            });
+            const seen = new Set(selectedValueSet);
+            const toAdd: string[] = [];
+            for (const token of tokens) {
+              const option = optionByToken.get(token);
+              if (option?.disabled || (!option && mode !== 'tags')) continue;
+              const value = option?.value ?? token;
+              if (seen.has(value)) continue;
+              seen.add(value);
+              toAdd.push(value);
+            }
             if (toAdd.length > 0) {
               const nextArray = [...valueArray, ...toAdd];
               if (maxCount != null && nextArray.length > maxCount) return;
@@ -251,6 +283,8 @@ export function Select(props: SelectProps) {
       valueArray,
       maxCount,
       tokenSeparators,
+      resolvedDisabled,
+      mode,
       isValueControlled,
       optionByToken,
       optionByValue,
@@ -265,6 +299,7 @@ export function Select(props: SelectProps) {
 
   const handleOpenChange = useCallback(
     (next: boolean) => {
+      if (next && resolvedDisabled) return;
       // In multi mode, suppress the auto-close that Radix fires after selection.
       if (isMultiple && !hasInlineSearch && !next && suppressCloseRef.current) {
         suppressCloseRef.current = false;
@@ -285,6 +320,7 @@ export function Select(props: SelectProps) {
       isOpenControlled,
       isSearchControlled,
       onOpenChange,
+      resolvedDisabled,
       showSearch,
       isMobile,
     ],
@@ -301,16 +337,23 @@ export function Select(props: SelectProps) {
   // Token separator handling for search input
   const handleSearchKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (isComposingKey(e.nativeEvent)) return;
       if (!isMultiple || !tokenSeparators || tokenSeparators.length === 0)
         return;
       const value = (e.target as HTMLInputElement).value;
-      const sep = tokenSeparators.find((s) => value.includes(s));
+      const sep = tokenSeparators.find((s) => s && value.includes(s));
       if (!sep) return;
       e.preventDefault();
       handleValueChange(value);
       if (!isSearchControlled) setSearchInternal('');
     },
-    [isMultiple, tokenSeparators, handleValueChange, isSearchControlled],
+    [
+      isMultiple,
+      tokenSeparators,
+      handleValueChange,
+      isSearchControlled,
+      isComposingKey,
+    ],
   );
 
   const clearValue = useCallback(() => {
@@ -360,6 +403,7 @@ export function Select(props: SelectProps) {
   // Mobile multi-select commit: fires when the user presses "Done" in the drawer.
   const handleMultiChange = useCallback(
     (nextArray: string[]) => {
+      if (resolvedDisabled) return;
       if (!isValueControlled) setValueInternal(nextArray);
       const selectedOpts = nextArray
         .map((v) => optionByValue.get(v))
@@ -385,6 +429,7 @@ export function Select(props: SelectProps) {
     [
       valueArray,
       selectedValueSet,
+      resolvedDisabled,
       isValueControlled,
       optionByValue,
       onChange,
@@ -459,6 +504,14 @@ export function Select(props: SelectProps) {
   const statusProps = {
     'data-tao-error': status === 'error' || undefined,
     'data-tao-warning': status === 'warning' || undefined,
+  };
+  const ariaProps = {
+    'aria-label': props['aria-label'],
+    'aria-labelledby': props['aria-labelledby'],
+    'aria-describedby': props['aria-describedby'],
+    'aria-errormessage': props['aria-errormessage'],
+    'aria-invalid': status === 'error' ? true : props['aria-invalid'],
+    'aria-required': props['aria-required'],
   };
 
   const tags = isMultiple ? (
@@ -571,7 +624,9 @@ export function Select(props: SelectProps) {
           autoFocus={autoFocus}
           role="button"
           tabIndex={resolvedDisabled ? undefined : 0}
+          {...ariaProps}
           aria-disabled={resolvedDisabled || undefined}
+          data-disabled={resolvedDisabled || undefined}
           className={cx(classNames?.root, className)}
           style={{ ...styles?.root, ...style }}
           onClick={() => handleOpenChange(true)}
@@ -652,6 +707,7 @@ export function Select(props: SelectProps) {
           notFoundContent={notFoundContent}
           optionRender={optionRender}
           multiple={isMultiple}
+          disabled={resolvedDisabled}
         />
       </>
     );
@@ -790,10 +846,15 @@ export function Select(props: SelectProps) {
   const searchableOptions = filteredFlatOptions.filter(
     (option) => !isSearchableOptionDisabled(option),
   );
-  const activeSearchOption =
-    searchableOptions[
-      Math.min(activeSearchIndex, Math.max(searchableOptions.length - 1, 0))
-    ];
+  const lastSearchIndex = Math.max(searchableOptions.length - 1, 0);
+  const boundedSearchIndex = Math.min(
+    Math.max(activeSearchIndex, 0),
+    lastSearchIndex,
+  );
+  if (activeSearchIndex !== boundedSearchIndex) {
+    setActiveSearchIndex(boundedSearchIndex);
+  }
+  const activeSearchOption = searchableOptions[boundedSearchIndex];
   const searchableMenuNode = (
     <SearchableSelectList
       id={searchListboxId}
@@ -825,6 +886,7 @@ export function Select(props: SelectProps) {
       ref={inputRef}
       id={id}
       role="combobox"
+      {...ariaProps}
       data-tao-select-trigger-input=""
       className={cx(classNames?.searchInput)}
       style={styles?.searchInput}
@@ -836,16 +898,27 @@ export function Select(props: SelectProps) {
       aria-expanded={open}
       aria-autocomplete="list"
       aria-controls={open ? searchListboxId : undefined}
-      aria-invalid={status === 'error' || undefined}
       aria-activedescendant={
         open && activeSearchOption
           ? `${searchListboxId}-option-${encodeURIComponent(activeSearchOption.value)}`
           : undefined
       }
-      aria-label={selectedOption ? String(selectedOption.label) : placeholder}
+      aria-label={
+        props['aria-label'] ??
+        (selectedOption ? String(selectedOption.label) : placeholder)
+      }
       // biome-ignore lint/a11y/noAutofocus: Select exposes autoFocus to match native input-like controls.
       autoFocus={autoFocus}
       autoComplete="off"
+      onCompositionStart={() => {
+        composingRef.current = true;
+      }}
+      onCompositionEnd={() => {
+        composingRef.current = false;
+      }}
+      onBlur={() => {
+        composingRef.current = false;
+      }}
       onClick={(event) => {
         if (open) event.stopPropagation();
       }}
@@ -856,6 +929,7 @@ export function Select(props: SelectProps) {
       }}
       onKeyDown={(event) => {
         event.stopPropagation();
+        if (isComposingKey(event.nativeEvent)) return;
         handleSearchKeyDown(event);
         if (event.defaultPrevented) return;
         if (event.key === 'Escape') {
@@ -865,15 +939,15 @@ export function Select(props: SelectProps) {
         }
         if (event.key === 'ArrowDown') {
           event.preventDefault();
-          setActiveSearchIndex((index) =>
-            Math.min(index + 1, searchableOptions.length - 1),
+          setActiveSearchIndex(
+            Math.min(boundedSearchIndex + 1, lastSearchIndex),
           );
           if (!open) handleOpenChange(true);
           return;
         }
         if (event.key === 'ArrowUp') {
           event.preventDefault();
-          setActiveSearchIndex((index) => Math.max(index - 1, 0));
+          setActiveSearchIndex(Math.max(boundedSearchIndex - 1, 0));
           return;
         }
         const nextValue =
@@ -991,6 +1065,7 @@ export function Select(props: SelectProps) {
               side={side}
               align={align}
               sideOffset={4}
+              onEscapeKeyDown={handleEscapeKeyDown}
               onOpenAutoFocus={(event) => event.preventDefault()}
               onCloseAutoFocus={(event) => {
                 event.preventDefault();
@@ -1021,6 +1096,7 @@ export function Select(props: SelectProps) {
         <div
           ref={triggerRef}
           id={id}
+          {...ariaProps}
           data-tao-control=""
           data-tao-select=""
           data-tao-size={resolvedSize}
@@ -1100,6 +1176,7 @@ export function Select(props: SelectProps) {
             className={cx(classNames?.popup)}
             style={contentStyle}
             position="popper"
+            onEscapeKeyDown={handleEscapeKeyDown}
             side={side}
             align={align}
             sideOffset={4}
@@ -1137,4 +1214,4 @@ export function Select(props: SelectProps) {
       </RadixSelect.Portal>
     </RadixSelect.Root>
   );
-}
+});

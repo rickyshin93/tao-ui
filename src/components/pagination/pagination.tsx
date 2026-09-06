@@ -140,6 +140,10 @@ export function Pagination({
   const pageSize = isPageSizeControlled ? pageSizeProp : internalPageSize;
 
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const boundedCurrent = Math.min(Math.max(1, internalCurrent), totalPages);
+  if (!isCurrentControlled && boundedCurrent !== internalCurrent) {
+    setInternalCurrent(boundedCurrent);
+  }
   const pages = useMemo(
     () => computePages(current, totalPages),
     [current, totalPages],

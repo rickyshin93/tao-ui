@@ -135,7 +135,13 @@ export function Tooltip({
   return (
     <RadixTooltip.Provider delayDuration={mouseEnterDelay * 1000}>
       <RadixTooltip.Root open={realOpen} onOpenChange={handleOpenChange}>
-        <RadixTooltip.Trigger asChild {...hoverProps}>
+        <RadixTooltip.Trigger
+          asChild
+          {...hoverProps}
+          onBlur={() => {
+            pointerDriven.current = false;
+          }}
+        >
           {asTriggerChild(children)}
         </RadixTooltip.Trigger>
         <RadixTooltip.Portal>
@@ -146,6 +152,9 @@ export function Tooltip({
               style={{ ...colorStyle, ...styles?.content, ...style }}
               side={placement}
               sideOffset={4}
+              onEscapeKeyDown={() => {
+                pointerDriven.current = false;
+              }}
               {...hoverProps}
             >
               {title}

@@ -12,6 +12,7 @@ import {
   type TaoBreakpointMap,
   useBreakpoint,
 } from '../../utils/breakpoint';
+import { DialogContent } from '../../utils/dialog-content';
 import { preventParentOutsideDismiss } from '../../utils/portal';
 import {
   cx,
@@ -73,7 +74,7 @@ export interface ModalProps {
   afterClose?: () => void;
   /**
    * Unmount children when closed. Defaults to `true`.
-   * Set `false` to keep children mounted and preserve their state across open/close.
+   * Set `false` to keep children mounted while releasing modal interaction locks when hidden.
    */
   destroyOnHidden?: boolean;
   children?: ReactNode;
@@ -151,7 +152,7 @@ export function Modal({
   }
 
   // Keep-alive: when destroyOnHidden is false we force-mount the portal subtree so
-  // children retain their state, and rely on CSS (data-state="closed") to hide it.
+  // the content host can retain child state while Radix releases its modal effects.
   const keepAlive = !destroyOnHidden;
   const forceMount = keepAlive ? true : undefined;
 
@@ -164,19 +165,23 @@ export function Modal({
     >
       <Dialog.Portal forceMount={forceMount}>
         <TaoPortalScope>
-          <Dialog.Overlay
-            forceMount={forceMount}
-            data-tao-modal-overlay=""
-            className={cx(classNames?.overlay)}
-            style={stylesProp?.overlay}
-            onClick={maskClosable ? onClose : undefined}
-          />
+          {(!keepAlive || open) && (
+            <Dialog.Overlay
+              forceMount={forceMount}
+              data-tao-modal-overlay=""
+              className={cx(classNames?.overlay)}
+              style={stylesProp?.overlay}
+              onClick={maskClosable ? onClose : undefined}
+            />
+          )}
           <div
             data-tao-modal-wrap=""
             data-tao-centered={centered ? '' : undefined}
             data-tao-open={open ? '' : undefined}
           >
-            <Dialog.Content
+            <DialogContent
+              open={open}
+              keepAlive={keepAlive}
               forceMount={forceMount}
               data-tao-modal=""
               style={contentStyle}
@@ -238,7 +243,7 @@ export function Modal({
                   {footerContent}
                 </div>
               )}
-            </Dialog.Content>
+            </DialogContent>
           </div>
         </TaoPortalScope>
       </Dialog.Portal>

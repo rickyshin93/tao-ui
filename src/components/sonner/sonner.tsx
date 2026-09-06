@@ -224,11 +224,21 @@ function create(
   return id;
 }
 
-function replacePromiseToast(
+function settlePromiseToast(
   id: string,
+  generation: number | undefined,
   type: 'success' | 'error',
   options: SonnerToastOptions | ReactNode,
 ) {
+  if (
+    runtimes.get(id)?.generation !== generation ||
+    !state.toasts.some((toast) => toast.id === id && toast.phase === 'active')
+  )
+    return;
+  if (!options) {
+    dismiss(id);
+    return;
+  }
   const normalized = normalizeOptions(options);
   create(type, { ...normalized, id });
 }
@@ -568,16 +578,16 @@ export const toast = Object.assign(baseToast, {
         : { title: messages.loading, duration: 0 },
     );
 
+    const generation = runtimes.get(id)?.generation;
+
     try {
       const value = await promise;
       const success = renderPromiseState(messages.success, value);
-      if (success) replacePromiseToast(id, 'success', success);
-      else dismiss(id);
+      settlePromiseToast(id, generation, 'success', success);
       return value;
     } catch (error) {
       const failure = renderPromiseState(messages.error, error);
-      if (failure) replacePromiseToast(id, 'error', failure);
-      else dismiss(id);
+      settlePromiseToast(id, generation, 'error', failure);
       throw error;
     }
   },

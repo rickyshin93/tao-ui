@@ -129,8 +129,13 @@ export function FormItem<Values = Record<string, unknown>>({
     control: Record<string, unknown> | null,
   ) => {
     const status: FormItemValidateStatus | undefined =
-      validateStatus ?? (meta?.errors.length ? 'error' : undefined);
-    const message = help ?? meta?.errors[0];
+      validateStatus ??
+      (meta?.errors.length
+        ? 'error'
+        : meta?.warnings.length
+          ? 'warning'
+          : undefined);
+    const message = help ?? meta?.errors[0] ?? meta?.warnings[0];
     const showAsStatus = message != null && status != null;
     const errorSlot = showAsStatus ? message : undefined;
     const descriptionSlot = extra ?? (!showAsStatus ? message : undefined);
@@ -149,11 +154,20 @@ export function FormItem<Values = Record<string, unknown>>({
     ) {
       controlProps = { ...controlProps, status };
     }
-    // Keep the bound control controlled from the first render: the store has
-    // no value before registration, and `undefined` would mount the control
-    // uncontrolled only to flip controlled once a value arrives.
     if (
       controlProps &&
+      valuePropName === 'checked' &&
+      'checked' in controlProps &&
+      controlProps.checked === undefined
+    ) {
+      controlProps = { ...controlProps, checked: false };
+    }
+    // Native text controls need an empty string to stay controlled. Custom
+    // text controls receive the store value unchanged and handle their own empty value.
+    if (
+      controlProps &&
+      isValidElement(content) &&
+      (content.type === 'input' || content.type === 'textarea') &&
       valuePropName == null &&
       controlProps.value === undefined
     ) {

@@ -1,12 +1,15 @@
 import {
   type ChangeEvent,
   createContext,
+  type ForwardedRef,
+  forwardRef,
   type ReactNode,
   type Ref,
   useCallback,
   useContext,
   useEffect,
   useRef,
+  useState,
 } from 'react';
 import { type TaoSize, useTaoConfig } from '../../provider/tao-provider';
 import { mergeRefs } from '../../utils/refs';
@@ -46,18 +49,20 @@ export interface CheckboxProps {
   ref?: Ref<HTMLInputElement>;
 }
 
-export function Checkbox({
-  checked,
-  defaultChecked,
-  indeterminate,
-  disabled,
-  onChange,
-  value,
-  children,
-  classNames,
-  styles,
-  ref,
-}: CheckboxProps) {
+export const Checkbox = forwardRef(function Checkbox(
+  {
+    checked,
+    defaultChecked,
+    indeterminate,
+    disabled,
+    onChange,
+    value,
+    children,
+    classNames,
+    styles,
+  }: CheckboxProps,
+  ref: ForwardedRef<HTMLInputElement>,
+) {
   const ctx = useTaoConfig();
   const groupCtx = useContext(CheckboxGroupContext);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -110,7 +115,7 @@ export function Checkbox({
           className={cx(classNames?.indicator)}
           style={styles?.indicator}
         >
-          {resolvedChecked && !indeterminate && <CheckIcon />}
+          {!indeterminate && <CheckIcon />}
           {indeterminate && <MinusIcon />}
         </span>
       </span>
@@ -125,7 +130,7 @@ export function Checkbox({
       )}
     </label>
   );
-}
+});
 
 // ---- CheckboxGroup ----
 
@@ -144,29 +149,41 @@ export interface CheckboxGroupProps {
   children?: ReactNode;
 }
 
-export function CheckboxGroup({
-  options,
-  value = [],
-  onChange,
-  disabled,
-  direction = 'horizontal',
-  children,
-}: CheckboxGroupProps) {
+export function CheckboxGroup(props: CheckboxGroupProps) {
+  const {
+    options,
+    value,
+    defaultValue,
+    onChange,
+    disabled,
+    direction = 'horizontal',
+    children,
+  } = props;
   const ctx = useTaoConfig();
   const resolvedDisabled = disabled ?? ctx.disabled ?? false;
+  const [internalValue, setInternalValue] = useState(() => [
+    ...new Set(defaultValue ?? []),
+  ]);
+  const isControlled = 'value' in props;
+  const resolvedValue = isControlled ? (value ?? []) : internalValue;
 
   const handleItemChange = useCallback(
     (itemValue: string, checked: boolean) => {
-      const next = checked
-        ? [...value, itemValue]
-        : value.filter((v) => v !== itemValue);
+      const next = [
+        ...new Set(
+          checked
+            ? [...resolvedValue, itemValue]
+            : resolvedValue.filter((v) => v !== itemValue),
+        ),
+      ];
+      if (!isControlled) setInternalValue(next);
       onChange?.(next);
     },
-    [value, onChange],
+    [resolvedValue, onChange, isControlled],
   );
 
   const groupCtxValue: CheckboxGroupContextValue = {
-    value,
+    value: resolvedValue,
     disabled: resolvedDisabled,
     onChange: handleItemChange,
   };

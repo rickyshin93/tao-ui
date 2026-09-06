@@ -154,6 +154,30 @@ export function Table<T extends TableRecord = Record<string, unknown>>({
     },
   );
 
+  const resolvedSort = useMemo(() => {
+    for (let i = 0; i < columns.length; i++) {
+      const col = columns[i];
+      const key = getColKey(col, i);
+      const order =
+        col.sortOrder !== undefined
+          ? col.sortOrder
+          : sortKey === key
+            ? sortOrder
+            : null;
+      if (order) return { key, order };
+    }
+    return { key: null, order: null };
+  }, [columns, sortKey, sortOrder]);
+  const resolvedFilterValues = useMemo(() => {
+    const values = { ...filterValues };
+    for (let i = 0; i < columns.length; i++) {
+      const col = columns[i];
+      if (col.filteredValue !== undefined)
+        values[getColKey(col, i)] = col.filteredValue;
+    }
+    return values;
+  }, [columns, filterValues]);
+
   // ---- Pagination state ----
   const hasPagination = paginationProp !== false;
   const paginationConfig =
@@ -228,7 +252,7 @@ export function Table<T extends TableRecord = Record<string, unknown>>({
           pageSize,
           colKey,
           nextSortOrder(col.sortOrder),
-          filterValues,
+          resolvedFilterValues,
         );
         return;
       }
@@ -236,21 +260,28 @@ export function Table<T extends TableRecord = Record<string, unknown>>({
       const newKey = next === null ? null : colKey;
       setSortKey(newKey);
       setSortOrder(next);
-      triggerChange(currentPage, pageSize, newKey, next, filterValues);
+      triggerChange(currentPage, pageSize, newKey, next, resolvedFilterValues);
     },
-    [sortKey, sortOrder, currentPage, pageSize, filterValues, triggerChange],
+    [
+      sortKey,
+      sortOrder,
+      currentPage,
+      pageSize,
+      resolvedFilterValues,
+      triggerChange,
+    ],
   );
 
   // ---- Handle filter ----
   const handleFilter = useCallback(
     (colKey: string, values: string[]) => {
-      const next = { ...filterValues, [colKey]: values };
+      const next = { ...resolvedFilterValues, [colKey]: values };
       setFilterValues(next);
       // Reset to page 1 on filter change
       setInternalPage(1);
-      triggerChange(1, pageSize, sortKey, sortOrder, next);
+      triggerChange(1, pageSize, resolvedSort.key, resolvedSort.order, next);
     },
-    [filterValues, pageSize, sortKey, sortOrder, triggerChange],
+    [resolvedFilterValues, pageSize, resolvedSort, triggerChange],
   );
 
   // ---- Handle pagination ----
@@ -258,9 +289,15 @@ export function Table<T extends TableRecord = Record<string, unknown>>({
     (page: number, ps: number) => {
       setInternalPage(page);
       setInternalPageSize(ps);
-      triggerChange(page, ps, sortKey, sortOrder, filterValues);
+      triggerChange(
+        page,
+        ps,
+        resolvedSort.key,
+        resolvedSort.order,
+        resolvedFilterValues,
+      );
     },
-    [sortKey, sortOrder, filterValues, triggerChange],
+    [resolvedSort, resolvedFilterValues, triggerChange],
   );
 
   // ---- Process data: filter → sort → paginate ----
@@ -313,6 +350,15 @@ export function Table<T extends TableRecord = Record<string, unknown>>({
 
   // ---- Paginate ----
   const totalForPagination = paginationConfig?.total ?? processedData.length;
+  const lastPage = Math.max(1, Math.ceil(totalForPagination / pageSize));
+  const boundedPage = Math.min(Math.max(1, internalPage), lastPage);
+  if (
+    hasPagination &&
+    paginationConfig?.current === undefined &&
+    boundedPage !== internalPage
+  ) {
+    setInternalPage(boundedPage);
+  }
   const paginatedData = useMemo(() => {
     if (!hasPagination) return processedData;
     // If user provides total, assume server-side pagination — show all data as-is
@@ -324,46 +370,72 @@ export function Table<T extends TableRecord = Record<string, unknown>>({
   // ---- Row selection ----
   const selectionColWidth = rowSelection?.columnWidth ?? 48;
   const selectionType = rowSelection?.type ?? 'checkbox';
-  const selectedKeys = rowSelection?.selectedRowKeys ?? [];
+  const isSelectionControlled = rowSelection?.selectedRowKeys !== undefined;
+  const [internalSelectedKeys, setInternalSelectedKeys] = useState<React.Key[]>(
+    [],
+  );
+  const selectedKeys = rowSelection?.selectedRowKeys ?? internalSelectedKeys;
+  const selectedKeySet = useMemo(() => new Set(selectedKeys), [selectedKeys]);
+  const selectablePageKeys = useMemo(
+    () =>
+      paginatedData
+        .filter((record) => !rowSelection?.getCheckboxProps?.(record)?.disabled)
+        .map((record) => getRowKey(record, rowKey)),
+    [paginatedData, rowSelection, rowKey],
+  );
 
   const handleSelectRow = useCallback(
     (key: React.Key) => {
-      if (!rowSelection?.onChange) return;
       let nextKeys: React.Key[];
       if (selectionType === 'radio') {
         nextKeys = [key];
       } else {
-        nextKeys = selectedKeys.includes(key)
+        nextKeys = selectedKeySet.has(key)
           ? selectedKeys.filter((k) => k !== key)
           : [...selectedKeys, key];
       }
+      if (!isSelectionControlled) setInternalSelectedKeys(nextKeys);
+      if (!rowSelection?.onChange) return;
+      const nextKeySet = new Set(nextKeys);
       const nextRows = dataSource.filter((r) =>
-        nextKeys.includes(getRowKey(r, rowKey)),
+        nextKeySet.has(getRowKey(r, rowKey)),
       );
       rowSelection.onChange(nextKeys, nextRows);
     },
-    [rowSelection, selectionType, selectedKeys, dataSource, rowKey],
+    [
+      rowSelection,
+      selectionType,
+      isSelectionControlled,
+      selectedKeys,
+      selectedKeySet,
+      dataSource,
+      rowKey,
+    ],
   );
 
   const handleSelectAll = useCallback(
     (checked: boolean) => {
-      if (!rowSelection?.onChange) return;
-      if (checked) {
-        const allKeys = paginatedData
-          .filter((r) => {
-            const props = rowSelection.getCheckboxProps?.(r);
-            return !props?.disabled;
-          })
-          .map((r) => getRowKey(r, rowKey));
-        const nextRows = dataSource.filter((r) =>
-          allKeys.includes(getRowKey(r, rowKey)),
-        );
-        rowSelection.onChange(allKeys, nextRows);
-      } else {
-        rowSelection.onChange([], []);
+      const nextKeySet = new Set(selectedKeys);
+      for (const key of selectablePageKeys) {
+        if (checked) nextKeySet.add(key);
+        else nextKeySet.delete(key);
       }
+      const nextKeys = [...nextKeySet];
+      if (!isSelectionControlled) setInternalSelectedKeys(nextKeys);
+      if (!rowSelection?.onChange) return;
+      const nextRows = dataSource.filter((record) =>
+        nextKeySet.has(getRowKey(record, rowKey)),
+      );
+      rowSelection.onChange(nextKeys, nextRows);
     },
-    [rowSelection, paginatedData, dataSource, rowKey],
+    [
+      rowSelection,
+      selectedKeys,
+      selectablePageKeys,
+      dataSource,
+      rowKey,
+      isSelectionControlled,
+    ],
   );
 
   // ---- Scroll + sticky columns ----
@@ -450,13 +522,13 @@ export function Table<T extends TableRecord = Record<string, unknown>>({
     ? { minWidth: typeof scroll.x === 'number' ? `${scroll.x}px` : scroll.x }
     : {};
 
+  const selectedPageCount = selectablePageKeys.filter((key) =>
+    selectedKeySet.has(key),
+  ).length;
   const isAllSelected =
-    paginatedData.length > 0 &&
-    paginatedData
-      .filter((r) => !rowSelection?.getCheckboxProps?.(r)?.disabled)
-      .every((r) => selectedKeys.includes(getRowKey(r, rowKey)));
-
-  const isIndeterminate = !isAllSelected && selectedKeys.length > 0;
+    selectablePageKeys.length > 0 &&
+    selectedPageCount === selectablePageKeys.length;
+  const isIndeterminate = selectedPageCount > 0 && !isAllSelected;
 
   return (
     <div
@@ -525,6 +597,7 @@ export function Table<T extends TableRecord = Record<string, unknown>>({
                           type="checkbox"
                           aria-label="Select all rows"
                           checked={isAllSelected}
+                          disabled={selectablePageKeys.length === 0}
                           ref={(el) => {
                             if (el) el.indeterminate = isIndeterminate;
                           }}
@@ -642,7 +715,7 @@ export function Table<T extends TableRecord = Record<string, unknown>>({
             ) : (
               paginatedData.map((record, rowIdx) => {
                 const key = getRowKey(record, rowKey);
-                const isSelected = selectedKeys.includes(key);
+                const isSelected = selectedKeySet.has(key);
                 const checkboxProps = rowSelection?.getCheckboxProps?.(record);
                 const rowProps = onRow?.(record, rowIdx) ?? {};
 

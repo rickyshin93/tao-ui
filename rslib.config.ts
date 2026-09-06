@@ -29,7 +29,7 @@ export default defineConfig({
       exclude: [/[\\/]node_modules[\\/]/],
       babelLoaderOptions(opts) {
         opts.plugins ??= [];
-        opts.plugins.unshift('babel-plugin-react-compiler');
+        opts.plugins.unshift(['babel-plugin-react-compiler', { target: '18' }]);
       },
     }),
   ],

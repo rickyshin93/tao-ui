@@ -1,6 +1,7 @@
 import { beforeAll, expect, test } from '@rstest/core';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
+import { Fragment } from 'react';
 import {
   Dropdown,
   type MenuItem,
@@ -37,6 +38,37 @@ test('renders trigger; menu mounts when open', () => {
   expect(screen.getByText('Copy')).toBeTruthy();
 });
 
+test('a Fragment trigger opens the menu on click', async () => {
+  render(
+    <Dropdown menu={{ items: basicItems }}>
+      <Fragment key="trigger">
+        <span aria-hidden="true">+</span>
+        <button type="button">Fragment trigger</button>
+      </Fragment>
+    </Dropdown>,
+  );
+  await userEvent.click(
+    screen.getByRole('button', { name: 'Fragment trigger' }),
+  );
+  expect(screen.getByRole('menu')).toBeTruthy();
+});
+
+test('a single Fragment trigger regains focus after keyboard dismissal', async () => {
+  render(
+    <Dropdown menu={{ items: basicItems }}>
+      <Fragment key="trigger">
+        <button type="button">Keyboard trigger</button>
+      </Fragment>
+    </Dropdown>,
+  );
+  const trigger = screen.getByRole('button', { name: 'Keyboard trigger' });
+  trigger.focus();
+  await userEvent.keyboard('{Enter}');
+  expect(screen.getByRole('menuitem', { name: 'Edit' })).toHaveFocus();
+  await userEvent.keyboard('{Escape}');
+  await waitFor(() => expect(trigger).toHaveFocus());
+});
+
 test('menu is not in the document when closed', () => {
   render(
     <Dropdown menu={{ items: basicItems }}>
@@ -44,6 +76,46 @@ test('menu is not in the document when closed', () => {
     </Dropdown>,
   );
   expect(screen.queryByText('Edit')).toBeNull();
+});
+
+for (const config of [
+  { name: 'local disabled', providerDisabled: false, disabled: true },
+  { name: 'provider disabled', providerDisabled: true, disabled: undefined },
+]) {
+  test(`hover does not open a menu with ${config.name}`, () => {
+    const changes: boolean[] = [];
+    render(
+      <TaoProvider disabled={config.providerDisabled}>
+        <Dropdown
+          disabled={config.disabled}
+          trigger={['hover']}
+          menu={{ items: basicItems }}
+          onOpenChange={(open) => changes.push(open)}
+        >
+          <span>Hover trigger</span>
+        </Dropdown>
+      </TaoProvider>,
+    );
+    fireEvent.pointerEnter(screen.getByText('Hover trigger'));
+    expect(screen.queryByRole('menu')).toBeNull();
+    expect(changes).toEqual([]);
+  });
+}
+
+test('local disabled=false allows hover under a disabled provider', () => {
+  render(
+    <TaoProvider disabled>
+      <Dropdown
+        disabled={false}
+        trigger={['hover']}
+        menu={{ items: basicItems }}
+      >
+        <span>Hover trigger</span>
+      </Dropdown>
+    </TaoProvider>,
+  );
+  fireEvent.pointerEnter(screen.getByText('Hover trigger'));
+  expect(screen.getByRole('menu')).toBeTruthy();
 });
 
 test('item.onClick and menu.onClick both fire with the key', async () => {

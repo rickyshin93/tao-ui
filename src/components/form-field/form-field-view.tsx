@@ -62,6 +62,7 @@ export function FormFieldView({
   const childId =
     typeof child?.props.id === 'string' ? child.props.id : undefined;
   const controlId = htmlFor ?? childId ?? `${generatedId}-control`;
+  const labelId = `${generatedId}-label`;
   const descriptionId = `${generatedId}-description`;
   const errorId = `${generatedId}-error`;
   const childDescribedBy =
@@ -78,9 +79,13 @@ export function FormFieldView({
     ? cloneElement(child, {
         ...controlProps,
         id: controlId,
+        'aria-labelledby':
+          child.props['aria-labelledby'] ??
+          (label != null && !child.props['aria-label'] ? labelId : undefined),
         'aria-describedby': describedBy || undefined,
-        'aria-errormessage': error ? errorId : undefined,
-        'aria-invalid': error ? true : child.props['aria-invalid'],
+        'aria-errormessage':
+          error && !warning ? errorId : child.props['aria-errormessage'],
+        'aria-invalid': error && !warning ? true : child.props['aria-invalid'],
         'aria-required': required ? true : child.props['aria-required'],
       })
     : children;
@@ -94,6 +99,7 @@ export function FormFieldView({
     >
       {label != null && (
         <label
+          id={labelId}
           htmlFor={controlId}
           className={classNames?.label}
           style={styles?.label}

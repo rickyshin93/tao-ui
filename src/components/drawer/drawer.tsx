@@ -8,6 +8,7 @@ import {
   useState,
 } from 'react';
 import { TaoPortalScope } from '../../provider/tao-provider';
+import { DialogContent } from '../../utils/dialog-content';
 import { preventParentOutsideDismiss } from '../../utils/portal';
 import {
   cx,
@@ -70,7 +71,7 @@ export interface DrawerProps {
   afterClose?: () => void;
   /**
    * Unmount children when closed. Defaults to `true`.
-   * Set `false` to keep children mounted and preserve their state across open/close.
+   * Set `false` to keep children mounted while releasing modal interaction locks when hidden.
    */
   destroyOnHidden?: boolean;
   children?: ReactNode;
@@ -185,7 +186,7 @@ export function Drawer({
     >
       <Dialog.Portal forceMount={forceMount}>
         <TaoPortalScope>
-          {mask && (
+          {mask && (!keepAlive || open) && (
             <Dialog.Overlay
               forceMount={forceMount}
               data-tao-drawer-overlay=""
@@ -194,8 +195,10 @@ export function Drawer({
               onClick={maskClosable ? onClose : undefined}
             />
           )}
-          <Dialog.Content
-            ref={contentRef}
+          <DialogContent
+            open={open}
+            keepAlive={keepAlive}
+            contentRef={contentRef}
             forceMount={forceMount}
             data-tao-drawer=""
             data-tao-placement={placement}
@@ -280,7 +283,7 @@ export function Drawer({
                 {footer}
               </div>
             )}
-          </Dialog.Content>
+          </DialogContent>
         </TaoPortalScope>
       </Dialog.Portal>
     </Dialog.Root>

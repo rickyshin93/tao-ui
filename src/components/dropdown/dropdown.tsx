@@ -1,7 +1,6 @@
 import * as RD from '@radix-ui/react-dropdown-menu';
 import {
   type CSSProperties,
-  isValidElement,
   type ReactNode,
   useCallback,
   useRef,
@@ -12,6 +11,7 @@ import {
   type TaoSize,
   useTaoConfig,
 } from '../../provider/tao-provider';
+import { asTriggerChild } from '../../utils/overlay';
 import {
   cx,
   type SemanticClassNames,
@@ -173,18 +173,14 @@ export function Dropdown(props: DropdownProps) {
   );
   const openOnHover = useCallback(() => {
     clearTimeout(closeTimer.current);
-    setOpen(true);
-  }, [setOpen]);
+    if (!resolvedDisabled) setOpen(true);
+  }, [resolvedDisabled, setOpen]);
   const closeOnHover = useCallback(() => {
     closeTimer.current = setTimeout(() => setOpen(false), 120);
   }, [setOpen]);
 
   const content = useMenuController(menu, DD, { classNames, styles });
-  const triggerChild = isValidElement(children) ? (
-    children
-  ) : (
-    <span>{children}</span>
-  );
+  const triggerChild = asTriggerChild(children);
 
   // Right-click → delegate to the standalone ContextMenu component.
   if (isContext) {

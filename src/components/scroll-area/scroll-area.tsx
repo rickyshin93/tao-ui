@@ -108,8 +108,12 @@ export function ScrollArea({
       hasHorizontal: hasH,
       thumbYRatio: hasV ? clientHeight / scrollHeight : 0,
       thumbXRatio: hasH ? clientWidth / scrollWidth : 0,
-      thumbYOffset: hasV ? scrollTop / (scrollHeight - clientHeight) : 0,
-      thumbXOffset: hasH ? scrollLeft / (scrollWidth - clientWidth) : 0,
+      thumbYOffset: hasV
+        ? Math.max(0, Math.min(1, scrollTop / (scrollHeight - clientHeight)))
+        : 0,
+      thumbXOffset: hasH
+        ? Math.max(0, Math.min(1, scrollLeft / (scrollWidth - clientWidth)))
+        : 0,
       atTop: scrollTop <= 1,
       atBottom: scrollTop + clientHeight >= scrollHeight - 1,
       atLeft: scrollLeft <= 1,
@@ -155,44 +159,62 @@ export function ScrollArea({
   );
 
   // ---- Thumb drag ----
-  const dragging = useRef<{
-    axis: 'x' | 'y';
-    startPos: number;
-    startScroll: number;
-  } | null>(null);
+  const dragCleanup = useRef<(() => void) | null>(null);
+  useEffect(() => () => dragCleanup.current?.(), []);
 
   const handleThumbPointerDown = useCallback(
     (axis: 'x' | 'y', e: React.PointerEvent) => {
       e.preventDefault();
       e.stopPropagation();
+      dragCleanup.current?.();
       const el = viewportRef.current;
       if (!el) return;
 
+      const thumb = e.currentTarget;
+      const track = thumb.parentElement;
+      if (!track) return;
       const pos = axis === 'y' ? e.clientY : e.clientX;
       const scroll = axis === 'y' ? el.scrollTop : el.scrollLeft;
-      dragging.current = { axis, startPos: pos, startScroll: scroll };
+      const pointerId = e.pointerId;
 
       const handleMove = (ev: PointerEvent) => {
-        if (!dragging.current || !viewportRef.current) return;
-        const { axis: a, startPos: sp, startScroll: ss } = dragging.current;
-        const delta = (a === 'y' ? ev.clientY : ev.clientX) - sp;
+        if (ev.pointerId !== pointerId || !viewportRef.current) return;
+        const delta = (axis === 'y' ? ev.clientY : ev.clientX) - pos;
         const vp = viewportRef.current;
-        const trackSize = a === 'y' ? vp.clientHeight : vp.clientWidth;
-        const contentSize = a === 'y' ? vp.scrollHeight : vp.scrollWidth;
-        const scrollDelta = (delta / trackSize) * contentSize;
+        const trackRect = track.getBoundingClientRect();
+        const thumbRect = thumb.getBoundingClientRect();
+        const travel =
+          axis === 'y'
+            ? trackRect.height - thumbRect.height
+            : trackRect.width - thumbRect.width;
+        const maxScroll =
+          axis === 'y'
+            ? vp.scrollHeight - vp.clientHeight
+            : vp.scrollWidth - vp.clientWidth;
+        if (travel <= 0 || maxScroll <= 0) return;
+        const nextScroll = Math.max(
+          0,
+          Math.min(maxScroll, scroll + (delta / travel) * maxScroll),
+        );
 
-        if (a === 'y') vp.scrollTop = ss + scrollDelta;
-        else vp.scrollLeft = ss + scrollDelta;
+        if (axis === 'y') vp.scrollTop = nextScroll;
+        else vp.scrollLeft = nextScroll;
       };
 
-      const handleUp = () => {
-        dragging.current = null;
+      const cleanup = () => {
         document.removeEventListener('pointermove', handleMove);
-        document.removeEventListener('pointerup', handleUp);
+        document.removeEventListener('pointerup', handleEnd);
+        document.removeEventListener('pointercancel', handleEnd);
+        dragCleanup.current = null;
       };
+      const handleEnd = (ev: PointerEvent) => {
+        if (ev.pointerId === pointerId) cleanup();
+      };
+      dragCleanup.current = cleanup;
 
       document.addEventListener('pointermove', handleMove);
-      document.addEventListener('pointerup', handleUp);
+      document.addEventListener('pointerup', handleEnd);
+      document.addEventListener('pointercancel', handleEnd);
     },
     [],
   );
@@ -303,7 +325,8 @@ export function ScrollArea({
             className={cx(classNames?.thumb)}
             style={{
               height: `${Math.max(scrollState.thumbYRatio * 100, 10)}%`,
-              top: `${scrollState.thumbYOffset * (1 - scrollState.thumbYRatio) * 100}%`,
+              top: `${scrollState.thumbYOffset * 100}%`,
+              transform: `translateY(-${scrollState.thumbYOffset * 100}%)`,
               ...styles?.thumb,
             }}
             onPointerDown={(e) => handleThumbPointerDown('y', e)}
@@ -328,7 +351,8 @@ export function ScrollArea({
             className={cx(classNames?.thumb)}
             style={{
               width: `${Math.max(scrollState.thumbXRatio * 100, 10)}%`,
-              left: `${scrollState.thumbXOffset * (1 - scrollState.thumbXRatio) * 100}%`,
+              left: `${scrollState.thumbXOffset * 100}%`,
+              transform: `translateX(-${scrollState.thumbXOffset * 100}%)`,
               ...styles?.thumb,
             }}
             onPointerDown={(e) => handleThumbPointerDown('x', e)}

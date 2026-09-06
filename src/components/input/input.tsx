@@ -70,6 +70,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
       )}
       <input
         {...rest}
+        value={'value' in rest ? (rest.value ?? '') : undefined}
         ref={ref}
         className={classNames?.input}
         style={styles?.input}

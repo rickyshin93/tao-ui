@@ -1,6 +1,6 @@
 ---
 name: tao-ui
-description: 克制、有序、AI-native 的 React 19 组件设计系统
+description: 克制、有序、AI-native 的 React 组件设计系统，最低支持 React 18.2，兼容 React 19
 colors:
   primary: "oklch(0.205 0.01 70)"
   success: "oklch(0.555 0.14 155)"

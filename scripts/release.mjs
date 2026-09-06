@@ -111,9 +111,16 @@ try {
   }
 }
 
+run('bun', ['run', 'lint']);
+run('bun', ['run', 'typecheck']);
+run('bun', ['run', 'test:types']);
+run('bun', ['run', 'check:components']);
+run('bun', ['run', 'docs:check']);
 run('bun', ['run', 'test']);
 run('bun', ['run', 'build']);
+run('bun', ['run', 'test:package']);
 run('bun', ['run', 'build:storybook']);
+run('bun', ['run', 'doc:build']);
 run('npm', ['pack', '--dry-run']);
 
 run('git', ['add', '-A']);

@@ -1,4 +1,6 @@
 import {
+  type ForwardedRef,
+  forwardRef,
   type ChangeEvent,
   createContext,
   type ReactNode,
@@ -42,18 +44,20 @@ export interface RadioProps {
   ref?: Ref<HTMLInputElement>;
 }
 
-export function Radio({
-  value,
-  checked,
-  defaultChecked,
-  disabled,
-  onChange,
-  children,
-  name,
-  classNames,
-  styles,
-  ref,
-}: RadioProps) {
+export const Radio = forwardRef(function Radio(
+  {
+    value,
+    checked,
+    defaultChecked,
+    disabled,
+    onChange,
+    children,
+    name,
+    classNames,
+    styles,
+  }: RadioProps,
+  ref: ForwardedRef<HTMLInputElement>,
+) {
   const ctx = useTaoConfig();
   const groupCtx = useContext(RadioGroupContext);
 
@@ -110,7 +114,7 @@ export function Radio({
       )}
     </label>
   );
-}
+});
 
 // ---- RadioGroup ----
 

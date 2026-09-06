@@ -1,8 +1,9 @@
 import { readFileSync } from 'node:fs';
-import { expect, test } from '@rstest/core';
-import { render, screen, waitFor } from '@testing-library/react';
+import { expect, rs, test } from '@rstest/core';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { Select } from '../../src/components/select/select';
+import { SearchableSelectList } from '../../src/components/select/select-searchable-list';
 import { TaoProvider } from '../../src/provider/tao-provider';
 
 test('desktop options include padding inside their popup width', () => {
@@ -15,6 +16,41 @@ test('desktop options include padding inside their popup width', () => {
 test('renders with placeholder', () => {
   render(<Select options={[]} placeholder="Pick one" />);
   expect(screen.getByText('Pick one')).toBeTruthy();
+});
+
+test.each([
+  { name: 'desktop', mobile: false, showSearch: false },
+  { name: 'searchable', mobile: false, showSearch: true },
+  { name: 'mobile', mobile: true, showSearch: false },
+])('forwards explicit field accessibility props to the $name control', ({
+  mobile,
+  showSearch,
+}) => {
+  render(
+    <>
+      <p id="select-help">Preferred interface language</p>
+      <p id="select-error">Unavailable language</p>
+      <Select
+        id="named-select"
+        mobile={mobile}
+        showSearch={showSearch}
+        defaultValue="zh"
+        options={[{ label: 'Chinese', value: 'zh' }]}
+        aria-label="Interface language"
+        aria-describedby="select-help"
+        aria-errormessage="select-error"
+        aria-invalid="true"
+        aria-required="true"
+      />
+    </>,
+  );
+  const control = screen.getByRole(mobile ? 'button' : 'combobox', {
+    name: 'Interface language',
+  });
+  expect(control).toHaveAttribute('id', 'named-select');
+  expect(control).toHaveAccessibleDescription('Preferred interface language');
+  expect(control).toHaveAccessibleErrorMessage('Unavailable language');
+  expect(control).toHaveAttribute('aria-required', 'true');
 });
 
 test('displays selected option label', () => {
@@ -811,4 +847,494 @@ test('mobile + multiple: Done commits and closes drawer', async () => {
   expect(committed).toEqual(['a', 'b']);
   // Dialog closed after Done
   expect(screen.queryByRole('dialog')).toBeNull();
+});
+
+test.each([
+  undefined,
+  'multiple',
+  'tags',
+] as const)('%s mode keeps defaultValue editable when value is omitted', async (mode) => {
+  render(
+    <Select
+      mode={mode}
+      mobile={false}
+      open
+      defaultValue={mode ? ['a'] : 'a'}
+      options={[
+        { label: 'Alpha', value: 'a' },
+        { label: 'Beta', value: 'b' },
+      ]}
+    />,
+  );
+  expect(document.querySelector('[data-tao-select]')).toHaveTextContent(
+    'Alpha',
+  );
+  await userEvent.click(screen.getByRole('option', { name: 'Beta' }));
+  expect(document.querySelector('[data-tao-select]')).toHaveTextContent('Beta');
+  if (mode)
+    expect(document.querySelectorAll('[data-tao-select-tag]')).toHaveLength(2);
+  else
+    expect(document.querySelector('[data-tao-select]')).not.toHaveTextContent(
+      'Alpha',
+    );
+});
+
+test('token separators normalize labels, ignore disabled options and deduplicate canonical values', () => {
+  const onChange = rs.fn();
+  const onSelect = rs.fn();
+  const alpha = { label: 'Alpha', value: 'a' };
+  render(
+    <Select
+      mobile={false}
+      mode="multiple"
+      showSearch
+      options={[alpha, { label: 'Beta', value: 'b', disabled: true }]}
+      tokenSeparators={[',', ';']}
+      onChange={onChange}
+      onSelect={onSelect}
+      maxCount={1}
+    />,
+  );
+  const input = screen.getByRole('combobox');
+  fireEvent.change(input, { target: { value: 'Alpha,a;b,unknown,' } });
+  fireEvent.keyDown(input, { key: 'Enter' });
+  expect(onChange).toHaveBeenCalledWith(['a'], [alpha]);
+  expect(onSelect).toHaveBeenCalledTimes(1);
+  expect(onSelect).toHaveBeenCalledWith('a', alpha);
+});
+
+test('tags separators preserve new tags and existing selections without duplicates', () => {
+  const onChange = rs.fn();
+  render(
+    <Select
+      mobile={false}
+      mode="tags"
+      showSearch
+      options={[{ label: 'Alpha', value: 'a' }]}
+      defaultValue={['a']}
+      tokenSeparators={[',']}
+      onChange={onChange}
+    />,
+  );
+  const input = screen.getByRole('combobox');
+  fireEvent.change(input, { target: { value: 'Alpha,new,new,' } });
+  fireEvent.keyDown(input, { key: 'Enter' });
+  expect(onChange).toHaveBeenCalledWith(
+    ['a', 'new'],
+    [{ label: 'Alpha', value: 'a' }],
+  );
+});
+
+test('token separators retain controlled selection and enforce maxCount after normalization', () => {
+  const onChange = rs.fn();
+  render(
+    <Select
+      mobile={false}
+      mode="multiple"
+      showSearch
+      options={[
+        { label: 'Alpha', value: 'a' },
+        { label: 'Beta', value: 'b' },
+      ]}
+      value={['a']}
+      tokenSeparators={[',']}
+      maxCount={1}
+      onChange={onChange}
+    />,
+  );
+  const input = screen.getByRole('combobox');
+  fireEvent.change(input, { target: { value: 'Beta,' } });
+  fireEvent.keyDown(input, { key: 'Enter' });
+  expect(onChange).not.toHaveBeenCalled();
+  expect(document.querySelectorAll('[data-tao-select-tag]')).toHaveLength(1);
+});
+
+test.each([
+  'local',
+  'provider',
+])('mobile Select respects %s disabled on pointer and keyboard activation', async (source) => {
+  const onOpenChange = rs.fn();
+  render(
+    <TaoProvider disabled={source === 'provider'}>
+      <Select
+        mobile
+        disabled={source === 'local' ? true : undefined}
+        placeholder="Pick"
+        options={[{ label: 'Alpha', value: 'a' }]}
+        onOpenChange={onOpenChange}
+      />
+    </TaoProvider>,
+  );
+  const trigger = screen.getByRole('button', { name: 'Pick' });
+  await userEvent.click(trigger);
+  fireEvent.keyDown(trigger, { key: 'Enter' });
+  fireEvent.keyDown(trigger, { key: ' ' });
+  expect(onOpenChange).not.toHaveBeenCalled();
+  expect(screen.queryByRole('dialog')).toBeNull();
+  expect(trigger).toHaveAttribute('data-disabled');
+});
+
+test.each([
+  'single',
+  'multiple',
+])('mobile %s selection becomes disabled while its drawer is open', async (mode) => {
+  const onChange = rs.fn();
+  const select = (disabled: boolean) => (
+    <TaoProvider disabled={disabled}>
+      <Select
+        mobile
+        defaultOpen
+        mode={mode === 'multiple' ? 'multiple' : undefined}
+        showSearch
+        options={[{ label: 'Alpha', value: 'a' }]}
+        onChange={onChange}
+      />
+    </TaoProvider>
+  );
+  const { rerender } = render(select(false));
+  if (mode === 'multiple')
+    await userEvent.click(screen.getByRole('button', { name: 'Alpha' }));
+  rerender(select(true));
+  const option = screen.getByRole('button', { name: 'Alpha' });
+  expect(option).toBeDisabled();
+  expect(screen.getByPlaceholderText('Search...')).toBeDisabled();
+  await userEvent.click(option);
+  if (mode === 'multiple') {
+    const done = screen.getByRole('button', { name: 'Done' });
+    expect(done).toBeDisabled();
+    await userEvent.click(done);
+  }
+  expect(onChange).not.toHaveBeenCalled();
+});
+
+test('local disabled=false still overrides mobile Select provider disabled', async () => {
+  const onChange = rs.fn();
+  render(
+    <TaoProvider disabled>
+      <Select
+        mobile
+        disabled={false}
+        placeholder="Pick"
+        options={[{ label: 'Alpha', value: 'a' }]}
+        onChange={onChange}
+      />
+    </TaoProvider>,
+  );
+  await userEvent.click(screen.getByRole('button', { name: 'Pick' }));
+  await userEvent.click(screen.getByRole('button', { name: 'Alpha' }));
+  expect(onChange).toHaveBeenCalledWith('a', { label: 'Alpha', value: 'a' });
+});
+
+test.each([
+  'Enter',
+  'Escape',
+  'ArrowDown',
+  'ArrowUp',
+])('Select leaves %s to the input method during composition', (key) => {
+  const onChange = rs.fn();
+  render(
+    <Select
+      mobile={false}
+      showSearch
+      mode="tags"
+      options={[
+        { label: 'Alpha', value: 'a' },
+        { label: 'Beta', value: 'b' },
+      ]}
+      filterOption={() => true}
+      onChange={onChange}
+    />,
+  );
+  const input = screen.getByRole('combobox');
+  fireEvent.change(input, { target: { value: '中文' } });
+  if (key === 'ArrowUp') fireEvent.keyDown(input, { key: 'ArrowDown' });
+  const activeOption = input.getAttribute('aria-activedescendant');
+  fireEvent.compositionStart(input);
+  fireEvent.keyDown(input, { key });
+  expect(onChange).not.toHaveBeenCalled();
+  expect(input).toHaveValue('中文');
+  expect(input).toHaveAttribute('aria-expanded', 'true');
+  expect(input.getAttribute('aria-activedescendant')).toBe(activeOption);
+});
+
+test.each([
+  { isComposing: true },
+  { keyCode: 229 },
+])('Select ignores native composing Enter %j', (nativeState) => {
+  const onChange = rs.fn();
+  render(
+    <Select
+      mobile={false}
+      showSearch
+      mode="tags"
+      options={[]}
+      onChange={onChange}
+    />,
+  );
+  const input = screen.getByRole('combobox');
+  fireEvent.change(input, { target: { value: '中文' } });
+  fireEvent.keyDown(input, { key: 'Enter', ...nativeState });
+  expect(onChange).not.toHaveBeenCalled();
+  expect(input).toHaveValue('中文');
+});
+
+test('Select defers token separators until composition ends and then accepts normal submission', () => {
+  const onChange = rs.fn();
+  render(
+    <Select
+      mobile={false}
+      showSearch
+      mode="tags"
+      tokenSeparators={[',']}
+      options={[]}
+      onChange={onChange}
+    />,
+  );
+  const input = screen.getByRole('combobox');
+  fireEvent.compositionStart(input);
+  fireEvent.change(input, { target: { value: '中文,' } });
+  fireEvent.keyDown(input, { key: ',' });
+  expect(onChange).not.toHaveBeenCalled();
+  expect(input).toHaveValue('中文,');
+  fireEvent.compositionEnd(input);
+  fireEvent.keyDown(input, { key: 'Enter' });
+  expect(onChange).toHaveBeenCalledWith(['中文'], []);
+  expect(input).toHaveValue('');
+});
+
+test('search highlight uses the visible index when dynamic options shrink and grow', () => {
+  const onChange = rs.fn();
+  const options = Array.from({ length: 10 }, (_, index) => ({
+    value: String(index),
+    label: `Item ${index}`,
+  }));
+  const { rerender } = render(
+    <Select
+      mobile={false}
+      showSearch
+      defaultOpen
+      options={options}
+      onChange={onChange}
+    />,
+  );
+  const input = screen.getByRole('combobox');
+  for (let index = 0; index < 9; index++)
+    fireEvent.keyDown(input, { key: 'ArrowDown' });
+  rerender(
+    <Select
+      mobile={false}
+      showSearch
+      defaultOpen
+      options={options.slice(0, 2)}
+      onChange={onChange}
+    />,
+  );
+  expect(onChange).not.toHaveBeenCalled();
+  fireEvent.keyDown(input, { key: 'ArrowUp' });
+  fireEvent.keyDown(input, { key: 'Enter' });
+  expect(onChange).toHaveBeenLastCalledWith('0', options[0]);
+  fireEvent.keyDown(input, { key: 'ArrowDown' });
+  rerender(
+    <Select
+      mobile={false}
+      showSearch
+      defaultOpen
+      options={options}
+      onChange={onChange}
+    />,
+  );
+  fireEvent.keyDown(input, { key: 'Enter' });
+  expect(onChange).toHaveBeenLastCalledWith('1', options[1]);
+});
+
+test('shrinking and restoring search results does not revive an out-of-range highlight', () => {
+  const onChange = rs.fn();
+  const options = Array.from({ length: 10 }, (_, index) => ({
+    value: String(index),
+    label: `Item ${index}`,
+  }));
+  const { rerender } = render(
+    <Select
+      mobile={false}
+      showSearch
+      defaultOpen
+      options={options}
+      onChange={onChange}
+    />,
+  );
+  const input = screen.getByRole('combobox');
+  for (let index = 0; index < 9; index++)
+    fireEvent.keyDown(input, { key: 'ArrowDown' });
+  rerender(
+    <Select
+      mobile={false}
+      showSearch
+      defaultOpen
+      options={options.slice(0, 2)}
+      onChange={onChange}
+    />,
+  );
+  rerender(
+    <Select
+      mobile={false}
+      showSearch
+      defaultOpen
+      options={options}
+      onChange={onChange}
+    />,
+  );
+  expect(onChange).not.toHaveBeenCalled();
+  fireEvent.keyDown(input, { key: 'Enter' });
+  expect(onChange).toHaveBeenCalledWith('1', options[1]);
+});
+
+test('ArrowDown with no search results still permits Enter after async options arrive', () => {
+  const onChange = rs.fn();
+  const option = { value: 'a', label: 'Alpha' };
+  const { rerender } = render(
+    <Select
+      mobile={false}
+      showSearch
+      defaultOpen
+      options={[]}
+      onChange={onChange}
+    />,
+  );
+  const input = screen.getByRole('combobox');
+  fireEvent.keyDown(input, { key: 'ArrowDown' });
+  rerender(
+    <Select
+      mobile={false}
+      showSearch
+      defaultOpen
+      options={[option]}
+      onChange={onChange}
+    />,
+  );
+  expect(onChange).not.toHaveBeenCalled();
+  fireEvent.keyDown(input, { key: 'Enter' });
+  expect(onChange).toHaveBeenCalledWith('a', option);
+});
+
+test('search highlight is normalized when options become disabled', () => {
+  const onChange = rs.fn();
+  const options = Array.from({ length: 4 }, (_, index) => ({
+    value: String(index),
+    label: `Item ${index}`,
+  }));
+  const { rerender } = render(
+    <Select
+      mobile={false}
+      showSearch
+      defaultOpen
+      options={options}
+      onChange={onChange}
+    />,
+  );
+  const input = screen.getByRole('combobox');
+  for (let index = 0; index < 3; index++)
+    fireEvent.keyDown(input, { key: 'ArrowDown' });
+  rerender(
+    <Select
+      mobile={false}
+      showSearch
+      defaultOpen
+      options={options.map((option, index) => ({
+        ...option,
+        disabled: index > 1,
+      }))}
+      onChange={onChange}
+    />,
+  );
+  expect(onChange).not.toHaveBeenCalled();
+  fireEvent.keyDown(input, { key: 'ArrowUp' });
+  fireEvent.keyDown(input, { key: 'Enter' });
+  expect(onChange).toHaveBeenCalledWith('0', {
+    ...options[0],
+    disabled: false,
+  });
+});
+
+test('grouped searchable optionRender indexes include disabled leaves while keyboard indexes skip them', () => {
+  const onChange = rs.fn();
+  const onDeselect = rs.fn();
+  const alpha = { value: 'a', label: 'Alpha' };
+  const beta = { value: 'b', label: 'Beta' };
+  render(
+    <Select
+      mobile={false}
+      showSearch
+      defaultOpen
+      mode="multiple"
+      defaultValue={['a']}
+      maxCount={2}
+      options={[
+        {
+          value: 'group',
+          label: 'Group',
+          options: [
+            { value: 'disabled', label: 'Disabled', disabled: true },
+            alpha,
+            beta,
+          ],
+        },
+        { value: 'c', label: 'Gamma' },
+      ]}
+      optionRender={(option, { index }) => (
+        <span>
+          {String(option.label)}-{index}
+        </span>
+      )}
+      onChange={onChange}
+      onDeselect={onDeselect}
+    />,
+  );
+  expect(screen.getByRole('option', { name: 'Disabled-0' })).toBeDisabled();
+  const alphaOption = screen.getByRole('option', { name: 'Alpha-1' });
+  const betaOption = screen.getByRole('option', { name: 'Beta-2' });
+  fireEvent.mouseMove(betaOption);
+  fireEvent.keyDown(screen.getByRole('combobox'), { key: 'Enter' });
+  expect(onChange).toHaveBeenLastCalledWith(['a', 'b'], [alpha, beta]);
+  expect(screen.getByRole('option', { name: 'Gamma-3' })).toBeDisabled();
+  fireEvent.mouseMove(alphaOption);
+  fireEvent.keyDown(screen.getByRole('combobox'), { key: 'Enter' });
+  expect(onChange).toHaveBeenLastCalledWith(['b'], [beta]);
+  expect(onDeselect).toHaveBeenCalledWith('a', alpha);
+});
+
+test('searchable-list highlight updates keep lookup work linear as options double', () => {
+  function measure(size: number) {
+    let reads = 0;
+    const options = Array.from({ length: size }, (_, index) => ({
+      get value() {
+        reads++;
+        return String(index);
+      },
+      label: `Measured ${index}`,
+    }));
+    const list = (activeValue: string) => (
+      <SearchableSelectList
+        id="measurement"
+        options={options}
+        resultCount={size}
+        searchableOptions={options}
+        activeValue={activeValue}
+        selectedValues={[]}
+        multiple={false}
+        maxCountReached={false}
+        listHeight={200}
+        notFoundContent="Empty"
+        onActiveIndexChange={() => {}}
+        onValueChange={() => {}}
+        onClose={() => {}}
+      />
+    );
+    const { rerender, unmount } = render(list('0'));
+    reads = 0;
+    rerender(list('1'));
+    const count = reads;
+    unmount();
+    return count;
+  }
+  expect(measure(400)).toBeLessThanOrEqual(measure(200) * 2.5);
 });

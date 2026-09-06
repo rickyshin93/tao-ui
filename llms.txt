@@ -1,6 +1,6 @@
 # @rockshin/tao-ui
 
-> A modern React 19 component library with semantic DOM customization and OKLCH-based theming.
+> A component library for React 18.2 and 19 with semantic DOM customization and OKLCH-based theming.
 
 ## Install
 
@@ -8,8 +8,10 @@
 npm install @rockshin/tao-ui
 ```
 
-Peer dependencies: `react >=19`, `react-dom >=19`, `dayjs >=1.11`.
-Import from the package root. The package entry imports tao-ui CSS side effects automatically.
+Peer dependencies: `react ^18.2.0 || ^19.0.0`, `react-dom ^18.2.0 || ^19.0.0`. Minimum version: React and React DOM 18.2; React 19 is also supported.
+`dayjs` is a regular dependency and is installed automatically.
+Import components from subpaths such as `@rockshin/tao-ui/button` and `TaoProvider` from `@rockshin/tao-ui/provider` to load only their component dependencies and shared theme styles. No separate CSS import is needed.
+The package root remains available and includes all component styles.
 
 ## Core Concepts
 

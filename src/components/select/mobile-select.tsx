@@ -13,6 +13,7 @@ interface MobileSelectContentProps {
   onMultiChange?: (values: string[]) => void;
   placeholder?: string;
   showSearch?: boolean;
+  disabled?: boolean;
   filterOption?: (input: string, option: SelectOption) => boolean;
   notFoundContent?: ReactNode;
   optionRender?: (option: SelectOption, info: { index: number }) => ReactNode;
@@ -32,6 +33,7 @@ function MobileSelectContentInner({
   optionRender,
   onClose,
   multiple,
+  disabled,
 }: MobileSelectContentProps) {
   const [search, setSearch] = useState('');
 
@@ -55,6 +57,7 @@ function MobileSelectContentInner({
 
   const handleSelect = useCallback(
     (optValue: string) => {
+      if (disabled) return;
       if (multiple) {
         setDraft((prev) =>
           prev.includes(optValue)
@@ -66,13 +69,14 @@ function MobileSelectContentInner({
         onClose();
       }
     },
-    [multiple, onChange, onClose],
+    [multiple, onChange, onClose, disabled],
   );
 
   const handleDone = useCallback(() => {
+    if (disabled) return;
     onMultiChange?.(draft);
     onClose();
-  }, [draft, onMultiChange, onClose]);
+  }, [draft, onMultiChange, onClose, disabled]);
 
   let optIndex = 0;
   const renderItem = (opt: SelectOption): ReactNode => {
@@ -84,8 +88,8 @@ function MobileSelectContentInner({
         key={opt.value}
         data-tao-sheet-item=""
         data-tao-selected={isSelected || undefined}
-        data-tao-disabled={opt.disabled || undefined}
-        disabled={opt.disabled}
+        data-tao-disabled={disabled || opt.disabled || undefined}
+        disabled={disabled || opt.disabled}
         onClick={() => {
           handleSelect(opt.value);
         }}
@@ -135,6 +139,7 @@ function MobileSelectContentInner({
           <input
             data-tao-sheet-search-input=""
             value={search}
+            disabled={disabled}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search..."
           />
@@ -149,7 +154,12 @@ function MobileSelectContentInner({
       </div>
       {multiple && (
         <div data-tao-sheet-footer="">
-          <button type="button" data-tao-sheet-done="" onClick={handleDone}>
+          <button
+            type="button"
+            data-tao-sheet-done=""
+            disabled={disabled}
+            onClick={handleDone}
+          >
             Done
           </button>
         </div>

@@ -1,4 +1,10 @@
-import type { ButtonHTMLAttributes, ReactNode, Ref } from 'react';
+import {
+  type ForwardedRef,
+  forwardRef,
+  type ButtonHTMLAttributes,
+  type ReactNode,
+  type Ref,
+} from 'react';
 import { type TaoSize, useTaoConfig } from '../../provider/tao-provider';
 import {
   cx,
@@ -33,21 +39,23 @@ export interface ButtonProps
   styles?: SemanticStyles<ButtonSemanticPart>;
 }
 
-export function Button({
-  variant = 'primary',
-  size,
-  disabled,
-  loading,
-  icon,
-  loadingIcon,
-  children,
-  ref,
-  className,
-  style,
-  classNames,
-  styles,
-  ...rest
-}: ButtonProps) {
+export const Button = forwardRef(function Button(
+  {
+    variant = 'primary',
+    size,
+    disabled,
+    loading,
+    icon,
+    loadingIcon,
+    children,
+    className,
+    style,
+    classNames,
+    styles,
+    ...rest
+  }: ButtonProps,
+  ref: ForwardedRef<HTMLButtonElement>,
+) {
   const ctx = useTaoConfig();
   const resolvedSize = size ?? ctx.size;
   const resolvedDisabled = disabled ?? ctx.disabled ?? false;
@@ -82,7 +90,7 @@ export function Button({
       {children}
     </button>
   );
-}
+});
 
 function LoadingSpinner() {
   return (

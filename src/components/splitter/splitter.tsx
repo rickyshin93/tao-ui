@@ -53,6 +53,78 @@ function parseSize(
   return parseFloat(value);
 }
 
+function allocateSizes(
+  panels: SplitterPanelProps[],
+  previous: number[],
+  available: number,
+): number[] {
+  const initialized = previous.length === panels.length;
+  const desired = panels.map(
+    (panel, i) =>
+      parseSize(panel.size, available) ??
+      (initialized ? previous[i] : parseSize(panel.defaultSize, available)),
+  );
+  const unspecified = desired.filter((size) => size === undefined).length;
+  const remaining = Math.max(
+    0,
+    available - desired.reduce<number>((sum, size) => sum + (size ?? 0), 0),
+  );
+  const weights = desired.map((size) => size ?? remaining / unspecified);
+  const bounds = panels.map((panel, i) => {
+    const fixed = panel.size !== undefined;
+    const collapsed = !fixed && panel.collapsible && weights[i] === 0;
+    const min = collapsed
+      ? 0
+      : Math.max(0, parseSize(panel.min, available) ?? 0);
+    const max = collapsed
+      ? 0
+      : Math.max(min, parseSize(panel.max, available) ?? Infinity);
+    return { fixed, min, max };
+  });
+  const fixedTotal = weights.reduce(
+    (sum, size, i) => sum + (bounds[i].fixed ? size : 0),
+    0,
+  );
+  const flexibleTotal = weights.reduce(
+    (sum, size, i) => sum + (bounds[i].fixed ? 0 : size),
+    0,
+  );
+  const flexibleCount = bounds.filter((bound) => !bound.fixed).length;
+  const flexibleSpace = Math.max(0, available - fixedTotal);
+  const next = weights.map((size, i) => {
+    if (bounds[i].fixed) return size;
+    const share = flexibleTotal > 0 ? size / flexibleTotal : 1 / flexibleCount;
+    return Math.max(
+      bounds[i].min,
+      Math.min(bounds[i].max, flexibleSpace * share),
+    );
+  });
+
+  // Each incomplete pass exhausts at least one panel's capacity.
+  for (let pass = 0; pass < panels.length; pass++) {
+    const delta = available - next.reduce((sum, size) => sum + size, 0);
+    if (Math.abs(delta) < 0.001) break;
+    const adjustable = bounds
+      .map((_, i) => i)
+      .filter(
+        (i) =>
+          !bounds[i].fixed &&
+          (delta > 0 ? next[i] < bounds[i].max : next[i] > bounds[i].min),
+      );
+    if (adjustable.length === 0) break;
+    const totalWeight = adjustable.reduce((sum, i) => sum + weights[i], 0);
+    for (const i of adjustable) {
+      const share =
+        totalWeight > 0 ? weights[i] / totalWeight : 1 / adjustable.length;
+      next[i] = Math.max(
+        bounds[i].min,
+        Math.min(bounds[i].max, next[i] + delta * share),
+      );
+    }
+  }
+  return next;
+}
+
 // ---- Icons ----
 
 function CollapseIcon({
@@ -132,7 +204,6 @@ export function Splitter({
   // ---- Size state ----
   const [sizes, setSizes] = useState<number[]>([]);
   const [containerSize, setContainerSize] = useState(0);
-  const initialized = useRef(false);
 
   // Observe container size
   useEffect(() => {
@@ -150,74 +221,21 @@ export function Splitter({
     return () => observer.disconnect();
   }, [isHorizontal]);
 
-  // Initialize sizes
   useEffect(() => {
     if (containerSize <= 0 || panelCount === 0) return;
-    if (initialized.current && sizes.length === panelCount) return;
-
-    const draggerSpace = (panelCount - 1) * 1; // dragger width (1px line)
-    const available = containerSize - draggerSpace;
-
-    const newSizes: number[] = [];
-    let allocated = 0;
-    let unspecified = 0;
-
-    for (let i = 0; i < panelCount; i++) {
-      const p = panels[i];
-      const controlled =
-        p.size !== undefined ? parseSize(p.size, available) : undefined;
-      const def =
-        p.defaultSize !== undefined
-          ? parseSize(p.defaultSize, available)
-          : undefined;
-      const s = controlled ?? def;
-      if (s !== undefined) {
-        newSizes.push(s);
-        allocated += s;
-      } else {
-        newSizes.push(-1); // placeholder
-        unspecified++;
-      }
+    const available = Math.max(0, containerSize - (panelCount - 1));
+    const next = allocateSizes(panels, sizes, available);
+    if (
+      next.length !== sizes.length ||
+      next.some((size, i) => Math.abs(size - sizes[i]) > 0.001)
+    ) {
+      setSizes(next);
     }
-
-    const remaining = Math.max(0, available - allocated);
-    const perUnspecified = unspecified > 0 ? remaining / unspecified : 0;
-
-    for (let i = 0; i < newSizes.length; i++) {
-      if (newSizes[i] < 0) newSizes[i] = perUnspecified;
-    }
-
-    setSizes(newSizes);
-    initialized.current = true;
-  }, [containerSize, panelCount, panels, sizes.length]);
-
-  // Sync controlled sizes
-  useEffect(() => {
-    if (!initialized.current || sizes.length !== panelCount) return;
-    const draggerSpace = (panelCount - 1) * 1;
-    const available = containerSize - draggerSpace;
-
-    let changed = false;
-    const next = [...sizes];
-    for (let i = 0; i < panelCount; i++) {
-      const controlled =
-        panels[i].size !== undefined
-          ? parseSize(panels[i].size, available)
-          : undefined;
-      if (controlled !== undefined && Math.abs(controlled - next[i]) > 0.5) {
-        next[i] = controlled;
-        changed = true;
-      }
-    }
-    if (changed) setSizes(next);
   }, [containerSize, panelCount, panels, sizes]);
 
   // ---- Drag logic ----
-  const dragging = useRef<{
-    index: number;
-    startPos: number;
-    startSizes: number[];
-  } | null>(null);
+  const dragCleanup = useRef<(() => void) | null>(null);
+  useEffect(() => () => dragCleanup.current?.(), []);
 
   const resizePanels = useCallback(
     (index: number, delta: number, startSizes: number[]) => {
@@ -249,44 +267,42 @@ export function Splitter({
   const handleDragStart = useCallback(
     (index: number, e: React.PointerEvent) => {
       e.preventDefault();
+      dragCleanup.current?.();
       const pos = isHorizontal ? e.clientX : e.clientY;
-      dragging.current = { index, startPos: pos, startSizes: [...sizes] };
+      const pointerId = e.pointerId;
+      const startSizes = [...sizes];
+      let currentSizes = startSizes;
       onResizeStart?.(sizes);
 
       const handleMove = (ev: PointerEvent) => {
-        if (!dragging.current) return;
-        const { index: idx, startPos, startSizes } = dragging.current;
-        const delta = (isHorizontal ? ev.clientX : ev.clientY) - startPos;
+        if (ev.pointerId !== pointerId) return;
+        const delta = (isHorizontal ? ev.clientX : ev.clientY) - pos;
 
-        const next = resizePanels(idx, delta, startSizes);
+        const next = resizePanels(index, delta, startSizes);
+        currentSizes = next;
 
         setSizes(next);
         onResize?.(next);
       };
 
-      const handleUp = () => {
-        if (dragging.current) {
-          dragging.current = null;
-          document.removeEventListener('pointermove', handleMove);
-          document.removeEventListener('pointerup', handleUp);
-          setSizes((cur) => {
-            onResizeEnd?.(cur);
-            return cur;
-          });
-        }
+      const cleanup = () => {
+        document.removeEventListener('pointermove', handleMove);
+        document.removeEventListener('pointerup', handleEnd);
+        document.removeEventListener('pointercancel', handleEnd);
+        dragCleanup.current = null;
       };
+      const handleEnd = (ev: PointerEvent) => {
+        if (ev.pointerId !== pointerId) return;
+        cleanup();
+        onResizeEnd?.(currentSizes);
+      };
+      dragCleanup.current = cleanup;
 
       document.addEventListener('pointermove', handleMove);
-      document.addEventListener('pointerup', handleUp);
+      document.addEventListener('pointerup', handleEnd);
+      document.addEventListener('pointercancel', handleEnd);
     },
-    [
-      isHorizontal,
-      sizes,
-      onResize,
-      onResizeEnd,
-      onResizeStart,
-      resizePanels,
-    ],
+    [isHorizontal, sizes, onResize, onResizeEnd, onResizeStart, resizePanels],
   );
 
   const handleDraggerKeyDown = useCallback(

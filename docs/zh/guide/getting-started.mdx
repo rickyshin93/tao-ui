@@ -1,11 +1,11 @@
 ---
 title: 快速开始
-description: 安装 tao-ui、接入 TaoProvider，并渲染首个继承主题配置的无障碍 React 19 组件。
+description: 在 React 18.2 或 React 19 中安装 tao-ui、接入 TaoProvider，并渲染首个继承主题配置的无障碍组件。
 ---
 
 import { PackageManagerTabs } from '@rspress/core/theme';
 
-使用你偏好的包管理器安装 tao-ui。
+React 和 React DOM 最低需要 18.2，同时兼容 React 19，两者的 peer dependency 范围均为 `^18.2.0 || ^19.0.0`。日期组件使用的 `dayjs` 是普通依赖，会自动安装。使用你偏好的包管理器安装 tao-ui。
 
 <PackageManagerTabs command="install @rockshin/tao-ui" />
 
@@ -24,6 +24,21 @@ export default function App() {
   );
 }
 ```
+
+## 按组件引入
+
+按组件入口引入时，只加载对应组件及其依赖的样式，并自动包含公共主题样式，无需额外导入 CSS。现有根入口继续可用，会包含全部组件样式。
+
+```tsx
+import { Button, type ButtonProps } from '@rockshin/tao-ui/button';
+import { TaoProvider } from '@rockshin/tao-ui/provider';
+```
+
+入口使用短横线命名，例如 `/input-number`、`/range-picker`、`/form-layout`。同组导出共用入口：`CheckboxGroup` 使用 `/checkbox`，`HeadlessInputNumber` 使用 `/number-input`。
+
+## 控制字段值
+
+Input、Textarea、InputNumber、Select、DatePicker 和 RangePicker 中，显式传入 `value={undefined}` 表示受控空值。非受控字段应省略 `value`，使用 `defaultValue` 设置初始值。表单中可通过 `form.setFieldsValue({ field: undefined })` 清空字段，无需重新挂载控件。
 
 ## 使用深色模式
 

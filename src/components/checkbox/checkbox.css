@@ -64,7 +64,7 @@
 }
 
 /* Checked */
-[data-tao-checkbox][data-tao-checked] {
+[data-tao-checkbox-input]:checked + [data-tao-checkbox] {
   background: var(--tao-primary);
   border-color: var(--tao-primary);
 }
@@ -76,6 +76,12 @@
 }
 
 /* Icon color */
+[data-tao-checkbox-input]:not(:checked)
+  + [data-tao-checkbox]:not([data-tao-indeterminate])
+  [data-tao-checkbox-icon] {
+  display: none;
+}
+
 [data-tao-checkbox-icon] {
   color: white;
 }

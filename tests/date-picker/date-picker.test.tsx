@@ -1,8 +1,9 @@
-import { expect, test } from '@rstest/core';
+import { expect, rstest, test } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import dayjs from 'dayjs';
 import { DatePicker } from '../../src/components/date-picker/date-picker';
+import { Form } from '../../src/components/form';
 import { TaoProvider } from '../../src/provider/tao-provider';
 
 test('renders with placeholder', () => {
@@ -36,6 +37,34 @@ test('uncontrolled selection updates the displayed value', async () => {
   await userEvent.click(screen.getByRole('textbox'));
   await userEvent.click(screen.getByRole('button', { name: '2026-06-20' }));
   expect(screen.getByRole('textbox')).toHaveValue('2026-06-20');
+});
+
+test('Form can clear a date with undefined after the first user selection without remounting', async () => {
+  function Demo() {
+    const [form] = Form.useForm();
+    return (
+      <>
+        <Form form={form}>
+          <Form.Item name="date">
+            <DatePicker mobile={false} />
+          </Form.Item>
+        </Form>
+        <button
+          type="button"
+          onClick={() => form.setFieldsValue({ date: undefined })}
+        >
+          Clear field
+        </button>
+      </>
+    );
+  }
+  render(<Demo />);
+  const input = screen.getByRole('textbox');
+  await userEvent.type(input, '2026-06-15{Enter}');
+  expect(input).toHaveValue('2026-06-15');
+  await userEvent.click(screen.getByRole('button', { name: 'Clear field' }));
+  expect(screen.getByRole('textbox')).toBe(input);
+  expect(input).toHaveValue('');
 });
 
 test('controlled input restores the value when its change is rejected', async () => {
@@ -259,4 +288,191 @@ test('applies popup semantic customization in the mobile drawer', () => {
   expect(document.querySelector('.semantic-mobile-popup')).toHaveStyle({
     minWidth: '280px',
   });
+});
+
+test.each([
+  { picker: 'month', boundary: 'minDate', bound: '2026-06-15', target: 'May' },
+  { picker: 'month', boundary: 'maxDate', bound: '2026-06-15', target: 'Jul' },
+  { picker: 'year', boundary: 'minDate', bound: '2026-06-15', target: '2025' },
+  { picker: 'year', boundary: 'maxDate', bound: '2026-06-15', target: '2027' },
+] as const)('$picker selection respects $boundary', async ({
+  picker,
+  boundary,
+  bound,
+  target,
+}) => {
+  const onChange = rstest.fn();
+  render(
+    <DatePicker
+      picker={picker}
+      open
+      defaultValue={dayjs('2026-06-15')}
+      {...{ [boundary]: dayjs(bound) }}
+      onChange={onChange}
+    />,
+  );
+  const option = screen.getByRole('button', { name: target, exact: true });
+  expect(option).toBeDisabled();
+  await userEvent.click(option);
+  expect(onChange).not.toHaveBeenCalled();
+});
+
+test.each([
+  { picker: 'month', text: '2026-06', target: 'Jun' },
+  { picker: 'year', text: '2026', target: '2026' },
+] as const)('$picker boundary period is valid for both typing and selection', async ({
+  picker,
+  text,
+  target,
+}) => {
+  const onChange = rstest.fn();
+  const { rerender } = render(
+    <DatePicker
+      picker={picker}
+      mobile={false}
+      minDate={dayjs('2026-06-15')}
+      maxDate={dayjs('2026-06-20')}
+      onChange={onChange}
+    />,
+  );
+  await userEvent.type(screen.getByRole('textbox'), text);
+  await userEvent.keyboard('{Enter}');
+  expect(onChange).toHaveBeenLastCalledWith(expect.anything(), text);
+  onChange.mockClear();
+  rerender(
+    <DatePicker
+      picker={picker}
+      open
+      minDate={dayjs('2026-06-15')}
+      maxDate={dayjs('2026-06-20')}
+      onChange={onChange}
+    />,
+  );
+  const option = screen.getByRole('button', { name: target, exact: true });
+  expect(option).not.toBeDisabled();
+  await userEvent.click(option);
+  expect(onChange).toHaveBeenLastCalledWith(expect.anything(), text);
+});
+
+test('date picker can navigate through a partially allowed month and year', async () => {
+  const onChange = rstest.fn();
+  render(
+    <DatePicker
+      open
+      defaultValue={dayjs('2026-06-18')}
+      minDate={dayjs('2026-06-15')}
+      maxDate={dayjs('2026-06-20')}
+      onChange={onChange}
+    />,
+  );
+  await userEvent.click(
+    screen.getByRole('button', { name: 'Jun', exact: true }),
+  );
+  const month = screen.getByRole('button', { name: 'Jun', exact: true });
+  expect(month).not.toBeDisabled();
+  await userEvent.click(month);
+  await userEvent.click(
+    screen.getByRole('button', { name: '2026', exact: true }),
+  );
+  const year = screen.getByRole('button', { name: '2026', exact: true });
+  expect(year).not.toBeDisabled();
+  await userEvent.click(year);
+  await userEvent.click(
+    screen.getByRole('button', { name: 'Jan', exact: true }),
+  );
+  await userEvent.click(
+    screen.getByRole('button', { name: 'Jun', exact: true }),
+  );
+  expect(screen.getByRole('button', { name: '2026-06-14' })).toBeDisabled();
+  await userEvent.click(screen.getByRole('button', { name: '2026-06-16' }));
+  expect(onChange).toHaveBeenLastCalledWith(expect.anything(), '2026-06-16');
+});
+
+test.each([
+  {
+    name: 'minDate',
+    target: '2026-01-01',
+    props: { minDate: dayjs('2026-01-10') },
+  },
+  {
+    name: 'maxDate',
+    target: '2026-01-31',
+    props: { maxDate: dayjs('2026-01-25') },
+  },
+  {
+    name: 'disabledDate',
+    target: '2026-01-20',
+    props: { disabledDate: (date: dayjs.Dayjs) => date.date() === 20 },
+  },
+  { name: 'invalid date', target: 'invalid', props: {} },
+])('presets respect $name without changing or closing the picker', async ({
+  target,
+  props,
+}) => {
+  const onChange = rstest.fn();
+  const onOpenChange = rstest.fn();
+  render(
+    <DatePicker
+      mobile={false}
+      open
+      defaultValue={dayjs('2026-01-15')}
+      {...props}
+      presets={[{ label: 'Blocked preset', value: dayjs(target) }]}
+      onChange={onChange}
+      onOpenChange={onOpenChange}
+    />,
+  );
+  await userEvent.click(screen.getByRole('button', { name: 'Blocked preset' }));
+  expect(onChange).not.toHaveBeenCalled();
+  expect(onOpenChange).not.toHaveBeenCalled();
+  expect(screen.getByRole('textbox')).toHaveValue('2026-01-15');
+});
+
+test.each([
+  'month',
+  'year',
+] as const)('valid %s presets use the same boundary granularity as manual input', async (picker) => {
+  const onChange = rstest.fn();
+  const preset = dayjs('2026-01-01');
+  render(
+    <DatePicker
+      mobile={false}
+      open
+      picker={picker}
+      minDate={dayjs('2026-01-15')}
+      maxDate={dayjs('2026-01-20')}
+      presets={[{ label: 'Allowed period', value: preset }]}
+      onChange={onChange}
+    />,
+  );
+  await userEvent.click(screen.getByRole('button', { name: 'Allowed period' }));
+  expect(onChange).toHaveBeenCalledWith(
+    preset,
+    picker === 'month' ? '2026-01' : '2026',
+  );
+});
+
+test('preset validation follows updated boundaries without changing the preset list', async () => {
+  const presets = [{ label: 'January 10', value: dayjs('2026-01-10') }];
+  const onChange = rstest.fn();
+  const { rerender } = render(
+    <DatePicker
+      mobile={false}
+      open
+      minDate={dayjs('2026-01-01')}
+      presets={presets}
+      onChange={onChange}
+    />,
+  );
+  rerender(
+    <DatePicker
+      mobile={false}
+      open
+      minDate={dayjs('2026-01-15')}
+      presets={presets}
+      onChange={onChange}
+    />,
+  );
+  await userEvent.click(screen.getByRole('button', { name: 'January 10' }));
+  expect(onChange).not.toHaveBeenCalled();
 });

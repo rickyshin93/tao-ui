@@ -150,6 +150,17 @@ export function Popover({
     undefined,
   );
   const popupRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLElement | null>(null);
+  const setTriggerRef = useCallback((node: HTMLElement | null) => {
+    triggerRef.current = node;
+  }, []);
+  const containsFocusTarget = useCallback(
+    (target: EventTarget | null) =>
+      target instanceof Node &&
+      (triggerRef.current?.contains(target) ||
+        popupRef.current?.contains(target)),
+    [],
+  );
 
   const cancelTimers = useCallback(() => {
     clearTimeout(openTimer.current);
@@ -168,35 +179,25 @@ export function Popover({
 
   const scheduleClose = useCallback(() => {
     cancelTimers();
+    const close = () => {
+      if (!focusMode || !containsFocusTarget(document.activeElement))
+        setOpen(false);
+    };
     if (mouseLeaveDelay <= 0) {
-      setOpen(false);
+      close();
       return;
     }
-    closeTimer.current = setTimeout(
-      () => setOpen(false),
-      mouseLeaveDelay * 1000,
-    );
-  }, [cancelTimers, mouseLeaveDelay, setOpen]);
+    closeTimer.current = setTimeout(close, mouseLeaveDelay * 1000);
+  }, [cancelTimers, containsFocusTarget, focusMode, mouseLeaveDelay, setOpen]);
 
-  const handleTriggerBlur = useCallback(
+  const handleBlur = useCallback(
     (event: FocusEvent<HTMLElement>) => {
-      if (
-        focusMode &&
-        !popupRef.current?.contains(event.relatedTarget as Node | null)
-      ) {
+      if (!containsFocusTarget(event.relatedTarget)) {
+        cancelTimers();
         setOpen(false);
       }
     },
-    [focusMode, setOpen],
-  );
-
-  const handleContentBlur = useCallback(
-    (event: FocusEvent<HTMLDivElement>) => {
-      if (focusMode && !event.currentTarget.contains(event.relatedTarget)) {
-        setOpen(false);
-      }
-    },
-    [focusMode, setOpen],
+    [cancelTimers, containsFocusTarget, setOpen],
   );
 
   if (!hasPopup) return <>{children}</>;
@@ -209,8 +210,13 @@ export function Popover({
     : undefined;
   const triggerProps = {
     ...hoverProps,
-    onFocus: focusMode ? () => setOpen(true) : undefined,
-    onBlur: focusMode ? handleTriggerBlur : undefined,
+    onFocus: focusMode
+      ? () => {
+          cancelTimers();
+          setOpen(true);
+        }
+      : undefined,
+    onBlur: focusMode ? handleBlur : undefined,
     onContextMenu: contextMenuMode
       ? (event: MouseEvent<HTMLElement>) => {
           event.preventDefault();
@@ -221,7 +227,7 @@ export function Popover({
 
   return (
     <RadixPopover.Root open={realOpen} onOpenChange={setOpen}>
-      <TriggerPrimitive asChild {...triggerProps}>
+      <TriggerPrimitive asChild ref={setTriggerRef} {...triggerProps}>
         {asTriggerChild(children)}
       </TriggerPrimitive>
       <RadixPopover.Portal forceMount={shouldDestroy ? undefined : true}>
@@ -238,7 +244,11 @@ export function Popover({
             forceMount={shouldDestroy ? undefined : true}
             onOpenAutoFocus={(event) => event.preventDefault()}
             onFocusCapture={focusMode ? cancelTimers : undefined}
-            onBlurCapture={focusMode ? handleContentBlur : undefined}
+            onBlurCapture={focusMode ? handleBlur : undefined}
+            onFocusOutside={(event) => {
+              if (focusMode && containsFocusTarget(event.target))
+                event.preventDefault();
+            }}
             {...hoverProps}
           >
             <div

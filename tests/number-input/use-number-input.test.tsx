@@ -263,3 +263,243 @@ describe('uncontrolled', () => {
     expect(input.value).toBe('5');
   });
 });
+
+test.each([
+  { next: '20', display: '20', isPercentage: false },
+  { next: undefined, display: '', isPercentage: false },
+  { next: '0.25', display: '25', isPercentage: true },
+])('blur uses the latest external value after a focused update (%#)', ({
+  next,
+  display,
+  isPercentage,
+}) => {
+  const onChange = rstest.fn();
+  const onBlur = rstest.fn();
+  const { getByTestId, rerender } = render(
+    <Harness opts={{ value: '10', isPercentage, onChange, onBlur }} />,
+  );
+  const input = getByTestId('input');
+  fireEvent.focus(input);
+  rerender(<Harness opts={{ value: next, isPercentage, onChange, onBlur }} />);
+  fireEvent.blur(input);
+  expect(input).toHaveValue(display);
+  expect(onChange).toHaveBeenLastCalledWith(next ?? '');
+  expect(onBlur).toHaveBeenLastCalledWith(next ?? '');
+});
+
+test('blur restores a controlled value when its typed change is rejected', () => {
+  const onChange = rstest.fn();
+  const { getByTestId } = render(<Harness opts={{ value: '10', onChange }} />);
+  const input = getByTestId('input');
+  fireEvent.focus(input);
+  fireEvent.change(input, { target: { value: '20' } });
+  expect(onChange).toHaveBeenLastCalledWith('20');
+  fireEvent.blur(input);
+  expect(input).toHaveValue('10');
+  expect(onChange).toHaveBeenLastCalledWith('10');
+});
+
+test('accepted percentage edits retain their canonical value on blur', () => {
+  const onChange = rstest.fn();
+  const { getByTestId } = render(
+    <ControlledHarness
+      initialValue="0.1"
+      onChange={onChange}
+      opts={{
+        isPercentage: true,
+        decimalPlaces: 2,
+        padDecimalsOnBlur: 'always',
+      }}
+    />,
+  );
+  const input = getByTestId('input');
+  fireEvent.focus(input);
+  fireEvent.change(input, { target: { value: '25.5' } });
+  expect(onChange).toHaveBeenLastCalledWith('0.255');
+  fireEvent.blur(input);
+  expect(input).toHaveValue('25.5');
+  expect(onChange).toHaveBeenLastCalledWith('0.255');
+});
+
+test('uncontrolled edits retain their buffer for blur normalization', () => {
+  const onChange = rstest.fn();
+  const { getByTestId } = render(
+    <Harness
+      opts={{
+        defaultValue: '10',
+        decimalPlaces: 2,
+        padDecimalsOnBlur: 'always',
+        onChange,
+      }}
+    />,
+  );
+  const input = getByTestId('input');
+  fireEvent.focus(input);
+  fireEvent.change(input, { target: { value: '20' } });
+  fireEvent.blur(input);
+  expect(input).toHaveValue('20.00');
+  expect(onChange).toHaveBeenLastCalledWith('20.00');
+});
+
+test('accepted numeric edits still normalize on blur', () => {
+  const onChange = rstest.fn();
+  const { getByTestId } = render(
+    <ControlledHarness
+      initialValue="10"
+      onChange={onChange}
+      opts={{ decimalPlaces: 2, padDecimalsOnBlur: 'always' }}
+    />,
+  );
+  const input = getByTestId('input');
+  fireEvent.focus(input);
+  fireEvent.change(input, { target: { value: '20' } });
+  fireEvent.blur(input);
+  expect(input).toHaveValue('20.00');
+  expect(onChange).toHaveBeenLastCalledWith('20.00');
+});
+
+test.each([
+  false,
+  true,
+])('small boundaries remain stable over repeated blur (percentage=%s)', (isPercentage) => {
+  const onChange = rstest.fn();
+  const { getByTestId } = render(
+    <Harness
+      opts={{
+        defaultValue: '0',
+        min: 0.0000001,
+        decimalPlaces: 8,
+        isPercentage,
+        onChange,
+      }}
+    />,
+  );
+  const input = getByTestId('input');
+  for (let index = 0; index < 2; index++) {
+    fireEvent.focus(input);
+    fireEvent.blur(input);
+    expect(onChange).toHaveBeenLastCalledWith('0.0000001');
+    expect(input).toHaveValue(isPercentage ? '0.00001' : '0.0000001');
+  }
+});
+
+test.each([
+  false,
+  true,
+])('separator changes preserve values and repeated blur (controlled=%s)', (controlled) => {
+  const onChange = rstest.fn();
+  const opts = {
+    ...(controlled ? { value: '1234.5' } : { defaultValue: '1234.5' }),
+    onChange,
+  };
+  const { getByTestId, rerender } = render(<Harness opts={opts} />);
+  const input = getByTestId('input');
+  rerender(
+    <Harness
+      opts={{ ...opts, decimalSeparator: ',', thousandsSeparator: '.' }}
+    />,
+  );
+  expect(input).toHaveValue('1.234,5');
+  expect(onChange).not.toHaveBeenCalled();
+  fireEvent.blur(input);
+  fireEvent.blur(input);
+  expect(onChange).toHaveBeenLastCalledWith('1234.5');
+});
+
+test.each([
+  false,
+  true,
+])('percentage toggles preserve actual values in both directions (controlled=%s)', (controlled) => {
+  const onChange = rstest.fn();
+  const opts = {
+    ...(controlled ? { value: '0.5' } : { defaultValue: '0.5' }),
+    onChange,
+  };
+  const { getByTestId, rerender } = render(<Harness opts={opts} />);
+  const input = getByTestId('input');
+  rerender(<Harness opts={{ ...opts, isPercentage: true }} />);
+  expect(input).toHaveValue('50');
+  expect(onChange).not.toHaveBeenCalled();
+  fireEvent.blur(input);
+  expect(onChange).toHaveBeenLastCalledWith('0.5');
+  rerender(<Harness opts={opts} />);
+  expect(input).toHaveValue('0.5');
+  fireEvent.blur(input);
+  expect(onChange).toHaveBeenLastCalledWith('0.5');
+});
+
+test('focused separator changes preserve the current edit, trailing decimal and caret', () => {
+  const onChange = rstest.fn();
+  const opts = { value: '10', onChange };
+  const { getByTestId, rerender } = render(<Harness opts={opts} />);
+  const input = getByTestId('input') as HTMLInputElement;
+  act(() => input.focus());
+  fireEvent.change(input, { target: { value: '1234.' } });
+  input.setSelectionRange(3, 3);
+  rerender(
+    <Harness
+      opts={{ ...opts, decimalSeparator: ',', thousandsSeparator: ' ' }}
+    />,
+  );
+  expect(input).toHaveValue('1 234,');
+  expect(input.selectionStart).toBe(3);
+  expect(document.activeElement).toBe(input);
+  fireEvent.blur(input);
+  expect(input).toHaveValue('10');
+  expect(onChange).toHaveBeenLastCalledWith('10');
+});
+
+test.each([
+  '',
+  '-',
+  '12.',
+])('format mode changes preserve the intermediate edit %s', (text) => {
+  const opts = { allowNegative: true, thousandsSeparator: '' as const };
+  const { getByTestId, rerender } = render(<Harness opts={opts} />);
+  const input = getByTestId('input');
+  fireEvent.focus(input);
+  fireEvent.change(input, { target: { value: text } });
+  rerender(<Harness opts={{ ...opts, isPercentage: true }} />);
+  expect(input).toHaveValue(text === '12.' ? '1200.' : text);
+  rerender(<Harness opts={opts} />);
+  expect(input).toHaveValue(text);
+});
+
+test('format changes keep the hook canonical value stable before blur', () => {
+  const { result, rerender } = renderHook(
+    (opts: UseNumberInputOptions) => useNumberInput(opts),
+    { initialProps: { defaultValue: '1234.5' } },
+  );
+  rerender({
+    defaultValue: '1234.5',
+    decimalSeparator: ',',
+    thousandsSeparator: '.',
+  });
+  expect(result.current.value).toBe('1234.5');
+  expect(result.current.displayValue).toBe('1.234,5');
+});
+
+test('separator changes preserve a selected digit range', () => {
+  const { getByTestId, rerender } = render(
+    <Harness opts={{ defaultValue: '1234.5', thousandsSeparator: '' }} />,
+  );
+  const input = getByTestId('input') as HTMLInputElement;
+  act(() => input.focus());
+  input.setSelectionRange(2, 4);
+  rerender(
+    <Harness
+      opts={{
+        defaultValue: '1234.5',
+        decimalSeparator: ',',
+        thousandsSeparator: '.',
+      }}
+    />,
+  );
+  expect(input).toHaveValue('1.234,5');
+  expect(input.selectionStart).toBe(3);
+  expect(input.selectionEnd).toBe(5);
+  expect(input.value.slice(input.selectionStart!, input.selectionEnd!)).toBe(
+    '34',
+  );
+  expect(document.activeElement).toBe(input);
+});

@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { expect, test } from '@rstest/core';
-import { render, screen } from '@testing-library/react';
+import { expect, rs, test } from '@rstest/core';
+import { act, render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { Textarea } from '../../src/components/textarea/textarea';
 import { TaoProvider } from '../../src/provider/tao-provider';
@@ -84,6 +84,86 @@ test('autoSize marks the textarea element', () => {
   expect(screen.getByRole('textbox').hasAttribute('data-tao-autosize')).toBe(
     true,
   );
+});
+
+test('autoSize responds to width changes, respects maxRows and releases observation', () => {
+  let notify = (_width: number) => {};
+  const disconnect = rs.fn();
+  rs.stubGlobal(
+    'ResizeObserver',
+    class {
+      constructor(callback: ResizeObserverCallback) {
+        notify = (width) =>
+          callback(
+            [{ contentRect: { width } }] as ResizeObserverEntry[],
+            this as unknown as ResizeObserver,
+          );
+      }
+      observe() {}
+      disconnect = disconnect;
+    },
+  );
+  let frame: FrameRequestCallback | undefined;
+  rs.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => {
+    frame = callback;
+    return 1;
+  });
+  rs.stubGlobal('cancelAnimationFrame', () => {
+    frame = undefined;
+  });
+  const resized = (width: number) =>
+    act(() => {
+      notify(width);
+      const callback = frame;
+      frame = undefined;
+      callback?.(0);
+    });
+  try {
+    const { rerender, unmount } = render(
+      <Textarea autoSize defaultValue="Long article" />,
+    );
+    const textarea = screen.getByRole('textbox');
+    let contentHeight = 162;
+    const measure = rs.fn(() => contentHeight);
+    Object.defineProperty(textarea, 'scrollHeight', {
+      configurable: true,
+      get: measure,
+    });
+    resized(638);
+    expect(textarea.style.height).toBe('162px');
+    contentHeight = 668;
+    resized(178);
+    expect(textarea.style.height).toBe('668px');
+    measure.mockClear();
+    resized(178);
+    expect(measure).not.toHaveBeenCalled();
+    contentHeight = 162;
+    resized(638);
+    expect(textarea.style.height).toBe('162px');
+
+    rerender(
+      <Textarea
+        autoSize={{ maxRows: 3 }}
+        defaultValue="Long article"
+        styles={{ textarea: { lineHeight: '20px', padding: '4px' } }}
+      />,
+    );
+    contentHeight = 668;
+    resized(178);
+    expect(textarea.style.height).toBe('68px');
+    expect(textarea.style.overflowY).toBe('auto');
+    contentHeight = 48;
+    resized(638);
+    expect(textarea.style.height).toBe('48px');
+    expect(textarea.style.overflowY).toBe('hidden');
+    act(() => notify(178));
+    expect(frame).toBeDefined();
+    unmount();
+    expect(frame).toBeUndefined();
+    expect(disconnect).toHaveBeenCalled();
+  } finally {
+    rs.unstubAllGlobals();
+  }
 });
 
 test('semantic classNames merge onto parts', () => {

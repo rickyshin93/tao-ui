@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode, Ref } from 'react';
+import type { AriaAttributes, CSSProperties, ReactNode, Ref } from 'react';
 import type {
   TaoSize,
   TaoStatus,
@@ -57,7 +57,16 @@ export interface SelectRef {
   nativeElement: HTMLElement | null;
 }
 
-export interface SelectProps {
+export interface SelectProps
+  extends Pick<
+    AriaAttributes,
+    | 'aria-label'
+    | 'aria-labelledby'
+    | 'aria-describedby'
+    | 'aria-errormessage'
+    | 'aria-invalid'
+    | 'aria-required'
+  > {
   options: SelectOption[];
   value?: string | string[];
   defaultValue?: string | string[];

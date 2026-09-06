@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { type ReactNode, useMemo } from 'react';
 import { cx } from '../../utils/semantic';
 import { CheckIcon } from './select-icons';
 import type { SelectOption, SelectProps } from './select-types';
@@ -40,14 +40,24 @@ export function SearchableSelectList({
   onValueChange,
   onClose,
 }: SearchableSelectListProps) {
+  const indexByValue = useMemo(() => {
+    const index = new Map<string, number>();
+    searchableOptions.forEach((option, position) => {
+      const value = option.value;
+      if (!index.has(value)) index.set(value, position);
+    });
+    return index;
+  }, [searchableOptions]);
+  const selectedValueSet = useMemo(
+    () => new Set(selectedValues),
+    [selectedValues],
+  );
   let itemIndex = 0;
 
   const renderItem = (option: SelectOption): ReactNode => {
     const renderIndex = itemIndex++;
-    const optionIndex = searchableOptions.findIndex(
-      (candidate) => candidate.value === option.value,
-    );
-    const isSelected = selectedValues.includes(option.value);
+    const optionIndex = indexByValue.get(option.value);
+    const isSelected = selectedValueSet.has(option.value);
     const isDisabled = !!option.disabled || (maxCountReached && !isSelected);
 
     return (
@@ -68,7 +78,7 @@ export function SearchableSelectList({
         style={styles?.item}
         onPointerDown={(event) => event.preventDefault()}
         onMouseMove={() => {
-          if (optionIndex >= 0) onActiveIndexChange(optionIndex);
+          if (optionIndex !== undefined) onActiveIndexChange(optionIndex);
         }}
         onClick={() => {
           if (isDisabled) return;

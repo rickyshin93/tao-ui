@@ -76,11 +76,11 @@
 }
 
 /* Checked */
-[data-tao-radio][data-tao-checked] {
+[data-tao-radio-input]:checked + [data-tao-radio] {
   border-color: var(--tao-primary);
 }
 
-[data-tao-radio][data-tao-checked]::after {
+[data-tao-radio-input]:checked + [data-tao-radio]::after {
   background: var(--tao-primary);
   transform: scale(1);
 }

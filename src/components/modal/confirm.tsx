@@ -23,21 +23,32 @@ export default function confirm(config: ModalFuncProps): ModalFuncReturn {
 
   let currentConfig = config;
   let open = true;
+  let mounted = false;
+  let destroyed = false;
+
+  function onMount() {
+    mounted = true;
+  }
 
   function destroy() {
+    if (destroyed) return;
+    destroyed = true;
     root.unmount();
     const idx = destroyFns.indexOf(destroy);
     if (idx !== -1) destroyFns.splice(idx, 1);
   }
 
   function afterClose() {
-    currentConfig.afterClose?.();
+    if (destroyed) return;
     destroy();
+    currentConfig.afterClose?.();
   }
 
   function close() {
+    if (destroyed || !open) return;
     open = false;
-    render();
+    if (mounted) render();
+    else afterClose();
   }
 
   function render() {
@@ -47,6 +58,7 @@ export default function confirm(config: ModalFuncProps): ModalFuncReturn {
         open={open}
         close={close}
         afterClose={afterClose}
+        onMount={onMount}
       />,
     );
   }
@@ -56,6 +68,7 @@ export default function confirm(config: ModalFuncProps): ModalFuncReturn {
       | Partial<ModalFuncProps>
       | ((prev: ModalFuncProps) => ModalFuncProps),
   ) {
+    if (destroyed) return;
     currentConfig =
       typeof configUpdate === 'function'
         ? configUpdate(currentConfig)

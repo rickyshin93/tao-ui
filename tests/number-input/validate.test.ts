@@ -56,3 +56,19 @@ test('clampToRange: empty is empty (no clamp)', () => {
 test('clampToRange: undefined bounds is no-op', () => {
   expect(clampToRange('5', undefined, undefined)).toBe('5');
 });
+
+test.each([
+  { input: '0', min: 0.0000001, max: undefined, expected: '0.0000001' },
+  { input: '1', min: undefined, max: 0.0000001, expected: '0.0000001' },
+  { input: '0', min: undefined, max: -0.0000001, expected: '-0.0000001' },
+  { input: '0', min: 1e21, max: undefined, expected: '1000000000000000000000' },
+])('clamp expands the finite boundary $expected into canonical decimals', ({
+  input,
+  min,
+  max,
+  expected,
+}) => {
+  const result = clampToRange(input, min, max);
+  expect(result).toBe(expected);
+  expect(isValidCanonical(result)).toBe(true);
+});

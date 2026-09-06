@@ -1,4 +1,4 @@
-import { type ReactNode, useState } from 'react';
+import { type ReactNode, useLayoutEffect, useRef, useState } from 'react';
 import {
   cx,
   type SemanticClassNames,
@@ -41,6 +41,7 @@ export interface ConfirmDialogProps extends ModalFuncProps {
   open: boolean;
   /** Requests close (container flips `open` to false). */
   close: () => void;
+  onMount?: () => void;
 }
 
 function isPromise(v: unknown): v is Promise<unknown> {
@@ -48,6 +49,7 @@ function isPromise(v: unknown): v is Promise<unknown> {
 }
 
 export function ConfirmDialog({
+  onMount,
   open,
   close,
   type = 'confirm',
@@ -72,6 +74,9 @@ export function ConfirmDialog({
   styles,
 }: ConfirmDialogProps) {
   const [loading, setLoading] = useState(false);
+  const [cancelLoading, setCancelLoading] = useState(false);
+  const cancelPending = useRef(false);
+  useLayoutEffect(() => onMount?.(), [onMount]);
   const showCancel = okCancel ?? type === 'confirm';
 
   const runAndClose = async (
@@ -81,6 +86,7 @@ export function ConfirmDialog({
     const result = handler?.();
     if (isPromise(result)) {
       if (withLoading) setLoading(true);
+      else setCancelLoading(true);
       try {
         await result;
         close();
@@ -88,14 +94,26 @@ export function ConfirmDialog({
         // Reject keeps the dialog open.
       } finally {
         if (withLoading) setLoading(false);
+        else setCancelLoading(false);
       }
     } else {
       close();
     }
   };
 
-  const handleOk = () => runAndClose(onOk, true);
-  const handleCancel = () => runAndClose(onCancel, false);
+  const handleOk = () => {
+    if (cancelPending.current) return;
+    return runAndClose(onOk, true);
+  };
+  const handleCancel = async () => {
+    if (cancelPending.current) return;
+    cancelPending.current = true;
+    try {
+      await runAndClose(onCancel, false);
+    } finally {
+      cancelPending.current = false;
+    }
+  };
 
   const iconNode = icon === null ? null : (icon ?? <StatusIconFor type={type} />);
 
@@ -121,6 +139,7 @@ export function ConfirmDialog({
           {showCancel && (
             <Button
               variant="secondary"
+              loading={cancelLoading}
               onClick={handleCancel}
               {...cancelButtonProps}
             >
@@ -132,6 +151,7 @@ export function ConfirmDialog({
             loading={loading}
             onClick={handleOk}
             {...okButtonProps}
+            disabled={cancelLoading || okButtonProps?.disabled}
           >
             {okText ?? 'OK'}
           </Button>

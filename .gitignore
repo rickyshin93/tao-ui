@@ -9,6 +9,9 @@ dist/
 storybook-static
 doc_build/
 
+# Tooling
+.codex/
+
 # IDE
 .vscode/*
 !.vscode/extensions.json

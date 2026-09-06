@@ -480,6 +480,13 @@ legend[data-tao-select-group-label] {
   width: 4ch;
 }
 
+/* Without tags, restore the regular Select text inset. Once a tag is present,
+   the input keeps the compact spacing between tags. */
+[data-tao-select][data-tao-inline-search][data-tao-multiple]
+  [data-tao-select-values] > [data-tao-select-trigger-input]:only-child {
+  padding-inline-start: calc(var(--tao-select-padding-inline) - 4px);
+}
+
 /* Individual tag pill */
 [data-tao-select-tag] {
   display: inline-flex;

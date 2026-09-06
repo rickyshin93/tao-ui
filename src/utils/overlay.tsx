@@ -1,4 +1,6 @@
 import {
+  Children,
+  Fragment,
   isValidElement,
   type ReactElement,
   type ReactNode,
@@ -39,9 +41,14 @@ export function useControlledOpen({
 }
 
 /**
- * Radix `Trigger asChild` requires exactly one element child — wrap plain
- * text/fragment content in a span so triggers can accept any ReactNode.
+ * Radix triggers need a DOM-capable element. Unwrap single-child fragments so
+ * focus returns to the real trigger; wrap text or multiple nodes in a span.
  */
 export function asTriggerChild(children: ReactNode): ReactElement {
-  return isValidElement(children) ? children : <span>{children}</span>;
+  if (!isValidElement<{ children?: ReactNode }>(children)) {
+    return <span>{children}</span>;
+  }
+  if (children.type !== Fragment) return children;
+  const items = Children.toArray(children.props.children);
+  return items.length === 1 ? asTriggerChild(items[0]) : <span>{children}</span>;
 }

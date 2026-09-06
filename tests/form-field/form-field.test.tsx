@@ -1,6 +1,7 @@
 import { expect, test } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
 import { FormField } from '../../src/components/form-field/form-field';
+import { Select } from '../../src/components/select/select';
 
 test('renders label text', () => {
   render(
@@ -43,6 +44,101 @@ test('automatically links label and help text to a single control', () => {
   expect(input.getAttribute('aria-errormessage')).toBe(
     screen.getByText('Invalid address').id,
   );
+});
+
+test.each([
+  { name: 'desktop', mobile: false, showSearch: false },
+  { name: 'searchable', mobile: false, showSearch: true },
+  { name: 'mobile', mobile: true, showSearch: false },
+])('links label and validation to the $name Select control', ({
+  mobile,
+  showSearch,
+}) => {
+  const field = (error?: string) => (
+    <>
+      <p id="language-hint">Existing language hint</p>
+      <FormField
+        label="Language"
+        required
+        error={error}
+        description="Choose your language"
+      >
+        <Select
+          mobile={mobile}
+          showSearch={showSearch}
+          defaultValue="zh"
+          options={[{ label: 'Chinese', value: 'zh' }]}
+          aria-describedby="language-hint"
+        />
+      </FormField>
+    </>
+  );
+  const { rerender } = render(field('Unsupported language'));
+  const control = screen.getByRole(mobile ? 'button' : 'combobox');
+  expect(control).toHaveAccessibleName('Language');
+  expect(control).toHaveAccessibleDescription(
+    'Existing language hint Unsupported language',
+  );
+  expect(control).toHaveAccessibleErrorMessage('Unsupported language');
+  expect(control).toHaveAttribute('aria-required', 'true');
+
+  rerender(field());
+  expect(control).toHaveAccessibleName('Language');
+  expect(control).toHaveAccessibleDescription(
+    'Existing language hint Choose your language',
+  );
+  expect(control).not.toHaveAttribute('aria-invalid');
+  expect(control).not.toHaveAttribute('aria-errormessage');
+});
+
+test('preserves native control errors unless the field supplies its own error', () => {
+  const field = (error?: string) => (
+    <>
+      <p id="external-error">Email is already in use</p>
+      <p id="external-hint">Use your work email</p>
+      <FormField label="Email" error={error} description="Required for sign in">
+        <input
+          aria-invalid="true"
+          aria-errormessage="external-error"
+          aria-describedby="external-hint"
+        />
+      </FormField>
+    </>
+  );
+  const { rerender } = render(field());
+  const input = screen.getByRole('textbox', { name: 'Email' });
+  expect(input).toHaveAccessibleErrorMessage('Email is already in use');
+  expect(input).toHaveAccessibleDescription(
+    'Use your work email Required for sign in',
+  );
+
+  rerender(field('Invalid email format'));
+  expect(input).toHaveAccessibleErrorMessage('Invalid email format');
+  expect(input).toHaveAccessibleDescription(
+    'Use your work email Invalid email format',
+  );
+  rerender(field());
+  expect(input).toHaveAccessibleErrorMessage('Email is already in use');
+});
+
+test('keeps explicit accessible names on native controls', () => {
+  render(
+    <>
+      <p id="custom-label">Custom field name</p>
+      <FormField label="Visible label">
+        <input aria-label="Custom input name" />
+      </FormField>
+      <FormField label="Another label">
+        <input aria-labelledby="custom-label" />
+      </FormField>
+    </>,
+  );
+  expect(
+    screen.getByRole('textbox', { name: 'Custom input name' }),
+  ).toBeTruthy();
+  expect(
+    screen.getByRole('textbox', { name: 'Custom field name' }),
+  ).toBeTruthy();
 });
 
 test('required shows asterisk', () => {

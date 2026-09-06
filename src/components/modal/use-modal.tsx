@@ -1,4 +1,4 @@
-import { type ReactElement, useCallback, useMemo, useState } from 'react';
+import { type ReactElement, useMemo, useState } from 'react';
 import type { ModalFuncReturn } from './confirm';
 import {
   ConfirmDialog,
@@ -19,6 +19,9 @@ interface HookDialog {
   type: ConfirmType;
   open: boolean;
   config: ModalFuncProps;
+  onMount: () => void;
+  close: () => void;
+  afterClose: () => void;
 }
 
 let uuid = 0;
@@ -36,50 +39,54 @@ let uuid = 0;
 export function useModal(): [ModalHookApi, ReactElement] {
   const [dialogs, setDialogs] = useState<HookDialog[]>([]);
 
-  const closeDialog = useCallback((key: string) => {
-    setDialogs((prev) =>
-      prev.map((d) => (d.key === key ? { ...d, open: false } : d)),
-    );
-  }, []);
-
-  const destroyDialog = useCallback((key: string) => {
-    setDialogs((prev) => prev.filter((d) => d.key !== key));
-  }, []);
-
-  const updateDialog = useCallback(
-    (
-      key: string,
-      configUpdate:
-        | Partial<ModalFuncProps>
-        | ((prev: ModalFuncProps) => ModalFuncProps),
-    ) => {
-      setDialogs((prev) =>
-        prev.map((d) =>
-          d.key === key
-            ? {
-                ...d,
-                config:
-                  typeof configUpdate === 'function'
-                    ? configUpdate(d.config)
-                    : { ...d.config, ...configUpdate },
-              }
-            : d,
-        ),
-      );
-    },
-    [],
-  );
-
   const api = useMemo<ModalHookApi>(() => {
     const open = (
       config: ModalFuncProps,
       type: ConfirmType,
     ): ModalFuncReturn => {
       const key = `tao-modal-${uuid++}`;
-      setDialogs((prev) => [...prev, { key, type, open: true, config }]);
+      let currentConfig = config;
+      let mounted = false;
+      let closed = false;
+      let destroyed = false;
+
+      const afterClose = () => {
+        if (destroyed) return;
+        destroyed = true;
+        setDialogs((prev) => prev.filter((d) => d.key !== key));
+        currentConfig.afterClose?.();
+      };
+      const close = () => {
+        if (closed) return;
+        closed = true;
+        if (mounted) {
+          setDialogs((prev) =>
+            prev.map((d) => (d.key === key ? { ...d, open: false } : d)),
+          );
+        } else {
+          afterClose();
+        }
+      };
+      const onMount = () => {
+        mounted = true;
+      };
+      setDialogs((prev) => [
+        ...prev,
+        { key, type, open: true, config, onMount, close, afterClose },
+      ]);
       return {
-        destroy: () => closeDialog(key),
-        update: (configUpdate) => updateDialog(key, configUpdate),
+        destroy: close,
+        update: (configUpdate) => {
+          if (closed || destroyed) return;
+          currentConfig =
+            typeof configUpdate === 'function'
+              ? configUpdate(currentConfig)
+              : { ...currentConfig, ...configUpdate };
+          const nextConfig = currentConfig;
+          setDialogs((prev) =>
+            prev.map((d) => (d.key === key ? { ...d, config: nextConfig } : d)),
+          );
+        },
       };
     };
     return {
@@ -89,7 +96,7 @@ export function useModal(): [ModalHookApi, ReactElement] {
       error: (config) => open({ okCancel: false, ...config }, 'error'),
       warning: (config) => open({ okCancel: false, ...config }, 'warning'),
     };
-  }, [closeDialog, updateDialog]);
+  }, []);
 
   const contextHolder = (
     <>
@@ -99,11 +106,9 @@ export function useModal(): [ModalHookApi, ReactElement] {
           key={d.key}
           type={d.type}
           open={d.open}
-          close={() => closeDialog(d.key)}
-          afterClose={() => {
-            d.config.afterClose?.();
-            destroyDialog(d.key);
-          }}
+          onMount={d.onMount}
+          close={d.close}
+          afterClose={d.afterClose}
         />
       ))}
     </>

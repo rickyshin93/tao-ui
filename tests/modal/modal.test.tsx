@@ -1,10 +1,23 @@
-import { afterEach, expect, test } from '@rstest/core';
-import { render, screen, waitFor } from '@testing-library/react';
+import { afterEach, expect, rstest, test } from '@rstest/core';
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
+import { createContext, StrictMode, useContext } from 'react';
 import { Modal } from '../../src/components/modal';
+import {
+  destroyFns,
+  type ModalFuncReturn,
+} from '../../src/components/modal/confirm';
+import type { ModalHookApi } from '../../src/components/modal/use-modal';
 import { restoreViewport, setViewportWidth } from '../utils/mock-viewport';
 
 afterEach(() => {
+  act(() => Modal.destroyAll());
   restoreViewport();
 });
 
@@ -311,6 +324,249 @@ test('Modal.confirm onOk fires on OK click', async () => {
   Modal.destroyAll();
 });
 
+test('static modal handles are harmless after destroyAll', async () => {
+  const instance = Modal.confirm({ title: 'Handle lifecycle' });
+  await screen.findByText('Handle lifecycle');
+  act(() => Modal.destroyAll());
+  const update = rstest.fn((config) => config);
+  expect(() => instance.update(update)).not.toThrow();
+  expect(() => instance.destroy()).not.toThrow();
+  expect(update).not.toHaveBeenCalled();
+});
+
+test('immediate static modal destruction releases the root exactly once', async () => {
+  const afterClose = rstest.fn();
+  const before = destroyFns.length;
+  await act(async () => {
+    const instance = Modal.confirm({ title: 'Immediate cleanup', afterClose });
+    instance.destroy();
+    instance.destroy();
+    instance.update({ content: 'Late content' });
+  });
+  expect(destroyFns.length).toBe(before);
+  expect(afterClose).toHaveBeenCalledTimes(1);
+  expect(screen.queryByText('Late content')).toBeNull();
+});
+
+test('mounted static modal preserves afterClose and makes repeated cleanup safe', async () => {
+  const afterClose = rstest.fn();
+  const before = destroyFns.length;
+  const instance = Modal.confirm({ title: 'Mounted cleanup', afterClose });
+  await screen.findByText('Mounted cleanup');
+  expect(afterClose).not.toHaveBeenCalled();
+  act(() => instance.destroy());
+  await waitFor(() => expect(afterClose).toHaveBeenCalledTimes(1));
+  expect(destroyFns.length).toBe(before);
+  expect(() => instance.destroy()).not.toThrow();
+  expect(() => instance.update({ content: 'Too late' })).not.toThrow();
+  expect(afterClose).toHaveBeenCalledTimes(1);
+});
+
+function renderHookModal(strict = false) {
+  let api!: ModalHookApi;
+  function Harness() {
+    const [modal, holder] = Modal.useModal();
+    api = modal;
+    return holder;
+  }
+  render(
+    strict ? (
+      <StrictMode>
+        <Harness />
+      </StrictMode>
+    ) : (
+      <Harness />
+    ),
+  );
+  return api;
+}
+
+test.each([
+  false,
+  true,
+])('immediately destroyed hook modal is released once (StrictMode=%s)', (strict) => {
+  const modal = renderHookModal(strict);
+  const afterClose = rstest.fn();
+  const staleUpdate = rstest.fn((config) => config);
+  let instance!: ModalFuncReturn;
+  act(() => {
+    instance = modal.confirm({ title: 'Immediate hook cleanup', afterClose });
+    instance.destroy();
+    instance.destroy();
+    instance.update(staleUpdate);
+  });
+  act(() => instance.update(staleUpdate));
+  expect(afterClose).toHaveBeenCalledTimes(1);
+  expect(staleUpdate).not.toHaveBeenCalled();
+  expect(screen.queryByRole('dialog')).toBeNull();
+});
+
+test('mounted hook modal uses its latest config and ignores updates after destroy', () => {
+  const modal = renderHookModal(true);
+  const originalAfterClose = rstest.fn();
+  const latestAfterClose = rstest.fn();
+  const staleUpdate = rstest.fn((config) => config);
+  let instance!: ModalFuncReturn;
+  act(() => {
+    instance = modal.confirm({
+      title: 'Hook cleanup',
+      afterClose: originalAfterClose,
+    });
+  });
+  act(() =>
+    instance.update({
+      afterClose: latestAfterClose,
+      content: 'Updated content',
+    }),
+  );
+  expect(screen.getByText('Updated content')).toBeTruthy();
+  act(() => {
+    instance.destroy();
+    instance.update(staleUpdate);
+    instance.destroy();
+  });
+  expect(originalAfterClose).not.toHaveBeenCalled();
+  expect(latestAfterClose).toHaveBeenCalledTimes(1);
+  expect(staleUpdate).not.toHaveBeenCalled();
+  expect(screen.queryByRole('dialog')).toBeNull();
+});
+
+test('hook modal content retains the surrounding React context', () => {
+  const Context = createContext('default');
+  let modal!: ModalHookApi;
+  function Content() {
+    return <span>{useContext(Context)}</span>;
+  }
+  function Harness() {
+    const [api, holder] = Modal.useModal();
+    modal = api;
+    return holder;
+  }
+  render(
+    <Context.Provider value="surrounding context">
+      <Harness />
+    </Context.Provider>,
+  );
+  act(() => {
+    modal.info({ content: <Content /> });
+  });
+  expect(screen.getByText('surrounding context')).toBeTruthy();
+});
+
+test.each([
+  'hook',
+  'static',
+])('%s modal deduplicates pending cancellation and allows retry after rejection', async (kind) => {
+  const modal = kind === 'hook' ? renderHookModal() : Modal;
+  let rejectFirst!: (reason: Error) => void;
+  const first = new Promise<void>((_, reject) => {
+    rejectFirst = reject;
+  });
+  const onCancel = rstest.fn().mockReturnValue(first);
+  const onOk = rstest.fn();
+  const afterClose = rstest.fn();
+  act(() => {
+    modal.confirm({
+      title: 'Pending cancellation',
+      maskClosable: true,
+      onCancel,
+      onOk,
+      afterClose,
+    });
+  });
+
+  const cancel = screen.getByRole('button', { name: 'Cancel' });
+  fireEvent.click(cancel);
+  const ok = screen.getByRole('button', { name: 'OK' });
+  expect(ok).toBeDisabled();
+  fireEvent.click(ok);
+  expect(onOk).not.toHaveBeenCalled();
+  fireEvent.click(cancel);
+  fireEvent.keyDown(screen.getByRole('dialog'), { key: 'Escape' });
+  const overlay = document.querySelector('[data-tao-modal-overlay]');
+  expect(overlay).toBeTruthy();
+  if (overlay) fireEvent.click(overlay);
+  expect(onCancel).toHaveBeenCalledTimes(1);
+  expect(cancel).toHaveAttribute('aria-busy', 'true');
+
+  await act(async () => {
+    rejectFirst(new Error('Try again'));
+    await first.catch(() => {});
+  });
+  expect(screen.getByRole('dialog')).toBeTruthy();
+  expect(cancel).not.toBeDisabled();
+  expect(ok).not.toBeDisabled();
+  expect(afterClose).not.toHaveBeenCalled();
+  onCancel.mockResolvedValueOnce(undefined);
+  await userEvent.click(cancel);
+  await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+  expect(onCancel).toHaveBeenCalledTimes(2);
+  expect(afterClose).toHaveBeenCalledTimes(1);
+});
+
+test.each([
+  'hook',
+  'static',
+])('%s modal preserves asynchronous OK loading and retry', async (kind) => {
+  const modal = kind === 'hook' ? renderHookModal() : Modal;
+  let rejectFirst!: (reason: Error) => void;
+  const first = new Promise<void>((_, reject) => {
+    rejectFirst = reject;
+  });
+  const onOk = rstest
+    .fn()
+    .mockReturnValueOnce(first)
+    .mockResolvedValueOnce(undefined);
+  act(() => {
+    modal.confirm({ title: 'Pending confirmation', onOk });
+  });
+
+  const ok = screen.getByRole('button', { name: 'OK' });
+  fireEvent.click(ok);
+  expect(ok).toHaveAttribute('aria-busy', 'true');
+  expect(ok).toBeDisabled();
+  await act(async () => {
+    rejectFirst(new Error('Try again'));
+    await first.catch(() => {});
+  });
+  expect(screen.getByRole('dialog')).toBeTruthy();
+  expect(ok).not.toBeDisabled();
+  await userEvent.click(ok);
+  await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+  expect(onOk).toHaveBeenCalledTimes(2);
+});
+
+test.each([
+  'hook',
+  'static',
+])('%s modal can cancel pending OK without closing twice when it settles', async (kind) => {
+  const modal = kind === 'hook' ? renderHookModal() : Modal;
+  let resolveOk!: () => void;
+  const pending = new Promise<void>((resolve) => {
+    resolveOk = resolve;
+  });
+  const afterClose = rstest.fn();
+  const onCancel = rstest.fn();
+  act(() => {
+    modal.confirm({
+      title: 'Cancel pending OK',
+      onOk: () => pending,
+      onCancel,
+      afterClose,
+    });
+  });
+  await userEvent.click(screen.getByRole('button', { name: 'OK' }));
+  await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+  expect(screen.queryByRole('dialog')).toBeNull();
+  expect(onCancel).toHaveBeenCalledTimes(1);
+  expect(afterClose).toHaveBeenCalledTimes(1);
+  await act(async () => {
+    resolveOk();
+    await pending;
+  });
+  expect(afterClose).toHaveBeenCalledTimes(1);
+});
+
 test('responsive width resolves the largest matching breakpoint', async () => {
   setViewportWidth(1024);
   render(
@@ -324,7 +580,11 @@ test('responsive width resolves the largest matching breakpoint', async () => {
 
 test('responsive width falls back to the 520px default without a match', async () => {
   setViewportWidth(400);
-  render(<Modal open width={{ md: 640 }}>body</Modal>);
+  render(
+    <Modal open width={{ md: 640 }}>
+      body
+    </Modal>,
+  );
   const content = screen.getByRole('dialog');
   await new Promise((resolve) => setTimeout(resolve, 20));
   expect(content.style.width).toBe('520px');
