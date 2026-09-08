@@ -574,6 +574,76 @@ test('mode="tags" + showSearch creates a tag from the inline input', async () =>
   expect(screen.getByText('New tag')).toBeTruthy();
 });
 
+test('tags without suggestions never opens an empty popup and still creates tags', async () => {
+  render(
+    <Select
+      mobile={false}
+      mode="tags"
+      showSearch
+      options={[]}
+      notFoundContent={null}
+    />,
+  );
+  const input = screen.getByRole('combobox');
+  await userEvent.click(input);
+  expect(input).toHaveAttribute('aria-expanded', 'false');
+  expect(document.querySelector('[data-tao-select-content]')).toBeNull();
+  await userEvent.type(input, 'Template{Enter}');
+  expect(screen.getByText('Template')).toBeTruthy();
+  expect(document.querySelector('[data-tao-select-content]')).toBeNull();
+});
+
+test('tags with no empty content hides unmatched suggestions and restores them when search clears', async () => {
+  render(
+    <Select
+      mobile={false}
+      mode="tags"
+      showSearch
+      options={[{ value: 'Known', label: 'Known' }]}
+      notFoundContent={null}
+    />,
+  );
+  const input = screen.getByRole('combobox');
+  await userEvent.click(input);
+  expect(screen.getByRole('option', { name: 'Known' })).toBeTruthy();
+  await userEvent.type(input, 'New');
+  expect(input).toHaveAttribute('aria-expanded', 'false');
+  expect(document.querySelector('[data-tao-select-content]')).toBeNull();
+  await userEvent.clear(input);
+  expect(screen.getByRole('option', { name: 'Known' })).toBeTruthy();
+});
+
+test('tags preserves explicit empty content and the default suffix', async () => {
+  render(
+    <Select
+      mobile={false}
+      mode="tags"
+      showSearch
+      options={[]}
+      notFoundContent="No templates"
+    />,
+  );
+  await userEvent.click(screen.getByRole('combobox'));
+  expect(screen.getByText('No templates')).toBeTruthy();
+  expect(
+    document.querySelector('[data-tao-select-icons] [data-tao-select-icon]'),
+  ).toBeTruthy();
+});
+
+test('tags preserves custom popup content even without suggestions', () => {
+  render(
+    <Select
+      mobile={false}
+      mode="tags"
+      showSearch
+      options={[]}
+      open
+      popupRender={() => <div>Custom content</div>}
+    />,
+  );
+  expect(screen.getByText('Custom content')).toBeTruthy();
+});
+
 test('mode="multiple" renders tags from value array', () => {
   render(
     <Select

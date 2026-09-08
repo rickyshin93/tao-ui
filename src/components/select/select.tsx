@@ -163,7 +163,7 @@ export const Select = forwardRef(function Select(
   // open (controlled / uncontrolled)
   const isOpenControlled = openProp !== undefined;
   const [openInternal, setOpenInternal] = useState(defaultOpen ?? false);
-  const open = isOpenControlled ? openProp : openInternal;
+  const requestedOpen = isOpenControlled ? openProp : openInternal;
 
   // search (controlled / uncontrolled)
   const isSearchControlled = searchValueProp !== undefined;
@@ -472,6 +472,15 @@ export const Select = forwardRef(function Select(
     () => flattenLeafOptions(filteredOptions),
     [filteredOptions],
   );
+
+  const suppressEmptyTagsPopup =
+    hasInlineSearch &&
+    mode === 'tags' &&
+    filteredFlatOptions.length === 0 &&
+    !notFoundContent &&
+    !loading &&
+    !popupRender;
+  const open = requestedOpen && !suppressEmptyTagsPopup;
 
   const allowClearEnabled = !!allowClear;
   const clearIcon = (typeof allowClear === 'object' &&

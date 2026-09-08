@@ -11,6 +11,7 @@
 - none
 
 ## Done
+- 2026-09-07 suppress blank tags popups when empty content is disabled; preserve tag entry, suffix icons, and custom popup content
 - 2026-09-06 fix numeric/search/Splitter updates, uncontrolled Table selection, date preset constraints and range month synchronization, Popover focus retention and cleared Form boolean fields
 - 2026-09-06 optimize large-table selection; fix checkbox/tabs/field accessibility, mobile/IME/date input, textarea resizing and dialog lifecycles
 - 2026-09-06 fix selection, pagination, async lifecycle and form warning issues, including empty searchable multi-select text inset; add component imports that reduce Button CSS by 85%
