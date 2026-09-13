@@ -88,10 +88,14 @@
   position: absolute;
   left: 0;
   bottom: 0;
+  /* Grown by `scaleX(<target width>)`, so this element must stay 1px wide with
+     no border-radius: a non-uniform scale stretches the rounded caps into long
+     tapered points — the ends look sharp instead of square. A radius applied
+     here is baked in *before* the scale and cannot survive it. */
   width: 1px;
   height: 2px;
   background: var(--tao-primary);
-  border-radius: var(--tao-radius-full);
+  border-radius: 0;
   transform-origin: left center;
   transition: transform var(--tao-motion-duration-mid)
     var(--tao-motion-ease-out-quint);

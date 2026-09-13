@@ -51,6 +51,10 @@ test('tabs animate the indicator with compositor transforms', () => {
   const transformExpression =
     'translateX($' + '{inkStyle.left}px) scaleX($' + '{inkStyle.width})';
   expect(source).toContain(transformExpression);
+  // The ink bar is scaled non-uniformly, which stretches any rounded cap into a
+  // long tapered point. The ends must stay square or the bar looks sharp.
+  const inkRule = css.match(/\[data-tao-tabs-ink\]\s*\{[^}]*\}/)?.[0] ?? '';
+  expect(inkRule).toContain('border-radius: 0;');
 });
 
 // ---- Token contracts ----
