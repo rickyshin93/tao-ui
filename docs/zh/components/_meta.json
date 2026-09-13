@@ -53,6 +53,11 @@
   },
   {
     "type": "file",
+    "name": "steps",
+    "label": "Steps"
+  },
+  {
+    "type": "file",
     "name": "tabs",
     "label": "Tabs"
   },

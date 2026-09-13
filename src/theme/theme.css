@@ -286,7 +286,19 @@
 
     /* ===========================
        DERIVED: Spacing
+       antd genSizeMapToken(): sizeUnit * (sizeStep ± N)  (DESIGN.md §2.3.4)
        =========================== */
+    --tao-size-xxs: calc(var(--tao-size-unit) * (var(--tao-size-step) - 3));
+    --tao-size-xs: calc(var(--tao-size-unit) * (var(--tao-size-step) - 2));
+    --tao-size-sm: calc(var(--tao-size-unit) * (var(--tao-size-step) - 1));
+    --tao-size: calc(var(--tao-size-unit) * var(--tao-size-step));
+    --tao-size-ms: calc(var(--tao-size-unit) * var(--tao-size-step));
+    --tao-size-md: calc(var(--tao-size-unit) * (var(--tao-size-step) + 1));
+    --tao-size-lg: calc(var(--tao-size-unit) * (var(--tao-size-step) + 2));
+    --tao-size-xl: calc(var(--tao-size-unit) * (var(--tao-size-step) + 4));
+    --tao-size-xxl: calc(var(--tao-size-unit) * (var(--tao-size-step) + 8));
+
+    /* padding 语义别名 (antd AliasToken padding 系列) */
     --tao-padding-xxs: 2px;
     --tao-padding-xs: calc(var(--tao-size-unit) * (var(--tao-size-step) - 2));
     --tao-padding-sm: calc(var(--tao-size-unit) * (var(--tao-size-step) - 1));
@@ -294,6 +306,21 @@
     --tao-padding-md: calc(var(--tao-size-unit) * (var(--tao-size-step) + 1));
     --tao-padding-lg: calc(var(--tao-size-unit) * (var(--tao-size-step) + 2));
     --tao-padding-xl: calc(var(--tao-size-unit) * (var(--tao-size-step) + 4));
+
+    /* margin 语义别名 (antd AliasToken margin 系列). These MUST live in the
+       base scope, not only in the compact-density block below: a var() that
+       is declared solely under the compact selector makes every calc() that
+       references it invalid at computed-value time, so the whole declaration
+       is silently dropped in the default theme. margin-xxs/xxl have no
+       padding counterpart (margin-xxs 4px, margin-xxl 48px). */
+    --tao-margin-xxs: calc(var(--tao-size-unit) * 1);
+    --tao-margin-xs: calc(var(--tao-size-unit) * (var(--tao-size-step) - 2));
+    --tao-margin-sm: calc(var(--tao-size-unit) * (var(--tao-size-step) - 1));
+    --tao-margin: calc(var(--tao-size-unit) * var(--tao-size-step));
+    --tao-margin-md: calc(var(--tao-size-unit) * (var(--tao-size-step) + 1));
+    --tao-margin-lg: calc(var(--tao-size-unit) * (var(--tao-size-step) + 2));
+    --tao-margin-xl: calc(var(--tao-size-unit) * (var(--tao-size-step) + 4));
+    --tao-margin-xxl: calc(var(--tao-size-unit) * (var(--tao-size-step) + 8));
 
     /* ===========================
        DERIVED: Motion
@@ -357,9 +384,29 @@
        disabled 不受文本对比度要求，继续使用 quaternary 的"熄灭"感。 */
     --tao-color-text-placeholder: var(--tao-color-text-tertiary);
     --tao-color-text-disabled: var(--tao-color-text-quaternary);
+    /* 其余 antd 文字别名 (colorTextHeading / Label / Description)。
+       heading 在 antd v5+ 与 colorText 同值，这里保持同样的 fall-through。 */
+    --tao-color-text-heading: var(--tao-color-text);
+    --tao-color-text-label: var(--tao-color-text-secondary);
+    --tao-color-text-description: var(--tao-color-text-tertiary);
+
     --tao-color-bg-disabled: var(--tao-color-fill-tertiary);
+    --tao-color-bg-container-disabled: var(--tao-color-fill-tertiary);
+    --tao-color-bg-text-hover: var(--tao-color-fill-tertiary);
+    --tao-color-bg-text-active: var(--tao-color-fill-secondary);
+
     --tao-control-item-bg-hover: var(--tao-color-fill-tertiary);
     --tao-control-item-bg-active: var(--tao-primary-bg);
+    --tao-control-item-bg-active-hover: var(--tao-primary-bg-hover);
+    --tao-control-padding-horizontal: var(--tao-padding-sm);
+    --tao-control-padding-horizontal-sm: var(--tao-padding-xs);
+
+    /* 分割线 (antd colorSplit) */
+    --tao-color-split: var(--tao-color-border-secondary);
+
+    /* 粗线宽 (antd lineWidthBold = lineWidth + 1) */
+    --tao-line-width-bold: calc(var(--tao-line-width) + 1px);
+
     --tao-opacity-loading: 0.65;
 
     /* Modal / Drawer / Sheet 的 dim 层。dark scope 加深 */

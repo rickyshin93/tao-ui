@@ -90,6 +90,7 @@ export default defineConfig({
         spinner: './src/components/spinner/spinner.tsx',
         splitter: './src/components/splitter/splitter.tsx',
         stack: './src/layouts/stack/stack.tsx',
+        steps: './src/components/steps/steps.tsx',
         switch: './src/components/switch/switch.tsx',
         table: './src/components/table/table.tsx',
         tabs: './src/components/tabs/tabs.tsx',

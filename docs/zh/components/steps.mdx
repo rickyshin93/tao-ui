@@ -1,0 +1,291 @@
+---
+title: Steps
+description: "引导用户按顺序完成多阶段任务的步骤条。页面涵盖适用场景、设计建议、各类型与变体的可运行示例、交互状态与完整 API 参考。"
+---
+
+引导用户按顺序完成多阶段的任务。
+
+## 何时使用
+
+当任务存在先后顺序时使用 Steps——结算流程、引导向导、发布流水线。它同样可以作为「用户旁观而非操作」的过程进度指示。
+
+**推荐**
+
+- 标题保持在一到两个词，细节放进 `content`。
+- 整条步骤条由 `current` 驱动，状态从位置自动推导。
+- 当回退到已完成步骤有意义时，提供 `onChange`。
+- 流程较长或容器较窄时改用 `orientation="vertical"`。
+
+**避免**
+
+- 不要用 Steps 承载同级内容切换，请使用 Tabs。
+- 不要用 Steps 表示单一的不确定操作，请使用 Spinner。
+- 除非某一步确实失败或被跳过，否则不要逐项设置 `status`。
+
+## 基础用法
+
+```tsx preview
+import { Steps } from '@rockshin/tao-ui';
+
+function StepsExample() {
+  return (
+    <Steps
+      current={1}
+      items={[
+        { title: '已完成', content: '这一步已经完成。' },
+        { title: '进行中', content: '正在处理。' },
+        { title: '等待中', content: '尚未开始。' },
+      ]}
+    />
+  );
+}
+
+export default StepsExample;
+```
+
+## 垂直与可点击
+
+`onChange` 回调收到的是绝对步骤序号。点击当前步骤不会触发回调，`disabled` 的步骤始终不可交互。
+
+```tsx preview
+import { Stack, Steps } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+const items = [
+  { title: '已完成', content: '这一步已经完成。' },
+  { title: '进行中', content: '正在处理。' },
+  { title: '等待中', content: '尚未开始。' },
+  { title: '已锁定', content: '暂不可用。', disabled: true },
+];
+
+function ClickableSteps() {
+  const [current, setCurrent] = useState(0);
+
+  return (
+    <Stack gap="lg">
+      <Steps items={items} current={current} onChange={setCurrent} />
+      <Steps
+        items={items}
+        current={current}
+        onChange={setCurrent}
+        orientation="vertical"
+        style={{ maxWidth: 320 }}
+      />
+    </Stack>
+  );
+}
+
+export default ClickableSteps;
+```
+
+## 状态、变体与尺寸
+
+`status` 设置当前步骤的状态，其余步骤的状态由与当前位置的关系推导。`variant` 决定图标是实心还是描边，`size` 切换密度。
+
+```tsx preview
+import { Stack, Steps } from '@rockshin/tao-ui';
+
+const items = [
+  { title: '已完成', content: '这一步已经完成。' },
+  { title: '进行中', content: '正在处理。' },
+  { title: '等待中', content: '尚未开始。' },
+];
+
+function StepsStatus() {
+  return (
+    <Stack gap="lg">
+      <Steps items={items} current={1} status="error" />
+      <Steps items={items} current={1} variant="outlined" />
+      <Steps items={items} current={1} size="small" variant="outlined" />
+    </Stack>
+  );
+}
+
+export default StepsStatus;
+```
+
+## 类型
+
+`type` 改变整条步骤条的形态：`dot` 用小圆点替代数字图标，`navigation` 把每步变成带下划线指示的可点击标签，`panel` 则把步骤渲染成彼此咬合的缺口面板。
+
+```tsx preview
+import { Stack, Steps } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+const items = [
+  { title: '第一步', content: '第一段说明' },
+  { title: '第二步', content: '第二段说明' },
+  { title: '第三步', content: '第三段说明' },
+];
+
+function StepsTypes() {
+  const [current, setCurrent] = useState(1);
+
+  return (
+    <Stack gap="xl">
+      <Steps items={items} current={current} type="dot" />
+      <Steps
+        items={items}
+        current={current}
+        type="navigation"
+        onChange={setCurrent}
+      />
+      <Steps
+        items={items}
+        current={current}
+        type="panel"
+        onChange={setCurrent}
+      />
+      <Steps
+        items={items}
+        current={current}
+        type="panel"
+        variant="outlined"
+        onChange={setCurrent}
+      />
+    </Stack>
+  );
+}
+
+export default StepsTypes;
+```
+
+## 内联
+
+`type="inline"` 渲染一条紧凑的圆点条，说明文字改由 Tooltip 承载。`offset` 沿主轴推移整条步骤条，`titlePlacement` 把标题移到圆点下方。
+
+```tsx preview
+import { Stack, Steps } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+const items = [
+  { title: '第一步', content: '第一段说明' },
+  { title: '第二步', content: '第二段说明' },
+  { title: '第三步', content: '第三段说明' },
+];
+
+function InlineSteps() {
+  const [current, setCurrent] = useState(1);
+
+  return (
+    <Stack gap="lg">
+      <Steps
+        items={items}
+        current={current}
+        type="inline"
+        onChange={setCurrent}
+      />
+      <Steps
+        items={items}
+        current={current}
+        type="inline"
+        titlePlacement="vertical"
+        offset={1}
+        onChange={setCurrent}
+      />
+    </Stack>
+  );
+}
+
+export default InlineSteps;
+```
+
+## 进度与最大数量
+
+`percent` 会在当前图标外圈画出进度环。`maxCount` 用于收拢过长的流程：被隐藏的区间折叠为一个禁用的省略步骤，而 `onChange` 依旧回传原始序号。
+
+```tsx preview
+import { Stack, Steps } from '@rockshin/tao-ui';
+
+const items = [
+  { title: '已完成', content: '这一步已经完成。' },
+  { title: '进行中', content: '正在处理。' },
+  { title: '等待中', content: '尚未开始。' },
+];
+
+function StepsProgress() {
+  return (
+    <Stack gap="xl">
+      <Steps items={items} current={1} percent={60} />
+      <Steps
+        current={3}
+        maxCount={5}
+        items={Array.from({ length: 10 }, (_, index) => ({
+          title: `步骤 ${index + 1}`,
+        }))}
+      />
+    </Stack>
+  );
+}
+
+export default StepsProgress;
+```
+
+## 自定义图标
+
+`items[].icon` 替换单个步骤的图标。`iconRender` 替换全部图标，并会收到步骤序号、是否为当前步骤，以及用于渲染语义化图标容器的 `Icon` 组件。
+
+```tsx preview
+import { Steps } from '@rockshin/tao-ui';
+
+const items = [
+  { title: '已完成', content: '这一步已经完成。' },
+  { title: '进行中', content: '正在处理。' },
+  { title: '等待中', content: '尚未开始。' },
+];
+
+function CustomIconSteps() {
+  return (
+    <Steps
+      items={items}
+      current={1}
+      iconRender={(_node, { index, active }) => (
+        <span
+          style={{
+            width: 32,
+            height: 32,
+            borderRadius: 8,
+            display: 'grid',
+            placeItems: 'center',
+            fontSize: 12,
+            border: `1px solid ${active ? 'currentColor' : 'transparent'}`,
+          }}
+        >
+          {index + 1}
+        </span>
+      )}
+    />
+  );
+}
+
+export default CustomIconSteps;
+```
+
+## 语义化 DOM 定制
+
+每个部件都可以通过 `classNames` 与 `styles` 定位，单个步骤也能覆盖自己的部件。
+
+```tsx preview
+import { Steps } from '@rockshin/tao-ui';
+
+function StyledSteps() {
+  return (
+    <Steps
+      current={1}
+      items={[
+        { title: '已完成', content: '这一步已经完成。' },
+        { title: '进行中', content: '正在处理。' },
+        { title: '等待中', content: '尚未开始。' },
+      ]}
+      styles={{ itemTitle: { letterSpacing: '0.02em' } }}
+      classNames={{ itemContent: 'demo-step-content' }}
+    />
+  );
+}
+
+export default StyledSteps;
+```
+
+## API
+
+<API moduleName="steps" />

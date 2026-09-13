@@ -1,0 +1,291 @@
+---
+title: Steps
+description: "Guides users through the ordered stages of a task. Includes usage guidance, runnable examples for every type and variant, and the complete API reference."
+---
+
+Guides users through the ordered stages of a task.
+
+## When to use
+
+Use Steps when the work has a sequence — a checkout flow, an onboarding wizard, a deployment pipeline. Steps also doubles as a progress indicator for a process the user is watching rather than driving.
+
+**Recommended**
+
+- Keep titles to one or two words; move detail into `content`.
+- Drive the whole bar from `current` and let the status be derived from position.
+- Provide `onChange` when revisiting an already completed step is meaningful.
+- Switch to `orientation="vertical"` for long flows or narrow layouts.
+
+**Avoid**
+
+- Do not use Steps for peer views at the same level; use Tabs.
+- Do not use Steps for a single indeterminate operation; use Spinner.
+- Do not set `status` per item unless a step genuinely failed or was skipped.
+
+## Basic usage
+
+```tsx preview
+import { Steps } from '@rockshin/tao-ui';
+
+function StepsExample() {
+  return (
+    <Steps
+      current={1}
+      items={[
+        { title: 'Finished', content: 'This step is done.' },
+        { title: 'In Progress', content: 'Working on it now.' },
+        { title: 'Waiting', content: 'Not started yet.' },
+      ]}
+    />
+  );
+}
+
+export default StepsExample;
+```
+
+## Vertical and clickable
+
+`onChange` receives the absolute step index. Clicking the current step is a no-op, and `disabled` items never become interactive.
+
+```tsx preview
+import { Stack, Steps } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+const items = [
+  { title: 'Finished', content: 'This step is done.' },
+  { title: 'In Progress', content: 'Working on it now.' },
+  { title: 'Waiting', content: 'Not started yet.' },
+  { title: 'Locked', content: 'Unavailable.', disabled: true },
+];
+
+function ClickableSteps() {
+  const [current, setCurrent] = useState(0);
+
+  return (
+    <Stack gap="lg">
+      <Steps items={items} current={current} onChange={setCurrent} />
+      <Steps
+        items={items}
+        current={current}
+        onChange={setCurrent}
+        orientation="vertical"
+        style={{ maxWidth: 320 }}
+      />
+    </Stack>
+  );
+}
+
+export default ClickableSteps;
+```
+
+## Status, variants, and sizes
+
+`status` sets the state of the current step; every other step derives its own state from position. `variant` picks a solid or outlined icon treatment and `size` switches density.
+
+```tsx preview
+import { Stack, Steps } from '@rockshin/tao-ui';
+
+const items = [
+  { title: 'Finished', content: 'This step is done.' },
+  { title: 'In Progress', content: 'Working on it now.' },
+  { title: 'Waiting', content: 'Not started yet.' },
+];
+
+function StepsStatus() {
+  return (
+    <Stack gap="lg">
+      <Steps items={items} current={1} status="error" />
+      <Steps items={items} current={1} variant="outlined" />
+      <Steps items={items} current={1} size="small" variant="outlined" />
+    </Stack>
+  );
+}
+
+export default StepsStatus;
+```
+
+## Types
+
+`type` changes the whole shape of the bar: `dot` replaces numbered icons with small dots, `navigation` turns each step into a clickable tab with an underline, and `panel` renders steps as contiguous notched panels.
+
+```tsx preview
+import { Stack, Steps } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+const items = [
+  { title: 'One', content: 'First step' },
+  { title: 'Two', content: 'Second step' },
+  { title: 'Three', content: 'Third step' },
+];
+
+function StepsTypes() {
+  const [current, setCurrent] = useState(1);
+
+  return (
+    <Stack gap="xl">
+      <Steps items={items} current={current} type="dot" />
+      <Steps
+        items={items}
+        current={current}
+        type="navigation"
+        onChange={setCurrent}
+      />
+      <Steps
+        items={items}
+        current={current}
+        type="panel"
+        onChange={setCurrent}
+      />
+      <Steps
+        items={items}
+        current={current}
+        type="panel"
+        variant="outlined"
+        onChange={setCurrent}
+      />
+    </Stack>
+  );
+}
+
+export default StepsTypes;
+```
+
+## Inline
+
+`type="inline"` renders a compact dot strip whose descriptions live in tooltips. `offset` shifts the strip along its axis and `titlePlacement` moves the label under the dot.
+
+```tsx preview
+import { Stack, Steps } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+const items = [
+  { title: 'One', content: 'First step' },
+  { title: 'Two', content: 'Second step' },
+  { title: 'Three', content: 'Third step' },
+];
+
+function InlineSteps() {
+  const [current, setCurrent] = useState(1);
+
+  return (
+    <Stack gap="lg">
+      <Steps
+        items={items}
+        current={current}
+        type="inline"
+        onChange={setCurrent}
+      />
+      <Steps
+        items={items}
+        current={current}
+        type="inline"
+        titlePlacement="vertical"
+        offset={1}
+        onChange={setCurrent}
+      />
+    </Stack>
+  );
+}
+
+export default InlineSteps;
+```
+
+## Progress and max count
+
+`percent` draws a progress ring around the current icon. `maxCount` collapses long flows, folding the hidden range into a disabled ellipsis step while `onChange` keeps reporting the original indexes.
+
+```tsx preview
+import { Stack, Steps } from '@rockshin/tao-ui';
+
+const items = [
+  { title: 'Finished', content: 'This step is done.' },
+  { title: 'In Progress', content: 'Working on it now.' },
+  { title: 'Waiting', content: 'Not started yet.' },
+];
+
+function StepsProgress() {
+  return (
+    <Stack gap="xl">
+      <Steps items={items} current={1} percent={60} />
+      <Steps
+        current={3}
+        maxCount={5}
+        items={Array.from({ length: 10 }, (_, index) => ({
+          title: `Step ${index + 1}`,
+        }))}
+      />
+    </Stack>
+  );
+}
+
+export default StepsProgress;
+```
+
+## Custom icons
+
+`items[].icon` replaces a single step's glyph. `iconRender` replaces every glyph and receives the step index, the active flag, and an `Icon` component that renders the semantic icon container.
+
+```tsx preview
+import { Steps } from '@rockshin/tao-ui';
+
+const items = [
+  { title: 'Finished', content: 'This step is done.' },
+  { title: 'In Progress', content: 'Working on it now.' },
+  { title: 'Waiting', content: 'Not started yet.' },
+];
+
+function CustomIconSteps() {
+  return (
+    <Steps
+      items={items}
+      current={1}
+      iconRender={(_node, { index, active }) => (
+        <span
+          style={{
+            width: 32,
+            height: 32,
+            borderRadius: 8,
+            display: 'grid',
+            placeItems: 'center',
+            fontSize: 12,
+            border: `1px solid ${active ? 'currentColor' : 'transparent'}`,
+          }}
+        >
+          {index + 1}
+        </span>
+      )}
+    />
+  );
+}
+
+export default CustomIconSteps;
+```
+
+## Semantic DOM styling
+
+Every part of a step is addressable through `classNames` and `styles`, and each item can override its own parts.
+
+```tsx preview
+import { Steps } from '@rockshin/tao-ui';
+
+function StyledSteps() {
+  return (
+    <Steps
+      current={1}
+      items={[
+        { title: 'Finished', content: 'This step is done.' },
+        { title: 'In Progress', content: 'Working on it now.' },
+        { title: 'Waiting', content: 'Not started yet.' },
+      ]}
+      styles={{ itemTitle: { letterSpacing: '0.02em' } }}
+      classNames={{ itemContent: 'demo-step-content' }}
+    />
+  );
+}
+
+export default StyledSteps;
+```
+
+## API
+
+<API moduleName="steps" />

@@ -193,6 +193,22 @@ export {
   type SplitterSemanticPart,
 } from './components/splitter/splitter';
 export {
+  type StepItem,
+  Steps,
+  type StepsIconComponent,
+  type StepsIconRender,
+  type StepsIconRenderInfo,
+  type StepsItemSemanticPart,
+  type StepsOrientation,
+  type StepsProps,
+  type StepsSemanticPart,
+  type StepsSize,
+  type StepsStatus,
+  type StepsTitlePlacement,
+  type StepsType,
+  type StepsVariant,
+} from './components/steps/steps';
+export {
   Switch,
   type SwitchProps,
   type SwitchSemanticPart,

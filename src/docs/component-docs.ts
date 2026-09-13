@@ -29,6 +29,7 @@ import { sonnerDoc } from './components/sonner.doc';
 import { spinnerDoc } from './components/spinner.doc';
 import { splitterDoc } from './components/splitter.doc';
 import { stackDoc } from './components/stack.doc';
+import { stepsDoc } from './components/steps.doc';
 import { switchDoc } from './components/switch.doc';
 import { tableDoc } from './components/table.doc';
 import { tabsDoc } from './components/tabs.doc';
@@ -67,6 +68,7 @@ export const componentDocs = [
   spinnerDoc,
   splitterDoc,
   stackDoc,
+  stepsDoc,
   switchDoc,
   tableDoc,
   tabsDoc,

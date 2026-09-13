@@ -82,7 +82,16 @@
    =========================== */
 [data-tao-table] {
   width: 100%;
-  border-collapse: collapse;
+  /* `separate` + zero spacing — same model antd uses. With `collapse` a 1px
+     divider is centred on the grid line, so half of it composites over the row
+     above and half over the row below. On a hovered row (or a filled header)
+     one of those two device pixels lands on the fill and the other on the
+     neighbouring white row, so the fill swallows half the divider's ink and the
+     line reads as a faint hairline. With `separate` each cell's border-bottom is
+     painted entirely over its own row background, so the divider keeps its full
+     1px weight in every state. */
+  border-collapse: separate;
+  border-spacing: 0;
   table-layout: auto;
 }
 
@@ -415,6 +424,12 @@
 [data-tao-table-wrapper][data-tao-bordered] [data-tao-table] {
   border: var(--tao-line-width) solid var(--tao-table-border-color);
   border-radius: var(--tao-table-frame-radius);
+  /* Radius for the four corner cells, one border narrower than the frame so a
+     filled header / hovered edge row nests exactly inside the rounded frame. */
+  --tao-table-inner-radius: calc(
+    var(--tao-table-frame-radius) -
+    var(--tao-line-width)
+  );
 }
 
 [data-tao-table-wrapper][data-tao-bordered] [data-tao-table-cell] {
@@ -425,6 +440,51 @@
   tr
   > [data-tao-table-cell]:last-child {
   border-right: none;
+}
+
+/* The frame lives on the <table>, and with separate borders it no longer merges
+   with the last row's cells — drop their divider so the bottom edge stays 1px.
+   (`modern` frames its scroll container instead and has its own rule below.) */
+[data-tao-table-wrapper][data-tao-bordered]:not([data-tao-variant="modern"])
+  [data-tao-table-tbody]
+  tr:last-child
+  [data-tao-table-cell] {
+  border-bottom: none;
+}
+
+/* Separate borders paint cell backgrounds *over* the table's own border, so a
+   filled header cell or a hovered edge row would square off the frame's rounded
+   corners. Nest the four corner cells inside the frame instead (antd rounds its
+   corner cells for the same reason). `modern` frames + clips its scroll
+   container, so its corners are already handled. */
+[data-tao-table-wrapper][data-tao-bordered]:not([data-tao-variant="modern"])
+  [data-tao-table]
+  > thead
+  > tr:first-child
+  > [data-tao-table-cell]:first-child {
+  border-top-left-radius: var(--tao-table-inner-radius);
+}
+
+[data-tao-table-wrapper][data-tao-bordered]:not([data-tao-variant="modern"])
+  [data-tao-table]
+  > thead
+  > tr:first-child
+  > [data-tao-table-cell]:last-child {
+  border-top-right-radius: var(--tao-table-inner-radius);
+}
+
+[data-tao-table-wrapper][data-tao-bordered]:not([data-tao-variant="modern"])
+  [data-tao-table-tbody]
+  > tr:last-child
+  > [data-tao-table-cell]:first-child {
+  border-bottom-left-radius: var(--tao-table-inner-radius);
+}
+
+[data-tao-table-wrapper][data-tao-bordered]:not([data-tao-variant="modern"])
+  [data-tao-table-tbody]
+  > tr:last-child
+  > [data-tao-table-cell]:last-child {
+  border-bottom-right-radius: var(--tao-table-inner-radius);
 }
 
 [data-tao-table-wrapper][data-tao-variant="modern"][data-tao-bordered]

@@ -1,0 +1,1047 @@
+/* ===========================================================================
+   Steps
+   antd v6 Steps parity: same API and visuals, expressed with tao-ui tokens and
+   data attributes.
+   =========================================================================== */
+
+/* ===========================
+   Root variables
+   =========================== */
+[data-tao-steps] {
+  /* Icon geometry */
+  --tao-steps-icon-size: var(--tao-control-height);
+  --tao-steps-icon-hit-size: var(--tao-control-height);
+  --tao-steps-icon-size-active: var(--tao-steps-icon-size);
+  --tao-steps-icon-size-max: max(
+    var(--tao-steps-icon-size),
+    var(--tao-steps-icon-size-active)
+  );
+  --tao-steps-icon-border-width: var(--tao-line-width);
+  --tao-steps-line-width-bold: var(--tao-line-width-bold);
+  --tao-steps-rail-size: var(--tao-line-width);
+  --tao-steps-item-wrapper-padding-top: 0px;
+
+  /* Typography */
+  --tao-steps-title-font-size: var(--tao-font-size-lg);
+  --tao-steps-title-line-height: var(--tao-line-height-lg);
+  --tao-steps-subtitle-font-size: var(--tao-font-size-base);
+  --tao-steps-subtitle-line-height: var(--tao-line-height);
+  --tao-steps-title-height: calc(
+    var(--tao-steps-title-font-size) * var(--tao-steps-title-line-height)
+  );
+  --tao-steps-heading-height: max(
+    var(--tao-steps-icon-size),
+    var(--tao-steps-title-height)
+  );
+
+  /* Rhythm — antd's Steps uses the margin scale (margin / marginXS /
+     marginXXS), which theme.css derives alongside the padding scale. */
+  --tao-steps-item-margin: var(--tao-margin);
+  --tao-steps-rail-margin: var(--tao-margin);
+  --tao-steps-row-gap: var(--tao-padding-sm);
+  --tao-steps-rail-gap: var(--tao-margin-xxs);
+  --tao-steps-vertical-rail-margin: calc(var(--tao-margin-xxs) * 1.5);
+  /* antd's `fontSizeIcon` — the chevron drawn between navigation steps. */
+  --tao-steps-nav-arrow-size: calc(var(--tao-font-size) + 2px);
+
+  /* Status palette — re-declared per [data-tao-status] / variant below */
+  --tao-steps-rail-color: var(--tao-color-text-disabled);
+  --tao-steps-title-color: var(--tao-color-text);
+  --tao-steps-content-color: var(--tao-color-text-tertiary);
+  --tao-steps-content-active-color: var(--tao-color-text);
+  --tao-steps-subtitle-color: var(--tao-steps-content-color);
+  --tao-steps-text-hover-color: var(--tao-primary-hover);
+
+  --tao-steps-icon-custom-color: var(--tao-color-text-disabled);
+  --tao-steps-icon-bg: var(--tao-color-fill-tertiary);
+  --tao-steps-icon-border: transparent;
+  --tao-steps-icon-text: var(--tao-color-text-secondary);
+  --tao-steps-icon-bg-hover: var(--tao-primary-bg-hover);
+  --tao-steps-icon-border-hover: transparent;
+  --tao-steps-icon-text-hover: var(--tao-primary);
+  --tao-steps-icon-bg-active: var(--tao-primary);
+  --tao-steps-icon-border-active: transparent;
+  --tao-steps-icon-text-active: var(--tao-color-text-light-solid);
+
+  --tao-steps-dot-color: var(--tao-color-text-disabled);
+  --tao-steps-dot-bg: var(--tao-steps-dot-color);
+  --tao-steps-dot-border: var(--tao-steps-dot-color);
+
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: flex-start;
+  font-family: var(--tao-font-family);
+  color: var(--tao-color-text);
+}
+
+/* ===========================
+   Base DOM
+   =========================== */
+[data-tao-step] {
+  position: relative;
+  flex: none;
+}
+
+[data-tao-step-wrapper] {
+  display: flex;
+  flex-wrap: nowrap;
+  padding-top: var(--tao-steps-item-wrapper-padding-top);
+}
+
+[data-tao-step-header] {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+}
+
+[data-tao-step-title] {
+  color: var(--tao-steps-title-color);
+  font-size: var(--tao-steps-title-font-size);
+  line-height: var(--tao-steps-title-line-height);
+  word-break: break-word;
+}
+
+[data-tao-step-subtitle] {
+  color: var(--tao-steps-subtitle-color);
+  font-weight: var(--tao-font-weight-normal);
+  font-size: var(--tao-steps-subtitle-font-size);
+  line-height: var(--tao-steps-subtitle-line-height);
+  margin-inline-start: var(--tao-margin-xs);
+  word-break: break-word;
+}
+
+[data-tao-step-content] {
+  color: var(--tao-steps-content-color);
+  font-size: var(--tao-font-size-base);
+  line-height: var(--tao-line-height);
+  word-break: break-word;
+}
+
+[data-tao-step-rail] {
+  border-style: solid;
+  border-width: 0;
+}
+
+/* Motion — restricted to paint / composite properties. */
+[data-tao-step-title],
+[data-tao-step-subtitle],
+[data-tao-step-content],
+[data-tao-step-rail] {
+  transition:
+    color var(--tao-motion-duration-slow) var(--tao-motion-ease-out),
+    background-color var(--tao-motion-duration-slow) var(--tao-motion-ease-out),
+    border-color var(--tao-motion-duration-slow) var(--tao-motion-ease-out);
+}
+
+/* ===========================
+   Ellipsis
+   =========================== */
+[data-tao-steps][data-tao-ellipsis] [data-tao-step-title],
+[data-tao-steps][data-tao-ellipsis] [data-tao-step-subtitle],
+[data-tao-steps][data-tao-ellipsis] [data-tao-step-content] {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* ===========================
+   Clickable
+   =========================== */
+[data-tao-step][role="button"]:not([data-tao-active]):hover {
+  cursor: pointer;
+}
+
+[data-tao-step][role="button"]:focus-visible {
+  box-shadow: 0 0 0 2px var(--tao-control-outline);
+  border-radius: var(--tao-radius-sm);
+}
+
+/* ===========================
+   Icon
+   =========================== */
+[data-tao-step-icon] {
+  position: relative;
+  z-index: 1;
+  width: var(--tao-steps-icon-size);
+  height: var(--tao-steps-icon-size);
+  margin: 0;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--tao-font-size-base);
+  font-family: var(--tao-font-family);
+  line-height: var(--tao-steps-icon-size);
+  text-align: center;
+  border-radius: var(--tao-steps-icon-size);
+  border: var(--tao-steps-icon-border-width) solid transparent;
+  transition:
+    background-color var(--tao-motion-duration-slow) var(--tao-motion-ease-out),
+    border-color var(--tao-motion-duration-slow) var(--tao-motion-ease-out),
+    color var(--tao-motion-duration-slow) var(--tao-motion-ease-out),
+    transform var(--tao-motion-duration-slow) var(--tao-motion-ease-out);
+}
+
+/* Custom icon: drop the frame, scale the glyph to the box. */
+[data-tao-step][data-tao-custom] [data-tao-step-icon] {
+  background: none;
+  border: 0;
+  font-size: calc(var(--tao-steps-icon-size) * 0.875);
+  color: var(--tao-steps-icon-custom-color);
+}
+
+/* ===========================
+   Orientation: vertical
+   =========================== */
+[data-tao-steps][data-tao-orientation="vertical"] {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+[data-tao-steps][data-tao-orientation="vertical"] > [data-tao-step] {
+  min-height: calc(var(--tao-control-height) * 1.5);
+  padding-bottom: var(--tao-padding-sm);
+}
+
+[data-tao-steps][data-tao-orientation="vertical"] > [data-tao-step]:last-child {
+  padding-bottom: 0;
+}
+
+[data-tao-steps][data-tao-orientation="vertical"] [data-tao-step-icon] {
+  margin-inline-start: calc(
+    (var(--tao-steps-icon-size-max) - var(--tao-steps-icon-size)) / 2
+  );
+}
+
+[data-tao-steps][data-tao-orientation="vertical"] [data-tao-step-rail] {
+  --tao-steps-rail-offset: calc(
+    (var(--tao-steps-heading-height) - var(--tao-steps-icon-size)) / 2
+  );
+  position: absolute;
+  border-inline-start-width: var(--tao-steps-rail-size);
+  top: calc(
+    var(--tao-steps-icon-size) + var(--tao-steps-item-wrapper-padding-top) +
+      var(--tao-steps-rail-offset) + var(--tao-steps-vertical-rail-margin)
+  );
+  inset-inline-start: calc(var(--tao-steps-icon-size-max) / 2);
+  bottom: calc(
+    var(--tao-steps-vertical-rail-margin) - var(--tao-steps-rail-offset)
+  );
+  margin-inline-start: calc(var(--tao-steps-rail-size) / -2);
+}
+
+/* ===========================
+   Orientation: horizontal
+   =========================== */
+[data-tao-steps][data-tao-orientation="horizontal"] > [data-tao-step] {
+  flex: 1 1 auto;
+  min-width: var(--tao-steps-icon-size);
+}
+
+/* The rail lives inside the header and stretches to the next icon. */
+[data-tao-steps][data-tao-orientation="horizontal"]
+  > [data-tao-step]
+  [data-tao-step-rail] {
+  position: static;
+  width: auto;
+  flex: 1;
+  min-width: 0;
+  align-self: flex-start;
+  border-top-width: var(--tao-steps-rail-size);
+  margin-top: calc(
+    var(--tao-steps-icon-size-max) / 2 - var(--tao-steps-rail-size) / 2 +
+      var(--tao-steps-item-wrapper-padding-top)
+  );
+}
+
+/* ===========================
+   Title placement: horizontal (label beside the icon)
+   =========================== */
+[data-tao-steps][data-tao-title-placement="horizontal"] {
+  --tao-steps-heading-height: max(
+    var(--tao-steps-icon-size),
+    var(--tao-steps-title-height)
+  );
+}
+
+[data-tao-steps][data-tao-title-placement="horizontal"]
+  [data-tao-step-wrapper] {
+  column-gap: var(--tao-margin-xs);
+}
+
+[data-tao-steps][data-tao-title-placement="horizontal"]
+  [data-tao-step-section] {
+  flex: 1;
+  min-width: 0;
+}
+
+[data-tao-steps][data-tao-title-placement="horizontal"] [data-tao-step-header] {
+  min-height: var(--tao-steps-heading-height);
+}
+
+[data-tao-steps][data-tao-title-placement="horizontal"] [data-tao-step-title] {
+  flex: 0 1 auto;
+}
+
+[data-tao-steps][data-tao-title-placement="horizontal"]
+  [data-tao-step-subtitle] {
+  flex: 0 9999 auto;
+}
+
+[data-tao-steps][data-tao-title-placement="horizontal"] [data-tao-step-icon] {
+  margin-block-start: calc(
+    (var(--tao-steps-heading-height) - var(--tao-steps-icon-size)) / 2
+  );
+}
+
+/* `:where()` keeps this default's specificity low so `navigation` (and every
+   other type block below) can override it with a plain selector. */
+[data-tao-steps][data-tao-orientation="horizontal"]:where(
+    [data-tao-title-placement="horizontal"]
+  )
+  > [data-tao-step]:where(:not(:first-child)) {
+  margin-inline-start: var(--tao-steps-item-margin);
+}
+
+[data-tao-steps][data-tao-orientation="horizontal"]:where(
+    [data-tao-title-placement="horizontal"]
+  )
+  > [data-tao-step]:where(:last-child) {
+  flex: 0 1 auto;
+}
+
+[data-tao-steps][data-tao-orientation="horizontal"]:where(
+    [data-tao-title-placement="horizontal"]
+  )
+  [data-tao-step-rail] {
+  --tao-steps-item-wrapper-padding-top: 0px;
+  flex: 1 1 0%;
+  margin-inline-start: var(--tao-steps-rail-margin);
+}
+
+/* ===========================
+   Title placement: vertical (label under the icon)
+   =========================== */
+[data-tao-steps][data-tao-title-placement="vertical"] {
+  --tao-steps-row-gap: var(--tao-padding-sm);
+  --tao-steps-rail-gap: var(--tao-margin-xxs);
+  --tao-steps-heading-height: var(--tao-steps-icon-size-max);
+}
+
+[data-tao-steps][data-tao-title-placement="vertical"] > [data-tao-step] {
+  flex: 1 1 0%;
+}
+
+[data-tao-steps][data-tao-title-placement="vertical"]
+  > [data-tao-step]
+  [data-tao-step-wrapper] {
+  flex-direction: column;
+  row-gap: var(--tao-steps-row-gap);
+  align-items: center;
+}
+
+[data-tao-steps][data-tao-title-placement="vertical"]
+  > [data-tao-step]
+  [data-tao-step-section] {
+  align-self: stretch;
+}
+
+[data-tao-steps][data-tao-title-placement="vertical"]
+  > [data-tao-step]
+  [data-tao-step-header] {
+  flex-direction: column;
+  align-items: center;
+}
+
+[data-tao-steps][data-tao-title-placement="vertical"]
+  > [data-tao-step]
+  [data-tao-step-title],
+[data-tao-steps][data-tao-title-placement="vertical"]
+  > [data-tao-step]
+  [data-tao-step-subtitle],
+[data-tao-steps][data-tao-title-placement="vertical"]
+  > [data-tao-step]
+  [data-tao-step-content] {
+  text-align: center;
+  max-width: 100%;
+}
+
+[data-tao-steps][data-tao-title-placement="vertical"]
+  > [data-tao-step]
+  [data-tao-step-subtitle] {
+  margin: 0;
+}
+
+/* The rail crosses the gap between two icons, centred on the item. */
+[data-tao-steps][data-tao-title-placement="vertical"]
+  > [data-tao-step]
+  [data-tao-step-rail] {
+  position: absolute;
+  top: 0;
+  width: calc(
+    100% - var(--tao-steps-icon-size) - var(--tao-steps-rail-gap) * 2
+  );
+  inset-inline-start: calc(
+    50% + var(--tao-steps-icon-size) / 2 + var(--tao-steps-rail-gap)
+  );
+}
+
+/* ===========================
+   Size: small
+   =========================== */
+[data-tao-steps][data-tao-size="small"] {
+  --tao-steps-icon-size: calc(var(--tao-control-height) - 8px);
+  --tao-steps-item-margin: var(--tao-margin-sm);
+  --tao-steps-row-gap: var(--tao-padding-xs);
+  --tao-steps-title-font-size: var(--tao-font-size-base);
+  --tao-steps-title-line-height: var(--tao-line-height);
+  --tao-steps-rail-margin: var(--tao-margin-xs);
+}
+
+/* ===========================
+   Type: dot (shared by inline)
+   =========================== */
+[data-tao-steps][data-tao-type="dot"],
+[data-tao-steps][data-tao-type="inline"] {
+  --tao-steps-icon-size: calc(var(--tao-control-height) / 4);
+  --tao-steps-icon-size-active: calc(var(--tao-control-height-lg) / 4);
+  --tao-steps-icon-border-width: var(--tao-steps-line-width-bold);
+  --tao-steps-rail-size: var(--tao-steps-line-width-bold);
+}
+
+/* Enlarged hit area so an 8px dot is still comfortably clickable. */
+[data-tao-steps][data-tao-type="dot"] [data-tao-step-icon]::after,
+[data-tao-steps][data-tao-type="inline"] [data-tao-step-icon]::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--tao-steps-icon-hit-size);
+  height: var(--tao-steps-icon-hit-size);
+  transform: translate(-50%, -50%);
+}
+
+[data-tao-steps][data-tao-type="dot"]
+  [data-tao-step][data-tao-custom]
+  [data-tao-step-icon],
+[data-tao-steps][data-tao-type="inline"]
+  [data-tao-step][data-tao-custom]
+  [data-tao-step-icon] {
+  font-size: var(--tao-font-size-sm);
+  color: var(--tao-steps-icon-custom-color);
+}
+
+/* The icon *is* the dot — it only grows on the current step. */
+[data-tao-steps][data-tao-type="dot"]
+  [data-tao-step][data-tao-active]
+  [data-tao-step-icon],
+[data-tao-steps][data-tao-type="inline"]
+  [data-tao-step][data-tao-active]
+  [data-tao-step-icon] {
+  --tao-steps-icon-size: var(--tao-steps-icon-size-active);
+}
+
+/* ===========================
+   Status — shared text / rail colors
+   =========================== */
+[data-tao-step][data-tao-status="wait"] {
+  --tao-steps-icon-custom-color: var(--tao-color-text-disabled);
+  --tao-steps-title-color: var(--tao-color-text-tertiary);
+  --tao-steps-content-color: var(--tao-color-text-tertiary);
+  --tao-steps-content-active-color: var(--tao-color-text);
+  --tao-steps-text-hover-color: var(--tao-primary-hover);
+}
+
+[data-tao-step][data-tao-status="process"],
+[data-tao-step][data-tao-status="finish"] {
+  --tao-steps-icon-custom-color: var(--tao-primary);
+  --tao-steps-title-color: var(--tao-color-text);
+  --tao-steps-content-color: var(--tao-color-text-tertiary);
+  --tao-steps-content-active-color: var(--tao-color-text);
+  --tao-steps-text-hover-color: var(--tao-primary-hover);
+}
+
+[data-tao-step][data-tao-status="error"] {
+  --tao-steps-icon-custom-color: var(--tao-error);
+  --tao-steps-title-color: var(--tao-error);
+  --tao-steps-content-color: var(--tao-error);
+  --tao-steps-content-active-color: var(--tao-error);
+  --tao-steps-text-hover-color: var(--tao-error-hover);
+}
+
+[data-tao-step][data-tao-active] [data-tao-step-content] {
+  color: var(--tao-steps-content-active-color);
+}
+
+[data-tao-step][role="button"]:not([data-tao-active]):hover [data-tao-step-title],
+[data-tao-step][role="button"]:not([data-tao-active]):hover
+  [data-tao-step-content] {
+  color: var(--tao-steps-text-hover-color);
+}
+
+/* Rail — its own status drives the colour, so it is declared on the rail. */
+[data-tao-step-rail][data-tao-status="wait"] {
+  border-color: var(--tao-color-text-disabled);
+}
+
+[data-tao-step-rail][data-tao-status="process"],
+[data-tao-step-rail][data-tao-status="finish"] {
+  border-color: var(--tao-primary);
+}
+
+[data-tao-step-rail][data-tao-status="error"] {
+  border-color: var(--tao-error);
+}
+
+/* ===========================
+   Icon frame — default / navigation / panel
+   (dot + inline get the dot rules further down)
+   =========================== */
+[data-tao-steps][data-tao-type="default"]
+  [data-tao-step]:not([data-tao-custom])
+  [data-tao-step-icon],
+[data-tao-steps][data-tao-type="navigation"]
+  [data-tao-step]:not([data-tao-custom])
+  [data-tao-step-icon],
+[data-tao-steps][data-tao-type="panel"]
+  [data-tao-step]:not([data-tao-custom])
+  [data-tao-step-icon] {
+  background: var(--tao-steps-icon-bg);
+  border-color: var(--tao-steps-icon-border);
+  color: var(--tao-steps-icon-text);
+}
+
+[data-tao-steps][data-tao-type="default"]
+  [data-tao-step]:not([data-tao-custom])[role="button"]:not(
+    [data-tao-active]
+  ):hover
+  [data-tao-step-icon],
+[data-tao-steps][data-tao-type="navigation"]
+  [data-tao-step]:not([data-tao-custom])[role="button"]:not(
+    [data-tao-active]
+  ):hover
+  [data-tao-step-icon],
+[data-tao-steps][data-tao-type="panel"]
+  [data-tao-step]:not([data-tao-custom])[role="button"]:not(
+    [data-tao-active]
+  ):hover
+  [data-tao-step-icon] {
+  background: var(--tao-steps-icon-bg-hover);
+  border-color: var(--tao-steps-icon-border-hover);
+  color: var(--tao-steps-icon-text-hover);
+}
+
+/* Navigation deliberately keeps the process/finish frame on the current step —
+   its active affordance is the underline, not a solid icon. */
+[data-tao-steps][data-tao-type="default"]
+  [data-tao-step]:not([data-tao-custom])[data-tao-active]
+  [data-tao-step-icon],
+[data-tao-steps][data-tao-type="panel"]
+  [data-tao-step]:not([data-tao-custom])[data-tao-active]
+  [data-tao-step-icon] {
+  background: var(--tao-steps-icon-bg-active);
+  border-color: var(--tao-steps-icon-border-active);
+  color: var(--tao-steps-icon-text-active);
+}
+
+/* Dot / inline frame: the icon box is the dot itself. */
+[data-tao-steps][data-tao-type="dot"]
+  [data-tao-step]:not([data-tao-custom])
+  [data-tao-step-icon],
+[data-tao-steps][data-tao-type="inline"]
+  [data-tao-step]:not([data-tao-custom])
+  [data-tao-step-icon] {
+  background: var(--tao-steps-dot-bg);
+  border-color: var(--tao-steps-dot-border);
+  color: var(--tao-steps-dot-color);
+}
+
+/* ===========================
+   Variant: filled
+   =========================== */
+[data-tao-steps][data-tao-variant="filled"] [data-tao-step] {
+  --tao-steps-dot-border: transparent;
+}
+
+[data-tao-steps][data-tao-variant="filled"]
+  [data-tao-step][data-tao-status="wait"] {
+  --tao-steps-icon-bg: var(--tao-color-fill-tertiary);
+  --tao-steps-icon-border: transparent;
+  --tao-steps-icon-text: var(--tao-color-text-secondary);
+  --tao-steps-dot-bg: var(--tao-color-text-disabled);
+  --tao-steps-icon-bg-hover: var(--tao-primary-bg-hover);
+  --tao-steps-icon-border-hover: transparent;
+  --tao-steps-icon-text-hover: var(--tao-primary);
+  --tao-steps-icon-bg-active: var(--tao-primary);
+  --tao-steps-icon-border-active: transparent;
+  --tao-steps-icon-text-active: var(--tao-color-text-light-solid);
+}
+
+[data-tao-steps][data-tao-variant="filled"]
+  [data-tao-step][data-tao-status="process"],
+[data-tao-steps][data-tao-variant="filled"]
+  [data-tao-step][data-tao-status="finish"] {
+  --tao-steps-icon-bg: var(--tao-primary-bg);
+  --tao-steps-icon-border: transparent;
+  --tao-steps-icon-text: var(--tao-primary);
+  --tao-steps-dot-bg: var(--tao-primary);
+  --tao-steps-icon-bg-hover: var(--tao-primary-bg-hover);
+  --tao-steps-icon-border-hover: transparent;
+  --tao-steps-icon-text-hover: var(--tao-primary);
+  --tao-steps-icon-bg-active: var(--tao-primary);
+  --tao-steps-icon-border-active: transparent;
+  --tao-steps-icon-text-active: var(--tao-color-text-light-solid);
+}
+
+[data-tao-steps][data-tao-variant="filled"]
+  [data-tao-step][data-tao-status="error"] {
+  --tao-steps-icon-bg: var(--tao-error-bg);
+  --tao-steps-icon-border: transparent;
+  --tao-steps-icon-text: var(--tao-error);
+  --tao-steps-dot-bg: var(--tao-error);
+  /* antd's colorErrorBgFilledHover */
+  --tao-steps-icon-bg-hover: color-mix(
+    in oklch,
+    var(--tao-color-error) 12%,
+    var(--tao-color-bg-base)
+  );
+  --tao-steps-icon-border-hover: transparent;
+  --tao-steps-icon-text-hover: var(--tao-error);
+  --tao-steps-icon-bg-active: var(--tao-error);
+  --tao-steps-icon-border-active: transparent;
+  --tao-steps-icon-text-active: var(--tao-color-text-light-solid);
+}
+
+/* ===========================
+   Variant: outlined
+   =========================== */
+[data-tao-steps][data-tao-variant="outlined"] [data-tao-step] {
+  --tao-steps-dot-bg: transparent;
+}
+
+[data-tao-steps][data-tao-variant="outlined"]
+  [data-tao-step][data-tao-status="wait"] {
+  --tao-steps-icon-bg: var(--tao-color-bg-container);
+  --tao-steps-icon-border: var(--tao-color-text-disabled);
+  --tao-steps-icon-text: var(--tao-color-text-disabled);
+  --tao-steps-dot-color: var(--tao-color-text-disabled);
+  --tao-steps-icon-bg-hover: transparent;
+  --tao-steps-icon-border-hover: var(--tao-primary-hover);
+  --tao-steps-icon-text-hover: var(--tao-primary-hover);
+  --tao-steps-icon-bg-active: var(--tao-color-fill-tertiary);
+  --tao-steps-icon-border-active: var(--tao-color-text-disabled);
+  --tao-steps-icon-text-active: var(--tao-color-text-secondary);
+}
+
+[data-tao-steps][data-tao-variant="outlined"]
+  [data-tao-step][data-tao-status="process"],
+[data-tao-steps][data-tao-variant="outlined"]
+  [data-tao-step][data-tao-status="finish"] {
+  --tao-steps-icon-bg: var(--tao-color-bg-container);
+  --tao-steps-icon-border: var(--tao-primary);
+  --tao-steps-icon-text: var(--tao-primary);
+  --tao-steps-dot-color: var(--tao-primary);
+  --tao-steps-icon-bg-hover: transparent;
+  --tao-steps-icon-border-hover: var(--tao-primary-hover);
+  --tao-steps-icon-text-hover: var(--tao-primary-hover);
+  --tao-steps-icon-bg-active: var(--tao-primary-bg);
+  --tao-steps-icon-border-active: var(--tao-primary);
+  --tao-steps-icon-text-active: var(--tao-primary);
+}
+
+[data-tao-steps][data-tao-variant="outlined"]
+  [data-tao-step][data-tao-status="error"] {
+  --tao-steps-icon-bg: var(--tao-color-bg-container);
+  --tao-steps-icon-border: var(--tao-error);
+  --tao-steps-icon-text: var(--tao-error);
+  --tao-steps-dot-color: var(--tao-error);
+  --tao-steps-icon-bg-hover: transparent;
+  --tao-steps-icon-border-hover: var(--tao-error-hover);
+  --tao-steps-icon-text-hover: var(--tao-error-hover);
+  --tao-steps-icon-bg-active: var(--tao-error-bg);
+  --tao-steps-icon-border-active: var(--tao-error);
+  --tao-steps-icon-text-active: var(--tao-error);
+}
+
+/* ===========================
+   Type: navigation
+   =========================== */
+[data-tao-steps][data-tao-type="navigation"] > [data-tao-step] {
+  display: flex;
+  justify-content: center;
+  position: relative;
+  flex: 1;
+  margin-inline-start: 0;
+}
+
+[data-tao-steps][data-tao-type="navigation"] [data-tao-step-wrapper] {
+  padding-block: var(--tao-padding-sm);
+}
+
+[data-tao-steps][data-tao-type="navigation"] [data-tao-step-section] {
+  max-width: unset;
+}
+
+[data-tao-steps][data-tao-type="navigation"] [data-tao-step-rail] {
+  display: none;
+}
+
+/* Active underline. antd grows it from the centre; a scaleX/scaleY from the
+   centre is identical and stays on the compositor. */
+[data-tao-steps][data-tao-type="navigation"] > [data-tao-step]::before {
+  content: "";
+  position: absolute;
+  display: block;
+  background-color: var(--tao-primary);
+  transition: transform var(--tao-motion-duration-slow)
+    var(--tao-motion-ease-out);
+}
+
+[data-tao-steps][data-tao-type="navigation"][data-tao-orientation="horizontal"]
+  > [data-tao-step]::before {
+  inset-inline: 0;
+  bottom: 0;
+  height: var(--tao-steps-line-width-bold);
+  transform: scaleX(0);
+}
+
+[data-tao-steps][data-tao-type="navigation"][data-tao-orientation="horizontal"]
+  > [data-tao-step][data-tao-active]::before {
+  transform: scaleX(1);
+}
+
+[data-tao-steps][data-tao-type="navigation"][data-tao-orientation="vertical"]
+  > [data-tao-step]::before {
+  inset-block: 0;
+  inset-inline-end: 0;
+  width: var(--tao-steps-line-width-bold);
+  transform: scaleY(0);
+}
+
+[data-tao-steps][data-tao-type="navigation"][data-tao-orientation="vertical"]
+  > [data-tao-step][data-tao-active]::before {
+  transform: scaleY(1);
+}
+
+/* Chevron between items. */
+[data-tao-steps][data-tao-type="navigation"]
+  > [data-tao-step]:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  display: block;
+  border-top: var(--tao-line-width) solid var(--tao-color-text-disabled);
+  border-right: var(--tao-line-width) solid var(--tao-color-text-disabled);
+}
+
+[data-tao-steps][data-tao-type="navigation"][data-tao-orientation="horizontal"]
+  > [data-tao-step]:not(:last-child)::after {
+  top: 50%;
+  inset-inline-start: calc(100% - var(--tao-steps-nav-arrow-size) / 2);
+  width: var(--tao-steps-nav-arrow-size);
+  height: var(--tao-steps-nav-arrow-size);
+  transform: translateY(-50%) rotate(45deg);
+}
+
+[data-tao-steps][data-tao-type="navigation"][data-tao-orientation="vertical"]
+  > [data-tao-step]:not(:last-child)::after {
+  top: 100%;
+  inset-inline-start: 50%;
+  width: calc(var(--tao-steps-nav-arrow-size) / 3 * 2);
+  height: calc(var(--tao-steps-nav-arrow-size) / 3 * 2);
+  transform: translateY(-50%) translateX(-50%) rotate(135deg);
+}
+
+:dir(rtl)
+  [data-tao-steps][data-tao-type="navigation"][data-tao-orientation="horizontal"]
+  > [data-tao-step]:not(:last-child)::after {
+  border-right: none;
+  border-left: var(--tao-line-width) solid var(--tao-color-text-disabled);
+  transform: translateY(-50%) rotate(-45deg);
+}
+
+/* ===========================
+   Type: panel
+   =========================== */
+[data-tao-steps][data-tao-type="panel"] {
+  --tao-steps-panel-padding: var(--tao-padding-sm);
+  --tao-steps-panel-radius: var(--tao-radius-md);
+  --tao-steps-panel-line-width: var(--tao-steps-line-width-bold);
+}
+
+[data-tao-steps][data-tao-type="panel"][data-tao-orientation="horizontal"] {
+  align-items: stretch;
+}
+
+[data-tao-steps][data-tao-type="panel"] > [data-tao-step] {
+  /* Panel surfaces reuse the step icon palette, resolved on the item itself. */
+  --tao-steps-panel-bg: var(--tao-steps-icon-bg);
+  --tao-steps-panel-border: var(--tao-steps-icon-border);
+  --tao-steps-panel-active-bg: var(--tao-steps-icon-bg-active);
+  --tao-steps-panel-active-border: var(--tao-steps-icon-border-active);
+  --tao-steps-panel-title-height: calc(
+    var(--tao-steps-title-font-size) * var(--tao-steps-title-line-height)
+  );
+  --tao-steps-panel-base-height: calc(
+    var(--tao-steps-panel-padding) * 2 + var(--tao-steps-icon-size) +
+      var(--tao-steps-panel-title-height)
+  );
+  --tao-steps-panel-notch-width: calc(
+    var(--tao-steps-panel-base-height) * 0.7071
+  );
+
+  flex: 1;
+  margin: 0;
+  position: relative;
+  padding: var(--tao-steps-panel-padding);
+  background: var(--tao-steps-panel-bg);
+  border-block: var(--tao-steps-panel-line-width) solid
+    var(--tao-steps-panel-border);
+  transition: background-color var(--tao-motion-duration-mid)
+    var(--tao-motion-ease-out);
+}
+
+[data-tao-steps][data-tao-type="panel"] > [data-tao-step]:not(:first-child) {
+  padding-inline-start: calc(
+    var(--tao-steps-panel-padding) + var(--tao-steps-panel-notch-width)
+  );
+}
+
+[data-tao-steps][data-tao-type="panel"] > [data-tao-step]:first-child {
+  border-inline-start: var(--tao-steps-panel-line-width) solid
+    var(--tao-steps-panel-border);
+  border-start-start-radius: var(--tao-steps-panel-radius);
+  border-end-start-radius: var(--tao-steps-panel-radius);
+}
+
+[data-tao-steps][data-tao-type="panel"] > [data-tao-step]:last-child {
+  border-inline-end: var(--tao-steps-panel-line-width) solid
+    var(--tao-steps-panel-border);
+  border-start-end-radius: var(--tao-steps-panel-radius);
+  border-end-end-radius: var(--tao-steps-panel-radius);
+}
+
+[data-tao-steps][data-tao-type="panel"]
+  > [data-tao-step][data-tao-active] {
+  background: var(--tao-steps-panel-active-bg);
+  border-color: var(--tao-steps-panel-active-border);
+}
+
+[data-tao-steps][data-tao-type="panel"]
+  > [data-tao-step][data-tao-active]
+  [data-tao-step-title],
+[data-tao-steps][data-tao-type="panel"]
+  > [data-tao-step][data-tao-active]
+  [data-tao-step-subtitle],
+[data-tao-steps][data-tao-type="panel"]
+  > [data-tao-step][data-tao-active]
+  [data-tao-step-content] {
+  color: var(--tao-steps-icon-text-active);
+}
+
+[data-tao-steps][data-tao-type="panel"] [data-tao-step-rail] {
+  display: none;
+}
+
+[data-tao-steps][data-tao-type="panel"] [data-tao-step-icon] {
+  display: none;
+}
+
+[data-tao-steps][data-tao-type="panel"] [data-tao-step-header] {
+  min-height: auto;
+}
+
+/* Notched separator between panels. */
+[data-tao-steps][data-tao-type="panel"] [data-tao-steps-panel-arrow] {
+  position: absolute;
+  top: calc(var(--tao-steps-panel-line-width) * -1);
+  inset-inline-start: 100%;
+  z-index: 1;
+  height: calc(var(--tao-steps-panel-line-width) * 2 + 100%);
+  width: var(--tao-steps-panel-notch-width);
+  overflow: visible;
+  stroke-linecap: round;
+}
+
+[data-tao-steps][data-tao-type="panel"]
+  [data-tao-steps-panel-arrow]
+  path {
+  /* `fill` / `stroke` are the SVG counterparts of background-color /
+     border-color — paint-only, so animating them stays cheap. */
+  fill: var(--tao-steps-panel-bg);
+  stroke: var(--tao-steps-panel-border);
+  stroke-width: var(--tao-steps-panel-line-width);
+  vector-effect: non-scaling-stroke;
+  transition: fill var(--tao-motion-duration-mid) var(--tao-motion-ease-out);
+}
+
+[data-tao-steps][data-tao-type="panel"]
+  > [data-tao-step][data-tao-active]
+  [data-tao-steps-panel-arrow]
+  path {
+  fill: var(--tao-steps-panel-active-bg);
+  stroke: var(--tao-steps-panel-active-border);
+}
+
+[data-tao-steps][data-tao-type="panel"]
+  > [data-tao-step]:last-child
+  [data-tao-steps-panel-arrow] {
+  display: none;
+}
+
+[data-tao-steps][data-tao-type="panel"][data-tao-size="small"] {
+  --tao-steps-panel-padding: var(--tao-padding-xs);
+  --tao-steps-panel-radius: var(--tao-radius-sm);
+}
+
+/* `filled` panels overlap so the notches interlock. */
+[data-tao-steps][data-tao-type="panel"][data-tao-variant="filled"]
+  > [data-tao-step]:not(:first-child) {
+  clip-path: polygon(
+    var(--tao-steps-panel-line-width) 0,
+    calc(100% + var(--tao-steps-panel-notch-width)) 0,
+    calc(100% + var(--tao-steps-panel-notch-width)) 100%,
+    var(--tao-steps-panel-line-width) 100%,
+    calc(var(--tao-steps-panel-notch-width) + var(--tao-steps-panel-line-width))
+      50%
+  );
+}
+
+:dir(rtl)
+  [data-tao-steps][data-tao-type="panel"][data-tao-variant="filled"]
+  > [data-tao-step]:not(:first-child) {
+  clip-path: polygon(
+    calc(0px - var(--tao-steps-panel-notch-width)) 0,
+    calc(100% - var(--tao-steps-panel-line-width)) 0,
+    calc(
+        100% - var(--tao-steps-panel-notch-width) -
+          var(--tao-steps-panel-line-width)
+      )
+      50%,
+    calc(100% - var(--tao-steps-panel-line-width)) 100%,
+    calc(0px - var(--tao-steps-panel-notch-width)) 100%
+  );
+}
+
+:dir(rtl)
+  [data-tao-steps][data-tao-type="panel"] [data-tao-steps-panel-arrow] {
+  transform: scaleX(-1);
+}
+
+/* ===========================
+   Type: inline
+   =========================== */
+[data-tao-steps][data-tao-type="inline"] {
+  --tao-steps-icon-size: 6px;
+  --tao-steps-icon-size-active: 6px;
+  --tao-steps-icon-border-width: var(--tao-line-width);
+  --tao-steps-rail-size: var(--tao-line-width);
+  --tao-steps-row-gap: var(--tao-padding-xs);
+  --tao-steps-rail-gap: 0px;
+  --tao-steps-item-wrapper-padding-top: calc(
+    var(--tao-padding-xs) + var(--tao-line-width)
+  );
+  --tao-steps-title-font-size: var(--tao-font-size-sm);
+  --tao-steps-title-line-height: var(--tao-line-height-sm);
+  --tao-steps-title-color: var(--tao-color-text-secondary);
+  --tao-steps-subtitle-font-size: var(--tao-font-size-sm);
+  --tao-steps-subtitle-line-height: var(--tao-line-height-sm);
+  --tao-steps-subtitle-color: var(--tao-color-text-quaternary);
+
+  display: inline-flex;
+}
+
+[data-tao-steps][data-tao-type="inline"]::before {
+  content: "";
+  flex: var(--tao-steps-items-offset);
+}
+
+[data-tao-steps][data-tao-type="inline"] > [data-tao-step] {
+  flex: 1;
+}
+
+[data-tao-steps][data-tao-type="inline"] [data-tao-step-wrapper] {
+  padding-inline: var(--tao-padding-xxs);
+  margin-inline: calc(var(--tao-margin-xxs) / 2);
+  border-radius: var(--tao-radius-sm);
+  cursor: pointer;
+  transition: background-color var(--tao-motion-duration-mid)
+    var(--tao-motion-ease-out);
+}
+
+[data-tao-steps][data-tao-type="inline"] [data-tao-step-wrapper]:hover {
+  background: var(--tao-control-item-bg-hover);
+}
+
+[data-tao-steps][data-tao-type="inline"] [data-tao-step-title] {
+  font-weight: var(--tao-font-weight-normal);
+  white-space: nowrap;
+}
+
+/* Content is surfaced through a tooltip instead of the body. */
+[data-tao-steps][data-tao-type="inline"] [data-tao-step-content] {
+  display: none;
+}
+
+/* ===========================
+   Max count — collapsed ranges
+   =========================== */
+[data-tao-steps][data-tao-max-count] [data-tao-step][data-tao-ellipsis]
+  [data-tao-step-title],
+[data-tao-steps][data-tao-max-count] [data-tao-step][data-tao-ellipsis]
+  [data-tao-step-subtitle],
+[data-tao-steps][data-tao-max-count] [data-tao-step][data-tao-ellipsis]
+  [data-tao-step-content] {
+  color: var(--tao-color-text-tertiary);
+}
+
+/* ===========================
+   Percent — progress ring around the current icon
+   =========================== */
+[data-tao-steps][data-tao-with-progress] {
+  --tao-steps-item-wrapper-padding-top: calc(
+    var(--tao-steps-line-width-bold) * 2
+  );
+}
+
+[data-tao-steps-progress] {
+  --tao-steps-progress-enhance: calc(var(--tao-steps-line-width-bold) * 2);
+  /* Resize the 100x100 viewBox to the icon plus the ring's overflow, then
+     convert back to user units so r / stroke-width can be expressed in px. */
+  --tao-steps-progress-svg-size: calc(
+    var(--tao-steps-progress-enhance) * 2 + var(--tao-steps-icon-size)
+  );
+  --tao-steps-progress-unitless: calc(
+    100 / tan(atan2(var(--tao-steps-progress-svg-size), 1px))
+  );
+  --tao-steps-progress-radius: calc(
+    (var(--tao-steps-progress-svg-size) - var(--tao-steps-line-width-bold)) *
+      var(--tao-steps-progress-unitless) / 2
+  );
+
+  position: absolute;
+  inset: calc(var(--tao-steps-progress-enhance) * -1);
+  width: var(--tao-steps-progress-svg-size);
+  height: var(--tao-steps-progress-svg-size);
+  pointer-events: none;
+}
+
+[data-tao-steps-progress] circle {
+  r: var(--tao-steps-progress-radius);
+  cx: 50;
+  cy: 50;
+  fill: none;
+  stroke-width: calc(
+    var(--tao-steps-progress-unitless) * var(--tao-steps-line-width-bold)
+  );
+  /* Paint-only animation of a ~40px SVG (antd animates the same property). */
+  transition: stroke-dasharray var(--tao-motion-duration-slow)
+    var(--tao-motion-ease-out);
+}
+
+[data-tao-steps-progress-rail] {
+  stroke: var(--tao-color-border-secondary);
+}
+
+[data-tao-steps-progress-ptg] {
+  stroke: var(--tao-primary);
+}

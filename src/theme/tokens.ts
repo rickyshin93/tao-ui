@@ -5,11 +5,14 @@ export type TaoTokenName =
   | '--tao-box-shadow-xs'
   | '--tao-color-bg-base'
   | '--tao-color-bg-container'
+  | '--tao-color-bg-container-disabled'
   | '--tao-color-bg-disabled'
   | '--tao-color-bg-elevated'
   | '--tao-color-bg-layout'
   | '--tao-color-bg-mask'
   | '--tao-color-bg-surface'
+  | '--tao-color-bg-text-active'
+  | '--tao-color-bg-text-hover'
   | '--tao-color-border'
   | '--tao-color-border-secondary'
   | '--tao-color-error'
@@ -20,10 +23,14 @@ export type TaoTokenName =
   | '--tao-color-fill-tertiary'
   | '--tao-color-primary'
   | '--tao-color-shadow-hint'
+  | '--tao-color-split'
   | '--tao-color-success'
   | '--tao-color-text'
   | '--tao-color-text-base'
+  | '--tao-color-text-description'
   | '--tao-color-text-disabled'
+  | '--tao-color-text-heading'
+  | '--tao-color-text-label'
   | '--tao-color-text-light-solid'
   | '--tao-color-text-placeholder'
   | '--tao-color-text-quaternary'
@@ -35,10 +42,14 @@ export type TaoTokenName =
   | '--tao-control-height-lg'
   | '--tao-control-height-sm'
   | '--tao-control-item-bg-active'
+  | '--tao-control-item-bg-active-hover'
   | '--tao-control-item-bg-hover'
   | '--tao-control-outline'
+  | '--tao-control-padding-horizontal'
+  | '--tao-control-padding-horizontal-sm'
   | '--tao-control-range-width'
   | '--tao-control-width'
+  | '--tao-drop-shadow-popover'
   | '--tao-error'
   | '--tao-error-active'
   | '--tao-error-bg'
@@ -60,6 +71,15 @@ export type TaoTokenName =
   | '--tao-line-height-lg'
   | '--tao-line-height-sm'
   | '--tao-line-width'
+  | '--tao-line-width-bold'
+  | '--tao-margin'
+  | '--tao-margin-lg'
+  | '--tao-margin-md'
+  | '--tao-margin-sm'
+  | '--tao-margin-xl'
+  | '--tao-margin-xs'
+  | '--tao-margin-xxl'
+  | '--tao-margin-xxs'
   | '--tao-motion-duration-fast'
   | '--tao-motion-duration-mid'
   | '--tao-motion-duration-slow'
@@ -92,8 +112,17 @@ export type TaoTokenName =
   | '--tao-radius-xl'
   | '--tao-radius-xs'
   | '--tao-ring-width'
+  | '--tao-size'
+  | '--tao-size-lg'
+  | '--tao-size-md'
+  | '--tao-size-ms'
+  | '--tao-size-sm'
   | '--tao-size-step'
   | '--tao-size-unit'
+  | '--tao-size-xl'
+  | '--tao-size-xs'
+  | '--tao-size-xxl'
+  | '--tao-size-xxs'
   | '--tao-success'
   | '--tao-success-bg'
   | '--tao-success-border'
@@ -117,11 +146,14 @@ export const taoTokenNames = [
   '--tao-box-shadow-xs',
   '--tao-color-bg-base',
   '--tao-color-bg-container',
+  '--tao-color-bg-container-disabled',
   '--tao-color-bg-disabled',
   '--tao-color-bg-elevated',
   '--tao-color-bg-layout',
   '--tao-color-bg-mask',
   '--tao-color-bg-surface',
+  '--tao-color-bg-text-active',
+  '--tao-color-bg-text-hover',
   '--tao-color-border',
   '--tao-color-border-secondary',
   '--tao-color-error',
@@ -132,10 +164,14 @@ export const taoTokenNames = [
   '--tao-color-fill-tertiary',
   '--tao-color-primary',
   '--tao-color-shadow-hint',
+  '--tao-color-split',
   '--tao-color-success',
   '--tao-color-text',
   '--tao-color-text-base',
+  '--tao-color-text-description',
   '--tao-color-text-disabled',
+  '--tao-color-text-heading',
+  '--tao-color-text-label',
   '--tao-color-text-light-solid',
   '--tao-color-text-placeholder',
   '--tao-color-text-quaternary',
@@ -147,10 +183,14 @@ export const taoTokenNames = [
   '--tao-control-height-lg',
   '--tao-control-height-sm',
   '--tao-control-item-bg-active',
+  '--tao-control-item-bg-active-hover',
   '--tao-control-item-bg-hover',
   '--tao-control-outline',
+  '--tao-control-padding-horizontal',
+  '--tao-control-padding-horizontal-sm',
   '--tao-control-range-width',
   '--tao-control-width',
+  '--tao-drop-shadow-popover',
   '--tao-error',
   '--tao-error-active',
   '--tao-error-bg',
@@ -172,6 +212,15 @@ export const taoTokenNames = [
   '--tao-line-height-lg',
   '--tao-line-height-sm',
   '--tao-line-width',
+  '--tao-line-width-bold',
+  '--tao-margin',
+  '--tao-margin-lg',
+  '--tao-margin-md',
+  '--tao-margin-sm',
+  '--tao-margin-xl',
+  '--tao-margin-xs',
+  '--tao-margin-xxl',
+  '--tao-margin-xxs',
   '--tao-motion-duration-fast',
   '--tao-motion-duration-mid',
   '--tao-motion-duration-slow',
@@ -204,8 +253,17 @@ export const taoTokenNames = [
   '--tao-radius-xl',
   '--tao-radius-xs',
   '--tao-ring-width',
+  '--tao-size',
+  '--tao-size-lg',
+  '--tao-size-md',
+  '--tao-size-ms',
+  '--tao-size-sm',
   '--tao-size-step',
   '--tao-size-unit',
+  '--tao-size-xl',
+  '--tao-size-xs',
+  '--tao-size-xxl',
+  '--tao-size-xxs',
   '--tao-success',
   '--tao-success-bg',
   '--tao-success-border',

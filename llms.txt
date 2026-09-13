@@ -29,7 +29,7 @@ The package root remains available and includes all component styles.
 - General: Button
 - Headless: HeadlessInputNumber
 - Layout: FormLayout, Splitter, Stack
-- Navigation: Breadcrumb, ContextMenu, Dropdown, Pagination, Tabs
+- Navigation: Breadcrumb, ContextMenu, Dropdown, Pagination, Steps, Tabs
 
 ## Components
 
@@ -408,6 +408,19 @@ Composes children in a flex row or column with consistent spacing.
 - Semantic parts: `root`
 
 Use Stack for simple one-dimensional layout and spacing.
+
+### Steps
+
+Guides users through the ordered stages of a task.
+
+- Category: Navigation
+- Exports: `Steps`
+- Source: `src/components/steps/steps.tsx`
+- Storybook: `stories/steps.stories.tsx`
+- Tests: `tests/steps/steps.test.tsx`
+- Semantic parts: `root`, `item`, `itemWrapper`, `itemIcon`, `itemSection`, `itemHeader`, `itemTitle`, `itemSubtitle`, `itemContent`, `itemRail`
+
+Use Steps to show progress through a multi-stage task, or to let users jump back to a stage they already visited.
 
 ### Switch
 
