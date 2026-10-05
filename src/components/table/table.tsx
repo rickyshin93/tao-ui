@@ -16,20 +16,18 @@ import {
   getCellValue,
   getColKey,
   getRowKey,
-  nextSortOrder,
   resolveRowClassName,
   resolveRowStyle,
   resolveSemanticClassNames,
   resolveSemanticStyles,
 } from './table-model';
 import type {
-  SorterResult,
-  SortOrder,
   TableColumn,
   TableProps,
   TableRecord,
   TableVariant,
 } from './table-types';
+import { useTableData } from './use-table-data';
 import './table.css';
 
 export type {
@@ -128,244 +126,13 @@ export function Table<T extends TableRecord = Record<string, unknown>>({
   );
   const resolvedStyles = resolveSemanticStyles(styles, semanticProps);
 
-  // ---- Sort state ----
-  const defaultSortCol = columns.find((c) => c.defaultSortOrder);
-  const [sortKey, setSortKey] = useState<string | null>(
-    defaultSortCol
-      ? getColKey(defaultSortCol, columns.indexOf(defaultSortCol))
-      : null,
-  );
-  const [sortOrder, setSortOrder] = useState<SortOrder>(
-    defaultSortCol?.defaultSortOrder ?? null,
-  );
-
-  // ---- Filter state ----
-  const [filterValues, setFilterValues] = useState<Record<string, string[]>>(
-    () => {
-      const init: Record<string, string[]> = {};
-      for (let i = 0; i < columns.length; i++) {
-        const col = columns[i];
-        if (col.filters) {
-          const key = getColKey(col, i);
-          init[key] = col.filteredValue ?? [];
-        }
-      }
-      return init;
-    },
-  );
-
-  const resolvedSort = useMemo(() => {
-    for (let i = 0; i < columns.length; i++) {
-      const col = columns[i];
-      const key = getColKey(col, i);
-      const order =
-        col.sortOrder !== undefined
-          ? col.sortOrder
-          : sortKey === key
-            ? sortOrder
-            : null;
-      if (order) return { key, order };
-    }
-    return { key: null, order: null };
-  }, [columns, sortKey, sortOrder]);
-  const resolvedFilterValues = useMemo(() => {
-    const values = { ...filterValues };
-    for (let i = 0; i < columns.length; i++) {
-      const col = columns[i];
-      if (col.filteredValue !== undefined)
-        values[getColKey(col, i)] = col.filteredValue;
-    }
-    return values;
-  }, [columns, filterValues]);
-
-  // ---- Pagination state ----
-  const hasPagination = paginationProp !== false;
-  const paginationConfig =
-    paginationProp === false ? undefined : paginationProp;
-  const [internalPage, setInternalPage] = useState(
-    paginationConfig?.defaultCurrent ?? 1,
-  );
-  const [internalPageSize, setInternalPageSize] = useState(
-    paginationConfig?.defaultPageSize ?? paginationConfig?.pageSize ?? 10,
-  );
-  const currentPage = paginationConfig?.current ?? internalPage;
-  const pageSize = paginationConfig?.pageSize ?? internalPageSize;
-
-  // ---- Build sorter result ----
-  const buildSorterResult = useCallback(
-    (key: string | null, order: SortOrder): SorterResult<T> => {
-      if (!key || !order) return { order: null };
-      const colIdx = columns.findIndex((c, i) => getColKey(c, i) === key);
-      const col = columns[colIdx];
-      return {
-        column: col,
-        order,
-        field: col?.dataIndex,
-      };
-    },
-    [columns],
-  );
-
-  // ---- Build filters record ----
-  const buildFiltersRecord = useCallback(
-    (fv: Record<string, string[]>): Record<string, string[] | null> => {
-      const result: Record<string, string[] | null> = {};
-      for (let i = 0; i < columns.length; i++) {
-        const col = columns[i];
-        if (col.filters) {
-          const key = getColKey(col, i);
-          const vals = fv[key];
-          result[col.dataIndex == null ? key : String(col.dataIndex)] =
-            vals && vals.length > 0 ? vals : null;
-        }
-      }
-      return result;
-    },
-    [columns],
-  );
-
-  // ---- Trigger onChange ----
-  const triggerChange = useCallback(
-    (
-      page: number,
-      ps: number,
-      sk: string | null,
-      so: SortOrder,
-      fv: Record<string, string[]>,
-    ) => {
-      onChange?.(
-        { current: page, pageSize: ps },
-        buildFiltersRecord(fv),
-        buildSorterResult(sk, so),
-      );
-    },
-    [onChange, buildFiltersRecord, buildSorterResult],
-  );
-
-  // ---- Handle sort click ----
-  const handleSort = useCallback(
-    (colKey: string, col: TableColumn<T>) => {
-      // Controlled sort — do nothing internally
-      if (col.sortOrder !== undefined) {
-        triggerChange(
-          currentPage,
-          pageSize,
-          colKey,
-          nextSortOrder(col.sortOrder),
-          resolvedFilterValues,
-        );
-        return;
-      }
-      const next = sortKey === colKey ? nextSortOrder(sortOrder) : 'ascend';
-      const newKey = next === null ? null : colKey;
-      setSortKey(newKey);
-      setSortOrder(next);
-      triggerChange(currentPage, pageSize, newKey, next, resolvedFilterValues);
-    },
-    [
-      sortKey,
-      sortOrder,
-      currentPage,
-      pageSize,
-      resolvedFilterValues,
-      triggerChange,
-    ],
-  );
-
-  // ---- Handle filter ----
-  const handleFilter = useCallback(
-    (colKey: string, values: string[]) => {
-      const next = { ...resolvedFilterValues, [colKey]: values };
-      setFilterValues(next);
-      // Reset to page 1 on filter change
-      setInternalPage(1);
-      triggerChange(1, pageSize, resolvedSort.key, resolvedSort.order, next);
-    },
-    [resolvedFilterValues, pageSize, resolvedSort, triggerChange],
-  );
-
-  // ---- Handle pagination ----
-  const handlePageChange = useCallback(
-    (page: number, ps: number) => {
-      setInternalPage(page);
-      setInternalPageSize(ps);
-      triggerChange(
-        page,
-        ps,
-        resolvedSort.key,
-        resolvedSort.order,
-        resolvedFilterValues,
-      );
-    },
-    [resolvedSort, resolvedFilterValues, triggerChange],
-  );
-
-  // ---- Process data: filter → sort → paginate ----
-  const processedData = useMemo(() => {
-    let data = [...dataSource];
-
-    // Apply client-side filters
-    for (let i = 0; i < columns.length; i++) {
-      const col = columns[i];
-      if (!col.filters || !col.onFilter) continue;
-      const key = getColKey(col, i);
-      const controlledValues = col.filteredValue;
-      const activeVals = controlledValues ?? filterValues[key];
-      if (activeVals && activeVals.length > 0) {
-        data = data.filter((record) =>
-          activeVals.some((v) => col.onFilter!(v, record)),
-        );
-      }
-    }
-
-    // Apply client-side sort
-    const activeSortCol = columns.find((col, i) => {
-      const key = getColKey(col, i);
-      const order =
-        col.sortOrder !== undefined
-          ? col.sortOrder
-          : sortKey === key
-            ? sortOrder
-            : null;
-      return order !== null && typeof col.sorter === 'function';
-    });
-    if (activeSortCol && typeof activeSortCol.sorter === 'function') {
-      const colIdx = columns.indexOf(activeSortCol);
-      const key = getColKey(activeSortCol, colIdx);
-      const order =
-        activeSortCol.sortOrder !== undefined
-          ? activeSortCol.sortOrder
-          : sortKey === key
-            ? sortOrder
-            : null;
-      const sorterFn = activeSortCol.sorter as (a: T, b: T) => number;
-      data.sort((a, b) => {
-        const result = sorterFn(a, b);
-        return order === 'descend' ? -result : result;
-      });
-    }
-
-    return data;
-  }, [dataSource, columns, filterValues, sortKey, sortOrder]);
-
-  // ---- Paginate ----
-  const totalForPagination = paginationConfig?.total ?? processedData.length;
-  const lastPage = Math.max(1, Math.ceil(totalForPagination / pageSize));
-  const boundedPage = Math.min(Math.max(1, internalPage), lastPage);
-  if (
-    hasPagination &&
-    paginationConfig?.current === undefined &&
-    boundedPage !== internalPage
-  ) {
-    setInternalPage(boundedPage);
-  }
-  const paginatedData = useMemo(() => {
-    if (!hasPagination) return processedData;
-    // If user provides total, assume server-side pagination — show all data as-is
-    if (paginationConfig?.total !== undefined) return processedData;
-    const start = (currentPage - 1) * pageSize;
-    return processedData.slice(start, start + pageSize);
-  }, [processedData, hasPagination, paginationConfig, currentPage, pageSize]);
+  const tableData = useTableData({
+    columns,
+    dataSource,
+    pagination: paginationProp,
+    onChange,
+  });
+  const paginatedData = tableData.rows;
 
   // ---- Row selection ----
   const selectionColWidth = rowSelection?.columnWidth ?? 48;
@@ -508,15 +275,6 @@ export function Table<T extends TableRecord = Record<string, unknown>>({
     return positions;
   }, [allColumns, scroll?.x]);
 
-  // ---- Resolve sort order for a column ----
-  const getResolvedSortOrder = (
-    col: TableColumn<T>,
-    colKey: string,
-  ): SortOrder => {
-    if (col.sortOrder !== undefined) return col.sortOrder;
-    return sortKey === colKey ? sortOrder : null;
-  };
-
   // ---- Render ----
   const tableStyle: React.CSSProperties = scroll?.x
     ? { minWidth: typeof scroll.x === 'number' ? `${scroll.x}px` : scroll.x }
@@ -611,10 +369,12 @@ export function Table<T extends TableRecord = Record<string, unknown>>({
                     const colKey = getColKey(col, i);
                     const hasSorter = !!col.sorter;
                     const hasFilter = !!(col.filters && col.filters.length > 0);
-                    const resolvedOrder = getResolvedSortOrder(col, colKey);
-                    const controlledFilterValues = col.filteredValue;
-                    const activeFilterValues =
-                      controlledFilterValues ?? filterValues[colKey] ?? [];
+                    const {
+                      sortOrder: resolvedOrder,
+                      filteredValue: activeFilterValues,
+                      onSort,
+                      onFilter,
+                    } = tableData.getColumnState(i);
                     const stickyPos = stickyPositions[colKey];
                     const isFixed = !!col.fixed && !!scroll?.x;
                     const headerCellProps = col.onHeaderCell?.(col) ?? {};
@@ -670,7 +430,7 @@ export function Table<T extends TableRecord = Record<string, unknown>>({
                               data-tao-sortable=""
                               className={resolvedClassNames['header.title']}
                               style={resolvedStyles['header.title']}
-                              onClick={() => handleSort(colKey, col)}
+                              onClick={onSort}
                             >
                               {col.title}
                               <SortIcon order={resolvedOrder} />
@@ -688,7 +448,7 @@ export function Table<T extends TableRecord = Record<string, unknown>>({
                             <TableFilterDropdown
                               filters={col.filters!}
                               activeValues={activeFilterValues}
-                              onSelect={(vals) => handleFilter(colKey, vals)}
+                              onSelect={onFilter}
                             />
                           )}
                         </div>
@@ -815,22 +575,13 @@ export function Table<T extends TableRecord = Record<string, unknown>>({
         </table>
       </div>
 
-      {hasPagination && totalForPagination > 0 && (
+      {tableData.pagination && tableData.pagination.total > 0 && (
         <div
           data-tao-table-pagination=""
           className={resolvedClassNames.pagination}
           style={resolvedStyles.pagination}
         >
-          <Pagination
-            current={currentPage}
-            pageSize={pageSize}
-            total={totalForPagination}
-            onChange={handlePageChange}
-            size={resolvedSize}
-            showSizeChanger={paginationConfig?.showSizeChanger}
-            pageSizeOptions={paginationConfig?.pageSizeOptions}
-            showTotal={paginationConfig?.showTotal}
-          />
+          <Pagination {...tableData.pagination} size={resolvedSize} />
         </div>
       )}
     </div>

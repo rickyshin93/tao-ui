@@ -919,6 +919,173 @@ test('mobile + multiple: Done commits and closes drawer', async () => {
   expect(screen.queryByRole('dialog')).toBeNull();
 });
 
+test('multiple selection notifies change before select, deselect and clear', async () => {
+  const alpha = { label: 'Alpha', value: 'a' };
+  const beta = { label: 'Beta', value: 'b' };
+  const events: unknown[][] = [];
+  render(
+    <Select
+      mobile={false}
+      showSearch
+      defaultOpen
+      mode="multiple"
+      defaultValue={['a']}
+      options={[alpha, beta]}
+      allowClear
+      onChange={(value, options) => events.push(['change', value, options])}
+      onSelect={(value, option) => events.push(['select', value, option])}
+      onDeselect={(value, option) => events.push(['deselect', value, option])}
+      onClear={() => events.push(['clear'])}
+    />,
+  );
+
+  await userEvent.click(screen.getByRole('option', { name: 'Beta' }));
+  expect(events).toEqual([
+    ['change', ['a', 'b'], [alpha, beta]],
+    ['select', 'b', beta],
+  ]);
+  events.length = 0;
+  await userEvent.click(screen.getByRole('option', { name: 'Alpha' }));
+  expect(events).toEqual([
+    ['change', ['b'], [beta]],
+    ['deselect', 'a', alpha],
+  ]);
+  events.length = 0;
+  await userEvent.click(screen.getByRole('button', { name: 'Remove Beta' }));
+  expect(events).toEqual([
+    ['change', [], []],
+    ['deselect', 'b', beta],
+  ]);
+
+  await userEvent.click(screen.getByRole('option', { name: 'Alpha' }));
+  events.length = 0;
+  await userEvent.click(screen.getByRole('button', { name: 'Clear' }));
+  expect(events).toEqual([['change', [], undefined], ['clear']]);
+  expect(document.querySelectorAll('[data-tao-select-tag]')).toHaveLength(0);
+});
+
+test.each([
+  undefined,
+  'multiple',
+  'tags',
+] as const)('%s controlled selection accepts only parent updates, including explicit undefined', async (mode) => {
+  const alpha = { label: 'Alpha', value: 'a' };
+  const beta = { label: 'Beta', value: 'b' };
+  const updatedBeta = { label: 'Updated Beta', value: 'b' };
+  const events: unknown[][] = [];
+  const props = {
+    mobile: false,
+    showSearch: true,
+    open: true,
+    mode,
+    placeholder: 'Pick',
+    onChange: (value: unknown, options: unknown) =>
+      events.push(['change', value, options]),
+    onSelect: (value: unknown, option: unknown) =>
+      events.push(['select', value, option]),
+    onDeselect: (value: unknown, option: unknown) =>
+      events.push(['deselect', value, option]),
+  };
+  const { container, rerender } = render(
+    <Select
+      {...props}
+      options={[alpha, beta]}
+      value={undefined}
+      defaultValue={mode ? ['b'] : 'b'}
+    />,
+  );
+  const trigger = container.querySelector('[data-tao-select]');
+  expect(trigger).not.toHaveTextContent('Beta');
+  await userEvent.click(screen.getByRole('option', { name: 'Alpha' }));
+  expect(events).toEqual([
+    ['change', mode ? ['a'] : 'a', mode ? [alpha] : alpha],
+    ['select', 'a', alpha],
+  ]);
+  expect(trigger).not.toHaveTextContent('Alpha');
+
+  rerender(
+    <Select
+      {...props}
+      options={[alpha, updatedBeta]}
+      value={mode ? ['b'] : 'b'}
+    />,
+  );
+  expect(trigger).toHaveTextContent('Updated Beta');
+  expect(events).toHaveLength(2);
+  events.length = 0;
+  await userEvent.click(screen.getByRole('option', { name: 'Updated Beta' }));
+  expect(events).toEqual([
+    ['change', mode ? [] : 'b', mode ? [] : updatedBeta],
+    [mode ? 'deselect' : 'select', 'b', updatedBeta],
+  ]);
+  expect(trigger).toHaveTextContent('Updated Beta');
+});
+
+test('tag tokens notify once in canonical order and omit synthetic options', () => {
+  const alpha = { label: 'Alpha', value: 'a' };
+  const beta = { label: 'Beta', value: 'b' };
+  const events: unknown[][] = [];
+  render(
+    <Select
+      mobile={false}
+      showSearch
+      mode="tags"
+      defaultValue={['a']}
+      options={[alpha, beta]}
+      tokenSeparators={[',']}
+      onChange={(value, options) => events.push(['change', value, options])}
+      onSelect={(value, option) => events.push(['select', value, option])}
+    />,
+  );
+  const input = screen.getByRole('combobox');
+  fireEvent.change(input, { target: { value: 'Beta,b,new,new,Alpha,' } });
+  fireEvent.keyDown(input, { key: 'Enter' });
+  expect(events).toEqual([
+    ['change', ['a', 'b', 'new'], [alpha, beta]],
+    ['select', 'b', beta],
+  ]);
+  expect(document.querySelectorAll('[data-tao-select-tag]')).toHaveLength(3);
+  expect(input).toHaveValue('');
+});
+
+test('mobile draft commit notifies change then additions and removals, while cancel discards edits', async () => {
+  const alpha = { label: 'Alpha', value: 'a' };
+  const beta = { label: 'Beta', value: 'b' };
+  const gamma = { label: 'Gamma', value: 'c' };
+  const events: unknown[][] = [];
+  const { container } = render(
+    <Select
+      mobile
+      mode="multiple"
+      defaultValue={['a', 'b']}
+      options={[alpha, beta, gamma]}
+      onChange={(value, options) => events.push(['change', value, options])}
+      onSelect={(value, option) => events.push(['select', value, option])}
+      onDeselect={(value, option) => events.push(['deselect', value, option])}
+    />,
+  );
+  const trigger = container.querySelector('[data-tao-select]')!;
+  await userEvent.click(trigger);
+  await userEvent.click(screen.getByRole('button', { name: 'Beta' }));
+  await userEvent.click(screen.getByRole('button', { name: 'Gamma' }));
+  expect(events).toEqual([]);
+  await userEvent.click(screen.getByRole('button', { name: 'Done' }));
+  expect(events).toEqual([
+    ['change', ['a', 'c'], [alpha, gamma]],
+    ['select', 'c', gamma],
+    ['deselect', 'b', beta],
+  ]);
+  expect(trigger).toHaveTextContent('Alpha');
+  expect(trigger).toHaveTextContent('Gamma');
+  expect(trigger).not.toHaveTextContent('Beta');
+  events.length = 0;
+  await userEvent.click(trigger);
+  await userEvent.click(screen.getByRole('button', { name: 'Alpha' }));
+  await userEvent.click(screen.getByRole('button', { name: 'Close' }));
+  expect(events).toEqual([]);
+  expect(trigger).toHaveTextContent('Alpha');
+});
+
 test.each([
   undefined,
   'multiple',

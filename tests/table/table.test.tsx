@@ -501,6 +501,31 @@ test('client-side filter', async () => {
   expect(screen.queryByText('Bob')).toBeNull();
 });
 
+test('column filter methods retain their column receiver', () => {
+  const filterColumns: TableColumn<User>[] = [
+    columns[0],
+    {
+      ...columns[2],
+      filters: [{ text: 'Admin', value: 'admin' }],
+      filteredValue: ['admin'],
+      onFilter(value, record) {
+        return record[this.dataIndex!] === value;
+      },
+    },
+  ];
+  render(
+    <Table
+      columns={filterColumns}
+      dataSource={data}
+      rowKey="id"
+      pagination={false}
+    />,
+  );
+  expect(screen.getByText('Alice')).toBeTruthy();
+  expect(screen.getByText('Diana')).toBeTruthy();
+  expect(screen.queryByText('Bob')).toBeNull();
+});
+
 test('filter menu exposes keyboard menu semantics', async () => {
   const filterColumns: TableColumn<User>[] = [
     {
@@ -609,6 +634,123 @@ test('pagination callbacks preserve current controlled sorting and filters', () 
     filters: { role: ['user'] },
     sorter: { field: 'age', order: 'ascend' },
   });
+});
+
+test('sort, filter and page interactions report the same data view', async () => {
+  const changes: Parameters<NonNullable<TableProps<User>['onChange']>>[] = [];
+  render(
+    <Table
+      columns={[
+        columns[0],
+        { ...columns[1], sorter: (a, b) => a.age - b.age },
+        {
+          ...columns[2],
+          filters: [{ text: 'Admin', value: 'admin' }],
+          onFilter: (role, record) => record.role === role,
+        },
+      ]}
+      dataSource={data}
+      rowKey="id"
+      pagination={{ defaultCurrent: 3, pageSize: 1 }}
+      onChange={(...change) => changes.push(change)}
+    />,
+  );
+  expect(screen.getByText('Charlie')).toBeTruthy();
+  fireEvent.click(screen.getByText('Age'));
+  expect(screen.getByText('Diana')).toBeTruthy();
+  expect(changes[0]).toMatchObject([
+    { current: 3, pageSize: 1 },
+    { role: null },
+    { field: 'age', order: 'ascend' },
+  ]);
+
+  await userEvent.click(screen.getByLabelText('Filter'));
+  await userEvent.click(
+    screen.getByRole('menuitemcheckbox', { name: 'Admin' }),
+  );
+  fireEvent.keyDown(screen.getByRole('menu'), { key: 'Escape' });
+  expect(screen.getByLabelText('Page 1')).toHaveAttribute(
+    'aria-current',
+    'page',
+  );
+  expect(screen.getByText('Diana')).toBeTruthy();
+  expect(changes[1]).toMatchObject([
+    { current: 1, pageSize: 1 },
+    { role: ['admin'] },
+    { field: 'age', order: 'ascend' },
+  ]);
+
+  fireEvent.click(screen.getByLabelText('Page 2'));
+  expect(screen.getByText('Alice')).toBeTruthy();
+  expect(changes[2]).toMatchObject([
+    { current: 2, pageSize: 1 },
+    { role: ['admin'] },
+    { field: 'age', order: 'ascend' },
+  ]);
+  expect(changes).toHaveLength(3);
+  expect(data.map((record) => record.name)).toEqual([
+    'Alice',
+    'Bob',
+    'Charlie',
+    'Diana',
+    'Eve',
+  ]);
+});
+
+test('controlled data view rejects edits until its parent supplies new conditions', async () => {
+  const changes: Parameters<NonNullable<TableProps<User>['onChange']>>[] = [];
+  const controlledColumns = (
+    order: 'ascend' | 'descend',
+    role: string,
+  ): TableColumn<User>[] => [
+    columns[0],
+    { ...columns[1], sorter: (a, b) => a.age - b.age, sortOrder: order },
+    {
+      ...columns[2],
+      filters: [{ text: 'Admin', value: 'admin' }],
+      filteredValue: [role],
+      onFilter: (value, record) => record.role === value,
+    },
+  ];
+  const table = (order: 'ascend' | 'descend', role: string) => (
+    <Table
+      columns={controlledColumns(order, role)}
+      dataSource={data}
+      rowKey="id"
+      pagination={{ current: 1, pageSize: 1 }}
+      onChange={(...change) => changes.push(change)}
+    />
+  );
+  const { rerender } = render(table('descend', 'admin'));
+  fireEvent.click(screen.getByText('Age'));
+  expect(changes[0][2]).toEqual({ order: null });
+  expect(screen.getByText('Alice')).toBeTruthy();
+
+  await userEvent.click(screen.getByLabelText('Filter'));
+  await userEvent.click(
+    screen.getByRole('menuitemcheckbox', { name: 'Admin' }),
+  );
+  expect(changes[1]).toMatchObject([
+    { current: 1, pageSize: 1 },
+    { role: null },
+    { field: 'age', order: 'descend' },
+  ]);
+  expect(
+    screen.getByRole('menuitemcheckbox', { name: 'Admin' }),
+  ).toHaveAttribute('aria-checked', 'true');
+  fireEvent.keyDown(screen.getByRole('menu'), { key: 'Escape' });
+  expect(screen.getByText('Alice')).toBeTruthy();
+
+  rerender(table('ascend', 'user'));
+  expect(screen.getByText('Eve')).toBeTruthy();
+  fireEvent.click(screen.getByLabelText('Page 2'));
+  expect(changes[2]).toMatchObject([
+    { current: 2, pageSize: 1 },
+    { role: ['user'] },
+    { field: 'age', order: 'ascend' },
+  ]);
+  expect(screen.getByText('Eve')).toBeTruthy();
+  expect(changes).toHaveLength(3);
 });
 
 test('pagination: false shows all data', () => {

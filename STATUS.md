@@ -1,7 +1,7 @@
 # STATUS
 
 ## Doing
-- none
+- 2026-10-05 release patch v0.0.36 with the Table/Select architecture refactor; waiting for release checks, GitHub workflow and npm verification
 
 ## Next
 
@@ -11,6 +11,7 @@
 - none
 
 ## Done
+- 2026-10-05 deepen Table data view and Select selection modules; preserve public behavior and React 18/19 support, complete two review rounds
 - 2026-09-07 suppress blank tags popups when empty content is disabled; preserve tag entry, suffix icons, and custom popup content
 - 2026-09-06 fix numeric/search/Splitter updates, uncontrolled Table selection, date preset constraints and range month synchronization, Popover focus retention and cleared Form boolean fields
 - 2026-09-06 optimize large-table selection; fix checkbox/tabs/field accessibility, mobile/IME/date input, textarea resizing and dialog lifecycles

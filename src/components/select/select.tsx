@@ -22,14 +22,10 @@ import {
   LoadingIcon,
   SearchIcon,
 } from './select-icons';
-import {
-  buildSelectIndex,
-  defaultFilter,
-  filterTree,
-  flattenLeafOptions,
-} from './select-model';
+import { defaultFilter, filterTree, flattenLeafOptions } from './select-model';
 import { SearchableSelectList } from './select-searchable-list';
 import { SelectTags } from './select-tags';
+import { useSelectSelection } from './use-select-selection';
 import './select.css';
 import { useIsMobile } from '../../utils/breakpoint';
 import type {
@@ -64,12 +60,6 @@ export const Select = forwardRef(function Select(
 ) {
   const {
     options,
-    value: valueProp,
-    defaultValue,
-    onChange,
-    onSelect,
-    onDeselect,
-    onClear,
     mode,
     placeholder,
     size,
@@ -143,22 +133,18 @@ export const Select = forwardRef(function Select(
     [hasInlineSearch],
   );
 
-  // value (controlled / uncontrolled)
-  const isValueControlled = 'value' in props;
-  const [valueInternal, setValueInternal] = useState<
-    string | string[] | undefined
-  >(
-    isMultiple
-      ? ((defaultValue as string[] | undefined) ?? [])
-      : (defaultValue as string | undefined),
-  );
-  const value = isValueControlled ? valueProp : valueInternal;
-
-  // Normalized array form for consistent internal handling.
-  const valueArray = useMemo<string[]>(() => {
-    if (isMultiple) return (value as string[]) ?? [];
-    return value ? [value as string] : [];
-  }, [isMultiple, value]);
+  const {
+    value,
+    valueArray,
+    selectedValueSet,
+    selectedOption,
+    selectedOptions,
+    select: selectValue,
+    addTokens,
+    remove: removeValue,
+    commit: handleMultiChange,
+    clear: clearValue,
+  } = useSelectSelection(props, resolvedDisabled);
 
   // open (controlled / uncontrolled)
   const isOpenControlled = openProp !== undefined;
@@ -188,110 +174,31 @@ export const Select = forwardRef(function Select(
   // Prevents Radix from auto-closing the dropdown after a multi-select toggle.
   const suppressCloseRef = useRef(false);
 
-  const { optionByToken, optionByValue } = useMemo(
-    () => buildSelectIndex(options),
-    [options],
-  );
-  const selectedValueSet = useMemo(() => new Set(valueArray), [valueArray]);
-
   const handleValueChange = useCallback(
     (next: string) => {
       if (resolvedDisabled) return;
       if (isMultiple) {
-        // Token separators: split on separator chars
-        if (tokenSeparators && tokenSeparators.length > 0) {
-          const hasSeparator = tokenSeparators.some(
+        if (
+          tokenSeparators?.some(
             (separator) => separator && next.includes(separator),
-          );
-          if (hasSeparator) {
-            const tokens = tokenSeparators
-              .reduce(
-                (parts, separator) =>
-                  separator
-                    ? parts.flatMap((part) => part.split(separator))
-                    : parts,
-                [next],
-              )
-              .map((token) => token.trim())
-              .filter(Boolean);
-            const seen = new Set(selectedValueSet);
-            const toAdd: string[] = [];
-            for (const token of tokens) {
-              const option = optionByToken.get(token);
-              if (option?.disabled || (!option && mode !== 'tags')) continue;
-              const value = option?.value ?? token;
-              if (seen.has(value)) continue;
-              seen.add(value);
-              toAdd.push(value);
-            }
-            if (toAdd.length > 0) {
-              const nextArray = [...valueArray, ...toAdd];
-              if (maxCount != null && nextArray.length > maxCount) return;
-              if (!isValueControlled) setValueInternal(nextArray);
-              const selectedOpts = nextArray
-                .map((v) => optionByValue.get(v))
-                .filter(Boolean) as SelectOption[];
-              onChange?.(nextArray, selectedOpts);
-              for (const v of toAdd) {
-                const opt = optionByValue.get(v);
-                if (opt) onSelect?.(v, opt);
-              }
-            }
-            return;
-          }
+          )
+        ) {
+          addTokens(next);
+          return;
         }
-
         if (!hasInlineSearch) suppressCloseRef.current = true;
-        const current = valueArray;
-        const existed = selectedValueSet.has(next);
-        const nextArray = existed
-          ? current.filter((v) => v !== next)
-          : [...current, next];
-
-        if (!existed && maxCount != null && nextArray.length > maxCount) return;
-
-        if (!isValueControlled) setValueInternal(nextArray);
-        const selectedOpts = nextArray
-          .map((v) => optionByValue.get(v))
-          .filter(Boolean) as SelectOption[];
-        onChange?.(nextArray, selectedOpts);
-
-        const opt = optionByValue.get(next);
-        if (opt) {
-          if (existed) {
-            onDeselect?.(next, opt);
-          } else {
-            onSelect?.(next, opt);
-          }
-        }
-
-        if (autoClearSearchValue && !isSearchControlled) {
-          setSearchInternal('');
-        }
-        return;
       }
-
-      // Single mode
-      const opt = optionByValue.get(next);
-      if (!isValueControlled) setValueInternal(next);
-      onChange?.(next, opt);
-      if (opt) onSelect?.(next, opt);
+      if (!selectValue(next)) return;
+      if (isMultiple && autoClearSearchValue && !isSearchControlled)
+        setSearchInternal('');
     },
     [
       isMultiple,
       hasInlineSearch,
-      valueArray,
-      maxCount,
       tokenSeparators,
       resolvedDisabled,
-      mode,
-      isValueControlled,
-      optionByToken,
-      optionByValue,
-      selectedValueSet,
-      onChange,
-      onSelect,
-      onDeselect,
+      selectValue,
+      addTokens,
       autoClearSearchValue,
       isSearchControlled,
     ],
@@ -356,17 +263,6 @@ export const Select = forwardRef(function Select(
     ],
   );
 
-  const clearValue = useCallback(() => {
-    if (isMultiple) {
-      if (!isValueControlled) setValueInternal([]);
-      onChange?.([], undefined);
-    } else {
-      if (!isValueControlled) setValueInternal(undefined);
-      onChange?.('', undefined);
-    }
-    onClear?.();
-  }, [isMultiple, isValueControlled, onChange, onClear]);
-
   const handleClear = useCallback(
     (e: React.MouseEvent) => {
       e.stopPropagation();
@@ -380,62 +276,9 @@ export const Select = forwardRef(function Select(
     (removedValue: string, e: React.SyntheticEvent) => {
       e.stopPropagation();
       e.preventDefault();
-      if (!isMultiple) return;
-      const nextArray = valueArray.filter((v) => v !== removedValue);
-      if (!isValueControlled) setValueInternal(nextArray);
-      const selectedOpts = nextArray
-        .map((v) => optionByValue.get(v))
-        .filter(Boolean) as SelectOption[];
-      onChange?.(nextArray, selectedOpts);
-      const opt = optionByValue.get(removedValue);
-      if (opt) onDeselect?.(removedValue, opt);
+      removeValue(removedValue);
     },
-    [
-      isMultiple,
-      valueArray,
-      isValueControlled,
-      optionByValue,
-      onChange,
-      onDeselect,
-    ],
-  );
-
-  // Mobile multi-select commit: fires when the user presses "Done" in the drawer.
-  const handleMultiChange = useCallback(
-    (nextArray: string[]) => {
-      if (resolvedDisabled) return;
-      if (!isValueControlled) setValueInternal(nextArray);
-      const selectedOpts = nextArray
-        .map((v) => optionByValue.get(v))
-        .filter(Boolean) as SelectOption[];
-      onChange?.(nextArray, selectedOpts);
-
-      // Fire onSelect for newly added, onDeselect for removed.
-      const prev = valueArray;
-      const nextSet = new Set(nextArray);
-      for (const v of nextArray) {
-        if (!selectedValueSet.has(v)) {
-          const opt = optionByValue.get(v);
-          if (opt) onSelect?.(v, opt);
-        }
-      }
-      for (const v of prev) {
-        if (!nextSet.has(v)) {
-          const opt = optionByValue.get(v);
-          if (opt) onDeselect?.(v, opt);
-        }
-      }
-    },
-    [
-      valueArray,
-      selectedValueSet,
-      resolvedDisabled,
-      isValueControlled,
-      optionByValue,
-      onChange,
-      onSelect,
-      onDeselect,
-    ],
+    [removeValue],
   );
 
   const filteredOptions = useMemo(() => {
@@ -489,26 +332,6 @@ export const Select = forwardRef(function Select(
     allowClearEnabled &&
     (isMultiple ? valueArray.length > 0 : !!value) &&
     !resolvedDisabled;
-
-  const selectedOption = useMemo(
-    () =>
-      !isMultiple && value ? optionByValue.get(value as string) : undefined,
-    [isMultiple, value, optionByValue],
-  );
-
-  const selectedOptions = useMemo(
-    () =>
-      isMultiple
-        ? (valueArray
-            .map(
-              (v) =>
-                optionByValue.get(v) ??
-                (mode === 'tags' ? { label: v, value: v } : undefined),
-            )
-            .filter(Boolean) as SelectOption[])
-        : [],
-    [isMultiple, valueArray, optionByValue, mode],
-  );
 
   const statusProps = {
     'data-tao-error': status === 'error' || undefined,
