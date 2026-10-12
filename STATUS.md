@@ -11,6 +11,7 @@
 - none
 
 ## Done
+- 2026-10-12 drop Popover's popup+30 stacking so Select/Menu/DatePicker popups opened inside a Popover paint above it (unreleased)
 - 2026-10-05 release v0.0.36 with deeper Table data view and Select selection modules; preserve public behavior and React 18/19 support, complete two review rounds
 - 2026-09-07 suppress blank tags popups when empty content is disabled; preserve tag entry, suffix icons, and custom popup content
 - 2026-09-06 fix numeric/search/Splitter updates, uncontrolled Table selection, date preset constraints and range month synchronization, Popover focus retention and cleared Form boolean fields

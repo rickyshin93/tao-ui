@@ -14,7 +14,7 @@
   user-select: text;
   filter: var(--tao-drop-shadow-popover);
   transform-origin: var(--radix-popover-content-transform-origin);
-  z-index: calc(var(--tao-z-index-popup) + 30);
+  z-index: var(--tao-z-index-popup);
   animation-duration: var(--tao-motion-duration-mid);
   animation-timing-function: var(--tao-motion-ease-out);
 }

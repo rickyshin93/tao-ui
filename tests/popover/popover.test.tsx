@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { expect, rstest, test } from '@rstest/core';
 import {
   act,
@@ -443,4 +444,14 @@ test('empty title and content disable the popup', () => {
     </Popover>,
   );
   expect(document.querySelector('[data-tao-popover]')).toBeNull();
+});
+
+test('popover shares the popup stacking level so nested popups paint above it', () => {
+  // A Select, Menu or DatePicker opened inside a Popover portals later at the
+  // same level and lands on top; a higher popover level would bury it.
+  const css = readFileSync('src/components/popover/popover.css', 'utf8');
+  const levels = [...css.matchAll(/z-index:\s*([^;]+);/g)].map(
+    (match) => match[1],
+  );
+  expect(levels).toEqual(['var(--tao-z-index-popup)']);
 });
