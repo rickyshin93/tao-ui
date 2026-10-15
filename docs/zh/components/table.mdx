@@ -125,6 +125,55 @@ function TableStates() {
 export default TableStates;
 ```
 
+## 固定表头、展开行与总结栏
+
+`scroll.y` 限制表体高度并让表头吸顶；`expandable` 在行下方展开详情（展开列位于选择列之前）；`summary` 返回 `Table.Summary.Row` / `Table.Summary.Cell` 作为总结栏，`Cell` 的 `index` 从展开列/选择列开始计数，用于同步固定列，`<Table.Summary fixed>` 在纵向滚动时吸底。
+
+```tsx preview
+import { Table } from '@rockshin/tao-ui';
+
+const data = Array.from({ length: 30 }, (_, index) => ({
+  id: index + 1,
+  name: 'User ' + (index + 1),
+  team: ['Design', 'Engineering', 'Sales'][index % 3],
+  score: 60 + ((index * 7) % 40),
+}));
+
+const columns = [
+  { key: 'name', dataIndex: 'name', title: 'Name', width: 160, fixed: 'left' },
+  { key: 'team', dataIndex: 'team', title: 'Team', width: 240 },
+  { key: 'score', dataIndex: 'score', title: 'Score', width: 120, align: 'right' },
+];
+
+function TableAdvanced() {
+  return (
+    <Table
+      columns={columns}
+      dataSource={data}
+      rowKey="id"
+      pagination={false}
+      scroll={{ x: 640, y: 280 }}
+      expandable={{
+        expandedRowRender: (record) => record.name + ' works in ' + record.team + '.',
+        rowExpandable: (record) => record.team !== 'Sales',
+      }}
+      summary={(pageData) => (
+        <Table.Summary fixed>
+          <Table.Summary.Row>
+            <Table.Summary.Cell index={0} colSpan={3}>Total</Table.Summary.Cell>
+            <Table.Summary.Cell index={3} align="right">
+              {pageData.reduce((sum, record) => sum + record.score, 0)}
+            </Table.Summary.Cell>
+          </Table.Summary.Row>
+        </Table.Summary>
+      )}
+    />
+  );
+}
+
+export default TableAdvanced;
+```
+
 ## API
 
 <API moduleName="table" />

@@ -396,6 +396,152 @@ export const HorizontalScroll: StoryObj = {
   },
 };
 
+export const FixedHeader: StoryObj = {
+  name: 'Fixed Header (scroll.y)',
+  render: () => {
+    const columns: TableColumn<User>[] = [
+      { key: 'id', dataIndex: 'id', title: 'ID', width: 80, fixed: 'left' },
+      { key: 'name', dataIndex: 'name', title: 'Name', width: 150 },
+      { key: 'age', dataIndex: 'age', title: 'Age', width: 100 },
+      { key: 'email', dataIndex: 'email', title: 'Email', width: 250 },
+      { key: 'role', dataIndex: 'role', title: 'Role', width: 120 },
+      {
+        key: 'department',
+        dataIndex: 'department',
+        title: 'Department',
+        width: 150,
+        fixed: 'right',
+      },
+    ];
+    return (
+      <Stack gap="lg" style={{ maxWidth: 640 }}>
+        {(['modern', 'outlined', 'borderless'] as const).map((variant) => (
+          <Table
+            key={variant}
+            variant={variant}
+            columns={columns}
+            dataSource={users}
+            rowKey="id"
+            scroll={{ x: 900, y: 240 }}
+            pagination={false}
+          />
+        ))}
+      </Stack>
+    );
+  },
+};
+
+export const Expandable: StoryObj = {
+  render: () => (
+    <Table
+      columns={baseColumns}
+      dataSource={users.slice(0, 6)}
+      rowKey="id"
+      rowSelection={{}}
+      pagination={false}
+      expandable={{
+        expandedRowRender: (record) =>
+          `${record.name} works in ${record.department} as ${record.role}.`,
+        rowExpandable: (record) => record.role !== 'viewer',
+        defaultExpandedRowKeys: [1],
+      }}
+    />
+  ),
+};
+
+export const ExpandableWithScroll: StoryObj = {
+  name: 'Expandable + Fixed Columns',
+  render: () => (
+    <div style={{ maxWidth: 600 }}>
+      <Table
+        columns={[
+          {
+            key: 'name',
+            dataIndex: 'name',
+            title: 'Name',
+            width: 140,
+            fixed: 'left',
+          },
+          { key: 'email', dataIndex: 'email', title: 'Email', width: 260 },
+          {
+            key: 'department',
+            dataIndex: 'department',
+            title: 'Department',
+            width: 200,
+          },
+          {
+            key: 'role',
+            dataIndex: 'role',
+            title: 'Role',
+            width: 120,
+            fixed: 'right',
+          },
+        ]}
+        dataSource={users.slice(0, 5)}
+        rowKey="id"
+        scroll={{ x: 900 }}
+        pagination={false}
+        expandable={{
+          fixed: true,
+          expandedRowRender: (record) =>
+            `${record.name} works in ${record.department} as ${record.role}; this text stays inside the visible area while the table scrolls sideways.`,
+          defaultExpandedRowKeys: [2],
+        }}
+      />
+    </div>
+  ),
+};
+
+export const Summary: StoryObj = {
+  render: () => (
+    <div style={{ maxWidth: 640 }}>
+      <Table
+        columns={[
+          {
+            key: 'name',
+            dataIndex: 'name',
+            title: 'Name',
+            width: 160,
+            fixed: 'left',
+          },
+          {
+            key: 'department',
+            dataIndex: 'department',
+            title: 'Department',
+            width: 200,
+          },
+          { key: 'email', dataIndex: 'email', title: 'Email', width: 260 },
+          {
+            key: 'age',
+            dataIndex: 'age',
+            title: 'Age',
+            width: 100,
+            align: 'right',
+            fixed: 'right',
+          },
+        ]}
+        dataSource={users.slice(0, 20)}
+        rowKey="id"
+        scroll={{ x: 800, y: 300 }}
+        pagination={false}
+        summary={(pageData) => (
+          <Table.Summary fixed>
+            <Table.Summary.Row>
+              <Table.Summary.Cell index={0}>Total</Table.Summary.Cell>
+              <Table.Summary.Cell index={1} colSpan={2}>
+                {pageData.length} people
+              </Table.Summary.Cell>
+              <Table.Summary.Cell index={3} align="right">
+                {pageData.reduce((sum, user) => sum + user.age, 0)}
+              </Table.Summary.Cell>
+            </Table.Summary.Row>
+          </Table.Summary>
+        )}
+      />
+    </div>
+  ),
+};
+
 export const Loading: StoryObj = {
   render: () => (
     <Table
@@ -548,8 +694,18 @@ export const ResponsiveColumns: StoryObj = {
     <Table
       columns={[
         { key: 'name', dataIndex: 'name', title: 'Name' },
-        { key: 'email', dataIndex: 'email', title: 'Email', responsive: ['md'] },
-        { key: 'department', dataIndex: 'department', title: 'Department', responsive: ['lg'] },
+        {
+          key: 'email',
+          dataIndex: 'email',
+          title: 'Email',
+          responsive: ['md'],
+        },
+        {
+          key: 'department',
+          dataIndex: 'department',
+          title: 'Department',
+          responsive: ['lg'],
+        },
       ]}
       dataSource={users.slice(0, 5)}
       rowKey="id"

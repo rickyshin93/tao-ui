@@ -1,5 +1,12 @@
 # tao-ui 项目自我学习
 
+## [Table CSS] 固定列阴影伪元素要盖住 cell 自身的 border-bottom
+- **日期**: 2026-10-15
+- **错误假设**: sticky cell 的阴影伪元素 `bottom: 0` 即可连续成一条竖向阴影。
+- **真实行为**: `border-collapse: separate` 下绝对定位只到 padding box，每行分隔线处阴影断开 1px；改成 `bottom: -lineWidth`（同 antd）后，`modern` 末行无分隔线又会越出 table 1px，撑出竖向滚动条。
+- **正确做法**: 伪元素 `bottom: calc(var(--tao-line-width) * -1)`，横向滚动容器显式 `overflow-y: hidden`。另：默认主色近黑，验证「主色浅调」类效果要临时把 `--tao-color-primary` 设成彩色再截图。
+- **适用场景**: Table 固定列阴影、任何跨行拼接的 cell 伪元素装饰。
+
 ## [Input CSS] 原生单行输入框必须几何居中整条行盒
 - **日期**: 2026-08-27
 - **错误假设**: 可以把普通文本的原生行盒上移 1px 来校正字形光学中心，同时保持 focus 光标视觉居中。

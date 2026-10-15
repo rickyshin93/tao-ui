@@ -24,6 +24,8 @@ export type TableSemanticPart =
   | 'body.row'
   | 'body.cell'
   | 'selection.cell'
+  | 'expandedRow'
+  | 'summary'
   | 'empty'
   | 'pagination';
 
@@ -73,6 +75,23 @@ export interface TableRowSelection<
   columnWidth?: number | string;
 }
 
+export interface TableExpandable<
+  T extends TableRecord = Record<string, unknown>,
+> {
+  expandedRowRender: (record: T, index: number) => ReactNode;
+  /** Rows returning false get no expand icon. */
+  rowExpandable?: (record: T) => boolean;
+  expandedRowKeys?: Key[];
+  defaultExpandedRowKeys?: Key[];
+  onExpand?: (expanded: boolean, record: T) => void;
+  onExpandedRowsChange?: (expandedKeys: Key[]) => void;
+  /** Toggle by clicking anywhere on the row, not just the icon. */
+  expandRowByClick?: boolean;
+  /** Pin the expand column to the left edge (needs `scroll.x`). */
+  fixed?: boolean;
+  columnWidth?: number | string;
+}
+
 export interface TablePagination {
   current?: number;
   pageSize?: number;
@@ -114,8 +133,12 @@ export interface TableProps<T extends TableRecord = Record<string, unknown>> {
     filters: Record<string, string[] | null>,
     sorter: SorterResult<T>,
   ) => void;
-  scroll?: { x?: number | string };
+  /** `y` caps the body height and keeps the header pinned while it scrolls. */
+  scroll?: { x?: number | string; y?: number | string };
   rowSelection?: TableRowSelection<T>;
+  expandable?: TableExpandable<T>;
+  /** Footer rows built from `Table.Summary.Row` / `Table.Summary.Cell`. */
+  summary?: (pageData: T[]) => ReactNode;
   rowClassName?: string | ((record: T, index: number) => string);
   rowStyle?: CSSProperties | ((record: T, index: number) => CSSProperties);
   onRow?: (record: T, index: number) => HTMLAttributes<HTMLTableRowElement>;

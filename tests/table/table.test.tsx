@@ -1,4 +1,4 @@
-import { afterEach, expect, test } from '@rstest/core';
+import { afterEach, expect, rstest, test } from '@rstest/core';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import {
@@ -1214,4 +1214,223 @@ test('controlled local pagination retains the page requested by its parent', () 
     <Table columns={cols} dataSource={rows} pagination={{ current: 2 }} />,
   );
   expect(screen.getByText('Controlled 11')).toBeTruthy();
+});
+
+test('recomputes fixed-column scroll state when the scroll container resizes', async () => {
+  const callbacks: ResizeObserverCallback[] = [];
+  const Original = globalThis.ResizeObserver;
+  globalThis.ResizeObserver = class {
+    constructor(cb: ResizeObserverCallback) {
+      callbacks.push(cb);
+    }
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  } as unknown as typeof ResizeObserver;
+
+  try {
+    const { container } = render(
+      <Table
+        columns={[
+          { ...columns[0], fixed: 'left', width: 100 },
+          ...columns.slice(1),
+        ]}
+        dataSource={data}
+        rowKey="id"
+        scroll={{ x: 800 }}
+      />,
+    );
+    const wrapper = container.querySelector('[data-tao-table-wrapper]');
+    const scrollEl = container.querySelector('[data-tao-table-scroll]');
+    if (!(scrollEl instanceof HTMLElement)) throw new Error('missing scroll');
+    expect(wrapper?.getAttribute('data-tao-scroll-state')).toBe('both');
+
+    Object.defineProperty(scrollEl, 'clientWidth', {
+      configurable: true,
+      value: 300,
+    });
+    Object.defineProperty(scrollEl, 'scrollWidth', {
+      configurable: true,
+      value: 800,
+    });
+    for (const cb of callbacks) cb([], {} as ResizeObserver);
+
+    await waitFor(() =>
+      expect(wrapper?.getAttribute('data-tao-scroll-state')).toBe('left'),
+    );
+  } finally {
+    globalThis.ResizeObserver = Original;
+  }
+});
+
+// ---- scroll.y ----
+
+test('scroll.y caps the scroll container height and marks it for sticky header', () => {
+  const { container } = render(
+    <Table
+      columns={columns}
+      dataSource={data}
+      rowKey="id"
+      scroll={{ y: 240 }}
+    />,
+  );
+  const scrollEl = container.querySelector('[data-tao-table-scroll]');
+  expect(scrollEl?.hasAttribute('data-tao-scroll-y')).toBe(true);
+  expect((scrollEl as HTMLElement).style.maxHeight).toBe('240px');
+});
+
+// ---- Expandable ----
+
+test('expand icon toggles the expanded row and reports changes', async () => {
+  const user = userEvent.setup();
+  const onExpand = rstest.fn();
+  const onExpandedRowsChange = rstest.fn();
+  const { container } = render(
+    <Table
+      columns={columns}
+      dataSource={data}
+      rowKey="id"
+      rowSelection={{}}
+      expandable={{
+        expandedRowRender: (record) => `Detail of ${record.name}`,
+        rowExpandable: (record) => record.name !== 'Bob',
+        onExpand,
+        onExpandedRowsChange,
+      }}
+    />,
+  );
+
+  expect(screen.getAllByRole('button', { name: 'Expand row' })).toHaveLength(4);
+  await user.click(screen.getAllByRole('button', { name: 'Expand row' })[0]);
+
+  expect(screen.getByText('Detail of Alice')).toBeTruthy();
+  const expandedCell = container.querySelector(
+    '[data-tao-table-expanded-row] > td',
+  );
+  // expand + selection + 3 data columns
+  expect(expandedCell?.getAttribute('colspan')).toBe('5');
+  expect(onExpand).toHaveBeenCalledWith(true, data[0]);
+  expect(onExpandedRowsChange).toHaveBeenCalledWith([1]);
+
+  await user.click(screen.getByRole('button', { name: 'Collapse row' }));
+  expect(screen.queryByText('Detail of Alice')).toBeNull();
+  expect(onExpandedRowsChange).toHaveBeenLastCalledWith([]);
+});
+
+test('expandRowByClick toggles on row click but not on the selection checkbox', async () => {
+  const user = userEvent.setup();
+  render(
+    <Table
+      columns={columns}
+      dataSource={data}
+      rowKey="id"
+      rowSelection={{}}
+      expandable={{
+        expandedRowRender: (record) => `Detail of ${record.name}`,
+        expandRowByClick: true,
+      }}
+    />,
+  );
+
+  await user.click(screen.getByRole('checkbox', { name: 'Select row 1' }));
+  expect(screen.queryByText('Detail of Alice')).toBeNull();
+
+  await user.click(screen.getByText('Alice'));
+  expect(screen.getByText('Detail of Alice')).toBeTruthy();
+
+  // Icon click toggles once, not twice via the row handler.
+  await user.click(screen.getByRole('button', { name: 'Collapse row' }));
+  expect(screen.queryByText('Detail of Alice')).toBeNull();
+});
+
+test('controlled expandedRowKeys and defaultExpandedRowKeys', async () => {
+  const user = userEvent.setup();
+  const { rerender } = render(
+    <Table
+      columns={columns}
+      dataSource={data}
+      rowKey="id"
+      expandable={{
+        expandedRowRender: (record) => `Detail of ${record.name}`,
+        defaultExpandedRowKeys: [2],
+      }}
+    />,
+  );
+  expect(screen.getByText('Detail of Bob')).toBeTruthy();
+
+  rerender(
+    <Table
+      columns={columns}
+      dataSource={data}
+      rowKey="id"
+      expandable={{
+        expandedRowRender: (record) => `Detail of ${record.name}`,
+        expandedRowKeys: [3],
+      }}
+    />,
+  );
+  expect(screen.getByText('Detail of Charlie')).toBeTruthy();
+  expect(screen.queryByText('Detail of Bob')).toBeNull();
+
+  await user.click(screen.getAllByRole('button', { name: 'Expand row' })[0]);
+  // Controlled: stays as the parent says.
+  expect(screen.queryByText('Detail of Alice')).toBeNull();
+});
+
+// ---- Summary ----
+
+test('summary renders footer rows and syncs fixed columns by index', () => {
+  const { container } = render(
+    <Table
+      columns={[
+        { ...columns[0], fixed: 'left', width: 120 },
+        { ...columns[1], width: 100 },
+        { ...columns[2], fixed: 'right', width: 100 },
+      ]}
+      dataSource={data}
+      rowKey="id"
+      scroll={{ x: 800, y: 200 }}
+      summary={(pageData) => (
+        <Table.Summary fixed>
+          <Table.Summary.Row>
+            <Table.Summary.Cell index={0}>Total</Table.Summary.Cell>
+            <Table.Summary.Cell index={1}>
+              {pageData.reduce((sum, r) => sum + r.age, 0)}
+            </Table.Summary.Cell>
+            <Table.Summary.Cell index={2}>-</Table.Summary.Cell>
+          </Table.Summary.Row>
+        </Table.Summary>
+      )}
+    />,
+  );
+
+  const tfoot = container.querySelector('tfoot[data-tao-table-summary]');
+  expect(tfoot?.hasAttribute('data-tao-summary-fixed')).toBe(true);
+  const cells = tfoot?.querySelectorAll('td') ?? [];
+  expect(cells[1]?.textContent).toBe('140');
+  expect(cells[0]?.getAttribute('data-tao-fixed')).toBe('left');
+  expect((cells[0] as HTMLElement).style.left).toBe('0px');
+  expect(cells[1]?.hasAttribute('data-tao-fixed')).toBe(false);
+  expect(cells[2]?.getAttribute('data-tao-fixed')).toBe('right');
+  expect((cells[2] as HTMLElement).style.right).toBe('0px');
+});
+
+test('summary without Table.Summary fixed is not pinned', () => {
+  const { container } = render(
+    <Table
+      columns={columns}
+      dataSource={data}
+      rowKey="id"
+      summary={() => (
+        <Table.Summary.Row>
+          <Table.Summary.Cell index={0} colSpan={3}>
+            Footer
+          </Table.Summary.Cell>
+        </Table.Summary.Row>
+      )}
+    />,
+  );
+  const tfoot = container.querySelector('tfoot[data-tao-table-summary]');
+  expect(tfoot?.hasAttribute('data-tao-summary-fixed')).toBe(false);
+  expect(tfoot?.querySelector('td')?.getAttribute('colspan')).toBe('3');
 });

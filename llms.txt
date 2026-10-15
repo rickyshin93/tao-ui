@@ -437,14 +437,14 @@ Use Switch for settings that take effect immediately.
 
 ### Table
 
-Displays structured row and column data with selection, sorting, filtering, and pagination hooks.
+Displays structured row and column data with selection, sorting, filtering, expandable rows, summary rows, a pinned header, and pagination hooks.
 
 - Category: Data Display
 - Exports: `Table`
 - Source: `src/components/table/table.tsx`
 - Storybook: `stories/table.stories.tsx`
 - Tests: `tests/table/table.test.tsx`
-- Semantic parts: `root`, `scroll`, `table`, `header.wrapper`, `header.row`, `header.cell`, `header.content`, `header.title`, `body.row`, `body.cell`, `selection.cell`, `empty`, `pagination`
+- Semantic parts: `root`, `scroll`, `table`, `header.wrapper`, `header.row`, `header.cell`, `header.content`, `header.title`, `body.row`, `body.cell`, `selection.cell`, `expandedRow`, `summary`, `empty`, `pagination`
 
 Use Table for dense, comparable records that benefit from aligned columns.
 

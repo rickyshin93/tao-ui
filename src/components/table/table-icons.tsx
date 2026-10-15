@@ -1,3 +1,4 @@
+import type { MouseEvent } from 'react';
 import type { SortOrder } from './table-types';
 
 export function SortIcon({ order }: { order: SortOrder }) {
@@ -98,5 +99,24 @@ export function CheckIcon() {
         strokeLinejoin="round"
       />
     </svg>
+  );
+}
+
+export function ExpandIcon({
+  expanded,
+  onClick,
+}: {
+  expanded: boolean;
+  onClick: (event: MouseEvent<HTMLButtonElement>) => void;
+}) {
+  return (
+    <button
+      type="button"
+      data-tao-table-expand-icon=""
+      data-tao-expanded={expanded || undefined}
+      aria-expanded={expanded}
+      aria-label={expanded ? 'Collapse row' : 'Expand row'}
+      onClick={onClick}
+    />
   );
 }

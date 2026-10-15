@@ -218,11 +218,15 @@ export {
   type SortOrder,
   Table,
   type TableColumn,
+  type TableExpandable,
   type TableFilterItem,
   type TablePagination,
   type TableProps,
   type TableRowSelection,
   type TableSemanticPart,
+  type TableSummaryCellProps,
+  type TableSummaryProps,
+  type TableSummaryRowProps,
   type TableVariant,
 } from './components/table/table';
 export {

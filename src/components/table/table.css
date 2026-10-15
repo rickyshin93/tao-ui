@@ -15,11 +15,19 @@
   --tao-table-cell-bg: transparent;
   --tao-table-header-bg: transparent;
   --tao-table-header-color: var(--tao-color-text-secondary);
-  --tao-table-row-hover-bg: var(--tao-color-fill-quaternary);
-  --tao-table-row-selected-bg: var(--tao-color-shadow-hint);
-  --tao-table-row-selected-hover-bg: color-mix(
+  /* Row states are a light primary tint (hover < selected < selected-hover)
+     and must stay opaque: sticky cells paint them, and a translucent fill
+     lets scrolled content show through the fixed columns. */
+  --tao-table-row-hover-bg: color-mix(
     in oklch,
-    var(--tao-color-text-base) 7%,
+    var(--tao-color-primary) 4%,
+    var(--tao-color-bg-container)
+  );
+  --tao-table-row-selected-bg: var(--tao-primary-bg);
+  --tao-table-row-selected-hover-bg: var(--tao-primary-bg-hover);
+  --tao-table-fixed-shadow-color: color-mix(
+    in oklch,
+    var(--tao-color-text-base) 14%,
     transparent
   );
   --tao-table-border-color: var(--tao-color-border-secondary);
@@ -37,22 +45,19 @@
   --tao-table-empty-padding-block: var(--tao-padding-xl);
   --tao-table-empty-padding-inline: var(--tao-padding);
   --tao-table-empty-color: var(--tao-color-text-tertiary);
+  --tao-table-expanded-row-bg: var(--tao-color-fill-quaternary);
 }
 
-/* Filled / outlined: bring back the grey header + tinted interaction states */
+/* Filled / outlined: bring back the grey header */
 [data-tao-table-wrapper][data-tao-variant="filled"],
 [data-tao-table-wrapper][data-tao-variant="outlined"] {
   --tao-table-header-bg: var(--tao-color-fill-quaternary);
-  --tao-table-row-selected-bg: var(--tao-primary-bg);
-  --tao-table-row-selected-hover-bg: var(--tao-primary-bg-hover);
 }
 
 /* Modern: shadcn-like frame, softer header, and restrained interaction states. */
 [data-tao-table-wrapper][data-tao-variant="modern"] {
   --tao-table-header-bg: var(--tao-color-bg-container);
   --tao-table-header-color: var(--tao-color-text-secondary);
-  --tao-table-row-selected-bg: var(--tao-primary-bg);
-  --tao-table-row-selected-hover-bg: var(--tao-primary-bg-hover);
   --tao-table-border-color: var(--tao-color-border);
   --tao-table-frame-radius: var(--tao-radius-md);
 }
@@ -68,7 +73,23 @@
    =========================== */
 [data-tao-table-scroll] {
   overflow-x: auto;
+  /* Horizontal-only scroller unless `scroll.y`; the fixed-column shadow pokes
+     1px below a last row that has no divider, which would otherwise add a
+     vertical scrollbar. */
+  overflow-y: hidden;
   position: relative;
+}
+
+[data-tao-table-scroll][data-tao-scroll-y] {
+  overflow-y: auto;
+}
+
+/* scroll.y: one table, header cells pinned with sticky — no separate header
+   table, so column widths never need syncing. */
+[data-tao-scroll-y] [data-tao-table-thead] [data-tao-table-cell] {
+  position: sticky;
+  top: 0;
+  z-index: 2;
 }
 
 [data-tao-table-wrapper][data-tao-variant="modern"] [data-tao-table-scroll] {
@@ -343,7 +364,18 @@
 
 [data-tao-table-thead] [data-tao-table-cell][data-tao-fixed] {
   z-index: 3;
-  background: var(--tao-table-header-bg);
+}
+
+/* Pinned header cells must be opaque even when the header has no fill
+   (borderless / headerBackground={false}): paint the header tint over the
+   container colour. */
+[data-tao-scroll-y] [data-tao-table-thead] [data-tao-table-cell],
+[data-tao-table-thead] [data-tao-table-cell][data-tao-fixed] {
+  background-color: var(--tao-color-bg-container);
+  background-image: linear-gradient(
+    var(--tao-table-header-bg),
+    var(--tao-table-header-bg)
+  );
 }
 
 /* Shadow indicators */
@@ -355,9 +387,10 @@
   position: absolute;
   top: 0;
   right: -30px;
-  bottom: 0;
+  /* Cover the cell's own border-bottom, else the shadow breaks at each row. */
+  bottom: calc(var(--tao-line-width) * -1);
   width: 30px;
-  box-shadow: inset 10px 0 8px -8px var(--tao-table-border-color);
+  box-shadow: inset 12px 0 12px -8px var(--tao-table-fixed-shadow-color);
   transition: box-shadow var(--tao-motion-duration-slow)
     var(--tao-motion-ease-out);
   pointer-events: none;
@@ -371,12 +404,129 @@
   position: absolute;
   top: 0;
   left: -30px;
-  bottom: 0;
+  /* Cover the cell's own border-bottom, else the shadow breaks at each row. */
+  bottom: calc(var(--tao-line-width) * -1);
   width: 30px;
-  box-shadow: inset -10px 0 8px -8px var(--tao-table-border-color);
+  box-shadow: inset -12px 0 12px -8px var(--tao-table-fixed-shadow-color);
   transition: box-shadow var(--tao-motion-duration-slow)
     var(--tao-motion-ease-out);
   pointer-events: none;
+}
+
+/* ===========================
+   Expandable rows
+   =========================== */
+[data-tao-table-expand-cell] {
+  text-align: center;
+}
+
+/* antd's +/- box: two bars, the second rotates to turn + into -. */
+[data-tao-table-expand-icon] {
+  position: relative;
+  display: inline-flex;
+  width: 17px;
+  height: 17px;
+  padding: 0;
+  vertical-align: middle;
+  color: inherit;
+  background: var(--tao-color-bg-container);
+  border: var(--tao-line-width) solid var(--tao-color-border);
+  border-radius: var(--tao-radius-xs);
+  cursor: pointer;
+  transition: border-color var(--tao-motion-duration-fast)
+    var(--tao-motion-ease-out);
+}
+
+[data-tao-table-expand-icon]:hover {
+  border-color: currentColor;
+}
+
+[data-tao-table-expand-icon]:focus-visible {
+  box-shadow: 0 0 0 var(--tao-ring-width) var(--tao-control-outline);
+  outline: none;
+}
+
+[data-tao-table-expand-icon]::before,
+[data-tao-table-expand-icon]::after {
+  content: "";
+  position: absolute;
+  background: currentColor;
+  transition: transform var(--tao-motion-duration-slow)
+    var(--tao-motion-ease-out);
+}
+
+[data-tao-table-expand-icon]::before {
+  top: 7px;
+  inset-inline: 3px;
+  height: 1px;
+  transform: rotate(-180deg);
+}
+
+[data-tao-table-expand-icon]::after {
+  left: 7px;
+  inset-block: 3px;
+  width: 1px;
+}
+
+[data-tao-table-expand-icon][data-tao-expanded]::before {
+  transform: rotate(0deg);
+}
+
+[data-tao-table-expand-icon][data-tao-expanded]::after {
+  transform: rotate(90deg);
+}
+
+[data-tao-table-expanded-row] > [data-tao-table-cell] {
+  padding: 0;
+  background: var(--tao-table-expanded-row-bg);
+}
+
+[data-tao-table-expanded-content] {
+  box-sizing: border-box;
+  padding: var(--tao-table-cell-padding-block)
+    var(--tao-table-cell-padding-inline);
+}
+
+/* Horizontal scroll: keep expanded content inside the visible width (the
+   width itself comes from the scroll container, see viewportWidth). */
+[data-tao-scroll-state] [data-tao-table-expanded-content] {
+  position: sticky;
+  left: 0;
+  overflow: hidden;
+}
+
+/* ===========================
+   Summary (tfoot)
+   =========================== */
+/* The summary's first row draws the divider above it — inset, so a pinned
+   summary keeps the line while rows scroll beneath — and the body's last row
+   drops its own to avoid a double line. */
+[data-tao-table]:has(> [data-tao-table-summary])
+  [data-tao-table-tbody]
+  > tr:last-child
+  > [data-tao-table-cell] {
+  border-bottom: none;
+}
+
+[data-tao-table-summary] > tr:first-child > [data-tao-table-cell] {
+  box-shadow: inset 0 var(--tao-line-width) 0 var(--tao-table-border-color);
+}
+
+[data-tao-table-wrapper][data-tao-bordered]
+  [data-tao-table-summary]
+  > tr:last-child
+  > [data-tao-table-cell] {
+  border-bottom: none;
+}
+
+[data-tao-scroll-y] [data-tao-table-summary][data-tao-summary-fixed] {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+}
+
+[data-tao-table-summary][data-tao-summary-fixed] [data-tao-table-cell] {
+  background: var(--tao-color-bg-container);
 }
 
 /* ===========================
@@ -432,6 +582,19 @@
   );
 }
 
+/* scroll.y: the table scrolls inside the container, so the frame moves to the
+   container (as `modern` always does) or it would scroll away with the rows. */
+[data-tao-table-wrapper][data-tao-bordered] [data-tao-scroll-y] {
+  border: var(--tao-line-width) solid var(--tao-table-border-color);
+  border-radius: var(--tao-table-frame-radius);
+}
+
+[data-tao-table-wrapper][data-tao-bordered]
+  [data-tao-scroll-y]
+  [data-tao-table] {
+  border: none;
+}
+
 [data-tao-table-wrapper][data-tao-bordered] [data-tao-table-cell] {
   border-right: var(--tao-line-width) solid var(--tao-table-border-color);
 }
@@ -474,14 +637,16 @@
 }
 
 [data-tao-table-wrapper][data-tao-bordered]:not([data-tao-variant="modern"])
-  [data-tao-table-tbody]
+  [data-tao-table]
+  > :last-child
   > tr:last-child
   > [data-tao-table-cell]:first-child {
   border-bottom-left-radius: var(--tao-table-inner-radius);
 }
 
 [data-tao-table-wrapper][data-tao-bordered]:not([data-tao-variant="modern"])
-  [data-tao-table-tbody]
+  [data-tao-table]
+  > :last-child
   > tr:last-child
   > [data-tao-table-cell]:last-child {
   border-bottom-right-radius: var(--tao-table-inner-radius);

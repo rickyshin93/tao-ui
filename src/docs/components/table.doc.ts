@@ -5,7 +5,7 @@ export const tableDoc = {
   displayName: 'Table',
   category: 'Data Display',
   description:
-    'Displays structured row and column data with selection, sorting, filtering, and pagination hooks.',
+    'Displays structured row and column data with selection, sorting, filtering, expandable rows, summary rows, a pinned header, and pagination hooks.',
   exports: ['Table'],
   source: 'src/components/table/table.tsx',
   story: 'stories/table.stories.tsx',
@@ -22,6 +22,8 @@ export const tableDoc = {
     'body.row',
     'body.cell',
     'selection.cell',
+    'expandedRow',
+    'summary',
     'empty',
     'pagination',
   ],

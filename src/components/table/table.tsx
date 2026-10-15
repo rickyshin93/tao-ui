@@ -1,4 +1,6 @@
 import {
+  Fragment,
+  isValidElement,
   type ReactNode,
   useCallback,
   useEffect,
@@ -11,7 +13,7 @@ import { useBreakpoint } from '../../utils/breakpoint';
 import { cx } from '../../utils/semantic';
 import { Pagination } from '../pagination/pagination';
 import { TableFilterDropdown } from './table-filter';
-import { SortIcon, TableLoadingSpinner } from './table-icons';
+import { ExpandIcon, SortIcon, TableLoadingSpinner } from './table-icons';
 import {
   getCellValue,
   getColKey,
@@ -21,6 +23,12 @@ import {
   resolveSemanticClassNames,
   resolveSemanticStyles,
 } from './table-model';
+import {
+  TableSummary,
+  type TableSummaryColumn,
+  TableSummaryContext,
+  type TableSummaryProps,
+} from './table-summary';
 import type {
   TableColumn,
   TableProps,
@@ -31,9 +39,15 @@ import { useTableData } from './use-table-data';
 import './table.css';
 
 export type {
+  TableSummaryCellProps,
+  TableSummaryProps,
+  TableSummaryRowProps,
+} from './table-summary';
+export type {
   SorterResult,
   SortOrder,
   TableColumn,
+  TableExpandable,
   TableFilterItem,
   TablePagination,
   TableProps,
@@ -44,6 +58,12 @@ export type {
   TableSemanticStyles,
   TableVariant,
 } from './table-types';
+
+type StickyPos = { left?: number; right?: number };
+
+function stickyStyle(pos: StickyPos | undefined, zIndex: number) {
+  return pos ? { position: 'sticky' as const, ...pos, zIndex } : undefined;
+}
 
 // ---- Table ----
 
@@ -56,6 +76,8 @@ export function Table<T extends TableRecord = Record<string, unknown>>({
   onChange,
   scroll,
   rowSelection,
+  expandable,
+  summary,
   size,
   variant,
   headerBackground = true,
@@ -106,6 +128,8 @@ export function Table<T extends TableRecord = Record<string, unknown>>({
     onChange,
     scroll,
     rowSelection,
+    expandable,
+    summary,
     rowClassName,
     rowStyle,
     onRow,
@@ -205,8 +229,30 @@ export function Table<T extends TableRecord = Record<string, unknown>>({
     ],
   );
 
+  // ---- Expandable rows ----
+  const expandColWidth = expandable?.columnWidth ?? 48;
+  const [internalExpandedKeys, setInternalExpandedKeys] = useState<React.Key[]>(
+    () => expandable?.defaultExpandedRowKeys ?? [],
+  );
+  const expandedKeys = expandable?.expandedRowKeys ?? internalExpandedKeys;
+  const expandedKeySet = useMemo(() => new Set(expandedKeys), [expandedKeys]);
+
+  const toggleExpand = (record: T, key: React.Key) => {
+    const expanded = !expandedKeySet.has(key);
+    const nextKeys = expanded
+      ? [...expandedKeys, key]
+      : expandedKeys.filter((k) => k !== key);
+    if (expandable?.expandedRowKeys === undefined) {
+      setInternalExpandedKeys(nextKeys);
+    }
+    expandable?.onExpand?.(expanded, record);
+    expandable?.onExpandedRowsChange?.(nextKeys);
+  };
+
   // ---- Scroll + sticky columns ----
   const scrollRef = useRef<HTMLDivElement>(null);
+  // Expanded content is pinned to the visible width while scrolling sideways.
+  const [viewportWidth, setViewportWidth] = useState<number>();
   const [scrollState, setScrollState] = useState<
     'left' | 'middle' | 'right' | 'both'
   >('left');
@@ -217,20 +263,37 @@ export function Table<T extends TableRecord = Record<string, unknown>>({
     const { scrollLeft, scrollWidth, clientWidth } = el;
     const atLeft = scrollLeft <= 1;
     const atRight = scrollLeft + clientWidth >= scrollWidth - 1;
+    setViewportWidth(clientWidth);
     if (atLeft && atRight) setScrollState('both');
     else if (atLeft) setScrollState('left');
     else if (atRight) setScrollState('right');
     else setScrollState('middle');
   }, []);
 
+  // Container width / column widths change without a scroll event.
   useEffect(() => {
-    if (!scroll?.x) return;
+    const el = scrollRef.current;
+    if (!scroll?.x || !el) return;
     handleScroll();
+    const observer = new ResizeObserver(handleScroll);
+    observer.observe(el);
+    if (el.firstElementChild) observer.observe(el.firstElementChild);
+    return () => observer.disconnect();
   }, [scroll?.x, handleScroll]);
 
   // ---- Compute sticky positions ----
   const allColumns = useMemo(() => {
     const cols: (TableColumn<T> & { _key: string; _index: number })[] = [];
+
+    // Expand column (antd puts it before the selection column)
+    if (expandable) {
+      cols.push({
+        _key: '__expand__',
+        _index: -2,
+        width: expandColWidth,
+        fixed: expandable.fixed ? 'left' : undefined,
+      });
+    }
 
     // Selection column
     if (rowSelection) {
@@ -247,11 +310,11 @@ export function Table<T extends TableRecord = Record<string, unknown>>({
     });
 
     return cols;
-  }, [columns, rowSelection, selectionColWidth]);
+  }, [columns, rowSelection, selectionColWidth, expandable, expandColWidth]);
 
   const stickyPositions = useMemo(() => {
     if (!scroll?.x) return {};
-    const positions: Record<string, { left?: number; right?: number }> = {};
+    const positions: Record<string, StickyPos> = {};
 
     // Left fixed
     let leftOffset = 0;
@@ -274,6 +337,20 @@ export function Table<T extends TableRecord = Record<string, unknown>>({
 
     return positions;
   }, [allColumns, scroll?.x]);
+
+  const summaryColumns = useMemo<TableSummaryColumn[]>(
+    () =>
+      allColumns.map((col) => ({
+        fixed: col.fixed,
+        sticky: stickyPositions[col._key],
+      })),
+    [allColumns, stickyPositions],
+  );
+  const summaryNode = summary?.(paginatedData);
+  const summaryFixed =
+    isValidElement<TableSummaryProps>(summaryNode) &&
+    summaryNode.type === TableSummary &&
+    !!summaryNode.props.fixed;
 
   // ---- Render ----
   const tableStyle: React.CSSProperties = scroll?.x
@@ -299,14 +376,15 @@ export function Table<T extends TableRecord = Record<string, unknown>>({
       className={cx(resolvedClassNames.root, className)}
       style={{ ...resolvedStyles.root, ...style }}
     >
+      {loading && <TableLoadingSpinner />}
       <div
         data-tao-table-scroll=""
+        data-tao-scroll-y={scroll?.y ? '' : undefined}
         ref={scrollRef}
         onScroll={scroll?.x ? handleScroll : undefined}
         className={resolvedClassNames.scroll}
-        style={resolvedStyles.scroll}
+        style={{ maxHeight: scroll?.y, ...resolvedStyles.scroll }}
       >
-        {loading && <TableLoadingSpinner />}
         <table
           data-tao-table=""
           className={resolvedClassNames.table}
@@ -332,21 +410,30 @@ export function Table<T extends TableRecord = Record<string, unknown>>({
                     ...headerRowProps.style,
                   }}
                 >
+                  {expandable && (
+                    <th
+                      data-tao-table-cell=""
+                      data-tao-table-expand-cell=""
+                      data-tao-fixed={
+                        stickyPositions.__expand__ ? 'left' : undefined
+                      }
+                      style={{
+                        width: expandColWidth,
+                        ...stickyStyle(stickyPositions.__expand__, 3),
+                      }}
+                    />
+                  )}
                   {rowSelection && (
                     <th
                       data-tao-table-cell=""
                       data-tao-table-selection-cell=""
-                      data-tao-fixed="left"
+                      data-tao-fixed={
+                        stickyPositions.__selection__ ? 'left' : undefined
+                      }
                       className={resolvedClassNames['selection.cell']}
                       style={{
                         width: selectionColWidth,
-                        ...(stickyPositions.__selection__
-                          ? {
-                              position: 'sticky',
-                              left: stickyPositions.__selection__.left,
-                              zIndex: 2,
-                            }
-                          : {}),
+                        ...stickyStyle(stickyPositions.__selection__, 3),
                         ...resolvedStyles['selection.cell'],
                       }}
                     >
@@ -403,18 +490,7 @@ export function Table<T extends TableRecord = Record<string, unknown>>({
                         style={{
                           ...resolvedStyles['header.cell'],
                           width: col.width,
-                          ...(isFixed && stickyPos
-                            ? {
-                                position: 'sticky',
-                                ...(stickyPos.left !== undefined
-                                  ? { left: stickyPos.left }
-                                  : {}),
-                                ...(stickyPos.right !== undefined
-                                  ? { right: stickyPos.right }
-                                  : {}),
-                                zIndex: 2,
-                              }
-                            : {}),
+                          ...stickyStyle(isFixed ? stickyPos : undefined, 3),
                           ...headerCellProps.style,
                         }}
                       >
@@ -465,7 +541,7 @@ export function Table<T extends TableRecord = Record<string, unknown>>({
                 <td
                   data-tao-table-cell=""
                   data-tao-table-empty=""
-                  colSpan={columns.length + (rowSelection ? 1 : 0)}
+                  colSpan={allColumns.length}
                   className={resolvedClassNames.empty}
                   style={resolvedStyles.empty}
                 >
@@ -478,100 +554,153 @@ export function Table<T extends TableRecord = Record<string, unknown>>({
                 const isSelected = selectedKeySet.has(key);
                 const checkboxProps = rowSelection?.getCheckboxProps?.(record);
                 const rowProps = onRow?.(record, rowIdx) ?? {};
+                const rowExpandable =
+                  !!expandable && (expandable.rowExpandable?.(record) ?? true);
+                const isExpanded = rowExpandable && expandedKeySet.has(key);
 
                 return (
-                  <tr
-                    {...rowProps}
-                    key={key}
-                    data-tao-table-row=""
-                    data-tao-selected={isSelected || undefined}
-                    className={cx(
-                      resolvedClassNames['body.row'],
-                      resolveRowClassName(rowClassName, record, rowIdx),
-                      rowProps.className,
-                    )}
-                    style={{
-                      ...resolvedStyles['body.row'],
-                      ...resolveRowStyle(rowStyle, record, rowIdx),
-                      ...rowProps.style,
-                    }}
-                  >
-                    {rowSelection && (
-                      <td
-                        data-tao-table-cell=""
-                        data-tao-table-selection-cell=""
-                        data-tao-fixed="left"
-                        className={resolvedClassNames['selection.cell']}
-                        style={{
-                          ...(stickyPositions.__selection__
-                            ? {
-                                position: 'sticky',
-                                left: stickyPositions.__selection__.left,
-                                zIndex: 1,
-                              }
-                            : {}),
-                          ...resolvedStyles['selection.cell'],
-                        }}
-                      >
-                        <input
-                          type={
-                            selectionType === 'radio' ? 'radio' : 'checkbox'
-                          }
-                          checked={isSelected}
-                          aria-label={`Select row ${String(key)}`}
-                          disabled={checkboxProps?.disabled}
-                          onChange={() => handleSelectRow(key)}
-                          data-tao-table-checkbox=""
-                        />
-                      </td>
-                    )}
-                    {columns.map((col, colIdx) => {
-                      const colKey = getColKey(col, colIdx);
-                      const value = getCellValue(record, col.dataIndex);
-                      const stickyPos = stickyPositions[colKey];
-                      const isFixed = !!col.fixed && !!scroll?.x;
-                      const cellProps = col.onCell?.(record, rowIdx) ?? {};
-
-                      return (
+                  <Fragment key={key}>
+                    <tr
+                      {...rowProps}
+                      data-tao-table-row=""
+                      data-tao-selected={isSelected || undefined}
+                      onClick={
+                        rowExpandable && expandable?.expandRowByClick
+                          ? (e) => {
+                              rowProps.onClick?.(e);
+                              toggleExpand(record, key);
+                            }
+                          : rowProps.onClick
+                      }
+                      className={cx(
+                        resolvedClassNames['body.row'],
+                        resolveRowClassName(rowClassName, record, rowIdx),
+                        rowProps.className,
+                      )}
+                      style={{
+                        ...resolvedStyles['body.row'],
+                        ...resolveRowStyle(rowStyle, record, rowIdx),
+                        ...rowProps.style,
+                      }}
+                    >
+                      {expandable && (
                         <td
-                          {...cellProps}
-                          key={colKey}
                           data-tao-table-cell=""
-                          data-tao-align={col.align}
-                          data-tao-ellipsis={col.ellipsis || undefined}
-                          data-tao-fixed={isFixed ? col.fixed : undefined}
-                          className={cx(
-                            resolvedClassNames['body.cell'],
-                            cellProps.className,
+                          data-tao-table-expand-cell=""
+                          data-tao-fixed={
+                            stickyPositions.__expand__ ? 'left' : undefined
+                          }
+                          style={stickyStyle(stickyPositions.__expand__, 1)}
+                        >
+                          {rowExpandable && (
+                            <ExpandIcon
+                              expanded={isExpanded}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                toggleExpand(record, key);
+                              }}
+                            />
                           )}
+                        </td>
+                      )}
+                      {rowSelection && (
+                        <td
+                          data-tao-table-cell=""
+                          data-tao-table-selection-cell=""
+                          data-tao-fixed={
+                            stickyPositions.__selection__ ? 'left' : undefined
+                          }
+                          className={resolvedClassNames['selection.cell']}
                           style={{
-                            ...resolvedStyles['body.cell'],
-                            ...(isFixed && stickyPos
-                              ? {
-                                  position: 'sticky',
-                                  ...(stickyPos.left !== undefined
-                                    ? { left: stickyPos.left }
-                                    : {}),
-                                  ...(stickyPos.right !== undefined
-                                    ? { right: stickyPos.right }
-                                    : {}),
-                                  zIndex: 1,
-                                }
-                              : {}),
-                            ...cellProps.style,
+                            ...stickyStyle(stickyPositions.__selection__, 1),
+                            ...resolvedStyles['selection.cell'],
                           }}
                         >
-                          {col.render
-                            ? col.render(value, record, rowIdx)
-                            : (value as ReactNode)}
+                          <input
+                            type={
+                              selectionType === 'radio' ? 'radio' : 'checkbox'
+                            }
+                            checked={isSelected}
+                            aria-label={`Select row ${String(key)}`}
+                            disabled={checkboxProps?.disabled}
+                            onChange={() => handleSelectRow(key)}
+                            // Ticking a box must not trigger row clicks
+                            // (e.g. expandRowByClick), same as antd.
+                            onClick={(e) => e.stopPropagation()}
+                            data-tao-table-checkbox=""
+                          />
                         </td>
-                      );
-                    })}
-                  </tr>
+                      )}
+                      {columns.map((col, colIdx) => {
+                        const colKey = getColKey(col, colIdx);
+                        const value = getCellValue(record, col.dataIndex);
+                        const stickyPos = stickyPositions[colKey];
+                        const isFixed = !!col.fixed && !!scroll?.x;
+                        const cellProps = col.onCell?.(record, rowIdx) ?? {};
+
+                        return (
+                          <td
+                            {...cellProps}
+                            key={colKey}
+                            data-tao-table-cell=""
+                            data-tao-align={col.align}
+                            data-tao-ellipsis={col.ellipsis || undefined}
+                            data-tao-fixed={isFixed ? col.fixed : undefined}
+                            className={cx(
+                              resolvedClassNames['body.cell'],
+                              cellProps.className,
+                            )}
+                            style={{
+                              ...resolvedStyles['body.cell'],
+                              ...stickyStyle(
+                                isFixed ? stickyPos : undefined,
+                                1,
+                              ),
+                              ...cellProps.style,
+                            }}
+                          >
+                            {col.render
+                              ? col.render(value, record, rowIdx)
+                              : (value as ReactNode)}
+                          </td>
+                        );
+                      })}
+                    </tr>
+                    {isExpanded && (
+                      <tr
+                        data-tao-table-expanded-row=""
+                        className={resolvedClassNames.expandedRow}
+                        style={resolvedStyles.expandedRow}
+                      >
+                        <td data-tao-table-cell="" colSpan={allColumns.length}>
+                          <div
+                            data-tao-table-expanded-content=""
+                            style={
+                              scroll?.x ? { width: viewportWidth } : undefined
+                            }
+                          >
+                            {expandable.expandedRowRender(record, rowIdx)}
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </Fragment>
                 );
               })
             )}
           </tbody>
+          {summaryNode != null && (
+            <tfoot
+              data-tao-table-summary=""
+              data-tao-summary-fixed={summaryFixed || undefined}
+              className={resolvedClassNames.summary}
+              style={resolvedStyles.summary}
+            >
+              <TableSummaryContext.Provider value={summaryColumns}>
+                {summaryNode}
+              </TableSummaryContext.Provider>
+            </tfoot>
+          )}
         </table>
       </div>
 
@@ -587,3 +716,5 @@ export function Table<T extends TableRecord = Record<string, unknown>>({
     </div>
   );
 }
+
+Table.Summary = TableSummary;

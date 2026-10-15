@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "packageName": "@rockshin/tao-ui",
-  "generatedAt": "2026-09-13T04:23:06.126Z",
+  "generatedAt": "2026-10-15T04:34:03.126Z",
   "components": [
     {
       "name": "alert",
@@ -1565,7 +1565,7 @@
       "name": "table",
       "displayName": "Table",
       "category": "Data Display",
-      "description": "Displays structured row and column data with selection, sorting, filtering, and pagination hooks.",
+      "description": "Displays structured row and column data with selection, sorting, filtering, expandable rows, summary rows, a pinned header, and pagination hooks.",
       "exports": [
         "Table"
       ],
@@ -1586,6 +1586,8 @@
         "body.row",
         "body.cell",
         "selection.cell",
+        "expandedRow",
+        "summary",
         "empty",
         "pagination"
       ],

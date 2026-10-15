@@ -126,6 +126,55 @@ function TableStates() {
 export default TableStates;
 ```
 
+## Fixed header, expandable rows, and summary
+
+`scroll.y` caps the body height and pins the header; `expandable` renders details under a row (the expand column sits before the selection column); `summary` returns `Table.Summary.Row` / `Table.Summary.Cell` footer rows — `Cell.index` counts from the expand/selection columns to sync fixed columns, and `<Table.Summary fixed>` pins the footer while the body scrolls.
+
+```tsx preview
+import { Table } from '@rockshin/tao-ui';
+
+const data = Array.from({ length: 30 }, (_, index) => ({
+  id: index + 1,
+  name: 'User ' + (index + 1),
+  team: ['Design', 'Engineering', 'Sales'][index % 3],
+  score: 60 + ((index * 7) % 40),
+}));
+
+const columns = [
+  { key: 'name', dataIndex: 'name', title: 'Name', width: 160, fixed: 'left' },
+  { key: 'team', dataIndex: 'team', title: 'Team', width: 240 },
+  { key: 'score', dataIndex: 'score', title: 'Score', width: 120, align: 'right' },
+];
+
+function TableAdvanced() {
+  return (
+    <Table
+      columns={columns}
+      dataSource={data}
+      rowKey="id"
+      pagination={false}
+      scroll={{ x: 640, y: 280 }}
+      expandable={{
+        expandedRowRender: (record) => record.name + ' works in ' + record.team + '.',
+        rowExpandable: (record) => record.team !== 'Sales',
+      }}
+      summary={(pageData) => (
+        <Table.Summary fixed>
+          <Table.Summary.Row>
+            <Table.Summary.Cell index={0} colSpan={3}>Total</Table.Summary.Cell>
+            <Table.Summary.Cell index={3} align="right">
+              {pageData.reduce((sum, record) => sum + record.score, 0)}
+            </Table.Summary.Cell>
+          </Table.Summary.Row>
+        </Table.Summary>
+      )}
+    />
+  );
+}
+
+export default TableAdvanced;
+```
+
 ## API
 
 <API moduleName="table" />
