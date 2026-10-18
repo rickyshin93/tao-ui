@@ -2,6 +2,7 @@
 import { execFileSync, spawnSync } from 'node:child_process';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { setTimeout as delay } from 'node:timers/promises';
+import { fetchPublishedVersion } from './npm-registry.mjs';
 
 const version = process.argv[2];
 const npmCache = process.env.npm_config_cache || '/private/tmp/npm-cache';
@@ -169,16 +170,32 @@ for (let attempt = 0; attempt < 20; attempt++) {
 assert(runId, `Could not find release workflow run for ${tag}`);
 run('gh', ['run', 'watch', runId, '--exit-status']);
 
-const finalPublishedVersion = read('npm', [
-  'view',
-  packageJson.name,
-  'version',
-  '--registry=https://registry.npmjs.org/',
-  '--prefer-online',
-]);
+// The release workflow finishes as soon as npm accepts the tarball, but the
+// registry can keep serving the previous packument for a minute or two while
+// it processes the upload. Poll instead of failing the whole release on that
+// propagation lag.
+const registry = packageJson.publishConfig?.registry;
+console.log(`\nWaiting for npm to serve ${packageJson.name}@${version}...`);
+let publishedVersion;
+for (let attempt = 0; attempt < 30; attempt++) {
+  try {
+    publishedVersion = await fetchPublishedVersion(
+      packageJson.name,
+      version,
+      registry,
+    );
+  } catch (error) {
+    console.warn(`Registry check failed: ${error.message}`);
+  }
+  if (publishedVersion === version) {
+    break;
+  }
+  await delay(10000);
+}
+
 assert(
-  finalPublishedVersion === version,
-  `Expected npm version ${version}, got ${finalPublishedVersion}`,
+  publishedVersion === version,
+  `Expected npm version ${version}, got ${publishedVersion ?? 'nothing'} after 5 minutes`,
 );
 
 console.log(`\nReleased ${packageJson.name}@${version}`);
