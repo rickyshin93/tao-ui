@@ -224,12 +224,20 @@ button[data-tao-select-clear] {
 }
 
 [data-tao-select-clear] {
+  position: relative;
   color: var(--tao-color-text-quaternary);
   cursor: pointer;
   transition: color var(--tao-motion-duration-fast) var(--tao-motion-ease-out);
 }
 [data-tao-select-clear]:hover {
   color: var(--tao-color-text-secondary);
+}
+/* Enlarge the hit area beyond the 16px glyph box: a near miss would land on
+   the trigger, open the popup and make the clear button vanish. */
+[data-tao-select-clear]::before {
+  content: "";
+  position: absolute;
+  inset: -6px -8px;
 }
 
 /* Loading spinner */

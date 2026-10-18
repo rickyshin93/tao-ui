@@ -11,6 +11,8 @@
 - none
 
 ## Done
+- 2026-10-18 Theme/Table/Tag/Steps/control: colored×neutral tints (primary/status -bg/-border, tag fills incl. custom color, row hover) mix in oklab — oklch hue drift collapsed them to beige/peach (blue hover ≈ header, selected rows & tag fills beige); hover 4%→6%, table row divider 5%→7% (≈antd) (unreleased)
+- 2026-10-16 Select: enlarge allowClear hit area (::before, 16px→~32×28) so near misses no longer open the popup and hide the clear button (unreleased)
 - 2026-10-15 Table: light primary-tinted row hover, opaque row states under fixed columns, stronger unbroken fixed-edge shadows that track container resize (unreleased)
 - 2026-10-15 Table: add scroll.y sticky header, antd-style expandable rows, and summary footer (Table.Summary, fixed); opaque pinned headers, loading mask covers whole table (unreleased)
 - 2026-10-12 drop Popover's popup+30 stacking so Select/Menu/DatePicker popups opened inside a Popover paint above it (unreleased)
