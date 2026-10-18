@@ -116,9 +116,9 @@ export function Tag({
                   borderColor: `color-mix(in oklch, ${color} 36%, transparent)`,
                 }
               : {
-                  background: `color-mix(in oklch, ${color} 10%, var(--tao-color-bg-base))`,
+                  background: `color-mix(in oklab, ${color} 10%, var(--tao-color-bg-base))`,
                   color,
-                  borderColor: `color-mix(in oklch, ${color} 18%, var(--tao-color-bg-base))`,
+                  borderColor: `color-mix(in oklab, ${color} 18%, var(--tao-color-bg-base))`,
                 }),
         }
       : undefined;

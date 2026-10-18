@@ -113,13 +113,13 @@
 /* Primary */
 [data-tao-tag][data-tao-color="primary"][data-tao-variant="filled"] {
   background: color-mix(
-    in oklch,
+    in oklab,
     var(--tao-color-primary) 10%,
     var(--tao-color-bg-base)
   );
   color: var(--tao-primary);
   border-color: color-mix(
-    in oklch,
+    in oklab,
     var(--tao-color-primary) 18%,
     var(--tao-color-bg-base)
   );
@@ -128,13 +128,13 @@
 /* Success */
 [data-tao-tag][data-tao-color="success"][data-tao-variant="filled"] {
   background: color-mix(
-    in oklch,
+    in oklab,
     var(--tao-color-success) 10%,
     var(--tao-color-bg-base)
   );
   color: var(--tao-success);
   border-color: color-mix(
-    in oklch,
+    in oklab,
     var(--tao-color-success) 18%,
     var(--tao-color-bg-base)
   );
@@ -143,13 +143,13 @@
 /* Warning */
 [data-tao-tag][data-tao-color="warning"][data-tao-variant="filled"] {
   background: color-mix(
-    in oklch,
+    in oklab,
     var(--tao-color-warning) 12%,
     var(--tao-color-bg-base)
   );
   color: var(--tao-warning);
   border-color: color-mix(
-    in oklch,
+    in oklab,
     var(--tao-color-warning) 22%,
     var(--tao-color-bg-base)
   );
@@ -158,13 +158,13 @@
 /* Error */
 [data-tao-tag][data-tao-color="error"][data-tao-variant="filled"] {
   background: color-mix(
-    in oklch,
+    in oklab,
     var(--tao-color-error) 10%,
     var(--tao-color-bg-base)
   );
   color: var(--tao-error);
   border-color: color-mix(
-    in oklch,
+    in oklab,
     var(--tao-color-error) 18%,
     var(--tao-color-bg-base)
   );

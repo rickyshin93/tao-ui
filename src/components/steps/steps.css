@@ -601,7 +601,7 @@
   --tao-steps-dot-bg: var(--tao-error);
   /* antd's colorErrorBgFilledHover */
   --tao-steps-icon-bg-hover: color-mix(
-    in oklch,
+    in oklab,
     var(--tao-color-error) 12%,
     var(--tao-color-bg-base)
   );

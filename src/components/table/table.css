@@ -17,10 +17,12 @@
   --tao-table-header-color: var(--tao-color-text-secondary);
   /* Row states are a light primary tint (hover < selected < selected-hover)
      and must stay opaque: sticky cells paint them, and a translucent fill
-     lets scrolled content show through the fixed columns. */
+     lets scrolled content show through the fixed columns.
+     Mixed in oklab: oklch would interpolate hue toward the neutral bg's
+     hue, turning a blue primary into a pink/peach grey. */
   --tao-table-row-hover-bg: color-mix(
-    in oklch,
-    var(--tao-color-primary) 4%,
+    in oklab,
+    var(--tao-color-primary) 6%,
     var(--tao-color-bg-container)
   );
   --tao-table-row-selected-bg: var(--tao-primary-bg);
@@ -30,7 +32,13 @@
     var(--tao-color-text-base) 14%,
     transparent
   );
-  --tao-table-border-color: var(--tao-color-border-secondary);
+  /* Row divider a touch stronger than border-secondary (5% → 7%, about antd's
+     colorBorderSecondary) so it still reads against hover and the filled header. */
+  --tao-table-border-color: color-mix(
+    in oklch,
+    var(--tao-color-text-base) 7%,
+    transparent
+  );
   --tao-table-frame-radius: var(--tao-radius-md);
   --tao-table-cell-padding-block: var(--tao-padding-sm);
   --tao-table-cell-padding-inline: var(--tao-padding);

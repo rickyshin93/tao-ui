@@ -154,7 +154,7 @@
   [data-disabled]
 ):not(:focus-within) {
   background: color-mix(
-    in oklch,
+    in oklab,
     var(--tao-color-error) 10%,
     var(--tao-color-bg-base)
   );
@@ -181,7 +181,7 @@
   [data-disabled]
 ):not(:focus-within) {
   background: color-mix(
-    in oklch,
+    in oklab,
     var(--tao-color-warning) 10%,
     var(--tao-color-bg-base)
   );

@@ -102,17 +102,17 @@
       black
     );
     --tao-primary-bg: color-mix(
-      in oklch,
+      in oklab,
       var(--tao-color-primary) 8%,
       var(--tao-color-bg-base)
     );
     --tao-primary-bg-hover: color-mix(
-      in oklch,
+      in oklab,
       var(--tao-color-primary) 12%,
       var(--tao-color-bg-base)
     );
     --tao-primary-border: color-mix(
-      in oklch,
+      in oklab,
       var(--tao-color-primary) 30%,
       var(--tao-color-bg-base)
     );
@@ -125,12 +125,12 @@
     --tao-error-hover: color-mix(in oklch, var(--tao-color-error) 80%, white);
     --tao-error-active: color-mix(in oklch, var(--tao-color-error) 90%, black);
     --tao-error-bg: color-mix(
-      in oklch,
+      in oklab,
       var(--tao-color-error) 6%,
       var(--tao-color-bg-base)
     );
     --tao-error-border: color-mix(
-      in oklch,
+      in oklab,
       var(--tao-color-error) 30%,
       var(--tao-color-bg-base)
     );
@@ -142,12 +142,12 @@
        =========================== */
     --tao-success: var(--tao-color-success);
     --tao-success-bg: color-mix(
-      in oklch,
+      in oklab,
       var(--tao-color-success) 6%,
       var(--tao-color-bg-base)
     );
     --tao-success-border: color-mix(
-      in oklch,
+      in oklab,
       var(--tao-color-success) 30%,
       var(--tao-color-bg-base)
     );
@@ -157,12 +157,12 @@
        =========================== */
     --tao-warning: var(--tao-color-warning);
     --tao-warning-bg: color-mix(
-      in oklch,
+      in oklab,
       var(--tao-color-warning) 6%,
       var(--tao-color-bg-base)
     );
     --tao-warning-border: color-mix(
-      in oklch,
+      in oklab,
       var(--tao-color-warning) 30%,
       var(--tao-color-bg-base)
     );
@@ -477,12 +477,12 @@
     /* ---- derived：翻转方向不同的 ---- */
     /* 浅色主色在暗底上：hover 向深色 mix（变灰），active 更深 */
     --tao-primary-hover: color-mix(
-      in oklch,
+      in oklab,
       var(--tao-color-primary) 85%,
       var(--tao-color-bg-base)
     );
     --tao-primary-active: color-mix(
-      in oklch,
+      in oklab,
       var(--tao-color-primary) 75%,
       var(--tao-color-bg-base)
     );
