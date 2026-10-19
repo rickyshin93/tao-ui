@@ -16,6 +16,12 @@ name: Release icons
 # version exists and the trusted publisher is configured on npmjs.com, the
 # NODE_AUTH_TOKEN line below can be removed; OIDC then takes over.
 #
+# New-package note: npm converts a first publish of a brand-new package made with
+# a 2FA-bypass token into *staged publishing* — the registry only gets a public
+# `0.0.0-stage` placeholder. A maintainer must approve the staged version with
+# 2FA (npmjs.com -> "Staged Packages" -> Approve, or `npm stage approve <id>`)
+# before the real version becomes installable.
+#
 # Provenance: the repository is currently private and npm provenance requires a
 # public repository, so publishing intentionally omits `--provenance` for now.
 # Restore it together with OIDC once the repo is made public.

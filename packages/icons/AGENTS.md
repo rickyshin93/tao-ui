@@ -20,7 +20,7 @@
 - 装饰性默认、显式可访问名、调用者负责 titleId 唯一性；不得随机 ID、全局计数或 useId
 - React 18/19 的 root/subpath、ref、事件、SSR、hydration 与严格 TS 消费必须通过
 - Next 是 client boundary + SSR，不是原生 RSC；Next 16.4.2 重复独立根导入泄漏必须明确报告
-- 包身份固定为 `@rockshin/tao-icons`、version `0.0.1`、license MIT，且不设 `private`；发布仅通过 GitHub Release `icons-v<version>` 触发 `release-icons.yml`；首个版本用仓库 `NPM_TOKEN` 引导，之后配置 trusted publisher 走 OIDC，发布需明确授权
+- 包身份固定为 `@rockshin/tao-icons`、version `0.0.1`、license MIT，且不设 `private`；发布仅通过 GitHub Release `icons-v<version>` 触发 `release-icons.yml`；首个版本用仓库 `NPM_TOKEN` 引导且会被 npm 转为 staged publish（需维护者 2FA 批准），之后配置 trusted publisher 走 OIDC，发布需明确授权
 
 ## 验证命令
 
