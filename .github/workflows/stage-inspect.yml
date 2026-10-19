@@ -26,8 +26,8 @@ jobs:
         run: |
           npm install --global npm@11 >/dev/null
           npm --version
-          npm stage list @rockshin/tao-icons
+          npm stage list
           echo '--- json ---'
-          npm stage list @rockshin/tao-icons --json
+          npm stage list --json
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
