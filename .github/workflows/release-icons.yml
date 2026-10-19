@@ -16,6 +16,10 @@ name: Release icons
 # version exists and the trusted publisher is configured on npmjs.com, the
 # NODE_AUTH_TOKEN line below can be removed; OIDC then takes over.
 #
+# Provenance: the repository is currently private and npm provenance requires a
+# public repository, so publishing intentionally omits `--provenance` for now.
+# Restore it together with OIDC once the repo is made public.
+#
 # Note: `npm publish` runs the package's own lifecycle scripts
 # (`prepack` -> check:fast and `prepublishOnly` -> release:check + check:extended),
 # so the full real-tarball consumer gate also runs here. That is why this job
@@ -51,12 +55,14 @@ jobs:
         with:
           bun-version: 1.4.2
 
-      # No registry-url: trusted publishing exchanges the Actions OIDC token for
-      # a short-lived npm credential, so we must not pre-write a token auth line.
+      # registry-url writes //registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}
+      # to .npmrc so the bootstrap token below is actually used. OIDC can
+      # replace this once a trusted publisher exists for the package.
       - name: Setup Node
         uses: actions/setup-node@v5
         with:
           node-version: 24
+          registry-url: 'https://registry.npmjs.org'
 
       - name: Ensure npm supports trusted publishing
         # npm >= 11.5.1 is required for OIDC trusted publishing.
@@ -81,10 +87,9 @@ jobs:
       - name: Fast package gate
         run: bun run check:fast
 
-      - name: Publish to npm with provenance
-        run: npm publish --provenance --access public
+      - name: Publish to npm
+        run: npm publish --access public
         env:
-          NPM_CONFIG_REGISTRY: https://registry.npmjs.org/
           # Bootstrap only: lets the very first publish through before a
           # trusted publisher can be configured for this package on npmjs.com.
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

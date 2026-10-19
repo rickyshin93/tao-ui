@@ -4,7 +4,7 @@
 
 新增分类、语义、优先级与完整目录见 [GENERIC-COVERAGE.md](./GENERIC-COVERAGE.md)，保险范围见 [INSURANCE-COVERAGE.md](./INSURANCE-COVERAGE.md)。SVG 总览与可视目录随独立设计资产包提供；本包的 `data/manifest.json` 是程序可读目录，`svg/` 包含全部原始图标。
 
-当前包名 `@rockshin/tao-icons`，版本 `0.0.1`，license 为 MIT。首次发布由 GitHub Release `icons-v<version>` 触发 `release-icons.yml`（npm OIDC trusted publishing，仓库不保存长期 token）。发布前安装方式仍是本地构建的 tgz 或 monorepo workspace 引用。
+当前包名 `@rockshin/tao-icons`，版本 `0.0.1`，license 为 MIT。发布由 GitHub Release `icons-v<version>` 触发 `release-icons.yml`：首个版本用仓库 `NPM_TOKEN` 引导发布，之后可在 npmjs 配置 trusted publisher 切到 OIDC；private 仓库暂不生成 provenance。发布前安装方式仍是本地构建的 tgz 或 monorepo workspace 引用。
 
 ## 安装本地构建包
 
@@ -167,6 +167,6 @@ Rslib 的职责是将 TSX 编译成独立 ESM 模块、生成声明和管理 Rea
 2. 图标与代码版权已按 MIT license 提供（见 LICENSE）；若版权归属变化需同步更新
 3. 确认发布版本（当前 `0.0.1`），同步包名示例与测试，再运行 `bun run release:check`
 4. `bun install && bun run check:extended`，检查 `npm pack --dry-run` 与实际 tgz 安装
-5. 在明确批准发布后，创建 GitHub Release `icons-v<version>` 触发 `release-icons.yml`（OIDC trusted publishing）；首次发布前需在 npmjs 为该仓库配置 trusted publisher
+5. 在明确批准发布后，创建 GitHub Release `icons-v<version>` 触发 `release-icons.yml`；0.0.1 首次发布使用仓库 `NPM_TOKEN`，发布后可在 npmjs 配置 trusted publisher 供后续版本使用
 
 Rslib 与 React 均为各自项目的名称；本包没有声称得到它们的官方背书。
