@@ -1,6 +1,6 @@
-# 验证记录 · 554 枚图标 · 0.1.0
+# 验证记录 · 554 枚图标 · 0.0.1
 
-版本：`@rockshin/tao-icons@0.1.0`（图标数据 canonical version 仍为 `1.4.0-preview.1`，属冻结数据，不随包版本改写），共 554 枚。原批准 330 枚保持不变，新增 224 枚为用户请求范围内的通用候选，尚未最终设计确认。完整执行结果、时间、实测大小以源 ZIP 内 `artifacts/check-extended.log`、`consumer-results.json` 和 `next-results.json` 为准。本文件描述本版门禁和覆盖，不替代实际输出。
+版本：`@rockshin/tao-icons@0.0.1`（图标数据 canonical version 仍为 `1.4.0-preview.1`，属冻结数据，不随包版本改写），共 554 枚。原批准 330 枚保持不变，新增 224 枚为用户请求范围内的通用候选，尚未最终设计确认。完整执行结果、时间、实测大小以源 ZIP 内 `artifacts/check-extended.log`、`consumer-results.json` 和 `next-results.json` 为准。本文件描述本版门禁和覆盖，不替代实际输出。
 
 ## 固定基线
 
@@ -17,7 +17,7 @@
 - 13 项 Node 测试：全部几何/安全 schema、独立批准基线、新候选、API、可访问名称、原生 props、ref/click、hydration、生成漂移负测和发布元数据守卫通过
 - React 18.3.1 / 19.3.1 分别安装真实本地 tgz；全部 554 root/subpath 导出一致
 - 全部 554 图标 SSR、DOM ref、click 事件；完整 554 图标树 hydration 不产生 recoverable error
-- TypeScript 5.9.3 Bundler / NodeNext 严格检查全部 554 root/subpath 用法、SVG ref/事件以及错误 props 负测，skipLibCheck:false
+- TypeScript 7.0.2 Bundler / NodeNext 严格检查全部 554 root/subpath 用法、SVG ref/事件以及错误 props 负测，skipLibCheck:false
 - esbuild 对 Search、Coverage、RiskScore、ProductBuilder、FileSpreadsheet、ChartPie、GitPullRequest 分别测 root/subpath，每次严格只有 1 个图标模块贡献字节，排除其余 553 个；React external
 - 原 Search 单图标 1200/700 B 预算不变，保险及新增通用代表 1600/850 B；整体 tgz 340000 B、unpacked 1450000 B，仅对应 330 → 554 的独立资产规模增长
 

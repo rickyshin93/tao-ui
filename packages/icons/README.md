@@ -4,12 +4,12 @@
 
 新增分类、语义、优先级与完整目录见 [GENERIC-COVERAGE.md](./GENERIC-COVERAGE.md)，保险范围见 [INSURANCE-COVERAGE.md](./INSURANCE-COVERAGE.md)。SVG 总览与可视目录随独立设计资产包提供；本包的 `data/manifest.json` 是程序可读目录，`svg/` 包含全部原始图标。
 
-当前包名 `@rockshin/tao-icons`，版本 `0.1.0`，license 为 MIT；它**尚未发布到 npm**。仓库里没有配置发布 token 或自动发布流程，安装方式仍是本地构建的 tgz 或 monorepo workspace 引用。
+当前包名 `@rockshin/tao-icons`，版本 `0.0.1`，license 为 MIT。首次发布由 GitHub Release `icons-v<version>` 触发 `release-icons.yml`（npm OIDC trusted publishing，仓库不保存长期 token）。发布前安装方式仍是本地构建的 tgz 或 monorepo workspace 引用。
 
 ## 安装本地构建包
 
 ```sh
-npm install ./rockshin-tao-icons-0.1.0.tgz
+npm install ./rockshin-tao-icons-0.0.1.tgz
 ```
 
 在已有 React 18.3.1 或 React 19 项目里安装。React 是 peer dependency（`^18.2.0 || ^19.0.0`），不包含在图标 bundle 里。此版本输出 **ESM + TypeScript 声明**，不提供 CommonJS 入口。monorepo 内使用时可以直接通过 workspace 引用，无需安装 tgz。
@@ -156,7 +156,7 @@ Rslib 的职责是将 TSX 编译成独立 ESM 模块、生成声明和管理 Rea
 
 - 330/330 已批准 SVG 的 SHA-256 与独立旧基线一致；新通用 224 枚候选 hash 和范围记录分开保存；全部 canonical 几何与 SSR 元素属性一致
 - React 18.3.1 / 19.3.1：真实 tgz 安装、全部 root/subpath 导出、SSR、ref、事件与无差异 hydration
-- TypeScript 5.9.3：消费端 `Bundler` / `NodeNext` 两种解析，以及故意错误 props 的类型拒绝
+- TypeScript 7.0.2：消费端 `Bundler` / `NodeNext` 两种解析，以及故意错误 props 的类型拒绝
 - esbuild 0.28.2：分别只引入 SearchIcon、多个保险代表及 FileSpreadsheet / ChartPie / GitPullRequest 通用代表图标，root / subpath 均只保留 1 个图标模块，剔除其余图标；React external。实际字节与 metafile 在 `artifacts/consumer-results.json`
 - Next App Router：生产 webpack 构建与 SSR；详细结果和限定条件在 `artifacts/next-results.json`
 - 不承诺 CommonJS、React Native、所有第三方框架/打包器或旧 React 版本
@@ -165,8 +165,8 @@ Rslib 的职责是将 TSX 编译成独立 ESM 模块、生成声明和管理 Rea
 
 1. 包名已确定为 `@rockshin/tao-icons`（scope `@rockshin`），发布前确认账号拥有权与公开范围
 2. 图标与代码版权已按 MIT license 提供（见 LICENSE）；若版权归属变化需同步更新
-3. 确认发布版本（当前 `0.1.0`），同步包名示例与测试，再运行 `bun run release:check`
+3. 确认发布版本（当前 `0.0.1`），同步包名示例与测试，再运行 `bun run release:check`
 4. `bun install && bun run check:extended`，检查 `npm pack --dry-run` 与实际 tgz 安装
-5. 在明确批准发布后，才由授权账号执行 npm publish；本仓库没有 token、自动发布 CI 或部署步骤，当前尚未发布到 npm
+5. 在明确批准发布后，创建 GitHub Release `icons-v<version>` 触发 `release-icons.yml`（OIDC trusted publishing）；首次发布前需在 npmjs 为该仓库配置 trusted publisher
 
 Rslib 与 React 均为各自项目的名称；本包没有声称得到它们的官方背书。
