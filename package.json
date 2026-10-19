@@ -32,5 +32,8 @@
     "icons:test": "bun run --filter @rockshin/tao-icons test",
     "icons:verify": "bun run --filter @rockshin/tao-icons check:extended",
     "release:icons": "cd packages/icons && node scripts/release-guard.mjs"
+  },
+  "devDependencies": {
+    "typescript": "6.0.3"
   }
 }

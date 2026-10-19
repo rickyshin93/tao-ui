@@ -1,7 +1,12 @@
 #!/usr/bin/env node
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import ts from 'typescript';
+// TypeScript 7 (the native port) no longer ships the JS compiler API that this
+// semantic contract check needs (`ts.createProgram`, `ts.sys`, `getTypeChecker`),
+// and the `typescript/unstable/*` API is not stable enough to gate CI on. The
+// package type-checks and builds with TS 7; this check keeps using the TS 6
+// compiler via the `typescript-compiler` alias.
+import ts from 'typescript-compiler';
 import { readComponentDocs, rootDir } from './read-component-docs.mjs';
 
 const docs = readComponentDocs();
