@@ -1,0 +1,19 @@
+// 由 data/icons.json 生成（原 330 批准图标 + 新通用候选）；执行 npm run generate。
+'use client';
+
+import { forwardRef } from 'react';
+import type { IconProps } from '../types.js';
+import { resolveIconProps } from '../icon-props.js';
+
+export const HandIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
+  function HandIcon(props, ref) {
+    const { title, titleId, children, svgProps } = resolveIconProps(props);
+    return (
+      <svg {...svgProps} ref={ref}>
+        {title ? <title id={titleId}>{title}</title> : null}
+        <path d="M7.5 11V5.8a1.7 1.7 0 0 1 3.4 0V4.7a1.7 1.7 0 0 1 3.4 0v1.1a1.7 1.7 0 0 1 3.4 0v2.3a1.7 1.7 0 0 1 3.4 0v6.2c0 4.1-2.7 6.7-6.8 6.7h-1.7c-2.6 0-3.9-1.2-5.2-3L3.9 13a1.8 1.8 0 0 1 2.6-2.5l1 1ZM10.9 5.8v4.3M14.3 5.8v4.3M17.7 8.1v2"/>
+        {children}
+      </svg>
+    );
+  },
+);

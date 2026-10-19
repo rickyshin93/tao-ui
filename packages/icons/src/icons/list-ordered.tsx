@@ -1,0 +1,19 @@
+// 由 data/icons.json 生成（原 330 批准图标 + 新通用候选）；执行 npm run generate。
+'use client';
+
+import { forwardRef } from 'react';
+import type { IconProps } from '../types.js';
+import { resolveIconProps } from '../icon-props.js';
+
+export const ListOrderedIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
+  function ListOrderedIcon(props, ref) {
+    const { title, titleId, children, svgProps } = resolveIconProps(props);
+    return (
+      <svg {...svgProps} ref={ref}>
+        {title ? <title id={titleId}>{title}</title> : null}
+        <path d="m3.7 5.2 1.7-1.3v5.7M3.7 9.6h3.4M3.6 15.6c0-2.7 4-2.7 4-.1 0 1.3-1.5 2.3-4 4.5h4.2M11 6.8h9M11 17.2h9"/>
+        {children}
+      </svg>
+    );
+  },
+);

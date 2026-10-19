@@ -1,0 +1,19 @@
+// 由 data/icons.json 生成（原 330 批准图标 + 新通用候选）；执行 npm run generate。
+'use client';
+
+import { forwardRef } from 'react';
+import type { IconProps } from '../types.js';
+import { resolveIconProps } from '../icon-props.js';
+
+export const ThumbsDownIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
+  function ThumbsDownIcon(props, ref) {
+    const { title, titleId, children, svgProps } = resolveIconProps(props);
+    return (
+      <svg {...svgProps} ref={ref}>
+        {title ? <title id={titleId}>{title}</title> : null}
+        <path d="M8.1 13.8 11.55 20q.7 1.25 1.9.55l.3-.2q1.15-.75.95-2.1L14.1 15h4.7q2.2 0 1.8-2.2l-1.3-7.1q-.35-1.85-2.2-1.85H8.1ZM3.25 13.8H8.1V3.85H3.25Z"/>
+        {children}
+      </svg>
+    );
+  },
+);

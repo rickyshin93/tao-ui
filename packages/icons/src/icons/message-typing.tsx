@@ -1,0 +1,19 @@
+// 由 data/icons.json 生成（原 330 批准图标 + 新通用候选）；执行 npm run generate。
+'use client';
+
+import { forwardRef } from 'react';
+import type { IconProps } from '../types.js';
+import { resolveIconProps } from '../icon-props.js';
+
+export const MessageTypingIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
+  function MessageTypingIcon(props, ref) {
+    const { title, titleId, children, svgProps } = resolveIconProps(props);
+    return (
+      <svg {...svgProps} ref={ref}>
+        {title ? <title id={titleId}>{title}</title> : null}
+        <path d="M5.1 4h13.8q1.8 0 1.8 1.8v9.4q0 1.8-1.8 1.8H9.4l-4.9 3.4V17q-1.2-.25-1.2-1.8V5.8Q3.3 4 5.1 4Z"/><circle cx="7.5" cy="10.5" r="1.2" fill="currentColor" stroke="none"/><circle cx="12" cy="10.5" r="1.2" fill="currentColor" stroke="none"/><circle cx="16.5" cy="10.5" r="1.2" fill="currentColor" stroke="none"/>
+        {children}
+      </svg>
+    );
+  },
+);

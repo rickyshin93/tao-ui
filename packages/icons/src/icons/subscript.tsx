@@ -1,0 +1,19 @@
+// 由 data/icons.json 生成（原 330 批准图标 + 新通用候选）；执行 npm run generate。
+'use client';
+
+import { forwardRef } from 'react';
+import type { IconProps } from '../types.js';
+import { resolveIconProps } from '../icon-props.js';
+
+export const SubscriptIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
+  function SubscriptIcon(props, ref) {
+    const { title, titleId, children, svgProps } = resolveIconProps(props);
+    return (
+      <svg {...svgProps} ref={ref}>
+        {title ? <title id={titleId}>{title}</title> : null}
+        <path d="m4 5.1 8 10.4m0-10.4L4 15.5M15.1 15.8c0-2.8 4.5-2.8 4.5-.2 0 1.4-1.8 2.5-4.5 4.6h4.8"/>
+        {children}
+      </svg>
+    );
+  },
+);

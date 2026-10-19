@@ -1,0 +1,19 @@
+// 由 data/icons.json 生成（原 330 批准图标 + 新通用候选）；执行 npm run generate。
+'use client';
+
+import { forwardRef } from 'react';
+import type { IconProps } from '../types.js';
+import { resolveIconProps } from '../icon-props.js';
+
+export const TextCursorIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
+  function TextCursorIcon(props, ref) {
+    const { title, titleId, children, svgProps } = resolveIconProps(props);
+    return (
+      <svg {...svgProps} ref={ref}>
+        {title ? <title id={titleId}>{title}</title> : null}
+        <path d="M7.8 3.8c2.5 0 4.2.9 4.2 2.7 0-1.8 1.7-2.7 4.2-2.7M12 6.5v11M7.8 20.2c2.5 0 4.2-.9 4.2-2.7 0 1.8 1.7 2.7 4.2 2.7"/>
+        {children}
+      </svg>
+    );
+  },
+);

@@ -1,0 +1,19 @@
+// 由 data/icons.json 生成（原 330 批准图标 + 新通用候选）；执行 npm run generate。
+'use client';
+
+import { forwardRef } from 'react';
+import type { IconProps } from '../types.js';
+import { resolveIconProps } from '../icon-props.js';
+
+export const QuoteIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
+  function QuoteIcon(props, ref) {
+    const { title, titleId, children, svgProps } = resolveIconProps(props);
+    return (
+      <svg {...svgProps} ref={ref}>
+        {title ? <title id={titleId}>{title}</title> : null}
+        <rect x="3.7" y="5.5" width="6.1" height="6.8" rx="1.2"/><path d="M9.8 12.4c0 3.2-1.7 5.3-4.5 6.1"/><rect x="14.2" y="5.5" width="6.1" height="6.8" rx="1.2"/><path d="M20.3 12.4c0 3.2-1.7 5.3-4.5 6.1"/>
+        {children}
+      </svg>
+    );
+  },
+);

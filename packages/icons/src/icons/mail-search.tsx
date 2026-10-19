@@ -1,0 +1,19 @@
+// 由 data/icons.json 生成（原 330 批准图标 + 新通用候选）；执行 npm run generate。
+'use client';
+
+import { forwardRef } from 'react';
+import type { IconProps } from '../types.js';
+import { resolveIconProps } from '../icon-props.js';
+
+export const MailSearchIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
+  function MailSearchIcon(props, ref) {
+    const { title, titleId, children, svgProps } = resolveIconProps(props);
+    return (
+      <svg {...svgProps} ref={ref}>
+        {title ? <title id={titleId}>{title}</title> : null}
+        <path d="M20.9 10.3V6.9q0-1.8-1.8-1.8H4.9q-1.8 0-1.8 1.8v10.2q0 1.8 1.8 1.8h6.3"/><path d="m3.8 6.1 7.1 6q1.1.9 2.2 0l7.1-6"/><circle cx="16.8" cy="15.8" r="2.8"/><path d="m18.8 17.8 2.6 2.6"/>
+        {children}
+      </svg>
+    );
+  },
+);

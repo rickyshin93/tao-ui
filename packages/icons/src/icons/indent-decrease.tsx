@@ -1,0 +1,19 @@
+// 由 data/icons.json 生成（原 330 批准图标 + 新通用候选）；执行 npm run generate。
+'use client';
+
+import { forwardRef } from 'react';
+import type { IconProps } from '../types.js';
+import { resolveIconProps } from '../icon-props.js';
+
+export const IndentDecreaseIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
+  function IndentDecreaseIcon(props, ref) {
+    const { title, titleId, children, svgProps } = resolveIconProps(props);
+    return (
+      <svg {...svgProps} ref={ref}>
+        {title ? <title id={titleId}>{title}</title> : null}
+        <path d="M3.8 4.5h16.4M12.3 9.5h7.9M12.3 14.5h7.9M3.8 19.5h16.4M8.6 12H3.5m2.3-2.3L3.5 12l2.3 2.3"/>
+        {children}
+      </svg>
+    );
+  },
+);

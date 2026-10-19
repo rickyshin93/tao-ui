@@ -1,0 +1,19 @@
+// 由 data/icons.json 生成（原 330 批准图标 + 新通用候选）；执行 npm run generate。
+'use client';
+
+import { forwardRef } from 'react';
+import type { IconProps } from '../types.js';
+import { resolveIconProps } from '../icon-props.js';
+
+export const InsuranceNeedsIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
+  function InsuranceNeedsIcon(props, ref) {
+    const { title, titleId, children, svgProps } = resolveIconProps(props);
+    return (
+      <svg {...svgProps} ref={ref}>
+        {title ? <title id={titleId}>{title}</title> : null}
+        <path d="M7 18 3.5 21v-6.5Q3.5 5 12 5t8.5 6.5q0 6.5-8.5 6.5H7ZM8 11.5h8"/>
+        {children}
+      </svg>
+    );
+  },
+);

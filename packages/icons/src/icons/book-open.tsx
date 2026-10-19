@@ -1,0 +1,19 @@
+// 由 data/icons.json 生成（原 330 批准图标 + 新通用候选）；执行 npm run generate。
+'use client';
+
+import { forwardRef } from 'react';
+import type { IconProps } from '../types.js';
+import { resolveIconProps } from '../icon-props.js';
+
+export const BookOpenIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
+  function BookOpenIcon(props, ref) {
+    const { title, titleId, children, svgProps } = resolveIconProps(props);
+    return (
+      <svg {...svgProps} ref={ref}>
+        {title ? <title id={titleId}>{title}</title> : null}
+        <path d="M12 6.1C9.6 4.4 6.3 4 3.4 4.7v14.1c3.1-.7 6.1-.3 8.6 1.3 2.5-1.6 5.5-2 8.6-1.3V4.7c-2.9-.7-6.2-.3-8.6 1.4Zm0 .2v13.3"/>
+        {children}
+      </svg>
+    );
+  },
+);

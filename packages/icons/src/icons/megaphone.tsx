@@ -1,0 +1,19 @@
+// 由 data/icons.json 生成（原 330 批准图标 + 新通用候选）；执行 npm run generate。
+'use client';
+
+import { forwardRef } from 'react';
+import type { IconProps } from '../types.js';
+import { resolveIconProps } from '../icon-props.js';
+
+export const MegaphoneIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
+  function MegaphoneIcon(props, ref) {
+    const { title, titleId, children, svgProps } = resolveIconProps(props);
+    return (
+      <svg {...svgProps} ref={ref}>
+        {title ? <title id={titleId}>{title}</title> : null}
+        <path d="M8.2 8.2 18.8 4v14L8.2 13.8H4.9q-1.6 0-1.6-1.6V9.8q0-1.6 1.6-1.6ZM8.2 8.2v5.6M7 14l1.4 6h4l-1.5-5.1M21.5 9v4"/>
+        {children}
+      </svg>
+    );
+  },
+);

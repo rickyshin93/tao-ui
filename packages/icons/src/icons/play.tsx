@@ -1,0 +1,19 @@
+// 由 data/icons.json 生成（原 330 批准图标 + 新通用候选）；执行 npm run generate。
+'use client';
+
+import { forwardRef } from 'react';
+import type { IconProps } from '../types.js';
+import { resolveIconProps } from '../icon-props.js';
+
+export const PlayIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
+  function PlayIcon(props, ref) {
+    const { title, titleId, children, svgProps } = resolveIconProps(props);
+    return (
+      <svg {...svgProps} ref={ref}>
+        {title ? <title id={titleId}>{title}</title> : null}
+        <path d="M7 5.15q0-1.05.9-.55l11.1 6.75q1 .65 0 1.3L7.9 19.4q-.9.5-.9-.55Z"/>
+        {children}
+      </svg>
+    );
+  },
+);

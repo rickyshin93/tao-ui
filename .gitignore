@@ -3,14 +3,19 @@
 *.local
 *.log*
 
-# Dist
+# Dependencies and build output (apply to every workspace package)
 node_modules
 dist/
 storybook-static
 doc_build/
+artifacts/
+**/tests/.work/
+*.tgz
 
 # Tooling
 .codex/
+hook.cache.json
+config.local.json
 
 # IDE
 .vscode/*

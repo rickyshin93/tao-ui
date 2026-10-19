@@ -1,0 +1,19 @@
+// 由 data/icons.json 生成（原 330 批准图标 + 新通用候选）；执行 npm run generate。
+'use client';
+
+import { forwardRef } from 'react';
+import type { IconProps } from '../types.js';
+import { resolveIconProps } from '../icon-props.js';
+
+export const ShieldXIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
+  function ShieldXIcon(props, ref) {
+    const { title, titleId, children, svgProps } = resolveIconProps(props);
+    return (
+      <svg {...svgProps} ref={ref}>
+        {title ? <title id={titleId}>{title}</title> : null}
+        <path d="M12 3 20 6v5.2c0 4.4-2.9 7.5-8 10-5.1-2.5-8-5.6-8-10V6Z"/><path d="m9 9 6 6M15 9l-6 6"/>
+        {children}
+      </svg>
+    );
+  },
+);

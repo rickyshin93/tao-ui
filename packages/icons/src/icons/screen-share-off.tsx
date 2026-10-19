@@ -1,0 +1,19 @@
+// 由 data/icons.json 生成（原 330 批准图标 + 新通用候选）；执行 npm run generate。
+'use client';
+
+import { forwardRef } from 'react';
+import type { IconProps } from '../types.js';
+import { resolveIconProps } from '../icon-props.js';
+
+export const ScreenShareOffIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
+  function ScreenShareOffIcon(props, ref) {
+    const { title, titleId, children, svgProps } = resolveIconProps(props);
+    return (
+      <svg {...svgProps} ref={ref}>
+        {title ? <title id={titleId}>{title}</title> : null}
+        <path d="m3.5 3.5 17 17M5.4 7.2h-.35Q3.2 7.2 3.2 9.05v6.4q0 1.85 1.85 1.85h9.3M20.8 10.1v4.15M12 17.5v3.05M7.7 20.55h8.6M15.4 10.1V3.6m-3 3 3-3 3 3"/>
+        {children}
+      </svg>
+    );
+  },
+);

@@ -1,0 +1,12 @@
+{
+  "searchMinifiedBytes": 1200,
+  "searchGzipBytes": 700,
+  "maxPackedBytes": 340000,
+  "maxUnpackedBytes": 1450000,
+  "iconCount": 554,
+  "insuranceMinifiedBytes": 1600,
+  "insuranceGzipBytes": 850,
+  "rationale": "330 -> 554：新增 224 个独立模块、声明和 SVG，整体包预算按新增约 68% 等比扩展；Search 1200/700 与保险单图标 1600/850 不变。新增通用单图标同样限 1600/850，贡献模块数严格等于 1。",
+  "genericMinifiedBytes": 1600,
+  "genericGzipBytes": 850
+}

@@ -1,0 +1,19 @@
+// 由 data/icons.json 生成（原 330 批准图标 + 新通用候选）；执行 npm run generate。
+'use client';
+
+import { forwardRef } from 'react';
+import type { IconProps } from '../types.js';
+import { resolveIconProps } from '../icon-props.js';
+
+export const EyeIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
+  function EyeIcon(props, ref) {
+    const { title, titleId, children, svgProps } = resolveIconProps(props);
+    return (
+      <svg {...svgProps} ref={ref}>
+        {title ? <title id={titleId}>{title}</title> : null}
+        <path d="M2.9 12c2.2-4.1 5.25-6.2 9.1-6.2s6.9 2.1 9.1 6.2c-2.2 4.1-5.25 6.2-9.1 6.2S5.1 16.1 2.9 12Z"/><circle cx="12" cy="12" r="2.8"/>
+        {children}
+      </svg>
+    );
+  },
+);

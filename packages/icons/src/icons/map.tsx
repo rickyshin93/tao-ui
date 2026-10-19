@@ -1,0 +1,19 @@
+// 由 data/icons.json 生成（原 330 批准图标 + 新通用候选）；执行 npm run generate。
+'use client';
+
+import { forwardRef } from 'react';
+import type { IconProps } from '../types.js';
+import { resolveIconProps } from '../icon-props.js';
+
+export const MapIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
+  function MapIcon(props, ref) {
+    const { title, titleId, children, svgProps } = resolveIconProps(props);
+    return (
+      <svg {...svgProps} ref={ref}>
+        {title ? <title id={titleId}>{title}</title> : null}
+        <path d="m9.1 3.65 5.8 2.5 5.1-2.1q.75-.3.75.5v13.1q0 .55-.5.8l-5.35 2.2-5.8-2.5-5.1 2.1q-.75.3-.75-.5V6.65q0-.55.5-.8ZM9.1 3.9v13.95M14.9 6.35v13.95"/>
+        {children}
+      </svg>
+    );
+  },
+);

@@ -1,0 +1,19 @@
+// 由 data/icons.json 生成（原 330 批准图标 + 新通用候选）；执行 npm run generate。
+'use client';
+
+import { forwardRef } from 'react';
+import type { IconProps } from '../types.js';
+import { resolveIconProps } from '../icon-props.js';
+
+export const ScanFaceIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
+  function ScanFaceIcon(props, ref) {
+    const { title, titleId, children, svgProps } = resolveIconProps(props);
+    return (
+      <svg {...svgProps} ref={ref}>
+        {title ? <title id={titleId}>{title}</title> : null}
+        <path d="M3.5 8V5q0-1.5 1.5-1.5h3M16 3.5h3q1.5 0 1.5 1.5v3M20.5 16v3q0 1.5-1.5 1.5h-3M8 20.5H5q-1.5 0-1.5-1.5v-3M8.5 8.5v1M15.5 8.5v1M12 9v4h-1M8.5 15.5q3.5 3 7 0"/>
+        {children}
+      </svg>
+    );
+  },
+);

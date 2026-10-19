@@ -1,0 +1,19 @@
+// 由 data/icons.json 生成（原 330 批准图标 + 新通用候选）；执行 npm run generate。
+'use client';
+
+import { forwardRef } from 'react';
+import type { IconProps } from '../types.js';
+import { resolveIconProps } from '../icon-props.js';
+
+export const WalletIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
+  function WalletIcon(props, ref) {
+    const { title, titleId, children, svgProps } = resolveIconProps(props);
+    return (
+      <svg {...svgProps} ref={ref}>
+        {title ? <title id={titleId}>{title}</title> : null}
+        <path d="M19.05 7.7V4.75q0-1.2-1.2-.95L5 6.3q-1.7.3-1.7 2v10.15q0 1.85 1.85 1.85h13.7q1.85 0 1.85-1.85v-8.9q0-1.85-1.85-1.85H5.2"/><path d="M20.5 11.55h-4.15q-1.35 0-1.35 1.35v2.35q0 1.35 1.35 1.35h4.15"/><circle cx="17.75" cy="14.1" r=".7" fill="currentColor" stroke="none"/>
+        {children}
+      </svg>
+    );
+  },
+);

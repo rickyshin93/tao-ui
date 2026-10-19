@@ -1,0 +1,19 @@
+// 由 data/icons.json 生成（原 330 批准图标 + 新通用候选）；执行 npm run generate。
+'use client';
+
+import { forwardRef } from 'react';
+import type { IconProps } from '../types.js';
+import { resolveIconProps } from '../icon-props.js';
+
+export const IdCardIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
+  function IdCardIcon(props, ref) {
+    const { title, titleId, children, svgProps } = resolveIconProps(props);
+    return (
+      <svg {...svgProps} ref={ref}>
+        {title ? <title id={titleId}>{title}</title> : null}
+        <rect x="3.1" y="3.8" width="17.8" height="16.4" rx="1.8"/><circle cx="8.7" cy="9.4" r="2"/><path d="M5.7 16.5c0-1.05 1.1-1.5 3-1.5s3 .45 3 1.5M14.7 9.4h3M14.7 14.7h3"/>
+        {children}
+      </svg>
+    );
+  },
+);

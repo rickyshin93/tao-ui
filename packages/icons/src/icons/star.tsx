@@ -1,0 +1,19 @@
+// 由 data/icons.json 生成（原 330 批准图标 + 新通用候选）；执行 npm run generate。
+'use client';
+
+import { forwardRef } from 'react';
+import type { IconProps } from '../types.js';
+import { resolveIconProps } from '../icon-props.js';
+
+export const StarIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
+  function StarIcon(props, ref) {
+    const { title, titleId, children, svgProps } = resolveIconProps(props);
+    return (
+      <svg {...svgProps} ref={ref}>
+        {title ? <title id={titleId}>{title}</title> : null}
+        <path d="m12.65 3.65 2.1 4.7q.2.45.7.5l5.1.6q.85.1.2.75l-3.8 3.6q-.35.35-.25.8l.95 5.1q.15.85-.6.4l-4.65-2.6q-.4-.2-.8 0l-4.65 2.6q-.75.45-.6-.4l.95-5.1q.1-.45-.25-.8l-3.8-3.6q-.65-.65.2-.75l5.1-.6q.5-.05.7-.5l2.1-4.7q.65-1.4 1.3 0Z"/>
+        {children}
+      </svg>
+    );
+  },
+);

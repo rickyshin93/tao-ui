@@ -1,0 +1,19 @@
+// 由 data/icons.json 生成（原 330 批准图标 + 新通用候选）；执行 npm run generate。
+'use client';
+
+import { forwardRef } from 'react';
+import type { IconProps } from '../types.js';
+import { resolveIconProps } from '../icon-props.js';
+
+export const EraserIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
+  function EraserIcon(props, ref) {
+    const { title, titleId, children, svgProps } = resolveIconProps(props);
+    return (
+      <svg {...svgProps} ref={ref}>
+        {title ? <title id={titleId}>{title}</title> : null}
+        <path d="M13.5 4.5q1-1 2 0l5 5q1 1 0 2L12 20H9l-4.5-4.5q-1-1 0-2Z"/><path d="m7.8 10.2 7 7M12 20h8.5"/>
+        {children}
+      </svg>
+    );
+  },
+);

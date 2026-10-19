@@ -1,0 +1,19 @@
+// 由 data/icons.json 生成（原 330 批准图标 + 新通用候选）；执行 npm run generate。
+'use client';
+
+import { forwardRef } from 'react';
+import type { IconProps } from '../types.js';
+import { resolveIconProps } from '../icon-props.js';
+
+export const TicketIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
+  function TicketIcon(props, ref) {
+    const { title, titleId, children, svgProps } = resolveIconProps(props);
+    return (
+      <svg {...svgProps} ref={ref}>
+        {title ? <title id={titleId}>{title}</title> : null}
+        <path d="M4.8 5.3h14.4q1.5 0 1.5 1.5v2.8a2.4 2.4 0 0 0 0 4.8v2.8q0 1.5-1.5 1.5H4.8q-1.5 0-1.5-1.5v-2.8a2.4 2.4 0 0 0 0-4.8V6.8q0-1.5 1.5-1.5ZM15.1 8v2.2M15.1 13.8V16"/>
+        {children}
+      </svg>
+    );
+  },
+);

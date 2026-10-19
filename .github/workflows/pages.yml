@@ -1,19 +1,28 @@
 name: Rspress Pages
 
+# Builds packages/tao-ui/docs with Rspress and deploys the output to GitHub
+# Pages. Rspress writes its static site to packages/tao-ui/doc_build.
+
 on:
   pull_request:
   push:
     branches: [main]
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   build:
     name: Build docs
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     permissions:
       contents: read
       pages: read
+    defaults:
+      run:
+        working-directory: packages/tao-ui
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -21,9 +30,10 @@ jobs:
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
-          bun-version: 1.3.14
+          bun-version: 1.4.2
 
       - name: Install dependencies
+        working-directory: .
         run: bun install --frozen-lockfile
 
       - name: Configure GitHub Pages
@@ -36,11 +46,13 @@ jobs:
           RSPRESS_BASE: /tao-ui/
           RSPRESS_SITE_ORIGIN: https://rickyshin93.github.io
 
+      # Actions ignore run-step working-directory, so the artifact path is
+      # repo-root relative.
       - name: Upload GitHub Pages artifact
         if: github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v4
         with:
-          path: doc_build
+          path: packages/tao-ui/doc_build
 
   deploy:
     name: Deploy docs

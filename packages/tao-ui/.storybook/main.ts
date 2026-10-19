@@ -1,0 +1,61 @@
+import { resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+import type { StorybookConfig } from 'storybook-react-rsbuild';
+
+/**
+ * This function is used to resolve the absolute path of a package.
+ * It is needed in projects that use Yarn PnP or are set up within a monorepo.
+ */
+const getAbsolutePath = (value: string): string => {
+  return resolve(
+    fileURLToPath(
+      new URL(import.meta.resolve(`${value}/package.json`, import.meta.url)),
+    ),
+    '..',
+  );
+};
+
+const config: StorybookConfig = {
+  stories: [
+    '../stories/**/*.mdx',
+    '../stories/**/*.stories.@(js|jsx|mjs|ts|tsx)',
+  ],
+  addons: [
+    '@storybook/addon-docs',
+    '@storybook/addon-onboarding',
+    {
+      name: getAbsolutePath('storybook-addon-rslib'),
+      // rsbuild 2.2 + babel-loader choke on the JSON-string source maps that
+      // chained loaders hand over, so Storybook skips the Rslib babel pass
+      // (React Compiler is only needed for the published library build).
+      options: {
+        rslib: {
+          modifyLibRsbuildConfig: (config) => {
+            config.plugins = (config.plugins ?? []).filter(
+              (plugin) => plugin?.name !== 'rsbuild:babel',
+            );
+          },
+        },
+      },
+    },
+  ],
+  framework: {
+    name: getAbsolutePath('storybook-react-rsbuild'),
+    options: {},
+  },
+  typescript: {
+    reactDocgen: 'react-docgen-typescript',
+    check: true,
+  },
+  rsbuildFinal: (rsbuildConfig) => {
+    rsbuildConfig.resolve ??= {};
+    rsbuildConfig.resolve.alias ??= {};
+    (rsbuildConfig.resolve.alias as Record<string, string>)[
+      '@rockshin/tao-ui'
+    ] = resolve(fileURLToPath(new URL('../src/index.tsx', import.meta.url)));
+    return rsbuildConfig;
+  },
+};
+
+export default config;

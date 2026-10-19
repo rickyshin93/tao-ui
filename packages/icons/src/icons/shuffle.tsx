@@ -1,0 +1,19 @@
+// 由 data/icons.json 生成（原 330 批准图标 + 新通用候选）；执行 npm run generate。
+'use client';
+
+import { forwardRef } from 'react';
+import type { IconProps } from '../types.js';
+import { resolveIconProps } from '../icon-props.js';
+
+export const ShuffleIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
+  function ShuffleIcon(props, ref) {
+    const { title, titleId, children, svgProps } = resolveIconProps(props);
+    return (
+      <svg {...svgProps} ref={ref}>
+        {title ? <title id={titleId}>{title}</title> : null}
+        <path d="M3.3 5.7h2.2q1.3 0 2.1 1.2l8.8 10.3q.9 1.1 2.2 1.1h2.1m-2.7-2.7 2.7 2.7-2.7 2.7M3.3 18.3h2.2q1.3 0 2.1-1.2l2.2-2.6M14 9.3l2.4-2.5q.9-1.1 2.2-1.1h2.1M18 3l2.7 2.7L18 8.4"/>
+        {children}
+      </svg>
+    );
+  },
+);

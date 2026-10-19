@@ -1,0 +1,19 @@
+// 由 data/icons.json 生成（原 330 批准图标 + 新通用候选）；执行 npm run generate。
+'use client';
+
+import { forwardRef } from 'react';
+import type { IconProps } from '../types.js';
+import { resolveIconProps } from '../icon-props.js';
+
+export const CurrencyEuroIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
+  function CurrencyEuroIcon(props, ref) {
+    const { title, titleId, children, svgProps } = resolveIconProps(props);
+    return (
+      <svg {...svgProps} ref={ref}>
+        {title ? <title id={titleId}>{title}</title> : null}
+        <path d="M17.7 5.2c-1.6-1.4-3.2-2-5.3-1.3C8 4.8 7.1 8.8 7.1 12s.9 7.2 5.3 8.1c2.1.7 3.7.1 5.3-1.3M4.4 9.7h10.5M4.4 14.3h8.5"/>
+        {children}
+      </svg>
+    );
+  },
+);

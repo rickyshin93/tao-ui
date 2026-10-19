@@ -1,0 +1,19 @@
+// 由 data/icons.json 生成（原 330 批准图标 + 新通用候选）；执行 npm run generate。
+'use client';
+
+import { forwardRef } from 'react';
+import type { IconProps } from '../types.js';
+import { resolveIconProps } from '../icon-props.js';
+
+export const DistributeHorizontalIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
+  function DistributeHorizontalIcon(props, ref) {
+    const { title, titleId, children, svgProps } = resolveIconProps(props);
+    return (
+      <svg {...svgProps} ref={ref}>
+        {title ? <title id={titleId}>{title}</title> : null}
+        <path d="M3.2 4.2v15.6M20.8 4.2v15.6"/><rect x="6.3" y="8" width="2.6" height="8" rx="0.5" fill="currentColor" stroke="none"/><rect x="10.7" y="5.4" width="2.6" height="13.2" rx="0.5" fill="currentColor" stroke="none"/><rect x="15.1" y="8" width="2.6" height="8" rx="0.5" fill="currentColor" stroke="none"/>
+        {children}
+      </svg>
+    );
+  },
+);

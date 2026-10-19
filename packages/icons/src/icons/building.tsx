@@ -1,0 +1,19 @@
+// 由 data/icons.json 生成（原 330 批准图标 + 新通用候选）；执行 npm run generate。
+'use client';
+
+import { forwardRef } from 'react';
+import type { IconProps } from '../types.js';
+import { resolveIconProps } from '../icon-props.js';
+
+export const BuildingIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
+  function BuildingIcon(props, ref) {
+    const { title, titleId, children, svgProps } = resolveIconProps(props);
+    return (
+      <svg {...svgProps} ref={ref}>
+        {title ? <title id={titleId}>{title}</title> : null}
+        <path d="M5.25 20.7V5.1q0-1.8 1.8-1.8h9.9q1.8 0 1.8 1.8v15.6M3.35 20.7h17.3M10 20.45V16.6h4v3.85M9.1 7.6h.05m5.65 0h.05M9.1 11.75h.05m5.65 0h.05"/>
+        {children}
+      </svg>
+    );
+  },
+);

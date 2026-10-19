@@ -1,0 +1,19 @@
+// 由 data/icons.json 生成（原 330 批准图标 + 新通用候选）；执行 npm run generate。
+'use client';
+
+import { forwardRef } from 'react';
+import type { IconProps } from '../types.js';
+import { resolveIconProps } from '../icon-props.js';
+
+export const StrikethroughIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
+  function StrikethroughIcon(props, ref) {
+    const { title, titleId, children, svgProps } = resolveIconProps(props);
+    return (
+      <svg {...svgProps} ref={ref}>
+        {title ? <title id={titleId}>{title}</title> : null}
+        <path d="M17.2 6.3c-1.1-1.45-2.65-2.1-5-2.1-3.3 0-5.4 1.45-5.4 3.65 0 1.05.55 1.9 1.6 2.5M4 12h16M15.85 14.1c1.05.65 1.55 1.45 1.55 2.5 0 2.15-2.1 3.45-5.4 3.45-2.45 0-4.25-.8-5.6-2.4"/>
+        {children}
+      </svg>
+    );
+  },
+);

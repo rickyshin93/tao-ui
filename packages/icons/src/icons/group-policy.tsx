@@ -1,0 +1,19 @@
+// 由 data/icons.json 生成（原 330 批准图标 + 新通用候选）；执行 npm run generate。
+'use client';
+
+import { forwardRef } from 'react';
+import type { IconProps } from '../types.js';
+import { resolveIconProps } from '../icon-props.js';
+
+export const GroupPolicyIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
+  function GroupPolicyIcon(props, ref) {
+    const { title, titleId, children, svgProps } = resolveIconProps(props);
+    return (
+      <svg {...svgProps} ref={ref}>
+        {title ? <title id={titleId}>{title}</title> : null}
+        <circle cx="8" cy="7" r="3"/><path d="M3 20v-1.5q0-4.5 5-4.5t5 4.5V20M16 4a3 3 0 0 1 0 6M17 14q4 0 4 4.5V20"/>
+        {children}
+      </svg>
+    );
+  },
+);

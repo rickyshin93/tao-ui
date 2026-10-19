@@ -1,0 +1,19 @@
+// 由 data/icons.json 生成（原 330 批准图标 + 新通用候选）；执行 npm run generate。
+'use client';
+
+import { forwardRef } from 'react';
+import type { IconProps } from '../types.js';
+import { resolveIconProps } from '../icon-props.js';
+
+export const ProhibitIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
+  function ProhibitIcon(props, ref) {
+    const { title, titleId, children, svgProps } = resolveIconProps(props);
+    return (
+      <svg {...svgProps} ref={ref}>
+        {title ? <title id={titleId}>{title}</title> : null}
+        <circle cx="12" cy="12" r="8.7"/><path d="m5.9 5.9 12.2 12.2"/>
+        {children}
+      </svg>
+    );
+  },
+);

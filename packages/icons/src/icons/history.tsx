@@ -1,0 +1,19 @@
+// 由 data/icons.json 生成（原 330 批准图标 + 新通用候选）；执行 npm run generate。
+'use client';
+
+import { forwardRef } from 'react';
+import type { IconProps } from '../types.js';
+import { resolveIconProps } from '../icon-props.js';
+
+export const HistoryIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
+  function HistoryIcon(props, ref) {
+    const { title, titleId, children, svgProps } = resolveIconProps(props);
+    return (
+      <svg {...svgProps} ref={ref}>
+        {title ? <title id={titleId}>{title}</title> : null}
+        <path d="M4.5 7.65a8.45 8.45 0 1 1-.75 6.7M3.2 3.75v4.6q0 .65.65.65h4.6M12 7.3v5l3.4 2"/>
+        {children}
+      </svg>
+    );
+  },
+);

@@ -1,0 +1,4176 @@
+{
+  "name": "Rounded essentials · Common UI",
+  "version": "1.0.0",
+  "count": 224,
+  "viewBox": "0 0 24 24",
+  "strokeWidth": 1.8,
+  "categories": [
+    {
+      "id": "navigation",
+      "label": "Navigation & movement",
+      "labelZh": "导航与移动",
+      "count": 13
+    },
+    {
+      "id": "action-controls",
+      "label": "Actions & form controls",
+      "labelZh": "操作与表单控件",
+      "count": 20
+    },
+    {
+      "id": "files",
+      "label": "Files & documents",
+      "labelZh": "文件与文档",
+      "count": 19
+    },
+    {
+      "id": "editing",
+      "label": "Editing & typography",
+      "labelZh": "编辑与排版",
+      "count": 25
+    },
+    {
+      "id": "layout",
+      "label": "Layout & arrangement",
+      "labelZh": "布局与排列",
+      "count": 16
+    },
+    {
+      "id": "data-charts",
+      "label": "Data & charts",
+      "labelZh": "数据与图表",
+      "count": 17
+    },
+    {
+      "id": "users-security",
+      "label": "People & authentication",
+      "labelZh": "用户与身份安全",
+      "count": 11
+    },
+    {
+      "id": "communication",
+      "label": "Communication & feedback",
+      "labelZh": "沟通与反馈",
+      "count": 20
+    },
+    {
+      "id": "media",
+      "label": "Audio & video",
+      "labelZh": "音频与视频",
+      "count": 18
+    },
+    {
+      "id": "devices-connectivity",
+      "label": "Devices & connectivity",
+      "labelZh": "设备与连接",
+      "count": 14
+    },
+    {
+      "id": "commerce-location",
+      "label": "Commerce & places",
+      "labelZh": "商业与地点",
+      "count": 18
+    },
+    {
+      "id": "time-status",
+      "label": "Time & task states",
+      "labelZh": "时间与任务状态",
+      "count": 8
+    },
+    {
+      "id": "accessibility",
+      "label": "Accessibility",
+      "labelZh": "无障碍",
+      "count": 5
+    },
+    {
+      "id": "developer-ai",
+      "label": "Development & AI",
+      "labelZh": "开发与人工智能",
+      "count": 20
+    }
+  ],
+  "icons": [
+    {
+      "name": "arrow-up-left",
+      "label": "Arrow up left",
+      "labelZh": "左上箭头",
+      "category": "navigation",
+      "semantic": "Navigate diagonally up-left",
+      "priority": "P1",
+      "tags": [
+        "arrow up left",
+        "左上箭头",
+        "Navigate diagonally up-left"
+      ],
+      "component": "ArrowUpLeftIcon",
+      "svg": "svg/arrow-up-left.svg",
+      "symbol": "common-arrow-up-left",
+      "approvedOriginal": false,
+      "sha256": "6dbc024d9f182ccf76f3ebc9643030d1e02438f7ceac0acb6a7d4ffd89e2d561"
+    },
+    {
+      "name": "arrow-down-left",
+      "label": "Arrow down left",
+      "labelZh": "左下箭头",
+      "category": "navigation",
+      "semantic": "Navigate diagonally down-left",
+      "priority": "P1",
+      "tags": [
+        "arrow down left",
+        "左下箭头",
+        "Navigate diagonally down-left"
+      ],
+      "component": "ArrowDownLeftIcon",
+      "svg": "svg/arrow-down-left.svg",
+      "symbol": "common-arrow-down-left",
+      "approvedOriginal": false,
+      "sha256": "1554658fc6d74d96f2f1df862ff2f9b3c5acc157ab48a6abc60f2537864647de"
+    },
+    {
+      "name": "arrow-down-right",
+      "label": "Arrow down right",
+      "labelZh": "右下箭头",
+      "category": "navigation",
+      "semantic": "Navigate diagonally down-right",
+      "priority": "P1",
+      "tags": [
+        "arrow down right",
+        "右下箭头",
+        "Navigate diagonally down-right"
+      ],
+      "component": "ArrowDownRightIcon",
+      "svg": "svg/arrow-down-right.svg",
+      "symbol": "common-arrow-down-right",
+      "approvedOriginal": false,
+      "sha256": "47b3ce377e5ee991a45e37c593df498cebb9163e0ced7aba9b4afdf54ace4ddf"
+    },
+    {
+      "name": "arrow-left-right",
+      "label": "Arrow left right",
+      "labelZh": "左右交换",
+      "category": "navigation",
+      "semantic": "Swap items or directions",
+      "priority": "P1",
+      "tags": [
+        "arrow left right",
+        "左右交换",
+        "Swap items or directions"
+      ],
+      "component": "ArrowLeftRightIcon",
+      "svg": "svg/arrow-left-right.svg",
+      "symbol": "common-arrow-left-right",
+      "approvedOriginal": false,
+      "sha256": "86b28c438ba58f34936a52157ef35214d0cdb670b5ed7d30610477470e3fc837"
+    },
+    {
+      "name": "arrow-up-down",
+      "label": "Arrow up down",
+      "labelZh": "上下交换",
+      "category": "navigation",
+      "semantic": "Reorder or switch vertical direction",
+      "priority": "P1",
+      "tags": [
+        "arrow up down",
+        "上下交换",
+        "Reorder or switch vertical direction"
+      ],
+      "component": "ArrowUpDownIcon",
+      "svg": "svg/arrow-up-down.svg",
+      "symbol": "common-arrow-up-down",
+      "approvedOriginal": false,
+      "sha256": "a4e79ee99e344c7afd77da06adeb20f60f1079f7bb7d072b439d44501147f545"
+    },
+    {
+      "name": "chevrons-up",
+      "label": "Chevrons up",
+      "labelZh": "双上尖括号",
+      "category": "navigation",
+      "semantic": "Jump to top",
+      "priority": "P1",
+      "tags": [
+        "chevrons up",
+        "双上尖括号",
+        "Jump to top"
+      ],
+      "component": "ChevronsUpIcon",
+      "svg": "svg/chevrons-up.svg",
+      "symbol": "common-chevrons-up",
+      "approvedOriginal": false,
+      "sha256": "73bd06d6ba969720a2ec39fa0a81886147cdcffe1d3e88580bfb09bf8ae39b68"
+    },
+    {
+      "name": "chevrons-down",
+      "label": "Chevrons down",
+      "labelZh": "双下尖括号",
+      "category": "navigation",
+      "semantic": "Jump to bottom",
+      "priority": "P1",
+      "tags": [
+        "chevrons down",
+        "双下尖括号",
+        "Jump to bottom"
+      ],
+      "component": "ChevronsDownIcon",
+      "svg": "svg/chevrons-down.svg",
+      "symbol": "common-chevrons-down",
+      "approvedOriginal": false,
+      "sha256": "2d775b4f1bf0e4cad3e080dff6f529a3e6410a5e6c1a66b28fec4c7099d7b36e"
+    },
+    {
+      "name": "chevrons-up-down",
+      "label": "Chevrons up down",
+      "labelZh": "上下选择",
+      "category": "navigation",
+      "semantic": "Select or sort control",
+      "priority": "P1",
+      "tags": [
+        "chevrons up down",
+        "上下选择",
+        "Select or sort control"
+      ],
+      "component": "ChevronsUpDownIcon",
+      "svg": "svg/chevrons-up-down.svg",
+      "symbol": "common-chevrons-up-down",
+      "approvedOriginal": false,
+      "sha256": "320d980ee90132950e4c36114a8ca9b8a880e8473dd4b76738b0d7df10672705"
+    },
+    {
+      "name": "corner-down-left",
+      "label": "Corner down left",
+      "labelZh": "回车",
+      "category": "navigation",
+      "semantic": "Return or submit keyboard action",
+      "priority": "P1",
+      "tags": [
+        "corner down left",
+        "回车",
+        "Return or submit keyboard action"
+      ],
+      "component": "CornerDownLeftIcon",
+      "svg": "svg/corner-down-left.svg",
+      "symbol": "common-corner-down-left",
+      "approvedOriginal": false,
+      "sha256": "88a73cfc0244e709aa85210cdadf305f70a5cd3055f85903c8d2bd22a0ed2e4a"
+    },
+    {
+      "name": "move-horizontal",
+      "label": "Move horizontal",
+      "labelZh": "水平移动",
+      "category": "navigation",
+      "semantic": "Resize horizontally",
+      "priority": "P1",
+      "tags": [
+        "move horizontal",
+        "水平移动",
+        "Resize horizontally"
+      ],
+      "component": "MoveHorizontalIcon",
+      "svg": "svg/move-horizontal.svg",
+      "symbol": "common-move-horizontal",
+      "approvedOriginal": false,
+      "sha256": "9859ccf6eb2c5408e6de1d0e9c7edf25676c7be091a26fcadf364f5b497e7b3a"
+    },
+    {
+      "name": "move-vertical",
+      "label": "Move vertical",
+      "labelZh": "垂直移动",
+      "category": "navigation",
+      "semantic": "Resize vertically",
+      "priority": "P1",
+      "tags": [
+        "move vertical",
+        "垂直移动",
+        "Resize vertically"
+      ],
+      "component": "MoveVerticalIcon",
+      "svg": "svg/move-vertical.svg",
+      "symbol": "common-move-vertical",
+      "approvedOriginal": false,
+      "sha256": "c019b77e26a3b071f8f80bd36701331ffe323de24dccc1df772a00e26158994e"
+    },
+    {
+      "name": "mouse-pointer",
+      "label": "Mouse pointer",
+      "labelZh": "鼠标指针",
+      "category": "navigation",
+      "semantic": "Pointer or selection tool",
+      "priority": "P1",
+      "tags": [
+        "mouse pointer",
+        "鼠标指针",
+        "Pointer or selection tool"
+      ],
+      "component": "MousePointerIcon",
+      "svg": "svg/mouse-pointer.svg",
+      "symbol": "common-mouse-pointer",
+      "approvedOriginal": false,
+      "sha256": "cb4a3710ebd4fa71bb94d3ff45ef1b5f41f31395155481b0f4e265aa3a9a0809"
+    },
+    {
+      "name": "hand",
+      "label": "Hand",
+      "labelZh": "抓手",
+      "category": "navigation",
+      "semantic": "Pan a canvas",
+      "priority": "P1",
+      "tags": [
+        "hand",
+        "抓手",
+        "Pan a canvas"
+      ],
+      "component": "HandIcon",
+      "svg": "svg/hand.svg",
+      "symbol": "common-hand",
+      "approvedOriginal": false,
+      "sha256": "3d3f8737ce218466ef845a357c1b53d29ea32fdb221b5af11b1127f7718e1518"
+    },
+    {
+      "name": "checkbox",
+      "label": "Checkbox",
+      "labelZh": "未选复选框",
+      "category": "action-controls",
+      "semantic": "Unchecked multiple-choice input",
+      "priority": "P0",
+      "tags": [
+        "checkbox",
+        "未选复选框",
+        "Unchecked multiple-choice input",
+        "square"
+      ],
+      "component": "CheckboxIcon",
+      "svg": "svg/checkbox.svg",
+      "symbol": "common-checkbox",
+      "approvedOriginal": false,
+      "sha256": "106b2d00e33366196f7daa4f9314fca948d3dae2ecba71d1c6af60e86b43c536"
+    },
+    {
+      "name": "checkbox-checked",
+      "label": "Checkbox checked",
+      "labelZh": "已选复选框",
+      "category": "action-controls",
+      "semantic": "Checked multiple-choice input",
+      "priority": "P0",
+      "tags": [
+        "checkbox checked",
+        "已选复选框",
+        "Checked multiple-choice input",
+        "check-square"
+      ],
+      "component": "CheckboxCheckedIcon",
+      "svg": "svg/checkbox-checked.svg",
+      "symbol": "common-checkbox-checked",
+      "approvedOriginal": false,
+      "sha256": "52879eb931a32fdedec336476185dce4fdb3d4685833b806f6b1b7f1adabf53e"
+    },
+    {
+      "name": "checkbox-indeterminate",
+      "label": "Checkbox indeterminate",
+      "labelZh": "半选复选框",
+      "category": "action-controls",
+      "semantic": "Partially selected group",
+      "priority": "P0",
+      "tags": [
+        "checkbox indeterminate",
+        "半选复选框",
+        "Partially selected group"
+      ],
+      "component": "CheckboxIndeterminateIcon",
+      "svg": "svg/checkbox-indeterminate.svg",
+      "symbol": "common-checkbox-indeterminate",
+      "approvedOriginal": false,
+      "sha256": "c8a5f23b8822e5fc57d7d6a3ec636a63d47dbc30527447a281e4b6b27fc87e64"
+    },
+    {
+      "name": "radio-button",
+      "label": "Radio button",
+      "labelZh": "未选单选框",
+      "category": "action-controls",
+      "semantic": "Unselected exclusive choice",
+      "priority": "P0",
+      "tags": [
+        "radio button",
+        "未选单选框",
+        "Unselected exclusive choice",
+        "circle"
+      ],
+      "component": "RadioButtonIcon",
+      "svg": "svg/radio-button.svg",
+      "symbol": "common-radio-button",
+      "approvedOriginal": false,
+      "sha256": "920c6945c873ec11cb0cc79f36057599039cdcf3316481f52fd2ac4520aba549"
+    },
+    {
+      "name": "radio-button-selected",
+      "label": "Radio button selected",
+      "labelZh": "已选单选框",
+      "category": "action-controls",
+      "semantic": "Selected exclusive choice",
+      "priority": "P0",
+      "tags": [
+        "radio button selected",
+        "已选单选框",
+        "Selected exclusive choice",
+        "circle-dot",
+        "record"
+      ],
+      "component": "RadioButtonSelectedIcon",
+      "svg": "svg/radio-button-selected.svg",
+      "symbol": "common-radio-button-selected",
+      "approvedOriginal": false,
+      "sha256": "0c661ba30a14cd3783ad3055cc3cd3724d95b7835a186e0ffe900987659a62de"
+    },
+    {
+      "name": "toggle-left",
+      "label": "Toggle left",
+      "labelZh": "开关关闭",
+      "category": "action-controls",
+      "semantic": "Disabled switch state",
+      "priority": "P0",
+      "tags": [
+        "toggle left",
+        "开关关闭",
+        "Disabled switch state"
+      ],
+      "component": "ToggleLeftIcon",
+      "svg": "svg/toggle-left.svg",
+      "symbol": "common-toggle-left",
+      "approvedOriginal": false,
+      "sha256": "3a17b377d641c0c0e9f750d945888a9033d45fd6a822aa644bf2fea7aeedbe6c"
+    },
+    {
+      "name": "toggle-right",
+      "label": "Toggle right",
+      "labelZh": "开关开启",
+      "category": "action-controls",
+      "semantic": "Enabled switch state",
+      "priority": "P0",
+      "tags": [
+        "toggle right",
+        "开关开启",
+        "Enabled switch state"
+      ],
+      "component": "ToggleRightIcon",
+      "svg": "svg/toggle-right.svg",
+      "symbol": "common-toggle-right",
+      "approvedOriginal": false,
+      "sha256": "1656ab459e7c3b162528164f6db288778ab53ad541990f49d5defd2f3bad60c4"
+    },
+    {
+      "name": "plus-circle",
+      "label": "Plus circle",
+      "labelZh": "圆形加号",
+      "category": "action-controls",
+      "semantic": "Inline add action",
+      "priority": "P1",
+      "tags": [
+        "plus circle",
+        "圆形加号",
+        "Inline add action"
+      ],
+      "component": "PlusCircleIcon",
+      "svg": "svg/plus-circle.svg",
+      "symbol": "common-plus-circle",
+      "approvedOriginal": false,
+      "sha256": "ac67e4d1e19835a2a130413c1c65449b285e6bfdbdf0523984eb25163b174870"
+    },
+    {
+      "name": "minus-circle",
+      "label": "Minus circle",
+      "labelZh": "圆形减号",
+      "category": "action-controls",
+      "semantic": "Inline remove action",
+      "priority": "P1",
+      "tags": [
+        "minus circle",
+        "圆形减号",
+        "Inline remove action"
+      ],
+      "component": "MinusCircleIcon",
+      "svg": "svg/minus-circle.svg",
+      "symbol": "common-minus-circle",
+      "approvedOriginal": false,
+      "sha256": "28a61bf69c8d1923c1cf5c0067da84a0a0882355d79a51e7f12f651da63644f2"
+    },
+    {
+      "name": "filter-clear",
+      "label": "Filter clear",
+      "labelZh": "清除筛选",
+      "category": "action-controls",
+      "semantic": "Reset active filters",
+      "priority": "P1",
+      "tags": [
+        "filter clear",
+        "清除筛选",
+        "Reset active filters"
+      ],
+      "component": "FilterClearIcon",
+      "svg": "svg/filter-clear.svg",
+      "symbol": "common-filter-clear",
+      "approvedOriginal": false,
+      "sha256": "76def2284262ec765f50222dcaf8d87f540fc40d7145e07fbad6c39d52704925"
+    },
+    {
+      "name": "list-filter",
+      "label": "List filter",
+      "labelZh": "列表筛选",
+      "category": "action-controls",
+      "semantic": "Filter a list view",
+      "priority": "P1",
+      "tags": [
+        "list filter",
+        "列表筛选",
+        "Filter a list view"
+      ],
+      "component": "ListFilterIcon",
+      "svg": "svg/list-filter.svg",
+      "symbol": "common-list-filter",
+      "approvedOriginal": false,
+      "sha256": "5bba369aeff907a19efb8f69574d7a7f6ec761db314fa90a668be6b4d0fd1b60"
+    },
+    {
+      "name": "pin",
+      "label": "Pin",
+      "labelZh": "固定",
+      "category": "action-controls",
+      "semantic": "Pin a page or item",
+      "priority": "P1",
+      "tags": [
+        "pin",
+        "固定",
+        "Pin a page or item"
+      ],
+      "component": "PinIcon",
+      "svg": "svg/pin.svg",
+      "symbol": "common-pin",
+      "approvedOriginal": false,
+      "sha256": "e4cec82ad861d7cff1269bff2d580f0d9d6be07630a5324cb059924f82cf2287"
+    },
+    {
+      "name": "pin-off",
+      "label": "Pin off",
+      "labelZh": "取消固定",
+      "category": "action-controls",
+      "semantic": "Unpin an item",
+      "priority": "P1",
+      "tags": [
+        "pin off",
+        "取消固定",
+        "Unpin an item"
+      ],
+      "component": "PinOffIcon",
+      "svg": "svg/pin-off.svg",
+      "symbol": "common-pin-off",
+      "approvedOriginal": false,
+      "sha256": "1c6de5bb4853fa8778b238d74d6f4c811230e6c3eccf3dee9a33349fecd07965"
+    },
+    {
+      "name": "clipboard-check",
+      "label": "Clipboard check",
+      "labelZh": "剪贴板完成",
+      "category": "action-controls",
+      "semantic": "Completed checklist or copied state",
+      "priority": "P1",
+      "tags": [
+        "clipboard check",
+        "剪贴板完成",
+        "Completed checklist or copied state"
+      ],
+      "component": "ClipboardCheckIcon",
+      "svg": "svg/clipboard-check.svg",
+      "symbol": "common-clipboard-check",
+      "approvedOriginal": false,
+      "sha256": "077f159915f679cbb52c1bc18cd8335aa127ea009e1fe922f6cafdb59fa0817c"
+    },
+    {
+      "name": "clipboard-list",
+      "label": "Clipboard list",
+      "labelZh": "任务清单",
+      "category": "action-controls",
+      "semantic": "Review a list of tasks",
+      "priority": "P1",
+      "tags": [
+        "clipboard list",
+        "任务清单",
+        "Review a list of tasks"
+      ],
+      "component": "ClipboardListIcon",
+      "svg": "svg/clipboard-list.svg",
+      "symbol": "common-clipboard-list",
+      "approvedOriginal": false,
+      "sha256": "9a328efb144a41fb1a8588fcd89dfd6c67da880d7f4fc81683f4218cc9e51986"
+    },
+    {
+      "name": "clipboard-paste",
+      "label": "Clipboard paste",
+      "labelZh": "粘贴",
+      "category": "action-controls",
+      "semantic": "Paste clipboard content",
+      "priority": "P1",
+      "tags": [
+        "clipboard paste",
+        "粘贴",
+        "Paste clipboard content"
+      ],
+      "component": "ClipboardPasteIcon",
+      "svg": "svg/clipboard-paste.svg",
+      "symbol": "common-clipboard-paste",
+      "approvedOriginal": false,
+      "sha256": "baf66e9176c05b2c36edcbf1dbadd6c07e5f1f9f0ca6dcac7cf29547b81d40fa"
+    },
+    {
+      "name": "check-check",
+      "label": "Check check",
+      "labelZh": "全部已读",
+      "category": "action-controls",
+      "semantic": "Read or verified delivery status",
+      "priority": "P1",
+      "tags": [
+        "check check",
+        "全部已读",
+        "Read or verified delivery status"
+      ],
+      "component": "CheckCheckIcon",
+      "svg": "svg/check-check.svg",
+      "symbol": "common-check-check",
+      "approvedOriginal": false,
+      "sha256": "225dbdc47bd7726d1244838dae272e5b48b1437d64891a55c3e95d8eb23e2989"
+    },
+    {
+      "name": "search-x",
+      "label": "Search x",
+      "labelZh": "无搜索结果",
+      "category": "action-controls",
+      "semantic": "No matching records",
+      "priority": "P1",
+      "tags": [
+        "search x",
+        "无搜索结果",
+        "No matching records"
+      ],
+      "component": "SearchXIcon",
+      "svg": "svg/search-x.svg",
+      "symbol": "common-search-x",
+      "approvedOriginal": false,
+      "sha256": "81a3655b13be2f3f70a741814df681db3cf4083acb69681835df39589ec69de6"
+    },
+    {
+      "name": "grip-vertical",
+      "label": "Grip vertical",
+      "labelZh": "纵向拖动手柄",
+      "category": "action-controls",
+      "semantic": "Reorder an item using a vertical drag handle",
+      "priority": "P0",
+      "tags": [
+        "grip vertical",
+        "纵向拖动手柄",
+        "Reorder an item using a vertical drag handle"
+      ],
+      "component": "GripVerticalIcon",
+      "svg": "svg/grip-vertical.svg",
+      "symbol": "common-grip-vertical",
+      "approvedOriginal": false,
+      "sha256": "c678824e8eaf27fbb61a019384add70c4981f810115d96e457873f104552c97f"
+    },
+    {
+      "name": "grip-horizontal",
+      "label": "Grip horizontal",
+      "labelZh": "横向拖动手柄",
+      "category": "action-controls",
+      "semantic": "Resize or reorder using a horizontal drag handle",
+      "priority": "P0",
+      "tags": [
+        "grip horizontal",
+        "横向拖动手柄",
+        "Resize or reorder using a horizontal drag handle"
+      ],
+      "component": "GripHorizontalIcon",
+      "svg": "svg/grip-horizontal.svg",
+      "symbol": "common-grip-horizontal",
+      "approvedOriginal": false,
+      "sha256": "466cb1c5cdc02e0d20034e471c3cbbcba7ad56b279d12b2ce39b9cc2f1a09eac"
+    },
+    {
+      "name": "file-minus",
+      "label": "File minus",
+      "labelZh": "删除文件",
+      "category": "files",
+      "semantic": "Remove a document",
+      "priority": "P1",
+      "tags": [
+        "file minus",
+        "删除文件",
+        "Remove a document"
+      ],
+      "component": "FileMinusIcon",
+      "svg": "svg/file-minus.svg",
+      "symbol": "common-file-minus",
+      "approvedOriginal": false,
+      "sha256": "3b58bc60b3a656676222df2a993708b48682d174c934f873aada7dfd511dd6c8"
+    },
+    {
+      "name": "file-x",
+      "label": "File x",
+      "labelZh": "文件失败",
+      "category": "files",
+      "semantic": "Invalid or rejected document",
+      "priority": "P1",
+      "tags": [
+        "file x",
+        "文件失败",
+        "Invalid or rejected document"
+      ],
+      "component": "FileXIcon",
+      "svg": "svg/file-x.svg",
+      "symbol": "common-file-x",
+      "approvedOriginal": false,
+      "sha256": "e09919f4b6dbab11d1b6fbd4e90789b9156f370b948238daae436d99e63ea053"
+    },
+    {
+      "name": "file-search",
+      "label": "File search",
+      "labelZh": "查找文件",
+      "category": "files",
+      "semantic": "Search within documents",
+      "priority": "P0",
+      "tags": [
+        "file search",
+        "查找文件",
+        "Search within documents"
+      ],
+      "component": "FileSearchIcon",
+      "svg": "svg/file-search.svg",
+      "symbol": "common-file-search",
+      "approvedOriginal": false,
+      "sha256": "650228afcea501c42ceea57ff5871284cf4e48dffb21ccba07db6b80cf4f47d2"
+    },
+    {
+      "name": "file-download",
+      "label": "File download",
+      "labelZh": "下载文件",
+      "category": "files",
+      "semantic": "Download a document",
+      "priority": "P0",
+      "tags": [
+        "file download",
+        "下载文件",
+        "Download a document"
+      ],
+      "component": "FileDownloadIcon",
+      "svg": "svg/file-download.svg",
+      "symbol": "common-file-download",
+      "approvedOriginal": false,
+      "sha256": "92370936e53cc5167a1317be369278b2e087ac4c6c48b442440f01ed9d95f60a"
+    },
+    {
+      "name": "file-upload",
+      "label": "File upload",
+      "labelZh": "上传文件",
+      "category": "files",
+      "semantic": "Upload a document",
+      "priority": "P0",
+      "tags": [
+        "file upload",
+        "上传文件",
+        "Upload a document"
+      ],
+      "component": "FileUploadIcon",
+      "svg": "svg/file-upload.svg",
+      "symbol": "common-file-upload",
+      "approvedOriginal": false,
+      "sha256": "f775a7c8502625720e8d31434e512cdd0d8958aba86e40f9b814f53d61f654c7"
+    },
+    {
+      "name": "file-lock",
+      "label": "File lock",
+      "labelZh": "加密文件",
+      "category": "files",
+      "semantic": "Restricted document",
+      "priority": "P1",
+      "tags": [
+        "file lock",
+        "加密文件",
+        "Restricted document"
+      ],
+      "component": "FileLockIcon",
+      "svg": "svg/file-lock.svg",
+      "symbol": "common-file-lock",
+      "approvedOriginal": false,
+      "sha256": "6659353a479f99027b38cd248bd3ba4b1a2a1163d9b4e2a7e15d2d8c1647bbbc"
+    },
+    {
+      "name": "file-spreadsheet",
+      "label": "File spreadsheet",
+      "labelZh": "电子表格",
+      "category": "files",
+      "semantic": "Spreadsheet file type",
+      "priority": "P0",
+      "tags": [
+        "file spreadsheet",
+        "电子表格",
+        "Spreadsheet file type"
+      ],
+      "component": "FileSpreadsheetIcon",
+      "svg": "svg/file-spreadsheet.svg",
+      "symbol": "common-file-spreadsheet",
+      "approvedOriginal": false,
+      "sha256": "9541f517d2723fbff8027bb3e506466d592915136a338801952bf3af188fba6a"
+    },
+    {
+      "name": "file-chart",
+      "label": "File chart",
+      "labelZh": "数据报告",
+      "category": "files",
+      "semantic": "Analytical report file",
+      "priority": "P1",
+      "tags": [
+        "file chart",
+        "数据报告",
+        "Analytical report file"
+      ],
+      "component": "FileChartIcon",
+      "svg": "svg/file-chart.svg",
+      "symbol": "common-file-chart",
+      "approvedOriginal": false,
+      "sha256": "36dce81476a5e3a7982d1ebcc89fad410297be0c2082452bb24f2d1b9cd0e389"
+    },
+    {
+      "name": "file-audio",
+      "label": "File audio",
+      "labelZh": "音频文件",
+      "category": "files",
+      "semantic": "Audio file type",
+      "priority": "P1",
+      "tags": [
+        "file audio",
+        "音频文件",
+        "Audio file type"
+      ],
+      "component": "FileAudioIcon",
+      "svg": "svg/file-audio.svg",
+      "symbol": "common-file-audio",
+      "approvedOriginal": false,
+      "sha256": "e2efe8a8848d73bf03a96f968f414c106c4018973b7c9f65be7eed6ca86143e8"
+    },
+    {
+      "name": "file-video",
+      "label": "File video",
+      "labelZh": "视频文件",
+      "category": "files",
+      "semantic": "Video file type",
+      "priority": "P1",
+      "tags": [
+        "file video",
+        "视频文件",
+        "Video file type"
+      ],
+      "component": "FileVideoIcon",
+      "svg": "svg/file-video.svg",
+      "symbol": "common-file-video",
+      "approvedOriginal": false,
+      "sha256": "5d481758c06e18731dc12660cb2052b6d7fec95dd1ac427efe419999697dee40"
+    },
+    {
+      "name": "file-archive",
+      "label": "File archive",
+      "labelZh": "压缩文件",
+      "category": "files",
+      "semantic": "Compressed archive type",
+      "priority": "P1",
+      "tags": [
+        "file archive",
+        "压缩文件",
+        "Compressed archive type"
+      ],
+      "component": "FileArchiveIcon",
+      "svg": "svg/file-archive.svg",
+      "symbol": "common-file-archive",
+      "approvedOriginal": false,
+      "sha256": "03def6a051f7cddbcfead6081db453e3a1d1ae328130d8a5aa51559c67a0d189"
+    },
+    {
+      "name": "folder-minus",
+      "label": "Folder minus",
+      "labelZh": "删除文件夹",
+      "category": "files",
+      "semantic": "Remove a folder",
+      "priority": "P1",
+      "tags": [
+        "folder minus",
+        "删除文件夹",
+        "Remove a folder"
+      ],
+      "component": "FolderMinusIcon",
+      "svg": "svg/folder-minus.svg",
+      "symbol": "common-folder-minus",
+      "approvedOriginal": false,
+      "sha256": "fc88ed3b98006f8228612bde3c4e7c92cac30e93fb55fe607125979f267e22b3"
+    },
+    {
+      "name": "folder-search",
+      "label": "Folder search",
+      "labelZh": "查找文件夹",
+      "category": "files",
+      "semantic": "Search a folder",
+      "priority": "P0",
+      "tags": [
+        "folder search",
+        "查找文件夹",
+        "Search a folder"
+      ],
+      "component": "FolderSearchIcon",
+      "svg": "svg/folder-search.svg",
+      "symbol": "common-folder-search",
+      "approvedOriginal": false,
+      "sha256": "bd879fd7c29e54255f5bcbaf285df6943ff40eaad92efe28778dcef5e7f39adf"
+    },
+    {
+      "name": "folder-check",
+      "label": "Folder check",
+      "labelZh": "文件夹完成",
+      "category": "files",
+      "semantic": "Folder ready or synced",
+      "priority": "P1",
+      "tags": [
+        "folder check",
+        "文件夹完成",
+        "Folder ready or synced"
+      ],
+      "component": "FolderCheckIcon",
+      "svg": "svg/folder-check.svg",
+      "symbol": "common-folder-check",
+      "approvedOriginal": false,
+      "sha256": "ee9a99628a7e4edbdfceb0235cf7b28f531e4d1313a29c3c11d69a5c13ee120b"
+    },
+    {
+      "name": "folder-lock",
+      "label": "Folder lock",
+      "labelZh": "私密文件夹",
+      "category": "files",
+      "semantic": "Restricted folder",
+      "priority": "P1",
+      "tags": [
+        "folder lock",
+        "私密文件夹",
+        "Restricted folder"
+      ],
+      "component": "FolderLockIcon",
+      "svg": "svg/folder-lock.svg",
+      "symbol": "common-folder-lock",
+      "approvedOriginal": false,
+      "sha256": "e09eef1e8f381237078ad0b93d4ce3c3e465936eef2912fc06336b617b27e986"
+    },
+    {
+      "name": "folders",
+      "label": "Folders",
+      "labelZh": "文件夹组",
+      "category": "files",
+      "semantic": "Browse folder collection",
+      "priority": "P1",
+      "tags": [
+        "folders",
+        "文件夹组",
+        "Browse folder collection"
+      ],
+      "component": "FoldersIcon",
+      "svg": "svg/folders.svg",
+      "symbol": "common-folders",
+      "approvedOriginal": false,
+      "sha256": "616162bf4b9c20768a606bdd4003df591d54b71aa84c9ce5b7889fafd7026e49"
+    },
+    {
+      "name": "book-open",
+      "label": "Book open",
+      "labelZh": "打开的书",
+      "category": "files",
+      "semantic": "Read documentation",
+      "priority": "P1",
+      "tags": [
+        "book open",
+        "打开的书",
+        "Read documentation"
+      ],
+      "component": "BookOpenIcon",
+      "svg": "svg/book-open.svg",
+      "symbol": "common-book-open",
+      "approvedOriginal": false,
+      "sha256": "c7b679fd5e079f3b56fda42f6296a6beef0513c12d041203a53b127054fe9f5c"
+    },
+    {
+      "name": "bookmark-plus",
+      "label": "Bookmark plus",
+      "labelZh": "添加书签",
+      "category": "files",
+      "semantic": "Save a new bookmark",
+      "priority": "P1",
+      "tags": [
+        "bookmark plus",
+        "添加书签",
+        "Save a new bookmark"
+      ],
+      "component": "BookmarkPlusIcon",
+      "svg": "svg/bookmark-plus.svg",
+      "symbol": "common-bookmark-plus",
+      "approvedOriginal": false,
+      "sha256": "7aa4a75df5dcc0bbd680739e417456b7b93b8c1539a76735f8045d60ac369370"
+    },
+    {
+      "name": "bookmark-minus",
+      "label": "Bookmark minus",
+      "labelZh": "移除书签",
+      "category": "files",
+      "semantic": "Remove saved bookmark",
+      "priority": "P1",
+      "tags": [
+        "bookmark minus",
+        "移除书签",
+        "Remove saved bookmark"
+      ],
+      "component": "BookmarkMinusIcon",
+      "svg": "svg/bookmark-minus.svg",
+      "symbol": "common-bookmark-minus",
+      "approvedOriginal": false,
+      "sha256": "1573679c26ef56c0ffb6663b670017c250c89e00edc00b45b71a8ee9a0fc6fc3"
+    },
+    {
+      "name": "list-bullets",
+      "label": "List bullets",
+      "labelZh": "无序列表",
+      "category": "editing",
+      "semantic": "Insert bullet list",
+      "priority": "P0",
+      "tags": [
+        "list bullets",
+        "无序列表",
+        "Insert bullet list"
+      ],
+      "component": "ListBulletsIcon",
+      "svg": "svg/list-bullets.svg",
+      "symbol": "common-list-bullets",
+      "approvedOriginal": false,
+      "sha256": "5c3db86e8369f91ac4ba70e105d601eb34a831158182f13931e5c5181c0f6feb"
+    },
+    {
+      "name": "list-ordered",
+      "label": "List ordered",
+      "labelZh": "有序列表",
+      "category": "editing",
+      "semantic": "Insert numbered list",
+      "priority": "P0",
+      "tags": [
+        "list ordered",
+        "有序列表",
+        "Insert numbered list"
+      ],
+      "component": "ListOrderedIcon",
+      "svg": "svg/list-ordered.svg",
+      "symbol": "common-list-ordered",
+      "approvedOriginal": false,
+      "sha256": "e8f28b78c636bd69acbfd47720c60ed863bbfcda2771363e7803311a95445461"
+    },
+    {
+      "name": "list-checks",
+      "label": "List checks",
+      "labelZh": "勾选列表",
+      "category": "editing",
+      "semantic": "Insert checklist",
+      "priority": "P1",
+      "tags": [
+        "list checks",
+        "勾选列表",
+        "Insert checklist"
+      ],
+      "component": "ListChecksIcon",
+      "svg": "svg/list-checks.svg",
+      "symbol": "common-list-checks",
+      "approvedOriginal": false,
+      "sha256": "d44c765c63f234978001c91dc722a370ca16728798b22394c36c45334ca86e96"
+    },
+    {
+      "name": "indent-increase",
+      "label": "Indent increase",
+      "labelZh": "增加缩进",
+      "category": "editing",
+      "semantic": "Indent paragraph",
+      "priority": "P0",
+      "tags": [
+        "indent increase",
+        "增加缩进",
+        "Indent paragraph"
+      ],
+      "component": "IndentIncreaseIcon",
+      "svg": "svg/indent-increase.svg",
+      "symbol": "common-indent-increase",
+      "approvedOriginal": false,
+      "sha256": "dad595d93d8874eee1238932c39190986577f45c89d65aaa5543589eb0f5d722"
+    },
+    {
+      "name": "indent-decrease",
+      "label": "Indent decrease",
+      "labelZh": "减少缩进",
+      "category": "editing",
+      "semantic": "Outdent paragraph",
+      "priority": "P0",
+      "tags": [
+        "indent decrease",
+        "减少缩进",
+        "Outdent paragraph"
+      ],
+      "component": "IndentDecreaseIcon",
+      "svg": "svg/indent-decrease.svg",
+      "symbol": "common-indent-decrease",
+      "approvedOriginal": false,
+      "sha256": "a028bbadf5faed8f0e5e0a585c5b46f25beafb7b1c1bf89c4c966c400017802b"
+    },
+    {
+      "name": "heading",
+      "label": "Heading",
+      "labelZh": "标题",
+      "category": "editing",
+      "semantic": "Set heading style",
+      "priority": "P0",
+      "tags": [
+        "heading",
+        "标题",
+        "Set heading style"
+      ],
+      "component": "HeadingIcon",
+      "svg": "svg/heading.svg",
+      "symbol": "common-heading",
+      "approvedOriginal": false,
+      "sha256": "7c7255461b627f85350dba20ee969af433911a8836e381afca6b753936008f54"
+    },
+    {
+      "name": "quote",
+      "label": "Quote",
+      "labelZh": "引用",
+      "category": "editing",
+      "semantic": "Insert block quotation",
+      "priority": "P0",
+      "tags": [
+        "quote",
+        "引用",
+        "Insert block quotation"
+      ],
+      "component": "QuoteIcon",
+      "svg": "svg/quote.svg",
+      "symbol": "common-quote",
+      "approvedOriginal": false,
+      "sha256": "c2e5bf325da8c9e3417d6c1df23eb8ebd54c9373ace9c082f12ce821291159a0"
+    },
+    {
+      "name": "paragraph",
+      "label": "Paragraph",
+      "labelZh": "段落",
+      "category": "editing",
+      "semantic": "Paragraph formatting",
+      "priority": "P1",
+      "tags": [
+        "paragraph",
+        "段落",
+        "Paragraph formatting"
+      ],
+      "component": "ParagraphIcon",
+      "svg": "svg/paragraph.svg",
+      "symbol": "common-paragraph",
+      "approvedOriginal": false,
+      "sha256": "240cfdab9850895041f3889497275dfc3afcf3e09f8aa7a5f968596486925698"
+    },
+    {
+      "name": "text-cursor",
+      "label": "Text cursor",
+      "labelZh": "文本光标",
+      "category": "editing",
+      "semantic": "Text insertion tool",
+      "priority": "P1",
+      "tags": [
+        "text cursor",
+        "文本光标",
+        "Text insertion tool"
+      ],
+      "component": "TextCursorIcon",
+      "svg": "svg/text-cursor.svg",
+      "symbol": "common-text-cursor",
+      "approvedOriginal": false,
+      "sha256": "b5a32cbea6213d080360c197b49f97629df1572be8c70a8bba038652ee851c85"
+    },
+    {
+      "name": "text-wrap",
+      "label": "Text wrap",
+      "labelZh": "自动换行",
+      "category": "editing",
+      "semantic": "Wrap overflowing text",
+      "priority": "P1",
+      "tags": [
+        "text wrap",
+        "自动换行",
+        "Wrap overflowing text"
+      ],
+      "component": "TextWrapIcon",
+      "svg": "svg/text-wrap.svg",
+      "symbol": "common-text-wrap",
+      "approvedOriginal": false,
+      "sha256": "ef2d6f876dddb196d7b461cf8dcafce98e279b2501848f7569609aee421d389e"
+    },
+    {
+      "name": "text-color",
+      "label": "Text color",
+      "labelZh": "文字颜色",
+      "category": "editing",
+      "semantic": "Choose text color",
+      "priority": "P0",
+      "tags": [
+        "text color",
+        "文字颜色",
+        "Choose text color"
+      ],
+      "component": "TextColorIcon",
+      "svg": "svg/text-color.svg",
+      "symbol": "common-text-color",
+      "approvedOriginal": false,
+      "sha256": "cdf12da4544dcaf1be5871c52837be597c18a62dddd384ad871db4ab867586ca"
+    },
+    {
+      "name": "highlighter",
+      "label": "Highlighter",
+      "labelZh": "文本高亮",
+      "category": "editing",
+      "semantic": "Highlight text",
+      "priority": "P0",
+      "tags": [
+        "highlighter",
+        "文本高亮",
+        "Highlight text"
+      ],
+      "component": "HighlighterIcon",
+      "svg": "svg/highlighter.svg",
+      "symbol": "common-highlighter",
+      "approvedOriginal": false,
+      "sha256": "90c769d975e1784f75daf8b116180c9ed1e92c5ef88dc0584197a3e2fb4230f7"
+    },
+    {
+      "name": "remove-formatting",
+      "label": "Remove formatting",
+      "labelZh": "清除格式",
+      "category": "editing",
+      "semantic": "Reset text formatting",
+      "priority": "P1",
+      "tags": [
+        "remove formatting",
+        "清除格式",
+        "Reset text formatting"
+      ],
+      "component": "RemoveFormattingIcon",
+      "svg": "svg/remove-formatting.svg",
+      "symbol": "common-remove-formatting",
+      "approvedOriginal": false,
+      "sha256": "86958358d312c77f458bd103c9bbc7d3dd4d11b8b33ab4e70231e567f4a01a2f"
+    },
+    {
+      "name": "superscript",
+      "label": "Superscript",
+      "labelZh": "上标",
+      "category": "editing",
+      "semantic": "Insert superscript",
+      "priority": "P1",
+      "tags": [
+        "superscript",
+        "上标",
+        "Insert superscript"
+      ],
+      "component": "SuperscriptIcon",
+      "svg": "svg/superscript.svg",
+      "symbol": "common-superscript",
+      "approvedOriginal": false,
+      "sha256": "6beffd6c8ab0079e9ae39670dd62c5dcbb3e68015767583e9ae9213dede94b97"
+    },
+    {
+      "name": "subscript",
+      "label": "Subscript",
+      "labelZh": "下标",
+      "category": "editing",
+      "semantic": "Insert subscript",
+      "priority": "P1",
+      "tags": [
+        "subscript",
+        "下标",
+        "Insert subscript"
+      ],
+      "component": "SubscriptIcon",
+      "svg": "svg/subscript.svg",
+      "symbol": "common-subscript",
+      "approvedOriginal": false,
+      "sha256": "9cf0a013d8b8dff82e79dc54e5d1fcd86dc7424a114acc48c52555eb8e7aba4c"
+    },
+    {
+      "name": "palette",
+      "label": "Palette",
+      "labelZh": "调色板",
+      "category": "editing",
+      "semantic": "Select a color palette",
+      "priority": "P1",
+      "tags": [
+        "palette",
+        "调色板",
+        "Select a color palette"
+      ],
+      "component": "PaletteIcon",
+      "svg": "svg/palette.svg",
+      "symbol": "common-palette",
+      "approvedOriginal": false,
+      "sha256": "5f556489af6d3fbfcac78e5fdd96275f639e932d1bc11998529e46311dde25f0"
+    },
+    {
+      "name": "pipette",
+      "label": "Pipette",
+      "labelZh": "吸管取色",
+      "category": "editing",
+      "semantic": "Sample a color",
+      "priority": "P1",
+      "tags": [
+        "pipette",
+        "吸管取色",
+        "Sample a color"
+      ],
+      "component": "PipetteIcon",
+      "svg": "svg/pipette.svg",
+      "symbol": "common-pipette",
+      "approvedOriginal": false,
+      "sha256": "e21a948449b1910e0b56157e253324fe3ee8deb1029768238892a9d8b86f104c"
+    },
+    {
+      "name": "pen-tool",
+      "label": "Pen tool",
+      "labelZh": "钢笔工具",
+      "category": "editing",
+      "semantic": "Edit vector curves",
+      "priority": "P1",
+      "tags": [
+        "pen tool",
+        "钢笔工具",
+        "Edit vector curves"
+      ],
+      "component": "PenToolIcon",
+      "svg": "svg/pen-tool.svg",
+      "symbol": "common-pen-tool",
+      "approvedOriginal": false,
+      "sha256": "012dc04881a45c578092de1d15b8bdecee1db29277239ae2ac465be2d9c2dad0"
+    },
+    {
+      "name": "ruler",
+      "label": "Ruler",
+      "labelZh": "标尺",
+      "category": "editing",
+      "semantic": "Measure or set dimensions",
+      "priority": "P1",
+      "tags": [
+        "ruler",
+        "标尺",
+        "Measure or set dimensions"
+      ],
+      "component": "RulerIcon",
+      "svg": "svg/ruler.svg",
+      "symbol": "common-ruler",
+      "approvedOriginal": false,
+      "sha256": "556f105b6cebf12a7f05a83fea35764578caf9240c2b02ca15cfdca8ef325247"
+    },
+    {
+      "name": "rotate-left",
+      "label": "Rotate left",
+      "labelZh": "向左旋转",
+      "category": "editing",
+      "semantic": "Rotate selection left",
+      "priority": "P1",
+      "tags": [
+        "rotate left",
+        "向左旋转",
+        "Rotate selection left"
+      ],
+      "component": "RotateLeftIcon",
+      "svg": "svg/rotate-left.svg",
+      "symbol": "common-rotate-left",
+      "approvedOriginal": false,
+      "sha256": "99314fc19fb737c45c21a39dc794e894e09979e701b2c2684877bfb9fa225705"
+    },
+    {
+      "name": "rotate-right",
+      "label": "Rotate right",
+      "labelZh": "向右旋转",
+      "category": "editing",
+      "semantic": "Rotate selection right",
+      "priority": "P1",
+      "tags": [
+        "rotate right",
+        "向右旋转",
+        "Rotate selection right"
+      ],
+      "component": "RotateRightIcon",
+      "svg": "svg/rotate-right.svg",
+      "symbol": "common-rotate-right",
+      "approvedOriginal": false,
+      "sha256": "b19d8f8a3c3700255cd6606986b4ce2b16b1ce65c4a2bd182fbe61def9512558"
+    },
+    {
+      "name": "flip-horizontal",
+      "label": "Flip horizontal",
+      "labelZh": "水平翻转",
+      "category": "editing",
+      "semantic": "Mirror across vertical axis",
+      "priority": "P1",
+      "tags": [
+        "flip horizontal",
+        "水平翻转",
+        "Mirror across vertical axis"
+      ],
+      "component": "FlipHorizontalIcon",
+      "svg": "svg/flip-horizontal.svg",
+      "symbol": "common-flip-horizontal",
+      "approvedOriginal": false,
+      "sha256": "6964b27b74ef40ec254671a05602198edb79cd65036a12a060c0bfecdf3e2cff"
+    },
+    {
+      "name": "flip-vertical",
+      "label": "Flip vertical",
+      "labelZh": "垂直翻转",
+      "category": "editing",
+      "semantic": "Mirror across horizontal axis",
+      "priority": "P1",
+      "tags": [
+        "flip vertical",
+        "垂直翻转",
+        "Mirror across horizontal axis"
+      ],
+      "component": "FlipVerticalIcon",
+      "svg": "svg/flip-vertical.svg",
+      "symbol": "common-flip-vertical",
+      "approvedOriginal": false,
+      "sha256": "94513c49b692eec4b078f682f9e4ecceb9fe2ac23d69a4af168ccb7e961f26e5"
+    },
+    {
+      "name": "triangle",
+      "label": "Triangle",
+      "labelZh": "三角形",
+      "category": "editing",
+      "semantic": "Triangle primitive for diagrams and shape tools",
+      "priority": "P1",
+      "tags": [
+        "triangle",
+        "三角形",
+        "Triangle primitive for diagrams and shape tools"
+      ],
+      "component": "TriangleIcon",
+      "svg": "svg/triangle.svg",
+      "symbol": "common-triangle",
+      "approvedOriginal": false,
+      "sha256": "f6ba33706ec0bf6fc8e721b63a56ad74c1bf4b47cf4160c1327ab1f66ad83205"
+    },
+    {
+      "name": "diamond",
+      "label": "Diamond",
+      "labelZh": "菱形",
+      "category": "editing",
+      "semantic": "Decision shape in diagrams",
+      "priority": "P1",
+      "tags": [
+        "diamond",
+        "菱形",
+        "Decision shape in diagrams"
+      ],
+      "component": "DiamondIcon",
+      "svg": "svg/diamond.svg",
+      "symbol": "common-diamond",
+      "approvedOriginal": false,
+      "sha256": "adaa34d71d6b661d95a67796eecd70cb63228836fa9699e16a412f0f09dcb46e"
+    },
+    {
+      "name": "align-top",
+      "label": "Align top",
+      "labelZh": "顶端对齐",
+      "category": "layout",
+      "semantic": "Align objects to top edge",
+      "priority": "P1",
+      "tags": [
+        "align top",
+        "顶端对齐",
+        "Align objects to top edge"
+      ],
+      "component": "AlignTopIcon",
+      "svg": "svg/align-top.svg",
+      "symbol": "common-align-top",
+      "approvedOriginal": false,
+      "sha256": "026dde02fc0590bb4530547fdc07c61b99a47f0ec8aafc87fd60f205ab479690"
+    },
+    {
+      "name": "align-bottom",
+      "label": "Align bottom",
+      "labelZh": "底端对齐",
+      "category": "layout",
+      "semantic": "Align objects to bottom edge",
+      "priority": "P1",
+      "tags": [
+        "align bottom",
+        "底端对齐",
+        "Align objects to bottom edge"
+      ],
+      "component": "AlignBottomIcon",
+      "svg": "svg/align-bottom.svg",
+      "symbol": "common-align-bottom",
+      "approvedOriginal": false,
+      "sha256": "d9b51ea0eb42a933dccf190b5244bf3fab8615ccf4e3e828e64a7efea42eb1d2"
+    },
+    {
+      "name": "align-middle",
+      "label": "Align middle",
+      "labelZh": "垂直居中",
+      "category": "layout",
+      "semantic": "Align object centers vertically",
+      "priority": "P1",
+      "tags": [
+        "align middle",
+        "垂直居中",
+        "Align object centers vertically"
+      ],
+      "component": "AlignMiddleIcon",
+      "svg": "svg/align-middle.svg",
+      "symbol": "common-align-middle",
+      "approvedOriginal": false,
+      "sha256": "d35c5d484971a6e023252e6fad4e0e03e4b90ccbfb3c95a72f2b28738cbc5472"
+    },
+    {
+      "name": "distribute-horizontal",
+      "label": "Distribute horizontal",
+      "labelZh": "水平分布",
+      "category": "layout",
+      "semantic": "Distribute objects horizontally",
+      "priority": "P1",
+      "tags": [
+        "distribute horizontal",
+        "水平分布",
+        "Distribute objects horizontally"
+      ],
+      "component": "DistributeHorizontalIcon",
+      "svg": "svg/distribute-horizontal.svg",
+      "symbol": "common-distribute-horizontal",
+      "approvedOriginal": false,
+      "sha256": "5ceb34df37743c1739bc6b0e2067b39d38f71a71f191919b71f41857676ac64c"
+    },
+    {
+      "name": "distribute-vertical",
+      "label": "Distribute vertical",
+      "labelZh": "垂直分布",
+      "category": "layout",
+      "semantic": "Distribute objects vertically",
+      "priority": "P1",
+      "tags": [
+        "distribute vertical",
+        "垂直分布",
+        "Distribute objects vertically"
+      ],
+      "component": "DistributeVerticalIcon",
+      "svg": "svg/distribute-vertical.svg",
+      "symbol": "common-distribute-vertical",
+      "approvedOriginal": false,
+      "sha256": "dea97f416fcf4138f97ce8c9bdccf4f72d787f316996bfa5ee3926679d6f6f3e"
+    },
+    {
+      "name": "group",
+      "label": "Group",
+      "labelZh": "组合",
+      "category": "layout",
+      "semantic": "Group selected objects",
+      "priority": "P1",
+      "tags": [
+        "group",
+        "组合",
+        "Group selected objects"
+      ],
+      "component": "GroupIcon",
+      "svg": "svg/group.svg",
+      "symbol": "common-group",
+      "approvedOriginal": false,
+      "sha256": "5d0c630da7ad08b87a6bcfc9e4d080987d755ce38c434f1e8a352cab9bad2c0a"
+    },
+    {
+      "name": "ungroup",
+      "label": "Ungroup",
+      "labelZh": "取消组合",
+      "category": "layout",
+      "semantic": "Separate grouped objects",
+      "priority": "P1",
+      "tags": [
+        "ungroup",
+        "取消组合",
+        "Separate grouped objects"
+      ],
+      "component": "UngroupIcon",
+      "svg": "svg/ungroup.svg",
+      "symbol": "common-ungroup",
+      "approvedOriginal": false,
+      "sha256": "67cd272ea0966b9ef64a33cbd7ba2a5ce58fb3bff1087824d4d9f9bfdaae7bbd"
+    },
+    {
+      "name": "bring-to-front",
+      "label": "Bring to front",
+      "labelZh": "置于顶层",
+      "category": "layout",
+      "semantic": "Move object to front",
+      "priority": "P1",
+      "tags": [
+        "bring to front",
+        "置于顶层",
+        "Move object to front"
+      ],
+      "component": "BringToFrontIcon",
+      "svg": "svg/bring-to-front.svg",
+      "symbol": "common-bring-to-front",
+      "approvedOriginal": false,
+      "sha256": "90cb8e28eb1d3775b141aca2b8a62657dbd2f685e0bbf106e98b6bd060be9a13"
+    },
+    {
+      "name": "send-to-back",
+      "label": "Send to back",
+      "labelZh": "置于底层",
+      "category": "layout",
+      "semantic": "Move object behind others",
+      "priority": "P1",
+      "tags": [
+        "send to back",
+        "置于底层",
+        "Move object behind others"
+      ],
+      "component": "SendToBackIcon",
+      "svg": "svg/send-to-back.svg",
+      "symbol": "common-send-to-back",
+      "approvedOriginal": false,
+      "sha256": "ba0fe3599e2d06a8cd5ca5733472c7e279421a4c133835661f9ec5298368a9e7"
+    },
+    {
+      "name": "panel-left-close",
+      "label": "Panel left close",
+      "labelZh": "收起左侧栏",
+      "category": "layout",
+      "semantic": "Collapse left sidebar",
+      "priority": "P1",
+      "tags": [
+        "panel left close",
+        "收起左侧栏",
+        "Collapse left sidebar"
+      ],
+      "component": "PanelLeftCloseIcon",
+      "svg": "svg/panel-left-close.svg",
+      "symbol": "common-panel-left-close",
+      "approvedOriginal": false,
+      "sha256": "2e20de237c6dea2d5ec3c8f5bc09912acdca157e4b7b4f350a27cf7d8391ab4e"
+    },
+    {
+      "name": "panel-left-open",
+      "label": "Panel left open",
+      "labelZh": "展开左侧栏",
+      "category": "layout",
+      "semantic": "Expand left sidebar",
+      "priority": "P1",
+      "tags": [
+        "panel left open",
+        "展开左侧栏",
+        "Expand left sidebar"
+      ],
+      "component": "PanelLeftOpenIcon",
+      "svg": "svg/panel-left-open.svg",
+      "symbol": "common-panel-left-open",
+      "approvedOriginal": false,
+      "sha256": "54cde12450f21b4cca0363d772b580104d72f0d4b647a522cbd0145d819c8875"
+    },
+    {
+      "name": "panel-right-close",
+      "label": "Panel right close",
+      "labelZh": "收起右侧栏",
+      "category": "layout",
+      "semantic": "Collapse right sidebar",
+      "priority": "P1",
+      "tags": [
+        "panel right close",
+        "收起右侧栏",
+        "Collapse right sidebar"
+      ],
+      "component": "PanelRightCloseIcon",
+      "svg": "svg/panel-right-close.svg",
+      "symbol": "common-panel-right-close",
+      "approvedOriginal": false,
+      "sha256": "0da8f7f33727f24466b90f2a51330551a9ed7ff4913859845592c243f8693544"
+    },
+    {
+      "name": "panel-right-open",
+      "label": "Panel right open",
+      "labelZh": "展开右侧栏",
+      "category": "layout",
+      "semantic": "Expand right sidebar",
+      "priority": "P1",
+      "tags": [
+        "panel right open",
+        "展开右侧栏",
+        "Expand right sidebar"
+      ],
+      "component": "PanelRightOpenIcon",
+      "svg": "svg/panel-right-open.svg",
+      "symbol": "common-panel-right-open",
+      "approvedOriginal": false,
+      "sha256": "ce66326cc1374d9f993ce50fe3cfe8bcb512ee8cb856c6069c85d90952f36d4d"
+    },
+    {
+      "name": "layout-template",
+      "label": "Layout template",
+      "labelZh": "布局模板",
+      "category": "layout",
+      "semantic": "Choose a page template",
+      "priority": "P1",
+      "tags": [
+        "layout template",
+        "布局模板",
+        "Choose a page template"
+      ],
+      "component": "LayoutTemplateIcon",
+      "svg": "svg/layout-template.svg",
+      "symbol": "common-layout-template",
+      "approvedOriginal": false,
+      "sha256": "778b3155195cc1b85ccc86f99f744f9b08c33ce59b7727f60928e09aed33c58d"
+    },
+    {
+      "name": "gallery-horizontal",
+      "label": "Gallery horizontal",
+      "labelZh": "横向画廊",
+      "category": "layout",
+      "semantic": "Carousel or horizontal gallery",
+      "priority": "P1",
+      "tags": [
+        "gallery horizontal",
+        "横向画廊",
+        "Carousel or horizontal gallery"
+      ],
+      "component": "GalleryHorizontalIcon",
+      "svg": "svg/gallery-horizontal.svg",
+      "symbol": "common-gallery-horizontal",
+      "approvedOriginal": false,
+      "sha256": "88d81804bde7bbbdfc22ac066de86e4f84f5fd4c130a7c03b8b8db745d0f595e"
+    },
+    {
+      "name": "split",
+      "label": "Split",
+      "labelZh": "分屏",
+      "category": "layout",
+      "semantic": "Split the current view",
+      "priority": "P1",
+      "tags": [
+        "split",
+        "分屏",
+        "Split the current view"
+      ],
+      "component": "SplitIcon",
+      "svg": "svg/split.svg",
+      "symbol": "common-split",
+      "approvedOriginal": false,
+      "sha256": "68be9d14d24a4e5222cf4437f8c44a1cb4fa37b3e3c6d1b2cae2f2ddf0f8d1aa"
+    },
+    {
+      "name": "chart-pie",
+      "label": "Chart pie",
+      "labelZh": "饼图",
+      "category": "data-charts",
+      "semantic": "Compare shares of a whole",
+      "priority": "P0",
+      "tags": [
+        "chart pie",
+        "饼图",
+        "Compare shares of a whole"
+      ],
+      "component": "ChartPieIcon",
+      "svg": "svg/chart-pie.svg",
+      "symbol": "common-chart-pie",
+      "approvedOriginal": false,
+      "sha256": "bc4222d073f5225dc3a16e57ff9f56d5acc4989726ef51ec4da04813ef344fe5"
+    },
+    {
+      "name": "chart-donut",
+      "label": "Chart donut",
+      "labelZh": "环形图",
+      "category": "data-charts",
+      "semantic": "Show composition with center value",
+      "priority": "P1",
+      "tags": [
+        "chart donut",
+        "环形图",
+        "Show composition with center value"
+      ],
+      "component": "ChartDonutIcon",
+      "svg": "svg/chart-donut.svg",
+      "symbol": "common-chart-donut",
+      "approvedOriginal": false,
+      "sha256": "7c7755035c0769151657ce2100468945c042f1d19ee20bb3ee0400255cc6cc0a"
+    },
+    {
+      "name": "chart-area",
+      "label": "Chart area",
+      "labelZh": "面积图",
+      "category": "data-charts",
+      "semantic": "Visualize cumulative change",
+      "priority": "P0",
+      "tags": [
+        "chart area",
+        "面积图",
+        "Visualize cumulative change"
+      ],
+      "component": "ChartAreaIcon",
+      "svg": "svg/chart-area.svg",
+      "symbol": "common-chart-area",
+      "approvedOriginal": false,
+      "sha256": "4f46dd1a0f141e37416e94cf094a89b8aa621138c27b9f2b190d46ad27fd34fa"
+    },
+    {
+      "name": "chart-scatter",
+      "label": "Chart scatter",
+      "labelZh": "散点图",
+      "category": "data-charts",
+      "semantic": "Inspect variable correlation",
+      "priority": "P1",
+      "tags": [
+        "chart scatter",
+        "散点图",
+        "Inspect variable correlation"
+      ],
+      "component": "ChartScatterIcon",
+      "svg": "svg/chart-scatter.svg",
+      "symbol": "common-chart-scatter",
+      "approvedOriginal": false,
+      "sha256": "070b05f1d3b6eeb2187f0f02b0225d18dca80bf661474ddb2e55206a58033063"
+    },
+    {
+      "name": "chart-bar-horizontal",
+      "label": "Chart bar horizontal",
+      "labelZh": "横向柱状图",
+      "category": "data-charts",
+      "semantic": "Compare category values horizontally",
+      "priority": "P1",
+      "tags": [
+        "chart bar horizontal",
+        "横向柱状图",
+        "Compare category values horizontally"
+      ],
+      "component": "ChartBarHorizontalIcon",
+      "svg": "svg/chart-bar-horizontal.svg",
+      "symbol": "common-chart-bar-horizontal",
+      "approvedOriginal": false,
+      "sha256": "e80ab9468d107d893024a58c1fc3b1b2cfc79b37529916589c2ffad11d27873a"
+    },
+    {
+      "name": "chart-stacked",
+      "label": "Chart stacked",
+      "labelZh": "堆叠柱状图",
+      "category": "data-charts",
+      "semantic": "Compare segmented quantities",
+      "priority": "P1",
+      "tags": [
+        "chart stacked",
+        "堆叠柱状图",
+        "Compare segmented quantities"
+      ],
+      "component": "ChartStackedIcon",
+      "svg": "svg/chart-stacked.svg",
+      "symbol": "common-chart-stacked",
+      "approvedOriginal": false,
+      "sha256": "677e506f23364befaa1fdf69d7794f2bccfdeb021883ef80256d308ba085fc2b"
+    },
+    {
+      "name": "trending-up",
+      "label": "Trending up",
+      "labelZh": "上升趋势",
+      "category": "data-charts",
+      "semantic": "Indicate increasing metric",
+      "priority": "P0",
+      "tags": [
+        "trending up",
+        "上升趋势",
+        "Indicate increasing metric"
+      ],
+      "component": "TrendingUpIcon",
+      "svg": "svg/trending-up.svg",
+      "symbol": "common-trending-up",
+      "approvedOriginal": false,
+      "sha256": "b87c88f827e97aa4874c50ab0b40f02e34a6b46bef8419d36f20b569cad69192"
+    },
+    {
+      "name": "trending-down",
+      "label": "Trending down",
+      "labelZh": "下降趋势",
+      "category": "data-charts",
+      "semantic": "Indicate decreasing metric",
+      "priority": "P0",
+      "tags": [
+        "trending down",
+        "下降趋势",
+        "Indicate decreasing metric"
+      ],
+      "component": "TrendingDownIcon",
+      "svg": "svg/trending-down.svg",
+      "symbol": "common-trending-down",
+      "approvedOriginal": false,
+      "sha256": "084923afffad348502b451bed7db5680256e50d5d361f8fc6f7639c6e7ae178d"
+    },
+    {
+      "name": "activity",
+      "label": "Activity",
+      "labelZh": "活动监测",
+      "category": "data-charts",
+      "semantic": "Live activity or health of a service",
+      "priority": "P0",
+      "tags": [
+        "activity",
+        "活动监测",
+        "Live activity or health of a service"
+      ],
+      "component": "ActivityIcon",
+      "svg": "svg/activity.svg",
+      "symbol": "common-activity",
+      "approvedOriginal": false,
+      "sha256": "7259500d6ca8b66aec500f226de139559141948d73f21e430d6d0ffad961ece2"
+    },
+    {
+      "name": "gauge",
+      "label": "Gauge",
+      "labelZh": "仪表盘",
+      "category": "data-charts",
+      "semantic": "Show performance or utilization",
+      "priority": "P1",
+      "tags": [
+        "gauge",
+        "仪表盘",
+        "Show performance or utilization"
+      ],
+      "component": "GaugeIcon",
+      "svg": "svg/gauge.svg",
+      "symbol": "common-gauge",
+      "approvedOriginal": false,
+      "sha256": "bc4a3dcd45f022b4d4b8e53f92cd7c1da54ed322ad9f1f414957fa7bcded5980"
+    },
+    {
+      "name": "calculator",
+      "label": "Calculator",
+      "labelZh": "计算器",
+      "category": "data-charts",
+      "semantic": "Calculate values",
+      "priority": "P0",
+      "tags": [
+        "calculator",
+        "计算器",
+        "Calculate values"
+      ],
+      "component": "CalculatorIcon",
+      "svg": "svg/calculator.svg",
+      "symbol": "common-calculator",
+      "approvedOriginal": false,
+      "sha256": "5c6a61b5f3a7540525dff479a4421d4697b98d4584b35996998d476f7711d4d8"
+    },
+    {
+      "name": "percent",
+      "label": "Percent",
+      "labelZh": "百分比",
+      "category": "data-charts",
+      "semantic": "Rates and proportions",
+      "priority": "P0",
+      "tags": [
+        "percent",
+        "百分比",
+        "Rates and proportions"
+      ],
+      "component": "PercentIcon",
+      "svg": "svg/percent.svg",
+      "symbol": "common-percent",
+      "approvedOriginal": false,
+      "sha256": "aa11cceace9ac2e100fe858c8e8577538750f9983ff376b6b702485a5986aa8d"
+    },
+    {
+      "name": "sigma",
+      "label": "Sigma",
+      "labelZh": "求和",
+      "category": "data-charts",
+      "semantic": "Aggregate values",
+      "priority": "P1",
+      "tags": [
+        "sigma",
+        "求和",
+        "Aggregate values"
+      ],
+      "component": "SigmaIcon",
+      "svg": "svg/sigma.svg",
+      "symbol": "common-sigma",
+      "approvedOriginal": false,
+      "sha256": "ce57901bc5fe4224b492bfce2794a4b53071b666501554cfa63f96c015a26cab"
+    },
+    {
+      "name": "table-add-row",
+      "label": "Table add row",
+      "labelZh": "插入行",
+      "category": "data-charts",
+      "semantic": "Add a row to a data table",
+      "priority": "P1",
+      "tags": [
+        "table add row",
+        "插入行",
+        "Add a row to a data table"
+      ],
+      "component": "TableAddRowIcon",
+      "svg": "svg/table-add-row.svg",
+      "symbol": "common-table-add-row",
+      "approvedOriginal": false,
+      "sha256": "762a4d264933131e25063899aca645304f651f631ca3587acf5314c986a7d84e"
+    },
+    {
+      "name": "table-add-column",
+      "label": "Table add column",
+      "labelZh": "插入列",
+      "category": "data-charts",
+      "semantic": "Add a column to a data table",
+      "priority": "P1",
+      "tags": [
+        "table add column",
+        "插入列",
+        "Add a column to a data table"
+      ],
+      "component": "TableAddColumnIcon",
+      "svg": "svg/table-add-column.svg",
+      "symbol": "common-table-add-column",
+      "approvedOriginal": false,
+      "sha256": "1c5841f48b0a65bb768bd1d4508a5fa3ed641e2a761fec8af690cc669d397941"
+    },
+    {
+      "name": "table-delete-row",
+      "label": "Table delete row",
+      "labelZh": "删除行",
+      "category": "data-charts",
+      "semantic": "Remove a table row",
+      "priority": "P1",
+      "tags": [
+        "table delete row",
+        "删除行",
+        "Remove a table row"
+      ],
+      "component": "TableDeleteRowIcon",
+      "svg": "svg/table-delete-row.svg",
+      "symbol": "common-table-delete-row",
+      "approvedOriginal": false,
+      "sha256": "70e10d89d726d2c8f83031b14ecedb2bce92debe01a44d895f03a112a5bea9fd"
+    },
+    {
+      "name": "table-delete-column",
+      "label": "Table delete column",
+      "labelZh": "删除列",
+      "category": "data-charts",
+      "semantic": "Remove a table column",
+      "priority": "P1",
+      "tags": [
+        "table delete column",
+        "删除列",
+        "Remove a table column"
+      ],
+      "component": "TableDeleteColumnIcon",
+      "svg": "svg/table-delete-column.svg",
+      "symbol": "common-table-delete-column",
+      "approvedOriginal": false,
+      "sha256": "1cfc3f95fa22a070076404efe241ba2b8204287eba2fad6b43c6303f8e13cb35"
+    },
+    {
+      "name": "user-minus",
+      "label": "User minus",
+      "labelZh": "移除用户",
+      "category": "users-security",
+      "semantic": "Remove a member",
+      "priority": "P0",
+      "tags": [
+        "user minus",
+        "移除用户",
+        "Remove a member"
+      ],
+      "component": "UserMinusIcon",
+      "svg": "svg/user-minus.svg",
+      "symbol": "common-user-minus",
+      "approvedOriginal": false,
+      "sha256": "8c2fe8319af311ca265f7a88174dd5628e522860bcd1a4d16503e8f9c9ebfb2a"
+    },
+    {
+      "name": "user-x",
+      "label": "User x",
+      "labelZh": "用户禁用",
+      "category": "users-security",
+      "semantic": "Blocked or rejected user",
+      "priority": "P0",
+      "tags": [
+        "user x",
+        "用户禁用",
+        "Blocked or rejected user"
+      ],
+      "component": "UserXIcon",
+      "svg": "svg/user-x.svg",
+      "symbol": "common-user-x",
+      "approvedOriginal": false,
+      "sha256": "2aaa6118cf744e70e2c4c2b6e024c62016e55eaa8aad207701840ef61b1f8430"
+    },
+    {
+      "name": "user-settings",
+      "label": "User settings",
+      "labelZh": "用户设置",
+      "category": "users-security",
+      "semantic": "Manage account preferences",
+      "priority": "P1",
+      "tags": [
+        "user settings",
+        "用户设置",
+        "Manage account preferences"
+      ],
+      "component": "UserSettingsIcon",
+      "svg": "svg/user-settings.svg",
+      "symbol": "common-user-settings",
+      "approvedOriginal": false,
+      "sha256": "56f51ac23d1c138887e6ad584159fde0370c00f265e873e583510f537ab2312d"
+    },
+    {
+      "name": "user-search",
+      "label": "User search",
+      "labelZh": "查找用户",
+      "category": "users-security",
+      "semantic": "Find a person",
+      "priority": "P1",
+      "tags": [
+        "user search",
+        "查找用户",
+        "Find a person"
+      ],
+      "component": "UserSearchIcon",
+      "svg": "svg/user-search.svg",
+      "symbol": "common-user-search",
+      "approvedOriginal": false,
+      "sha256": "ea51f29ba6edd76296da86f84ce707c9b7c02ad75da618d8abb2339c03afb4a2"
+    },
+    {
+      "name": "contact",
+      "label": "Contact",
+      "labelZh": "联系人",
+      "category": "users-security",
+      "semantic": "Address-book entry",
+      "priority": "P1",
+      "tags": [
+        "contact",
+        "联系人",
+        "Address-book entry"
+      ],
+      "component": "ContactIcon",
+      "svg": "svg/contact.svg",
+      "symbol": "common-contact",
+      "approvedOriginal": false,
+      "sha256": "7caa160a05c8b4564ccdd59a25652847f013b7fa185a8861a12b9f193613f37e"
+    },
+    {
+      "name": "badge-check",
+      "label": "Badge check",
+      "labelZh": "认证徽章",
+      "category": "users-security",
+      "semantic": "Verified account or trusted item",
+      "priority": "P1",
+      "tags": [
+        "badge check",
+        "认证徽章",
+        "Verified account or trusted item"
+      ],
+      "component": "BadgeCheckIcon",
+      "svg": "svg/badge-check.svg",
+      "symbol": "common-badge-check",
+      "approvedOriginal": false,
+      "sha256": "66f1def68368ab8acc3f33fd1fbf14a639097fec48570ef4d1c9fd824e2ee24c"
+    },
+    {
+      "name": "shield-alert",
+      "label": "Shield alert",
+      "labelZh": "安全警告",
+      "category": "users-security",
+      "semantic": "Security concern",
+      "priority": "P1",
+      "tags": [
+        "shield alert",
+        "安全警告",
+        "Security concern"
+      ],
+      "component": "ShieldAlertIcon",
+      "svg": "svg/shield-alert.svg",
+      "symbol": "common-shield-alert",
+      "approvedOriginal": false,
+      "sha256": "4a393d70dd3f86fd7e1226066858eb5c29ac0fa728787d035a96fbc45bf36a01"
+    },
+    {
+      "name": "shield-x",
+      "label": "Shield x",
+      "labelZh": "防护失败",
+      "category": "users-security",
+      "semantic": "Protection unavailable",
+      "priority": "P1",
+      "tags": [
+        "shield x",
+        "防护失败",
+        "Protection unavailable"
+      ],
+      "component": "ShieldXIcon",
+      "svg": "svg/shield-x.svg",
+      "symbol": "common-shield-x",
+      "approvedOriginal": false,
+      "sha256": "69553d8a58281ccdbed9f8cf97861de00901fa6dc78cbbb600a0e4c288847d8e"
+    },
+    {
+      "name": "shield-off",
+      "label": "Shield off",
+      "labelZh": "防护关闭",
+      "category": "users-security",
+      "semantic": "Protection disabled",
+      "priority": "P1",
+      "tags": [
+        "shield off",
+        "防护关闭",
+        "Protection disabled"
+      ],
+      "component": "ShieldOffIcon",
+      "svg": "svg/shield-off.svg",
+      "symbol": "common-shield-off",
+      "approvedOriginal": false,
+      "sha256": "afbd02b2cd9decf0f35ac24875f17f37ced06d494b6c9ec569a28df187398130"
+    },
+    {
+      "name": "lock-keyhole",
+      "label": "Lock keyhole",
+      "labelZh": "密码锁",
+      "category": "users-security",
+      "semantic": "Password-protected access",
+      "priority": "P1",
+      "tags": [
+        "lock keyhole",
+        "密码锁",
+        "Password-protected access"
+      ],
+      "component": "LockKeyholeIcon",
+      "svg": "svg/lock-keyhole.svg",
+      "symbol": "common-lock-keyhole",
+      "approvedOriginal": false,
+      "sha256": "a9385aeb40b227bbac29cf635d3373dc0dfa75ab7a77ed8b4716398f8db3b14c"
+    },
+    {
+      "name": "scan-face",
+      "label": "Scan face",
+      "labelZh": "人脸识别",
+      "category": "users-security",
+      "semantic": "Face authentication",
+      "priority": "P1",
+      "tags": [
+        "scan face",
+        "人脸识别",
+        "Face authentication"
+      ],
+      "component": "ScanFaceIcon",
+      "svg": "svg/scan-face.svg",
+      "symbol": "common-scan-face",
+      "approvedOriginal": false,
+      "sha256": "850169109902a12dbf8541e7e544388d5e94fe43e470f5c930e75e298695caf4"
+    },
+    {
+      "name": "bell-off",
+      "label": "Bell off",
+      "labelZh": "关闭通知",
+      "category": "communication",
+      "tags": [
+        "bell off",
+        "关闭通知",
+        "Muted notifications"
+      ],
+      "semantic": "Muted notifications",
+      "priority": "P0",
+      "component": "BellOffIcon",
+      "svg": "svg/bell-off.svg",
+      "symbol": "common-bell-off",
+      "approvedOriginal": false,
+      "sha256": "c2fd8eb418a05070ed538c0e030396b95328125f655fee20e22c89a9370830a1"
+    },
+    {
+      "name": "bell-ring",
+      "label": "Bell ring",
+      "labelZh": "通知提醒",
+      "category": "communication",
+      "tags": [
+        "bell ring",
+        "通知提醒",
+        "Active or urgent notification"
+      ],
+      "semantic": "Active or urgent notification",
+      "priority": "P0",
+      "component": "BellRingIcon",
+      "svg": "svg/bell-ring.svg",
+      "symbol": "common-bell-ring",
+      "approvedOriginal": false,
+      "sha256": "fdc19550a9b522279df74781a6a1cbae252db7c2aeb86ddc5a4a8bc8a51021cb"
+    },
+    {
+      "name": "mail-check",
+      "label": "Mail check",
+      "labelZh": "邮件已发送",
+      "category": "communication",
+      "tags": [
+        "mail check",
+        "邮件已发送",
+        "Confirmed email delivery"
+      ],
+      "semantic": "Confirmed email delivery",
+      "priority": "P1",
+      "component": "MailCheckIcon",
+      "svg": "svg/mail-check.svg",
+      "symbol": "common-mail-check",
+      "approvedOriginal": false,
+      "sha256": "d36bde629f1b0da9c59b7786795d87888f1d141558c16fc91dc312cc1b5af32d"
+    },
+    {
+      "name": "mail-plus",
+      "label": "Mail plus",
+      "labelZh": "新建邮件",
+      "category": "communication",
+      "tags": [
+        "mail plus",
+        "新建邮件",
+        "Compose new email"
+      ],
+      "semantic": "Compose new email",
+      "priority": "P1",
+      "component": "MailPlusIcon",
+      "svg": "svg/mail-plus.svg",
+      "symbol": "common-mail-plus",
+      "approvedOriginal": false,
+      "sha256": "5a1c3a933f7a41a7211f47077cab68019e6a5b02c7eabf51c70e6f50d4d484c8"
+    },
+    {
+      "name": "mail-x",
+      "label": "Mail x",
+      "labelZh": "邮件失败",
+      "category": "communication",
+      "tags": [
+        "mail x",
+        "邮件失败",
+        "Failed email delivery"
+      ],
+      "semantic": "Failed email delivery",
+      "priority": "P1",
+      "component": "MailXIcon",
+      "svg": "svg/mail-x.svg",
+      "symbol": "common-mail-x",
+      "approvedOriginal": false,
+      "sha256": "19237daa40f210d9700f7c7f6c0482b8f60472a5917e5533fbee42262b635c69"
+    },
+    {
+      "name": "mail-search",
+      "label": "Mail search",
+      "labelZh": "搜索邮件",
+      "category": "communication",
+      "tags": [
+        "mail search",
+        "搜索邮件",
+        "Find an email"
+      ],
+      "semantic": "Find an email",
+      "priority": "P1",
+      "component": "MailSearchIcon",
+      "svg": "svg/mail-search.svg",
+      "symbol": "common-mail-search",
+      "approvedOriginal": false,
+      "sha256": "a4972f1c1704e46054a50bb54753514a11ee0438b13696fa27f672bd1f761932"
+    },
+    {
+      "name": "message-plus",
+      "label": "Message plus",
+      "labelZh": "新建消息",
+      "category": "communication",
+      "tags": [
+        "message plus",
+        "新建消息",
+        "Start a conversation"
+      ],
+      "semantic": "Start a conversation",
+      "priority": "P1",
+      "component": "MessagePlusIcon",
+      "svg": "svg/message-plus.svg",
+      "symbol": "common-message-plus",
+      "approvedOriginal": false,
+      "sha256": "a67780266d8a452053ea575b36a6aff4943dca30d8b86fe582842655686e34b0"
+    },
+    {
+      "name": "message-check",
+      "label": "Message check",
+      "labelZh": "消息已读",
+      "category": "communication",
+      "tags": [
+        "message check",
+        "消息已读",
+        "Acknowledged message"
+      ],
+      "semantic": "Acknowledged message",
+      "priority": "P1",
+      "component": "MessageCheckIcon",
+      "svg": "svg/message-check.svg",
+      "symbol": "common-message-check",
+      "approvedOriginal": false,
+      "sha256": "8366bd4b5960d4516a6c7ec5f4bdbb022e4edb7bda515174541a39698d0d14fa"
+    },
+    {
+      "name": "message-typing",
+      "label": "Message typing",
+      "labelZh": "正在输入",
+      "category": "communication",
+      "tags": [
+        "message typing",
+        "正在输入",
+        "Conversation typing state"
+      ],
+      "semantic": "Conversation typing state",
+      "priority": "P1",
+      "component": "MessageTypingIcon",
+      "svg": "svg/message-typing.svg",
+      "symbol": "common-message-typing",
+      "approvedOriginal": false,
+      "sha256": "440d501457c9ffd44c5541c6b23d3588272537b4244f568f8f62c9bc691830da"
+    },
+    {
+      "name": "reply",
+      "label": "Reply",
+      "labelZh": "回复",
+      "category": "communication",
+      "tags": [
+        "reply",
+        "回复",
+        "Reply to message"
+      ],
+      "semantic": "Reply to message",
+      "priority": "P0",
+      "component": "ReplyIcon",
+      "svg": "svg/reply.svg",
+      "symbol": "common-reply",
+      "approvedOriginal": false,
+      "sha256": "f3b080427d00be71682935b2019a1139b543be10129cbfe2224dd81dcad4457a"
+    },
+    {
+      "name": "reply-all",
+      "label": "Reply all",
+      "labelZh": "回复全部",
+      "category": "communication",
+      "tags": [
+        "reply all",
+        "回复全部",
+        "Reply to all recipients"
+      ],
+      "semantic": "Reply to all recipients",
+      "priority": "P0",
+      "component": "ReplyAllIcon",
+      "svg": "svg/reply-all.svg",
+      "symbol": "common-reply-all",
+      "approvedOriginal": false,
+      "sha256": "3538a274c48fbea418d4aa967450a774b2f593ab0a9ecdc100be455781f7da91"
+    },
+    {
+      "name": "forward",
+      "label": "Forward",
+      "labelZh": "转发",
+      "category": "communication",
+      "tags": [
+        "forward",
+        "转发",
+        "Forward message"
+      ],
+      "semantic": "Forward message",
+      "priority": "P0",
+      "component": "ForwardIcon",
+      "svg": "svg/forward.svg",
+      "symbol": "common-forward",
+      "approvedOriginal": false,
+      "sha256": "a0e2f8bca2c4ce5469463c2e3f91cdd4800866fda7351cfe9e76070791994ae1"
+    },
+    {
+      "name": "megaphone",
+      "label": "Megaphone",
+      "labelZh": "公告",
+      "category": "communication",
+      "tags": [
+        "megaphone",
+        "公告",
+        "Broadcast an announcement"
+      ],
+      "semantic": "Broadcast an announcement",
+      "priority": "P1",
+      "component": "MegaphoneIcon",
+      "svg": "svg/megaphone.svg",
+      "symbol": "common-megaphone",
+      "approvedOriginal": false,
+      "sha256": "fceb51755a897a02edfdc243888856e0e18058db38606b94958711efc53b13c7"
+    },
+    {
+      "name": "phone-incoming",
+      "label": "Phone incoming",
+      "labelZh": "来电",
+      "category": "communication",
+      "tags": [
+        "phone incoming",
+        "来电",
+        "Incoming call state"
+      ],
+      "semantic": "Incoming call state",
+      "priority": "P1",
+      "component": "PhoneIncomingIcon",
+      "svg": "svg/phone-incoming.svg",
+      "symbol": "common-phone-incoming",
+      "approvedOriginal": false,
+      "sha256": "77ac9c63acdf1b46b19af3bb6a56188321e03873b10b11fbbe471b8970074598"
+    },
+    {
+      "name": "phone-outgoing",
+      "label": "Phone outgoing",
+      "labelZh": "去电",
+      "category": "communication",
+      "tags": [
+        "phone outgoing",
+        "去电",
+        "Outgoing call state"
+      ],
+      "semantic": "Outgoing call state",
+      "priority": "P1",
+      "component": "PhoneOutgoingIcon",
+      "svg": "svg/phone-outgoing.svg",
+      "symbol": "common-phone-outgoing",
+      "approvedOriginal": false,
+      "sha256": "038ca91b7d21a681772e588a723c72b3e7c1be12c8f44c14d390c5db35844cf3"
+    },
+    {
+      "name": "phone-missed",
+      "label": "Phone missed",
+      "labelZh": "未接来电",
+      "category": "communication",
+      "tags": [
+        "phone missed",
+        "未接来电",
+        "Missed call state"
+      ],
+      "semantic": "Missed call state",
+      "priority": "P1",
+      "component": "PhoneMissedIcon",
+      "svg": "svg/phone-missed.svg",
+      "symbol": "common-phone-missed",
+      "approvedOriginal": false,
+      "sha256": "b7b7441be2ff6959d444831726d98d192175edc60401a28c3269d9f61d83546e"
+    },
+    {
+      "name": "phone-off",
+      "label": "Phone off",
+      "labelZh": "通话关闭",
+      "category": "communication",
+      "tags": [
+        "phone off",
+        "通话关闭",
+        "End or disable calling"
+      ],
+      "semantic": "End or disable calling",
+      "priority": "P1",
+      "component": "PhoneOffIcon",
+      "svg": "svg/phone-off.svg",
+      "symbol": "common-phone-off",
+      "approvedOriginal": false,
+      "sha256": "4452808d20fe77ef4cde807c02cb6102776064139a2b7af46823248bcc2949e0"
+    },
+    {
+      "name": "smile",
+      "label": "Smile",
+      "labelZh": "笑脸",
+      "category": "communication",
+      "tags": [
+        "smile",
+        "笑脸",
+        "Positive reaction or emoji picker"
+      ],
+      "semantic": "Positive reaction or emoji picker",
+      "priority": "P0",
+      "component": "SmileIcon",
+      "svg": "svg/smile.svg",
+      "symbol": "common-smile",
+      "approvedOriginal": false,
+      "sha256": "42e4298a6eec5d7e1f66c8871da92cb5fd0b4e3aeb02439238b3aabe72475b73"
+    },
+    {
+      "name": "frown",
+      "label": "Frown",
+      "labelZh": "难过",
+      "category": "communication",
+      "tags": [
+        "frown",
+        "难过",
+        "Negative reaction or feedback"
+      ],
+      "semantic": "Negative reaction or feedback",
+      "priority": "P1",
+      "component": "FrownIcon",
+      "svg": "svg/frown.svg",
+      "symbol": "common-frown",
+      "approvedOriginal": false,
+      "sha256": "981587e194879b10bb860370393abace65c922b65e26447f40fab06281a3fb0d"
+    },
+    {
+      "name": "thumbs-down",
+      "label": "Thumbs down",
+      "labelZh": "不赞同",
+      "category": "communication",
+      "tags": [
+        "thumbs down",
+        "不赞同",
+        "Negative feedback"
+      ],
+      "semantic": "Negative feedback",
+      "priority": "P0",
+      "component": "ThumbsDownIcon",
+      "svg": "svg/thumbs-down.svg",
+      "symbol": "common-thumbs-down",
+      "approvedOriginal": false,
+      "sha256": "3d10424f7f9036216de9a33cc4b4586c2ca91f797301f26f00d3f80449354a7b"
+    },
+    {
+      "name": "video",
+      "label": "Video",
+      "labelZh": "录像",
+      "category": "media",
+      "tags": [
+        "video",
+        "录像",
+        "Video content or camera control"
+      ],
+      "semantic": "Video content or camera control",
+      "priority": "P0",
+      "component": "VideoIcon",
+      "svg": "svg/video.svg",
+      "symbol": "common-video",
+      "approvedOriginal": false,
+      "sha256": "7ce6b6396ef0e58ebb48c86104901ac3b26d712fbb4816f93e0cbb8257a4cfd7"
+    },
+    {
+      "name": "video-off",
+      "label": "Video off",
+      "labelZh": "关闭视频",
+      "category": "media",
+      "tags": [
+        "video off",
+        "关闭视频",
+        "Disabled video camera"
+      ],
+      "semantic": "Disabled video camera",
+      "priority": "P0",
+      "component": "VideoOffIcon",
+      "svg": "svg/video-off.svg",
+      "symbol": "common-video-off",
+      "approvedOriginal": false,
+      "sha256": "9aa9ae212cda66ee34bbc79c9b8e012a92d1321e9ec076b71aa182794756ba50"
+    },
+    {
+      "name": "camera-off",
+      "label": "Camera off",
+      "labelZh": "关闭相机",
+      "category": "media",
+      "tags": [
+        "camera off",
+        "关闭相机",
+        "Camera unavailable"
+      ],
+      "semantic": "Camera unavailable",
+      "priority": "P1",
+      "component": "CameraOffIcon",
+      "svg": "svg/camera-off.svg",
+      "symbol": "common-camera-off",
+      "approvedOriginal": false,
+      "sha256": "4eccd4a0fdce3160465603e96181c5520d6cf57f953bd0c1ff13ddb71c000048"
+    },
+    {
+      "name": "image-plus",
+      "label": "Image plus",
+      "labelZh": "添加图片",
+      "category": "media",
+      "tags": [
+        "image plus",
+        "添加图片",
+        "Insert an image"
+      ],
+      "semantic": "Insert an image",
+      "priority": "P0",
+      "component": "ImagePlusIcon",
+      "svg": "svg/image-plus.svg",
+      "symbol": "common-image-plus",
+      "approvedOriginal": false,
+      "sha256": "c4b48dbf21da4dedfee80f3fb896edee198d09e3a9a9919bf56d2ca3dc561482"
+    },
+    {
+      "name": "images",
+      "label": "Images",
+      "labelZh": "图片集",
+      "category": "media",
+      "tags": [
+        "images",
+        "图片集",
+        "Multiple-image gallery"
+      ],
+      "semantic": "Multiple-image gallery",
+      "priority": "P1",
+      "component": "ImagesIcon",
+      "svg": "svg/images.svg",
+      "symbol": "common-images",
+      "approvedOriginal": false,
+      "sha256": "8c8de6350db70d77a1d8e5e7a2a5cfc69008a2fc40948c866243e1515e4e8a39"
+    },
+    {
+      "name": "image-off",
+      "label": "Image off",
+      "labelZh": "图片不可用",
+      "category": "media",
+      "tags": [
+        "image off",
+        "图片不可用",
+        "Unavailable image"
+      ],
+      "semantic": "Unavailable image",
+      "priority": "P1",
+      "component": "ImageOffIcon",
+      "svg": "svg/image-off.svg",
+      "symbol": "common-image-off",
+      "approvedOriginal": false,
+      "sha256": "c2aced11ae4789b2a6c1e2ff30557f740cfec2b57a91df56e1e17a4bad09f67b"
+    },
+    {
+      "name": "volume-low",
+      "label": "Volume low",
+      "labelZh": "低音量",
+      "category": "media",
+      "tags": [
+        "volume low",
+        "低音量",
+        "Low volume setting"
+      ],
+      "semantic": "Low volume setting",
+      "priority": "P0",
+      "component": "VolumeLowIcon",
+      "svg": "svg/volume-low.svg",
+      "symbol": "common-volume-low",
+      "approvedOriginal": false,
+      "sha256": "3fd2b73f9022b69767352a16ff1fd2154829507b65789b6e394549a6d69540d5"
+    },
+    {
+      "name": "fast-forward",
+      "label": "Fast forward",
+      "labelZh": "快进",
+      "category": "media",
+      "tags": [
+        "fast forward",
+        "快进",
+        "Seek forward quickly"
+      ],
+      "semantic": "Seek forward quickly",
+      "priority": "P1",
+      "component": "FastForwardIcon",
+      "svg": "svg/fast-forward.svg",
+      "symbol": "common-fast-forward",
+      "approvedOriginal": false,
+      "sha256": "1959358b0e4eeabe47d9982f90b2a846540b8ae54a521282c87bcdad23040b8a"
+    },
+    {
+      "name": "rewind",
+      "label": "Rewind",
+      "labelZh": "快退",
+      "category": "media",
+      "tags": [
+        "rewind",
+        "快退",
+        "Seek backward quickly"
+      ],
+      "semantic": "Seek backward quickly",
+      "priority": "P1",
+      "component": "RewindIcon",
+      "svg": "svg/rewind.svg",
+      "symbol": "common-rewind",
+      "approvedOriginal": false,
+      "sha256": "eb00f79bf3d4babcff7ce573fdf8f0ef35139fed67a46ee4de6c9b5fb62e9fa6"
+    },
+    {
+      "name": "repeat",
+      "label": "Repeat",
+      "labelZh": "循环播放",
+      "category": "media",
+      "tags": [
+        "repeat",
+        "循环播放",
+        "Repeat playlist"
+      ],
+      "semantic": "Repeat playlist",
+      "priority": "P0",
+      "component": "RepeatIcon",
+      "svg": "svg/repeat.svg",
+      "symbol": "common-repeat",
+      "approvedOriginal": false,
+      "sha256": "e3f093071c414910efd109fdc97623746e0b1fd731e55222ff2160362072f9c2"
+    },
+    {
+      "name": "repeat-one",
+      "label": "Repeat one",
+      "labelZh": "单曲循环",
+      "category": "media",
+      "tags": [
+        "repeat one",
+        "单曲循环",
+        "Repeat current item"
+      ],
+      "semantic": "Repeat current item",
+      "priority": "P1",
+      "component": "RepeatOneIcon",
+      "svg": "svg/repeat-one.svg",
+      "symbol": "common-repeat-one",
+      "approvedOriginal": false,
+      "sha256": "a272ae3ac66a96e1fa8caf79bb093da1c31e239400538467bbba5757680b2c8f"
+    },
+    {
+      "name": "shuffle",
+      "label": "Shuffle",
+      "labelZh": "随机播放",
+      "category": "media",
+      "tags": [
+        "shuffle",
+        "随机播放",
+        "Shuffle playback queue"
+      ],
+      "semantic": "Shuffle playback queue",
+      "priority": "P0",
+      "component": "ShuffleIcon",
+      "svg": "svg/shuffle.svg",
+      "symbol": "common-shuffle",
+      "approvedOriginal": false,
+      "sha256": "e80281b56e6cd4ed6f31e0e8e63fa9516cf61f868e13a890f10acdf5eb0485b2"
+    },
+    {
+      "name": "play-circle",
+      "label": "Play circle",
+      "labelZh": "圆形播放",
+      "category": "media",
+      "tags": [
+        "play circle",
+        "圆形播放",
+        "Start prominent media playback"
+      ],
+      "semantic": "Start prominent media playback",
+      "priority": "P1",
+      "component": "PlayCircleIcon",
+      "svg": "svg/play-circle.svg",
+      "symbol": "common-play-circle",
+      "approvedOriginal": false,
+      "sha256": "d447cd3e8b1838186726918b6a65ed7e05aaccd1ab17874d44766dcd66072bd3"
+    },
+    {
+      "name": "pause-circle",
+      "label": "Pause circle",
+      "labelZh": "圆形暂停",
+      "category": "media",
+      "tags": [
+        "pause circle",
+        "圆形暂停",
+        "Pause prominent media playback"
+      ],
+      "semantic": "Pause prominent media playback",
+      "priority": "P1",
+      "component": "PauseCircleIcon",
+      "svg": "svg/pause-circle.svg",
+      "symbol": "common-pause-circle",
+      "approvedOriginal": false,
+      "sha256": "292377e44456c7620f79cd0cc27f04ce90237dd898ba2b92f73300b7e1565016"
+    },
+    {
+      "name": "audio-waveform",
+      "label": "Audio waveform",
+      "labelZh": "音频波形",
+      "category": "media",
+      "tags": [
+        "audio waveform",
+        "音频波形",
+        "Audio playback or speech activity"
+      ],
+      "semantic": "Audio playback or speech activity",
+      "priority": "P1",
+      "component": "AudioWaveformIcon",
+      "svg": "svg/audio-waveform.svg",
+      "symbol": "common-audio-waveform",
+      "approvedOriginal": false,
+      "sha256": "4af20b6832117d23dde40d97d1a4d5642e0035db2f02a058772359d31e63b29d"
+    },
+    {
+      "name": "screen-share",
+      "label": "Screen share",
+      "labelZh": "共享屏幕",
+      "category": "media",
+      "tags": [
+        "screen share",
+        "共享屏幕",
+        "Present screen contents"
+      ],
+      "semantic": "Present screen contents",
+      "priority": "P0",
+      "component": "ScreenShareIcon",
+      "svg": "svg/screen-share.svg",
+      "symbol": "common-screen-share",
+      "approvedOriginal": false,
+      "sha256": "3d48e41e49296ced1f1a71ad5938f873c01edd1086c37762c27dcde3efed8668"
+    },
+    {
+      "name": "screen-share-off",
+      "label": "Screen share off",
+      "labelZh": "停止共享",
+      "category": "media",
+      "tags": [
+        "screen share off",
+        "停止共享",
+        "Disable screen sharing"
+      ],
+      "semantic": "Disable screen sharing",
+      "priority": "P1",
+      "component": "ScreenShareOffIcon",
+      "svg": "svg/screen-share-off.svg",
+      "symbol": "common-screen-share-off",
+      "approvedOriginal": false,
+      "sha256": "30caf7dab4cf686483750c59a1f2293c294d3dd4dc9ac0a9e866506ba04dc8e8"
+    },
+    {
+      "name": "picture-in-picture",
+      "label": "Picture in picture",
+      "labelZh": "画中画",
+      "category": "media",
+      "tags": [
+        "picture in picture",
+        "画中画",
+        "Float media above content"
+      ],
+      "semantic": "Float media above content",
+      "priority": "P1",
+      "component": "PictureInPictureIcon",
+      "svg": "svg/picture-in-picture.svg",
+      "symbol": "common-picture-in-picture",
+      "approvedOriginal": false,
+      "sha256": "b8b6360f27d36e76a48a6647b6e30cd1018747500bf351b469e6e607a620b3a3"
+    },
+    {
+      "name": "wifi-off",
+      "label": "Wifi off",
+      "labelZh": "无线网络断开",
+      "category": "devices-connectivity",
+      "tags": [
+        "wifi off",
+        "无线网络断开",
+        "No Wi-Fi connectivity"
+      ],
+      "semantic": "No Wi-Fi connectivity",
+      "priority": "P0",
+      "component": "WifiOffIcon",
+      "svg": "svg/wifi-off.svg",
+      "symbol": "common-wifi-off",
+      "approvedOriginal": false,
+      "sha256": "884f8448ee08ca87cad35d78427f64752a3301cbde7f18c427aa207a2a8a069e"
+    },
+    {
+      "name": "bluetooth-off",
+      "label": "Bluetooth off",
+      "labelZh": "蓝牙关闭",
+      "category": "devices-connectivity",
+      "tags": [
+        "bluetooth off",
+        "蓝牙关闭",
+        "Bluetooth disabled"
+      ],
+      "semantic": "Bluetooth disabled",
+      "priority": "P0",
+      "component": "BluetoothOffIcon",
+      "svg": "svg/bluetooth-off.svg",
+      "symbol": "common-bluetooth-off",
+      "approvedOriginal": false,
+      "sha256": "43fcbcff5e8a2a56fcbebad517406aec06a5648c8bbfe6561f234c70c86d8ae5"
+    },
+    {
+      "name": "battery-charging",
+      "label": "Battery charging",
+      "labelZh": "电池充电",
+      "category": "devices-connectivity",
+      "tags": [
+        "battery charging",
+        "电池充电",
+        "Device charging"
+      ],
+      "semantic": "Device charging",
+      "priority": "P0",
+      "component": "BatteryChargingIcon",
+      "svg": "svg/battery-charging.svg",
+      "symbol": "common-battery-charging",
+      "approvedOriginal": false,
+      "sha256": "73dd63e1e12c470c98137b626c5e4bb65390c036dc2d50fe94c93cbc8f23684b"
+    },
+    {
+      "name": "battery-low",
+      "label": "Battery low",
+      "labelZh": "低电量",
+      "category": "devices-connectivity",
+      "tags": [
+        "battery low",
+        "低电量",
+        "Low remaining charge"
+      ],
+      "semantic": "Low remaining charge",
+      "priority": "P0",
+      "component": "BatteryLowIcon",
+      "svg": "svg/battery-low.svg",
+      "symbol": "common-battery-low",
+      "approvedOriginal": false,
+      "sha256": "7d411827e206b6451db75ec1dfa9cc6a684c7a8ae957fd09215c7b63adf89d05"
+    },
+    {
+      "name": "battery-full",
+      "label": "Battery full",
+      "labelZh": "电量充足",
+      "category": "devices-connectivity",
+      "tags": [
+        "battery full",
+        "电量充足",
+        "Full remaining charge"
+      ],
+      "semantic": "Full remaining charge",
+      "priority": "P1",
+      "component": "BatteryFullIcon",
+      "svg": "svg/battery-full.svg",
+      "symbol": "common-battery-full",
+      "approvedOriginal": false,
+      "sha256": "81524e08b7cdd781d6fd35f01e569418c9230d5eb1ada1e398f03c09c053a391"
+    },
+    {
+      "name": "signal",
+      "label": "Signal",
+      "labelZh": "移动信号",
+      "category": "devices-connectivity",
+      "tags": [
+        "signal",
+        "移动信号",
+        "Cellular reception"
+      ],
+      "semantic": "Cellular reception",
+      "priority": "P0",
+      "component": "SignalIcon",
+      "svg": "svg/signal.svg",
+      "symbol": "common-signal",
+      "approvedOriginal": false,
+      "sha256": "922bc007c8b29383ca4d8fa3d05d6ad053a9f9fb57174b54f192944dfb60b5ff"
+    },
+    {
+      "name": "signal-off",
+      "label": "Signal off",
+      "labelZh": "无移动信号",
+      "category": "devices-connectivity",
+      "tags": [
+        "signal off",
+        "无移动信号",
+        "No cellular reception"
+      ],
+      "semantic": "No cellular reception",
+      "priority": "P1",
+      "component": "SignalOffIcon",
+      "svg": "svg/signal-off.svg",
+      "symbol": "common-signal-off",
+      "approvedOriginal": false,
+      "sha256": "fce0f27e518a47ad5aa311e5b5cc47c7c25417146f5455ea3d77031787fe883a"
+    },
+    {
+      "name": "router",
+      "label": "Router",
+      "labelZh": "路由器",
+      "category": "devices-connectivity",
+      "tags": [
+        "router",
+        "路由器",
+        "Network router settings"
+      ],
+      "semantic": "Network router settings",
+      "priority": "P1",
+      "component": "RouterIcon",
+      "svg": "svg/router.svg",
+      "symbol": "common-router",
+      "approvedOriginal": false,
+      "sha256": "dee097b997bd084b9865e8c5957b9ba824c4e212c312fa20c712a4e17a8c3dc6"
+    },
+    {
+      "name": "ethernet",
+      "label": "Ethernet",
+      "labelZh": "有线网络",
+      "category": "devices-connectivity",
+      "tags": [
+        "ethernet",
+        "有线网络",
+        "Wired network connection"
+      ],
+      "semantic": "Wired network connection",
+      "priority": "P1",
+      "component": "EthernetIcon",
+      "svg": "svg/ethernet.svg",
+      "symbol": "common-ethernet",
+      "approvedOriginal": false,
+      "sha256": "4c0f0ff3afedf4b1f8dc1efdb2ecfa3272934fbf5a8399b36ebdfd3b5c284868"
+    },
+    {
+      "name": "usb",
+      "label": "Usb",
+      "labelZh": "USB连接",
+      "category": "devices-connectivity",
+      "tags": [
+        "usb",
+        "USB连接",
+        "USB device or port"
+      ],
+      "semantic": "USB device or port",
+      "priority": "P1",
+      "component": "UsbIcon",
+      "svg": "svg/usb.svg",
+      "symbol": "common-usb",
+      "approvedOriginal": false,
+      "sha256": "4c62281486bdd8183c457b89e45e420514c4a510c1f6455ebe798d4d0e123210"
+    },
+    {
+      "name": "cast",
+      "label": "Cast",
+      "labelZh": "无线投屏",
+      "category": "devices-connectivity",
+      "tags": [
+        "cast",
+        "无线投屏",
+        "Cast media to another screen"
+      ],
+      "semantic": "Cast media to another screen",
+      "priority": "P1",
+      "component": "CastIcon",
+      "svg": "svg/cast.svg",
+      "symbol": "common-cast",
+      "approvedOriginal": false,
+      "sha256": "61675ebc26543805218f9b00d2d188c7c1bb5eded41210813d117148c34a4547"
+    },
+    {
+      "name": "monitor-off",
+      "label": "Monitor off",
+      "labelZh": "显示器关闭",
+      "category": "devices-connectivity",
+      "tags": [
+        "monitor off",
+        "显示器关闭",
+        "Display unavailable or sleeping"
+      ],
+      "semantic": "Display unavailable or sleeping",
+      "priority": "P1",
+      "component": "MonitorOffIcon",
+      "svg": "svg/monitor-off.svg",
+      "symbol": "common-monitor-off",
+      "approvedOriginal": false,
+      "sha256": "065a4c8f7289d88af9f1f38ea18c32b4dffce58acd1e27e1f168dd6e9e4f5da1"
+    },
+    {
+      "name": "printer-check",
+      "label": "Printer check",
+      "labelZh": "打印完成",
+      "category": "devices-connectivity",
+      "tags": [
+        "printer check",
+        "打印完成",
+        "Successful print job"
+      ],
+      "semantic": "Successful print job",
+      "priority": "P1",
+      "component": "PrinterCheckIcon",
+      "svg": "svg/printer-check.svg",
+      "symbol": "common-printer-check",
+      "approvedOriginal": false,
+      "sha256": "bb22b105c0ea8634673dcf51b7008c3f36772f519634384ba0170c55b11c55b8"
+    },
+    {
+      "name": "smartwatch",
+      "label": "Smartwatch",
+      "labelZh": "智能手表",
+      "category": "devices-connectivity",
+      "tags": [
+        "smartwatch",
+        "智能手表",
+        "Wearable device"
+      ],
+      "semantic": "Wearable device",
+      "priority": "P1",
+      "component": "SmartwatchIcon",
+      "svg": "svg/smartwatch.svg",
+      "symbol": "common-smartwatch",
+      "approvedOriginal": false,
+      "sha256": "6955a57f85d5c22305848cfc0980b22cd2051775b51644cee154b738e4a0bac9"
+    },
+    {
+      "name": "store",
+      "label": "Store",
+      "labelZh": "商店",
+      "category": "commerce-location",
+      "tags": [
+        "store",
+        "商店",
+        "Storefront or marketplace"
+      ],
+      "semantic": "Storefront or marketplace",
+      "priority": "P0",
+      "component": "StoreIcon",
+      "svg": "svg/store.svg",
+      "symbol": "common-store",
+      "approvedOriginal": false,
+      "sha256": "32365e5edd352f5f518c47e11948524a0138bdb30bc256226cde3d92fd59e923"
+    },
+    {
+      "name": "shopping-cart-plus",
+      "label": "Shopping cart plus",
+      "labelZh": "加入购物车",
+      "category": "commerce-location",
+      "tags": [
+        "shopping cart plus",
+        "加入购物车",
+        "Add selected goods to cart"
+      ],
+      "semantic": "Add selected goods to cart",
+      "priority": "P1",
+      "component": "ShoppingCartPlusIcon",
+      "svg": "svg/shopping-cart-plus.svg",
+      "symbol": "common-shopping-cart-plus",
+      "approvedOriginal": false,
+      "sha256": "6d35487a7fcd483952c3ac43a7ca7fd5482e7b66b99eb432d987c408ecaf02e0"
+    },
+    {
+      "name": "shopping-cart-check",
+      "label": "Shopping cart check",
+      "labelZh": "购物车完成",
+      "category": "commerce-location",
+      "tags": [
+        "shopping cart check",
+        "购物车完成",
+        "Cart or checkout confirmed"
+      ],
+      "semantic": "Cart or checkout confirmed",
+      "priority": "P1",
+      "component": "ShoppingCartCheckIcon",
+      "svg": "svg/shopping-cart-check.svg",
+      "symbol": "common-shopping-cart-check",
+      "approvedOriginal": false,
+      "sha256": "fcbd66843058fb9d09fe54b912dce76b32b3f54faab9533c2f39df2f8b24dde2"
+    },
+    {
+      "name": "barcode",
+      "label": "Barcode",
+      "labelZh": "条形码",
+      "category": "commerce-location",
+      "tags": [
+        "barcode",
+        "条形码",
+        "Product identification"
+      ],
+      "semantic": "Product identification",
+      "priority": "P1",
+      "component": "BarcodeIcon",
+      "svg": "svg/barcode.svg",
+      "symbol": "common-barcode",
+      "approvedOriginal": false,
+      "sha256": "e8e851110c2832b266a35697416b178e5d98fc7de7d045d3d2bcd6015b5f3172"
+    },
+    {
+      "name": "qr-code",
+      "label": "Qr code",
+      "labelZh": "二维码",
+      "category": "commerce-location",
+      "tags": [
+        "qr code",
+        "二维码",
+        "Scan or display QR code"
+      ],
+      "semantic": "Scan or display QR code",
+      "priority": "P0",
+      "component": "QrCodeIcon",
+      "svg": "svg/qr-code.svg",
+      "symbol": "common-qr-code",
+      "approvedOriginal": false,
+      "sha256": "09d2cae800e247242b54d00ba5cf9b4c5e3e52857cee10928bc7d5e0d53362d7"
+    },
+    {
+      "name": "banknote",
+      "label": "Banknote",
+      "labelZh": "纸币",
+      "category": "commerce-location",
+      "tags": [
+        "banknote",
+        "纸币",
+        "Cash payment"
+      ],
+      "semantic": "Cash payment",
+      "priority": "P1",
+      "component": "BanknoteIcon",
+      "svg": "svg/banknote.svg",
+      "symbol": "common-banknote",
+      "approvedOriginal": false,
+      "sha256": "07b66aaf52f5cccb15478a770cdf847aa4b98fb2acd6dfc1e343d4321e0a3be2"
+    },
+    {
+      "name": "coins",
+      "label": "Coins",
+      "labelZh": "硬币",
+      "category": "commerce-location",
+      "tags": [
+        "coins",
+        "硬币",
+        "Balance or credits"
+      ],
+      "semantic": "Balance or credits",
+      "priority": "P0",
+      "component": "CoinsIcon",
+      "svg": "svg/coins.svg",
+      "symbol": "common-coins",
+      "approvedOriginal": false,
+      "sha256": "ccc8501bab4f8336c7db2865bd4c919aacd3b1180faf055c1421b6680ad5bf9d"
+    },
+    {
+      "name": "landmark",
+      "label": "Landmark",
+      "labelZh": "银行机构",
+      "category": "commerce-location",
+      "tags": [
+        "landmark",
+        "银行机构",
+        "Bank or public institution"
+      ],
+      "semantic": "Bank or public institution",
+      "priority": "P1",
+      "component": "LandmarkIcon",
+      "svg": "svg/landmark.svg",
+      "symbol": "common-landmark",
+      "approvedOriginal": false,
+      "sha256": "6de5f0670eb305040f6b306af498d42a54ee42e67baec0018e3fe39320ffa7dd"
+    },
+    {
+      "name": "currency-dollar",
+      "label": "Currency dollar",
+      "labelZh": "美元",
+      "category": "commerce-location",
+      "tags": [
+        "currency dollar",
+        "美元",
+        "Dollar-denominated amount"
+      ],
+      "semantic": "Dollar-denominated amount",
+      "priority": "P1",
+      "component": "CurrencyDollarIcon",
+      "svg": "svg/currency-dollar.svg",
+      "symbol": "common-currency-dollar",
+      "approvedOriginal": false,
+      "sha256": "ccaaea4011f65ea15d6ab52f76a7ef0bcea07840556cd1aa763896c35e2e0ef3"
+    },
+    {
+      "name": "currency-euro",
+      "label": "Currency euro",
+      "labelZh": "欧元",
+      "category": "commerce-location",
+      "tags": [
+        "currency euro",
+        "欧元",
+        "Euro-denominated amount"
+      ],
+      "semantic": "Euro-denominated amount",
+      "priority": "P1",
+      "component": "CurrencyEuroIcon",
+      "svg": "svg/currency-euro.svg",
+      "symbol": "common-currency-euro",
+      "approvedOriginal": false,
+      "sha256": "a59533b7b42f65c4d5244ebf72358aa393ed9c167cc3e8e2284196e76946a669"
+    },
+    {
+      "name": "currency-yuan",
+      "label": "Currency yuan",
+      "labelZh": "人民币",
+      "category": "commerce-location",
+      "tags": [
+        "currency yuan",
+        "人民币",
+        "Yuan-denominated amount"
+      ],
+      "semantic": "Yuan-denominated amount",
+      "priority": "P1",
+      "component": "CurrencyYuanIcon",
+      "svg": "svg/currency-yuan.svg",
+      "symbol": "common-currency-yuan",
+      "approvedOriginal": false,
+      "sha256": "2a019da6108c4c9ee243ef462e17c88ee8e7c42d41580407ef7f8abd55788dbc"
+    },
+    {
+      "name": "ticket",
+      "label": "Ticket",
+      "labelZh": "票券",
+      "category": "commerce-location",
+      "tags": [
+        "ticket",
+        "票券",
+        "Ticket or voucher"
+      ],
+      "semantic": "Ticket or voucher",
+      "priority": "P1",
+      "component": "TicketIcon",
+      "svg": "svg/ticket.svg",
+      "symbol": "common-ticket",
+      "approvedOriginal": false,
+      "sha256": "6acee7f8aaf9e673f7427d574693fd0bb8b3832309023955d9f7db2580a591b3"
+    },
+    {
+      "name": "map-pin-off",
+      "label": "Map pin off",
+      "labelZh": "位置关闭",
+      "category": "commerce-location",
+      "tags": [
+        "map pin off",
+        "位置关闭",
+        "Location unavailable"
+      ],
+      "semantic": "Location unavailable",
+      "priority": "P1",
+      "component": "MapPinOffIcon",
+      "svg": "svg/map-pin-off.svg",
+      "symbol": "common-map-pin-off",
+      "approvedOriginal": false,
+      "sha256": "89ac4fe93ad938387dee53c59f1b09db3a48fd125baf53be02de34586d5aa785"
+    },
+    {
+      "name": "locate",
+      "label": "Locate",
+      "labelZh": "定位当前位置",
+      "category": "commerce-location",
+      "tags": [
+        "locate",
+        "定位当前位置",
+        "Center map on current position"
+      ],
+      "semantic": "Center map on current position",
+      "priority": "P0",
+      "component": "LocateIcon",
+      "svg": "svg/locate.svg",
+      "symbol": "common-locate",
+      "approvedOriginal": false,
+      "sha256": "02530b0dcc67ddf1c53ce27c19a77f5ca0aa277ae92dc6d46cc1357a0653feab"
+    },
+    {
+      "name": "route",
+      "label": "Route",
+      "labelZh": "路线",
+      "category": "commerce-location",
+      "tags": [
+        "route",
+        "路线",
+        "Route planning"
+      ],
+      "semantic": "Route planning",
+      "priority": "P1",
+      "component": "RouteIcon",
+      "svg": "svg/route.svg",
+      "symbol": "common-route",
+      "approvedOriginal": false,
+      "sha256": "978ac887cc877bf7b6a6a2d830a4691571cf7343eed4d7cb61b50d837eb88969"
+    },
+    {
+      "name": "signpost",
+      "label": "Signpost",
+      "labelZh": "路标",
+      "category": "commerce-location",
+      "tags": [
+        "signpost",
+        "路标",
+        "Directions or wayfinding"
+      ],
+      "semantic": "Directions or wayfinding",
+      "priority": "P1",
+      "component": "SignpostIcon",
+      "svg": "svg/signpost.svg",
+      "symbol": "common-signpost",
+      "approvedOriginal": false,
+      "sha256": "06d4d3267692ff72e659a03bff2b7c0559a7197e2ff0a0f10f2b075562c87da6"
+    },
+    {
+      "name": "plane",
+      "label": "Plane",
+      "labelZh": "飞机",
+      "category": "commerce-location",
+      "tags": [
+        "plane",
+        "飞机",
+        "Air travel option"
+      ],
+      "semantic": "Air travel option",
+      "priority": "P1",
+      "component": "PlaneIcon",
+      "svg": "svg/plane.svg",
+      "symbol": "common-plane",
+      "approvedOriginal": false,
+      "sha256": "a056fd80324239e3933d4901d172419c7736d93279aeb6b20745040675267a01"
+    },
+    {
+      "name": "train",
+      "label": "Train",
+      "labelZh": "火车",
+      "category": "commerce-location",
+      "tags": [
+        "train",
+        "火车",
+        "Rail transport option"
+      ],
+      "semantic": "Rail transport option",
+      "priority": "P1",
+      "component": "TrainIcon",
+      "svg": "svg/train.svg",
+      "symbol": "common-train",
+      "approvedOriginal": false,
+      "sha256": "1ff89d96b77d03953f9b7ed5f6469bf999a2e11b9dde85c7b9b4a06fa22afd21"
+    },
+    {
+      "name": "calendar-plus",
+      "label": "Calendar plus",
+      "labelZh": "新建日程",
+      "category": "time-status",
+      "semantic": "Add calendar event",
+      "priority": "P0",
+      "tags": [
+        "calendar plus",
+        "新建日程",
+        "Add calendar event"
+      ],
+      "component": "CalendarPlusIcon",
+      "svg": "svg/calendar-plus.svg",
+      "symbol": "common-calendar-plus",
+      "approvedOriginal": false,
+      "sha256": "3d65597aff5bc4f238aa2d8b72daf1edbdee28c855e5a9fff2697a1ef8396165"
+    },
+    {
+      "name": "calendar-x",
+      "label": "Calendar x",
+      "labelZh": "取消日程",
+      "category": "time-status",
+      "semantic": "Canceled calendar event",
+      "priority": "P1",
+      "tags": [
+        "calendar x",
+        "取消日程",
+        "Canceled calendar event"
+      ],
+      "component": "CalendarXIcon",
+      "svg": "svg/calendar-x.svg",
+      "symbol": "common-calendar-x",
+      "approvedOriginal": false,
+      "sha256": "c7c49acca9468a4ac438e566da92978b3a54f0ffe1437d444442d88cfcb29b6e"
+    },
+    {
+      "name": "calendar-range",
+      "label": "Calendar range",
+      "labelZh": "日期范围",
+      "category": "time-status",
+      "semantic": "Select a date interval",
+      "priority": "P0",
+      "tags": [
+        "calendar range",
+        "日期范围",
+        "Select a date interval"
+      ],
+      "component": "CalendarRangeIcon",
+      "svg": "svg/calendar-range.svg",
+      "symbol": "common-calendar-range",
+      "approvedOriginal": false,
+      "sha256": "26a301abf5cca8b3746fc876c669f1296ed891bed16d81cbdc283fedec9f594f"
+    },
+    {
+      "name": "calendar-clock",
+      "label": "Calendar clock",
+      "labelZh": "日程时间",
+      "category": "time-status",
+      "semantic": "Scheduled event time",
+      "priority": "P1",
+      "tags": [
+        "calendar clock",
+        "日程时间",
+        "Scheduled event time"
+      ],
+      "component": "CalendarClockIcon",
+      "svg": "svg/calendar-clock.svg",
+      "symbol": "common-calendar-clock",
+      "approvedOriginal": false,
+      "sha256": "863a6461dfcc65dc09d8d62aa720edecec41e95507bea467a5625a0e2f013fad"
+    },
+    {
+      "name": "hourglass",
+      "label": "Hourglass",
+      "labelZh": "等待中",
+      "category": "time-status",
+      "semantic": "Time elapsing or pending work",
+      "priority": "P1",
+      "tags": [
+        "hourglass",
+        "等待中",
+        "Time elapsing or pending work"
+      ],
+      "component": "HourglassIcon",
+      "svg": "svg/hourglass.svg",
+      "symbol": "common-hourglass",
+      "approvedOriginal": false,
+      "sha256": "9beb2fe515960104cd10ccb560a27804f936a755ac6da443c0a5297f4c5e2292"
+    },
+    {
+      "name": "alarm-off",
+      "label": "Alarm off",
+      "labelZh": "关闭闹钟",
+      "category": "time-status",
+      "semantic": "Alarm disabled",
+      "priority": "P1",
+      "tags": [
+        "alarm off",
+        "关闭闹钟",
+        "Alarm disabled"
+      ],
+      "component": "AlarmOffIcon",
+      "svg": "svg/alarm-off.svg",
+      "symbol": "common-alarm-off",
+      "approvedOriginal": false,
+      "sha256": "9e855d312b187f7f469429023fdbcf4cfd19b0a18d9f094ba35842a37371c6b5"
+    },
+    {
+      "name": "flag-off",
+      "label": "Flag off",
+      "labelZh": "取消标记",
+      "category": "time-status",
+      "semantic": "Clear flagged state",
+      "priority": "P1",
+      "tags": [
+        "flag off",
+        "取消标记",
+        "Clear flagged state"
+      ],
+      "component": "FlagOffIcon",
+      "svg": "svg/flag-off.svg",
+      "symbol": "common-flag-off",
+      "approvedOriginal": false,
+      "sha256": "36a81cb55d94b05810bdf1283e6f766ea902c3c147e016b8327f8d5781945b4d"
+    },
+    {
+      "name": "circle-dashed",
+      "label": "Circle dashed",
+      "labelZh": "待处理",
+      "category": "time-status",
+      "semantic": "Incomplete or pending status",
+      "priority": "P1",
+      "tags": [
+        "circle dashed",
+        "待处理",
+        "Incomplete or pending status"
+      ],
+      "component": "CircleDashedIcon",
+      "svg": "svg/circle-dashed.svg",
+      "symbol": "common-circle-dashed",
+      "approvedOriginal": false,
+      "sha256": "f029edb5c9954a4bd72756fff45fab35a0f2f928e7c58237bc23b8c5ce2bebbb"
+    },
+    {
+      "name": "accessibility",
+      "label": "Accessibility",
+      "labelZh": "无障碍",
+      "category": "accessibility",
+      "tags": [
+        "accessibility",
+        "无障碍",
+        "Accessibility settings"
+      ],
+      "semantic": "Accessibility settings",
+      "priority": "P0",
+      "component": "AccessibilityIcon",
+      "svg": "svg/accessibility.svg",
+      "symbol": "common-accessibility",
+      "approvedOriginal": false,
+      "sha256": "adb18a474f38abf3bd9e4df32c3e5241af6d38911b009bd232cce975509674d3"
+    },
+    {
+      "name": "captions",
+      "label": "Captions",
+      "labelZh": "字幕",
+      "category": "accessibility",
+      "tags": [
+        "captions",
+        "字幕",
+        "Closed-caption toggle"
+      ],
+      "semantic": "Closed-caption toggle",
+      "priority": "P0",
+      "component": "CaptionsIcon",
+      "svg": "svg/captions.svg",
+      "symbol": "common-captions",
+      "approvedOriginal": false,
+      "sha256": "7cdf187eab5ba88847521b993a5bbe0b58d583ddee284ee43d9c44183138311f"
+    },
+    {
+      "name": "contrast",
+      "label": "Contrast",
+      "labelZh": "对比度",
+      "category": "accessibility",
+      "tags": [
+        "contrast",
+        "对比度",
+        "High contrast appearance"
+      ],
+      "semantic": "High contrast appearance",
+      "priority": "P0",
+      "component": "ContrastIcon",
+      "svg": "svg/contrast.svg",
+      "symbol": "common-contrast",
+      "approvedOriginal": false,
+      "sha256": "134b9e96348649d620c637ed681afd559b42293d3f77adc74512f43917e66210"
+    },
+    {
+      "name": "text-size",
+      "label": "Text size",
+      "labelZh": "文字大小",
+      "category": "accessibility",
+      "tags": [
+        "text size",
+        "文字大小",
+        "Adjust text size"
+      ],
+      "semantic": "Adjust text size",
+      "priority": "P0",
+      "component": "TextSizeIcon",
+      "svg": "svg/text-size.svg",
+      "symbol": "common-text-size",
+      "approvedOriginal": false,
+      "sha256": "5e9189108b5cbe48ba10ccdab0d6aecc6a0d4fa026b09ed3723d5ed48893daff"
+    },
+    {
+      "name": "hearing",
+      "label": "Hearing",
+      "labelZh": "听觉辅助",
+      "category": "accessibility",
+      "tags": [
+        "hearing",
+        "听觉辅助",
+        "Audio accessibility settings"
+      ],
+      "semantic": "Audio accessibility settings",
+      "priority": "P1",
+      "component": "HearingIcon",
+      "svg": "svg/hearing.svg",
+      "symbol": "common-hearing",
+      "approvedOriginal": false,
+      "sha256": "4b840617c1863bd1c5a82d83a1f64bedd849cd9a18aa7361ed0d27b740ed8fda"
+    },
+    {
+      "name": "sparkles",
+      "label": "Sparkles",
+      "labelZh": "智能生成",
+      "category": "developer-ai",
+      "semantic": "AI assistance or enhancement",
+      "priority": "P0",
+      "tags": [
+        "sparkles",
+        "智能生成",
+        "AI assistance or enhancement"
+      ],
+      "component": "SparklesIcon",
+      "svg": "svg/sparkles.svg",
+      "symbol": "common-sparkles",
+      "approvedOriginal": false,
+      "sha256": "fd296aa7981c3f988c5ee483bcd92ade6617043b1beb544f7dca72806d9b5acd"
+    },
+    {
+      "name": "bot",
+      "label": "Bot",
+      "labelZh": "智能助手",
+      "category": "developer-ai",
+      "semantic": "Conversational assistant",
+      "priority": "P0",
+      "tags": [
+        "bot",
+        "智能助手",
+        "Conversational assistant"
+      ],
+      "component": "BotIcon",
+      "svg": "svg/bot.svg",
+      "symbol": "common-bot",
+      "approvedOriginal": false,
+      "sha256": "eabc9adba0d186785cc0dbfefd55880d841ed20f46d2646f602c2aa2f23dca74"
+    },
+    {
+      "name": "brain",
+      "label": "Brain",
+      "labelZh": "智能分析",
+      "category": "developer-ai",
+      "semantic": "Reasoning or intelligent analysis",
+      "priority": "P1",
+      "tags": [
+        "brain",
+        "智能分析",
+        "Reasoning or intelligent analysis"
+      ],
+      "component": "BrainIcon",
+      "svg": "svg/brain.svg",
+      "symbol": "common-brain",
+      "approvedOriginal": false,
+      "sha256": "aeb495ce5c851069bb8b34272f584d5e6b835df338592c430b5fdb98392e6a01"
+    },
+    {
+      "name": "wand",
+      "label": "Wand",
+      "labelZh": "智能优化",
+      "category": "developer-ai",
+      "semantic": "Automatic improvement or transformation",
+      "priority": "P1",
+      "tags": [
+        "wand",
+        "智能优化",
+        "Automatic improvement or transformation"
+      ],
+      "component": "WandIcon",
+      "svg": "svg/wand.svg",
+      "symbol": "common-wand",
+      "approvedOriginal": false,
+      "sha256": "e85de7034dbdc97df8cdee8de0924a91b4d4456927049784f1053044fedeb7a6"
+    },
+    {
+      "name": "lightbulb",
+      "label": "Lightbulb",
+      "labelZh": "灵感",
+      "category": "developer-ai",
+      "semantic": "Suggestion or idea",
+      "priority": "P0",
+      "tags": [
+        "lightbulb",
+        "灵感",
+        "Suggestion or idea"
+      ],
+      "component": "LightbulbIcon",
+      "svg": "svg/lightbulb.svg",
+      "symbol": "common-lightbulb",
+      "approvedOriginal": false,
+      "sha256": "870b2d9e7f095fb11c4f7774eacacb5031d76691821fa685a23021941a3016d3"
+    },
+    {
+      "name": "zap",
+      "label": "Zap",
+      "labelZh": "快捷操作",
+      "category": "developer-ai",
+      "semantic": "Fast action or automation",
+      "priority": "P0",
+      "tags": [
+        "zap",
+        "快捷操作",
+        "Fast action or automation"
+      ],
+      "component": "ZapIcon",
+      "svg": "svg/zap.svg",
+      "symbol": "common-zap",
+      "approvedOriginal": false,
+      "sha256": "d6a1032df1e2de8d8e2ecb873df5ac85a8ff33dc6711f0e477702a1c19baa92f"
+    },
+    {
+      "name": "command",
+      "label": "Command",
+      "labelZh": "命令键",
+      "category": "developer-ai",
+      "semantic": "Keyboard shortcut modifier",
+      "priority": "P0",
+      "tags": [
+        "command",
+        "命令键",
+        "Keyboard shortcut modifier"
+      ],
+      "component": "CommandIcon",
+      "svg": "svg/command.svg",
+      "symbol": "common-command",
+      "approvedOriginal": false,
+      "sha256": "8d46ae8ea55d2d339a3c047bdaa5f94648e6a53980b6e4f6554ca43625d89215"
+    },
+    {
+      "name": "code-block",
+      "label": "Code block",
+      "labelZh": "代码块",
+      "category": "developer-ai",
+      "semantic": "Insert or display code block",
+      "priority": "P1",
+      "tags": [
+        "code block",
+        "代码块",
+        "Insert or display code block"
+      ],
+      "component": "CodeBlockIcon",
+      "svg": "svg/code-block.svg",
+      "symbol": "common-code-block",
+      "approvedOriginal": false,
+      "sha256": "5883ef72821ba1c4d74d65513a9676735d14ece13ddfec2ff8a69141e05c983f"
+    },
+    {
+      "name": "git-pull-request",
+      "label": "Git pull request",
+      "labelZh": "合并请求",
+      "category": "developer-ai",
+      "semantic": "Review proposed code changes",
+      "priority": "P0",
+      "tags": [
+        "git pull request",
+        "合并请求",
+        "Review proposed code changes"
+      ],
+      "component": "GitPullRequestIcon",
+      "svg": "svg/git-pull-request.svg",
+      "symbol": "common-git-pull-request",
+      "approvedOriginal": false,
+      "sha256": "14c8bb695435e8bf75f690777a48385d58054fbce8d88db0844ba23f76c5cf61"
+    },
+    {
+      "name": "git-compare",
+      "label": "Git compare",
+      "labelZh": "比较分支",
+      "category": "developer-ai",
+      "semantic": "Compare code branches",
+      "priority": "P1",
+      "tags": [
+        "git compare",
+        "比较分支",
+        "Compare code branches"
+      ],
+      "component": "GitCompareIcon",
+      "svg": "svg/git-compare.svg",
+      "symbol": "common-git-compare",
+      "approvedOriginal": false,
+      "sha256": "e89ff12da4cd65c6af94dda5bbe623d7517f84d31e706c38145fe503342db270"
+    },
+    {
+      "name": "git-fork",
+      "label": "Git fork",
+      "labelZh": "代码分叉",
+      "category": "developer-ai",
+      "semantic": "Fork repository",
+      "priority": "P1",
+      "tags": [
+        "git fork",
+        "代码分叉",
+        "Fork repository"
+      ],
+      "component": "GitForkIcon",
+      "svg": "svg/git-fork.svg",
+      "symbol": "common-git-fork",
+      "approvedOriginal": false,
+      "sha256": "9e48cb0e790d4ba9efe47e8afaeb433f6310832be1fa91bb5915650d243f2073"
+    },
+    {
+      "name": "network",
+      "label": "Network",
+      "labelZh": "网络拓扑",
+      "category": "developer-ai",
+      "semantic": "Connected system structure",
+      "priority": "P1",
+      "tags": [
+        "network",
+        "网络拓扑",
+        "Connected system structure"
+      ],
+      "component": "NetworkIcon",
+      "svg": "svg/network.svg",
+      "symbol": "common-network",
+      "approvedOriginal": false,
+      "sha256": "3d661fbfce968e488df4baaf614a3edb2e308de5e5c77c867069c92c2db644db"
+    },
+    {
+      "name": "database-backup",
+      "label": "Database backup",
+      "labelZh": "数据库备份",
+      "category": "developer-ai",
+      "semantic": "Back up stored data",
+      "priority": "P1",
+      "tags": [
+        "database backup",
+        "数据库备份",
+        "Back up stored data"
+      ],
+      "component": "DatabaseBackupIcon",
+      "svg": "svg/database-backup.svg",
+      "symbol": "common-database-backup",
+      "approvedOriginal": false,
+      "sha256": "ad20e3561da6a8f7591ff20c4ec988b1c38843c1a55d8899512948e6c1ffff48"
+    },
+    {
+      "name": "cloud-off",
+      "label": "Cloud off",
+      "labelZh": "云端断开",
+      "category": "developer-ai",
+      "semantic": "Offline cloud connection",
+      "priority": "P1",
+      "tags": [
+        "cloud off",
+        "云端断开",
+        "Offline cloud connection"
+      ],
+      "component": "CloudOffIcon",
+      "svg": "svg/cloud-off.svg",
+      "symbol": "common-cloud-off",
+      "approvedOriginal": false,
+      "sha256": "696229be24c371686838cdd011013e596115bd5aab095661f329e32572a35c7b"
+    },
+    {
+      "name": "cloud-check",
+      "label": "Cloud check",
+      "labelZh": "云端同步完成",
+      "category": "developer-ai",
+      "semantic": "Cloud data synchronized",
+      "priority": "P1",
+      "tags": [
+        "cloud check",
+        "云端同步完成",
+        "Cloud data synchronized"
+      ],
+      "component": "CloudCheckIcon",
+      "svg": "svg/cloud-check.svg",
+      "symbol": "common-cloud-check",
+      "approvedOriginal": false,
+      "sha256": "a92641cb938a17f0041dda7af71ffbb4d80dd43abcb990feb952fdd4b93f1b69"
+    },
+    {
+      "name": "container",
+      "label": "Container",
+      "labelZh": "容器",
+      "category": "developer-ai",
+      "semantic": "Containerized service",
+      "priority": "P1",
+      "tags": [
+        "container",
+        "容器",
+        "Containerized service"
+      ],
+      "component": "ContainerIcon",
+      "svg": "svg/container.svg",
+      "symbol": "common-container",
+      "approvedOriginal": false,
+      "sha256": "3d4cc15e1a8d4384828d3b9a3c353935a5ba946a7bbaec4cf784b6c25c7d7429"
+    },
+    {
+      "name": "brackets",
+      "label": "Brackets",
+      "labelZh": "方括号",
+      "category": "developer-ai",
+      "semantic": "Array or structured input",
+      "priority": "P1",
+      "tags": [
+        "brackets",
+        "方括号",
+        "Array or structured input"
+      ],
+      "component": "BracketsIcon",
+      "svg": "svg/brackets.svg",
+      "symbol": "common-brackets",
+      "approvedOriginal": false,
+      "sha256": "6b19cec9880964b2eed746e9be40ee6f264525fe3b323042f47a2bd9611dc062"
+    },
+    {
+      "name": "variable",
+      "label": "Variable",
+      "labelZh": "变量",
+      "category": "developer-ai",
+      "semantic": "Variable or dynamic value",
+      "priority": "P1",
+      "tags": [
+        "variable",
+        "变量",
+        "Variable or dynamic value"
+      ],
+      "component": "VariableIcon",
+      "svg": "svg/variable.svg",
+      "symbol": "common-variable",
+      "approvedOriginal": false,
+      "sha256": "d9233f20ee1e61094c7a4bfbc131c32ac1dcba2cfa732ddc47aa883e3275cd44"
+    },
+    {
+      "name": "rocket",
+      "label": "Rocket",
+      "labelZh": "发布上线",
+      "category": "developer-ai",
+      "semantic": "Launch or deploy",
+      "priority": "P1",
+      "tags": [
+        "rocket",
+        "发布上线",
+        "Launch or deploy"
+      ],
+      "component": "RocketIcon",
+      "svg": "svg/rocket.svg",
+      "symbol": "common-rocket",
+      "approvedOriginal": false,
+      "sha256": "19f361e9476516af300f678df4e00930290712bb0c73fe2b7cf70a4e14ac196d"
+    },
+    {
+      "name": "wrench",
+      "label": "Wrench",
+      "labelZh": "工具",
+      "category": "developer-ai",
+      "semantic": "Maintenance or configuration",
+      "priority": "P0",
+      "tags": [
+        "wrench",
+        "工具",
+        "Maintenance or configuration"
+      ],
+      "component": "WrenchIcon",
+      "svg": "svg/wrench.svg",
+      "symbol": "common-wrench",
+      "approvedOriginal": false,
+      "sha256": "e764b55bc8fc2dab948e326bb5220a17a8fe96b97858ad03a17dd60ecba5d6fa"
+    }
+  ],
+  "referenceSources": [
+    {
+      "title": "Lucide official catalog",
+      "url": "https://lucide.dev/icons",
+      "use": "Gap discovery and widely reused UI concepts; no SVG geometry copied"
+    },
+    {
+      "title": "Ant Design official icon catalog",
+      "url": "https://ant.design/components/icon/",
+      "use": "Cross-check editor, data, direction, and application coverage; no SVG geometry copied"
+    },
+    {
+      "title": "Heroicons official catalog",
+      "url": "https://heroicons.com/",
+      "use": "Cross-check practical navigation, application, media, and device semantics; no SVG geometry copied"
+    }
+  ],
+  "reuseAliases": {
+    "check-square": "checkbox-checked",
+    "square": "checkbox",
+    "circle": "radio-button",
+    "circle-dot": "radio-button-selected",
+    "record": "radio-button-selected",
+    "key-round": "key",
+    "pencil": "edit",
+    "cog": "settings",
+    "ellipsis": "more-horizontal",
+    "ellipsis-vertical": "more-vertical",
+    "refresh-cw": "refresh",
+    "rotate-ccw (undo action)": "undo",
+    "rotate-cw (redo action)": "redo",
+    "list": "layout-list",
+    "layout-grid": "grid",
+    "house": "home",
+    "funnel": "filter",
+    "circle-check": "check-circle",
+    "circle-x": "x-circle",
+    "circle-help": "help-circle",
+    "arrow-down-to-line": "download",
+    "arrow-up-from-line": "upload",
+    "phone-call (active)": "phone-call",
+    "volume-high": "volume",
+    "car": "insurance-auto"
+  }
+}

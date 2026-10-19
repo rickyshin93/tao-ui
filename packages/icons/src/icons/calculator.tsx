@@ -1,0 +1,19 @@
+// 由 data/icons.json 生成（原 330 批准图标 + 新通用候选）；执行 npm run generate。
+'use client';
+
+import { forwardRef } from 'react';
+import type { IconProps } from '../types.js';
+import { resolveIconProps } from '../icon-props.js';
+
+export const CalculatorIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
+  function CalculatorIcon(props, ref) {
+    const { title, titleId, children, svgProps } = resolveIconProps(props);
+    return (
+      <svg {...svgProps} ref={ref}>
+        {title ? <title id={titleId}>{title}</title> : null}
+        <rect x="5.1" y="3.2" width="13.8" height="17.6" rx="1.8"/><rect x="8.2" y="6.3" width="7.6" height="3.4" rx="0.5"/><rect x="8.4" y="12.8" width="2.2" height="1.6" rx="0.55" fill="currentColor" stroke="none"/><rect x="13.4" y="12.8" width="2.2" height="1.6" rx="0.55" fill="currentColor" stroke="none"/><rect x="8.4" y="17" width="2.2" height="1.6" rx="0.55" fill="currentColor" stroke="none"/><rect x="13.4" y="17" width="2.2" height="1.6" rx="0.55" fill="currentColor" stroke="none"/>
+        {children}
+      </svg>
+    );
+  },
+);

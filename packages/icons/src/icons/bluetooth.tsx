@@ -1,0 +1,19 @@
+// 由 data/icons.json 生成（原 330 批准图标 + 新通用候选）；执行 npm run generate。
+'use client';
+
+import { forwardRef } from 'react';
+import type { IconProps } from '../types.js';
+import { resolveIconProps } from '../icon-props.js';
+
+export const BluetoothIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
+  function BluetoothIcon(props, ref) {
+    const { title, titleId, children, svgProps } = resolveIconProps(props);
+    return (
+      <svg {...svgProps} ref={ref}>
+        {title ? <title id={titleId}>{title}</title> : null}
+        <path d="m6.2 7.1 10.55 9.25q.5.45-.05.9l-5.1 3.65q-.6.4-.6-.35V3.45q0-.75.6-.35l5.1 3.65q.55.45.05.9L6.2 16.9"/>
+        {children}
+      </svg>
+    );
+  },
+);

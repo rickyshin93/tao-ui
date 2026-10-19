@@ -1,0 +1,19 @@
+// 由 data/icons.json 生成（原 330 批准图标 + 新通用候选）；执行 npm run generate。
+'use client';
+
+import { forwardRef } from 'react';
+import type { IconProps } from '../types.js';
+import { resolveIconProps } from '../icon-props.js';
+
+export const PuzzleIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
+  function PuzzleIcon(props, ref) {
+    const { title, titleId, children, svgProps } = resolveIconProps(props);
+    return (
+      <svg {...svgProps} ref={ref}>
+        {title ? <title id={titleId}>{title}</title> : null}
+        <path d="M9 3.6H5.2q-1.7 0-1.7 1.7v4.1h1.6q2.6 0 2.6 2.6t-2.6 2.6H3.5v4.1q0 1.7 1.7 1.7H10v-1.6q0-2.6 2.6-2.6t2.6 2.6v1.6h3.6q1.7 0 1.7-1.7v-7.2h-1.6q-2.6 0-2.6-2.6t2.6-2.6h1.6V5.3q0-1.7-1.7-1.7H14M9 3.6v1.5q0 2.5 2.5 2.5T14 5.1V3.6"/>
+        {children}
+      </svg>
+    );
+  },
+);

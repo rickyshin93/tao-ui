@@ -1,0 +1,19 @@
+// 由 data/icons.json 生成（原 330 批准图标 + 新通用候选）；执行 npm run generate。
+'use client';
+
+import { forwardRef } from 'react';
+import type { IconProps } from '../types.js';
+import { resolveIconProps } from '../icon-props.js';
+
+export const BellIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
+  function BellIcon(props, ref) {
+    const { title, titleId, children, svgProps } = resolveIconProps(props);
+    return (
+      <svg {...svgProps} ref={ref}>
+        {title ? <title id={titleId}>{title}</title> : null}
+        <path d="M5.65 10.5C5.65 6.45 7.95 3.9 12 3.9s6.35 2.55 6.35 6.6v1.9c0 1.4.35 2.4 1.15 3.6.65 1 .05 2.2-1.15 2.2H5.65c-1.2 0-1.8-1.2-1.15-2.2.8-1.2 1.15-2.2 1.15-3.6Z"/><path d="M9.6 20.6q2.4 1.55 4.8 0"/>
+        {children}
+      </svg>
+    );
+  },
+);

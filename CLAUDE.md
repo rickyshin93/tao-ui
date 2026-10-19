@@ -1,89 +1,39 @@
-# tao-ui 项目指南
+# tao-ui monorepo 指南
 
-## 新组件开发清单
+Bun workspaces 单仓，两个可发布包。完整约定见根 `AGENTS.md`；组件开发清单在 `packages/tao-ui/CLAUDE.md`，图标生成与冻结基线在 `packages/icons/AGENTS.md` + `HARNESS.md`。
 
-每个新组件必须包含：
+## 结构
 
-1. **组件文件** `src/components/<name>/<name>.tsx` + `<name>.css`
-2. **Semantic DOM** — 定义 `<Name>SemanticPart` 类型，props 加 `classNames` / `styles`
-3. **导出** — 在 `src/index.tsx` 导出组件、Props 类型、SemanticPart 类型
-4. **测试** `tests/<name>/<name>.test.tsx`
-5. **Story** `stories/<name>.stories.tsx`，按 antd 分类放 title
-6. **Build 验证** — `rslib build` 通过（含 d.ts）
+- `packages/tao-ui` → `@rockshin/tao-ui`：Rslib 组件库（React 18.2/19）、Rstest、Rspress、Storybook、Biome
+- `packages/icons` → `@rockshin/tao-icons`：554 枚生成式 React 图标（24px / 1.8 stroke，逐图标子路径）
+- 根目录只放 workspace 脚本、CI、共享说明，没有运行时代码
 
-### Semantic DOM 规范
+## 命令（根目录执行）
 
-每个组件暴露 `classNames` 和 `styles` prop，按语义部件定制内部 DOM：
+| 命令 | 作用 |
+| --- | --- |
+| `bun install` | 安装全部 workspace（唯一锁文件 `bun.lockb`） |
+| `bun run build` | 两个包都构建 |
+| `bun run lint` / `typecheck` / `test` | tao-ui 质量门禁 |
+| `bun run test:types` / `test:package` | 公共类型契约 / 包导出与 CSS 体积 |
+| `bun run doc` / `storybook` | tao-ui 文档站 / 组件浏览器 |
+| `bun run docs:check` / `check:components` | 生成文档与组件注册表同步 |
+| `bun run icons:check` / `icons:verify` | 图标漂移+构建+打包 / 真实 tgz 消费与 Next 兼容 |
+| `bun run release <version>` | tao-ui 发版（仅 main） |
 
-```tsx
-import { cx, type SemanticClassNames, type SemanticStyles } from '../../utils/semantic';
+也可以进到包目录直接跑 `bun run <script>`。
 
-export type ExampleSemanticPart = 'root' | 'header' | 'body';
+## 硬约束
 
-export interface ExampleProps {
-  classNames?: SemanticClassNames<ExampleSemanticPart>;
-  styles?: SemanticStyles<ExampleSemanticPart>;
-  className?: string; // 合并到 root
-}
+- **不要手改生成文件**：`packages/icons/src/icons/*.tsx`、`packages/icons/src/index.ts` 由 `scripts/generate.mjs` 从 `data/` 生成，`generate:check` 会检测漂移；改几何要连同冻结基线一起走流程。
+- **冻结基线不得刷新**：approved v1.2.0 / v1.3.0-preview.2 / generic-candidates 的 SHA-256 不能为了让检查变绿而更新。
+- **不要动 tao-ui 的 `sideEffects` 白名单**（含 `./dist/index.js` 与 `./src/index.tsx`），否则严格 tree-shaker 会悄悄丢掉 `theme.css`。
+- **React 在两包都是 peer**；tao-ui 最低 18.2，icons 为 `^18.2.0 || ^19.0.0`。
+- **不要引入 package-lock**；图标消费 fixture 的 `package-lock.json` 例外（隔离安装真实 tgz）。
+- tao-ui 样式规范不变：`--tao-*` 变量、`data-tao-*` 属性、OKLCH + `color-mix()` 彩色×中性色用 `in oklab`；动画只允许 opacity / transform / background-color / border-color / color。
 
-// JSX 中应用：
-<div className={cx(classNames?.root, className)} style={styles?.root}>
-  <div className={cx(classNames?.header)} style={styles?.header}>...</div>
-</div>
-```
+## 改动前验证
 
-规则：
-- `className` prop 通过 `cx(classNames?.root, className)` 与 `classNames.root` 合并
-- 只暴露用户真正会定制的部件，不要把每个 DOM 节点都暴露
-- SemanticPart 类型必须导出，方便消费方使用
-- Table 等复杂组件用点号命名：`'header.cell' | 'body.row'`
-
-### Storybook 分类（参考 antd）
-
-| 分类 | 示例组件 |
-|------|---------|
-| `通用 General/` | Button |
-| `布局 Layout/` | Stack, FormLayout |
-| `导航 Navigation/` | Tabs, Pagination |
-| `数据录入 Data Entry/` | Input, Select, Checkbox, Radio, Switch, DatePicker, Form |
-| `数据展示 Data Display/` | Table |
-| `反馈 Feedback/` | Drawer |
-| `配置 Config/` | TaoProvider |
-
-### 样式规范
-
-- CSS 变量前缀 `--tao-*`，data 属性 `data-tao-*`
-- theme.css 和 control.css 在 `src/index.tsx` 顶层统一导入，组件 CSS 不需要 `@import theme`
-- **不要动 package.json 的 `sideEffects`**——白名单里显式列了 `./dist/index.js` 和 `./src/index.tsx`，让 tree-shaker 保留入口的 CSS 副作用（否则 Storybook/rspack/esbuild 严格模式会悄悄丢掉 theme.css，组件全变透明；已复现过一次）。tree-shaking 按 export 粒度工作，未用到的组件仍会被剪掉，不影响体积。
-- 用 data 属性驱动样式，不用 className
-- 颜色用 OKLCH + `color-mix()`；**彩色 × 中性色（bg-base / bg-container）的混色用 `in oklab`**——`in oklch` 会按最短弧插值色相，低比例混色会被中性色的 hue（70 / 0）带偏，蓝色主题色变成粉/桃色灰（table hover、selected 已踩过）
-- 动画只允许 `opacity`, `transform`, `background-color`, `border-color`, `color`
-
-### TaoProvider 继承
-
-组件通过 `useTaoConfig()` 继承 `size` / `disabled` / `variant`，本地 prop 优先。
-
-## 消费方本地 link 使用指南
-
-**场景**：在别的项目里 link 本仓库（`"@rockshin/tao-ui": "link:../../../personal/tao-ui"`），一改一试。
-
-**消费方 `vite.config.ts` 必须加**：
-```ts
-export default defineConfig({
-  resolve: { dedupe: ["react", "react-dom"] },
-  optimizeDeps: { exclude: ["@rockshin/tao-ui"] },
-});
-```
-
-- `resolve.dedupe`：**必需**。tao-ui 自己 devDeps 装了 react（dev/test/story 需要），symlink 后 Node 模块解析会从 `tao-ui/node_modules/react` 拿一份，消费方拿另一份 → 两份 React 实例 → `Invalid hook call` 整页白屏。dedupe 强制走消费方版本，唯一的解。（这不是 tao-ui 端能修的——peer/external 都已配对，问题在 Node 解析算法。）
-- `optimizeDeps.exclude`：性能优化。vite 不 pre-bundle tao-ui，你 `pnpm build` 后直接 HMR，不用每次 `vite --force` 清 `.vite/deps`。
-
-**开发流程**：
-```
-在 tao-ui：pnpm build   # rebuild dist；因为是 symlink，消费方立刻可见
-浏览器：⌘⇧R              # 硬刷拿新 CSS/JS
-```
-
-不需要在消费方 `pnpm install` 或 `--force` 重启 vite。
-
-**回归 npm**：切回 `"@rockshin/tao-ui": "^0.0.5"` 时，`optimizeDeps.exclude` 可去掉（享受 pre-bundle 加速），`resolve.dedupe` 建议留着（React lib 消费方通用护栏）。
+- tao-ui：`bun run lint && bun run typecheck && bun run test && bun run test:types && bun run test:package && bun run build && bun run docs:check && bun run check:components`
+- icons：`bun run icons:check`；动到 API/构建配置/打包时再跑 `bun run icons:verify`
+- 如实报告命令结果，不通过放宽检查、预算或断言来变绿。

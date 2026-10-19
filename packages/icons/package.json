@@ -1,0 +1,91 @@
+{
+  "name": "@rockshin/tao-icons",
+  "version": "0.1.0",
+  "description": "554 rounded 24px line icons for React, with per-icon entry points and accessible defaults.",
+  "keywords": [
+    "react",
+    "icons",
+    "svg",
+    "icon-set",
+    "design-system",
+    "accessible"
+  ],
+  "author": "rickyshin",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rickyshin93/tao-ui.git",
+    "directory": "packages/icons"
+  },
+  "homepage": "https://github.com/rickyshin93/tao-ui/tree/main/packages/icons",
+  "bugs": "https://github.com/rickyshin93/tao-ui/issues",
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./icons/*": {
+      "types": "./dist/icons/*.d.ts",
+      "import": "./dist/icons/*.js"
+    },
+    "./svg/*": "./svg/*",
+    "./manifest.json": "./data/manifest.json",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "svg",
+    "data/manifest.json",
+    "README.md",
+    "DESIGN.md",
+    "LICENSE",
+    "HARNESS.md",
+    "AGENTS.md",
+    "VERIFICATION.md",
+    "INSURANCE-COVERAGE.md",
+    "GENERIC-COVERAGE.md"
+  ],
+  "scripts": {
+    "generate": "node scripts/generate.mjs",
+    "generate:check": "node scripts/generate.mjs --check",
+    "build": "bun run generate && rslib build",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test tests/*.test.mjs",
+    "test:consumer": "node tests/consumer.mjs",
+    "test:next": "node tests/next.mjs",
+    "check": "bun run check:fast",
+    "verify": "bun run check:extended",
+    "prepack": "node scripts/prepare-pack.mjs && bun run check:fast",
+    "prepublishOnly": "bun run release:check && bun run check:extended",
+    "test:pack": "bun scripts/check-package.mjs",
+    "check:fast": "bun run generate:check && rslib build && bun run typecheck && bun run test && bun run test:pack",
+    "check:extended": "bun run check:fast && bun run test:consumer && bun run test:next",
+    "release:check": "bun scripts/release-guard.mjs"
+  },
+  "peerDependencies": {
+    "react": "^18.2.0 || ^19.0.0"
+  },
+  "devDependencies": {
+    "@rslib/core": "1.0.3",
+    "@rsbuild/plugin-react": "2.1.1",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "esbuild": "0.28.2",
+    "jsdom": "30.1.3",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "typescript": "5.9.3"
+  },
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  }
+}

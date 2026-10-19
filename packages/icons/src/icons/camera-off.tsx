@@ -1,0 +1,19 @@
+// 由 data/icons.json 生成（原 330 批准图标 + 新通用候选）；执行 npm run generate。
+'use client';
+
+import { forwardRef } from 'react';
+import type { IconProps } from '../types.js';
+import { resolveIconProps } from '../icon-props.js';
+
+export const CameraOffIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
+  function CameraOffIcon(props, ref) {
+    const { title, titleId, children, svgProps } = resolveIconProps(props);
+    return (
+      <svg {...svgProps} ref={ref}>
+        {title ? <title id={titleId}>{title}</title> : null}
+        <path d="m3.5 3.5 17 17M9.3 4.3h5.1q.6 0 .95.5l1.55 2.3h2.35q1.85 0 1.85 1.85v6.7M5.4 7.1h-.65q-1.85 0-1.85 1.85v9.15q0 1.85 1.85 1.85h10.8M8.75 12.65a3.35 3.35 0 0 0 3.5 4.09"/>
+        {children}
+      </svg>
+    );
+  },
+);

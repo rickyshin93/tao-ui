@@ -1,0 +1,19 @@
+// 由 data/icons.json 生成（原 330 批准图标 + 新通用候选）；执行 npm run generate。
+'use client';
+
+import { forwardRef } from 'react';
+import type { IconProps } from '../types.js';
+import { resolveIconProps } from '../icon-props.js';
+
+export const MicOffIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
+  function MicOffIcon(props, ref) {
+    const { title, titleId, children, svgProps } = resolveIconProps(props);
+    return (
+      <svg {...svgProps} ref={ref}>
+        {title ? <title id={titleId}>{title}</title> : null}
+        <path d="M9.2 4.7a3.4 3.4 0 0 1 6.2 1.9v4.25M5.5 10.7v.9a6.5 6.5 0 0 0 6.5 6.5q1.2 0 2.3-.45M18.5 10.7v.9q0 1.25-.45 2.3M12 18.1v3M8.7 21.1h6.6M3.5 3.5l17 17"/>
+        {children}
+      </svg>
+    );
+  },
+);

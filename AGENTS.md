@@ -1,51 +1,34 @@
-# AGENTS.md
+# AGENTS.md — tao-ui monorepo
 
-You are an expert in JavaScript, Rspack, Rsbuild, Rslib, and library development. You write maintainable, performant, and accessible code.
+Bun workspaces monorepo. Two publishable packages, each with its own build, docs and verification gate.
 
-## Commands
+## Layout
 
-- `bun run build` - Build the library for production
-- `bun run dev` - Turn on watch mode, watch for changes and rebuild the library
-- `bun run release <version>` - Bump `package.json`, run tests/builds, commit, tag, push, create the GitHub Release, wait for the release workflow, and verify npm. Example: `bun run release 0.0.8`
+- `packages/tao-ui` — `@rockshin/tao-ui`. Rslib component library (React 18.2/19), Rstest tests, Rspress docs, Storybook, Biome. Package-level guide: `packages/tao-ui/CLAUDE.md`.
+- `packages/icons` — `@rockshin/tao-icons`. 554 generated React icon modules, canonical geometry in `data/`, frozen SHA-256 baselines, node:test harness, real-tgz consumer and Next checks. Package-level guide: `packages/icons/AGENTS.md` and `HARNESS.md`.
+- Root: workspace scripts, CI workflows, shared agent instructions. No runtime code.
 
-## Release
+## Commands (from the repository root)
 
-Publishing is automated by `.github/workflows/release.yml`, but the workflow is triggered by a published GitHub Release, not by a tag push alone.
+- `bun install` — installs all workspaces from the single root lockfile. Never run `npm install` / `npm ci` here; there is no `package-lock.json`.
+- `bun run build` — both packages. `bun run build:tao-ui` / `bun run build:icons` for one.
+- `bun run lint`, `bun run typecheck`, `bun run test` — tao-ui quality gates.
+- `bun run doc`, `bun run storybook` — tao-ui docs and component explorer.
+- `bun run icons:check`, `bun run icons:verify` — icon drift/build/pack gate and the heavier consumer gate.
+- `bun run release <version>` — tao-ui release (main branch only). `bun run release:icons` — icon metadata guard.
 
-Use:
+## Non-negotiables
 
-```bash
-bun run release 0.0.8
-```
+- **Generated icon sources are never hand-edited.** `packages/icons/src/icons/*.tsx` and `src/index.ts` come from `scripts/generate.mjs` over `data/icons.json`; `generate:check` fails on drift. Changing geometry means changing `data/` plus the frozen baselines.
+- **Icon baselines stay frozen.** Approved v1.2.0, v1.3.0-preview.2 and the generic-candidate baselines keep their SHA-256 values; do not refresh hashes to make a check pass.
+- **tao-ui package.json `sideEffects` whitelist stays.** Dropping `./dist/index.js` / `./src/index.tsx` from it silently removes the theme CSS under strict tree-shakers.
+- **React stays a peer dependency in both packages.** tao-ui supports React 18.2+; icons peers `^18.2.0 || ^19.0.0`.
+- **Package boundaries stay clean.** `@rockshin/tao-icons` has no runtime dependencies; `@rockshin/tao-ui` keeps its Radix/rc/dayjs dependencies.
+- **Build toolchain is Rslib 1.x for both packages.** tao-ui uses `^1.0.3`, the icons package pins `1.0.3`; do not reintroduce a 0.x Rslib or a second Rsbuild major. Rslib 1 emits `.js`-extension declaration redirects and `modern-module` ESM externals — check consumer types when changing build config.
+- **No package-lock files in either package.** The root `bun.lockb` is the only lockfile; icon consumer fixtures keep their own frozen `package-lock.json` because they install a real tarball in isolation.
 
-The script creates and pushes `v<version>`, publishes the GitHub Release with `gh release create`, waits for the Release workflow, and verifies the npm version. It uses `/private/tmp/npm-cache` by default to avoid local `~/.npm` cache permission issues.
+## Verification before landing changes
 
-## Docs
-
-- Rslib: https://rslib.rs/llms.txt
-- Rsbuild: https://rsbuild.rs/llms.txt
-- Rspack: https://rspack.rs/llms.txt
-- Rspress: https://rspress.rs/llms.txt
-- Rstest: https://rstest.rs/llms.txt
-
-## Tools
-
-### Biome
-
-- Run `bun run lint` to lint your code
-- Run `bun run format` to format your code
-
-### Rspress
-
-- Run `bun run doc` to start the Rspress documentation dev server, which will also start Rslib in watch mode
-- Run `bun run doc:build` to build the documentation
-
-### Storybook
-
-- Run `bun run storybook` to start Storybook development server
-- Run `bun run build:storybook` to build Storybook for production
-
-### Rstest
-
-- Run `bun run test` to run tests
-- Run `bun run test:watch` to run tests in watch mode
+- tao-ui: `bun run lint`, `bun run typecheck`, `bun run test`, `bun run test:types`, `bun run test:package`, `bun run build`, `bun run docs:check`, `bun run check:components`.
+- icons: `bun run icons:check` (add `icons:verify` for API/build-config/packaging changes).
+- Report real command output; do not weaken checks, budgets or assertions to get green.

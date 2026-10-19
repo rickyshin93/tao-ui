@@ -1,0 +1,19 @@
+// 由 data/icons.json 生成（原 330 批准图标 + 新通用候选）；执行 npm run generate。
+'use client';
+
+import { forwardRef } from 'react';
+import type { IconProps } from '../types.js';
+import { resolveIconProps } from '../icon-props.js';
+
+export const CalendarRangeIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
+  function CalendarRangeIcon(props, ref) {
+    const { title, titleId, children, svgProps } = resolveIconProps(props);
+    return (
+      <svg {...svgProps} ref={ref}>
+        {title ? <title id={titleId}>{title}</title> : null}
+        <rect x="3.5" y="5" width="17" height="16" rx="1.8"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/><path d="M7.5 15h9"/><circle cx="7.5" cy="15" r="1.4" fill="currentColor" stroke="none"/><circle cx="16.5" cy="15" r="1.4" fill="currentColor" stroke="none"/>
+        {children}
+      </svg>
+    );
+  },
+);

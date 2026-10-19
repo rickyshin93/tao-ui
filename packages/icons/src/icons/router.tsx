@@ -1,0 +1,19 @@
+// 由 data/icons.json 生成（原 330 批准图标 + 新通用候选）；执行 npm run generate。
+'use client';
+
+import { forwardRef } from 'react';
+import type { IconProps } from '../types.js';
+import { resolveIconProps } from '../icon-props.js';
+
+export const RouterIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
+  function RouterIcon(props, ref) {
+    const { title, titleId, children, svgProps } = resolveIconProps(props);
+    return (
+      <svg {...svgProps} ref={ref}>
+        {title ? <title id={titleId}>{title}</title> : null}
+        <rect x="3.2" y="12.3" width="17.6" height="7.5" rx="1.8"/><path d="M6.3 3.5v8.6M17.7 3.5v8.6M12 16h4.8"/><circle cx="7.3" cy="16" r="1.05" fill="currentColor" stroke="none"/>
+        {children}
+      </svg>
+    );
+  },
+);

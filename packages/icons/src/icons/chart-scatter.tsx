@@ -1,0 +1,19 @@
+// 由 data/icons.json 生成（原 330 批准图标 + 新通用候选）；执行 npm run generate。
+'use client';
+
+import { forwardRef } from 'react';
+import type { IconProps } from '../types.js';
+import { resolveIconProps } from '../icon-props.js';
+
+export const ChartScatterIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
+  function ChartScatterIcon(props, ref) {
+    const { title, titleId, children, svgProps } = resolveIconProps(props);
+    return (
+      <svg {...svgProps} ref={ref}>
+        {title ? <title id={titleId}>{title}</title> : null}
+        <path d="M3.75 3.4v15.4q0 1.45 1.45 1.45h15.4"/><circle cx="8.2" cy="14.9" r="1.2" fill="currentColor" stroke="none"/><circle cx="11.7" cy="9.2" r="1.2" fill="currentColor" stroke="none"/><circle cx="15.7" cy="12.2" r="1.2" fill="currentColor" stroke="none"/><circle cx="19.2" cy="5.8" r="1.2" fill="currentColor" stroke="none"/>
+        {children}
+      </svg>
+    );
+  },
+);

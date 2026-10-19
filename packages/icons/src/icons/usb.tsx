@@ -1,0 +1,19 @@
+// 由 data/icons.json 生成（原 330 批准图标 + 新通用候选）；执行 npm run generate。
+'use client';
+
+import { forwardRef } from 'react';
+import type { IconProps } from '../types.js';
+import { resolveIconProps } from '../icon-props.js';
+
+export const UsbIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
+  function UsbIcon(props, ref) {
+    const { title, titleId, children, svgProps } = resolveIconProps(props);
+    return (
+      <svg {...svgProps} ref={ref}>
+        {title ? <title id={titleId}>{title}</title> : null}
+        <path d="M12 17.7V3.6m-2.4 2.4L12 3.6l2.4 2.4M6.2 10v3.1q0 .85.75 1.3L12 17.7M12 14.2l5.8-3.5V9.1"/><circle cx="6.2" cy="8.3" r="1.7"/><rect x="16.2" y="5.9" width="3.2" height="3.2" rx="0.3"/><circle cx="12" cy="19.4" r="1.7"/>
+        {children}
+      </svg>
+    );
+  },
+);

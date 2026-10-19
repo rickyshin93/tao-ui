@@ -1,0 +1,19 @@
+// 由 data/icons.json 生成（原 330 批准图标 + 新通用候选）；执行 npm run generate。
+'use client';
+
+import { forwardRef } from 'react';
+import type { IconProps } from '../types.js';
+import { resolveIconProps } from '../icon-props.js';
+
+export const TriangleIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
+  function TriangleIcon(props, ref) {
+    const { title, titleId, children, svgProps } = resolveIconProps(props);
+    return (
+      <svg {...svgProps} ref={ref}>
+        {title ? <title id={titleId}>{title}</title> : null}
+        <path d="m11.3 4.4-8 13.9q-.7 1.2.7 1.2h16q1.4 0 .7-1.2l-8-13.9q-.7-1.2-1.4 0Z"/>
+        {children}
+      </svg>
+    );
+  },
+);

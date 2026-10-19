@@ -1,0 +1,19 @@
+// 由 data/icons.json 生成（原 330 批准图标 + 新通用候选）；执行 npm run generate。
+'use client';
+
+import { forwardRef } from 'react';
+import type { IconProps } from '../types.js';
+import { resolveIconProps } from '../icon-props.js';
+
+export const TruckIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
+  function TruckIcon(props, ref) {
+    const { title, titleId, children, svgProps } = resolveIconProps(props);
+    return (
+      <svg {...svgProps} ref={ref}>
+        {title ? <title id={titleId}>{title}</title> : null}
+        <path d="M14.45 17.3V5.55q0-1.5-1.5-1.5h-8.4q-1.5 0-1.5 1.5V17.3h2.2m4.5 0h6.15m4.5 0h.6V12l-2.85-4.3h-3.45"/><path d="M14.65 12.1h6.15"/><circle cx="7.5" cy="18.05" r="2.25"/><circle cx="18.15" cy="18.05" r="2.25"/>
+        {children}
+      </svg>
+    );
+  },
+);

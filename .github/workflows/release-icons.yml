@@ -1,0 +1,82 @@
+name: Release icons
+
+# Publishes @rockshin/tao-icons to npm.
+#
+# Trigger: a *published GitHub Release* whose tag is `icons-v<version>`. The
+# tag must match `packages/icons/package.json`; creating the Release is the
+# explicit publish authorization step.
+#
+# Authentication: npm trusted publishing (OIDC) — there is intentionally no
+# NPM_TOKEN secret here. Before the first release, the package owner must add a
+# trusted publisher on npmjs.com for this repository and the workflow file name
+# `release-icons.yml`; no long-lived token is stored in the repo.
+#
+# Note: `npm publish` runs the package's own lifecycle scripts
+# (`prepack` -> check:fast and `prepublishOnly` -> release:check + check:extended),
+# so the full real-tarball consumer gate also runs here. That is why this job
+# gets a large timeout.
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: release-icons
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Publish @rockshin/tao-icons
+    if: startsWith(github.event.release.tag_name, 'icons-v')
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    defaults:
+      run:
+        working-directory: packages/icons
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.2
+
+      # No registry-url: trusted publishing exchanges the Actions OIDC token for
+      # a short-lived npm credential, so we must not pre-write a token auth line.
+      - name: Setup Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
+
+      - name: Ensure npm supports trusted publishing
+        # npm >= 11.5.1 is required for OIDC trusted publishing.
+        run: |
+          npm install --global npm@11
+          npm --version
+
+      - name: Install dependencies
+        working-directory: .
+        run: bun install --frozen-lockfile
+
+      - name: Verify release tag matches package version
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          PKG=$(node -p "require('./package.json').version")
+          if [ "$RELEASE_TAG" != "icons-v$PKG" ]; then
+            echo "::error::Release tag '$RELEASE_TAG' does not match packages/icons/package.json version 'icons-v$PKG'. Bump the version before releasing."
+            exit 1
+          fi
+
+      - name: Fast package gate
+        run: bun run check:fast
+
+      - name: Publish to npm with provenance
+        run: npm publish --provenance --access public
+        env:
+          NPM_CONFIG_REGISTRY: https://registry.npmjs.org/

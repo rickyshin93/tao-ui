@@ -1,0 +1,19 @@
+// 由 data/icons.json 生成（原 330 批准图标 + 新通用候选）；执行 npm run generate。
+'use client';
+
+import { forwardRef } from 'react';
+import type { IconProps } from '../types.js';
+import { resolveIconProps } from '../icon-props.js';
+
+export const LaptopIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
+  function LaptopIcon(props, ref) {
+    const { title, titleId, children, svgProps } = resolveIconProps(props);
+    return (
+      <svg {...svgProps} ref={ref}>
+        {title ? <title id={titleId}>{title}</title> : null}
+        <path d="M5.1 15.8V6.3q0-1.8 1.8-1.8h10.2q1.8 0 1.8 1.8v9.5M4.65 15.8h14.7q.6 0 .9.55l1.15 2.05q.65 1.2-.75 1.2H3.35q-1.4 0-.75-1.2l1.15-2.05q.3-.55.9-.55Z"/>
+        {children}
+      </svg>
+    );
+  },
+);

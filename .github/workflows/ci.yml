@@ -1,21 +1,50 @@
 name: CI
 
+# Monorepo CI: one job per publishable workspace.
+#
+# PRs run the fast package gates only. The icons consumer gate
+# (`check:extended`: real tarball installed into isolated React 18/19 and Next
+# fixtures) is slow and network heavy, so it is deliberately not part of every
+# PR. It runs from `workflow_dispatch` and the nightly schedule instead; the
+# normal jobs still run on the schedule so main gets a daily full green.
+
 on:
   pull_request:
   push:
     branches: [main]
+  schedule:
+    # 18:00 UTC = 02:00 Asia/Shanghai
+    - cron: '0 18 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
-  quality:
+  tao-ui:
+    name: tao-ui
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: packages/tao-ui
     steps:
-      - uses: actions/checkout@v5
+      - name: Checkout
+        uses: actions/checkout@v5
 
-      - uses: oven-sh/setup-bun@v2
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
         with:
-          bun-version: 1.3.14
+          bun-version: 1.4.2
 
+      # One install from the repo root: the root lockfile is the only lockfile
+      # for all workspaces, and CI must fail if it is stale.
       - name: Install dependencies
+        working-directory: .
         run: bun install --frozen-lockfile
 
       - name: Lint
@@ -39,8 +68,87 @@ jobs:
       - name: Build
         run: bun run build
 
+      - name: Check package exports
+        run: bun run test:package
+
       - name: Build Storybook
         run: bun run build:storybook
 
       - name: Check package contents
         run: npm pack --dry-run
+
+  icons:
+    name: icons (node ${{ matrix.node-version }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        # engines: ^20.19.0 || >=22.12.0 — cover the current LTS (22) and the
+        # Node version used for publishing (24).
+        node-version: [22, 24]
+    defaults:
+      run:
+        working-directory: packages/icons
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.2
+
+      - name: Setup Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install dependencies
+        working-directory: .
+        run: bun install --frozen-lockfile
+
+      - name: Check generated icons
+        run: bun run generate:check
+
+      - name: Build
+        run: bun run build
+
+      - name: Typecheck
+        run: bun run typecheck
+
+      - name: Test
+        run: bun run test
+
+      - name: Check package contents
+        run: bun run test:pack
+
+  icons-extended:
+    name: icons extended (real tarball + React 18/19 + Next)
+    # Nightly and on demand only; see the comment on the `on` block.
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    defaults:
+      run:
+        working-directory: packages/icons
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.2
+
+      - name: Setup Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
+
+      - name: Install dependencies
+        working-directory: .
+        run: bun install --frozen-lockfile
+
+      - name: Extended consumer gate
+        run: bun run check:extended

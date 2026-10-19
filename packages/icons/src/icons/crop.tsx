@@ -1,0 +1,19 @@
+// 由 data/icons.json 生成（原 330 批准图标 + 新通用候选）；执行 npm run generate。
+'use client';
+
+import { forwardRef } from 'react';
+import type { IconProps } from '../types.js';
+import { resolveIconProps } from '../icon-props.js';
+
+export const CropIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
+  function CropIcon(props, ref) {
+    const { title, titleId, children, svgProps } = resolveIconProps(props);
+    return (
+      <svg {...svgProps} ref={ref}>
+        {title ? <title id={titleId}>{title}</title> : null}
+        <path d="M6.6 3.1v12.6q0 1.7 1.7 1.7h12.6M3.1 6.6h12.6q1.7 0 1.7 1.7v12.6"/>
+        {children}
+      </svg>
+    );
+  },
+);

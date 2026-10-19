@@ -1,0 +1,19 @@
+// 由 data/icons.json 生成（原 330 批准图标 + 新通用候选）；执行 npm run generate。
+'use client';
+
+import { forwardRef } from 'react';
+import type { IconProps } from '../types.js';
+import { resolveIconProps } from '../icon-props.js';
+
+export const CloudOffIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
+  function CloudOffIcon(props, ref) {
+    const { title, titleId, children, svgProps } = resolveIconProps(props);
+    return (
+      <svg {...svgProps} ref={ref}>
+        {title ? <title id={titleId}>{title}</title> : null}
+        <path d="M3 3l18 18M8.5 4.8C12 2.2 17.5 4.7 17.5 9c4.2.2 5.1 5.2 2.5 7.6M16.5 19H7c-5.6 0-6.1-7.5-1.4-9.2"/>
+        {children}
+      </svg>
+    );
+  },
+);

@@ -1,0 +1,19 @@
+// 由 data/icons.json 生成（原 330 批准图标 + 新通用候选）；执行 npm run generate。
+'use client';
+
+import { forwardRef } from 'react';
+import type { IconProps } from '../types.js';
+import { resolveIconProps } from '../icon-props.js';
+
+export const ComplaintCaseIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
+  function ComplaintCaseIcon(props, ref) {
+    const { title, titleId, children, svgProps } = resolveIconProps(props);
+    return (
+      <svg {...svgProps} ref={ref}>
+        {title ? <title id={titleId}>{title}</title> : null}
+        <path d="M5 4.5h14q1.5 0 1.5 1.5v10q0 1.5-1.5 1.5h-8l-6 3v-3q-1.5 0-1.5-1.5V6Q3.5 4.5 5 4.5ZM8 11h8"/>
+        {children}
+      </svg>
+    );
+  },
+);

@@ -1,0 +1,19 @@
+// 由 data/icons.json 生成（原 330 批准图标 + 新通用候选）；执行 npm run generate。
+'use client';
+
+import { forwardRef } from 'react';
+import type { IconProps } from '../types.js';
+import { resolveIconProps } from '../icon-props.js';
+
+export const GitBranchIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
+  function GitBranchIcon(props, ref) {
+    const { title, titleId, children, svgProps } = resolveIconProps(props);
+    return (
+      <svg {...svgProps} ref={ref}>
+        {title ? <title id={titleId}>{title}</title> : null}
+        <circle cx="6.5" cy="5.6" r="2.2"/><circle cx="6.5" cy="18.4" r="2.2"/><circle cx="17.5" cy="6.4" r="2.2"/><path d="M6.5 8v8M17.5 8.8v.8q0 4.6-5.5 4.6t-5.5 2"/>
+        {children}
+      </svg>
+    );
+  },
+);

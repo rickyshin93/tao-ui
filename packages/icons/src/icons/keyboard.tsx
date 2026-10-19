@@ -1,0 +1,19 @@
+// 由 data/icons.json 生成（原 330 批准图标 + 新通用候选）；执行 npm run generate。
+'use client';
+
+import { forwardRef } from 'react';
+import type { IconProps } from '../types.js';
+import { resolveIconProps } from '../icon-props.js';
+
+export const KeyboardIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
+  function KeyboardIcon(props, ref) {
+    const { title, titleId, children, svgProps } = resolveIconProps(props);
+    return (
+      <svg {...svgProps} ref={ref}>
+        {title ? <title id={titleId}>{title}</title> : null}
+        <rect x="2" y="5.5" width="20" height="13" rx="1.8"/><rect x="5.9" y="8.1" width="2.2" height="1.6" rx=".45" fill="currentColor" stroke="none"/><rect x="10.9" y="8.1" width="2.2" height="1.6" rx=".45" fill="currentColor" stroke="none"/><rect x="15.9" y="8.1" width="2.2" height="1.6" rx=".45" fill="currentColor" stroke="none"/><rect x="5.9" y="11.1" width="2.2" height="1.6" rx=".45" fill="currentColor" stroke="none"/><rect x="10.9" y="11.1" width="2.2" height="1.6" rx=".45" fill="currentColor" stroke="none"/><rect x="15.9" y="11.1" width="2.2" height="1.6" rx=".45" fill="currentColor" stroke="none"/><path d="M8.6 15.1h6.8"/>
+        {children}
+      </svg>
+    );
+  },
+);

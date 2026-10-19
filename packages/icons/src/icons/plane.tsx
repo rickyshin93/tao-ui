@@ -1,0 +1,19 @@
+// 由 data/icons.json 生成（原 330 批准图标 + 新通用候选）；执行 npm run generate。
+'use client';
+
+import { forwardRef } from 'react';
+import type { IconProps } from '../types.js';
+import { resolveIconProps } from '../icon-props.js';
+
+export const PlaneIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
+  function PlaneIcon(props, ref) {
+    const { title, titleId, children, svgProps } = resolveIconProps(props);
+    return (
+      <svg {...svgProps} ref={ref}>
+        {title ? <title id={titleId}>{title}</title> : null}
+        <path d="M10.5 5q0-2 1.5-2t1.5 2v4.1l7.3 4.7V16l-7.3-2v4l2.8 2v1L12 19.8 7.7 21v-1l2.8-2v-4l-7.3 2v-2.2l7.3-4.7Z"/>
+        {children}
+      </svg>
+    );
+  },
+);

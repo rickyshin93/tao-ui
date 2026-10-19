@@ -1,0 +1,19 @@
+// 由 data/icons.json 生成（原 330 批准图标 + 新通用候选）；执行 npm run generate。
+'use client';
+
+import { forwardRef } from 'react';
+import type { IconProps } from '../types.js';
+import { resolveIconProps } from '../icon-props.js';
+
+export const ChartPieIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
+  function ChartPieIcon(props, ref) {
+    const { title, titleId, children, svgProps } = resolveIconProps(props);
+    return (
+      <svg {...svgProps} ref={ref}>
+        {title ? <title id={titleId}>{title}</title> : null}
+        <path d="M11.2 4.5a8.3 8.3 0 1 0 8.3 8.3h-8.3ZM14 3.3a6.7 6.7 0 0 1 6.7 6.7H14Z"/>
+        {children}
+      </svg>
+    );
+  },
+);

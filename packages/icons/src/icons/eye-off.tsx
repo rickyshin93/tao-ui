@@ -1,0 +1,19 @@
+// 由 data/icons.json 生成（原 330 批准图标 + 新通用候选）；执行 npm run generate。
+'use client';
+
+import { forwardRef } from 'react';
+import type { IconProps } from '../types.js';
+import { resolveIconProps } from '../icon-props.js';
+
+export const EyeOffIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
+  function EyeOffIcon(props, ref) {
+    const { title, titleId, children, svgProps } = resolveIconProps(props);
+    return (
+      <svg {...svgProps} ref={ref}>
+        {title ? <title id={titleId}>{title}</title> : null}
+        <path d="m3.5 3.5 17 17M9.7 5.9q1.1-.2 2.3-.2c3.8 0 6.9 2.1 9.1 6.3q-.85 1.65-2.1 2.95M5.3 8.6Q3.9 10.1 2.9 12c2.2 4.1 5.3 6.3 9.1 6.3q1.3 0 2.5-.25"/>
+        {children}
+      </svg>
+    );
+  },
+);

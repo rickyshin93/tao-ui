@@ -1,0 +1,19 @@
+// 由 data/icons.json 生成（原 330 批准图标 + 新通用候选）；执行 npm run generate。
+'use client';
+
+import { forwardRef } from 'react';
+import type { IconProps } from '../types.js';
+import { resolveIconProps } from '../icon-props.js';
+
+export const HeadphonesIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
+  function HeadphonesIcon(props, ref) {
+    const { title, titleId, children, svgProps } = resolveIconProps(props);
+    return (
+      <svg {...svgProps} ref={ref}>
+        {title ? <title id={titleId}>{title}</title> : null}
+        <path d="M4.1 12.5V11a7.9 7.9 0 0 1 15.8 0v1.5"/><path d="M7.35 11.55H5.6q-1.9 0-1.9 1.9v4.5q0 1.9 1.9 1.9h1.75q.8 0 .8-.8v-6.7q0-.8-.8-.8ZM16.65 11.55h1.75q1.9 0 1.9 1.9v4.5q0 1.9-1.9 1.9h-1.75q-.8 0-.8-.8v-6.7q0-.8.8-.8Z"/>
+        {children}
+      </svg>
+    );
+  },
+);

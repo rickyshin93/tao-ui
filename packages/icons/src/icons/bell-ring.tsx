@@ -1,0 +1,19 @@
+// 由 data/icons.json 生成（原 330 批准图标 + 新通用候选）；执行 npm run generate。
+'use client';
+
+import { forwardRef } from 'react';
+import type { IconProps } from '../types.js';
+import { resolveIconProps } from '../icon-props.js';
+
+export const BellRingIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
+  function BellRingIcon(props, ref) {
+    const { title, titleId, children, svgProps } = resolveIconProps(props);
+    return (
+      <svg {...svgProps} ref={ref}>
+        {title ? <title id={titleId}>{title}</title> : null}
+        <path d="M7.2 10.4c0-3.45 1.7-5.7 4.8-5.7s4.8 2.25 4.8 5.7v2.8q0 1.35 1.05 2.9c.6.9.05 1.9-1.05 1.9H7.2c-1.1 0-1.65-1-1.05-1.9q1.05-1.55 1.05-2.9ZM3.2 9.1q0-3.5 2.5-5.65M20.8 9.1q0-3.5-2.5-5.65M9.8 20.6q2.2 1.35 4.4 0"/>
+        {children}
+      </svg>
+    );
+  },
+);

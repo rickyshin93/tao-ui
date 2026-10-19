@@ -1,0 +1,19 @@
+// 由 data/icons.json 生成（原 330 批准图标 + 新通用候选）；执行 npm run generate。
+'use client';
+
+import { forwardRef } from 'react';
+import type { IconProps } from '../types.js';
+import { resolveIconProps } from '../icon-props.js';
+
+export const CollapseIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
+  function CollapseIcon(props, ref) {
+    const { title, titleId, children, svgProps } = resolveIconProps(props);
+    return (
+      <svg {...svgProps} ref={ref}>
+        {title ? <title id={titleId}>{title}</title> : null}
+        <path d="m20 4-5.2 5.2M18.4 9.2h-3.6V5.6M4 20l5.2-5.2M5.6 14.8h3.6v3.6"/>
+        {children}
+      </svg>
+    );
+  },
+);
