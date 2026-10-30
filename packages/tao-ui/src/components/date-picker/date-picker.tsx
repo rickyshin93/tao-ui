@@ -3,6 +3,7 @@ import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import {
+  type AriaAttributes,
   type CSSProperties,
   type ForwardedRef,
   forwardRef,
@@ -11,6 +12,7 @@ import {
   useCallback,
   useEffect,
   useImperativeHandle,
+  useId,
   useMemo,
   useRef,
   useState,
@@ -56,7 +58,17 @@ export type DatePickerSemanticPart =
   | 'cell'
   | 'footer';
 
-export interface DatePickerProps {
+export interface DatePickerProps
+  extends Pick<
+    AriaAttributes,
+    | 'aria-label'
+    | 'aria-labelledby'
+    | 'aria-describedby'
+    | 'aria-errormessage'
+    | 'aria-invalid'
+    | 'aria-required'
+  > {
+  id?: string;
   value?: Dayjs | null;
   defaultValue?: Dayjs | null;
   onChange?: (date: Dayjs | null, dateString: string) => void;
@@ -116,6 +128,9 @@ export const DatePicker = forwardRef(function DatePicker(
     classNames,
     styles,
   } = props;
+  const popupId = useId();
+  const popupRef = useRef<HTMLDivElement>(null);
+  const keyboardOpenRef = useRef(false);
   const ctx = useTaoConfig();
   const resolvedSize = size ?? ctx.size;
   const resolvedVariant = variant ?? ctx.variant;
@@ -473,9 +488,43 @@ export const DatePicker = forwardRef(function DatePicker(
     </span>
   );
 
+  const controlAria = {
+    'aria-label': props['aria-label'],
+    'aria-labelledby': props['aria-labelledby'],
+    'aria-describedby': props['aria-describedby'],
+    'aria-errormessage': props['aria-errormessage'],
+    'aria-invalid': status === 'error' ? true : props['aria-invalid'],
+    'aria-haspopup': 'dialog' as const,
+    'aria-expanded': isOpen,
+  };
+
+  const focusCalendar = () => {
+    const popup = popupRef.current;
+    const target =
+      popup?.querySelector<HTMLButtonElement>(
+        '[data-tao-calendar-cell-button][tabindex="0"]:not(:disabled)',
+      ) ??
+      popup?.querySelector<HTMLButtonElement>(
+        'button[aria-pressed="true"]:not(:disabled)',
+      ) ??
+      popup?.querySelector<HTMLButtonElement>('button:not(:disabled)');
+    target?.focus();
+  };
+
+  const openFromKeyboard = () => {
+    if (isOpen) {
+      focusCalendar();
+    } else {
+      keyboardOpenRef.current = true;
+      setOpen(true);
+    }
+  };
+
   const mobileTrigger = (
     <button
       ref={mobileTriggerRef}
+      id={props.id}
+      {...controlAria}
       type="button"
       data-tao-control=""
       data-tao-picker-trigger=""
@@ -502,9 +551,12 @@ export const DatePicker = forwardRef(function DatePicker(
   );
 
   const desktopTrigger = (
+    // biome-ignore lint/a11y/noStaticElementInteractions: the input surface forwards pointer activation; the inputs handle keyboard interaction.
+    // biome-ignore lint/a11y/useKeyWithClickEvents: the inputs handle keyboard interaction.
     <div
       data-tao-control=""
       data-tao-picker-trigger=""
+      onClick={() => !resolvedDisabled && setOpen(!isOpen)}
       data-tao-size={resolvedSize}
       data-tao-variant={resolvedVariant}
       data-tao-error={status === 'error' || undefined}
@@ -515,13 +567,19 @@ export const DatePicker = forwardRef(function DatePicker(
       {prefix != null && <span data-tao-picker-prefix="">{prefix}</span>}
       <input
         ref={inputRef}
+        id={props.id}
+        {...controlAria}
+        role="combobox"
+        aria-expanded={isOpen}
+        aria-autocomplete="none"
+        aria-required={props['aria-required']}
+        aria-controls={isOpen ? popupId : undefined}
         data-tao-picker-input=""
         className={classNames?.input}
         style={styles?.input}
         value={inputValue}
         placeholder={defaultPlaceholder}
         disabled={resolvedDisabled}
-        aria-invalid={status === 'error' || undefined}
         onChange={(event) => setInputValue(event.target.value)}
         onBlur={(event) => {
           if (
@@ -533,7 +591,10 @@ export const DatePicker = forwardRef(function DatePicker(
           commitInputValue();
         }}
         onKeyDown={(event) => {
-          if (event.key === 'Enter') {
+          if (event.key === 'ArrowDown') {
+            event.preventDefault();
+            openFromKeyboard();
+          } else if (event.key === 'Enter') {
             event.preventDefault();
             commitInputValue();
           } else if (event.key === 'Escape') {
@@ -565,16 +626,32 @@ export const DatePicker = forwardRef(function DatePicker(
 
   return (
     <Popover.Root open={isOpen} onOpenChange={setOpen}>
-      <Popover.Trigger asChild>{desktopTrigger}</Popover.Trigger>
+      <Popover.Anchor asChild>{desktopTrigger}</Popover.Anchor>
       <Popover.Portal>
         <TaoPortalScope asChild>
           <Popover.Content
+            id={popupId}
+            ref={popupRef}
+            aria-label={props['aria-label'] ?? drawerTitle}
             data-tao-picker-dropdown=""
             sideOffset={4}
             align="start"
             className={classNames?.popup}
             style={styles?.popup}
-            onOpenAutoFocus={(e) => e.preventDefault()}
+            onOpenAutoFocus={(event) => {
+              event.preventDefault();
+              if (keyboardOpenRef.current) focusCalendar();
+              keyboardOpenRef.current = false;
+            }}
+            onCloseAutoFocus={(event) => {
+              event.preventDefault();
+              if (
+                document.activeElement === document.body ||
+                popupRef.current?.contains(document.activeElement)
+              ) {
+                inputRef.current?.focus();
+              }
+            }}
           >
             {panelContent}
           </Popover.Content>

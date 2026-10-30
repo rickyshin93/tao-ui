@@ -88,6 +88,7 @@ function MobileSelectContentInner({
         key={opt.value}
         data-tao-sheet-item=""
         data-tao-selected={isSelected || undefined}
+        aria-pressed={isSelected}
         data-tao-disabled={disabled || opt.disabled || undefined}
         disabled={disabled || opt.disabled}
         onClick={() => {
@@ -142,6 +143,7 @@ function MobileSelectContentInner({
             disabled={disabled}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search..."
+            aria-label="Search options"
           />
         </div>
       )}

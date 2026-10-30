@@ -1,4 +1,9 @@
-import type { CSSProperties, MouseEvent, ReactNode } from 'react';
+import {
+  type CSSProperties,
+  type MouseEvent,
+  type ReactNode,
+  useId,
+} from 'react';
 import { useControlledOpen } from '../../utils/overlay';
 import {
   cx,
@@ -77,6 +82,8 @@ export function Popconfirm({
   styles,
   children,
 }: PopconfirmProps) {
+  const titleId = useId();
+  const descriptionId = useId();
   // antd semantics: a disabled Popconfirm never opens on click,
   // while the trigger element itself stays enabled.
   const [realOpen, setOpen] = useControlledOpen({
@@ -118,6 +125,7 @@ export function Popconfirm({
           {title != null && (
             <div
               data-tao-popconfirm-title=""
+              id={titleId}
               className={cx(classNames?.title)}
               style={styles?.title}
             >
@@ -127,6 +135,7 @@ export function Popconfirm({
           {description != null && (
             <div
               data-tao-popconfirm-description=""
+              id={descriptionId}
               className={cx(classNames?.description)}
               style={styles?.description}
             >
@@ -167,6 +176,8 @@ export function Popconfirm({
       open={realOpen}
       onOpenChange={setOpen}
       content={content}
+      aria-labelledby={title != null ? titleId : undefined}
+      aria-describedby={description != null ? descriptionId : undefined}
     >
       {children}
     </Popover>

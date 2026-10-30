@@ -1,11 +1,13 @@
 import * as RadixPopover from '@radix-ui/react-popover';
 import {
+  type AriaAttributes,
   type CSSProperties,
   type FocusEvent,
   type MouseEvent,
   type ReactNode,
   useCallback,
   useEffect,
+  useId,
   useMemo,
   useRef,
 } from 'react';
@@ -43,7 +45,11 @@ export type PopoverPlacement =
 
 type PopoverRender = ReactNode | (() => ReactNode);
 
-export interface PopoverProps {
+export interface PopoverProps
+  extends Pick<
+    AriaAttributes,
+    'aria-label' | 'aria-labelledby' | 'aria-describedby'
+  > {
   /** Header content of the popup. */
   title?: PopoverRender;
   /** Body content of the popup. */
@@ -118,7 +124,11 @@ export function Popover({
   classNames,
   styles,
   children,
+  'aria-label': ariaLabel,
+  'aria-labelledby': ariaLabelledBy,
+  'aria-describedby': ariaDescribedBy,
 }: PopoverProps) {
+  const titleId = useId();
   const triggers = useMemo(
     () => new Set(Array.isArray(trigger) ? trigger : [trigger]),
     [trigger],
@@ -234,6 +244,12 @@ export function Popover({
         <TaoPortalScope asChild>
           <RadixPopover.Content
             ref={popupRef}
+            aria-label={ariaLabel}
+            aria-labelledby={
+              ariaLabelledBy ??
+              (!ariaLabel && isRenderable(titleNode) ? titleId : undefined)
+            }
+            aria-describedby={ariaDescribedBy}
             data-tao-popover=""
             data-tao-placement={placement}
             data-tao-keep-alive={!shouldDestroy || undefined}
@@ -259,6 +275,7 @@ export function Popover({
               {isRenderable(titleNode) && (
                 <div
                   data-tao-popover-title=""
+                  id={titleId}
                   className={cx(classNames?.title)}
                   style={styles?.title}
                 >

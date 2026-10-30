@@ -1,4 +1,5 @@
 import {
+  type AriaAttributes,
   type ForwardedRef,
   forwardRef,
   type ReactNode,
@@ -15,7 +16,17 @@ import './switch.css';
 
 export type SwitchSemanticPart = 'root' | 'handle';
 
-export interface SwitchProps {
+export interface SwitchProps
+  extends Pick<
+    AriaAttributes,
+    | 'aria-label'
+    | 'aria-labelledby'
+    | 'aria-describedby'
+    | 'aria-errormessage'
+    | 'aria-invalid'
+    | 'aria-required'
+  > {
+  id?: string;
   checked?: boolean;
   defaultChecked?: boolean;
   onChange?: (checked: boolean) => void;
@@ -45,6 +56,7 @@ export const Switch = forwardRef(function Switch(
     style,
     classNames,
     styles,
+    ...ariaProps
   }: SwitchProps,
   ref: ForwardedRef<HTMLButtonElement>,
 ) {
@@ -65,6 +77,8 @@ export const Switch = forwardRef(function Switch(
 
   return (
     <button
+      {...ariaProps}
+      aria-busy={loading || undefined}
       ref={ref}
       type="button"
       role="switch"

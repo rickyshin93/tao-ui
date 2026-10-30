@@ -1,4 +1,10 @@
-import { type ForwardedRef, forwardRef, type ReactNode, type Ref } from 'react';
+import {
+  type AriaAttributes,
+  type ForwardedRef,
+  forwardRef,
+  type ReactNode,
+  type Ref,
+} from 'react';
 import {
   type UseNumberInputOptions,
   useNumberInput,
@@ -23,7 +29,17 @@ import { Input, type InputSemanticPart } from '../input/input';
 //   • useNumberInput() — the raw hook, wire it into any element yourself
 export type InputNumberSemanticPart = InputSemanticPart;
 
-export interface InputNumberProps extends UseNumberInputOptions {
+export interface InputNumberProps
+  extends UseNumberInputOptions,
+    Pick<
+      AriaAttributes,
+      | 'aria-label'
+      | 'aria-labelledby'
+      | 'aria-describedby'
+      | 'aria-errormessage'
+      | 'aria-invalid'
+      | 'aria-required'
+    > {
   prefix?: ReactNode;
   suffix?: ReactNode;
   size?: TaoSize;
@@ -35,7 +51,6 @@ export interface InputNumberProps extends UseNumberInputOptions {
   placeholder?: string;
   id?: string;
   name?: string;
-  'aria-label'?: string;
   className?: string;
   classNames?: SemanticClassNames<InputNumberSemanticPart>;
   styles?: SemanticStyles<InputNumberSemanticPart>;
@@ -54,6 +69,11 @@ export const InputNumber = forwardRef(function InputNumber(
     id,
     name,
     'aria-label': ariaLabel,
+    'aria-labelledby': ariaLabelledBy,
+    'aria-describedby': ariaDescribedBy,
+    'aria-errormessage': ariaErrorMessage,
+    'aria-invalid': ariaInvalid,
+    'aria-required': ariaRequired,
     className,
     classNames,
     styles,
@@ -77,6 +97,11 @@ export const InputNumber = forwardRef(function InputNumber(
       id={id}
       name={name}
       aria-label={ariaLabel}
+      aria-labelledby={ariaLabelledBy}
+      aria-describedby={ariaDescribedBy}
+      aria-errormessage={ariaErrorMessage}
+      aria-invalid={status === 'error' || error ? true : ariaInvalid}
+      aria-required={ariaRequired}
       className={className}
       classNames={classNames}
       styles={styles}

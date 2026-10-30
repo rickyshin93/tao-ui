@@ -11,6 +11,11 @@ import {
   Select,
   type SelectRef,
   Switch,
+  Spinner,
+  Tabs,
+  Modal,
+  Drawer,
+  Popover,
   Table,
   type TableColumn,
   Textarea,
@@ -49,3 +54,28 @@ const invalidColumns: TableColumn<Person>[] = [
   { dataIndex: 'missing', title: 'Missing' },
 ];
 void invalidColumns;
+
+// Field semantics must remain public in both React type environments.
+const fieldAria = {
+  id: 'booking',
+  'aria-label': 'Booking',
+  'aria-labelledby': 'booking-label',
+  'aria-describedby': 'booking-help',
+  'aria-errormessage': 'booking-error',
+  'aria-invalid': true,
+  'aria-required': true,
+} as const;
+<InputNumber {...fieldAria} />;
+<DatePicker {...fieldAria} />;
+<RangePicker {...fieldAria} />;
+<Checkbox {...fieldAria} />;
+<Radio {...fieldAria} />;
+<Radio required aria-label="Choice" />;
+<Switch {...fieldAria} />;
+<Spinner aria-label="Loading results" />;
+<Tabs aria-label="Details" items={[]} />;
+<Modal open aria-label="Review" aria-describedby="review-help" />;
+<Drawer open aria-label="Details" aria-describedby="details-help" />;
+<Popover aria-label="Actions" content="Details">
+  <button type="button">Open</button>
+</Popover>;

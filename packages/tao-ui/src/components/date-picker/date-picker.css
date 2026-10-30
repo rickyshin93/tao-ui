@@ -511,6 +511,10 @@ button[data-tao-year-cell]:disabled {
 }
 
 [data-tao-time-column] {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-inline-size: 0;
   display: flex;
   flex-direction: column;
   flex: 1;

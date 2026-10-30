@@ -3,6 +3,7 @@ import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
 import {
+  type AriaAttributes,
   type CSSProperties,
   type ForwardedRef,
   forwardRef,
@@ -11,6 +12,7 @@ import {
   useCallback,
   useEffect,
   useImperativeHandle,
+  useId,
   useRef,
   useState,
 } from 'react';
@@ -57,7 +59,17 @@ export type RangePickerSemanticPart =
   | 'calendar'
   | 'cell';
 
-export interface RangePickerProps {
+export interface RangePickerProps
+  extends Pick<
+    AriaAttributes,
+    | 'aria-label'
+    | 'aria-labelledby'
+    | 'aria-describedby'
+    | 'aria-errormessage'
+    | 'aria-invalid'
+    | 'aria-required'
+  > {
+  id?: string;
   value?: RangeValue;
   defaultValue?: [Dayjs | null, Dayjs | null];
   onChange?: (dates: RangeValue, dateStrings: [string, string]) => void;
@@ -115,6 +127,10 @@ export const RangePicker = forwardRef(function RangePicker(
     classNames,
     styles,
   } = props;
+  const popupId = useId();
+  const popupRef = useRef<HTMLDivElement>(null);
+  const [keyboardFocusRequested, setKeyboardFocusRequested] = useState(false);
+  const returnFocusRef = useRef<HTMLInputElement | null>(null);
   const ctx = useTaoConfig();
   const resolvedSize = size ?? ctx.size;
   const resolvedVariant = variant ?? ctx.variant;
@@ -212,7 +228,11 @@ export const RangePicker = forwardRef(function RangePicker(
   }, [isOpen]);
   useEffect(() => {
     if (controlledValueKey !== undefined) {
-      setInteraction({ phase: 'idle', activeInput: 'start' });
+      setInteraction((current) => ({
+        phase: 'idle',
+        activeInput:
+          current.phase === 'pickingEnd' ? 'start' : current.activeInput,
+      }));
     }
   }, [controlledValueKey]);
 
@@ -222,10 +242,15 @@ export const RangePicker = forwardRef(function RangePicker(
   const wasOpenRef = useRef(false);
   useEffect(() => {
     if (isOpen && !wasOpenRef.current) {
-      setViewDateStart(resolvedValue?.[0] ?? resolvedValue?.[1] ?? dayjs());
+      setViewDateStart(
+        resolvedValue?.[interaction.activeInput === 'end' ? 1 : 0] ??
+          resolvedValue?.[0] ??
+          resolvedValue?.[1] ??
+          dayjs(),
+      );
     }
     wasOpenRef.current = isOpen;
-  }, [isOpen, resolvedValue]);
+  }, [isOpen, resolvedValue, interaction.activeInput]);
   const viewDateEnd = viewDateStart.add(1, 'month');
 
   const rangeStart =
@@ -319,7 +344,7 @@ export const RangePicker = forwardRef(function RangePicker(
   useEffect(() => setInputEnd(displayEnd), [displayEnd]);
 
   const commitInputValue = useCallback(
-    (position: 'start' | 'end') => {
+    (position: 'start' | 'end', keepPopupOpen = false) => {
       if (position === 'start' ? startDisabled : endDisabled) return;
       const text = (position === 'start' ? inputStart : inputEnd).trim();
       const currentValue = position === 'start' ? displayStart : displayEnd;
@@ -350,11 +375,11 @@ export const RangePicker = forwardRef(function RangePicker(
         emitChange(nextStart || nextEnd ? [nextStart, nextEnd] : null);
       }
       setInteraction({ phase: 'idle', activeInput: position });
-      if (parsed) setViewDateStart(parsed);
+      if (parsed && !keepPopupOpen) setViewDateStart(parsed);
       if (position === 'start')
         setInputStart(isValueControlled ? displayStart : nextStrings[0]);
       else setInputEnd(isValueControlled ? displayEnd : nextStrings[1]);
-      if (nextStart && nextEnd) setOpen(false);
+      if (nextStart && nextEnd && !keepPopupOpen) setOpen(false);
     },
     [
       isDateBlocked,
@@ -521,9 +546,62 @@ export const RangePicker = forwardRef(function RangePicker(
     </span>
   );
 
+  const controlAria = {
+    'aria-label': props['aria-label'],
+    'aria-labelledby': props['aria-labelledby'],
+    'aria-describedby': props['aria-describedby'],
+    'aria-errormessage': props['aria-errormessage'],
+    'aria-invalid': status === 'error' ? true : props['aria-invalid'],
+    'aria-haspopup': 'dialog' as const,
+    'aria-expanded': isOpen,
+  };
+
+  const activeDate = interaction.activeInput === 'end' ? rangeEnd : rangeStart;
+  const focusCalendar = useCallback(() => {
+    const popup = popupRef.current;
+    if (!popup) return;
+    const selectedDate =
+      activeDate && !isDateBlocked(activeDate) ? activeDate : null;
+    if (
+      selectedDate &&
+      !selectedDate.isSame(viewDateStart, 'month') &&
+      !selectedDate.isSame(viewDateStart.add(1, 'month'), 'month')
+    ) {
+      setViewDateStart(selectedDate);
+      return;
+    }
+    let target = selectedDate
+      ? popup.querySelector<HTMLButtonElement>(
+          `[data-tao-calendar-cell-button][aria-label="${selectedDate.format('YYYY-MM-DD')}"]:not([data-tao-other-month]):not(:disabled)`,
+        )
+      : null;
+    target ??=
+      popup.querySelector<HTMLButtonElement>(
+        '[data-tao-calendar-cell-button][tabindex="0"]:not(:disabled)',
+      ) ??
+      popup.querySelector<HTMLButtonElement>(
+        'button[aria-pressed="true"]:not(:disabled)',
+      ) ??
+      popup.querySelector<HTMLButtonElement>('button:not(:disabled)');
+    target?.focus();
+    setKeyboardFocusRequested(false);
+  }, [activeDate, isDateBlocked, viewDateStart]);
+
+  useEffect(() => {
+    if (isOpen && keyboardFocusRequested) focusCalendar();
+  }, [isOpen, keyboardFocusRequested, focusCalendar]);
+
+  const openFromKeyboard = () => {
+    commitInputValue(interaction.activeInput, true);
+    setKeyboardFocusRequested(true);
+    if (!isOpen) setOpen(true);
+  };
+
   const mobileTrigger = (
     <button
       ref={mobileTriggerRef}
+      id={props.id}
+      {...controlAria}
       type="button"
       data-tao-control=""
       data-tao-range-trigger=""
@@ -571,9 +649,12 @@ export const RangePicker = forwardRef(function RangePicker(
   );
 
   const desktopTrigger = (
+    // biome-ignore lint/a11y/noStaticElementInteractions: the input surface forwards pointer activation; the inputs handle keyboard interaction.
+    // biome-ignore lint/a11y/useKeyWithClickEvents: the inputs handle keyboard interaction.
     <div
       data-tao-control=""
       data-tao-range-trigger=""
+      onClick={() => !resolvedDisabled && setOpen(!isOpen)}
       data-tao-size={resolvedSize}
       data-tao-variant={resolvedVariant}
       data-tao-error={status === 'error' || undefined}
@@ -581,8 +662,33 @@ export const RangePicker = forwardRef(function RangePicker(
       className={cx(classNames?.root, className)}
       style={{ ...styles?.root, ...style }}
     >
+      <span hidden id={`${popupId}-start-label`}>
+        {placeholder[0]}
+      </span>
+      <span hidden id={`${popupId}-end-label`}>
+        {placeholder[1]}
+      </span>
       <input
         ref={startInputRef}
+        id={props.id}
+        {...controlAria}
+        role="combobox"
+        aria-expanded={isOpen}
+        aria-autocomplete="none"
+        aria-required={props['aria-required']}
+        aria-controls={isOpen ? popupId : undefined}
+        aria-label={
+          props['aria-label']
+            ? `${props['aria-label']} ${placeholder[0]}`
+            : !props.id && !props['aria-labelledby']
+              ? placeholder[0]
+              : undefined
+        }
+        aria-labelledby={
+          props['aria-labelledby']
+            ? `${props['aria-labelledby']} ${popupId}-start-label`
+            : undefined
+        }
         data-tao-range-input=""
         data-tao-active={
           (interaction.activeInput === 'start' && isOpen) || undefined
@@ -592,14 +698,24 @@ export const RangePicker = forwardRef(function RangePicker(
         value={inputStart}
         placeholder={placeholder[0]}
         disabled={startDisabled}
-        aria-invalid={status === 'error' || undefined}
         onFocus={() => {
+          returnFocusRef.current = startInputRef.current;
           setInteraction({ phase: 'idle', activeInput: 'start' });
         }}
         onChange={(event) => setInputStart(event.target.value)}
-        onBlur={() => commitInputValue('start')}
+        onBlur={(event) => {
+          const enteringCalendar =
+            event.relatedTarget instanceof HTMLElement &&
+            !!popupRef.current?.contains(event.relatedTarget);
+          // ArrowDown already committed before requesting calendar focus.
+          if (enteringCalendar && keyboardFocusRequested) return;
+          commitInputValue('start', enteringCalendar);
+        }}
         onKeyDown={(event) => {
-          if (event.key === 'Enter') {
+          if (event.key === 'ArrowDown') {
+            event.preventDefault();
+            openFromKeyboard();
+          } else if (event.key === 'Enter') {
             event.preventDefault();
             commitInputValue('start');
           } else if (event.key === 'Escape') {
@@ -617,6 +733,25 @@ export const RangePicker = forwardRef(function RangePicker(
       </span>
       <input
         ref={endInputRef}
+        id={props.id ? `${props.id}-end` : undefined}
+        {...controlAria}
+        role="combobox"
+        aria-expanded={isOpen}
+        aria-autocomplete="none"
+        aria-required={props['aria-required']}
+        aria-controls={isOpen ? popupId : undefined}
+        aria-label={
+          props['aria-label']
+            ? `${props['aria-label']} ${placeholder[1]}`
+            : !props.id && !props['aria-labelledby']
+              ? placeholder[1]
+              : undefined
+        }
+        aria-labelledby={
+          props['aria-labelledby']
+            ? `${props['aria-labelledby']} ${popupId}-end-label`
+            : undefined
+        }
         data-tao-range-input=""
         data-tao-active={
           (interaction.activeInput === 'end' && isOpen) || undefined
@@ -626,14 +761,23 @@ export const RangePicker = forwardRef(function RangePicker(
         value={inputEnd}
         placeholder={placeholder[1]}
         disabled={endDisabled}
-        aria-invalid={status === 'error' || undefined}
         onFocus={() => {
+          returnFocusRef.current = endInputRef.current;
           setInteraction({ phase: 'idle', activeInput: 'end' });
         }}
         onChange={(event) => setInputEnd(event.target.value)}
-        onBlur={() => commitInputValue('end')}
+        onBlur={(event) => {
+          const enteringCalendar =
+            event.relatedTarget instanceof HTMLElement &&
+            !!popupRef.current?.contains(event.relatedTarget);
+          if (enteringCalendar && keyboardFocusRequested) return;
+          commitInputValue('end', enteringCalendar);
+        }}
         onKeyDown={(event) => {
-          if (event.key === 'Enter') {
+          if (event.key === 'ArrowDown') {
+            event.preventDefault();
+            openFromKeyboard();
+          } else if (event.key === 'Enter') {
             event.preventDefault();
             commitInputValue('end');
           } else if (event.key === 'Escape') {
@@ -665,16 +809,31 @@ export const RangePicker = forwardRef(function RangePicker(
 
   return (
     <Popover.Root open={isOpen} onOpenChange={setOpen}>
-      <Popover.Trigger asChild>{desktopTrigger}</Popover.Trigger>
+      <Popover.Anchor asChild>{desktopTrigger}</Popover.Anchor>
       <Popover.Portal>
         <TaoPortalScope asChild>
           <Popover.Content
+            id={popupId}
+            ref={popupRef}
+            aria-label={props['aria-label'] ?? 'Select date range'}
             data-tao-picker-dropdown=""
             sideOffset={4}
             align="start"
             className={classNames?.popup}
             style={styles?.popup}
-            onOpenAutoFocus={(e) => e.preventDefault()}
+            onOpenAutoFocus={(event) => {
+              event.preventDefault();
+              if (keyboardFocusRequested) focusCalendar();
+            }}
+            onCloseAutoFocus={(event) => {
+              event.preventDefault();
+              if (
+                document.activeElement === document.body ||
+                popupRef.current?.contains(document.activeElement)
+              ) {
+                (returnFocusRef.current ?? startInputRef.current)?.focus();
+              }
+            }}
           >
             {panelContent}
           </Popover.Content>

@@ -1,4 +1,10 @@
-import { type CSSProperties, type ReactNode, useEffect, useState } from 'react';
+import {
+  type AriaAttributes,
+  type CSSProperties,
+  type ReactNode,
+  useEffect,
+  useState,
+} from 'react';
 import { type TaoSize, useTaoConfig } from '../../provider/tao-provider';
 import {
   cx,
@@ -9,7 +15,8 @@ import './spinner.css';
 
 export type SpinnerSemanticPart = 'root' | 'indicator' | 'tip' | 'overlay';
 
-export interface SpinnerProps {
+export interface SpinnerProps
+  extends Pick<AriaAttributes, 'aria-label' | 'aria-labelledby'> {
   /** Whether the spinner is visible. Defaults to true. */
   spinning?: boolean;
   /** Size of the indicator. Inherits from TaoProvider. */
@@ -42,6 +49,8 @@ export function Spinner({
   style,
   classNames,
   styles,
+  'aria-label': ariaLabel,
+  'aria-labelledby': ariaLabelledBy,
 }: SpinnerProps) {
   const ctx = useTaoConfig();
   const resolvedSize = size ?? ctx.size;
@@ -66,6 +75,10 @@ export function Spinner({
       }
       role="status"
       aria-live="polite"
+      aria-label={
+        ariaLabel ?? (tip == null && !ariaLabelledBy ? 'Loading' : undefined)
+      }
+      aria-labelledby={ariaLabelledBy}
     >
       <span
         data-tao-spinner-indicator=""
@@ -109,7 +122,9 @@ export function Spinner({
         className={className}
         style={style}
       >
-        <div data-tao-spinner-content="">{children}</div>
+        <div data-tao-spinner-content="" aria-busy={spinning}>
+          {children}
+        </div>
         {active && (
           <div
             data-tao-spinner-overlay=""

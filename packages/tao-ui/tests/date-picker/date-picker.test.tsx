@@ -8,7 +8,7 @@ import { TaoProvider } from '../../src/provider/tao-provider';
 
 test('renders with placeholder', () => {
   render(<DatePicker />);
-  expect(screen.getByRole('textbox')).toHaveAttribute(
+  expect(screen.getByRole('combobox')).toHaveAttribute(
     'placeholder',
     'YYYY-MM-DD',
   );
@@ -16,7 +16,7 @@ test('renders with placeholder', () => {
 
 test('renders custom placeholder', () => {
   render(<DatePicker placeholder="Pick a date" />);
-  expect(screen.getByRole('textbox')).toHaveAttribute(
+  expect(screen.getByRole('combobox')).toHaveAttribute(
     'placeholder',
     'Pick a date',
   );
@@ -24,19 +24,19 @@ test('renders custom placeholder', () => {
 
 test('displays formatted value', () => {
   render(<DatePicker value={dayjs('2026-06-15')} />);
-  expect(screen.getByRole('textbox')).toHaveValue('2026-06-15');
+  expect(screen.getByRole('combobox')).toHaveValue('2026-06-15');
 });
 
 test('defaultValue seeds an uncontrolled picker', () => {
   render(<DatePicker defaultValue={dayjs('2026-06-15')} />);
-  expect(screen.getByRole('textbox')).toHaveValue('2026-06-15');
+  expect(screen.getByRole('combobox')).toHaveValue('2026-06-15');
 });
 
 test('uncontrolled selection updates the displayed value', async () => {
   render(<DatePicker defaultValue={dayjs('2026-06-15')} />);
-  await userEvent.click(screen.getByRole('textbox'));
+  await userEvent.click(screen.getByRole('combobox'));
   await userEvent.click(screen.getByRole('button', { name: '2026-06-20' }));
-  expect(screen.getByRole('textbox')).toHaveValue('2026-06-20');
+  expect(screen.getByRole('combobox')).toHaveValue('2026-06-20');
 });
 
 test('Form can clear a date with undefined after the first user selection without remounting', async () => {
@@ -59,11 +59,11 @@ test('Form can clear a date with undefined after the first user selection withou
     );
   }
   render(<Demo />);
-  const input = screen.getByRole('textbox');
+  const input = screen.getByRole('combobox');
   await userEvent.type(input, '2026-06-15{Enter}');
   expect(input).toHaveValue('2026-06-15');
   await userEvent.click(screen.getByRole('button', { name: 'Clear field' }));
-  expect(screen.getByRole('textbox')).toBe(input);
+  expect(screen.getByRole('combobox')).toBe(input);
   expect(input).toHaveValue('');
 });
 
@@ -79,7 +79,7 @@ test('controlled input restores the value when its change is rejected', async ()
     />,
   );
 
-  const input = screen.getByRole('textbox');
+  const input = screen.getByRole('combobox');
   await userEvent.clear(input);
   await userEvent.type(input, '2026-06-20{Enter}');
 
@@ -98,7 +98,7 @@ test('PC trigger accepts a typed date and commits it with Enter', async () => {
     />,
   );
 
-  await userEvent.type(screen.getByRole('textbox'), '2026-07-25{Enter}');
+  await userEvent.type(screen.getByRole('combobox'), '2026-07-25{Enter}');
 
   expect(result).toBe('2026-07-25');
 });
@@ -114,7 +114,7 @@ test('PC trigger rejects a typed date that does not match the format', async () 
     />,
   );
 
-  const input = screen.getByRole('textbox');
+  const input = screen.getByRole('combobox');
   await userEvent.type(input, '2026-02-31{Enter}');
 
   expect(changeCount).toBe(0);
@@ -124,28 +124,28 @@ test('PC trigger rejects a typed date that does not match the format', async () 
 test('mobile trigger remains a button', () => {
   render(<DatePicker mobile />);
   expect(screen.getByRole('button')).toBeTruthy();
-  expect(screen.queryByRole('textbox')).toBeNull();
+  expect(screen.queryByRole('combobox')).toBeNull();
 });
 
 test('picker=month shows month format', () => {
   render(<DatePicker picker="month" value={dayjs('2026-06-01')} />);
-  expect(screen.getByRole('textbox')).toHaveValue('2026-06');
+  expect(screen.getByRole('combobox')).toHaveValue('2026-06');
 });
 
 test('picker=year shows year format', () => {
   render(<DatePicker picker="year" value={dayjs('2026-01-01')} />);
-  expect(screen.getByRole('textbox')).toHaveValue('2026');
+  expect(screen.getByRole('combobox')).toHaveValue('2026');
 });
 
 test('click trigger opens popover with calendar', async () => {
   render(<DatePicker />);
-  await userEvent.click(screen.getByRole('textbox'));
+  await userEvent.click(screen.getByRole('combobox'));
   expect(screen.getByRole('grid')).toBeTruthy(); // calendar table
 });
 
 test('calendar exposes one date in the tab order', async () => {
   render(<DatePicker value={dayjs('2026-06-15')} />);
-  await userEvent.click(screen.getByRole('textbox'));
+  await userEvent.click(screen.getByRole('combobox'));
 
   const day15 = screen.getByRole('button', { name: '2026-06-15' });
   const tabbableDays = screen
@@ -206,13 +206,13 @@ test('inherits size from TaoProvider', () => {
     </TaoProvider>,
   );
   expect(
-    screen.getByRole('textbox').closest('[data-tao-picker-trigger]'),
+    screen.getByRole('combobox').closest('[data-tao-picker-trigger]'),
   ).toHaveAttribute('data-tao-size', 'small');
 });
 
 test('disabled prevents opening', async () => {
   render(<DatePicker disabled />);
-  expect(screen.getByRole('textbox')).toBeDisabled();
+  expect(screen.getByRole('combobox')).toBeDisabled();
 });
 
 test('presets render as buttons', async () => {
@@ -224,7 +224,7 @@ test('presets render as buttons', async () => {
       ]}
     />,
   );
-  await userEvent.click(screen.getByRole('textbox'));
+  await userEvent.click(screen.getByRole('combobox'));
   expect(screen.getByText('Today')).toBeTruthy();
   expect(screen.getByText('Yesterday')).toBeTruthy();
 });
@@ -261,7 +261,7 @@ test('applies semantic classes and styles to desktop parts', () => {
   ) as HTMLElement;
   expect(root).toHaveClass('consumer-root', 'semantic-root');
   expect(root).toHaveStyle({ width: '320px', maxWidth: '640px' });
-  expect(screen.getByRole('textbox')).toHaveClass('semantic-input');
+  expect(screen.getByRole('combobox')).toHaveClass('semantic-input');
   expect(document.querySelector('.semantic-popup')).toHaveStyle({
     minWidth: '280px',
   });
@@ -335,7 +335,7 @@ test.each([
       onChange={onChange}
     />,
   );
-  await userEvent.type(screen.getByRole('textbox'), text);
+  await userEvent.type(screen.getByRole('combobox'), text);
   await userEvent.keyboard('{Enter}');
   expect(onChange).toHaveBeenLastCalledWith(expect.anything(), text);
   onChange.mockClear();
@@ -425,7 +425,7 @@ test.each([
   await userEvent.click(screen.getByRole('button', { name: 'Blocked preset' }));
   expect(onChange).not.toHaveBeenCalled();
   expect(onOpenChange).not.toHaveBeenCalled();
-  expect(screen.getByRole('textbox')).toHaveValue('2026-01-15');
+  expect(screen.getByRole('combobox')).toHaveValue('2026-01-15');
 });
 
 test.each([

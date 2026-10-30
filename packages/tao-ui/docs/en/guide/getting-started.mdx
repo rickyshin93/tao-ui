@@ -51,3 +51,25 @@ Set the theme mode on the provider. Portaled components inherit the same theme.
 ```
 
 Continue with the [Button component](/components/button).
+
+
+## Accessibility and ARIA
+
+Use `FormField` or `Form.Item` to associate labels, help and validation messages with controls. Input, Textarea, InputNumber, Select, Checkbox, Radio, Switch, DatePicker and RangePicker forward field ARIA attributes to their interactive elements; CheckboxGroup and RadioGroup expose group labels and validation messages. Placeholders do not replace field labels.
+
+```tsx
+<FormField label="Travel dates" required error="Choose valid dates">
+  <RangePicker placeholder={['Start date', 'End date']} />
+</FormField>
+```
+
+Radio maps `aria-required` to native `required`; an explicit `required` prop takes precedence. Group options retain their native disabled state, including explicit `disabled={false}` overrides.
+
+Desktop date inputs expose `combobox` semantics. ArrowDown opens the calendar and moves focus into it; Escape closes it and returns focus to the input. RangePicker combines explicit ARIA labels and each endpoint placeholder to distinguish its inputs. Native labels can instead target `id` and `${id}-end`. Calendar, month, year and time choices expose selection state.
+
+- Name Tabs with `aria-label` or `aria-labelledby`; text panels are reachable with Tab.
+- Give Modal, Drawer and Popover a visible `title` or explicit ARIA name. Popconfirm associates its question and description automatically.
+- Spinner accepts `aria-label`, defaults to `Loading` without a tip, and marks wrapped content `aria-busy` throughout loading, including its display delay.
+- Applications must still supply meaningful names for icon-only buttons.
+
+Automated checks cover DOM semantics and keyboard interaction in React 18/19; test composed screens with a browser and screen reader as well. See the [WAI-ARIA date combobox example](https://www.w3.org/WAI/ARIA/apg/patterns/combobox/examples/combobox-datepicker/) and [Tabs pattern](https://www.w3.org/WAI/ARIA/apg/patterns/tabs/).

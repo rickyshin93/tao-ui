@@ -75,7 +75,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
         className={classNames?.input}
         style={styles?.input}
         disabled={resolvedDisabled}
-        aria-invalid={status === 'error' || error || undefined}
+        aria-invalid={status === 'error' || error ? true : rest['aria-invalid']}
       />
       {suffix != null && (
         <span

@@ -8,7 +8,7 @@ import { Form } from '../../src/components/form';
 
 test('renders with placeholder', () => {
   render(<RangePicker mobile={false} />);
-  const inputs = screen.getAllByRole('textbox');
+  const inputs = screen.getAllByRole('combobox');
   expect(inputs[0]).toHaveAttribute('placeholder', 'Start date');
   expect(inputs[1]).toHaveAttribute('placeholder', 'End date');
 });
@@ -20,7 +20,7 @@ test('displays formatted range values', () => {
       value={[dayjs('2026-06-01'), dayjs('2026-06-15')]}
     />,
   );
-  const inputs = screen.getAllByRole('textbox');
+  const inputs = screen.getAllByRole('combobox');
   expect(inputs[0]).toHaveValue('2026-06-01');
   expect(inputs[1]).toHaveValue('2026-06-15');
 });
@@ -42,7 +42,7 @@ test('range content aligns to the start without excess leading space', () => {
 
 test('click opens dual calendar panels', async () => {
   render(<RangePicker mobile={false} />);
-  await userEvent.click(screen.getAllByRole('textbox')[0]);
+  await userEvent.click(screen.getAllByRole('combobox')[0]);
   // Should have 2 calendar grids
   const grids = screen.getAllByRole('grid');
   expect(grids.length).toBe(2);
@@ -143,13 +143,13 @@ test('Form can clear a range with undefined after user entry without remounting'
     );
   }
   render(<Demo />);
-  const [start, end] = screen.getAllByRole('textbox');
+  const [start, end] = screen.getAllByRole('combobox');
   await userEvent.type(start, '2026-06-01{Enter}');
   await userEvent.type(end, '2026-06-15{Enter}');
   expect(start).toHaveValue('2026-06-01');
   expect(end).toHaveValue('2026-06-15');
   await userEvent.click(screen.getByRole('button', { name: 'Clear field' }));
-  expect(screen.getAllByRole('textbox')).toEqual([start, end]);
+  expect(screen.getAllByRole('combobox')).toEqual([start, end]);
   expect(start).toHaveValue('');
   expect(end).toHaveValue('');
 });
@@ -166,7 +166,7 @@ test('PC inputs accept a typed range with strict formatting', async () => {
     />,
   );
 
-  await userEvent.type(screen.getAllByRole('textbox')[0], '2026-07-01{Enter}');
+  await userEvent.type(screen.getAllByRole('combobox')[0], '2026-07-01{Enter}');
 
   expect(result).toEqual(['2026-07-01', '2026-07-31']);
 });
@@ -182,7 +182,7 @@ test('PC inputs reject invalid dates', async () => {
     />,
   );
 
-  const input = screen.getAllByRole('textbox')[0];
+  const input = screen.getAllByRole('combobox')[0];
   await userEvent.type(input, '2026-02-31{Enter}');
 
   expect(changeCount).toBe(0);
@@ -192,7 +192,7 @@ test('PC inputs reject invalid dates', async () => {
 test('mobile trigger remains a button', () => {
   render(<RangePicker mobile />);
   expect(screen.getByRole('button')).toBeTruthy();
-  expect(screen.queryByRole('textbox')).toBeNull();
+  expect(screen.queryByRole('combobox')).toBeNull();
 });
 
 test('clear button resets range', async () => {
@@ -224,7 +224,7 @@ test('presets render in range picker', async () => {
       ]}
     />,
   );
-  await userEvent.click(screen.getAllByRole('textbox')[0]);
+  await userEvent.click(screen.getAllByRole('combobox')[0]);
   expect(screen.getByText('This week')).toBeTruthy();
 });
 
@@ -259,7 +259,7 @@ test('applies semantic classes and styles to desktop parts', () => {
   ) as HTMLElement;
   expect(root).toHaveClass('consumer-root', 'semantic-root');
   expect(root).toHaveStyle({ width: '480px', maxWidth: '640px' });
-  expect(screen.getAllByRole('textbox')[0]).toHaveClass('semantic-input');
+  expect(screen.getAllByRole('combobox')[0]).toHaveClass('semantic-input');
   expect(container.querySelector('.semantic-separator')).toHaveStyle({
     opacity: '0.8',
   });
@@ -305,7 +305,7 @@ test.each([
       onChange={onChange}
     />,
   );
-  const input = screen.getAllByRole('textbox')[position];
+  const input = screen.getAllByRole('combobox')[position];
   fireEvent.change(input, { target: { value: text } });
   fireEvent.blur(input);
   expect(onChange).toHaveBeenCalledTimes(1);
@@ -322,7 +322,7 @@ test('Enter followed by blur does not resubmit a rejected range value', () => {
       onChange={onChange}
     />,
   );
-  const input = screen.getAllByRole('textbox')[0];
+  const input = screen.getAllByRole('combobox')[0];
   fireEvent.change(input, { target: { value: '2026-07-01' } });
   fireEvent.keyDown(input, { key: 'Enter' });
   fireEvent.blur(input);
@@ -340,7 +340,7 @@ test('uncontrolled range edits replace default values on blur', () => {
       onChange={onChange}
     />,
   );
-  const [start, end] = screen.getAllByRole('textbox');
+  const [start, end] = screen.getAllByRole('combobox');
   fireEvent.change(start, { target: { value: '2026-06-02' } });
   fireEvent.blur(start);
   expect(start).toHaveValue('2026-06-02');
@@ -361,7 +361,7 @@ test.each([
       onChange={onChange}
     />,
   );
-  const inputs = screen.getAllByRole('textbox');
+  const inputs = screen.getAllByRole('combobox');
   expect(inputs[position === 'start' ? 0 : 1]).toBeDisabled();
   const editable = inputs[position === 'start' ? 1 : 0];
   await userEvent.clear(editable);
@@ -528,8 +528,8 @@ test.each([
   await userEvent.click(screen.getByRole('button', { name: 'Blocked range' }));
   expect(onChange).not.toHaveBeenCalled();
   expect(onOpenChange).not.toHaveBeenCalled();
-  expect(screen.getAllByRole('textbox')[0]).toHaveValue('2026-01-10');
-  expect(screen.getAllByRole('textbox')[1]).toHaveValue('2026-01-15');
+  expect(screen.getAllByRole('combobox')[0]).toHaveValue('2026-01-10');
+  expect(screen.getAllByRole('combobox')[1]).toHaveValue('2026-01-15');
 });
 
 test.each([

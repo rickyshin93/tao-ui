@@ -131,7 +131,7 @@ export const Textarea = forwardRef(function Textarea(
         className={classNames?.textarea}
         style={styles?.textarea}
         disabled={resolvedDisabled}
-        aria-invalid={status === 'error' || error || undefined}
+        aria-invalid={status === 'error' || error ? true : rest['aria-invalid']}
         data-tao-autosize={autoSize ? '' : undefined}
         onChange={(e) => {
           if (autoSize) resize();

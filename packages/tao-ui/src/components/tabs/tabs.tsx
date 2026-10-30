@@ -1,4 +1,5 @@
 import {
+  type AriaAttributes,
   type KeyboardEvent,
   type ReactNode,
   useCallback,
@@ -26,7 +27,8 @@ export interface TabItem {
   disabled?: boolean;
 }
 
-export interface TabsProps {
+export interface TabsProps
+  extends Pick<AriaAttributes, 'aria-label' | 'aria-labelledby'> {
   items: TabItem[];
   activeKey?: string;
   defaultActiveKey?: string;
@@ -52,6 +54,8 @@ export function Tabs({
   className,
   classNames,
   styles,
+  'aria-label': ariaLabel,
+  'aria-labelledby': ariaLabelledBy,
 }: TabsProps) {
   const ctx = useTaoConfig();
   const id = useId();
@@ -171,6 +175,8 @@ export function Tabs({
         <div
           ref={tablistRef}
           role="tablist"
+          aria-label={ariaLabel}
+          aria-labelledby={ariaLabelledBy}
           data-tao-tabs-list=""
           onKeyDown={handleKeyDown}
         >
@@ -185,7 +191,9 @@ export function Tabs({
                 role="tab"
                 id={tabId}
                 aria-selected={isActive}
-                aria-controls={panelId}
+                aria-controls={
+                  !destroyInactiveTabPane || isActive ? panelId : undefined
+                }
                 aria-disabled={item.disabled || undefined}
                 tabIndex={!item.disabled && item.key === focusKey ? 0 : -1}
                 data-tao-tab=""
@@ -223,6 +231,8 @@ export function Tabs({
           <div
             key={item.key}
             role="tabpanel"
+            // biome-ignore lint/a11y/noNoninteractiveTabindex: WAI-ARIA APG includes text-only tabpanels in the Tab sequence.
+            tabIndex={0}
             id={panelId}
             aria-labelledby={tabId}
             hidden={!isActive}

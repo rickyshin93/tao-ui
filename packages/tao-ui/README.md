@@ -37,6 +37,18 @@ export default function App() {
 }
 ```
 
+### Accessibility
+
+Use `FormField` or `Form.Item` to label controls and associate help/validation messages. Input, Textarea, InputNumber, Select, Checkbox, Radio, Switch and the date pickers forward field ARIA attributes to their interactive elements; CheckboxGroup and RadioGroup expose group labels and validation messages. Placeholders are not a substitute for a label.
+
+Radio maps `aria-required` to native `required`; an explicit `required` prop takes precedence. Group options retain their native disabled state, including explicit `disabled={false}` overrides.
+
+Desktop date inputs expose `combobox` semantics: ArrowDown opens the calendar and moves focus into it; Escape closes it and returns focus. RangePicker combines explicit ARIA labels with each endpoint placeholder, so use distinct start/end text. Native labels can instead target `id` and `${id}-end`. Calendar, month, year and time choices expose their selection state.
+
+Name Tabs with `aria-label` or `aria-labelledby`. Give Modal, Drawer and Popover a visible `title` or an explicit ARIA name; Popconfirm uses its question as the dialog name. Spinner accepts an ARIA name (default `Loading` when no tip is present), and wrapped content reports `aria-busy` throughout loading, including its display delay.
+
+Automated regression checks cover DOM semantics and keyboard interactions in React 18/19. They do not replace testing your composed screens with a browser and screen reader.
+
 ### Component imports
 
 Use component entries to include only their styles and shared theme styles. No separate CSS import is needed. The root entry remains available and includes all component styles.

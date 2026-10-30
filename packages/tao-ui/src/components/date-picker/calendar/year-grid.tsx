@@ -37,6 +37,7 @@ export function YearGrid({
             type="button"
             data-tao-year-cell=""
             data-tao-selected={isSelected || undefined}
+            aria-pressed={!!isSelected}
             data-tao-other-month={isOutside || undefined}
             data-tao-disabled={disabled || undefined}
             disabled={disabled}

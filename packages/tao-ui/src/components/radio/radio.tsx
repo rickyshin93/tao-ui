@@ -1,4 +1,5 @@
 import {
+  type AriaAttributes,
   type ForwardedRef,
   forwardRef,
   type ChangeEvent,
@@ -31,11 +32,22 @@ const RadioGroupContext = createContext<RadioGroupContextValue | null>(null);
 
 // ---- Radio ----
 
-export interface RadioProps {
+export interface RadioProps
+  extends Pick<
+    AriaAttributes,
+    | 'aria-label'
+    | 'aria-labelledby'
+    | 'aria-describedby'
+    | 'aria-errormessage'
+    | 'aria-invalid'
+    | 'aria-required'
+  > {
+  id?: string;
   value?: string;
   checked?: boolean;
   defaultChecked?: boolean;
   disabled?: boolean;
+  required?: boolean;
   onChange?: (e: ChangeEvent<HTMLInputElement>) => void;
   children?: ReactNode;
   name?: string;
@@ -50,11 +62,14 @@ export const Radio = forwardRef(function Radio(
     checked,
     defaultChecked,
     disabled,
+    required,
+    'aria-required': ariaRequired,
     onChange,
     children,
     name,
     classNames,
     styles,
+    ...ariaProps
   }: RadioProps,
   ref: ForwardedRef<HTMLInputElement>,
 ) {
@@ -86,6 +101,10 @@ export const Radio = forwardRef(function Radio(
     >
       <span data-tao-radio-control="">
         <input
+          {...ariaProps}
+          required={
+            required ?? (ariaRequired === true || ariaRequired === 'true')
+          }
           ref={ref}
           type="radio"
           name={resolvedName}
@@ -122,7 +141,17 @@ export type RadioOptionType =
   | { label: ReactNode; value: string; disabled?: boolean }
   | string;
 
-export interface RadioGroupProps {
+export interface RadioGroupProps
+  extends Pick<
+    AriaAttributes,
+    | 'aria-label'
+    | 'aria-labelledby'
+    | 'aria-describedby'
+    | 'aria-errormessage'
+    | 'aria-invalid'
+    | 'aria-required'
+  > {
+  id?: string;
   options?: RadioOptionType[];
   value?: string;
   defaultValue?: string;
@@ -142,6 +171,13 @@ export function RadioGroup({
   direction = 'horizontal',
   name,
   children,
+  id,
+  'aria-label': ariaLabel,
+  'aria-labelledby': ariaLabelledBy,
+  'aria-describedby': ariaDescribedBy,
+  'aria-errormessage': ariaErrorMessage,
+  'aria-invalid': ariaInvalid,
+  'aria-required': ariaRequired,
 }: RadioGroupProps) {
   const ctx = useTaoConfig();
   const resolvedDisabled = disabled ?? ctx.disabled ?? false;
@@ -170,6 +206,13 @@ export function RadioGroup({
         data-tao-radio-group=""
         data-tao-direction={direction}
         role="radiogroup"
+        id={id}
+        aria-label={ariaLabel}
+        aria-labelledby={ariaLabelledBy}
+        aria-describedby={ariaDescribedBy}
+        aria-errormessage={ariaErrorMessage}
+        aria-invalid={ariaInvalid}
+        aria-required={ariaRequired}
       >
         {normalizedOptions
           ? normalizedOptions.map((opt) => (

@@ -109,7 +109,7 @@ function TimeColumn({
   }, [selected, scrollKey]);
 
   return (
-    <div data-tao-time-column="">
+    <fieldset data-tao-time-column="" aria-label={label}>
       <div data-tao-time-column-title="">{label}</div>
       <div
         data-tao-time-column-list=""
@@ -125,12 +125,13 @@ function TimeColumn({
             type="button"
             data-tao-time-cell=""
             data-tao-selected={v === selected || undefined}
+            aria-pressed={v === selected}
             onClick={() => onSelect(v)}
           >
             {String(v).padStart(2, '0')}
           </button>
         ))}
       </div>
-    </div>
+    </fieldset>
   );
 }

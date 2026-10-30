@@ -50,6 +50,7 @@ export function MonthGrid({
             type="button"
             data-tao-month-cell=""
             data-tao-selected={isSelected || undefined}
+            aria-pressed={!!isSelected}
             data-tao-disabled={disabled || undefined}
             disabled={disabled}
             onClick={() => onSelect(m)}

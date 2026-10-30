@@ -192,6 +192,7 @@ export function CheckableTag({
       data-tao-disabled={disabled || undefined}
       role="checkbox"
       aria-checked={checked}
+      aria-disabled={disabled || undefined}
       tabIndex={disabled ? undefined : 0}
       className={className}
       style={style}

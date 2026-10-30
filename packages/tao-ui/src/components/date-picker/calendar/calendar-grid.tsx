@@ -63,11 +63,15 @@ export function CalendarGrid({
   };
   const dates = weeks.flat();
   const preferredFocus =
-    value &&
-    dates.some((date) => date.isSame(value, 'day')) &&
-    !isDisabled(value)
-      ? value
-      : (dates.find((date) => !isDisabled(date)) ?? viewDate);
+    [value, rangeStart, today].find(
+      (candidate) =>
+        candidate != null &&
+        dates.some((date) => date.isSame(candidate, 'day')) &&
+        !isDisabled(candidate),
+    ) ??
+    dates.find((date) => date.month() === currentMonth && !isDisabled(date)) ??
+    dates.find((date) => !isDisabled(date)) ??
+    viewDate;
   const [focusedDate, setFocusedDate] = useState(preferredFocus);
   const focusedDateRef = useRef(focusedDate);
   const buttonRefs = useRef(new Map<string, HTMLButtonElement>());
@@ -164,6 +168,8 @@ export function CalendarGrid({
     <table
       data-tao-calendar-grid=""
       role="grid"
+      aria-label={viewDate.format('MMMM YYYY')}
+      aria-multiselectable={isRangeMode || undefined}
       className={className}
       style={style}
     >
@@ -191,7 +197,23 @@ export function CalendarGrid({
               const rEnd = !isOtherMonth && isRangeEnd(date);
 
               return (
-                <td key={date.format('YYYY-MM-DD')} data-tao-calendar-cell="">
+                // biome-ignore lint/a11y/useFocusableInteractive: each gridcell contains the focusable date button, which owns roving keyboard navigation.
+                <td
+                  role="gridcell"
+                  key={date.format('YYYY-MM-DD')}
+                  data-tao-calendar-cell=""
+                  aria-selected={
+                    isRangeMode
+                      ? !!(
+                          rangeStart &&
+                          rangeEnd &&
+                          !isOtherMonth &&
+                          !date.isBefore(rangeStart, 'day') &&
+                          !date.isAfter(rangeEnd, 'day')
+                        )
+                      : !!isSelected
+                  }
+                >
                   <button
                     ref={(element) => {
                       const key = date.format('YYYY-MM-DD');
@@ -213,7 +235,12 @@ export function CalendarGrid({
                     tabIndex={
                       date.isSame(focusedDateRef.current, 'day') ? 0 : -1
                     }
-                    onFocus={() => {
+                    onFocus={(event) => {
+                      const previous = buttonRefs.current.get(
+                        focusedDateRef.current.format('YYYY-MM-DD'),
+                      );
+                      if (previous) previous.tabIndex = -1;
+                      event.currentTarget.tabIndex = 0;
                       focusedDateRef.current = date;
                     }}
                     onKeyDown={(event) => handleKeyDown(event, date)}
@@ -221,6 +248,7 @@ export function CalendarGrid({
                     onMouseEnter={() => onHover?.(date)}
                     onMouseLeave={() => onHover?.(null)}
                     aria-label={date.format('YYYY-MM-DD')}
+                    aria-current={isToday ? 'date' : undefined}
                   >
                     <span data-tao-calendar-cell-inner="">{date.date()}</span>
                   </button>

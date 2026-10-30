@@ -1,4 +1,5 @@
 import {
+  type AriaAttributes,
   type ChangeEvent,
   createContext,
   type ForwardedRef,
@@ -36,7 +37,17 @@ const CheckboxGroupContext = createContext<CheckboxGroupContextValue | null>(
 
 // ---- Checkbox ----
 
-export interface CheckboxProps {
+export interface CheckboxProps
+  extends Pick<
+    AriaAttributes,
+    | 'aria-label'
+    | 'aria-labelledby'
+    | 'aria-describedby'
+    | 'aria-errormessage'
+    | 'aria-invalid'
+    | 'aria-required'
+  > {
+  id?: string;
   checked?: boolean;
   defaultChecked?: boolean;
   indeterminate?: boolean;
@@ -60,6 +71,7 @@ export const Checkbox = forwardRef(function Checkbox(
     children,
     classNames,
     styles,
+    ...ariaProps
   }: CheckboxProps,
   ref: ForwardedRef<HTMLInputElement>,
 ) {
@@ -99,6 +111,7 @@ export const Checkbox = forwardRef(function Checkbox(
     >
       <span data-tao-checkbox-control="">
         <input
+          {...ariaProps}
           ref={mergeRefs(inputRef, ref)}
           type="checkbox"
           checked={resolvedChecked}
@@ -138,7 +151,16 @@ export type CheckboxOptionType =
   | { label: ReactNode; value: string; disabled?: boolean }
   | string;
 
-export interface CheckboxGroupProps {
+export interface CheckboxGroupProps
+  extends Pick<
+    AriaAttributes,
+    | 'aria-label'
+    | 'aria-labelledby'
+    | 'aria-describedby'
+    | 'aria-errormessage'
+    | 'aria-invalid'
+  > {
+  id?: string;
   options?: CheckboxOptionType[];
   value?: string[];
   defaultValue?: string[];
@@ -194,7 +216,16 @@ export function CheckboxGroup(props: CheckboxGroupProps) {
 
   return (
     <CheckboxGroupContext.Provider value={groupCtxValue}>
-      <div data-tao-checkbox-group="" data-tao-direction={direction}>
+      <fieldset
+        data-tao-checkbox-group=""
+        data-tao-direction={direction}
+        id={props.id}
+        aria-label={props['aria-label']}
+        aria-labelledby={props['aria-labelledby']}
+        aria-describedby={props['aria-describedby']}
+        aria-errormessage={props['aria-errormessage']}
+        aria-invalid={props['aria-invalid']}
+      >
         {normalizedOptions
           ? normalizedOptions.map((opt) => (
               <Checkbox
@@ -206,7 +237,7 @@ export function CheckboxGroup(props: CheckboxGroupProps) {
               </Checkbox>
             ))
           : children}
-      </div>
+      </fieldset>
     </CheckboxGroupContext.Provider>
   );
 }

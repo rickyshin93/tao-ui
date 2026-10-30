@@ -131,13 +131,13 @@ test.each([
 ])('date controls forward their imperative refs (%#)', (Control) => {
   const ref = createRef<PickerRef>();
   const { unmount } = render(<Control ref={ref} mobile={false} />);
-  const input = screen.getAllByRole('textbox')[0];
+  const input = screen.getAllByRole('combobox')[0];
   expect(ref.current?.nativeElement).toBe(input);
   act(() => ref.current?.focus());
   expect(document.activeElement).toBe(input);
   if (Control === RangePicker) {
     act(() => ref.current?.focus('end'));
-    expect(document.activeElement).toBe(screen.getAllByRole('textbox')[1]);
+    expect(document.activeElement).toBe(screen.getAllByRole('combobox')[1]);
   }
   act(() => ref.current?.blur());
   expect(document.activeElement).not.toBe(input);

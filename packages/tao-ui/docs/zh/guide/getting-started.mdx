@@ -51,3 +51,25 @@ Input、Textarea、InputNumber、Select、DatePicker 和 RangePicker 中，显�
 ```
 
 继续阅读 [Button 组件](/zh/components/button)。
+
+
+## 无障碍与 ARIA
+
+使用 `FormField` 或 `Form.Item` 为控件关联标签、说明与错误信息。Input、Textarea、InputNumber、Select、Checkbox、Radio、Switch、DatePicker 和 RangePicker 会将字段 ARIA 属性传递到实际交互元素；CheckboxGroup 与 RadioGroup 支持分组标签及错误关联。占位符不能代替字段标签。
+
+```tsx
+<FormField label="出行日期" required error="请选择有效日期">
+  <RangePicker placeholder={['开始日期', '结束日期']} />
+</FormField>
+```
+
+Radio 将 `aria-required` 转为原生 `required`，显式 `required` prop 优先。分组选项使用各自的原生禁用状态，保留子项 `disabled={false}` 的覆盖行为。
+
+桌面日期输入框使用 `combobox` 语义，按方向下键打开日历并移入焦点，Escape 关闭并返回输入框。RangePicker 的两个输入框组合显式 ARIA 标签和各自占位符作为名称，请提供可区分的起止文案；原生 `label` 可分别关联 `id` 和 `${id}-end`。日历、月份、年份、时间选项均暴露选中态。
+
+- Tabs 使用 `aria-label` 或 `aria-labelledby` 命名标签组；文本面板可通过 Tab 聚焦。
+- Modal、Drawer、Popover 使用可见 `title` 或显式 ARIA 名称；Popconfirm 自动关联问题和说明。
+- Spinner 可用 `aria-label` 自定义加载名称；无提示文案时默认为 `Loading`，包裹内容在加载期间（包括延迟显示阶段）标记 `aria-busy`。
+- 仅含图标的按钮仍需要应用提供有意义的名称。
+
+自动测试验证 React 18/19 的 DOM 语义和键盘行为，应用仍需对组合后的页面进行浏览器及读屏检查。交互依据参考 [WAI-ARIA 日期组合框示例](https://www.w3.org/WAI/ARIA/apg/patterns/combobox/examples/combobox-datepicker/) 和 [Tabs 模式](https://www.w3.org/WAI/ARIA/apg/patterns/tabs/)。

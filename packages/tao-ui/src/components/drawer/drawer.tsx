@@ -1,5 +1,6 @@
 import * as Dialog from '@radix-ui/react-dialog';
 import {
+  type AriaAttributes,
   type CSSProperties,
   type ReactNode,
   type PointerEvent as ReactPointerEvent,
@@ -40,7 +41,11 @@ const SIZE_PRESET: Record<DrawerSize, number> = { default: 378, large: 736 };
 /** Minimum drawer size (px) while resizing. */
 const MIN_DRAG_SIZE = 200;
 
-export interface DrawerProps {
+export interface DrawerProps
+  extends Pick<
+    AriaAttributes,
+    'aria-label' | 'aria-labelledby' | 'aria-describedby'
+  > {
   open: boolean;
   onClose?: () => void;
   title?: ReactNode;
@@ -101,6 +106,9 @@ export function Drawer({
   children,
   classNames,
   styles: stylesProp,
+  'aria-label': ariaLabel,
+  'aria-labelledby': ariaLabelledBy,
+  'aria-describedby': ariaDescribedBy,
 }: DrawerProps) {
   const prevOpen = useRef(open);
   useEffect(() => {
@@ -204,7 +212,11 @@ export function Drawer({
             data-tao-placement={placement}
             style={contentStyle}
             className={cx(classNames?.root)}
-            aria-describedby={undefined}
+            aria-label={ariaLabel}
+            {...(ariaLabel || ariaLabelledBy
+              ? { 'aria-labelledby': ariaLabelledBy }
+              : {})}
+            aria-describedby={ariaDescribedBy}
             onEscapeKeyDown={(e) => {
               if (!keyboard) e.preventDefault();
             }}

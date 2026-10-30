@@ -97,6 +97,10 @@
    Group
    =========================== */
 [data-tao-checkbox-group] {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-inline-size: 0;
   display: flex;
   flex-wrap: wrap;
   gap: var(--tao-padding-xs) var(--tao-padding);

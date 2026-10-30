@@ -1,5 +1,6 @@
 import * as Dialog from '@radix-ui/react-dialog';
 import {
+  type AriaAttributes,
   type CSSProperties,
   type FC,
   type ReactNode,
@@ -37,7 +38,11 @@ export type ModalFooterRender = (
   extra: { OkBtn: FC; CancelBtn: FC },
 ) => ReactNode;
 
-export interface ModalProps {
+export interface ModalProps
+  extends Pick<
+    AriaAttributes,
+    'aria-label' | 'aria-labelledby' | 'aria-describedby'
+  > {
   open: boolean;
   onClose?: () => void;
   title?: ReactNode;
@@ -103,6 +108,9 @@ export function Modal({
   children,
   classNames,
   styles: stylesProp,
+  'aria-label': ariaLabel,
+  'aria-labelledby': ariaLabelledBy,
+  'aria-describedby': ariaDescribedBy,
 }: ModalProps) {
   const prevOpen = useRef(open);
   useEffect(() => {
@@ -186,7 +194,11 @@ export function Modal({
               data-tao-modal=""
               style={contentStyle}
               className={cx(classNames?.root)}
-              aria-describedby={undefined}
+              aria-label={ariaLabel}
+              {...(ariaLabel || ariaLabelledBy
+                ? { 'aria-labelledby': ariaLabelledBy }
+                : {})}
+              aria-describedby={ariaDescribedBy}
               onEscapeKeyDown={(e) => {
                 if (!keyboard) e.preventDefault();
               }}
