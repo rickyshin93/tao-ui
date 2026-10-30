@@ -1,7 +1,7 @@
 # STATUS
 
 ## Doing
-- 2026-10-30 Release `@rockshin/tao-ui@0.0.40`: local checks passed; GitHub release and npm publication pending.
+- 2026-10-30 Release `@rockshin/tao-ui@0.0.40`: local and GitHub release checks passed; npm accepted the package for processing, but the version is not yet visible in the registry. Staged-package lookup requires npm authentication.
 - 2026-10-20 Approve the staged `@rockshin/tao-icons@0.0.1` on npmjs.com: the registry currently shows the public `0.0.0-stage` placeholder, and the real version needs maintainer 2FA approval (Staged Packages -> Approve)
 
 ## Next
