@@ -1,0 +1,154 @@
+@layer components {
+  [data-tao-badge] {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    vertical-align: middle;
+    font-family: var(--tao-font-family);
+    font-size: var(--tao-font-size);
+    line-height: var(--tao-line-height);
+  }
+  [data-tao-badge-indicator] {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    min-width: 20px;
+    height: 20px;
+    padding-inline: var(--tao-padding-xxs);
+    border-radius: 999px;
+    background: var(--tao-color-error);
+    color: var(--tao-color-text-light-solid);
+    font-size: var(--tao-font-size-sm);
+    font-weight: 400;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    z-index: 1;
+  }
+  [data-tao-badge][data-tao-wrapper] > [data-tao-badge-indicator] {
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline-end: 0;
+    transform: translate(50%, -50%);
+    box-shadow: 0 0 0 var(--tao-line-width) var(--tao-color-bg-container);
+  }
+  [data-tao-badge][data-tao-wrapper]:dir(rtl) > [data-tao-badge-indicator] {
+    transform: translate(-50%, -50%);
+  }
+  [data-tao-badge-indicator][data-tao-size="small"] {
+    min-width: 14px;
+    height: 14px;
+    font-size: calc(var(--tao-font-size) - 2px);
+  }
+  [data-tao-badge-indicator][data-tao-dot] {
+    width: 6px;
+    min-width: 6px;
+    height: 6px;
+    padding: 0;
+  }
+  [data-tao-badge-indicator][data-tao-status="success"] {
+    background: var(--tao-color-success);
+  }
+  [data-tao-badge-indicator][data-tao-status="processing"] {
+    background: var(--tao-color-primary);
+  }
+  [data-tao-badge-indicator][data-tao-status="default"] {
+    background: var(--tao-color-text-quaternary);
+  }
+  [data-tao-badge-indicator][data-tao-status="error"] {
+    background: var(--tao-color-error);
+  }
+  [data-tao-badge-indicator][data-tao-status="warning"] {
+    background: var(--tao-color-warning);
+  }
+  [data-tao-badge-indicator][data-tao-custom] {
+    background: transparent;
+    box-shadow: none;
+    padding: 0;
+  }
+  [data-tao-badge-text] {
+    margin-inline-start: var(--tao-margin-xs);
+    color: var(--tao-color-text);
+  }
+  [data-tao-badge-indicator][data-tao-status="processing"][data-tao-dot]::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border: var(--tao-line-width) solid var(--tao-color-primary);
+    border-radius: 50%;
+    animation: tao-badge-processing calc(var(--tao-motion-unit) * 14) ease-out
+      infinite;
+  }
+  [data-tao-badge-indicator][data-tao-status="processing"][data-tao-dot] {
+    position: relative;
+  }
+  [data-tao-ribbon] {
+    position: relative;
+  }
+  [data-tao-ribbon-indicator] {
+    --tao-ribbon-color: var(--tao-color-primary);
+    position: absolute;
+    inset-block-start: var(--tao-margin-md);
+    inset-inline-end: calc(var(--tao-margin-xs) * -1);
+    padding: var(--tao-padding-xxs) var(--tao-padding-sm);
+    color: var(--tao-color-text-light-solid);
+    background: var(--tao-ribbon-color);
+    border-radius: var(--tao-radius-sm) var(--tao-radius-sm) 0
+      var(--tao-radius-sm);
+    font-family: var(--tao-font-family);
+    font-size: var(--tao-font-size);
+    line-height: var(--tao-line-height);
+  }
+  [data-tao-ribbon-indicator]::after {
+    content: "";
+    position: absolute;
+    inset-block-start: 100%;
+    inset-inline-end: 0;
+    width: 0;
+    height: 0;
+    border: calc(var(--tao-margin-xs) / 2) solid transparent;
+    border-block-start-color: color-mix(
+      in oklab,
+      var(--tao-ribbon-color) 75%,
+      black
+    );
+    border-inline-start-color: color-mix(
+      in oklab,
+      var(--tao-ribbon-color) 75%,
+      black
+    );
+  }
+  [data-tao-ribbon][data-tao-placement="start"] > [data-tao-ribbon-indicator] {
+    inset-inline-end: auto;
+    inset-inline-start: calc(var(--tao-margin-xs) * -1);
+    border-radius: var(--tao-radius-sm) var(--tao-radius-sm)
+      var(--tao-radius-sm) 0;
+  }
+  [data-tao-ribbon][data-tao-placement="start"]
+    > [data-tao-ribbon-indicator]::after {
+    inset-inline-end: auto;
+    inset-inline-start: 0;
+    border-inline-start-color: transparent;
+    border-inline-end-color: color-mix(
+      in oklab,
+      var(--tao-ribbon-color) 75%,
+      black
+    );
+  }
+  @keyframes tao-badge-processing {
+    from {
+      transform: scale(1);
+      opacity: 0.8;
+    }
+    to {
+      transform: scale(2.4);
+      opacity: 0;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    [data-tao-badge-indicator][data-tao-status="processing"]::after {
+      animation: none;
+    }
+  }
+}

@@ -5,12 +5,32 @@
   },
   {
     "type": "file",
+    "name": "border-beam",
+    "label": "BorderBeam"
+  },
+  {
+    "type": "file",
     "name": "button",
     "label": "Button"
   },
   {
+    "type": "file",
+    "name": "float-button",
+    "label": "FloatButton"
+  },
+  {
+    "type": "file",
+    "name": "watermark",
+    "label": "Watermark"
+  },
+  {
     "type": "section-header",
     "label": "Layout"
+  },
+  {
+    "type": "file",
+    "name": "divider",
+    "label": "Divider"
   },
   {
     "type": "file",
@@ -30,6 +50,11 @@
   {
     "type": "section-header",
     "label": "Navigation"
+  },
+  {
+    "type": "file",
+    "name": "affix",
+    "label": "Affix"
   },
   {
     "type": "file",
@@ -67,8 +92,23 @@
   },
   {
     "type": "file",
+    "name": "auto-complete",
+    "label": "AutoComplete"
+  },
+  {
+    "type": "file",
+    "name": "cascader",
+    "label": "Cascader"
+  },
+  {
+    "type": "file",
     "name": "checkbox",
     "label": "Checkbox"
+  },
+  {
+    "type": "file",
+    "name": "color-picker",
+    "label": "ColorPicker"
   },
   {
     "type": "file",
@@ -97,11 +137,6 @@
   },
   {
     "type": "file",
-    "name": "headless-input-number",
-    "label": "HeadlessInputNumber"
-  },
-  {
-    "type": "file",
     "name": "input",
     "label": "Input"
   },
@@ -109,6 +144,11 @@
     "type": "file",
     "name": "input-number",
     "label": "InputNumber"
+  },
+  {
+    "type": "file",
+    "name": "mentions",
+    "label": "Mentions"
   },
   {
     "type": "file",
@@ -122,8 +162,23 @@
   },
   {
     "type": "file",
+    "name": "rate",
+    "label": "Rate"
+  },
+  {
+    "type": "file",
+    "name": "segmented",
+    "label": "Segmented"
+  },
+  {
+    "type": "file",
     "name": "select",
     "label": "Select"
+  },
+  {
+    "type": "file",
+    "name": "slider",
+    "label": "Slider"
   },
   {
     "type": "file",
@@ -136,8 +191,53 @@
     "label": "Textarea"
   },
   {
+    "type": "file",
+    "name": "time-picker",
+    "label": "TimePicker"
+  },
+  {
+    "type": "file",
+    "name": "transfer",
+    "label": "Transfer"
+  },
+  {
+    "type": "file",
+    "name": "tree-select",
+    "label": "TreeSelect"
+  },
+  {
+    "type": "file",
+    "name": "upload",
+    "label": "Upload"
+  },
+  {
     "type": "section-header",
     "label": "Data Display"
+  },
+  {
+    "type": "file",
+    "name": "avatar",
+    "label": "Avatar"
+  },
+  {
+    "type": "file",
+    "name": "badge",
+    "label": "Badge"
+  },
+  {
+    "type": "file",
+    "name": "calendar",
+    "label": "Calendar"
+  },
+  {
+    "type": "file",
+    "name": "card",
+    "label": "Card"
+  },
+  {
+    "type": "file",
+    "name": "carousel",
+    "label": "Carousel"
   },
   {
     "type": "file",
@@ -146,13 +246,53 @@
   },
   {
     "type": "file",
+    "name": "descriptions",
+    "label": "Descriptions"
+  },
+  {
+    "type": "file",
+    "name": "empty",
+    "label": "Empty"
+  },
+  {
+    "type": "file",
+    "name": "image",
+    "label": "Image"
+  },
+  {
+    "type": "file",
+    "name": "list",
+    "label": "List"
+  },
+  {
+    "type": "file",
+    "name": "listy",
+    "label": "Listy"
+  },
+  {
+    "type": "file",
+    "name": "masonry",
+    "label": "Masonry"
+  },
+  {
+    "type": "file",
     "name": "popover",
     "label": "Popover"
   },
   {
     "type": "file",
+    "name": "qr-code",
+    "label": "QRCode"
+  },
+  {
+    "type": "file",
     "name": "scroll-area",
     "label": "ScrollArea"
+  },
+  {
+    "type": "file",
+    "name": "statistic",
+    "label": "Statistic"
   },
   {
     "type": "file",
@@ -166,8 +306,18 @@
   },
   {
     "type": "file",
+    "name": "timeline",
+    "label": "Timeline"
+  },
+  {
+    "type": "file",
     "name": "tooltip",
     "label": "Tooltip"
+  },
+  {
+    "type": "file",
+    "name": "tree",
+    "label": "Tree"
   },
   {
     "type": "section-header",
@@ -195,6 +345,21 @@
   },
   {
     "type": "file",
+    "name": "progress",
+    "label": "Progress"
+  },
+  {
+    "type": "file",
+    "name": "result",
+    "label": "Result"
+  },
+  {
+    "type": "file",
+    "name": "skeleton",
+    "label": "Skeleton"
+  },
+  {
+    "type": "file",
     "name": "sonner",
     "label": "Sonner"
   },
@@ -204,12 +369,36 @@
     "label": "Spinner"
   },
   {
+    "type": "file",
+    "name": "tour",
+    "label": "Tour"
+  },
+  {
+    "type": "section-header",
+    "label": "Headless"
+  },
+  {
+    "type": "file",
+    "name": "headless-input-number",
+    "label": "HeadlessInputNumber"
+  },
+  {
     "type": "section-header",
     "label": "Config"
   },
   {
     "type": "file",
+    "name": "app",
+    "label": "App"
+  },
+  {
+    "type": "file",
     "name": "tao-provider",
     "label": "TaoProvider"
+  },
+  {
+    "type": "file",
+    "name": "util",
+    "label": "Util"
   }
 ]

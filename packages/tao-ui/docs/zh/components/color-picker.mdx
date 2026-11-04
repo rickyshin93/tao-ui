@@ -1,0 +1,268 @@
+---
+
+title: ColorPicker
+
+description: "选择单色或渐变色，提供精度保留的颜色对象、预设与格式转换。"
+
+---
+
+import Preview from '../../_components/demo-preview';
+
+选择单色或渐变色，提供精度保留的颜色对象、预设与格式转换。
+
+新增 API 对齐 Ant Design 6.7.0，外观、主题与 Semantic DOM 使用 tao-ui。既有组件 API 保持原样。
+
+## 代码演示
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="color-picker-controlled">
+
+### 受控颜色
+
+保留 onChange 返回的 Color 对象，避免编辑过程中反复转换精度。
+
+```tsx preview
+import { ColorPicker, type Color } from '@rockshin/tao-ui';
+import { useState } from 'react';
+export default function Demo() {
+  const [color, setColor] = useState<string | Color>('#008888');
+  return (
+    <div>
+      <ColorPicker value={color} onChange={setColor} showText />
+      <p>{typeof color === 'string' ? color : color.toCssString()}</p>
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="color-picker-sizes">
+
+### 三种尺寸
+
+尺寸沿用兼容 API 的 small、middle 和 large。
+
+```tsx preview
+import { ColorPicker, Stack } from '@rockshin/tao-ui';
+export default function Demo() {
+  return (
+    <Stack direction="horizontal" gap="md">
+      {(['small', 'middle', 'large'] as const).map((size) => (
+        <ColorPicker key={size} size={size} defaultValue="#008888" showText />
+      ))}
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="color-picker-gradient">
+
+### 渐变与色标
+
+添加、删除和移动色标，或切换单色与渐变模式。
+
+```tsx preview
+import { ColorPicker } from '@rockshin/tao-ui';
+export default function Demo() {
+  return (
+    <ColorPicker
+      mode={['single', 'gradient']}
+      defaultValue={[
+        { color: '#008888', percent: 0 },
+        { color: '#7c3aed', percent: 100 },
+      ]}
+      showText
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="color-picker-presets">
+
+### 分组预设
+
+按业务颜色分组；预设也可以包含渐变。
+
+```tsx preview
+import { ColorPicker } from '@rockshin/tao-ui';
+export default function Demo() {
+  return (
+    <ColorPicker
+      presets={[
+        {
+          label: 'Brand',
+          colors: ['#008888', '#7c3aed', '#ed6c02'],
+          defaultOpen: true,
+        },
+        {
+          label: 'Gradient',
+          colors: [
+            [
+              { color: '#008888', percent: 0 },
+              { color: '#ffffff', percent: 100 },
+            ],
+          ],
+        },
+      ]}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="color-picker-formats">
+
+### HEX、RGB 与 HSB
+
+使用格式菜单切换表达方式，或锁定需要的格式。
+
+```tsx preview
+import { ColorPicker, Stack } from '@rockshin/tao-ui';
+export default function Demo() {
+  return (
+    <Stack gap="md">
+      <ColorPicker defaultFormat="rgb" defaultValue="#00888880" showText />
+      <ColorPicker
+        format="hsb"
+        disabledFormat
+        defaultValue="#7c3aed"
+        showText
+      />
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="color-picker-alpha">
+
+### 透明度与清除
+
+disabledAlpha 仅提交不透明颜色；allowClear 提供透明值。
+
+```tsx preview
+import { ColorPicker, Stack } from '@rockshin/tao-ui';
+export default function Demo() {
+  return (
+    <Stack direction="horizontal" gap="md">
+      <ColorPicker defaultValue="#00888880" allowClear showText />
+      <ColorPicker defaultValue="#008888" disabledAlpha showText />
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="color-picker-complete">
+
+### 完成后提交
+
+onChangeComplete 用于拖动或输入结束后的业务提交。
+
+```tsx preview
+import { ColorPicker } from '@rockshin/tao-ui';
+import { useState } from 'react';
+export default function Demo() {
+  const [saved, setSaved] = useState('#008888');
+  return (
+    <div>
+      <ColorPicker
+        defaultValue={saved}
+        onChangeComplete={(color) => setSaved(color.toCssString())}
+      />
+      <p>Committed: {saved}</p>
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="color-picker-custom-panel">
+
+### 自定义面板
+
+组合 Picker 和 Presets，并保留选择器状态与事件。
+
+```tsx preview
+import { ColorPicker } from '@rockshin/tao-ui';
+export default function Demo() {
+  return (
+    <ColorPicker
+      presets={[{ label: 'Palette', colors: ['#008888', '#ed6c02'] }]}
+      panelRender={(_, { components: { Picker, Presets } }) => (
+        <div>
+          <strong>Project palette</strong>
+          <Presets />
+          <Picker />
+        </div>
+      )}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="color-picker-trigger">
+
+### 触发器与禁用
+
+可使用自定义按钮、悬停触发或禁用状态。
+
+```tsx preview
+import { ColorPicker, Button, Stack } from '@rockshin/tao-ui';
+export default function Demo() {
+  return (
+    <Stack direction="horizontal" gap="md">
+      <ColorPicker trigger="hover">
+        <Button variant="secondary">Hover for color</Button>
+      </ColorPicker>
+      <ColorPicker disabled defaultValue="#008888" showText />
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="color-picker-phone">
+
+### 手机调色板
+
+独立手机视口限制面板宽度，并继承暗色主题。
+
+```tsx preview="iframe-follow"
+import { ColorPicker, TaoProvider, zhCN } from '@rockshin/tao-ui';
+export default function Demo() {
+  return (
+    <TaoProvider locale={zhCN}>
+      <div style={{ padding: 16 }}>
+        <ColorPicker
+          showText
+          allowClear
+          mode={['single', 'gradient']}
+          defaultValue="#008888"
+        />
+      </div>
+    </TaoProvider>
+  );
+}
+```
+
+</section>
+
+</div>
+
+## API
+
+<API moduleName="color-picker" />

@@ -1,0 +1,244 @@
+---
+title: Progress
+description: "使用进度条、圆环或仪表盘弧线展示可量化进度。"
+---
+
+import Preview from '../../_components/demo-preview';
+
+使用进度条、圆环或仪表盘弧线展示可量化进度。
+
+## 何时使用
+
+percent 应表达实际可测量的进度。为每个进度组件提供说明操作的无障碍标签。
+
+## 示例
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="progress-example-1">
+
+### 受控进度
+
+此本地示例以 10 为单位调整 percent。
+
+```tsx preview="iframe-follow"
+import { useState } from 'react';
+import { Button, Progress, Stack } from '@rockshin/tao-ui';
+
+export default function Example() {
+  const [percent, setPercent] = useState(40);
+  return (
+    <Stack gap="md">
+      <Progress percent={percent} aria-label="Import completion" />
+      <Stack direction="horizontal" gap="sm">
+        <Button
+          variant="secondary"
+          onClick={() => setPercent((value) => Math.max(0, value - 10))}
+        >
+          Decrease
+        </Button>
+        <Button
+          onClick={() => setPercent((value) => Math.min(100, value + 10))}
+        >
+          Increase
+        </Button>
+      </Stack>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="progress-example-2">
+
+### 状态
+
+active 表示正在执行，exception 表示执行失败。
+
+```tsx preview
+import { Progress, Stack } from '@rockshin/tao-ui';
+
+export default function Example() {
+  return (
+    <Stack gap="md">
+      <Progress percent={45} status="active" aria-label="Uploading" />
+      <Progress percent={68} status="exception" aria-label="Upload failed" />
+      <Progress percent={100} status="success" aria-label="Upload completed" />
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="progress-example-3">
+
+### 圆环与仪表盘
+
+仪表盘通过 gapDegree 和 gapPlacement 设置弧线缺口。
+
+```tsx preview
+import { Progress, Stack } from '@rockshin/tao-ui';
+
+export default function Example() {
+  return (
+    <Stack direction="horizontal" gap="lg" style={{ flexWrap: 'wrap' }}>
+      <Progress
+        type="circle"
+        percent={75}
+        size={104}
+        aria-label="Storage used"
+      />
+      <Progress
+        type="dashboard"
+        percent={75}
+        size={104}
+        gapDegree={90}
+        gapPlacement="bottom"
+        aria-label="Quota used"
+      />
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="progress-example-4">
+
+### 渐变与成功分段
+
+success.percent 表示总进度中已经成功完成的部分。
+
+```tsx preview
+import { Progress, Stack } from '@rockshin/tao-ui';
+
+export default function Example() {
+  return (
+    <Stack gap="md">
+      <Progress
+        percent={80}
+        success={{ percent: 35 }}
+        aria-label="Processed records"
+      />
+      <Progress
+        percent={85}
+        strokeColor={{ from: '#3b82f6', to: '#14b8a6' }}
+        aria-label="Export completion"
+      />
+      <Progress
+        type="circle"
+        percent={75}
+        size={96}
+        strokeColor={{ '0%': '#3b82f6', '100%': '#14b8a6' }}
+        aria-label="Sync completion"
+      />
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="progress-example-5">
+
+### 分段进度
+
+steps 适合固定数量的任务单元；圆环分段还可指定间距。
+
+```tsx preview
+import { Progress, Stack } from '@rockshin/tao-ui';
+
+export default function Example() {
+  return (
+    <Stack gap="md">
+      <Progress
+        percent={60}
+        steps={5}
+        strokeColor={['#3b82f6', '#3b82f6', '#14b8a6']}
+        aria-label="Three of five tasks complete"
+      />
+      <Progress
+        type="circle"
+        percent={70}
+        steps={{ count: 10, gap: 3 }}
+        size={108}
+        aria-label="Seven of ten checks complete"
+      />
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="progress-example-6">
+
+### 标签位置与格式
+
+可将标签放在进度条内部，或将百分比替换为任务单位。
+
+```tsx preview
+import { Progress, Stack } from '@rockshin/tao-ui';
+
+export default function Example() {
+  return (
+    <Stack gap="md">
+      <Progress
+        percent={65}
+        size={['100%', 24]}
+        percentPosition={{ align: 'center', type: 'inner' }}
+        aria-label="Import progress"
+      />
+      <Progress
+        percent={60}
+        format={(value) => `${Math.round((value ?? 0) / 10)} / 10 files`}
+        aria-label="Processed files"
+      />
+      <Progress percent={45} showInfo={false} aria-label="Background sync" />
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="progress-example-7">
+
+### 尺寸与语义样式
+
+数字尺寸用于条形高度或圆环直径；元组分别指定条形宽度和高度。
+
+```tsx preview
+import { Progress, Stack } from '@rockshin/tao-ui';
+
+export default function Example() {
+  return (
+    <Stack gap="md">
+      <Progress percent={55} size="small" aria-label="Small progress" />
+      <Progress
+        percent={55}
+        size={['100%', 16]}
+        strokeLinecap="butt"
+        aria-label="Thick progress"
+      />
+      <Progress
+        type="circle"
+        percent={55}
+        size={72}
+        styles={{ indicator: { fontWeight: 600 } }}
+        aria-label="Compact circle"
+      />
+    </Stack>
+  );
+}
+```
+
+</section>
+
+</div>
+
+## API
+
+<API moduleName="progress" />

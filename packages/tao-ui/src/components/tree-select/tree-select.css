@@ -1,0 +1,23 @@
+[data-tao-tree-select-switcher] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+[data-tao-tree-select-switcher]:not([data-tao-expanded]):not([data-tao-leaf])
+  > svg {
+  transform: rotate(-90deg);
+}
+[data-tao-tree-select-switcher] > svg {
+  transition: transform var(--tao-motion-duration-fast)
+    var(--tao-motion-ease-out);
+}
+[data-tao-select-engine-popup] [class$="-empty"] {
+  padding: var(--tao-padding-sm);
+  color: var(--tao-color-text-secondary);
+  text-align: center;
+}
+[data-tao-select-engine-popup]
+  [class*="-treenode-active"]
+  > [class*="-node-content-wrapper"] {
+  background: var(--tao-control-item-bg-hover);
+}

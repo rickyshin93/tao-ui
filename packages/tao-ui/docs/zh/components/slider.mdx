@@ -1,0 +1,238 @@
+---
+title: Slider
+description: "使用指针或键盘选择数值或范围。"
+---
+
+import Preview from '../../_components/demo-preview';
+
+使用指针或键盘选择数值或范围。
+
+## 何时使用
+
+适合需要快速调整范围的数值。在滑块附近展示当前值和单位。
+
+## 示例
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="slider-example-1">
+
+### 受控值与完成事件
+
+onChange 随移动更新；onChangeComplete 在指针或键盘交互完成时报告最终值。
+
+```tsx preview="iframe-follow"
+import { useState } from 'react';
+import { Slider, Stack } from '@rockshin/tao-ui';
+
+export default function Example() {
+  const [value, setValue] = useState(35);
+  const [committed, setCommitted] = useState(35);
+  return (
+    <Stack gap="md">
+      <span>Volume: {value}%</span>
+      <Slider
+        value={value}
+        onChange={setValue}
+        onChangeComplete={setCommitted}
+        ariaLabelForHandle="Volume"
+      />
+      <output>Last completed value: {committed}%</output>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="slider-example-2">
+
+### 范围与整体拖动
+
+拖动手柄调整区间，也可拖动选中轨道整体移动两个端点。
+
+```tsx preview
+import { useState } from 'react';
+import { Slider, Stack } from '@rockshin/tao-ui';
+
+export default function Example() {
+  const [range, setRange] = useState([20, 60]);
+  return (
+    <Stack gap="md">
+      <output>
+        Budget: {range[0]}–{range[1]}
+      </output>
+      <Slider
+        range={{ draggableTrack: true }}
+        value={range}
+        onChange={setRange}
+        ariaLabelForHandle={['Minimum budget', 'Maximum budget']}
+      />
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="slider-example-3">
+
+### 刻度与离散值
+
+step={null} 将选择范围限定到 marks；dots 显示所有步长位置。
+
+```tsx preview
+import { Slider, Stack } from '@rockshin/tao-ui';
+
+export default function Example() {
+  return (
+    <Stack gap="lg">
+      <Slider
+        defaultValue={25}
+        step={null}
+        marks={{ 0: 'Off', 25: 'Low', 50: 'Mid', 100: 'High' }}
+        ariaLabelForHandle="Quality preset"
+      />
+      <Slider
+        defaultValue={40}
+        step={20}
+        dots
+        marks={{ 0: '0', 100: '100' }}
+        ariaLabelForHandle="Opacity"
+      />
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="slider-example-4">
+
+### 提示格式
+
+formatter={null} 隐藏提示；open 可保持提示显示。
+
+```tsx preview
+import { Slider, Stack } from '@rockshin/tao-ui';
+
+export default function Example() {
+  return (
+    <Stack gap="lg" style={{ paddingBlock: 24 }}>
+      <Slider
+        defaultValue={42}
+        tooltip={{ formatter: (value) => `${value} °C`, open: true }}
+        ariaLabelForHandle="Temperature"
+      />
+      <Slider
+        defaultValue={60}
+        tooltip={{ formatter: null }}
+        ariaLabelForHandle="Tooltip-free value"
+      />
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="slider-example-5">
+
+### 垂直、反向与 RTL
+
+垂直滑块需要明确容器高度；direction 控制键盘和水平方向。
+
+```tsx preview
+import { Slider, Stack } from '@rockshin/tao-ui';
+
+export default function Example() {
+  return (
+    <Stack gap="lg">
+      <div style={{ height: 150, paddingInline: 20 }}>
+        <Slider
+          orientation="vertical"
+          defaultValue={40}
+          marks={{ 0: '0', 100: '100' }}
+          ariaLabelForHandle="Vertical value"
+        />
+      </div>
+      <Slider reverse defaultValue={30} ariaLabelForHandle="Reversed value" />
+      <Slider
+        direction="rtl"
+        defaultValue={60}
+        ariaLabelForHandle="RTL value"
+      />
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="slider-example-6">
+
+### 可编辑的多段范围
+
+点击轨道添加手柄；将手柄拖离轨道可删除，数量受 minCount 和 maxCount 约束。
+
+```tsx preview
+import { useState } from 'react';
+import { Slider, Stack } from '@rockshin/tao-ui';
+
+export default function Example() {
+  const [values, setValues] = useState([20, 50, 80]);
+  return (
+    <Stack gap="md">
+      <Slider
+        range={{ editable: true, minCount: 2, maxCount: 5 }}
+        value={values}
+        onChange={setValues}
+      />
+      <output>Stops: {values.join(', ')}</output>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="slider-example-7">
+
+### 禁用与焦点
+
+ref 提供 focus 和 blur；语义样式可定制轨道和手柄。
+
+```tsx preview
+import { useRef } from 'react';
+import { Button, Slider, Stack } from '@rockshin/tao-ui';
+import type { SliderRef } from '@rockshin/tao-ui';
+
+export default function Example() {
+  const ref = useRef<SliderRef>(null);
+  return (
+    <Stack gap="md">
+      <Button variant="secondary" onClick={() => ref.current?.focus()}>
+        Focus slider
+      </Button>
+      <Slider
+        ref={ref}
+        defaultValue={45}
+        styles={{
+          track: { background: '#14b8a6' },
+          handle: { borderColor: '#14b8a6' },
+        }}
+        ariaLabelForHandle="Custom slider"
+      />
+      <Slider disabled defaultValue={45} ariaLabelForHandle="Disabled slider" />
+    </Stack>
+  );
+}
+```
+
+</section>
+
+</div>
+
+## API
+
+<API moduleName="slider" />

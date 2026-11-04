@@ -158,7 +158,7 @@ export const DatePicker = forwardRef(function DatePicker(
 
   const fmt = formatProp ?? getDefaultFormat(picker, showTime);
   const defaultPlaceholder = placeholder ?? fmt;
-  const drawerTitle = showTime ? 'Date & Time' : defaultPlaceholder;
+  const drawerTitle = showTime ? ctx.locale.dateTime : defaultPlaceholder;
 
   const isDateBlocked = useCallback(
     (date: Dayjs) => {
@@ -442,7 +442,7 @@ export const DatePicker = forwardRef(function DatePicker(
             data-tao-picker-footer-btn=""
             onClick={handleNow}
           >
-            Now
+            {ctx.locale.now}
           </button>
           <button
             type="button"
@@ -450,7 +450,7 @@ export const DatePicker = forwardRef(function DatePicker(
             data-tao-primary=""
             onClick={handleOk}
           >
-            OK
+            {ctx.locale.ok}
           </button>
         </div>
       )}
@@ -470,7 +470,7 @@ export const DatePicker = forwardRef(function DatePicker(
             event.stopPropagation();
             handleClear(event);
           }}
-          aria-label="Clear"
+          aria-label={ctx.locale.clear}
           role="button"
           tabIndex={0}
           onKeyDown={(event) => {

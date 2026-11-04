@@ -3,6 +3,8 @@ title: Stack
 description: "Composes children in a flex row or column with consistent spacing. Includes usage guidance, a runnable example, and the complete API reference."
 ---
 
+import Preview from '../../_components/demo-preview';
+
 Composes children in a flex row or column with consistent spacing.
 
 ## When to use
@@ -19,7 +21,13 @@ Use Stack for simple one-dimensional layout and spacing.
 
 - Do not use the component outside its intended interaction model.
 
-## Basic usage
+## Examples
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="stack-example-1">
+
+### Basic usage
 
 ```tsx preview
 import { Stack, Tag } from '@rockshin/tao-ui';
@@ -37,7 +45,11 @@ function StackExample() {
 export default StackExample;
 ```
 
-## Direction, spacing, and alignment
+</section>
+
+<section className="tao-example" id="stack-example-2">
+
+### Direction, spacing, and alignment
 
 ```tsx preview
 import { Stack, Tag } from '@rockshin/tao-ui';
@@ -60,7 +72,11 @@ function StackVariants() {
 export default StackVariants;
 ```
 
-## Responsive direction
+</section>
+
+<section className="tao-example" id="stack-example-3">
+
+### Responsive direction
 
 ```tsx preview
 import { Button, Stack } from '@rockshin/tao-ui';
@@ -80,6 +96,113 @@ function ResponsiveStack() {
 
 export default ResponsiveStack;
 ```
+
+</section>
+
+<section className="tao-example" id="stack-alignment">
+
+### Alignment
+
+Use align and justifyContent on the root to position children.
+
+```tsx preview
+import { Stack, Button } from '@rockshin/tao-ui';
+export default function Example() {
+  return (
+    <Stack
+      align="center"
+      styles={{
+        root: {
+          justifyContent: 'space-between',
+          minHeight: 100,
+          width: '100%',
+        },
+      }}
+    >
+      <Button>Start</Button>
+      <span>Centered vertically</span>
+      <Button>End</Button>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="stack-wrap">
+
+### Wrapping items
+
+Enable flexWrap on the semantic root so a long toolbar can wrap.
+
+```tsx preview
+import { Stack, Button } from '@rockshin/tao-ui';
+export default function Example() {
+  return (
+    <Stack styles={{ root: { flexWrap: 'wrap' } }}>
+      {['Overview', 'Members', 'Permissions', 'Billing', 'Settings'].map(
+        (item) => (
+          <Button key={item}>{item}</Button>
+        ),
+      )}
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="stack-responsive">
+
+### Responsive direction and gap
+
+Use a vertical arrangement in narrow viewports and horizontal at wider breakpoints. Compare the phone preview.
+
+```tsx preview="iframe-follow"
+import { Stack, Input, Button } from '@rockshin/tao-ui';
+export default function Example() {
+  return (
+    <Stack
+      direction={{ xs: 'vertical', md: 'horizontal' }}
+      gap={{ xs: 'sm', md: 'lg' }}
+      align="stretch"
+    >
+      <Input aria-label="Email address" placeholder="name@example.com" />
+      <Button variant="primary">Continue</Button>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="stack-nested">
+
+### Nested layouts
+
+Let the outer stack space sections and the inner stack group related actions.
+
+```tsx preview
+import { Stack, Button } from '@rockshin/tao-ui';
+export default function Example() {
+  return (
+    <Stack direction="vertical" gap="lg">
+      <div>
+        <strong>Workspace</strong>
+        <p>Invite members and manage access.</p>
+      </div>
+      <Stack styles={{ root: { flexWrap: 'wrap' } }}>
+        <Button variant="primary">Invite member</Button>
+        <Button>Manage roles</Button>
+      </Stack>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+</div>
 
 ## API
 

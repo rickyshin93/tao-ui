@@ -1,11 +1,19 @@
-import { type ReactNode, useCallback, useMemo, useState } from 'react';
+import { type ReactNode, useCallback, useMemo, useRef } from 'react';
+import { useTaoConfig } from '../../provider/tao-provider';
 import { Drawer } from '../drawer/drawer';
 import { SearchIcon } from './select-icons';
-import { countLeafOptions, defaultFilter, filterTree } from './select-model';
-import type { SelectOption } from './select-types';
+import {
+  countLeafOptions,
+  defaultFilter,
+  filterTree,
+  flattenLeafOptions,
+} from './select-model';
+import type { SelectOption, SelectProps } from './select-types';
+import { useSelectSelection } from './use-select-selection';
 import './mobile-select.css';
 
-interface MobileSelectContentProps {
+interface MobileSelectContentProps
+  extends Pick<SelectProps, 'classNames' | 'styles' | 'popupRender'> {
   options: SelectOption[];
   value?: string | string[];
   onChange?: (value: string) => void;
@@ -13,6 +21,8 @@ interface MobileSelectContentProps {
   onMultiChange?: (values: string[]) => void;
   placeholder?: string;
   showSearch?: boolean;
+  searchValue: string;
+  onSearch: (value: string) => void;
   disabled?: boolean;
   filterOption?: (input: string, option: SelectOption) => boolean;
   notFoundContent?: ReactNode;
@@ -20,6 +30,10 @@ interface MobileSelectContentProps {
   onClose: () => void;
   /** Enable multi-select checkboxes + Done button flow. */
   multiple?: boolean;
+  maxCount?: number;
+  mode?: 'multiple' | 'tags';
+  tokenSeparators?: string[];
+  onSearchClear: () => void;
 }
 
 function MobileSelectContentInner({
@@ -28,28 +42,67 @@ function MobileSelectContentInner({
   onChange,
   onMultiChange,
   showSearch,
+  searchValue: search,
+  onSearch,
   filterOption,
   notFoundContent = 'No results',
   optionRender,
   onClose,
   multiple,
+  maxCount,
+  mode,
+  tokenSeparators,
+  onSearchClear,
   disabled,
+  classNames,
+  styles,
 }: MobileSelectContentProps) {
-  const [search, setSearch] = useState('');
-
+  const { locale } = useTaoConfig();
   const valueArray = useMemo<string[]>(() => {
     if (multiple) return (value as string[]) ?? [];
     return value ? [value as string] : [];
   }, [multiple, value]);
 
-  const [draft, setDraft] = useState<string[]>(valueArray);
-  const draftSet = useMemo(() => new Set(draft), [draft]);
+  const {
+    valueArray: draft,
+    selectedValueSet: draftSet,
+    selectedOptions,
+    select,
+    addTokens,
+  } = useSelectSelection(
+    { options, defaultValue: valueArray, mode, maxCount, tokenSeparators },
+    !!disabled,
+  );
+  const composingRef = useRef(false);
+  const createTag = () => {
+    addTokens(search);
+    onSearchClear();
+  };
 
+  const knownOptions = useMemo(() => flattenLeafOptions(options), [options]);
   const filteredOptions = useMemo(() => {
-    if (!showSearch || !search) return options;
+    const knownValues = new Set(knownOptions.map((option) => option.value));
+    const available =
+      mode === 'tags'
+        ? [
+            ...options,
+            ...selectedOptions.filter(
+              (option) => !knownValues.has(option.value),
+            ),
+          ]
+        : options;
+    if (!showSearch || !search) return available;
     const fn = filterOption ?? defaultFilter;
-    return filterTree(options, fn, search);
-  }, [options, search, showSearch, filterOption]);
+    return filterTree(available, fn, search);
+  }, [
+    options,
+    knownOptions,
+    selectedOptions,
+    mode,
+    search,
+    showSearch,
+    filterOption,
+  ]);
   const resultCount = useMemo(
     () => countLeafOptions(filteredOptions),
     [filteredOptions],
@@ -59,17 +112,13 @@ function MobileSelectContentInner({
     (optValue: string) => {
       if (disabled) return;
       if (multiple) {
-        setDraft((prev) =>
-          prev.includes(optValue)
-            ? prev.filter((v) => v !== optValue)
-            : [...prev, optValue],
-        );
+        if (select(optValue)) onSearchClear();
       } else {
         onChange?.(optValue);
         onClose();
       }
     },
-    [multiple, onChange, onClose, disabled],
+    [multiple, onChange, onClose, disabled, select, onSearchClear],
   );
 
   const handleDone = useCallback(() => {
@@ -82,15 +131,21 @@ function MobileSelectContentInner({
   const renderItem = (opt: SelectOption): ReactNode => {
     const index = optIndex++;
     const isSelected = multiple ? draftSet.has(opt.value) : opt.value === value;
+    const itemDisabled =
+      disabled ||
+      opt.disabled ||
+      (multiple && maxCount != null && draft.length >= maxCount && !isSelected);
     return (
       <button
         type="button"
         key={opt.value}
         data-tao-sheet-item=""
+        className={classNames?.item}
+        style={styles?.item}
         data-tao-selected={isSelected || undefined}
         aria-pressed={isSelected}
-        data-tao-disabled={disabled || opt.disabled || undefined}
-        disabled={disabled || opt.disabled}
+        data-tao-disabled={itemDisabled || undefined}
+        disabled={itemDisabled}
         onClick={() => {
           handleSelect(opt.value);
         }}
@@ -101,12 +156,30 @@ function MobileSelectContentInner({
         ) : (
           <>
             {opt.icon != null && (
-              <span data-tao-sheet-item-icon="">{opt.icon}</span>
+              <span
+                data-tao-sheet-item-icon=""
+                className={classNames?.itemIcon}
+                style={styles?.itemIcon}
+              >
+                {opt.icon}
+              </span>
             )}
             <span data-tao-sheet-item-main="">
-              <span data-tao-sheet-item-label="">{opt.label}</span>
+              <span
+                data-tao-sheet-item-label=""
+                className={classNames?.itemLabel}
+                style={styles?.itemLabel}
+              >
+                {opt.label}
+              </span>
               {opt.description != null && (
-                <span data-tao-sheet-item-desc="">{opt.description}</span>
+                <span
+                  data-tao-sheet-item-desc=""
+                  className={classNames?.itemDesc}
+                  style={styles?.itemDesc}
+                >
+                  {opt.description}
+                </span>
               )}
             </span>
           </>
@@ -123,8 +196,19 @@ function MobileSelectContentInner({
   const renderTree = (opts: SelectOption[]): ReactNode =>
     opts.map((o) =>
       o.options ? (
-        <div key={o.value} data-tao-sheet-group="">
-          <div data-tao-sheet-group-label="">{o.label}</div>
+        <div
+          key={o.value}
+          data-tao-sheet-group=""
+          className={classNames?.group}
+          style={styles?.group}
+        >
+          <div
+            data-tao-sheet-group-label=""
+            className={classNames?.groupLabel}
+            style={styles?.groupLabel}
+          >
+            {o.label}
+          </div>
           {o.options.map(renderItem)}
         </div>
       ) : (
@@ -135,23 +219,79 @@ function MobileSelectContentInner({
   return (
     <>
       {showSearch && (
-        <div data-tao-sheet-search="">
+        <div
+          data-tao-sheet-search=""
+          className={classNames?.search}
+          style={styles?.search}
+        >
           <SearchIcon />
           <input
             data-tao-sheet-search-input=""
+            className={classNames?.searchInput}
+            style={styles?.searchInput}
             value={search}
             disabled={disabled}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search..."
-            aria-label="Search options"
+            onChange={(e) => onSearch(e.target.value)}
+            onCompositionStart={() => {
+              composingRef.current = true;
+            }}
+            onCompositionEnd={() => {
+              composingRef.current = false;
+            }}
+            onKeyDown={(e) => {
+              if (
+                composingRef.current ||
+                e.nativeEvent.isComposing ||
+                e.keyCode === 229
+              )
+                return;
+              if (
+                multiple &&
+                (e.key === 'Enter' ||
+                  tokenSeparators?.some(
+                    (separator) => separator && search.includes(separator),
+                  ))
+              ) {
+                e.preventDefault();
+                createTag();
+              }
+            }}
+            placeholder={locale.searchPlaceholder}
+            aria-label={locale.searchOptions}
           />
         </div>
       )}
       <div data-tao-sheet-list="">
+        {mode === 'tags' &&
+          search.trim() &&
+          !draftSet.has(search.trim()) &&
+          !knownOptions.some(
+            (option) =>
+              option.value === search.trim() || option.label === search.trim(),
+          ) && (
+            <button
+              type="button"
+              data-tao-sheet-item=""
+              className={classNames?.item}
+              style={styles?.item}
+              disabled={
+                disabled || (maxCount != null && draft.length >= maxCount)
+              }
+              onClick={createTag}
+            >
+              {search.trim()}
+            </button>
+          )}
         {resultCount > 0 ? (
           renderTree(filteredOptions)
         ) : (
-          <div data-tao-sheet-empty="">{notFoundContent}</div>
+          <div
+            data-tao-sheet-empty=""
+            className={classNames?.empty}
+            style={styles?.empty}
+          >
+            {notFoundContent}
+          </div>
         )}
       </div>
       {multiple && (
@@ -159,10 +299,10 @@ function MobileSelectContentInner({
           <button
             type="button"
             data-tao-sheet-done=""
-            disabled={disabled}
+            disabled={disabled || (maxCount != null && draft.length > maxCount)}
             onClick={handleDone}
           >
-            Done
+            {locale.done}
           </button>
         </div>
       )}
@@ -180,21 +320,32 @@ export function MobileSelectDrawer({
   open,
   onClose,
   placeholder,
+  classNames,
+  styles,
+  popupRender,
   ...rest
 }: MobileSelectDrawerProps) {
+  const { locale } = useTaoConfig();
+  const content = (
+    <MobileSelectContentInner
+      onClose={onClose}
+      placeholder={placeholder}
+      classNames={classNames}
+      styles={styles}
+      {...rest}
+    />
+  );
   return (
     <Drawer
       open={open}
       onClose={onClose}
       placement="bottom"
-      title={placeholder ?? 'Select'}
+      title={placeholder ?? locale.select}
       height="70vh"
+      classNames={{ root: classNames?.popup }}
+      styles={{ root: styles?.popup }}
     >
-      <MobileSelectContentInner
-        onClose={onClose}
-        placeholder={placeholder}
-        {...rest}
-      />
+      {popupRender ? popupRender(content) : content}
     </Drawer>
   );
 }

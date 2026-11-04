@@ -3,6 +3,8 @@ title: Tag
 description: "Displays compact labels, statuses, categories, or checkable chips. Includes usage guidance, a runnable example, and the complete API reference."
 ---
 
+import Preview from '../../_components/demo-preview';
+
 Displays compact labels, statuses, categories, or checkable chips.
 
 ## When to use
@@ -18,7 +20,13 @@ Use Tag for lightweight metadata or status markers. Use CheckableTag for compact
 
 - Do not encode critical state by color alone.
 
-## Basic usage
+## Examples
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="tag-example-1">
+
+### Basic usage
 
 ```tsx preview
 import { Stack, Tag } from '@rockshin/tao-ui';
@@ -38,7 +46,11 @@ function TagExample() {
 export default TagExample;
 ```
 
-## Variants
+</section>
+
+<section className="tao-example" id="tag-example-2">
+
+### Variants
 
 ```tsx preview
 import { Stack, Tag } from '@rockshin/tao-ui';
@@ -47,18 +59,34 @@ function TagVariants() {
   return (
     <Stack gap="md">
       <Stack direction="horizontal" gap="sm">
-        <Tag variant="filled" color="primary">Filled</Tag>
-        <Tag variant="filled" color="success">Success</Tag>
-        <Tag variant="filled" color="warning">Warning</Tag>
+        <Tag variant="filled" color="primary">
+          Filled
+        </Tag>
+        <Tag variant="filled" color="success">
+          Success
+        </Tag>
+        <Tag variant="filled" color="warning">
+          Warning
+        </Tag>
       </Stack>
       <Stack direction="horizontal" gap="sm">
-        <Tag variant="solid" color="primary">Solid</Tag>
-        <Tag variant="solid" color="success">Success</Tag>
-        <Tag variant="solid" color="error">Error</Tag>
+        <Tag variant="solid" color="primary">
+          Solid
+        </Tag>
+        <Tag variant="solid" color="success">
+          Success
+        </Tag>
+        <Tag variant="solid" color="error">
+          Error
+        </Tag>
       </Stack>
       <Stack direction="horizontal" gap="sm">
-        <Tag variant="outlined" color="primary">Outlined</Tag>
-        <Tag variant="outlined" color="warning">Warning</Tag>
+        <Tag variant="outlined" color="primary">
+          Outlined
+        </Tag>
+        <Tag variant="outlined" color="warning">
+          Warning
+        </Tag>
       </Stack>
     </Stack>
   );
@@ -67,26 +95,59 @@ function TagVariants() {
 export default TagVariants;
 ```
 
-## Custom colors and closable tags
+</section>
+
+<section className="tao-example" id="tag-example-3">
+
+### Custom colors and closable tags
 
 ```tsx preview
+import { useState } from 'react';
 import { Stack, Tag } from '@rockshin/tao-ui';
 
 function CustomTags() {
+  const [feedback, setFeedback] = useState('');
   return (
-    <Stack direction="horizontal" gap="sm">
-      <Tag color="#245b57" variant="solid">Custom teal</Tag>
-      <Tag color="#8a5a21" variant="outlined">Custom ochre</Tag>
-      <Tag color="primary" closeIcon onClose={() => console.log('closed')}>Closable</Tag>
-      <Tag disabled color="primary" variant="solid">Disabled</Tag>
-    </Stack>
+    <>
+      <Stack direction="horizontal" gap="sm">
+        <Tag color="#245b57" variant="solid">
+          Custom teal
+        </Tag>
+        <Tag color="#8a5a21" variant="outlined">
+          Custom ochre
+        </Tag>
+        {feedback !== 'closed' && (
+          <Tag color="primary" closeIcon onClose={() => setFeedback('closed')}>
+            Closable
+          </Tag>
+        )}
+        <Tag disabled color="primary" variant="solid">
+          Disabled
+        </Tag>
+      </Stack>
+      <output
+        aria-live="polite"
+        style={{
+          display: 'block',
+          marginTop: 12,
+          whiteSpace: 'pre-wrap',
+          overflowWrap: 'anywhere',
+        }}
+      >
+        {feedback}
+      </output>
+    </>
   );
 }
 
 export default CustomTags;
 ```
 
-## Checkable tags
+</section>
+
+<section className="tao-example" id="tag-example-4">
+
+### Checkable tags
 
 ```tsx preview
 import { CheckableTag, Stack } from '@rockshin/tao-ui';
@@ -102,7 +163,11 @@ function CheckableTags() {
           key={label}
           checked={selected.includes(label)}
           onChange={(checked) =>
-            setSelected((items) => checked ? [...items, label] : items.filter((item) => item !== label))
+            setSelected((items) =>
+              checked
+                ? [...items, label]
+                : items.filter((item) => item !== label),
+            )
           }
         >
           {label}
@@ -114,6 +179,165 @@ function CheckableTags() {
 
 export default CheckableTags;
 ```
+
+</section>
+
+<section className="tao-example" id="tag-custom-color">
+
+### Custom colors
+
+Use custom colors for categories while keeping their meaning in readable text.
+
+```tsx preview
+import { Stack, Tag } from '@rockshin/tao-ui';
+
+export default function TagCustomColor() {
+  return (
+    <Stack gap="md">
+      <Stack direction="horizontal" gap="sm">
+        <Tag color="#6366f1">Indigo</Tag>
+        <Tag color="#ec4899">Pink</Tag>
+        <Tag color="#14b8a6">Teal</Tag>
+        <Tag color="#f97316">Orange</Tag>
+        <Tag color="#8b5cf6">Violet</Tag>
+      </Stack>
+      <Stack direction="horizontal" gap="sm">
+        <Tag color="#6366f1" variant="solid">
+          Indigo
+        </Tag>
+        <Tag color="#ec4899" variant="solid">
+          Pink
+        </Tag>
+        <Tag color="#14b8a6" variant="solid">
+          Teal
+        </Tag>
+        <Tag color="#f97316" variant="solid">
+          Orange
+        </Tag>
+        <Tag color="#8b5cf6" variant="solid">
+          Violet
+        </Tag>
+      </Stack>
+      <Stack direction="horizontal" gap="sm">
+        <Tag color="#6366f1" variant="outlined">
+          Indigo
+        </Tag>
+        <Tag color="#ec4899" variant="outlined">
+          Pink
+        </Tag>
+        <Tag color="#14b8a6" variant="outlined">
+          Teal
+        </Tag>
+        <Tag color="#f97316" variant="outlined">
+          Orange
+        </Tag>
+        <Tag color="#8b5cf6" variant="outlined">
+          Violet
+        </Tag>
+      </Stack>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="tag-with-icon">
+
+### Tags with icons
+
+Icons assist recognition while text retains the full meaning.
+
+```tsx preview
+import { Stack, Tag } from '@rockshin/tao-ui';
+
+export default function TagWithIcon() {
+  return (
+    <Stack direction="horizontal" gap="sm">
+      <Tag icon={<span>🔥</span>} color="error">
+        Hot
+      </Tag>
+      <Tag icon={<span>✅</span>} color="success">
+        Done
+      </Tag>
+      <Tag icon={<span>⚡</span>} color="warning">
+        Fast
+      </Tag>
+      <Tag icon={<span>🏷️</span>}>Label</Tag>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="tag-checkable">
+
+### Checkable tags
+
+Use `checked` and its change callback for lightweight category filtering.
+
+```tsx preview
+import { CheckableTag, Stack } from '@rockshin/tao-ui';
+
+import { useState } from 'react';
+
+export default function TagCheckable() {
+  function Demo() {
+    const [selected, setSelected] = useState<string[]>(['react']);
+    const options = ['react', 'vue', 'angular', 'svelte', 'solid'];
+    return (
+      <Stack direction="horizontal" gap="sm">
+        {options.map((opt) => (
+          <CheckableTag
+            key={opt}
+            checked={selected.includes(opt)}
+            onChange={(checked) =>
+              setSelected((prev) =>
+                checked ? [...prev, opt] : prev.filter((x) => x !== opt),
+              )
+            }
+          >
+            {opt}
+          </CheckableTag>
+        ))}
+      </Stack>
+    );
+  }
+  return <Demo />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="tag-disabled">
+
+### Disabled tags
+
+Disable selection or removal while retaining the label for reading.
+
+```tsx preview
+import { CheckableTag, Stack, Tag } from '@rockshin/tao-ui';
+
+export default function TagDisabled() {
+  return (
+    <Stack direction="horizontal" gap="sm">
+      <Tag disabled>Disabled</Tag>
+      <Tag disabled color="primary" variant="solid">
+        Disabled Solid
+      </Tag>
+      <Tag disabled onClose={() => {}}>
+        Can't Close
+      </Tag>
+      <CheckableTag disabled>Can't Check</CheckableTag>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+</div>
 
 ## API
 

@@ -1,0 +1,140 @@
+@layer tao {
+  [data-tao-float-button],
+  [data-tao-float-button-group] {
+    position: fixed;
+    inset-inline-end: 24px;
+    bottom: 48px;
+    z-index: calc(var(--tao-z-index-base) + 99);
+  }
+  [data-tao-float-button] {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    min-height: 40px;
+    padding: 8px;
+    box-sizing: border-box;
+    border: 1px solid var(--tao-color-border);
+    border-radius: 50%;
+    background: var(--tao-color-bg-elevated);
+    color: var(--tao-color-text);
+    box-shadow: 0 2px 8px
+      color-mix(in oklab, var(--tao-color-text) 15%, transparent);
+    cursor: pointer;
+    font: var(--tao-font-size-sm) / 1.25 var(--tao-font-family);
+    text-decoration: none;
+    transition:
+      background-color 150ms,
+      color 150ms,
+      border-color 150ms;
+  }
+  [data-tao-float-button][data-tao-shape="square"] {
+    border-radius: var(--tao-radius);
+  }
+  [data-tao-float-button]:not(:disabled):not([aria-disabled]):hover {
+    background: var(--tao-color-fill-secondary);
+  }
+  [data-tao-float-button]:focus-visible {
+    outline: 2px solid var(--tao-color-primary);
+    outline-offset: 3px;
+  }
+  [data-tao-float-button][data-tao-type="primary"] {
+    background: var(--tao-color-primary);
+    border-color: var(--tao-color-primary);
+    color: var(--tao-primary-fg);
+  }
+  [data-tao-float-button][data-tao-type="primary"]:not(:disabled):not(
+    [aria-disabled]
+  ):hover {
+    background: var(--tao-primary-hover);
+  }
+  [data-tao-float-button]:disabled,
+  [data-tao-float-button][aria-disabled] {
+    cursor: not-allowed;
+    color: var(--tao-color-text-disabled);
+    background: var(--tao-color-fill-tertiary);
+  }
+  [data-tao-float-button-icon] {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+  }
+  [data-tao-float-button-content] {
+    overflow-wrap: anywhere;
+    text-align: center;
+  }
+  [data-tao-float-button-badge] {
+    position: absolute;
+    top: -4px;
+    inset-inline-end: -4px;
+  }
+  [data-tao-float-button-group] {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  [data-tao-float-button][data-tao-in-group] {
+    position: relative;
+    inset: auto;
+  }
+  [data-tao-float-button-list] {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  [data-tao-float-button-group][data-tao-placement="bottom"] {
+    flex-direction: column-reverse;
+  }
+  [data-tao-float-button-group][data-tao-placement="left"] {
+    flex-direction: row;
+    align-items: center;
+  }
+  [data-tao-float-button-group][data-tao-placement="right"] {
+    flex-direction: row-reverse;
+    align-items: center;
+  }
+  [data-tao-float-button-group][data-tao-placement="left"]
+    [data-tao-float-button-list],
+  [data-tao-float-button-group][data-tao-placement="right"]
+    [data-tao-float-button-list] {
+    flex-direction: row;
+  }
+  [data-tao-float-button-group][data-tao-shape="square"]
+    [data-tao-float-button-list] {
+    gap: 0;
+    overflow: hidden;
+    border-radius: var(--tao-radius);
+    box-shadow: 0 2px 8px
+      color-mix(in oklab, var(--tao-color-text) 15%, transparent);
+  }
+  [data-tao-float-button-group][data-tao-shape="square"]
+    [data-tao-float-button-list]
+    [data-tao-float-button] {
+    border-radius: 0;
+    box-shadow: none;
+  }
+  [data-tao-float-button][data-tao-show-progress]::before {
+    content: "";
+    position: absolute;
+    inset: -3px;
+    padding: 2px;
+    border-radius: inherit;
+    background: conic-gradient(
+      var(--tao-color-primary) var(--tao-float-progress),
+      transparent 0
+    );
+    mask:
+      linear-gradient(var(--tao-color-text) 0 0) content-box,
+      linear-gradient(var(--tao-color-text) 0 0);
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    [data-tao-float-button] {
+      transition: none;
+    }
+  }
+}

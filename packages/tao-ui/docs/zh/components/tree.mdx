@@ -1,0 +1,377 @@
+---
+title: Tree
+description: "通过层级展开、勾选、异步子节点、拖拽和虚拟滚动浏览树形数据。"
+---
+
+import Preview from '../../_components/demo-preview';
+
+通过层级展开、勾选、异步子节点、拖拽和虚拟滚动浏览树形数据。
+
+每个示例都可以独立复制运行。带设备预览的示例可通过工具栏切换桌面与手机宽度。
+
+## 示例
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="tree-basic">
+
+### 展开与选择
+
+为节点提供稳定 key。方向键浏览节点，Enter 选择当前节点。
+
+```tsx preview
+import { Tree } from '@rockshin/tao-ui';
+const nodes = [
+  {
+    key: 'workspace',
+    title: 'Workspace',
+    children: [
+      {
+        key: 'design',
+        title: 'Design',
+        children: [{ key: 'tokens', title: 'tokens.json', isLeaf: true }],
+      },
+      {
+        key: 'engineering',
+        title: 'Engineering',
+        children: [{ key: 'readme', title: 'README.md', isLeaf: true }],
+      },
+    ],
+  },
+];
+export default function BasicTree() {
+  return (
+    <Tree
+      aria-label="Project files"
+      treeData={nodes}
+      defaultExpandedKeys={['workspace']}
+      showLine
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="tree-controlled">
+
+### 受控勾选
+
+勾选父节点会联动可用的后代节点，将回调中的 keys 存入状态。
+
+```tsx preview
+import { useState, type Key } from 'react';
+import { Tree } from '@rockshin/tao-ui';
+const nodes = [
+  {
+    key: 'workspace',
+    title: 'Workspace',
+    children: [
+      {
+        key: 'design',
+        title: 'Design',
+        children: [{ key: 'tokens', title: 'tokens.json', isLeaf: true }],
+      },
+      {
+        key: 'engineering',
+        title: 'Engineering',
+        children: [{ key: 'readme', title: 'README.md', isLeaf: true }],
+      },
+    ],
+  },
+];
+export default function ControlledTree() {
+  const [checked, setChecked] = useState<Key[]>(['tokens']);
+  return (
+    <div>
+      <Tree
+        checkable
+        defaultExpandAll
+        treeData={nodes}
+        checkedKeys={checked}
+        onCheck={(keys) =>
+          setChecked(Array.isArray(keys) ? keys : keys.checked)
+        }
+      />
+      <output>Checked: {checked.join(', ') || 'none'}</output>
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="tree-strict">
+
+### 独立勾选与禁用
+
+checkStrictly 让父子节点独立勾选；disabled 禁用节点，disableCheckbox 只禁用勾选。
+
+```tsx preview
+import { Tree } from '@rockshin/tao-ui';
+export default function StrictChecks() {
+  return (
+    <Tree
+      checkable
+      checkStrictly
+      defaultExpandAll
+      defaultCheckedKeys={['root']}
+      treeData={[
+        {
+          key: 'root',
+          title: 'Independent parent',
+          children: [
+            { key: 'a', title: 'Selectable child' },
+            { key: 'b', title: 'Checkbox disabled', disableCheckbox: true },
+            { key: 'c', title: 'Entire node disabled', disabled: true },
+          ],
+        },
+      ]}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="tree-directory">
+
+### 目录树
+
+DirectoryTree 提供文件夹和文件图标；multiple 开启后支持修饰键与范围选择。
+
+```tsx preview
+import { Tree } from '@rockshin/tao-ui';
+const nodes = [
+  {
+    key: 'workspace',
+    title: 'Workspace',
+    children: [
+      {
+        key: 'design',
+        title: 'Design',
+        children: [{ key: 'tokens', title: 'tokens.json', isLeaf: true }],
+      },
+      {
+        key: 'engineering',
+        title: 'Engineering',
+        children: [{ key: 'readme', title: 'README.md', isLeaf: true }],
+      },
+    ],
+  },
+];
+export default function FileBrowser() {
+  return (
+    <Tree.DirectoryTree
+      aria-label="Files"
+      multiple
+      defaultExpandAll
+      treeData={nodes}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="tree-render">
+
+### 自定义标题与语义样式
+
+titleRender 装饰节点内容而不改变 key；语义样式作用于实际标题部件。
+
+```tsx preview
+import { Tree, type DataNode } from '@rockshin/tao-ui';
+const nodes: DataNode[] = [
+  {
+    key: 'workspace',
+    title: 'Workspace',
+    children: [
+      {
+        key: 'design',
+        title: 'Design',
+        children: [{ key: 'tokens', title: 'tokens.json', isLeaf: true }],
+      },
+      {
+        key: 'engineering',
+        title: 'Engineering',
+        children: [{ key: 'readme', title: 'README.md', isLeaf: true }],
+      },
+    ],
+  },
+];
+export default function CustomTitles() {
+  return (
+    <Tree
+      treeData={nodes}
+      defaultExpandAll
+      showLine={{ showLeafIcon: false }}
+      titleRender={(node) => (
+        <span>
+          {node.title as string}
+          {node.isLeaf && (
+            <small style={{ marginInlineStart: 8, opacity: 0.55 }}>file</small>
+          )}
+        </span>
+      )}
+      styles={{ itemTitle: { fontWeight: 500 } }}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="tree-async">
+
+### 按需加载子节点
+
+此本地示例模拟延迟结果，更新父节点后完成 loadData。
+
+```tsx preview
+import { useState } from 'react';
+import { Tree, type DataNode } from '@rockshin/tao-ui';
+export default function AsyncTree() {
+  const [nodes, setNodes] = useState<DataNode[]>([
+    { key: 'reports', title: 'Reports' },
+  ]);
+  return (
+    <Tree
+      treeData={nodes}
+      loadData={async (node) => {
+        if (node.children) return;
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        setNodes([
+          {
+            key: 'reports',
+            title: 'Reports',
+            children: [
+              { key: 'annual', title: 'Annual report', isLeaf: true },
+              { key: 'monthly', title: 'Monthly report', isLeaf: true },
+            ],
+          },
+        ]);
+      }}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="tree-virtual">
+
+### 虚拟列表与定位
+
+设置有限高度启用虚拟渲染；ref 可以定位到当前视口外的节点。
+
+```tsx preview
+import { useRef } from 'react';
+import { Button, Tree, type TreeRef } from '@rockshin/tao-ui';
+const nodes = Array.from({ length: 500 }, (_, index) => ({
+  key: `row-${index}`,
+  title: `Document ${index + 1}`,
+}));
+export default function VirtualTree() {
+  const ref = useRef<TreeRef>(null);
+  return (
+    <div style={{ display: 'grid', gap: 12 }}>
+      <Button
+        onClick={() => ref.current?.scrollTo({ key: 'row-399', align: 'top' })}
+      >
+        Jump to document 400
+      </Button>
+      <Tree ref={ref} treeData={nodes} height={220} virtual blockNode />
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="tree-drag">
+
+### 拖拽调整顺序
+
+示例只允许在行间放置并保存新顺序；嵌套移动可以使用同一 onDrop 契约。
+
+```tsx preview
+import { useState } from 'react';
+import { Tree } from '@rockshin/tao-ui';
+export default function ReorderTree() {
+  const [nodes, setNodes] = useState(
+    ['Inbox', 'In review', 'Published'].map((title) => ({ key: title, title })),
+  );
+  return (
+    <Tree
+      treeData={nodes}
+      draggable
+      blockNode
+      allowDrop={({ dropPosition }) => dropPosition !== 0}
+      onDrop={(info) => {
+        const moving = nodes.find((node) => node.key === info.dragNode.key)!;
+        const next = nodes.filter((node) => node.key !== moving.key);
+        const at = next.findIndex((node) => node.key === info.node.key);
+        const offset =
+          info.dropPosition - Number(info.node.pos.split('-').at(-1));
+        next.splice(at + (offset > 0 ? 1 : 0), 0, moving);
+        setNodes(next);
+      }}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="tree-mobile">
+
+### 窄屏树形面板
+
+在手机预览中展开、勾选节点，列表在有限高度内滚动。
+
+```tsx preview="iframe-follow"
+import { Tree } from '@rockshin/tao-ui';
+const nodes = [
+  {
+    key: 'workspace',
+    title: 'Workspace',
+    children: [
+      {
+        key: 'design',
+        title: 'Design',
+        children: [{ key: 'tokens', title: 'tokens.json', isLeaf: true }],
+      },
+      {
+        key: 'engineering',
+        title: 'Engineering',
+        children: [{ key: 'readme', title: 'README.md', isLeaf: true }],
+      },
+    ],
+  },
+];
+export default function MobileTree() {
+  return (
+    <div style={{ padding: 16 }}>
+      <h3>Project access</h3>
+      <Tree
+        aria-label="Access permissions"
+        treeData={nodes}
+        checkable
+        defaultExpandAll
+        blockNode
+        height={280}
+        styles={{ item: { minHeight: 40 } }}
+      />
+    </div>
+  );
+}
+```
+
+</section>
+
+</div>
+
+## API
+
+<API moduleName="tree" />

@@ -159,7 +159,7 @@ export function useSelectSelection(props: SelectionProps, disabled: boolean) {
 
   const commit = useCallback(
     (nextArray: string[]) => {
-      if (disabled) return;
+      if (disabled || (maxCount != null && nextArray.length > maxCount)) return;
       publish(nextArray);
       const nextSet = new Set(nextArray);
       for (const next of nextArray) {
@@ -177,6 +177,7 @@ export function useSelectSelection(props: SelectionProps, disabled: boolean) {
     },
     [
       disabled,
+      maxCount,
       valueArray,
       selectedValueSet,
       optionByValue,

@@ -3,6 +3,8 @@ title: RangePicker
 description: 选择开始与结束日期，并可包含时间和快捷预设。页面涵盖适用场景、设计建议、多组可运行示例、交互状态与完整 API 参考。
 ---
 
+import Preview from '../../_components/demo-preview';
+
 选择开始与结束日期，并可包含时间和快捷预设。
 
 ## 何时使用
@@ -18,7 +20,13 @@ description: 选择开始与结束日期，并可包含时间和快捷预设。�
 
 - 只选单日时不要使用 RangePicker。
 
-## 基础用法
+## 代码演示
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="range-picker-example-1">
+
+### 基础用法
 
 ```tsx preview
 import { FormField, RangePicker } from '@rockshin/tao-ui';
@@ -34,15 +42,22 @@ function RangePickerExample() {
 export default RangePickerExample;
 ```
 
-## 受控日期范围
+</section>
+
+<section className="tao-example" id="range-picker-example-2">
+
+### 受控日期范围
 
 ```tsx preview
 import { RangePicker } from '@rockshin/tao-ui';
-import dayjs from 'dayjs';
+import dayjs, { type Dayjs } from 'dayjs';
 import { useState } from 'react';
 
 function ControlledRangePicker() {
-  const [value, setValue] = useState([dayjs().startOf('week'), dayjs().endOf('week')]);
+  const [value, setValue] = useState<[Dayjs | null, Dayjs | null] | null>([
+    dayjs().startOf('week'),
+    dayjs().endOf('week'),
+  ]);
 
   return <RangePicker value={value} onChange={setValue} />;
 }
@@ -50,7 +65,11 @@ function ControlledRangePicker() {
 export default ControlledRangePicker;
 ```
 
-## 预设与时间
+</section>
+
+<section className="tao-example" id="range-picker-example-3">
+
+### 预设与时间
 
 ```tsx preview
 import { RangePicker, Stack } from '@rockshin/tao-ui';
@@ -61,8 +80,14 @@ function RangePickerPresets() {
     <Stack gap="md">
       <RangePicker
         presets={[
-          { label: 'This week', value: [dayjs().startOf('week'), dayjs().endOf('week')] },
-          { label: 'This month', value: [dayjs().startOf('month'), dayjs().endOf('month')] },
+          {
+            label: 'This week',
+            value: [dayjs().startOf('week'), dayjs().endOf('week')],
+          },
+          {
+            label: 'This month',
+            value: [dayjs().startOf('month'), dayjs().endOf('month')],
+          },
         ]}
       />
       <RangePicker showTime />
@@ -72,6 +97,307 @@ function RangePickerPresets() {
 
 export default RangePickerPresets;
 ```
+
+</section>
+
+<section className="tao-example" id="range-picker-range-picker-basic">
+
+### 范围选择与清除
+
+依次选择开始和结束日期，维护范围值并提供清除入口。
+
+```tsx preview
+import { FormField, RangePicker, Stack } from '@rockshin/tao-ui';
+
+import type { Dayjs } from 'dayjs';
+
+import { useState } from 'react';
+
+export default function DatePickerRangePickerBasic() {
+  function Demo() {
+    const [val, setVal] = useState<[Dayjs | null, Dayjs | null] | null>(null);
+    return (
+      <Stack gap="md" style={{ maxWidth: 500 }}>
+        <FormField label="Date Range">
+          <RangePicker value={val} onChange={(d) => setVal(d)} />
+        </FormField>
+        <p style={{ fontSize: 13, color: 'var(--tao-color-text-secondary)' }}>
+          Range: {val?.[0]?.format('YYYY-MM-DD') ?? '?'} ~{' '}
+          {val?.[1]?.format('YYYY-MM-DD') ?? '?'}
+        </p>
+      </Stack>
+    );
+  }
+  return <Demo />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="range-picker-range-picker-presets">
+
+### 常用时间范围
+
+为报表和筛选提供常用范围；预设值与用户手选范围使用同一值结构。
+
+```tsx preview
+import { FormField, RangePicker, Stack } from '@rockshin/tao-ui';
+
+import type { Dayjs } from 'dayjs';
+
+import dayjs from 'dayjs';
+
+import { useState } from 'react';
+
+export default function DatePickerRangePickerPresets() {
+  function Demo() {
+    const [val, setVal] = useState<[Dayjs | null, Dayjs | null] | null>(null);
+    return (
+      <Stack gap="md" style={{ maxWidth: 500 }}>
+        <FormField label="Range with presets">
+          <RangePicker
+            value={val}
+            onChange={(d) => setVal(d)}
+            presets={[
+              {
+                label: 'This week',
+                value: [dayjs().startOf('week'), dayjs().endOf('week')],
+              },
+              {
+                label: 'This month',
+                value: [dayjs().startOf('month'), dayjs().endOf('month')],
+              },
+              {
+                label: 'Last 7 days',
+                value: [dayjs().subtract(7, 'day'), dayjs()],
+              },
+              {
+                label: 'Last 30 days',
+                value: [dayjs().subtract(30, 'day'), dayjs()],
+              },
+            ]}
+          />
+        </FormField>
+      </Stack>
+    );
+  }
+  return <Demo />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="range-picker-sizes">
+
+### 尺寸与外观
+
+选择不同尺寸与 variant，匹配页面中的其他输入控件。
+
+```tsx preview
+import { RangePicker, Stack } from '@rockshin/tao-ui';
+export default function Example() {
+  return (
+    <Stack direction="vertical">
+      {(['small', 'medium', 'large'] as const).map((size) => (
+        <RangePicker key={size} size={size} />
+      ))}
+      <RangePicker variant="filled" />
+      <RangePicker variant="borderless" />
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="range-picker-status">
+
+### 状态与禁用
+
+error 与 warning 表达校验状态，disabled 用于不可编辑的值。
+
+```tsx preview
+import { RangePicker, Stack } from '@rockshin/tao-ui';
+export default function Example() {
+  return (
+    <Stack direction="vertical">
+      <RangePicker status="error" />
+      <RangePicker status="warning" />
+      <RangePicker disabled />
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="range-picker-mobile">
+
+### 移动端选择
+
+在手机预览中打开选择器，体验抽屉内的选择、确认和清空。
+
+```tsx preview="iframe-follow"
+import { RangePicker, TaoProvider, zhCN } from '@rockshin/tao-ui';
+export default function Example() {
+  return (
+    <TaoProvider locale={zhCN}>
+      <RangePicker allowClear />
+    </TaoProvider>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="range-picker-locale">
+
+### 切换语言
+
+通过 TaoProvider 的 locale 同步内置按钮、占位文字与日历标签。
+
+```tsx preview
+import { useState } from 'react';
+import {
+  RangePicker,
+  TaoProvider,
+  zhCN,
+  enUS,
+  Button,
+  Stack,
+} from '@rockshin/tao-ui';
+export default function Example() {
+  const [chinese, setChinese] = useState(false);
+  return (
+    <Stack direction="vertical">
+      <Button onClick={() => setChinese(!chinese)}>
+        {chinese ? 'Switch to English' : '切换到中文'}
+      </Button>
+      <TaoProvider locale={chinese ? zhCN : enUS}>
+        <RangePicker />
+      </TaoProvider>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="range-picker-bounded">
+
+### 限制日期范围
+
+minDate 与 maxDate 同时限制输入和日历导航，示例固定为 2026 年以便复现。
+
+```tsx preview
+import dayjs from 'dayjs';
+import { RangePicker } from '@rockshin/tao-ui';
+export default function Example() {
+  return (
+    <RangePicker
+      minDate={dayjs('2026-01-01')}
+      maxDate={dayjs('2026-12-31')}
+      defaultValue={[dayjs('2026-06-10'), dayjs('2026-06-15')]}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="range-picker-controlled">
+
+### 受控值与清空
+
+在 onChange 中保存值；清空后将值设为 null。
+
+```tsx preview
+import { useState } from 'react';
+import type { Dayjs } from 'dayjs';
+import { RangePicker, Button, Stack } from '@rockshin/tao-ui';
+export default function Example() {
+  const [value, setValue] = useState<[Dayjs | null, Dayjs | null] | null>(null);
+  return (
+    <Stack direction="vertical">
+      <RangePicker value={value} onChange={setValue} allowClear />
+      <Button onClick={() => setValue(null)}>Clear value</Button>
+      <output>
+        {value?.map((date) => date?.format('YYYY-MM-DD') || '—').join(' → ') ||
+          'No selection'}
+      </output>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="range-picker-format">
+
+### 自定义显示格式
+
+format 控制显示文本，值仍是 Dayjs；不要将显示格式误认为存储格式。
+
+```tsx preview
+import { RangePicker } from '@rockshin/tao-ui';
+export default function Example() {
+  return <RangePicker format="DD/MM/YYYY" />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="range-picker-time-range">
+
+### 日期与时间范围
+
+showTime 增加两端的时间选择，确认后提交完整区间。
+
+```tsx preview
+import { RangePicker } from '@rockshin/tao-ui';
+export default function Example() {
+  return <RangePicker showTime format="YYYY-MM-DD HH:mm" />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="range-picker-modes">
+
+### 月份与年份范围
+
+picker 选择月份或年份粒度。
+
+```tsx preview
+import { RangePicker, Stack } from '@rockshin/tao-ui';
+export default function Example() {
+  return (
+    <Stack direction="vertical">
+      <RangePicker picker="month" />
+      <RangePicker picker="year" />
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="range-picker-disabled-end">
+
+### 仅禁用一端
+
+元组形式的 disabled 可单独锁定开始或结束输入。
+
+```tsx preview
+import { RangePicker } from '@rockshin/tao-ui';
+export default function Example() {
+  return <RangePicker disabled={[true, false]} />;
+}
+```
+
+</section>
+
+</div>
 
 ## API
 

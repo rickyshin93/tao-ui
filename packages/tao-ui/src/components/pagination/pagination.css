@@ -3,6 +3,9 @@
    =========================== */
 [data-tao-pagination] {
   display: flex;
+  flex-wrap: wrap;
+  min-width: 0;
+  max-width: 100%;
   align-items: center;
   gap: var(--tao-padding-xxs);
   font-family: var(--tao-font-family);
@@ -164,4 +167,12 @@
 [data-tao-pagination][data-tao-disabled] {
   opacity: var(--tao-opacity-loading);
   pointer-events: none;
+}
+
+@media (pointer: coarse) {
+  [data-tao-pagination] [data-tao-pagination-btn],
+  [data-tao-pagination] [data-tao-pagination-sizer] {
+    min-width: 44px;
+    min-height: 44px;
+  }
 }

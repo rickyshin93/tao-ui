@@ -1,0 +1,313 @@
+import * as TooltipPrimitive from '@radix-ui/react-tooltip';
+import RcSlider, {
+  type SliderProps as RcSliderProps,
+  type SliderRef,
+} from '@rc-component/slider';
+import {
+  type CSSProperties,
+  forwardRef,
+  type ReactElement,
+  type ReactNode,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
+import { TaoPortalScope, useTaoConfig } from '../../provider/tao-provider';
+import {
+  cx,
+  type SemanticClassNames,
+  type SemanticStyles,
+} from '../../utils/semantic';
+import type { TooltipProps } from '../tooltip/tooltip';
+import '../tooltip/tooltip.css';
+import './slider.css';
+import { interopDefault } from '../../utils/interop-default';
+
+const RcSliderComponent = /*#__PURE__*/ interopDefault(RcSlider);
+
+export type { SliderRef };
+export type SliderSemanticPart =
+  | 'root'
+  | 'tracks'
+  | 'track'
+  | 'rail'
+  | 'handle';
+export type SliderMarks = RcSliderProps['marks'];
+export type Formatter = ((value?: number) => ReactNode) | null;
+export interface SliderTooltipProps
+  extends Omit<TooltipProps, 'children' | 'title' | 'placement'> {
+  prefixCls?: string;
+  placement?:
+    | 'top'
+    | 'topLeft'
+    | 'topRight'
+    | 'bottom'
+    | 'bottomLeft'
+    | 'bottomRight'
+    | 'left'
+    | 'leftTop'
+    | 'leftBottom'
+    | 'right'
+    | 'rightTop'
+    | 'rightBottom';
+  getPopupContainer?: (trigger: HTMLElement) => HTMLElement;
+  formatter?: Formatter;
+  autoAdjustOverflow?: boolean;
+}
+export interface SliderBaseProps
+  extends Omit<
+    RcSliderProps,
+    | 'value'
+    | 'defaultValue'
+    | 'onChange'
+    | 'onAfterChange'
+    | 'onChangeComplete'
+    | 'range'
+    | 'classNames'
+    | 'styles'
+  > {
+  rootClassName?: string;
+  orientation?: 'horizontal' | 'vertical';
+  direction?: 'ltr' | 'rtl';
+  tooltip?: SliderTooltipProps;
+  classNames?:
+    | SemanticClassNames<SliderSemanticPart>
+    | ((info: {
+        props: SliderProps;
+      }) => SemanticClassNames<SliderSemanticPart>);
+  styles?:
+    | SemanticStyles<SliderSemanticPart>
+    | ((info: { props: SliderProps }) => SemanticStyles<SliderSemanticPart>);
+}
+export interface SliderSingleProps extends SliderBaseProps {
+  range?: false;
+  value?: number;
+  defaultValue?: number;
+  onChange?: (value: number) => void;
+  onAfterChange?: (value: number) => void;
+  onChangeComplete?: (value: number) => void;
+}
+export interface SliderRangeProps extends SliderBaseProps {
+  range: Exclude<RcSliderProps['range'], false | undefined>;
+  value?: number[];
+  defaultValue?: number[];
+  onChange?: (value: number[]) => void;
+  onAfterChange?: (value: number[]) => void;
+  onChangeComplete?: (value: number[]) => void;
+}
+export type SliderProps = SliderSingleProps | SliderRangeProps;
+
+function SliderTip({
+  children,
+  value,
+  dragging,
+  disabled,
+  vertical,
+  direction,
+  options,
+}: {
+  children: ReactElement;
+  value: number;
+  dragging: boolean;
+  disabled: boolean;
+  vertical: boolean;
+  direction: 'ltr' | 'rtl';
+  options: SliderTooltipProps;
+}) {
+  const [trigger, setTrigger] = useState<HTMLElement | null>(null);
+  const [active, setActive] = useState(options.defaultOpen ?? false);
+  const pointerDriven = useRef(false);
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined,
+  );
+  useEffect(() => () => clearTimeout(closeTimer.current), []);
+  const {
+    formatter,
+    open,
+    placement = vertical ? (direction === 'rtl' ? 'left' : 'right') : 'top',
+    getPopupContainer,
+    autoAdjustOverflow = true,
+    arrow = true,
+    prefixCls,
+    className,
+    classNames,
+    styles,
+    style,
+    color,
+    mouseEnterDelay = 0.1,
+    mouseLeaveDelay = 0.1,
+    onOpenChange,
+    defaultOpen,
+  } = options;
+  const title =
+    formatter === null ? null : formatter ? formatter(value) : String(value);
+  const side = placement.startsWith('top')
+    ? 'top'
+    : placement.startsWith('bottom')
+      ? 'bottom'
+      : placement.startsWith('left')
+        ? 'left'
+        : 'right';
+  const align =
+    placement.endsWith('Left') || placement.endsWith('Top')
+      ? 'start'
+      : placement.endsWith('Right') || placement.endsWith('Bottom')
+        ? 'end'
+        : 'center';
+  const visible =
+    title != null &&
+    title !== '' &&
+    (open ?? (!disabled && (dragging || active)));
+  return (
+    <TooltipPrimitive.Provider delayDuration={mouseEnterDelay * 1000}>
+      <TooltipPrimitive.Root
+        defaultOpen={defaultOpen}
+        open={visible}
+        onOpenChange={(next) => {
+          clearTimeout(closeTimer.current);
+          const update = () => {
+            setActive(next);
+            onOpenChange?.(next);
+          };
+          if (!next && pointerDriven.current && mouseLeaveDelay > 0)
+            closeTimer.current = setTimeout(update, mouseLeaveDelay * 1000);
+          else update();
+        }}
+      >
+        <TooltipPrimitive.Trigger
+          asChild
+          ref={setTrigger}
+          onPointerEnter={() => {
+            pointerDriven.current = true;
+            clearTimeout(closeTimer.current);
+          }}
+          onBlur={() => {
+            pointerDriven.current = false;
+          }}
+        >
+          {children}
+        </TooltipPrimitive.Trigger>
+        <TooltipPrimitive.Portal
+          container={
+            trigger && getPopupContainer
+              ? getPopupContainer(trigger)
+              : undefined
+          }
+        >
+          <TaoPortalScope>
+            <TooltipPrimitive.Content
+              data-tao-tooltip-content=""
+              side={side}
+              align={align}
+              sideOffset={8}
+              avoidCollisions={autoAdjustOverflow}
+              updatePositionStrategy="always"
+              className={cx(prefixCls, classNames?.content, className)}
+              style={{
+                ...(color ? { backgroundColor: color } : {}),
+                ...styles?.content,
+                ...style,
+              }}
+            >
+              {title}
+              {arrow && (
+                <TooltipPrimitive.Arrow asChild>
+                  <span
+                    data-tao-tooltip-arrow=""
+                    className={classNames?.arrow}
+                    style={{
+                      ...(color
+                        ? ({ '--tao-tooltip-arrow-bg': color } as CSSProperties)
+                        : {}),
+                      ...styles?.arrow,
+                    }}
+                  />
+                </TooltipPrimitive.Arrow>
+              )}
+            </TooltipPrimitive.Content>
+          </TaoPortalScope>
+        </TooltipPrimitive.Portal>
+      </TooltipPrimitive.Root>
+    </TooltipPrimitive.Provider>
+  );
+}
+
+export const Slider = forwardRef<SliderRef, SliderProps>((props, ref) => {
+  const {
+    prefixCls = 'tao-slider',
+    classNames,
+    styles,
+    rootClassName,
+    className,
+    style,
+    orientation,
+    vertical = false,
+    direction = 'ltr',
+    disabled,
+    tooltip = {},
+    handleRender,
+    reverse,
+    ...rest
+  } = props;
+  const config = useTaoConfig();
+  const resolvedDisabled = disabled ?? config.disabled;
+  const resolvedVertical = orientation ? orientation === 'vertical' : vertical;
+  const mergedProps = {
+    ...props,
+    disabled: resolvedDisabled,
+    vertical: resolvedVertical,
+  };
+  const classes =
+    typeof classNames === 'function'
+      ? classNames({ props: mergedProps })
+      : classNames;
+  const semanticStyles =
+    typeof styles === 'function' ? styles({ props: mergedProps }) : styles;
+  const allDisabled = Array.isArray(resolvedDisabled)
+    ? resolvedDisabled.every(Boolean)
+    : resolvedDisabled;
+  return (
+    <div
+      data-tao-slider=""
+      data-tao-vertical={resolvedVertical ? '' : undefined}
+      data-tao-disabled={allDisabled ? '' : undefined}
+      dir={direction}
+    >
+      <RcSliderComponent
+        {...(rest as RcSliderProps)}
+        ref={ref}
+        prefixCls={prefixCls}
+        disabled={resolvedDisabled}
+        vertical={resolvedVertical}
+        reverse={direction === 'rtl' && !resolvedVertical ? !reverse : reverse}
+        className={cx(classes?.root, rootClassName, className)}
+        style={{ ...semanticStyles?.root, ...style }}
+        classNames={{
+          tracks: cx('tao-slider-tracks-slot', classes?.tracks),
+          track: cx('tao-slider-track-slot', classes?.track),
+          rail: cx('tao-slider-rail-slot', classes?.rail),
+          handle: cx('tao-slider-handle-slot', classes?.handle),
+        }}
+        styles={semanticStyles}
+        handleRender={(node, info) => (
+          <SliderTip
+            key={info.index}
+            value={info.value}
+            dragging={info.dragging}
+            disabled={
+              Array.isArray(resolvedDisabled)
+                ? !!resolvedDisabled[info.index]
+                : !!resolvedDisabled
+            }
+            vertical={resolvedVertical}
+            direction={direction}
+            options={tooltip}
+          >
+            {handleRender ? handleRender(node, info) : node}
+          </SliderTip>
+        )}
+      />
+    </div>
+  );
+});
+Slider.displayName = 'Slider';

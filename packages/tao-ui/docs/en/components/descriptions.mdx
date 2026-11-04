@@ -1,0 +1,194 @@
+---
+title: Descriptions
+description: "Displays labelled fields in a structured record view."
+---
+
+import Preview from '../../_components/demo-preview';
+
+Displays labelled fields in a structured record view.
+
+This native tao-ui component follows the public API of Ant Design 6.7.0. Appearance, theme tokens and Semantic DOM customization belong to tao-ui; configure themes with `TaoProvider`.
+
+Items, responsive columns and spans follow 6.7.0. The default columns adapt from one on phones to three on desktop, using tao-ui breakpoints.
+
+## When to use
+
+Use for read-only account, order or configuration details.
+
+## Examples
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="descriptions-example-1">
+
+### Basic record
+
+```tsx preview
+import { Descriptions } from "@rockshin/tao-ui";
+
+const items = [
+  { key: "name", label: "Name", children: "Ada Lovelace" },
+  { key: "plan", label: "Plan", children: "Team" },
+  { key: "region", label: "Region", children: "London" },
+  { key: "status", label: "Status", children: "Active" },
+];
+
+export default function Example() {
+  return <Descriptions title="Account" items={items} />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="descriptions-example-2">
+
+### Bordered and compact
+
+```tsx preview
+import { Descriptions } from "@rockshin/tao-ui";
+
+const items = [
+  { key: "name", label: "Name", children: "Ada Lovelace" },
+  { key: "plan", label: "Plan", children: "Team" },
+  { key: "region", label: "Region", children: "London" },
+  { key: "status", label: "Status", children: "Active" },
+];
+
+export default function Example() {
+  return (
+    <Descriptions
+      title="Account"
+      items={items}
+      bordered
+      size="small"
+      column={2}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="descriptions-example-3">
+
+### Vertical fields
+
+```tsx preview
+import { Descriptions } from "@rockshin/tao-ui";
+
+const items = [
+  { key: "name", label: "Name", children: "Ada Lovelace" },
+  { key: "plan", label: "Plan", children: "Team" },
+  { key: "region", label: "Region", children: "London" },
+  { key: "status", label: "Status", children: "Active" },
+];
+
+export default function Example() {
+  return (
+    <Descriptions layout="vertical" items={items} column={2} colon={false} />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="descriptions-example-4">
+
+### Spans and remaining space
+
+```tsx preview="iframe-follow"
+import { Descriptions } from "@rockshin/tao-ui";
+
+export default function Example() {
+  return (
+    <Descriptions
+      bordered
+      column={3}
+      items={[
+        { label: "Name", children: "Ada", span: 2 },
+        { label: "Status", children: "Active" },
+        {
+          label: "Notes",
+          children: "Available to all workspace members",
+          span: "filled",
+        },
+        { label: "Owner", children: "Engineering" },
+        { label: "Region", children: "Global", span: "filled" },
+      ]}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="descriptions-example-5">
+
+### Responsive columns
+
+```tsx preview="iframe-follow"
+import { Descriptions } from "@rockshin/tao-ui";
+
+const items = [
+  { key: "name", label: "Name", children: "Ada Lovelace" },
+  { key: "plan", label: "Plan", children: "Team" },
+  { key: "region", label: "Region", children: "London" },
+  { key: "status", label: "Status", children: "Active" },
+];
+
+export default function Example() {
+  return (
+    <Descriptions
+      title="Responsive account"
+      bordered
+      items={items}
+      column={{ xs: 1, sm: 2, lg: 3 }}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="descriptions-example-6">
+
+### Actions and semantic styling
+
+```tsx preview
+import { useState } from "react";
+import { Button, Descriptions } from "@rockshin/tao-ui";
+
+const items = [
+  { key: "name", label: "Name", children: "Ada Lovelace" },
+  { key: "plan", label: "Plan", children: "Team" },
+  { key: "region", label: "Region", children: "London" },
+  { key: "status", label: "Status", children: "Active" },
+];
+
+export default function Example() {
+  const [editing, setEditing] = useState(false);
+  return (
+    <Descriptions
+      title="Billing details"
+      extra={
+        <Button size="small" onClick={() => setEditing(!editing)}>
+          {editing ? "Show less" : "Show all"}
+        </Button>
+      }
+      items={editing ? items : items.slice(0, 2)}
+      styles={{
+        label: { color: "var(--tao-color-text-secondary)" },
+        content: { fontWeight: 600 },
+      }}
+    />
+  );
+}
+```
+
+</section>
+
+</div>
+
+## API
+
+<API moduleName="descriptions" />

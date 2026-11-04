@@ -1,0 +1,276 @@
+@layer tao {
+  [data-tao-timeline] {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    color: var(--tao-color-text);
+    font: var(--tao-font-size) / var(--tao-line-height) var(--tao-font-family);
+    --tao-timeline-color: var(--tao-color-primary);
+  }
+  [data-tao-timeline-item] {
+    position: relative;
+    min-width: 0;
+    padding-bottom: 20px;
+  }
+  [data-tao-timeline-item]:last-child {
+    padding-bottom: 0;
+  }
+  [data-tao-timeline-wrapper] {
+    min-width: 0;
+  }
+  [data-tao-timeline-icon] {
+    position: absolute;
+    inset-inline-start: 0;
+    top: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 10px;
+    height: 10px;
+    border: 2px solid var(--tao-timeline-color);
+    border-radius: 50%;
+    box-sizing: border-box;
+    color: var(--tao-timeline-color);
+    background: var(--tao-color-bg-container);
+    z-index: 1;
+  }
+  [data-tao-timeline-icon][data-tao-custom] {
+    top: 2px;
+    width: 18px;
+    height: 18px;
+    margin-inline-start: -4px;
+    border: 0;
+    border-radius: 0;
+  }
+  [data-tao-timeline-icon] [data-tao-spinner] {
+    font-size: 14px;
+  }
+  [data-tao-timeline][data-tao-variant="filled"]
+    [data-tao-timeline-icon]:not([data-tao-custom]) {
+    background: var(--tao-timeline-color);
+  }
+  [data-tao-timeline-rail] {
+    position: absolute;
+    top: 16px;
+    bottom: 0;
+    inset-inline-start: 4px;
+    width: 0;
+    border-inline-start: 2px solid var(--tao-color-border);
+  }
+  [data-tao-timeline-item]:last-child [data-tao-timeline-rail] {
+    display: none;
+  }
+  [data-tao-timeline-item][data-tao-loading] [data-tao-timeline-rail] {
+    border-inline-start-style: dotted;
+  }
+  [data-tao-timeline-section] {
+    padding-inline-start: 26px;
+    overflow-wrap: anywhere;
+  }
+  [data-tao-timeline-title] {
+    font-weight: 500;
+  }
+  [data-tao-timeline-content] {
+    min-width: 0;
+  }
+  [data-tao-timeline][data-tao-orientation="vertical"][data-tao-split]
+    [data-tao-timeline-section] {
+    padding: 0;
+    display: grid;
+    grid-template-columns: minmax(0, var(--tao-timeline-title-span)) minmax(
+        0,
+        1fr
+      );
+    gap: 0;
+  }
+  [data-tao-timeline][data-tao-orientation="vertical"][data-tao-split]
+    [data-tao-timeline-header] {
+    text-align: end;
+    padding-inline-end: 20px;
+  }
+  [data-tao-timeline][data-tao-orientation="vertical"][data-tao-split]
+    [data-tao-timeline-content] {
+    padding-inline-start: 20px;
+  }
+  [data-tao-timeline][data-tao-orientation="vertical"][data-tao-split]
+    [data-tao-timeline-icon] {
+    inset-inline-start: var(--tao-timeline-title-span);
+    margin-inline-start: -5px;
+  }
+  [data-tao-timeline][data-tao-orientation="vertical"][data-tao-split]
+    [data-tao-timeline-icon][data-tao-custom] {
+    margin-inline-start: -9px;
+  }
+  [data-tao-timeline][data-tao-orientation="vertical"][data-tao-split]
+    [data-tao-timeline-rail] {
+    inset-inline-start: var(--tao-timeline-title-span);
+    margin-inline-start: -1px;
+  }
+  [data-tao-timeline][data-tao-orientation="vertical"][data-tao-split]
+    [data-tao-placement="end"]
+    [data-tao-timeline-section] {
+    grid-template-columns: minmax(0, 1fr) minmax(
+        0,
+        var(--tao-timeline-title-span)
+      );
+  }
+  [data-tao-timeline][data-tao-orientation="vertical"][data-tao-split]
+    [data-tao-placement="end"]
+    [data-tao-timeline-header] {
+    grid-column: 2;
+    grid-row: 1;
+    text-align: start;
+    padding-inline: 20px 0;
+  }
+  [data-tao-timeline][data-tao-orientation="vertical"][data-tao-split]
+    [data-tao-placement="end"]
+    [data-tao-timeline-content] {
+    grid-column: 1;
+    grid-row: 1;
+    text-align: end;
+    padding-inline: 0 20px;
+  }
+  [data-tao-timeline][data-tao-orientation="vertical"][data-tao-split]
+    [data-tao-placement="end"]
+    [data-tao-timeline-icon],
+  [data-tao-timeline][data-tao-orientation="vertical"][data-tao-split]
+    [data-tao-placement="end"]
+    [data-tao-timeline-rail] {
+    inset-inline-start: calc(100% - var(--tao-timeline-title-span));
+  }
+  [data-tao-timeline][data-tao-orientation="vertical"]:not([data-tao-split])
+    [data-tao-placement="end"]
+    [data-tao-timeline-icon] {
+    inset-inline-start: auto;
+    inset-inline-end: 0;
+  }
+  [data-tao-timeline][data-tao-orientation="vertical"]:not([data-tao-split])
+    [data-tao-placement="end"]
+    [data-tao-timeline-rail] {
+    inset-inline-start: auto;
+    inset-inline-end: 4px;
+  }
+  [data-tao-timeline][data-tao-orientation="vertical"]:not([data-tao-split])
+    [data-tao-placement="end"]
+    [data-tao-timeline-section] {
+    text-align: end;
+    padding-inline: 0 26px;
+  }
+  [data-tao-timeline][data-tao-orientation="horizontal"] {
+    display: flex;
+    align-items: stretch;
+  }
+  [data-tao-timeline][data-tao-orientation="horizontal"]
+    [data-tao-timeline-item] {
+    flex: 1;
+    padding: 0 16px 0 0;
+  }
+  [data-tao-timeline][data-tao-orientation="horizontal"]
+    [data-tao-timeline-section] {
+    display: block;
+    padding: 24px 0 0;
+  }
+  [data-tao-timeline][data-tao-orientation="horizontal"]
+    [data-tao-timeline-icon] {
+    inset-inline-start: 0;
+    margin: 0;
+    top: 6px;
+  }
+  [data-tao-timeline][data-tao-orientation="horizontal"]
+    [data-tao-timeline-rail] {
+    top: 10px;
+    bottom: auto;
+    inset-inline-start: 10px;
+    width: calc(100% - 10px);
+    border-inline-start: 0;
+    border-top: 2px solid var(--tao-color-border);
+    margin: 0;
+  }
+  [data-tao-timeline][data-tao-orientation="horizontal"]
+    [data-tao-timeline-header],
+  [data-tao-timeline][data-tao-orientation="horizontal"]
+    [data-tao-timeline-content] {
+    padding: 0;
+    text-align: start;
+  }
+  [data-tao-timeline][data-tao-orientation="horizontal"]:not(
+      [data-tao-mode="alternate"]
+    )
+    [data-tao-placement="end"]
+    [data-tao-timeline-icon] {
+    top: auto;
+    bottom: 6px;
+  }
+  [data-tao-timeline][data-tao-orientation="horizontal"]:not(
+      [data-tao-mode="alternate"]
+    )
+    [data-tao-placement="end"]
+    [data-tao-timeline-rail] {
+    top: auto;
+    bottom: 10px;
+  }
+  [data-tao-timeline][data-tao-orientation="horizontal"]:not(
+      [data-tao-mode="alternate"]
+    )
+    [data-tao-placement="end"]
+    [data-tao-timeline-section] {
+    padding: 0 0 24px;
+  }
+  [data-tao-timeline][data-tao-orientation="horizontal"][data-tao-mode="alternate"]
+    [data-tao-timeline-item] {
+    padding: 0;
+  }
+  [data-tao-timeline][data-tao-orientation="horizontal"][data-tao-mode="alternate"]
+    [data-tao-timeline-wrapper] {
+    height: 100%;
+  }
+  [data-tao-timeline][data-tao-orientation="horizontal"][data-tao-mode="alternate"]
+    [data-tao-timeline-icon] {
+    top: 50%;
+    inset-inline-start: 50%;
+    transform: translate(-50%, -50%);
+  }
+  [data-tao-timeline][data-tao-orientation="horizontal"][data-tao-mode="alternate"]
+    [data-tao-timeline-rail] {
+    top: 50%;
+    inset-inline-start: 50%;
+    width: 100%;
+  }
+  [data-tao-timeline][data-tao-orientation="horizontal"][data-tao-mode="alternate"]
+    [data-tao-timeline-section] {
+    display: grid;
+    grid-template-rows: 1fr 20px 1fr;
+    min-height: 120px;
+    height: 100%;
+    padding: 0 8px;
+    box-sizing: border-box;
+  }
+  [data-tao-timeline][data-tao-orientation="horizontal"][data-tao-mode="alternate"]
+    [data-tao-timeline-header] {
+    grid-row: 1;
+    align-self: end;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+  [data-tao-timeline][data-tao-orientation="horizontal"][data-tao-mode="alternate"]
+    [data-tao-timeline-content] {
+    grid-row: 3;
+    align-self: start;
+    text-align: center;
+    margin-top: 10px;
+  }
+  [data-tao-timeline][data-tao-orientation="horizontal"][data-tao-mode="alternate"]
+    [data-tao-placement="end"]
+    [data-tao-timeline-header] {
+    grid-row: 3;
+    align-self: start;
+    margin: 10px 0 0;
+  }
+  [data-tao-timeline][data-tao-orientation="horizontal"][data-tao-mode="alternate"]
+    [data-tao-placement="end"]
+    [data-tao-timeline-content] {
+    grid-row: 1;
+    align-self: end;
+    margin: 0 0 10px;
+  }
+}

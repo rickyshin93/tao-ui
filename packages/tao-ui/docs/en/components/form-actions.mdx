@@ -3,6 +3,8 @@ title: FormActions
 description: "Lays out submit, cancel, and secondary actions for forms. Includes usage guidance, a runnable example, and the complete API reference."
 ---
 
+import Preview from '../../_components/demo-preview';
+
 Lays out submit, cancel, and secondary actions for forms.
 
 ## When to use
@@ -18,7 +20,13 @@ Use FormActions at the end of a form or section to align the final actions consi
 
 - Do not use the component outside its intended interaction model.
 
-## Basic usage
+## Examples
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="form-actions-example-1">
+
+### Basic usage
 
 ```tsx preview
 import { Button, FormActions } from '@rockshin/tao-ui';
@@ -35,7 +43,11 @@ function FormActionsExample() {
 export default FormActionsExample;
 ```
 
-## Secondary and destructive actions
+</section>
+
+<section className="tao-example" id="form-actions-example-2">
+
+### Secondary and destructive actions
 
 ```tsx preview
 import { Button, FormActions } from '@rockshin/tao-ui';
@@ -53,7 +65,11 @@ function FormActionVariants() {
 export default FormActionVariants;
 ```
 
-## Semantic alignment
+</section>
+
+<section className="tao-example" id="form-actions-example-3">
+
+### Semantic alignment
 
 ```tsx preview
 import { Button, FormActions } from '@rockshin/tao-ui';
@@ -69,6 +85,116 @@ function CustomizedFormActions() {
 
 export default CustomizedFormActions;
 ```
+
+</section>
+
+<section className="tao-example" id="form-actions-native-form">
+
+### Complete form composition
+
+Compose layout, fields, and actions with native submission feedback.
+
+```tsx preview
+import { useState } from 'react';
+import {
+  FormLayout,
+  FormSection,
+  FormField,
+  FormActions,
+  Input,
+  Textarea,
+  Button,
+} from '@rockshin/tao-ui';
+export default function Example() {
+  const [saved, setSaved] = useState('');
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        setSaved(String(new FormData(e.currentTarget).get('name')));
+      }}
+      onReset={() => setSaved('')}
+    >
+      <FormLayout>
+        <FormSection title="Profile" description="Public workspace information">
+          <FormField label="Display name" required>
+            <Input name="name" required defaultValue="Alex" />
+          </FormField>
+          <FormField label="Bio" description="A short introduction">
+            <Textarea name="bio" autoSize />
+          </FormField>
+        </FormSection>
+        <FormActions>
+          <Button type="reset">Reset</Button>
+          <Button type="submit" variant="primary">
+            Save
+          </Button>
+        </FormActions>
+        <output aria-live="polite">
+          {saved ? `Saved ${saved}` : 'No changes saved'}
+        </output>
+      </FormLayout>
+    </form>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="form-actions-alignment">
+
+### Alignment and wrapping
+
+Set root alignment while retaining wrapping on narrow screens.
+
+```tsx preview
+import { FormActions, Button } from '@rockshin/tao-ui';
+export default function Example() {
+  return (
+    <FormActions
+      styles={{ root: { justifyContent: 'space-between', flexWrap: 'wrap' } }}
+    >
+      <Button>Back</Button>
+      <Button variant="primary">Continue</Button>
+    </FormActions>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="form-actions-pending">
+
+### Pending actions
+
+Disable form actions while pending and show loading; a separate control finishes this local demo.
+
+```tsx preview
+import { useState } from 'react';
+import { FormActions, Button, Stack } from '@rockshin/tao-ui';
+export default function Example() {
+  const [pending, setPending] = useState(false);
+  return (
+    <Stack direction="vertical">
+      <FormActions>
+        <Button disabled={pending}>Cancel</Button>
+        <Button loading={pending} onClick={() => setPending(true)}>
+          Save
+        </Button>
+      </FormActions>
+      {pending && (
+        <Button onClick={() => setPending(false)}>
+          Finish simulated request
+        </Button>
+      )}
+    </Stack>
+  );
+}
+```
+
+</section>
+
+</div>
 
 ## API
 

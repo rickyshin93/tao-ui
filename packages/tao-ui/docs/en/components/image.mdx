@@ -1,0 +1,277 @@
+---
+title: Image
+description: "Images with full-screen preview, grouped navigation, zoom and rotation, fallbacks and progress placeholders."
+---
+
+import Preview from '../../_components/demo-preview';
+
+Images with full-screen preview, grouped navigation, zoom and rotation, fallbacks and progress placeholders.
+
+Each example can be copied and run independently. Use the device control on framed previews to switch between desktop and phone widths.
+
+## Examples
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="image-basic">
+
+### Preview an image
+
+Click the image or focus it and press Enter. Escape closes the preview and restores focus.
+
+```tsx preview="iframe-follow"
+import { Image } from '@rockshin/tao-ui';
+const photo = (color: string) =>
+  `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400"><rect width="600" height="400" fill="${color}"/><circle cx="420" cy="110" r="46" fill="#fff5"/><path d="M0 400L220 120L420 400Z" fill="#fff8"/><path d="M200 400L430 200L600 400Z" fill="#fff4"/></svg>`)}`;
+export default function BasicImage() {
+  return (
+    <div style={{ padding: 16 }}>
+      <Image
+        src={photo('#496f5d')}
+        alt="Illustrated green mountains"
+        width={260}
+      />
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="image-group">
+
+### Browse an image group
+
+PreviewGroup registers its children and supports previous/next navigation with buttons or arrow keys.
+
+```tsx preview="iframe-follow"
+import { Image } from '@rockshin/tao-ui';
+const photo = (color: string) =>
+  `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400"><rect width="600" height="400" fill="${color}"/><circle cx="420" cy="110" r="46" fill="#fff5"/><path d="M0 400L220 120L420 400Z" fill="#fff8"/><path d="M200 400L430 200L600 400Z" fill="#fff4"/></svg>`)}`;
+export default function ImageGallery() {
+  return (
+    <div style={{ padding: 16, display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+      <Image.PreviewGroup>
+        <Image src={photo('#496f5d')} alt="Green mountains" width={150} />
+        <Image src={photo('#6d5c91')} alt="Purple mountains" width={150} />
+        <Image src={photo('#9c6d43')} alt="Golden mountains" width={150} />
+      </Image.PreviewGroup>
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="image-controlled">
+
+### Open a controlled preview
+
+Control open and onOpenChange to launch the preview from another action.
+
+```tsx preview="iframe-follow"
+import { useState } from 'react';
+import { Button, Image } from '@rockshin/tao-ui';
+const photo = (color: string) =>
+  `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400"><rect width="600" height="400" fill="${color}"/><circle cx="420" cy="110" r="46" fill="#fff5"/><path d="M0 400L220 120L420 400Z" fill="#fff8"/><path d="M200 400L430 200L600 400Z" fill="#fff4"/></svg>`)}`;
+export default function ControlledPreview() {
+  const [open, setOpen] = useState(false);
+  return (
+    <div style={{ padding: 16, display: 'grid', gap: 12 }}>
+      <Button onClick={() => setOpen(true)}>Open original</Button>
+      <Image
+        src={photo('#6d5c91')}
+        alt="Purple mountains"
+        width={180}
+        preview={{ open, onOpenChange: setOpen }}
+      />
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="image-fallback">
+
+### Fallback and thumbnail-only mode
+
+fallback is shown after the source fails. preview:false keeps the image non-interactive.
+
+```tsx preview
+import { Image } from '@rockshin/tao-ui';
+const photo = (color: string) =>
+  `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400"><rect width="600" height="400" fill="${color}"/><circle cx="420" cy="110" r="46" fill="#fff5"/><path d="M0 400L220 120L420 400Z" fill="#fff8"/><path d="M200 400L430 200L600 400Z" fill="#fff4"/></svg>`)}`;
+export default function ImageFallback() {
+  return (
+    <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+      <Image
+        src="data:image/png;base64,broken"
+        fallback={photo('#9c6d43')}
+        alt="Fallback illustration"
+        width={180}
+        preview={false}
+      />
+      <Image
+        src={photo('#496f5d')}
+        alt="Non-interactive thumbnail"
+        width={180}
+        preview={false}
+      />
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="image-progress">
+
+### Progress placeholder
+
+The progress value belongs to the application. This example controls it with a range input and shows the image at 100%.
+
+```tsx preview
+import { useState } from 'react';
+import { Image } from '@rockshin/tao-ui';
+const photo = (color: string) =>
+  `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400"><rect width="600" height="400" fill="${color}"/><circle cx="420" cy="110" r="46" fill="#fff5"/><path d="M0 400L220 120L420 400Z" fill="#fff8"/><path d="M200 400L430 200L600 400Z" fill="#fff4"/></svg>`)}`;
+export default function ImageProgress() {
+  const [percent, setPercent] = useState(45);
+  return (
+    <div style={{ display: 'grid', gap: 12 }}>
+      <Image
+        src={photo('#496f5d')}
+        alt="Uploaded illustration"
+        width={240}
+        height={160}
+        preview={false}
+        placeholder={percent < 100 ? { progress: { percent } } : undefined}
+      />
+      <label>
+        Progress{' '}
+        <input
+          type="range"
+          min={0}
+          max={100}
+          value={percent}
+          onChange={(event) => setPercent(Number(event.target.value))}
+        />
+      </label>
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="image-cover">
+
+### Custom cover and styles
+
+Customize the hover cover and image slot without changing the preview behavior.
+
+```tsx preview="iframe-follow"
+import { Image } from '@rockshin/tao-ui';
+const photo = (color: string) =>
+  `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400"><rect width="600" height="400" fill="${color}"/><circle cx="420" cy="110" r="46" fill="#fff5"/><path d="M0 400L220 120L420 400Z" fill="#fff8"/><path d="M200 400L430 200L600 400Z" fill="#fff4"/></svg>`)}`;
+export default function ImageCover() {
+  return (
+    <div style={{ padding: 16 }}>
+      <Image
+        src={photo('#6d5c91')}
+        alt="Purple landscape"
+        width={240}
+        styles={{
+          root: { overflow: 'hidden', borderRadius: 12 },
+          image: { aspectRatio: '3 / 2', objectFit: 'cover' },
+          cover: { fontSize: 14 },
+        }}
+        preview={{
+          cover: { coverNode: 'Open landscape', placement: 'bottom' },
+        }}
+      />
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="image-actions">
+
+### Custom preview actions
+
+actionsRender receives the existing toolbar and transform actions. This example adds Reset.
+
+```tsx preview="iframe-follow"
+import { Image } from '@rockshin/tao-ui';
+const photo = (color: string) =>
+  `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400"><rect width="600" height="400" fill="${color}"/><circle cx="420" cy="110" r="46" fill="#fff5"/><path d="M0 400L220 120L420 400Z" fill="#fff8"/><path d="M200 400L430 200L600 400Z" fill="#fff4"/></svg>`)}`;
+export default function ImageActions() {
+  return (
+    <div style={{ padding: 16 }}>
+      <Image
+        src={photo('#9c6d43')}
+        alt="Golden landscape"
+        width={240}
+        preview={{
+          actionsRender: (actions, info) => (
+            <>
+              {actions}
+              <button
+                type="button"
+                style={{ width: 'auto', paddingInline: 12, fontSize: 14 }}
+                onClick={info.actions.onReset}
+              >
+                Reset
+              </button>
+            </>
+          ),
+        }}
+      />
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="image-mobile">
+
+### Preview on a phone
+
+The full-screen preview reserves space for actions and safe-area padding. Use the phone shell to check fit and navigation.
+
+```tsx preview="iframe-follow"
+import { Image } from '@rockshin/tao-ui';
+const photo = (color: string) =>
+  `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400"><rect width="600" height="400" fill="${color}"/><circle cx="420" cy="110" r="46" fill="#fff5"/><path d="M0 400L220 120L420 400Z" fill="#fff8"/><path d="M200 400L430 200L600 400Z" fill="#fff4"/></svg>`)}`;
+export default function MobileGallery() {
+  return (
+    <div style={{ padding: 16 }}>
+      <h3>Project gallery</h3>
+      <Image.PreviewGroup>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(2,minmax(0,1fr))',
+            gap: 12,
+          }}
+        >
+          <Image src={photo('#496f5d')} alt="Green landscape" width="100%" />
+          <Image src={photo('#6d5c91')} alt="Purple landscape" width="100%" />
+        </div>
+      </Image.PreviewGroup>
+    </div>
+  );
+}
+```
+
+</section>
+
+</div>
+
+## API
+
+<API moduleName="image" />

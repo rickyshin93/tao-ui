@@ -3,6 +3,8 @@ title: Popover
 description: "Displays a floating card with rich content anchored to a trigger element, opened by click or hover. Usage guidance, runnable example, and API reference."
 ---
 
+import Preview from '../../_components/demo-preview';
+
 Displays a floating card with rich content anchored to a trigger element, opened by click or hover.
 
 ## When to use
@@ -20,7 +22,13 @@ Use Popover for rich, non-blocking contextual content behind a click or hover. U
 - Do not nest essential workflows inside a hover-only popover.
 - Do not chain popovers from inside another popover.
 
-## Basic usage
+## Examples
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="popover-example-1">
+
+### Basic usage
 
 ```tsx preview
 import { Button, Popover } from '@rockshin/tao-ui';
@@ -40,7 +48,11 @@ function PopoverExample() {
 export default PopoverExample;
 ```
 
-## Hover, focus, and click
+</section>
+
+<section className="tao-example" id="popover-example-2">
+
+### Hover, focus, and click
 
 ```tsx preview
 import { Button, Popover, Stack } from '@rockshin/tao-ui';
@@ -51,10 +63,18 @@ function PopoverTriggers() {
       <Popover title="Hover" content="Opens on pointer hover.">
         <Button variant="secondary">Hover</Button>
       </Popover>
-      <Popover trigger="focus" title="Focus" content="Opens from keyboard focus.">
+      <Popover
+        trigger="focus"
+        title="Focus"
+        content="Opens from keyboard focus."
+      >
         <Button variant="secondary">Focus</Button>
       </Popover>
-      <Popover trigger="click" title="Click" content="Opens and closes on click.">
+      <Popover
+        trigger="click"
+        title="Click"
+        content="Opens and closes on click."
+      >
         <Button variant="secondary">Click</Button>
       </Popover>
     </Stack>
@@ -64,7 +84,11 @@ function PopoverTriggers() {
 export default PopoverTriggers;
 ```
 
-## Placement and arrow
+</section>
+
+<section className="tao-example" id="popover-example-3">
+
+### Placement and arrow
 
 ```tsx preview
 import { Button, Popover, Stack } from '@rockshin/tao-ui';
@@ -72,13 +96,26 @@ import { Button, Popover, Stack } from '@rockshin/tao-ui';
 function PopoverPlacements() {
   return (
     <Stack direction="horizontal" gap="md">
-      <Popover placement="topLeft" title="Top left" content="Aligned to the left edge.">
+      <Popover
+        placement="topLeft"
+        title="Top left"
+        content="Aligned to the left edge."
+      >
         <Button variant="secondary">Top left</Button>
       </Popover>
-      <Popover placement="bottom" title="Bottom" content="Centered below the trigger.">
+      <Popover
+        placement="bottom"
+        title="Bottom"
+        content="Centered below the trigger."
+      >
         <Button variant="secondary">Bottom</Button>
       </Popover>
-      <Popover placement="right" arrow={false} title="No arrow" content="Arrow disabled.">
+      <Popover
+        placement="right"
+        arrow={false}
+        title="No arrow"
+        content="Arrow disabled."
+      >
         <Button variant="secondary">Right</Button>
       </Popover>
     </Stack>
@@ -87,6 +124,134 @@ function PopoverPlacements() {
 
 export default PopoverPlacements;
 ```
+
+</section>
+
+<section className="tao-example" id="popover-controlled">
+
+### Controlled popup and internal dismissal
+
+An action inside the popup can update open and dismiss it after completion.
+
+```tsx preview
+import { useState } from 'react';
+import { Popover, Button } from '@rockshin/tao-ui';
+export default function Example() {
+  const [open, setOpen] = useState(false);
+  return (
+    <Popover
+      trigger="click"
+      title="Quick action"
+      open={open}
+      onOpenChange={setOpen}
+      content={<Button onClick={() => setOpen(false)}>Done</Button>}
+    >
+      <Button>Open actions</Button>
+    </Popover>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="popover-focus">
+
+### Focus trigger
+
+Use trigger=focus for keyboard hints and keep essential instructions visible on the page.
+
+```tsx preview
+import { Popover, Input } from '@rockshin/tao-ui';
+export default function Example() {
+  return (
+    <Popover
+      trigger="focus"
+      title="Project code"
+      content="Use a short, recognizable identifier."
+    >
+      <Input aria-label="Project code" placeholder="Focus this input" />
+    </Popover>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="popover-arrow-delay">
+
+### Arrow and delay
+
+Hover delays use seconds, and arrow controls the pointer.
+
+```tsx preview
+import { Popover, Button } from '@rockshin/tao-ui';
+export default function Example() {
+  return (
+    <Popover
+      title="Details"
+      content="Additional context appears after a short delay."
+      arrow={false}
+      mouseEnterDelay={0.4}
+      mouseLeaveDelay={0.2}
+    >
+      <Button>Hover for details</Button>
+    </Popover>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="popover-form-content">
+
+### Form content
+
+A popup can contain input and actions; submit, report the result, and close it.
+
+```tsx preview
+import { useState } from 'react';
+import { Popover, Input, Button, Stack } from '@rockshin/tao-ui';
+export default function Example() {
+  const [open, setOpen] = useState(false);
+  const [name, setName] = useState('Workspace');
+  return (
+    <Stack direction="vertical">
+      <Popover
+        trigger="click"
+        open={open}
+        onOpenChange={setOpen}
+        title="Rename"
+        content={
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              setName(String(new FormData(e.currentTarget).get('name')));
+              setOpen(false);
+            }}
+          >
+            <Stack direction="vertical">
+              <Input
+                name="name"
+                aria-label="New name"
+                defaultValue={name}
+                required
+              />
+              <Button type="submit">Save name</Button>
+            </Stack>
+          </form>
+        }
+      >
+        <Button>Rename project</Button>
+      </Popover>
+      <output>{name}</output>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+</div>
 
 ## API
 

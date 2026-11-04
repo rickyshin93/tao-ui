@@ -1,20 +1,7 @@
 import type { Dayjs } from 'dayjs';
 import { getMonths } from './use-calendar';
 
-const MONTH_LABELS = [
-  'Jan',
-  'Feb',
-  'Mar',
-  'Apr',
-  'May',
-  'Jun',
-  'Jul',
-  'Aug',
-  'Sep',
-  'Oct',
-  'Nov',
-  'Dec',
-];
+import { useTaoConfig } from '../../../provider/tao-provider';
 
 interface MonthGridProps {
   viewDate: Dayjs;
@@ -33,6 +20,7 @@ export function MonthGrid({
   minDate,
   maxDate,
 }: MonthGridProps) {
+  const { locale } = useTaoConfig();
   const months = getMonths(viewDate.year());
 
   return (
@@ -55,7 +43,7 @@ export function MonthGrid({
             disabled={disabled}
             onClick={() => onSelect(m)}
           >
-            {MONTH_LABELS[i]}
+            {locale.months[i]}
           </button>
         );
       })}

@@ -3,6 +3,8 @@ title: Checkbox
 description: "Selects one or more independent boolean options. Includes usage guidance, a runnable example, and the complete API reference."
 ---
 
+import Preview from '../../_components/demo-preview';
+
 Selects one or more independent boolean options.
 
 ## When to use
@@ -18,7 +20,13 @@ Use Checkbox for independent choices, or CheckboxGroup when users can select mul
 
 - Do not use CheckboxGroup when only one option may be selected; use RadioGroup instead.
 
-## Basic usage
+## Examples
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="checkbox-example-1">
+
+### Basic usage
 
 ```tsx preview
 import { Checkbox, CheckboxGroup, Stack } from '@rockshin/tao-ui';
@@ -30,7 +38,10 @@ function CheckboxExample() {
 
   return (
     <Stack gap="md">
-      <Checkbox checked={updates} onChange={(event) => setUpdates(event.target.checked)}>
+      <Checkbox
+        checked={updates}
+        onChange={(event) => setUpdates(event.target.checked)}
+      >
         Send product updates
       </Checkbox>
       <CheckboxGroup
@@ -49,7 +60,11 @@ function CheckboxExample() {
 export default CheckboxExample;
 ```
 
-## Standalone states
+</section>
+
+<section className="tao-example" id="checkbox-example-2">
+
+### Standalone states
 
 ```tsx preview
 import { Checkbox, Stack } from '@rockshin/tao-ui';
@@ -62,11 +77,29 @@ function CheckboxStates() {
 
   return (
     <Stack direction="horizontal" gap="lg">
-      <Checkbox checked={unchecked} onChange={(event) => setUnchecked(event.target.checked)}>Unchecked</Checkbox>
-      <Checkbox checked={checked} onChange={(event) => setChecked(event.target.checked)}>Checked</Checkbox>
-      <Checkbox checked={mixed} indeterminate={!mixed} onChange={(event) => setMixed(event.target.checked)}>Indeterminate</Checkbox>
+      <Checkbox
+        checked={unchecked}
+        onChange={(event) => setUnchecked(event.target.checked)}
+      >
+        Unchecked
+      </Checkbox>
+      <Checkbox
+        checked={checked}
+        onChange={(event) => setChecked(event.target.checked)}
+      >
+        Checked
+      </Checkbox>
+      <Checkbox
+        checked={mixed}
+        indeterminate={!mixed}
+        onChange={(event) => setMixed(event.target.checked)}
+      >
+        Indeterminate
+      </Checkbox>
       <Checkbox disabled>Disabled</Checkbox>
-      <Checkbox checked disabled onChange={() => {}}>Checked disabled</Checkbox>
+      <Checkbox checked disabled onChange={() => {}}>
+        Checked disabled
+      </Checkbox>
     </Stack>
   );
 }
@@ -74,7 +107,11 @@ function CheckboxStates() {
 export default CheckboxStates;
 ```
 
-## Vertical groups
+</section>
+
+<section className="tao-example" id="checkbox-example-3">
+
+### Vertical groups
 
 ```tsx preview
 import { CheckboxGroup, FormField } from '@rockshin/tao-ui';
@@ -101,6 +138,163 @@ function VerticalCheckboxGroup() {
 
 export default VerticalCheckboxGroup;
 ```
+
+</section>
+
+<section className="tao-example" id="checkbox-controlled">
+
+### Controlled checkbox
+
+onChange provides a native event; read the next value from target.checked.
+
+```tsx preview
+import { useState } from 'react';
+import { Checkbox, Stack } from '@rockshin/tao-ui';
+export default function Example() {
+  const [checked, setChecked] = useState(false);
+  return (
+    <Stack direction="vertical">
+      <Checkbox
+        checked={checked}
+        onChange={(e) => setChecked(e.target.checked)}
+      >
+        Receive updates
+      </Checkbox>
+      <output>{checked ? 'Subscribed' : 'Not subscribed'}</output>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="checkbox-select-all">
+
+### Select all and indeterminate
+
+Derive indeterminate state from the selected count instead of storing separate conflicting state.
+
+```tsx preview
+import { useState } from 'react';
+import { Checkbox, CheckboxGroup, Stack } from '@rockshin/tao-ui';
+export default function Example() {
+  const [values, setValues] = useState<string[]>(['Read']);
+  return (
+    <Stack direction="vertical">
+      <Checkbox
+        checked={values.length === 3}
+        indeterminate={values.length > 0 && values.length < 3}
+        onChange={(e) =>
+          setValues(e.target.checked ? ['Read', 'Write', 'Share'] : [])
+        }
+      >
+        Select all
+      </Checkbox>
+      <CheckboxGroup
+        options={['Read', 'Write', 'Share']}
+        value={values}
+        onChange={setValues}
+      />
+      <output>{values.join(', ') || 'None selected'}</output>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="checkbox-vertical">
+
+### Vertical options and disabled items
+
+Object options allow individual disabled items; direction controls layout.
+
+```tsx preview
+import { CheckboxGroup } from '@rockshin/tao-ui';
+export default function Example() {
+  return (
+    <CheckboxGroup
+      direction="vertical"
+      options={[
+        { label: 'Email', value: 'email' },
+        { label: 'SMS', value: 'sms' },
+        { label: 'Phone (unavailable)', value: 'phone', disabled: true },
+      ]}
+      defaultValue={['email']}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="checkbox-native-form">
+
+### Native form values
+
+Write controlled selections into hidden inputs and read them with FormData.
+
+```tsx preview
+import { useState } from 'react';
+import { CheckboxGroup, Button, Stack } from '@rockshin/tao-ui';
+export default function Example() {
+  const [values, setValues] = useState<string[]>(['email']);
+  const [result, setResult] = useState('');
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        setResult(
+          new FormData(e.currentTarget).getAll('channel').join(', ') || 'None',
+        );
+      }}
+    >
+      <Stack direction="vertical">
+        <CheckboxGroup
+          options={['email', 'sms']}
+          value={values}
+          onChange={setValues}
+        />
+        {values.map((value) => (
+          <input key={value} type="hidden" name="channel" value={value} />
+        ))}
+        <Button type="submit">Read values</Button>
+        <output>{result}</output>
+      </Stack>
+    </form>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="checkbox-sizes">
+
+### Sizes and shared disabled state
+
+A local Provider can set size or disable a group of controls.
+
+```tsx preview
+import { Checkbox, TaoProvider, Stack } from '@rockshin/tao-ui';
+export default function Example() {
+  return (
+    <Stack direction="vertical">
+      {(['small', 'medium', 'large'] as const).map((size) => (
+        <TaoProvider key={size} size={size}>
+          <Checkbox>{size}</Checkbox>
+        </TaoProvider>
+      ))}
+      <TaoProvider disabled>
+        <Checkbox defaultChecked>Disabled by provider</Checkbox>
+      </TaoProvider>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+</div>
 
 ## API
 

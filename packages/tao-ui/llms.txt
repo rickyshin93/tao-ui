@@ -22,16 +22,29 @@ The package root remains available and includes all component styles.
 
 ## Component Groups
 
-- Config: TaoProvider
-- Data Display: Collapsible, Popover, ScrollArea, Table, Tag, Tooltip
-- Data Entry: Checkbox, DatePicker, Form, FormActions, FormField, FormSection, Input, InputNumber, Radio, RangePicker, Select, Switch, Textarea
-- Feedback: Alert, Drawer, Modal, Popconfirm, Sonner, Spinner
-- General: Button
+- Config: App, TaoProvider
+- Data Display: Avatar, Badge, Calendar, Card, Carousel, Collapsible, Descriptions, Empty, Image, List, Listy, Masonry, Popover, QRCode, ScrollArea, Statistic, Table, Tag, Timeline, Tooltip, Tree
+- Data Entry: AutoComplete, Cascader, Checkbox, ColorPicker, DatePicker, Form, FormActions, FormField, FormSection, Input, InputNumber, Mentions, Radio, RangePicker, Rate, Segmented, Select, Slider, Switch, Textarea, TimePicker, Transfer, TreeSelect, Upload
+- Feedback: Alert, Drawer, Modal, Popconfirm, Progress, Result, Skeleton, Sonner, Spinner, Tour
+- General: BorderBeam, Button, FloatButton, Watermark
 - Headless: HeadlessInputNumber
-- Layout: FormLayout, Splitter, Stack
-- Navigation: Breadcrumb, ContextMenu, Dropdown, Pagination, Steps, Tabs
+- Layout: Divider, FormLayout, Splitter, Stack
+- Navigation: Affix, Breadcrumb, ContextMenu, Dropdown, Pagination, Steps, Tabs
 
 ## Components
+
+### Affix
+
+Affixes content to a window or scroll container boundary.
+
+- Category: Navigation
+- Exports: `Affix`
+- Source: `src/components/affix/affix.tsx`
+- Storybook: `stories/affix.stories.tsx`
+- Tests: `tests/affix/affix.test.tsx`
+- Semantic parts: `root`, `content`
+
+Affixes content to a window or scroll container boundary.
 
 ### Alert
 
@@ -45,6 +58,71 @@ Displays important contextual feedback messages with semantic status types.
 - Semantic parts: `root`, `icon`, `title`, `description`, `action`, `close`
 
 Use Alert for persistent, page-level feedback about a state or operation. Use Sonner toasts for transient notifications.
+
+### App
+
+Scopes imperative messages, notifications and confirmation dialogs to the current React tree and TaoProvider theme.
+
+- Category: Config
+- Exports: `App`
+- Source: `src/components/app/app.tsx`
+- Storybook: `stories/app.stories.tsx`
+- Tests: `tests/app/app.test.tsx`
+- Semantic parts: `root`
+
+Place App below TaoProvider, then call App.useApp() from descendant components. Messages return callable close handles that can be awaited; confirmation dialogs return update, destroy and then.
+
+### AutoComplete
+
+Editable text input with searchable suggestions, keyboard completion and custom input support.
+
+- Category: Data Entry
+- Exports: `AutoComplete`
+- Source: `src/components/auto-complete/auto-complete.tsx`
+- Storybook: `stories/auto-complete.stories.tsx`
+- Tests: `tests/auto-complete/auto-complete.test.tsx`
+- Semantic parts: `root`, `prefix`, `input`, `placeholder`, `content`, `clear`, `popup.root`, `popup.list`, `popup.listItem`
+
+Use AutoComplete when free-form input is valid and suggestions help users finish typing.
+
+### Avatar
+
+Represents people with images, icons or automatically fitted initials.
+
+- Category: Data Display
+- Exports: `Avatar`
+- Source: `src/components/avatar/avatar.tsx`
+- Storybook: `stories/avatar.stories.tsx`
+- Tests: `tests/avatar/avatar.test.tsx`
+- Semantic parts: `root`, `image`, `icon`, `content`
+
+Use Avatar for a person or account; group related people with Avatar.Group.
+
+### Badge
+
+Adds notification counts, status indicators or a ribbon to content.
+
+- Category: Data Display
+- Exports: `Badge`
+- Source: `src/components/badge/badge.tsx`
+- Storybook: `stories/badge.stories.tsx`
+- Tests: `tests/badge/badge.test.tsx`
+- Semantic parts: `root`, `indicator`
+
+Use Badge for compact counts or a status next to a label.
+
+### BorderBeam
+
+Animates a highlighted beam around the border of its child.
+
+- Category: General
+- Exports: `BorderBeam`
+- Source: `src/components/border-beam/border-beam.tsx`
+- Storybook: `stories/border-beam.stories.tsx`
+- Tests: `tests/border-beam/border-beam.test.tsx`
+- Semantic parts: `root`, `beam`
+
+Animates a highlighted beam around the border of its child.
 
 ### Breadcrumb
 
@@ -72,6 +150,58 @@ Triggers an immediate action such as submitting, saving, or opening a surface.
 
 Use Button for explicit actions. It inherits size, disabled, and variant defaults from TaoProvider.
 
+### Calendar
+
+Browse a month or year and place events inside date cells.
+
+- Category: Data Display
+- Exports: `Calendar`
+- Source: `src/components/calendar/calendar.tsx`
+- Storybook: `stories/calendar.stories.tsx`
+- Tests: `tests/calendar/calendar.test.tsx`
+- Semantic parts: `root`, `header`, `body`, `content`, `item`, `itemContent`
+
+Use Calendar to browse schedules and select a day without opening a popup.
+
+### Card
+
+Groups related content with an optional heading, cover, tabs and actions.
+
+- Category: Data Display
+- Exports: `Card`
+- Source: `src/components/card/card.tsx`
+- Storybook: `stories/card.stories.tsx`
+- Tests: `tests/card/card.test.tsx`
+- Semantic parts: `root`, `header`, `body`, `extra`, `title`, `actions`, `cover`
+
+Use Card for a distinct content item; Card.Meta organizes its identity and description.
+
+### Carousel
+
+Swipeable slides with fade, directional dots, autoplay, arrows and imperative navigation.
+
+- Category: Data Display
+- Exports: `Carousel`
+- Source: `src/components/carousel/carousel.tsx`
+- Storybook: `stories/carousel.stories.tsx`
+- Tests: `tests/carousel/carousel.test.tsx`
+- Semantic parts: `root`, `dots`
+
+Swipeable slides with fade, directional dots, autoplay, arrows and imperative navigation.
+
+### Cascader
+
+Choose paths through hierarchical options with search, lazy loading, multiple selection and an inline panel.
+
+- Category: Data Entry
+- Exports: `Cascader`, `CascaderPanel`
+- Source: `src/components/cascader/cascader.tsx`
+- Storybook: `stories/cascader.stories.tsx`
+- Tests: `tests/cascader/cascader.test.tsx`
+- Semantic parts: `root`, `prefix`, `suffix`, `input`, `clear`, `placeholder`, `content`, `item`, `itemContent`, `itemRemove`, `popup.root`, `popup.list`, `popup.listItem`
+
+Use Cascader when users select a complete path such as region, department or category.
+
 ### Checkbox
 
 Selects one or more independent boolean options.
@@ -97,6 +227,19 @@ Shows and hides a region of content while keeping disclosure state accessible.
 - Semantic parts: `root`, `trigger`, `content`
 
 Use Collapsible to hide secondary details while preserving a lightweight page layout.
+
+### ColorPicker
+
+Choose single or gradient colors with hex, RGB, HSB and alpha controls.
+
+- Category: Data Entry
+- Exports: `ColorPicker`
+- Source: `src/components/color-picker/color-picker.tsx`
+- Storybook: `stories/color-picker.stories.tsx`
+- Tests: `tests/color-picker/color-picker.test.tsx`
+- Semantic parts: `root`, `body`, `content`, `description`, `popup.root`, `popup.container`
+
+Keep the returned Color object when precision matters and call toCssString for use in CSS.
 
 ### ContextMenu
 
@@ -124,6 +267,32 @@ Lets users enter or choose a single date, with optional time selection.
 
 Use DatePicker when free text date input would be error-prone or when users benefit from calendar context.
 
+### Descriptions
+
+Displays labeled record fields with responsive columns and flexible spans.
+
+- Category: Data Display
+- Exports: `Descriptions`
+- Source: `src/components/descriptions/descriptions.tsx`
+- Storybook: `stories/descriptions.stories.tsx`
+- Tests: `tests/descriptions/descriptions.test.tsx`
+- Semantic parts: `root`, `header`, `title`, `extra`, `label`, `content`
+
+Use Descriptions for read-only details; use Form for editable fields.
+
+### Divider
+
+Separates sections or inline actions with an optional title.
+
+- Category: Layout
+- Exports: `Divider`
+- Source: `src/components/divider/divider.tsx`
+- Storybook: `stories/divider.stories.tsx`
+- Tests: `tests/divider/divider.test.tsx`
+- Semantic parts: `root`, `rail`, `content`
+
+Use a divider when spacing alone cannot explain a section boundary.
+
 ### Drawer
 
 Opens a side panel for related tasks without leaving the current page.
@@ -149,6 +318,32 @@ Opens a menu of actions or navigation choices from a trigger.
 - Semantic parts: `root`, `content`, `item`, `itemIcon`, `itemLabel`, `itemExtra`, `divider`, `groupLabel`, `subTrigger`, `subContent`
 
 Use Dropdown for compact action sets that do not need to stay visible.
+
+### Empty
+
+Shows a localized empty state with an illustration, description and optional action.
+
+- Category: Data Display
+- Exports: `Empty`
+- Source: `src/components/empty/empty.tsx`
+- Storybook: `stories/empty.stories.tsx`
+- Tests: `tests/empty/empty.test.tsx`
+- Semantic parts: `root`, `image`, `description`, `footer`
+
+Shows a localized empty state with an illustration, description and optional action.
+
+### FloatButton
+
+Provides floating actions, grouped controls and a scroll-to-top action.
+
+- Category: General
+- Exports: `FloatButton`
+- Source: `src/components/float-button/float-button.tsx`
+- Storybook: `stories/float-button.stories.tsx`
+- Tests: `tests/float-button/float-button.test.tsx`
+- Semantic parts: `root`, `icon`, `content`
+
+Provides floating actions, grouped controls and a scroll-to-top action.
 
 ### Form
 
@@ -227,6 +422,19 @@ Headless numeric input primitives and hook for custom number entry experiences.
 
 Use the headless API when tao-ui styling is not appropriate but number formatting behavior should stay consistent.
 
+### Image
+
+Images with keyboard-accessible preview, grouping, transforms, fallbacks and upload progress.
+
+- Category: Data Display
+- Exports: `Image`, `ImagePreviewGroup`
+- Source: `src/components/image/image.tsx`
+- Storybook: `stories/image.stories.tsx`
+- Tests: `tests/image/image.test.tsx`
+- Semantic parts: `root`, `image`, `cover`, `popup.root`, `popup.mask`, `popup.body`, `popup.footer`, `popup.actions`, `popup.close`, `placeholder.progress.root`, `placeholder.progress.content`, `placeholder.progress.rail`, `placeholder.progress.indicator`
+
+Images with keyboard-accessible preview, grouping, transforms, fallbacks and upload progress.
+
 ### Input
 
 Single-line text input for short freeform values.
@@ -253,6 +461,58 @@ A styled numeric input built on tao-ui number formatting and validation behavior
 
 Use InputNumber for numeric values that need min, max, step, precision, or formatted display.
 
+### List
+
+Displays records with metadata, actions, loading, pagination and responsive columns.
+
+- Category: Data Display
+- Exports: `List`
+- Source: `src/components/list/list.tsx`
+- Storybook: `stories/list.stories.tsx`
+- Tests: `tests/list/list.test.tsx`
+- Semantic parts: `root`, `header`, `items`, `footer`, `pagination`, `empty`
+
+Compose repeated content with List.Item and List.Item.Meta.
+
+### Listy
+
+Renders grouped or virtualized lists with precise item, group and position scrolling.
+
+- Category: Data Display
+- Exports: `Listy`
+- Source: `src/components/listy/listy.tsx`
+- Storybook: `stories/listy.stories.tsx`
+- Tests: `tests/listy/listy.test.tsx`
+- Semantic parts: `root`, `item`, `groupHeader`
+
+Render long lists and grouped records without mounting the entire data set.
+
+### Masonry
+
+Arranges variable-height content in responsive balanced columns.
+
+- Category: Data Display
+- Exports: `Masonry`
+- Source: `src/components/masonry/masonry.tsx`
+- Storybook: `stories/masonry.stories.tsx`
+- Tests: `tests/masonry/masonry.test.tsx`
+- Semantic parts: `root`, `item`
+
+Arranges variable-height content in responsive balanced columns.
+
+### Mentions
+
+Insert mentions into multiline text using configurable prefixes, search suggestions and keyboard selection.
+
+- Category: Data Entry
+- Exports: `Mentions`
+- Source: `src/components/mentions/mentions.tsx`
+- Storybook: `stories/mentions.stories.tsx`
+- Tests: `tests/mentions/mentions.test.tsx`
+- Semantic parts: `root`, `textarea`, `popup`, `suffix`
+
+Use Mentions for comments and messages that refer to people, topics or identifiers.
+
 ### Modal
 
 Displays a focused dialog for decisions, forms, and interruptive information.
@@ -262,7 +522,7 @@ Displays a focused dialog for decisions, forms, and interruptive information.
 - Source: `src/components/modal/modal.tsx`
 - Storybook: `stories/modal.stories.tsx`
 - Tests: `tests/modal/modal.test.tsx`
-- Semantic parts: `root`, `overlay`, `header`, `title`, `body`, `footer`, `close`
+- Semantic parts: `root`, `container`, `wrapper`, `mask`, `overlay`, `header`, `title`, `body`, `footer`, `close`
 
 Use Modal for focused tasks or decisions. Static helpers such as Modal.confirm mirror common confirmation flows.
 
@@ -305,6 +565,32 @@ Displays a floating card with rich content anchored to a trigger element, opened
 
 Use Popover for rich, non-blocking contextual content behind a click or hover. Use Tooltip for short text-only hints and Modal for blocking interactions.
 
+### Progress
+
+Shows measured completion with line, circle, dashboard or stepped progress indicators.
+
+- Category: Feedback
+- Exports: `Progress`
+- Source: `src/components/progress/progress.tsx`
+- Storybook: `stories/progress.stories.tsx`
+- Tests: `tests/progress/progress.test.tsx`
+- Semantic parts: `root`, `body`, `rail`, `track`, `indicator`
+
+Shows measured completion with line, circle, dashboard or stepped progress indicators.
+
+### QRCode
+
+Encode a value as a canvas or SVG QR code with status and refresh controls.
+
+- Category: Data Display
+- Exports: `QRCode`
+- Source: `src/components/qr-code/qr-code.tsx`
+- Storybook: `stories/qr-code.stories.tsx`
+- Tests: `tests/qr-code/qr-code.test.tsx`
+- Semantic parts: `root`, `cover`
+
+Provide a stable value and choose canvas for bitmap download or SVG for resolution-independent output.
+
 ### Radio
 
 Selects exactly one option from a mutually exclusive set.
@@ -331,6 +617,32 @@ Lets users select a start and end date as one range value.
 
 Use RangePicker for reporting windows, booking windows, and filters with start/end dates.
 
+### Rate
+
+Collects or displays a rating with half steps, keyboard control and custom symbols.
+
+- Category: Data Entry
+- Exports: `Rate`
+- Source: `src/components/rate/rate.tsx`
+- Storybook: `stories/rate.stories.tsx`
+- Tests: `tests/rate/rate.test.tsx`
+- Semantic parts: `root`, `item`
+
+Collect or show a bounded rating.
+
+### Result
+
+Communicates an operation result or error page with status, explanation and next actions.
+
+- Category: Feedback
+- Exports: `Result`
+- Source: `src/components/result/result.tsx`
+- Storybook: `stories/result.stories.tsx`
+- Tests: `tests/result/result.test.tsx`
+- Semantic parts: `root`, `title`, `subTitle`, `body`, `extra`, `icon`
+
+Communicates an operation result or error page with status, explanation and next actions.
+
 ### ScrollArea
 
 Provides a styled scroll container for overflow content.
@@ -344,6 +656,19 @@ Provides a styled scroll container for overflow content.
 
 Use ScrollArea when a fixed region needs overflow behavior without changing page scroll.
 
+### Segmented
+
+Selects one option from a compact accessible radio group.
+
+- Category: Data Entry
+- Exports: `Segmented`
+- Source: `src/components/segmented/segmented.tsx`
+- Storybook: `stories/segmented.stories.tsx`
+- Tests: `tests/segmented/segmented.test.tsx`
+- Semantic parts: `root`, `item`, `label`, `icon`
+
+Use Segmented for a small set of related views or modes.
+
 ### Select
 
 Chooses one value from a compact list of options.
@@ -356,6 +681,32 @@ Chooses one value from a compact list of options.
 - Semantic parts: `root`, `prefix`, `suffix`, `placeholder`, `clear`, `popup`, `search`, `searchInput`, `group`, `groupLabel`, `item`, `itemIcon`, `itemLabel`, `itemDesc`, `empty`, `tag`, `tagLabel`, `tagClose`, `tagRest`, `values`
 
 Use Select when choices are known but too numerous or secondary to show as radios.
+
+### Skeleton
+
+Displays theme-aware loading placeholders for content, avatars, controls and images.
+
+- Category: Feedback
+- Exports: `Skeleton`
+- Source: `src/components/skeleton/skeleton.tsx`
+- Storybook: `stories/skeleton.stories.tsx`
+- Tests: `tests/skeleton/skeleton.test.tsx`
+- Semantic parts: `root`, `header`, `section`, `avatar`, `title`, `paragraph`
+
+Displays theme-aware loading placeholders for content, avatars, controls and images.
+
+### Slider
+
+Selects a numeric value or editable range using pointer, touch and keyboard input.
+
+- Category: Data Entry
+- Exports: `Slider`
+- Source: `src/components/slider/slider.tsx`
+- Storybook: `stories/slider.stories.tsx`
+- Tests: `tests/slider/slider.test.tsx`
+- Semantic parts: `root`, `rail`, `tracks`, `track`, `handle`
+
+Adjust numeric values within explicit bounds.
 
 ### Sonner
 
@@ -408,6 +759,19 @@ Composes children in a flex row or column with consistent spacing.
 - Semantic parts: `root`
 
 Use Stack for simple one-dimensional layout and spacing.
+
+### Statistic
+
+Formats metrics and live count-up or countdown timers.
+
+- Category: Data Display
+- Exports: `Statistic`
+- Source: `src/components/statistic/statistic.tsx`
+- Storybook: `stories/statistic.stories.tsx`
+- Tests: `tests/statistic/statistic.test.tsx`
+- Semantic parts: `root`, `header`, `title`, `content`, `value`, `prefix`, `suffix`
+
+Use Statistic to emphasize a single metric with a clear title and unit.
 
 ### Steps
 
@@ -499,6 +863,32 @@ Multi-line text input with optional auto sizing.
 
 Use Textarea for longer freeform content such as descriptions, notes, and comments.
 
+### Timeline
+
+Shows ordered events with timestamps, indicators and alternate layouts.
+
+- Category: Data Display
+- Exports: `Timeline`
+- Source: `src/components/timeline/timeline.tsx`
+- Storybook: `stories/timeline.stories.tsx`
+- Tests: `tests/timeline/timeline.test.tsx`
+- Semantic parts: `root`, `item`, `itemWrapper`, `itemIcon`, `itemSection`, `itemHeader`, `itemTitle`, `itemContent`, `itemRail`
+
+Use Timeline for chronological events and their current progress.
+
+### TimePicker
+
+Select or type a time, or a time range, with Day.js values and configurable precision.
+
+- Category: Data Entry
+- Exports: `TimePicker`, `TimeRangePicker`
+- Source: `src/components/time-picker/time-picker.tsx`
+- Storybook: `stories/time-picker.stories.tsx`
+- Tests: `tests/time-picker/time-picker.test.tsx`
+- Semantic parts: `root`, `prefix`, `input`, `suffix`, `popup`
+
+Use TimePicker when a form needs a time without a calendar date; use TimePicker.RangePicker for start and end times.
+
 ### Tooltip
 
 Shows a brief informational popup when hovering or focusing an element.
@@ -511,6 +901,84 @@ Shows a brief informational popup when hovering or focusing an element.
 - Semantic parts: `content`, `arrow`
 
 Use Tooltip for short contextual hints on hover or focus. The popup is portaled and inherits the TaoProvider theme.
+
+### Tour
+
+Guided steps anchored to page elements with a spotlight mask, custom content and accessible actions.
+
+- Category: Feedback
+- Exports: `Tour`
+- Source: `src/components/tour/tour.tsx`
+- Storybook: `stories/tour.stories.tsx`
+- Tests: `tests/tour/tour.test.tsx`
+- Semantic parts: `root`, `cover`, `close`, `mask`, `section`, `footer`, `actions`, `indicator`, `indicators`, `header`, `title`, `description`
+
+Guided steps anchored to page elements with a spotlight mask, custom content and accessible actions.
+
+### Transfer
+
+Moves selected records between searchable, paginated source and target lists.
+
+- Category: Data Entry
+- Exports: `Transfer`
+- Source: `src/components/transfer/transfer.tsx`
+- Storybook: `stories/transfer.stories.tsx`
+- Tests: `tests/transfer/transfer.test.tsx`
+- Semantic parts: `root`, `section`, `header`, `title`, `body`, `list`, `item`, `itemIcon`, `itemContent`, `footer`, `actions`
+
+Assign records by moving them between source and target lists.
+
+### Tree
+
+Navigate, select and check hierarchical data with keyboard navigation, lazy loading and virtual scrolling.
+
+- Category: Data Display
+- Exports: `Tree`, `DirectoryTree`
+- Source: `src/components/tree/tree.tsx`
+- Storybook: `stories/tree.stories.tsx`
+- Tests: `tests/tree/tree.test.tsx`
+- Semantic parts: `root`, `item`, `itemIcon`, `itemTitle`, `itemSwitcher`
+
+Use Tree for hierarchical information. DirectoryTree adds file-explorer selection with Ctrl/Command and Shift modifiers.
+
+### TreeSelect
+
+Select hierarchical values with search, checkable trees, lazy loading and virtual scrolling.
+
+- Category: Data Entry
+- Exports: `TreeSelect`
+- Source: `src/components/tree-select/tree-select.tsx`
+- Storybook: `stories/tree-select.stories.tsx`
+- Tests: `tests/tree-select/tree-select.test.tsx`
+- Semantic parts: `root`, `prefix`, `suffix`, `input`, `clear`, `placeholder`, `content`, `item`, `itemContent`, `itemRemove`, `popup.root`, `popup.item`, `popup.itemTitle`, `popup.itemSwitcher`
+
+Use TreeSelect when a form value comes from a hierarchy and users need to search or check multiple nodes.
+
+### Upload
+
+Select, transform, upload and manage files with real request progress and cancellation.
+
+- Category: Data Entry
+- Exports: `Upload`
+- Source: `src/components/upload/upload.tsx`
+- Storybook: `stories/upload.stories.tsx`
+- Tests: `tests/upload/upload.test.tsx`
+- Semantic parts: `root`, `list`, `item`, `trigger`
+
+Provide an upload action or a customRequest transport, or return false from beforeUpload to manage files locally.
+
+### Watermark
+
+Repeats a text or image watermark over content and inherited dialog panels.
+
+- Category: General
+- Exports: `Watermark`
+- Source: `src/components/watermark/watermark.tsx`
+- Storybook: `stories/watermark.stories.tsx`
+- Tests: `tests/watermark/watermark.test.tsx`
+- Semantic parts: `root`, `mark`
+
+Repeats a text or image watermark over content and inherited dialog panels.
 
 ## Notes For Code Generation
 

@@ -1,0 +1,214 @@
+---
+title: Avatar
+description: "Identifies people or entities using images, initials or icons."
+---
+
+import Preview from '../../_components/demo-preview';
+
+Identifies people or entities using images, initials or icons.
+
+This native tao-ui component follows the public API of Ant Design 6.7.0. Appearance, theme tokens and Semantic DOM customization belong to tao-ui; configure themes with `TaoProvider`.
+
+Sizes inherit TaoProvider. Square avatars use the native tao-ui radius; group overflow uses the tao-ui Popover.
+
+## When to use
+
+Use short initials and meaningful alternative text. Groups show team membership.
+
+## Examples
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="avatar-example-1">
+
+### Sizes and shapes
+
+```tsx preview
+import { Avatar } from "@rockshin/tao-ui";
+
+export default function Example() {
+  return (
+    <div
+      style={{
+        display: "flex",
+        gap: 16,
+        alignItems: "center",
+        flexWrap: "wrap",
+      }}
+    >
+      <Avatar size="small">A</Avatar>
+      <Avatar>AB</Avatar>
+      <Avatar size="large">CD</Avatar>
+      <Avatar size={64} shape="square">
+        EF
+      </Avatar>
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="avatar-example-2">
+
+### Images and icons
+
+```tsx preview
+import { Avatar } from "@rockshin/tao-ui";
+
+const image = `data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect width="80" height="80" fill="#365e67"/><circle cx="40" cy="30" r="14" fill="#e0c2a1"/><path d="M12 80V70a28 28 0 0 1 56 0v10" fill="#d7ded5"/></svg>')}`;
+
+export default function Example() {
+  return (
+    <div
+      style={{
+        display: "flex",
+        gap: 16,
+        alignItems: "center",
+        flexWrap: "wrap",
+      }}
+    >
+      <Avatar size={48} src={image} alt="Abstract profile" />
+      <Avatar icon={<span aria-hidden="true">◎</span>} aria-label="Guest" />
+      <Avatar shape="square">RS</Avatar>
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="avatar-example-3">
+
+### Automatic text fitting
+
+```tsx preview
+import { useState } from "react";
+import { Avatar, Button } from "@rockshin/tao-ui";
+
+const labels = ["A", "Ada", "Lovelace"];
+
+export default function Example() {
+  const [index, setIndex] = useState(0);
+  return (
+    <div
+      style={{
+        display: "flex",
+        gap: 16,
+        alignItems: "center",
+        flexWrap: "wrap",
+      }}
+    >
+      <Avatar size={48} gap={6}>
+        {labels[index]}
+      </Avatar>
+      <Button onClick={() => setIndex((index + 1) % labels.length)}>
+        Change name
+      </Button>
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="avatar-example-4">
+
+### Groups and overflow
+
+```tsx preview="iframe-follow"
+import { Avatar } from "@rockshin/tao-ui";
+
+export default function Example() {
+  return (
+    <Avatar.Group
+      size="large"
+      max={{
+        count: 3,
+        popover: { trigger: "click" },
+        style: { background: "var(--tao-color-fill-secondary)" },
+      }}
+    >
+      {["AL", "BT", "CW", "DX", "EY"].map((name) => (
+        <Avatar key={name}>{name}</Avatar>
+      ))}
+    </Avatar.Group>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="avatar-example-5">
+
+### Responsive sizes
+
+```tsx preview="iframe-follow"
+import { Avatar } from "@rockshin/tao-ui";
+
+export default function Example() {
+  return (
+    <div
+      style={{
+        display: "flex",
+        gap: 16,
+        alignItems: "center",
+        flexWrap: "wrap",
+      }}
+    >
+      <Avatar size={{ xs: 32, sm: 48, lg: 72 }}>AL</Avatar>
+      <span>Resize the preview to change the avatar size.</span>
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="avatar-example-6">
+
+### Local theme and semantic parts
+
+```tsx preview
+import { Avatar, TaoProvider } from "@rockshin/tao-ui";
+
+export default function Example() {
+  return (
+    <TaoProvider
+      size="large"
+      theme={{ token: { colorPrimary: "oklch(0.45 0.08 205)" } }}
+    >
+      <div
+        style={{
+          display: "flex",
+          gap: 16,
+          alignItems: "center",
+          flexWrap: "wrap",
+        }}
+      >
+        <Avatar
+          shape="square"
+          styles={{
+            root: {
+              background: "var(--tao-color-primary)",
+              color: "var(--tao-primary-fg)",
+            },
+            content: { fontWeight: 700 },
+          }}
+        >
+          AL
+        </Avatar>
+        <Avatar shape="square">BT</Avatar>
+      </div>
+    </TaoProvider>
+  );
+}
+```
+
+</section>
+
+</div>
+
+## API
+
+<API moduleName="avatar" />

@@ -3,6 +3,8 @@ title: Input
 description: 输入单行文本，并支持前后缀、状态、尺寸与视觉变体。页面涵盖适用场景、设计建议、多组可运行示例、交互状态与完整 API 参考。
 ---
 
+import Preview from '../../_components/demo-preview';
+
 输入单行文本，并支持前后缀、状态、尺寸与视觉变体。
 
 ## 何时使用
@@ -18,7 +20,13 @@ description: 输入单行文本，并支持前后缀、状态、尺寸与视觉�
 
 - 多行内容不要使用 Input，应使用 Textarea。
 
-## 基础用法
+## 代码演示
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="input-example-1">
+
+### 基础用法
 
 ```tsx preview
 import { Input, Stack } from '@rockshin/tao-ui';
@@ -37,7 +45,11 @@ function InputExample() {
 export default InputExample;
 ```
 
-## 变体
+</section>
+
+<section className="tao-example" id="input-example-2">
+
+### 变体
 
 ```tsx preview
 import { Input, Stack } from '@rockshin/tao-ui';
@@ -55,7 +67,11 @@ function InputVariants() {
 export default InputVariants;
 ```
 
-## 尺寸与前后缀
+</section>
+
+<section className="tao-example" id="input-example-3">
+
+### 尺寸与前后缀
 
 ```tsx preview
 import { Input, Stack } from '@rockshin/tao-ui';
@@ -63,8 +79,16 @@ import { Input, Stack } from '@rockshin/tao-ui';
 function InputSizes() {
   return (
     <Stack gap="md" style={{ maxWidth: 400 }}>
-      <Input size="small" prefix={<span aria-hidden="true">⌕</span>} placeholder="Small search" />
-      <Input size="medium" suffix={<span>USD</span>} placeholder="Medium amount" />
+      <Input
+        size="small"
+        prefix={<span aria-hidden="true">⌕</span>}
+        placeholder="Small search"
+      />
+      <Input
+        size="medium"
+        suffix={<span>USD</span>}
+        placeholder="Medium amount"
+      />
       <Input size="large" placeholder="Large input" />
     </Stack>
   );
@@ -72,6 +96,224 @@ function InputSizes() {
 
 export default InputSizes;
 ```
+
+</section>
+
+<section className="tao-example" id="input-sizes">
+
+### 三种尺寸
+
+为表单、紧凑工具栏和宽松布局选择尺寸。
+
+```tsx preview
+import { Input, Stack } from '@rockshin/tao-ui';
+export default function Example() {
+  return (
+    <Stack direction="vertical">
+      {(['small', 'medium', 'large'] as const).map((size) => (
+        <Input key={size} size={size} aria-label={size} placeholder={size} />
+      ))}
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="input-controlled">
+
+### 受控值与清空
+
+通过 value 和 onChange 与外部状态同步，重置按钮更新同一状态。
+
+```tsx preview
+import { useState } from 'react';
+import { Input, Button, Stack } from '@rockshin/tao-ui';
+export default function Example() {
+  const [value, setValue] = useState('tao-ui');
+  return (
+    <Stack direction="vertical">
+      <Input
+        aria-label="Project name"
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+      />
+      <Button onClick={() => setValue('')}>Clear</Button>
+      <output>{value || 'Empty'}</output>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="input-affixes">
+
+### 前后缀
+
+前后缀显示单位或上下文，输入值仅保存用户内容。
+
+```tsx preview
+import { Input, Stack } from '@rockshin/tao-ui';
+export default function Example() {
+  return (
+    <Stack direction="vertical">
+      <Input
+        aria-label="Website"
+        prefix="https://"
+        suffix=".com"
+        placeholder="example"
+      />
+      <Input
+        aria-label="Budget"
+        prefix="$"
+        suffix="USD"
+        type="number"
+        defaultValue="1200"
+      />
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="input-password">
+
+### 显示密码
+
+切换原生 type，按钮提供明确名称并避免提交表单。
+
+```tsx preview
+import { useState } from 'react';
+import { Input, Button, Stack } from '@rockshin/tao-ui';
+export default function Example() {
+  const [visible, setVisible] = useState(false);
+  return (
+    <Stack direction="vertical">
+      <Input
+        aria-label="Password"
+        type={visible ? 'text' : 'password'}
+        defaultValue="example-password"
+        autoComplete="new-password"
+      />
+      <Button aria-pressed={visible} onClick={() => setVisible(!visible)}>
+        {visible ? 'Hide password' : 'Show password'}
+      </Button>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="input-search-submit">
+
+### 回车搜索
+
+通过原生表单处理回车和按钮提交，结果在页面内显示。
+
+```tsx preview
+import { useState } from 'react';
+import { Input, Button, Stack } from '@rockshin/tao-ui';
+export default function Example() {
+  const [query, setQuery] = useState('');
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        setQuery(String(new FormData(e.currentTarget).get('query')));
+      }}
+    >
+      <Stack direction="vertical">
+        <Input
+          name="query"
+          type="search"
+          aria-label="Search components"
+          placeholder="Search components"
+          required
+        />
+        <Button type="submit">Search</Button>
+        <output aria-live="polite">
+          {query ? `Searching for: ${query}` : 'Enter a component name'}
+        </output>
+      </Stack>
+    </form>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="input-native-constraints">
+
+### 原生约束与只读
+
+原生 email、required、maxLength 与 readOnly 可直接使用；错误状态由业务决定。
+
+```tsx preview
+import { Input, Stack } from '@rockshin/tao-ui';
+export default function Example() {
+  return (
+    <Stack direction="vertical">
+      <Input
+        aria-label="Email"
+        type="email"
+        required
+        placeholder="name@example.com"
+      />
+      <Input
+        aria-label="Short code"
+        maxLength={6}
+        placeholder="Up to 6 characters"
+      />
+      <Input aria-label="Record ID" readOnly value="REC-1042" />
+      <Input
+        aria-label="Invalid value"
+        status="error"
+        defaultValue="Invalid value"
+      />
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="input-focus-ref">
+
+### 命令式聚焦
+
+ref 指向原生输入框，可在完成其他操作后恢复焦点。
+
+```tsx preview
+import { useRef } from 'react';
+import { Input, Button, Stack } from '@rockshin/tao-ui';
+export default function Example() {
+  const ref = useRef<HTMLInputElement>(null);
+  return (
+    <Stack direction="vertical">
+      <Input
+        ref={ref}
+        aria-label="Focus target"
+        defaultValue="Select this text"
+      />
+      <Button
+        onClick={() => {
+          ref.current?.focus();
+          ref.current?.select();
+        }}
+      >
+        Focus and select
+      </Button>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+</div>
 
 ## API
 

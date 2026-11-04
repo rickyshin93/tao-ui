@@ -1,0 +1,201 @@
+---
+title: Rate
+description: "支持整星和半星选择的评分组件。"
+---
+
+import Preview from '../../_components/demo-preview';
+
+支持整星和半星选择的评分组件。
+
+## 何时使用
+
+用于简短的有序评分，提供可见标签并说明高分与低分含义。
+
+## 示例
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="rate-example-1">
+
+### 受控半星评分
+
+方向键调整评分。allowHalf 启用半星，tooltips 可说明整星分值。
+
+```tsx preview="iframe-follow"
+import { useState } from 'react';
+import { Rate, Stack } from '@rockshin/tao-ui';
+
+export default function Example() {
+  const [value, setValue] = useState(3.5);
+  return (
+    <Stack gap="sm">
+      <span>How was your experience?</span>
+      <Rate
+        value={value}
+        onChange={setValue}
+        allowHalf
+        aria-label="Experience rating"
+        tooltips={['Poor', 'Fair', 'Good', 'Very good', 'Excellent']}
+      />
+      <output>{value} / 5</output>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="rate-example-2">
+
+### 允许或禁止清空
+
+allowClear 开启时，再次点击已选分值可清空为 0。
+
+```tsx preview
+import { Rate, Stack } from '@rockshin/tao-ui';
+
+export default function Example() {
+  return (
+    <Stack gap="md">
+      <div>
+        <p>Click the selected star to clear</p>
+        <Rate defaultValue={3} aria-label="Clearable rating" />
+      </div>
+      <div>
+        <p>A value is always retained</p>
+        <Rate
+          defaultValue={3}
+          allowClear={false}
+          aria-label="Required rating"
+        />
+      </div>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="rate-example-3">
+
+### 只读与禁用
+
+readOnly 展示已有评分，disabled 表示当前不可操作。
+
+```tsx preview
+import { Rate, Stack } from '@rockshin/tao-ui';
+
+export default function Example() {
+  return (
+    <Stack gap="md">
+      <div>
+        <p>Average: 4.5</p>
+        <Rate value={4.5} allowHalf readOnly aria-label="Average rating" />
+      </div>
+      <div>
+        <p>Rating unavailable</p>
+        <Rate defaultValue={3} disabled aria-label="Unavailable rating" />
+      </div>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="rate-example-4">
+
+### 自定义字符与数量
+
+character 可传入节点或按序号返回节点的函数。
+
+```tsx preview
+import { Rate, Stack } from '@rockshin/tao-ui';
+
+export default function Example() {
+  return (
+    <Stack gap="md">
+      <Rate
+        count={3}
+        defaultValue={2}
+        character="♥"
+        aria-label="Three-heart rating"
+      />
+      <Rate
+        count={5}
+        defaultValue={3}
+        character={({ index }) => (
+          <span style={{ fontSize: 18 }}>{(index ?? 0) + 1}</span>
+        )}
+        aria-label="Numeric rating"
+      />
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="rate-example-5">
+
+### 尺寸与全局默认值
+
+支持 small、middle、large，也支持原生 medium 写法。
+
+```tsx preview
+import { Rate, Stack, TaoProvider } from '@rockshin/tao-ui';
+
+export default function Example() {
+  return (
+    <TaoProvider size="small">
+      <Stack gap="md">
+        <Rate defaultValue={3} aria-label="Inherited small rating" />
+        <Rate defaultValue={3} size="middle" aria-label="Medium rating" />
+        <Rate defaultValue={3} size="large" aria-label="Large rating" />
+      </Stack>
+    </TaoProvider>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="rate-example-6">
+
+### 焦点与语义定制
+
+其他操作需要将焦点移至评分时，可通过 ref 调用 focus。
+
+```tsx preview
+import { useRef } from 'react';
+import { Button, Rate, Stack } from '@rockshin/tao-ui';
+import type { RateRef } from '@rockshin/tao-ui';
+
+export default function Example() {
+  const ref = useRef<RateRef>(null);
+  return (
+    <Stack gap="md">
+      <Button variant="secondary" onClick={() => ref.current?.focus()}>
+        Focus rating
+      </Button>
+      <Rate
+        ref={ref}
+        defaultValue={4}
+        aria-label="Custom rating"
+        styles={{
+          root: { color: 'var(--tao-primary)' },
+          item: { marginInlineEnd: 8 },
+        }}
+      />
+    </Stack>
+  );
+}
+```
+
+</section>
+
+</div>
+
+## API
+
+<API moduleName="rate" />

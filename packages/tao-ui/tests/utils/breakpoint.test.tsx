@@ -48,8 +48,23 @@ test('matches everything at wide widths', async () => {
   setViewportWidth(1920);
   render(<BreakpointProbe />);
   await waitFor(() =>
-    expect(screen.getByText('xxl,xl,lg,md,sm')).toBeTruthy(),
+    expect(screen.getByText('xxxl,xxl,xl,lg,md,sm')).toBeTruthy(),
   );
+});
+
+test('xxxl starts at 1920px and takes precedence over xxl', async () => {
+  setViewportWidth(1919);
+  const { unmount } = render(<BreakpointProbe />);
+  expect(screen.getByText('xxl,xl,lg,md,sm')).toBeTruthy();
+  unmount();
+  setViewportWidth(1920);
+  render(<BreakpointProbe />);
+  await waitFor(() =>
+    expect(screen.getByText('xxxl,xxl,xl,lg,md,sm')).toBeTruthy(),
+  );
+  expect(
+    resolveResponsiveValue({ xxl: 3, xxxl: 4 }, { xxl: true, xxxl: true }),
+  ).toBe(4);
 });
 
 // ---- useIsMobile ----

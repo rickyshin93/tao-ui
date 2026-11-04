@@ -1,0 +1,275 @@
+---
+title: Masonry
+description: "将不同高度的卡片放入均衡的列中。"
+---
+
+import Preview from '../../_components/demo-preview';
+
+将不同高度的卡片放入均衡的列中。
+
+组件采用 tao-ui 原生实现，公共 API 对齐 Ant Design 6.7.0。外观、主题 token 与 Semantic DOM 定制遵循 tao-ui，主题通过 `TaoProvider` 配置。
+
+6.7.0 items/itemRender 契约支持响应式列数与 fresh 尺寸监听；布局使用原生定位，DOM 顺序保持输入顺序。
+
+## 何时使用
+
+适合图片墙或高度不同的内容卡片，不要求逐行对齐。
+
+## 代码演示
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="masonry-example-1">
+
+### 均衡列布局
+
+```tsx preview
+import { Masonry } from "@rockshin/tao-ui";
+
+const items = [100, 160, 80, 130, 90, 150].map((height, key) => ({
+  key,
+  height,
+  data: { title: `Tile ${key + 1}` },
+}));
+
+export default function Example() {
+  return (
+    <Masonry
+      columns={3}
+      gutter={16}
+      items={items}
+      itemRender={({ data }) => (
+        <div
+          style={{
+            height: "100%",
+            boxSizing: "border-box",
+            padding: 16,
+            borderRadius: 6,
+            background: "var(--tao-color-fill-secondary)",
+          }}
+        >
+          {data.title}
+        </div>
+      )}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="masonry-example-2">
+
+### 响应式列数与间距
+
+```tsx preview="iframe-follow"
+import { Masonry } from "@rockshin/tao-ui";
+
+const items = [100, 160, 80, 130, 90, 150].map((height, key) => ({
+  key,
+  height,
+  data: { title: `Tile ${key + 1}` },
+}));
+
+export default function Example() {
+  return (
+    <Masonry
+      columns={{ xs: 1, sm: 2, lg: 3 }}
+      gutter={[{ xs: 8, sm: 16 }, 16]}
+      items={items}
+      itemRender={({ data }) => (
+        <div
+          style={{
+            height: "100%",
+            boxSizing: "border-box",
+            padding: 16,
+            borderRadius: 6,
+            background: "var(--tao-color-fill-secondary)",
+          }}
+        >
+          {data.title}
+        </div>
+      )}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="masonry-example-3">
+
+### 指定列
+
+```tsx preview
+import { Masonry } from "@rockshin/tao-ui";
+
+const items = [100, 160, 80, 130, 90, 150].map((height, key) => ({
+  key,
+  height,
+  data: { title: `Tile ${key + 1}` },
+}));
+
+export default function Example() {
+  return (
+    <Masonry
+      columns={3}
+      gutter={16}
+      items={items.map((item, index) => ({
+        ...item,
+        column: index === 0 ? 2 : undefined,
+      }))}
+      itemRender={({ data }) => (
+        <div
+          style={{
+            height: "100%",
+            boxSizing: "border-box",
+            padding: 16,
+            borderRadius: 6,
+            background: "var(--tao-color-fill-secondary)",
+          }}
+        >
+          {data.title}
+        </div>
+      )}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="masonry-example-4">
+
+### 跟随内容高度变化
+
+```tsx preview="iframe-follow"
+import { useState } from "react";
+import { Button, Masonry } from "@rockshin/tao-ui";
+
+export default function Example() {
+  const [expanded, setExpanded] = useState(false);
+  return (
+    <div>
+      <Button
+        onClick={() => setExpanded(!expanded)}
+        style={{ marginBottom: 16 }}
+      >
+        Toggle details
+      </Button>
+      <Masonry
+        columns={{ xs: 1, sm: 2 }}
+        gutter={16}
+        fresh
+        items={[
+          {
+            key: "one",
+            data: 1,
+            children: (
+              <div
+                style={{
+                  padding: 16,
+                  background: "var(--tao-color-fill-secondary)",
+                  borderRadius: 6,
+                }}
+              >
+                <h4>Details</h4>
+                {expanded ? (
+                  <p>
+                    A longer description changes the card height and the
+                    following cards are positioned again.
+                  </p>
+                ) : (
+                  <p>Short summary.</p>
+                )}
+              </div>
+            ),
+          },
+          ...[2, 3, 4].map((key) => ({
+            key,
+            data: key,
+            height: 80 + key * 12,
+            children: (
+              <div
+                style={{
+                  height: "100%",
+                  padding: 16,
+                  boxSizing: "border-box",
+                  background: "var(--tao-color-fill-secondary)",
+                  borderRadius: 6,
+                }}
+              >
+                Card {key}
+              </div>
+            ),
+          })),
+        ]}
+      />
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="masonry-example-5">
+
+### 重排并观察布局
+
+```tsx preview
+import { useState } from "react";
+import { Button, Masonry } from "@rockshin/tao-ui";
+
+const items = [100, 160, 80, 130, 90, 150].map((height, key) => ({
+  key,
+  height,
+  data: { title: `Tile ${key + 1}` },
+}));
+
+export default function Example() {
+  const [reversed, setReversed] = useState(false);
+  const [columns, setColumns] = useState("");
+  return (
+    <div>
+      <Button
+        onClick={() => setReversed(!reversed)}
+        style={{ marginBottom: 16 }}
+      >
+        Reverse items
+      </Button>
+      <Masonry
+        columns={2}
+        gutter={12}
+        items={reversed ? [...items].reverse() : items}
+        onLayoutChange={(order) =>
+          setColumns(
+            order.map((item) => `${item.key} → ${item.column + 1}`).join(", "),
+          )
+        }
+        itemRender={({ data }) => (
+          <div
+            style={{
+              height: "100%",
+              boxSizing: "border-box",
+              padding: 16,
+              borderRadius: 6,
+              background: "var(--tao-color-fill-secondary)",
+            }}
+          >
+            {data.title}
+          </div>
+        )}
+      />
+      <p>Item → column: {columns}</p>
+    </div>
+  );
+}
+```
+
+</section>
+
+</div>
+
+## API
+
+<API moduleName="masonry" />

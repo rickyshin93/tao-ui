@@ -3,6 +3,8 @@ title: FormLayout
 description: 为产品级表单提供一致的宽度、区段与操作布局。页面涵盖适用场景、设计建议、多组可运行示例、交互状态与完整 API 参考。
 ---
 
+import Preview from '../../_components/demo-preview';
+
 为产品级表单提供一致的宽度、区段与操作布局。
 
 ## 何时使用
@@ -18,10 +20,23 @@ description: 为产品级表单提供一致的宽度、区段与操作布局。�
 
 - 不要用 FormLayout 包裹与表单无关的页面内容。
 
-## 基础用法
+## 代码演示
+
+<div className="tao-demo-grid tao-demo-grid-wide">
+
+<section className="tao-example" id="form-layout-example-1">
+
+### 基础用法
 
 ```tsx preview
-import { Button, FormActions, FormField, FormLayout, FormSection, Input } from '@rockshin/tao-ui';
+import {
+  Button,
+  FormActions,
+  FormField,
+  FormLayout,
+  FormSection,
+  Input,
+} from '@rockshin/tao-ui';
 
 function FormLayoutExample() {
   return (
@@ -42,10 +57,21 @@ function FormLayoutExample() {
 export default FormLayoutExample;
 ```
 
-## 多个区段
+</section>
+
+<section className="tao-example" id="form-layout-example-2">
+
+### 多个区段
 
 ```tsx preview
-import { Button, FormActions, FormField, FormLayout, FormSection, Input } from '@rockshin/tao-ui';
+import {
+  Button,
+  FormActions,
+  FormField,
+  FormLayout,
+  FormSection,
+  Input,
+} from '@rockshin/tao-ui';
 
 function CompleteFormLayout() {
   return (
@@ -55,7 +81,10 @@ function CompleteFormLayout() {
           <Input placeholder="Rihua Chen" />
         </FormField>
       </FormSection>
-      <FormSection title="Contact" description="Used for account notifications.">
+      <FormSection
+        title="Contact"
+        description="Used for account notifications."
+      >
         <FormField label="Email" required>
           <Input placeholder="you@example.com" />
         </FormField>
@@ -71,7 +100,11 @@ function CompleteFormLayout() {
 export default CompleteFormLayout;
 ```
 
-## 语义化定制
+</section>
+
+<section className="tao-example" id="form-layout-example-3">
+
+### 语义化定制
 
 ```tsx preview
 import { Button, FormActions, FormLayout } from '@rockshin/tao-ui';
@@ -89,6 +122,136 @@ function CustomizedFormLayout() {
 
 export default CustomizedFormLayout;
 ```
+
+</section>
+
+<section className="tao-example" id="form-layout-native-form">
+
+### 完整表单组合
+
+组合布局、字段与操作区，用原生提交展示保存结果。
+
+```tsx preview
+import { useState } from 'react';
+import {
+  FormLayout,
+  FormSection,
+  FormField,
+  FormActions,
+  Input,
+  Textarea,
+  Button,
+} from '@rockshin/tao-ui';
+export default function Example() {
+  const [saved, setSaved] = useState('');
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        setSaved(String(new FormData(e.currentTarget).get('name')));
+      }}
+      onReset={() => setSaved('')}
+    >
+      <FormLayout>
+        <FormSection title="Profile" description="Public workspace information">
+          <FormField label="Display name" required>
+            <Input name="name" required defaultValue="Alex" />
+          </FormField>
+          <FormField label="Bio" description="A short introduction">
+            <Textarea name="bio" autoSize />
+          </FormField>
+        </FormSection>
+        <FormActions>
+          <Button type="reset">Reset</Button>
+          <Button type="submit" variant="primary">
+            Save
+          </Button>
+        </FormActions>
+        <output aria-live="polite">
+          {saved ? `Saved ${saved}` : 'No changes saved'}
+        </output>
+      </FormLayout>
+    </form>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="form-layout-responsive-grid">
+
+### 响应式多列表单
+
+通过语义 root 使用 CSS Grid，空间不足时自动变为单列。
+
+```tsx preview="iframe-follow"
+import { FormLayout, FormField, Input } from '@rockshin/tao-ui';
+export default function Example() {
+  return (
+    <FormLayout
+      styles={{
+        root: {
+          display: 'grid',
+          gridTemplateColumns:
+            'repeat(auto-fit, minmax(min(100%, 240px), 1fr))',
+          gap: 16,
+        },
+      }}
+    >
+      <FormField label="First name">
+        <Input />
+      </FormField>
+      <FormField label="Last name">
+        <Input />
+      </FormField>
+      <FormField label="Email">
+        <Input type="email" />
+      </FormField>
+      <FormField label="Organization">
+        <Input />
+      </FormField>
+    </FormLayout>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="form-layout-sections">
+
+### 分组表单
+
+用 section 标题表达信息层级，外层布局统一间距。
+
+```tsx preview
+import {
+  FormLayout,
+  FormSection,
+  FormField,
+  Input,
+  Switch,
+} from '@rockshin/tao-ui';
+export default function Example() {
+  return (
+    <FormLayout>
+      <FormSection title="Account" description="Identity and contact">
+        <FormField label="Name">
+          <Input />
+        </FormField>
+      </FormSection>
+      <FormSection title="Notifications" description="Delivery preferences">
+        <FormField label="Email updates">
+          <Switch aria-label="Email updates" defaultChecked />
+        </FormField>
+      </FormSection>
+    </FormLayout>
+  );
+}
+```
+
+</section>
+
+</div>
 
 ## API
 

@@ -27,7 +27,7 @@ import { SearchableSelectList } from './select-searchable-list';
 import { SelectTags } from './select-tags';
 import { useSelectSelection } from './use-select-selection';
 import './select.css';
-import { useIsMobile } from '../../utils/breakpoint';
+import { useBreakpoint } from '../../utils/breakpoint';
 import type {
   SelectOption,
   SelectPlacement,
@@ -73,7 +73,7 @@ export const Select = forwardRef(function Select(
     allowClear,
     loading,
     loadingIcon,
-    notFoundContent = 'No results',
+    notFoundContent: notFoundContentProp,
     prefix,
     suffixIcon,
     removeIcon,
@@ -106,11 +106,28 @@ export const Select = forwardRef(function Select(
   } = props;
 
   const ctx = useTaoConfig();
+  const notFoundContent =
+    notFoundContentProp === undefined
+      ? ctx.locale.noResults
+      : notFoundContentProp;
   const resolvedSize = size ?? ctx.size;
   const resolvedVariant = variant ?? ctx.variant;
   const resolvedDisabled = disabled ?? ctx.disabled;
-  const autoMobile = useIsMobile();
-  const isMobile = mobile ?? autoMobile;
+  const screens = useBreakpoint();
+  const requestedMobile = mobile ?? screens.xs;
+  const isOpenControlled = openProp !== undefined;
+  const [openInternal, setOpenInternal] = useState(defaultOpen ?? false);
+  const requestedOpen = isOpenControlled ? openProp : openInternal;
+  // Preserve the active editing surface until it closes, including its draft and focus.
+  const [mobilePresentation, setMobilePresentation] = useState(requestedMobile);
+  if (
+    (!requestedOpen || mobilePresentation === undefined) &&
+    mobilePresentation !== requestedMobile
+  ) {
+    setMobilePresentation(requestedMobile);
+  }
+  const isMobile =
+    (requestedOpen ? mobilePresentation : requestedMobile) ?? false;
 
   const triggerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -146,11 +163,6 @@ export const Select = forwardRef(function Select(
     clear: clearValue,
   } = useSelectSelection(props, resolvedDisabled);
 
-  // open (controlled / uncontrolled)
-  const isOpenControlled = openProp !== undefined;
-  const [openInternal, setOpenInternal] = useState(defaultOpen ?? false);
-  const requestedOpen = isOpenControlled ? openProp : openInternal;
-
   // search (controlled / uncontrolled)
   const isSearchControlled = searchValueProp !== undefined;
   const [searchInternal, setSearchInternal] = useState('');
@@ -168,8 +180,6 @@ export const Select = forwardRef(function Select(
     },
     [isComposingKey],
   );
-
-  const [hovering, setHovering] = useState(false);
 
   // Prevents Radix from auto-closing the dropdown after a multi-select toggle.
   const suppressCloseRef = useRef(false);
@@ -215,6 +225,9 @@ export const Select = forwardRef(function Select(
       suppressCloseRef.current = false;
       if (!isOpenControlled) setOpenInternal(next);
       if (!next && !isSearchControlled) setSearchInternal('');
+      if (!next && isMobile) {
+        setTimeout(() => (inputRef.current ?? triggerRef.current)?.focus(), 0);
+      }
       // Focus the search input once the dropdown mounts.
       if (next && showSearch && !isMobile) {
         setTimeout(() => inputRef.current?.focus(), 0);
@@ -367,7 +380,7 @@ export const Select = forwardRef(function Select(
         <span data-tao-select-icon="" data-tao-select-loading-slot="">
           {loadingIcon ?? <LoadingIcon />}
         </span>
-      ) : showClearBtn && hovering ? (
+      ) : showClearBtn ? (
         // biome-ignore lint/a11y/useSemanticElements: inside Radix button trigger; nesting a button here would be invalid HTML.
         <span
           data-tao-select-clear=""
@@ -384,7 +397,7 @@ export const Select = forwardRef(function Select(
           }}
           role="button"
           tabIndex={0}
-          aria-label="Clear"
+          aria-label={ctx.locale.clear}
         >
           {clearIcon}
         </span>
@@ -420,7 +433,7 @@ export const Select = forwardRef(function Select(
               style={styles?.clear}
               onPointerDown={(event) => event.stopPropagation()}
               onClick={handleClear}
-              aria-label="Clear"
+              aria-label={ctx.locale.clear}
             >
               {clearIcon}
             </button>
@@ -448,6 +461,7 @@ export const Select = forwardRef(function Select(
           id={id}
           data-tao-control=""
           data-tao-select=""
+          data-tao-multiple={isMultiple || undefined}
           data-tao-size={resolvedSize}
           data-tao-variant={resolvedVariant}
           data-tao-disabled={resolvedDisabled || undefined}
@@ -468,8 +482,6 @@ export const Select = forwardRef(function Select(
               handleOpenChange(true);
             }
           }}
-          onMouseEnter={() => setHovering(true)}
-          onMouseLeave={() => setHovering(false)}
         >
           {prefix != null && (
             <span
@@ -527,6 +539,9 @@ export const Select = forwardRef(function Select(
           {trailingIcons}
         </div>
         <MobileSelectDrawer
+          classNames={classNames}
+          styles={styles}
+          popupRender={popupRender}
           open={open}
           onClose={() => handleOpenChange(false)}
           options={options}
@@ -535,10 +550,19 @@ export const Select = forwardRef(function Select(
           onMultiChange={handleMultiChange}
           placeholder={placeholder}
           showSearch={showSearch}
+          searchValue={search}
+          onSearch={handleSearchChange}
           filterOption={filterOption}
           notFoundContent={notFoundContent}
           optionRender={optionRender}
           multiple={isMultiple}
+          maxCount={maxCount}
+          mode={mode}
+          tokenSeparators={tokenSeparators}
+          onSearchClear={() => {
+            if (autoClearSearchValue && !isSearchControlled)
+              setSearchInternal('');
+          }}
           disabled={resolvedDisabled}
         />
       </>
@@ -889,6 +913,7 @@ export const Select = forwardRef(function Select(
           <TaoPortalScope asChild>
             <Popover.Content
               data-tao-select-content=""
+              data-tao-size={resolvedSize}
               data-tao-popup-width={
                 popupMatchSelectWidth === false ? 'content' : undefined
               }
@@ -924,7 +949,6 @@ export const Select = forwardRef(function Select(
       name={isMultiple ? undefined : name}
     >
       <RadixSelect.Trigger asChild>
-        {/* biome-ignore lint/a11y/noStaticElementInteractions: Radix adds combobox semantics and keyboard behavior to this trigger. */}
         <div
           ref={triggerRef}
           id={id}
@@ -938,8 +962,6 @@ export const Select = forwardRef(function Select(
           {...statusProps}
           className={cx(classNames?.root, className)}
           style={{ ...styles?.root, ...style }}
-          onMouseEnter={() => setHovering(true)}
-          onMouseLeave={() => setHovering(false)}
         >
           {prefix != null && (
             <span
@@ -1002,6 +1024,7 @@ export const Select = forwardRef(function Select(
         <TaoPortalScope asChild>
           <RadixSelect.Content
             data-tao-select-content=""
+            data-tao-size={resolvedSize}
             data-tao-popup-width={
               popupMatchSelectWidth === false ? 'content' : undefined
             }
@@ -1035,7 +1058,7 @@ export const Select = forwardRef(function Select(
                     e.stopPropagation();
                     handleSearchKeyDown(e);
                   }}
-                  placeholder="Search..."
+                  placeholder={ctx.locale.searchPlaceholder}
                   autoComplete="off"
                 />
               </div>

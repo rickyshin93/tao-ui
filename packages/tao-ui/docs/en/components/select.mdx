@@ -1,33 +1,32 @@
 ---
 title: Select
-description: "Chooses one value from a compact list of options. Includes usage guidance, a runnable example, and the complete API reference."
+description: Runnable examples for single and multiple selection, tags, token separators, filtering, groups, dependent choices, async loading, rendering, popup controls, mobile drawers, and forms.
 ---
 
-Chooses one value from a compact list of options.
+import Preview from '../../_components/demo-preview';
 
-## When to use
+Choose one or more values, search options, create tags, and customize their presentation. The examples below cover the currently supported capabilities and can each be copied and run independently.
 
-Use Select when choices are known but too numerous or secondary to show as radios.
+Examples normally adapt to a mobile drawer. Those described as desktop examples explicitly set `mobile={false}` to demonstrate input, menu, or popup-specific behavior.
 
-**Recommended**
+## Basics and appearance
 
-- Use RadioGroup when there are only a few important choices.
-- Keep option labels stable and easy to scan.
+<div className="tao-demo-grid">
 
-**Avoid**
+<section className="tao-example" id="select-basic">
 
-- Do not use Select for arbitrary text entry.
+### Basic usage
 
-## Basic usage
+Define choices with `options` and an initial selection with `defaultValue`. `FormField` gives the control an accessible label.
 
 ```tsx preview
 import { FormField, Select } from '@rockshin/tao-ui';
 
-function SelectExample() {
+export default function BasicSelect() {
   return (
     <FormField label="Framework">
       <Select
-        showSearch
+        defaultValue="react"
         placeholder="Choose a framework"
         options={[
           { label: 'React', value: 'react' },
@@ -38,94 +37,1424 @@ function SelectExample() {
     </FormField>
   );
 }
-
-export default SelectExample;
 ```
 
-## Search, clear, and status
+</section>
+
+<section className="tao-example" id="select-sizes">
+
+### Three sizes
+
+Use `small`, `medium`, and `large` for compact toolbars, standard forms, and prominent controls. Desktop option text and row height follow the control size; mobile drawers retain touch-friendly list sizing.
 
 ```tsx preview
-import { Select, Stack } from '@rockshin/tao-ui';
-
-const options = [
-  { label: 'React', value: 'react' },
-  { label: 'Vue', value: 'vue' },
-  { label: 'Svelte', value: 'svelte' },
-];
-
-function SelectStates() {
-  return (
-    <Stack gap="md" style={{ maxWidth: 420 }}>
-      <Select showSearch allowClear options={options} placeholder="Search frameworks" />
-      <Select status="error" options={options} placeholder="Error state" />
-      <Select status="warning" options={options} placeholder="Warning state" />
-      <Select loading options={[]} placeholder="Loading options" />
-    </Stack>
-  );
-}
-
-export default SelectStates;
-```
-
-## Multiple selection
-
-```tsx preview
-import { Select, Stack } from '@rockshin/tao-ui';
+import { FormField, Select, Stack } from '@rockshin/tao-ui';
 
 const options = [
   { label: 'Design', value: 'design' },
   { label: 'Engineering', value: 'engineering' },
-  { label: 'Research', value: 'research' },
-  { label: 'Operations', value: 'operations' },
 ];
 
-function MultipleSelect() {
+export default function SelectSizes() {
   return (
-    <Stack gap="md" style={{ maxWidth: 520 }}>
-      <Select
-        mode="multiple"
-        defaultValue={['design', 'engineering']}
-        options={options}
-        placeholder="Choose teams"
-      />
-      <Select
-        mode="multiple"
-        maxTagCount={2}
-        allowClear
-        defaultValue={['design', 'engineering', 'research']}
-        options={options}
-      />
+    <Stack>
+      {(['small', 'medium', 'large'] as const).map((size) => (
+        <FormField key={size} label={size}>
+          <Select size={size} defaultValue="design" options={options} />
+        </FormField>
+      ))}
     </Stack>
   );
 }
-
-export default MultipleSelect;
 ```
 
-## Disabled options and placement
+</section>
+
+<section className="tao-example" id="select-variants">
+
+### Variants
+
+Choose `outlined`, `filled`, or `borderless` for the surrounding surface. `TaoProvider` can set the shared variant.
 
 ```tsx preview
-import { Select, Stack } from '@rockshin/tao-ui';
+import { FormField, Select, Stack } from '@rockshin/tao-ui';
+
+const options = [
+  { label: 'Personal', value: 'personal' },
+  { label: 'Team', value: 'team' },
+];
+
+export default function SelectVariants() {
+  return (
+    <Stack>
+      {(['outlined', 'filled', 'borderless'] as const).map((variant) => (
+        <FormField key={variant} label={variant}>
+          <Select variant={variant} defaultValue="team" options={options} />
+        </FormField>
+      ))}
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="select-disabled">
+
+### Disabled controls and options
+
+An option-level `disabled` affects one choice. The control-level prop disables all interaction while keeping the current value visible.
+
+```tsx preview
+import { FormField, Select, Stack } from '@rockshin/tao-ui';
+
+const options = [
+  { label: 'Starter', value: 'starter' },
+  { label: 'Team', value: 'team' },
+  { label: 'Enterprise — unavailable', value: 'enterprise', disabled: true },
+];
+
+export default function DisabledSelect() {
+  return (
+    <Stack>
+      <FormField label="Available plans">
+        <Select options={options} defaultValue="starter" />
+      </FormField>
+      <FormField label="Read-only plan">
+        <Select options={options} defaultValue="team" disabled />
+      </FormField>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="select-status">
+
+### Validation states
+
+Use `error` or `warning` with an explanation. Error status also sets `aria-invalid` on the control.
+
+```tsx preview
+import { FormField, Select, Stack } from '@rockshin/tao-ui';
 
 const options = [
   { label: 'Production', value: 'production' },
   { label: 'Staging', value: 'staging' },
-  { label: 'Legacy', value: 'legacy', disabled: true },
 ];
 
-function AdvancedSelect() {
+export default function SelectStatus() {
   return (
-    <Stack gap="md" style={{ maxWidth: 420 }}>
-      <Select options={options} defaultValue="staging" />
-      <Select placement="topRight" options={options} placeholder="Opens upward" />
-      <Select disabled options={options} defaultValue="production" />
+    <Stack>
+      <FormField
+        label="Environment"
+        error="Choose an environment before continuing."
+      >
+        <Select
+          status="error"
+          options={options}
+          placeholder="Choose an environment"
+        />
+      </FormField>
+      <FormField
+        label="Review environment"
+        description="Production changes need a review."
+      >
+        <Select status="warning" options={options} defaultValue="production" />
+      </FormField>
     </Stack>
   );
 }
-
-export default AdvancedSelect;
 ```
+
+</section>
+
+<section className="tao-example" id="select-controlled">
+
+### Controlled selection
+
+Keep external state in sync with `value` and `onChange`. Clearing a single selection emits an empty string; an external action can also update the value.
+
+```tsx preview
+import { Button, FormField, Select, Stack } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+export default function ControlledSelect() {
+  const [value, setValue] = useState('react');
+  return (
+    <Stack>
+      <FormField label="Controlled framework">
+        <Select
+          value={value}
+          onChange={(next) => setValue(next as string)}
+          allowClear
+          options={[
+            { label: 'React', value: 'react' },
+            { label: 'Vue', value: 'vue' },
+          ]}
+          placeholder="Choose a framework"
+        />
+      </FormField>
+      <output aria-live="polite">Value: {value || '(empty)'}</output>
+      <Button variant="secondary" onClick={() => setValue('vue')}>
+        Select Vue
+      </Button>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+</div>
+
+## Multiple selection and tags
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="select-multiple">
+
+### Multiple selection
+
+`mode="multiple"` uses an array of strings. Remove a tag or select an option again to deselect it; `allowClear` clears the entire selection.
+
+```tsx preview
+import { FormField, Select, Stack } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+export default function MultipleSelect() {
+  const [value, setValue] = useState<string[]>(['design', 'engineering']);
+  return (
+    <Stack>
+      <FormField label="Teams">
+        <Select
+          mode="multiple"
+          showSearch
+          allowClear
+          value={value}
+          onChange={(next) => setValue(next as string[])}
+          options={[
+            { label: 'Design', value: 'design' },
+            { label: 'Engineering', value: 'engineering' },
+            { label: 'Research', value: 'research' },
+            { label: 'Operations', value: 'operations' },
+          ]}
+          placeholder="Choose teams"
+        />
+      </FormField>
+      <output aria-live="polite">
+        Selected: {value.join(', ') || '(none)'}
+      </output>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="select-max-count">
+
+### Maximum selection count
+
+`maxCount` limits the number of selections. At the limit, unselected options are disabled until an item is removed. This example uses the desktop popup.
+
+```tsx preview
+import { FormField, Select, Stack } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+export default function MaximumSelection() {
+  const [value, setValue] = useState<string[]>(['design']);
+  return (
+    <Stack>
+      <FormField label="Choose up to two teams">
+        <Select
+          mobile={false}
+          mode="multiple"
+          showSearch
+          maxCount={2}
+          value={value}
+          onChange={(next) => setValue(next as string[])}
+          options={['Design', 'Engineering', 'Research', 'Operations'].map(
+            (label) => ({ label, value: label.toLowerCase() }),
+          )}
+          placeholder="Choose teams"
+        />
+      </FormField>
+      <output aria-live="polite">{value.length} / 2 selected</output>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="select-tags">
+
+### Tags
+
+Combine `mode="tags"` with `showSearch` to create new values with Enter. `notFoundContent={null}` hides an empty suggestion popup. This example uses the desktop input.
+
+```tsx preview
+import { FormField, Select, Stack } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+export default function TagInput() {
+  const [value, setValue] = useState<string[]>(['design']);
+  return (
+    <Stack>
+      <FormField label="Project labels">
+        <Select
+          mobile={false}
+          mode="tags"
+          showSearch
+          allowClear
+          value={value}
+          onChange={(next) => setValue(next as string[])}
+          options={[
+            { label: 'design', value: 'design' },
+            { label: 'frontend', value: 'frontend' },
+          ]}
+          notFoundContent={null}
+          placeholder="Type a label and press Enter"
+        />
+      </FormField>
+      <output aria-live="polite">Labels: {value.join(', ') || '(none)'}</output>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="select-tokenization">
+
+### Token separators
+
+Paste `design,frontend;docs` and press Enter to split and deduplicate values. In `multiple` mode, tokens must match existing values or labels; `tags` can create new values.
+
+```tsx preview
+import { FormField, Select, Stack } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+export default function TokenizedTags() {
+  const [value, setValue] = useState<string[]>([]);
+  return (
+    <Stack>
+      <FormField
+        label="Batch labels"
+        description="Paste design,frontend;docs, then press Enter."
+      >
+        <Select
+          mobile={false}
+          mode="tags"
+          showSearch
+          tokenSeparators={[',', ';']}
+          options={[]}
+          notFoundContent={null}
+          value={value}
+          onChange={(next) => setValue(next as string[])}
+          placeholder="Separate labels with , or ;"
+        />
+      </FormField>
+      <output aria-live="polite">Labels: {value.join(', ') || '(none)'}</output>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="select-tag-overflow">
+
+### Tag count and length
+
+`maxTagCount` controls visible tags, `maxTagTextLength` shortens labels, and `maxTagPlaceholder` customizes the overflow message. The selected values stay intact.
+
+```tsx preview
+import { FormField, Select } from '@rockshin/tao-ui';
+
+const options = [
+  'Product design',
+  'Frontend engineering',
+  'User research',
+  'Operations',
+].map((label) => ({ label, value: label }));
+
+export default function TagOverflow() {
+  return (
+    <FormField label="Team membership">
+      <Select
+        mode="multiple"
+        defaultValue={options.map((option) => option.value)}
+        options={options}
+        maxTagCount={2}
+        maxTagTextLength={8}
+        maxTagPlaceholder={(omitted) => `+${omitted.length} teams`}
+      />
+    </FormField>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="select-hide-selected">
+
+### Hide selected options
+
+`hideSelected` removes selected entries from the suggestions. Removing a tag makes its option available again. This example uses the desktop popup.
+
+```tsx preview
+import { FormField, Select } from '@rockshin/tao-ui';
+
+export default function HideSelected() {
+  return (
+    <FormField label="Assign reviewers">
+      <Select
+        mobile={false}
+        mode="multiple"
+        showSearch
+        hideSelected
+        defaultValue={['maya']}
+        options={['Maya', 'Noah', 'Lin', 'Sam'].map((label) => ({
+          label,
+          value: label.toLowerCase(),
+        }))}
+        placeholder="Choose reviewers"
+        notFoundContent="Everyone has been selected"
+      />
+    </FormField>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="select-events">
+
+### Selection and clear events
+
+`onChange` provides the full value and matching existing options. `onSelect`, `onDeselect`, and `onClear` describe individual actions. Newly created tags have no existing option object.
+
+```tsx preview
+import { FormField, Select, Stack } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+export default function SelectionEvents() {
+  const [value, setValue] = useState<string[]>(['design']);
+  const [event, setEvent] = useState('No action yet');
+  return (
+    <Stack>
+      <FormField label="Event example">
+        <Select
+          mobile={false}
+          mode="multiple"
+          showSearch
+          allowClear
+          value={value}
+          onChange={(next) => setValue(next as string[])}
+          onSelect={(_, option) => setEvent(`Selected: ${option.label}`)}
+          onDeselect={(_, option) => setEvent(`Removed: ${option.label}`)}
+          onClear={() => setEvent('Cleared all selections')}
+          options={['Design', 'Engineering', 'Research'].map((label) => ({
+            label,
+            value: label.toLowerCase(),
+          }))}
+          placeholder="Choose teams"
+        />
+      </FormField>
+      <output aria-live="polite">{event}</output>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+</div>
+
+## Search and data
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="select-search">
+
+### Search and clear
+
+`showSearch` matches option labels without case sensitivity. Try `sv`, select a result, then clear it to choose again.
+
+```tsx preview
+import { FormField, Select } from '@rockshin/tao-ui';
+
+export default function SearchSelect() {
+  return (
+    <FormField label="Search frameworks">
+      <Select
+        showSearch
+        allowClear
+        options={[
+          { label: 'React', value: 'react' },
+          { label: 'Vue', value: 'vue' },
+          { label: 'Svelte', value: 'svelte' },
+          { label: 'Solid', value: 'solid' },
+        ]}
+        placeholder="Search by framework name"
+        notFoundContent="No matching frameworks"
+      />
+    </FormField>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="select-custom-filter">
+
+### Custom filtering
+
+Use `filterOption` to match labels, values, and descriptions. Search by city, airport code, or country, such as `hnd` or `Japan`.
+
+```tsx preview
+import { FormField, Select } from '@rockshin/tao-ui';
+
+export default function CustomFilter() {
+  return (
+    <FormField label="Destination">
+      <Select
+        showSearch
+        options={[
+          { label: 'Tokyo', value: 'HND', description: 'Japan' },
+          { label: 'Singapore', value: 'SIN', description: 'Singapore' },
+          { label: 'London', value: 'LHR', description: 'United Kingdom' },
+        ]}
+        filterOption={(input, option) =>
+          `${option.label} ${option.value} ${option.description}`
+            .toLowerCase()
+            .includes(input.toLowerCase())
+        }
+        placeholder="City, airport code, or country"
+      />
+    </FormField>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="select-controlled-search">
+
+### Controlled search
+
+Manage the query with `searchValue` and `onSearch`; the caller decides when to clear it. Uncontrolled multi-select can retain it with `autoClearSearchValue={false}`. This example uses desktop input.
+
+```tsx preview
+import { Button, FormField, Select, Stack } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+export default function ControlledSearch() {
+  const [search, setSearch] = useState('');
+  return (
+    <Stack>
+      <FormField label="Search several teams">
+        <Select
+          mobile={false}
+          mode="multiple"
+          showSearch
+          searchValue={search}
+          onSearch={setSearch}
+          autoClearSearchValue={false}
+          options={['Product design', 'Product research', 'Engineering'].map(
+            (label) => ({ label, value: label }),
+          )}
+          placeholder="Try Product"
+        />
+      </FormField>
+      <output aria-live="polite">Query: {search || '(empty)'}</output>
+      <Button variant="secondary" onClick={() => setSearch('')}>
+        Clear query
+      </Button>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="select-groups">
+
+### Grouped options
+
+Nest options to form groups. Searching keeps the matching entries under their group labels; group labels are not selectable values.
+
+```tsx preview
+import { FormField, Select } from '@rockshin/tao-ui';
+
+export default function GroupedSelect() {
+  return (
+    <FormField label="Technology">
+      <Select
+        showSearch
+        options={[
+          {
+            label: 'Frontend',
+            value: 'frontend',
+            options: [
+              { label: 'React', value: 'react' },
+              { label: 'Vue', value: 'vue' },
+            ],
+          },
+          {
+            label: 'Backend',
+            value: 'backend',
+            options: [
+              { label: 'Node.js', value: 'node' },
+              { label: 'Python', value: 'python' },
+            ],
+          },
+        ]}
+        placeholder="Choose a technology"
+      />
+    </FormField>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="select-coordinate">
+
+### Dependent selections
+
+When the upstream selection changes, update both the dependent options and value. Here the region determines the available cities.
+
+```tsx preview
+import { FormField, Select, Stack } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+const cities: Record<string, string[]> = {
+  Asia: ['Tokyo', 'Singapore'],
+  Europe: ['London', 'Berlin'],
+};
+
+export default function DependentSelects() {
+  const [region, setRegion] = useState('Asia');
+  const [city, setCity] = useState('Tokyo');
+  return (
+    <Stack>
+      <FormField label="Region">
+        <Select
+          value={region}
+          options={Object.keys(cities).map((value) => ({
+            label: value,
+            value,
+          }))}
+          onChange={(next) => {
+            const region = next as string;
+            setRegion(region);
+            setCity(cities[region][0]);
+          }}
+        />
+      </FormField>
+      <FormField label="City">
+        <Select
+          value={city}
+          onChange={(next) => setCity(next as string)}
+          options={cities[region].map((value) => ({ label: value, value }))}
+        />
+      </FormField>
+      <output aria-live="polite">
+        {region} / {city}
+      </output>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="select-async">
+
+### Async search and loading
+
+This example simulates a search request with local data and a 500ms delay. It cancels stale work and combines loading, controlled search, and an empty state. Replace the local lookup with your API in an application. It uses desktop input.
+
+```tsx preview
+import { FormField, Select, type SelectOption } from '@rockshin/tao-ui';
+import { useEffect, useState } from 'react';
+
+const people = [
+  { label: 'Maya Chen', value: 'maya', description: 'Design' },
+  { label: 'Noah Kim', value: 'noah', description: 'Engineering' },
+  { label: 'Lin Wang', value: 'lin', description: 'Research' },
+];
+
+export default function AsyncSelect() {
+  const [search, setSearch] = useState('');
+  const [options, setOptions] = useState<SelectOption[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setLoading(true);
+    setOptions([]);
+    const timer = window.setTimeout(() => {
+      setOptions(
+        people.filter((person) =>
+          person.label.toLowerCase().includes(search.toLowerCase()),
+        ),
+      );
+      setLoading(false);
+    }, 500);
+    return () => window.clearTimeout(timer);
+  }, [search]);
+
+  return (
+    <FormField
+      label="Search people"
+      description="Local demo with a simulated 500ms request."
+    >
+      <Select
+        mobile={false}
+        showSearch
+        allowClear
+        searchValue={search}
+        onSearch={setSearch}
+        options={options}
+        loading={loading}
+        filterOption={() => true}
+        notFoundContent={loading ? 'Searching…' : 'No matching people'}
+        placeholder="Try Maya or Noah"
+      />
+    </FormField>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="select-empty">
+
+### Custom empty state
+
+`notFoundContent` accepts text or a React node for an empty list or no matching results. An external action can populate the options.
+
+```tsx preview
+import { Button, FormField, Select, Stack } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+export default function EmptySelect() {
+  const [ready, setReady] = useState(false);
+  return (
+    <Stack>
+      <FormField label="Workspace">
+        <Select
+          options={ready ? [{ label: 'Design studio', value: 'studio' }] : []}
+          placeholder="Choose a workspace"
+          notFoundContent={<span>No workspaces yet. Add one below.</span>}
+        />
+      </FormField>
+      <Button
+        variant="secondary"
+        disabled={ready}
+        onClick={() => setReady(true)}
+      >
+        Add workspace
+      </Button>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+</div>
+
+## Content and styles
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="select-details">
+
+### Option icons and descriptions
+
+Add context with option-level `icon` and `description`. Keep `label` short and textual for searching and the selected value.
+
+```tsx preview
+import { FormField, Select } from '@rockshin/tao-ui';
+
+function WorkspaceIcon() {
+  return (
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      aria-hidden="true"
+    >
+      <rect x="3" y="3" width="14" height="14" rx="3" />
+      <path d="M3 8h14M8 8v9" />
+    </svg>
+  );
+}
+
+export default function OptionDetails() {
+  return (
+    <FormField label="Switch workspace">
+      <Select
+        defaultValue="design"
+        options={[
+          {
+            label: 'Design studio',
+            value: 'design',
+            icon: <WorkspaceIcon />,
+            description: 'Components and visual systems',
+          },
+          {
+            label: 'Engineering',
+            value: 'engineering',
+            icon: <WorkspaceIcon />,
+            description: 'Application development',
+          },
+        ]}
+      />
+    </FormField>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="select-option-render">
+
+### Custom option rendering
+
+`optionRender` receives the option and its flattened index. Compose labels and supporting details while Select keeps the keyboard and selection behavior.
+
+```tsx preview
+import { FormField, Select } from '@rockshin/tao-ui';
+
+export default function CustomOptions() {
+  return (
+    <FormField label="Subscription">
+      <Select
+        options={[
+          {
+            label: 'Starter',
+            value: 'starter',
+            description: 'For personal projects',
+          },
+          {
+            label: 'Team',
+            value: 'team',
+            description: 'For shared workspaces',
+          },
+        ]}
+        optionRender={(option, { index }) => (
+          <span style={{ display: 'grid', gap: 4 }}>
+            <strong>
+              {index + 1}. {option.label}
+            </strong>
+            <small style={{ color: 'var(--tao-color-text-secondary)' }}>
+              {option.description}
+            </small>
+          </span>
+        )}
+        placeholder="Compare plans"
+      />
+    </FormField>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="select-label-render">
+
+### Custom selected label
+
+`labelRender` customizes the selected single-value label independently of the option list. Here it adds the airport code beside the city.
+
+```tsx preview
+import { FormField, Select } from '@rockshin/tao-ui';
+
+export default function CustomLabel() {
+  return (
+    <FormField label="Arrival airport">
+      <Select
+        defaultValue="HND"
+        options={[
+          { label: 'Tokyo', value: 'HND' },
+          { label: 'Singapore', value: 'SIN' },
+        ]}
+        labelRender={(option) => (
+          <span>
+            <strong>{option.value}</strong> · {option.label}
+          </span>
+        )}
+      />
+    </FormField>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="select-tag-render">
+
+### Custom tag rendering
+
+Customize multi-select tags with `tagRender`. Preserve removal behavior using the supplied `closable`, `disabled`, and `onClose`. This example reuses tao-ui `Tag`.
+
+```tsx preview
+import { FormField, Select, Tag } from '@rockshin/tao-ui';
+
+export default function CustomTags() {
+  return (
+    <FormField label="Project disciplines">
+      <Select
+        mobile={false}
+        mode="multiple"
+        showSearch
+        defaultValue={['design', 'engineering']}
+        options={['Design', 'Engineering', 'Research'].map((label) => ({
+          label,
+          value: label.toLowerCase(),
+        }))}
+        tagRender={({ label, value, closable, disabled, onClose }) => (
+          <Tag
+            color={value === 'design' ? 'primary' : 'success'}
+            closeIcon={closable}
+            disabled={disabled}
+            onClose={onClose}
+          >
+            {label}
+          </Tag>
+        )}
+      />
+    </FormField>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="select-icons">
+
+### Prefix, suffix, and action icons
+
+Use `prefix`, `suffixIcon`, `allowClear.clearIcon`, `removeIcon`, and `loadingIcon` for the corresponding slots. Custom icons retain the built-in clear and remove behavior.
+
+```tsx preview
+import { FormField, Select, Spinner, Stack } from '@rockshin/tao-ui';
+
+const options = [
+  { label: 'Design', value: 'design' },
+  { label: 'Engineering', value: 'engineering' },
+];
+function Icon({ close = false }: { close?: boolean }) {
+  return (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      aria-hidden="true"
+    >
+      <path d={close ? 'm5 5 10 10M15 5 5 15' : 'm5 8 5 5 5-5'} />
+    </svg>
+  );
+}
+
+export default function CustomIcons() {
+  return (
+    <Stack>
+      <FormField label="Custom clear icon">
+        <Select
+          showSearch
+          defaultValue="design"
+          options={options}
+          prefix={<span>Team</span>}
+          suffixIcon={<Icon />}
+          allowClear={{ clearIcon: <Icon close /> }}
+        />
+      </FormField>
+      <FormField label="Custom remove icon">
+        <Select
+          mobile={false}
+          mode="multiple"
+          showSearch
+          defaultValue={['engineering']}
+          options={options}
+          removeIcon={<Icon close />}
+        />
+      </FormField>
+      <FormField label="Custom loading icon">
+        <Select
+          loading
+          loadingIcon={<Spinner size="small" />}
+          options={[]}
+          placeholder="Loading teams…"
+        />
+      </FormField>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="select-semantic">
+
+### Semantic styles
+
+Customize public semantic parts through `styles` and `classNames` without private selectors. The popup receives them even when rendered through a portal.
+
+```tsx preview
+import { FormField, Select } from '@rockshin/tao-ui';
+
+export default function SemanticSelect() {
+  return (
+    <>
+      <style>{`.select-example-popup { border-color: var(--tao-color-primary); }`}</style>
+      <FormField label="Styled team picker">
+        <Select
+          mobile={false}
+          showSearch
+          defaultValue="design"
+          options={[
+            { label: 'Design', value: 'design' },
+            { label: 'Engineering', value: 'engineering' },
+          ]}
+          classNames={{ popup: 'select-example-popup' }}
+          styles={{
+            root: { borderRadius: 12 },
+            item: { paddingBlock: 12 },
+            itemLabel: { fontWeight: 600 },
+          }}
+        />
+      </FormField>
+    </>
+  );
+}
+```
+
+</section>
+
+</div>
+
+## Popup and interaction
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="select-popup-render">
+
+### Extend the popup
+
+Keep the original menu and add actions through `popupRender`. Here a footer creates a project by name; the Add button preserves input focus. This example uses the desktop popup.
+
+```tsx preview
+import { Button, FormField, Input, Select } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+export default function ExtendedPopup() {
+  const [projects, setProjects] = useState(['Website', 'Mobile app']);
+  const [name, setName] = useState('');
+  function addProject() {
+    const label = name.trim();
+    if (!label || projects.includes(label)) return;
+    setProjects([...projects, label]);
+    setName('');
+  }
+  return (
+    <FormField label="Project">
+      <Select
+        mobile={false}
+        showSearch
+        options={projects.map((label) => ({ label, value: label }))}
+        placeholder="Choose or add a project"
+        popupRender={(menu) => (
+          <>
+            {menu}
+            <div
+              style={{
+                display: 'flex',
+                gap: 8,
+                padding: 12,
+                borderTop: '1px solid var(--tao-color-border)',
+              }}
+            >
+              <Input
+                aria-label="New project name"
+                value={name}
+                onChange={(event) => setName(event.target.value)}
+                placeholder="New project"
+              />
+              <Button
+                disabled={!name.trim() || projects.includes(name.trim())}
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={addProject}
+              >
+                Add
+              </Button>
+            </div>
+          </>
+        )}
+      />
+    </FormField>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="select-placement">
+
+### Popup placement
+
+`placement` sets the preferred side and alignment. The popup still avoids viewport collisions. This example uses desktop popups.
+
+```tsx preview
+import { FormField, Select, Stack } from '@rockshin/tao-ui';
+
+export default function PopupPlacement() {
+  return (
+    <Stack>
+      {(['bottomLeft', 'bottomRight', 'topLeft', 'topRight'] as const).map(
+        (placement) => (
+          <FormField key={placement} label={placement}>
+            <Select
+              mobile={false}
+              placement={placement}
+              placeholder={placement}
+              options={[
+                { label: 'Design', value: 'design' },
+                { label: 'Engineering', value: 'engineering' },
+              ]}
+            />
+          </FormField>
+        ),
+      )}
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="select-dimensions">
+
+### Popup width and list height
+
+`popupMatchSelectWidth` matches the trigger by default, or accepts `false` or a pixel width. Numeric widths currently retain the trigger's minimum width; this example pairs a 200px control with a 240px popup. `listHeight` limits the scrollable option area. This is a regular list, not a virtualized list.
+
+```tsx preview
+import { FormField, Select, Stack } from '@rockshin/tao-ui';
+
+const options = Array.from({ length: 60 }, (_, index) => ({
+  label: `Workspace ${index + 1}`,
+  value: String(index + 1),
+}));
+
+export default function PopupDimensions() {
+  return (
+    <Stack>
+      <FormField label="Match trigger width">
+        <Select
+          mobile={false}
+          showSearch
+          options={options}
+          listHeight={160}
+          placeholder="Scroll through 60 workspaces"
+        />
+      </FormField>
+      <FormField label="Content width">
+        <Select
+          mobile={false}
+          options={options}
+          popupMatchSelectWidth={false}
+          listHeight={160}
+          placeholder="Fit option text"
+        />
+      </FormField>
+      <FormField label="240px popup">
+        <Select
+          mobile={false}
+          options={options}
+          popupMatchSelectWidth={240}
+          style={{ width: 200 }}
+          listHeight={160}
+          placeholder="Fixed popup width"
+        />
+      </FormField>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="select-open-focus">
+
+### Controlled open and focus
+
+Control popup visibility with `open` and `onOpenChange`. Use the ref methods `focus()` and `blur()` to coordinate external actions.
+
+```tsx preview
+import {
+  Button,
+  FormField,
+  Select,
+  type SelectRef,
+  Stack,
+} from '@rockshin/tao-ui';
+import { useRef, useState } from 'react';
+
+export default function OpenAndFocus() {
+  const ref = useRef<SelectRef>(null);
+  const [open, setOpen] = useState(false);
+  return (
+    <Stack>
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+        <Button
+          variant="secondary"
+          onClick={() => {
+            ref.current?.focus();
+            setOpen(true);
+          }}
+        >
+          Open choices
+        </Button>
+        <Button
+          variant="secondary"
+          onClick={() => {
+            setOpen(false);
+            ref.current?.blur();
+          }}
+        >
+          Close and blur
+        </Button>
+      </div>
+      <FormField label="Controlled popup">
+        <Select
+          ref={ref}
+          mobile={false}
+          showSearch
+          open={open}
+          onOpenChange={setOpen}
+          options={[
+            { label: 'Design', value: 'design' },
+            { label: 'Engineering', value: 'engineering' },
+          ]}
+          placeholder="Choose a team"
+        />
+      </FormField>
+      <output aria-live="polite">Popup: {open ? 'open' : 'closed'}</output>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="select-portal">
+
+### Popup container
+
+`getPopupContainer` chooses the popup DOM container. Leave room for it and avoid ancestor clipping. This example mounts the popup inside its local panel.
+
+```tsx preview
+import { FormField, Select } from '@rockshin/tao-ui';
+import { useRef } from 'react';
+
+export default function PopupContainer() {
+  const container = useRef<HTMLDivElement>(null);
+  return (
+    <div ref={container} style={{ position: 'relative', minHeight: 160 }}>
+      <FormField label="Panel-local popup">
+        <Select
+          mobile={false}
+          showSearch
+          getPopupContainer={() => container.current!}
+          options={[
+            { label: 'Local workspace', value: 'local' },
+            { label: 'Shared workspace', value: 'shared' },
+          ]}
+          placeholder="Open inside this panel"
+        />
+      </FormField>
+    </div>
+  );
+}
+```
+
+</section>
+
+</div>
+
+## Mobile and forms
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="select-mobile">
+
+### Mobile single and multiple selection
+
+Select follows the viewport by default; `mobile` forces the bottom drawer. Single selection commits immediately. Multiple selection commits with Done; closing discards the draft. Try the mobile interaction on desktop here.
+
+```tsx preview="iframe-follow"
+import { FormField, Select, Stack } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+const options = ['Design', 'Engineering', 'Research', 'Operations'].map(
+  (label) => ({ label, value: label.toLowerCase() }),
+);
+
+export default function MobileSelect() {
+  const [value, setValue] = useState<string[]>(['design']);
+  return (
+    <Stack>
+      <FormField label="Mobile single choice">
+        <Select
+          showSearch
+          options={options}
+          placeholder="Choose one team"
+        />
+      </FormField>
+      <FormField label="Mobile multiple choices">
+        <Select
+          mode="multiple"
+          showSearch
+          options={options}
+          value={value}
+          onChange={(next) => setValue(next as string[])}
+          placeholder="Choose several teams"
+        />
+      </FormField>
+      <output aria-live="polite">
+        Committed: {value.join(', ') || '(none)'}
+      </output>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="select-provider">
+
+### Provider defaults
+
+Use `TaoProvider` to share `size`, `variant`, and `disabled`. Local props take precedence; the second control overrides the inherited size and disabled state.
+
+```tsx preview
+import { FormField, Select, Stack, TaoProvider } from '@rockshin/tao-ui';
+
+const options = [
+  { label: 'Personal', value: 'personal' },
+  { label: 'Team', value: 'team' },
+];
+
+export default function ProviderSelect() {
+  return (
+    <TaoProvider size="small" variant="filled" disabled>
+      <Stack>
+        <FormField label="Inherited settings">
+          <Select defaultValue="personal" options={options} />
+        </FormField>
+        <FormField label="Local overrides">
+          <Select
+            size="medium"
+            disabled={false}
+            defaultValue="team"
+            options={options}
+          />
+        </FormField>
+      </Stack>
+    </TaoProvider>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="select-form">
+
+### Form submission
+
+Desktop single-select can use `name` with native `FormData`; `id` associates the field label. Serialize controlled values explicitly for multiple selection and mobile drawers. This demo displays the result without sending a request.
+
+```tsx preview
+import { Button, FormField, Select, Stack } from '@rockshin/tao-ui';
+import { useId, useState } from 'react';
+
+export default function SelectForm() {
+  const id = useId();
+  const [result, setResult] = useState('Not submitted');
+  return (
+    <form
+      onSubmit={(event) => {
+        event.preventDefault();
+        const data = new FormData(event.currentTarget);
+        setResult(`Submitted team: ${data.get('team')}`);
+      }}
+    >
+      <Stack>
+        <FormField label="Team to submit" htmlFor={id}>
+          <Select
+            id={id}
+            name="team"
+            mobile={false}
+            showSearch
+            defaultValue="design"
+            options={[
+              { label: 'Design', value: 'design' },
+              { label: 'Engineering', value: 'engineering' },
+            ]}
+          />
+        </FormField>
+        <Button type="submit">Submit example</Button>
+        <output aria-live="polite">{result}</output>
+      </Stack>
+    </form>
+  );
+}
+```
+
+</section>
+
+</div>
+
+## Usage notes
+
+- For a few mutually exclusive choices that should be compared directly, prefer [Radio](/components/radio).
+- Single selection uses a string; multiple selection and tags use arrays. The second `onChange` argument contains matching existing options. A newly created tag may not have a matching option object.
+- The tag overflow example uses a numeric `maxTagCount` to demonstrate a fixed number of visible tags.
+- Mobile drawers support search, groups, custom options, and single/multiple confirmation. Examples marked as desktop use `mobile={false}` to demonstrate input and popup interactions. Placement, popup width, and portal containers configure desktop popups.
+- Desktop single-select supports native form submission through `name`. Serialize controlled values in application submission logic for mobile and multiple selection.
 
 ## API
 
 <API moduleName="select" />
+
+### SelectOption
+
+| Property | Type | Description |
+| --- | --- | --- |
+| `label` | `ReactNode` | Option text; prefer a string for default filtering and trigger display. |
+| `value` | `string` | Unique value; groups also need a stable value. |
+| `disabled` | `boolean` | Prevent selecting or removing this option. |
+| `icon` | `ReactNode` | Option icon. |
+| `description` | `ReactNode` | Supporting text. |
+| `options` | `SelectOption[]` | Nested options; makes the entry a group. |
+
+### TagRenderProps
+
+`tagRender` receives `{ label, value, closable, disabled, onClose }`. Use `closable` to decide whether to offer removal, and call `onClose` to perform it.
+
+### SelectRef
+
+The ref exposes `focus()`, `blur()`, and `nativeElement`. Avoid depending on private DOM structure.

@@ -1,0 +1,293 @@
+---
+title: AutoComplete
+description: "Editable text with suggestions, grouped options, keyboard completion and custom inputs."
+---
+
+import Preview from '../../_components/demo-preview';
+
+Editable text with suggestions, grouped options, keyboard completion and custom inputs.
+
+Each example can be copied and run independently. Use the device control on framed previews to switch between desktop and phone widths.
+
+Sizes are `small`, `medium` and `large`; the compatible `middle` alias uses the same dimensions as `medium`.
+
+## Examples
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="auto-complete-basic">
+
+### Free text and suggestions
+
+The value remains editable even when it is not in the options list. Control it with onChange.
+
+```tsx preview
+import { useState } from 'react';
+import { AutoComplete } from '@rockshin/tao-ui';
+const options = [
+  { value: 'alice@example.com', label: 'Alice Chen' },
+  { value: 'bob@example.com', label: 'Bob Li' },
+  { value: 'design@example.com', label: 'Design team' },
+];
+export default function BasicAutoComplete() {
+  const [value, setValue] = useState('');
+  return (
+    <div>
+      <AutoComplete
+        value={value}
+        onChange={setValue}
+        options={options}
+        aria-label="Email"
+        placeholder="Type any email address"
+        allowClear
+        style={{ width: '100%' }}
+      />
+      <p>Value: {value || 'empty'}</p>
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="auto-complete-filter">
+
+### Filter by a label
+
+Search can compare the typed text against the displayed label or the stored value.
+
+```tsx preview
+import { AutoComplete } from '@rockshin/tao-ui';
+const options = [
+  { value: 'alice@example.com', label: 'Alice Chen' },
+  { value: 'bob@example.com', label: 'Bob Li' },
+  { value: 'design@example.com', label: 'Design team' },
+];
+export default function FilteredSuggestions() {
+  return (
+    <AutoComplete
+      options={options}
+      showSearch={{
+        filterOption: (text, option) =>
+          String(option?.label).toLowerCase().includes(text.toLowerCase()),
+      }}
+      placeholder="Search Alice or Bob"
+      style={{ width: '100%' }}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="auto-complete-keyboard">
+
+### Keyboard backfill
+
+Arrow keys preview the active option in the input; Enter commits it.
+
+```tsx preview
+import { AutoComplete } from '@rockshin/tao-ui';
+const options = [
+  { value: 'alice@example.com', label: 'Alice Chen' },
+  { value: 'bob@example.com', label: 'Bob Li' },
+  { value: 'design@example.com', label: 'Design team' },
+];
+export default function KeyboardCompletion() {
+  return (
+    <AutoComplete
+      aria-label="Email completion"
+      options={options}
+      backfill
+      defaultActiveFirstOption
+      placeholder="Focus, then press ↓ and Enter"
+      style={{ width: '100%' }}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="auto-complete-input">
+
+### Reuse a custom Input
+
+A single input child becomes the editable control. Its own prefix and appearance are retained.
+
+```tsx preview
+import { AutoComplete, Input } from '@rockshin/tao-ui';
+const options = [
+  { value: 'alice@example.com', label: 'Alice Chen' },
+  { value: 'bob@example.com', label: 'Bob Li' },
+  { value: 'design@example.com', label: 'Design team' },
+];
+export default function CustomInput() {
+  return (
+    <AutoComplete options={options} style={{ width: '100%' }}>
+      <Input aria-label="Recipient" prefix="@" placeholder="Recipient" />
+    </AutoComplete>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="auto-complete-groups">
+
+### Grouped suggestions
+
+Group related options under a label and customize the rendered option content.
+
+```tsx preview
+import { AutoComplete } from '@rockshin/tao-ui';
+export default function GroupedSuggestions() {
+  return (
+    <AutoComplete
+      options={[
+        {
+          label: 'People',
+          options: [
+            { value: 'alice@example.com', label: 'Alice Chen' },
+            { value: 'bob@example.com', label: 'Bob Li' },
+          ],
+        },
+        {
+          label: 'Teams',
+          options: [{ value: 'design@example.com', label: 'Design team' }],
+        },
+      ]}
+      optionRender={(option) => (
+        <div style={{ display: 'grid' }}>
+          <span>{option.label}</span>
+          <small style={{ opacity: 0.55 }}>{String(option.value)}</small>
+        </div>
+      )}
+      placeholder="People and teams"
+      style={{ width: '100%' }}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="auto-complete-async">
+
+### Delayed suggestions
+
+This local example waits 400 ms after typing and cancels the previous request simulation.
+
+```tsx preview
+import { useEffect, useState } from 'react';
+import { AutoComplete } from '@rockshin/tao-ui';
+export default function DelayedSuggestions() {
+  const [value, setValue] = useState('');
+  const [options, setOptions] = useState<{ value: string }[]>([]);
+  useEffect(() => {
+    setOptions([]);
+    if (!value) return;
+    const timer = setTimeout(
+      () =>
+        setOptions(
+          ['example.com', 'company.dev'].map((domain) => ({
+            value: `${value.split('@')[0]}@${domain}`,
+          })),
+        ),
+      400,
+    );
+    return () => clearTimeout(timer);
+  }, [value]);
+  return (
+    <AutoComplete
+      value={value}
+      onChange={setValue}
+      options={options}
+      placeholder="Type a username"
+      style={{ width: '100%' }}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="auto-complete-appearance">
+
+### Appearance and states
+
+Size, variant, status and disabled are local overrides of TaoProvider defaults.
+
+```tsx preview
+import { AutoComplete } from '@rockshin/tao-ui';
+const options = [
+  { value: 'alice@example.com', label: 'Alice Chen' },
+  { value: 'bob@example.com', label: 'Bob Li' },
+  { value: 'design@example.com', label: 'Design team' },
+];
+export default function AutoCompleteAppearance() {
+  return (
+    <div style={{ display: 'grid', gap: 12 }}>
+      <AutoComplete options={options} size="small" placeholder="Small" />
+      <AutoComplete
+        options={options}
+        size="middle"
+        variant="filled"
+        placeholder="Filled"
+      />
+      <AutoComplete
+        options={options}
+        variant="underlined"
+        status="error"
+        placeholder="Required"
+      />
+      <AutoComplete
+        options={options}
+        disabled
+        defaultValue="alice@example.com"
+      />
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="auto-complete-mobile">
+
+### Suggestions in a narrow form
+
+Use the phone preview to type, select, and clear. AutoComplete retains an editable input and popup on mobile.
+
+```tsx preview="iframe-follow"
+import { AutoComplete } from '@rockshin/tao-ui';
+const options = [
+  { value: 'alice@example.com', label: 'Alice Chen' },
+  { value: 'bob@example.com', label: 'Bob Li' },
+  { value: 'design@example.com', label: 'Design team' },
+];
+export default function MobileAutoComplete() {
+  return (
+    <div style={{ padding: 16 }}>
+      <h3>Invite a teammate</h3>
+      <AutoComplete
+        aria-label="Teammate email"
+        options={options}
+        placeholder="Email address"
+        allowClear
+        size="large"
+        listHeight={200}
+        style={{ width: '100%' }}
+      />
+    </div>
+  );
+}
+```
+
+</section>
+
+</div>
+
+## API
+
+<API moduleName="auto-complete" />

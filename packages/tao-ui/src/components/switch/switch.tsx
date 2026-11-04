@@ -91,14 +91,16 @@ export const Switch = forwardRef(function Switch(
       data-tao-checked={resolvedChecked || undefined}
       onClick={handleChange}
     >
-      {/* Handle: absolute positioned circle */}
-      <div
-        className={classNames?.handle}
-        style={styles?.handle}
-        data-tao-switch-handle=""
-      >
-        {loading && <LoadingIcon />}
-      </div>
+      {/* The travel area follows the track width, including label content. */}
+      <span data-tao-switch-handle-track="">
+        <span
+          className={classNames?.handle}
+          style={styles?.handle}
+          data-tao-switch-handle=""
+        >
+          {loading && <LoadingIcon />}
+        </span>
+      </span>
       {/* Inner: two stacked lines, slide via margin */}
       <span data-tao-switch-inner="">
         <span data-tao-switch-inner-checked="">{checkedChildren}</span>

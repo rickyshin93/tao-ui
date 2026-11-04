@@ -3,6 +3,8 @@ title: Radio
 description: 从一组互斥选项中选择一个值。页面涵盖适用场景、设计建议、多组可运行示例、交互状态与完整 API 参考。
 ---
 
+import Preview from '../../_components/demo-preview';
+
 从一组互斥选项中选择一个值。
 
 ## 何时使用
@@ -18,7 +20,13 @@ description: 从一组互斥选项中选择一个值。页面涵盖适用场景�
 
 - 允许多选时不要使用 Radio，应使用 Checkbox。
 
-## 基础用法
+## 代码演示
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="radio-example-1">
+
+### 基础用法
 
 ```tsx preview
 import { RadioGroup } from '@rockshin/tao-ui';
@@ -43,7 +51,11 @@ function RadioExample() {
 export default RadioExample;
 ```
 
-## 独立状态
+</section>
+
+<section className="tao-example" id="radio-example-2">
+
+### 独立状态
 
 ```tsx preview
 import { Radio, RadioGroup, Stack } from '@rockshin/tao-ui';
@@ -57,7 +69,9 @@ function RadioStates() {
       <Stack direction="horizontal" gap="lg">
         <Radio value="selected">Selected</Radio>
         <Radio value="idle">Unselected</Radio>
-        <Radio value="disabled" disabled>Disabled</Radio>
+        <Radio value="disabled" disabled>
+          Disabled
+        </Radio>
       </Stack>
     </RadioGroup>
   );
@@ -66,7 +80,11 @@ function RadioStates() {
 export default RadioStates;
 ```
 
-## 纵向选项组
+</section>
+
+<section className="tao-example" id="radio-example-3">
+
+### 纵向选项组
 
 ```tsx preview
 import { FormField, RadioGroup } from '@rockshin/tao-ui';
@@ -93,6 +111,117 @@ function VerticalRadioGroup() {
 
 export default VerticalRadioGroup;
 ```
+
+</section>
+
+<section className="tao-example" id="radio-controlled">
+
+### 受控单选组
+
+Group 的 onChange 直接返回选项值。
+
+```tsx preview
+import { useState } from 'react';
+import { RadioGroup, Stack } from '@rockshin/tao-ui';
+export default function Example() {
+  const [value, setValue] = useState('Weekly');
+  return (
+    <Stack direction="vertical">
+      <RadioGroup
+        options={['Daily', 'Weekly', 'Monthly']}
+        value={value}
+        onChange={setValue}
+      />
+      <output>Frequency: {value}</output>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="radio-vertical">
+
+### 垂直与禁用选项
+
+用纵向排列容纳较长选项，单个选项可禁用。
+
+```tsx preview
+import { RadioGroup } from '@rockshin/tao-ui';
+export default function Example() {
+  return (
+    <RadioGroup
+      direction="vertical"
+      defaultValue="standard"
+      options={[
+        { label: 'Standard delivery', value: 'standard' },
+        { label: 'Express delivery', value: 'express' },
+        { label: 'Same day (unavailable)', value: 'same-day', disabled: true },
+      ]}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="radio-native-form">
+
+### 原生表单提交
+
+设置组的 name 后，可从 FormData 读取选中的值。
+
+```tsx preview
+import { useState } from 'react';
+import { RadioGroup, Button, Stack } from '@rockshin/tao-ui';
+export default function Example() {
+  const [result, setResult] = useState('');
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        setResult(String(new FormData(e.currentTarget).get('plan')));
+      }}
+    >
+      <Stack direction="vertical">
+        <RadioGroup name="plan" options={['Free', 'Pro']} defaultValue="Free" />
+        <Button type="submit">Read plan</Button>
+        <output>{result}</output>
+      </Stack>
+    </form>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="radio-sizes">
+
+### 单选组尺寸
+
+同一组的选项继承尺寸，维持一致的对齐和点击区域。
+
+```tsx preview
+import { RadioGroup, Stack } from '@rockshin/tao-ui';
+export default function Example() {
+  return (
+    <Stack direction="vertical">
+      {(['small', 'medium', 'large'] as const).map((size) => (
+        <RadioGroup
+          key={size}
+          size={size}
+          options={['A', 'B', 'C']}
+          defaultValue="A"
+        />
+      ))}
+    </Stack>
+  );
+}
+```
+
+</section>
+
+</div>
 
 ## API
 

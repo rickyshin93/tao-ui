@@ -3,6 +3,7 @@
    =========================== */
 [data-tao-input] {
   --tao-input-line-height: var(--tao-line-height);
+  --tao-input-affix-padding: var(--tao-padding-sm);
 
   position: relative;
   display: flex;
@@ -27,12 +28,13 @@
 
 [data-tao-input][data-tao-size="medium"] {
   --tao-input-control-height: var(--tao-control-height);
+  --tao-input-affix-padding: var(--tao-padding-xs);
 
   height: var(--tao-control-height);
   border-radius: var(--tao-radius-md);
 }
 [data-tao-input][data-tao-size="medium"] input {
-  padding-inline: var(--tao-input-padding-inline, var(--tao-padding-sm));
+  padding-inline: var(--tao-input-padding-inline, var(--tao-padding-xs));
   font-size: var(--tao-input-input-font-size, var(--tao-font-size-base));
 }
 
@@ -107,10 +109,10 @@
   flex-shrink: 0;
 }
 [data-tao-prefix] {
-  padding-inline-start: var(--tao-padding-sm);
+  padding-inline-start: var(--tao-input-affix-padding);
 }
 [data-tao-input] [data-tao-prefix] + input {
-  padding-inline-start: var(--tao-padding-sm);
+  padding-inline-start: var(--tao-input-affix-padding);
 }
 
 [data-tao-prefix] svg,
@@ -121,7 +123,7 @@
 
 [data-tao-input]:has([data-tao-prefix] svg) [data-tao-prefix] {
   position: absolute;
-  inset-inline-start: var(--tao-padding-sm);
+  inset-inline-start: var(--tao-input-affix-padding);
   top: 50%;
   padding: 0;
   transform: translateY(-50%);
@@ -134,11 +136,11 @@
 
 [data-tao-input]:has([data-tao-prefix] svg) input {
   padding-inline-start: calc(
-    var(--tao-padding-sm) +
+    var(--tao-input-affix-padding) +
     16px +
-    var(--tao-padding-sm)
+    var(--tao-input-affix-padding)
   );
 }
 [data-tao-suffix] {
-  padding-inline-end: var(--tao-padding-sm);
+  padding-inline-end: var(--tao-input-affix-padding);
 }

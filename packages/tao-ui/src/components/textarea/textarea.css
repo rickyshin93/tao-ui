@@ -37,7 +37,7 @@
     border-radius: var(--tao-radius-md);
   }
   :where([data-tao-textarea][data-tao-size="medium"] textarea) {
-    padding-inline: var(--tao-padding-sm);
+    padding-inline: var(--tao-padding-xs);
     padding-block: calc(
       (
         var(--tao-control-height) -

@@ -3,6 +3,8 @@ title: Popover
 description: 在触发器附近展示补充信息或轻量交互内容。页面涵盖适用场景、设计建议、多组可运行示例、交互状态与完整 API 参考。
 ---
 
+import Preview from '../../_components/demo-preview';
+
 在触发器附近展示补充信息或轻量交互内容。
 
 ## 何时使用
@@ -18,7 +20,13 @@ description: 在触发器附近展示补充信息或轻量交互内容。页面�
 
 - 不要在 Popover 中承载长流程。
 
-## 基础用法
+## 代码演示
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="popover-example-1">
+
+### 基础用法
 
 ```tsx preview
 import { Button, Popover } from '@rockshin/tao-ui';
@@ -38,7 +46,11 @@ function PopoverExample() {
 export default PopoverExample;
 ```
 
-## 悬停、聚焦与点击
+</section>
+
+<section className="tao-example" id="popover-example-2">
+
+### 悬停、聚焦与点击
 
 ```tsx preview
 import { Button, Popover, Stack } from '@rockshin/tao-ui';
@@ -49,10 +61,18 @@ function PopoverTriggers() {
       <Popover title="Hover" content="Opens on pointer hover.">
         <Button variant="secondary">Hover</Button>
       </Popover>
-      <Popover trigger="focus" title="Focus" content="Opens from keyboard focus.">
+      <Popover
+        trigger="focus"
+        title="Focus"
+        content="Opens from keyboard focus."
+      >
         <Button variant="secondary">Focus</Button>
       </Popover>
-      <Popover trigger="click" title="Click" content="Opens and closes on click.">
+      <Popover
+        trigger="click"
+        title="Click"
+        content="Opens and closes on click."
+      >
         <Button variant="secondary">Click</Button>
       </Popover>
     </Stack>
@@ -62,7 +82,11 @@ function PopoverTriggers() {
 export default PopoverTriggers;
 ```
 
-## 弹出位置与箭头
+</section>
+
+<section className="tao-example" id="popover-example-3">
+
+### 弹出位置与箭头
 
 ```tsx preview
 import { Button, Popover, Stack } from '@rockshin/tao-ui';
@@ -70,13 +94,26 @@ import { Button, Popover, Stack } from '@rockshin/tao-ui';
 function PopoverPlacements() {
   return (
     <Stack direction="horizontal" gap="md">
-      <Popover placement="topLeft" title="Top left" content="Aligned to the left edge.">
+      <Popover
+        placement="topLeft"
+        title="Top left"
+        content="Aligned to the left edge."
+      >
         <Button variant="secondary">Top left</Button>
       </Popover>
-      <Popover placement="bottom" title="Bottom" content="Centered below the trigger.">
+      <Popover
+        placement="bottom"
+        title="Bottom"
+        content="Centered below the trigger."
+      >
         <Button variant="secondary">Bottom</Button>
       </Popover>
-      <Popover placement="right" arrow={false} title="No arrow" content="Arrow disabled.">
+      <Popover
+        placement="right"
+        arrow={false}
+        title="No arrow"
+        content="Arrow disabled."
+      >
         <Button variant="secondary">Right</Button>
       </Popover>
     </Stack>
@@ -85,6 +122,134 @@ function PopoverPlacements() {
 
 export default PopoverPlacements;
 ```
+
+</section>
+
+<section className="tao-example" id="popover-controlled">
+
+### 受控弹层与内部关闭
+
+内容中的按钮可以更新 open，完成后明确关闭弹层。
+
+```tsx preview
+import { useState } from 'react';
+import { Popover, Button } from '@rockshin/tao-ui';
+export default function Example() {
+  const [open, setOpen] = useState(false);
+  return (
+    <Popover
+      trigger="click"
+      title="Quick action"
+      open={open}
+      onOpenChange={setOpen}
+      content={<Button onClick={() => setOpen(false)}>Done</Button>}
+    >
+      <Button>Open actions</Button>
+    </Popover>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="popover-focus">
+
+### 键盘焦点触发
+
+trigger=focus 可用于键盘聚焦时展示辅助内容，关键说明也应在页面可见。
+
+```tsx preview
+import { Popover, Input } from '@rockshin/tao-ui';
+export default function Example() {
+  return (
+    <Popover
+      trigger="focus"
+      title="Project code"
+      content="Use a short, recognizable identifier."
+    >
+      <Input aria-label="Project code" placeholder="Focus this input" />
+    </Popover>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="popover-arrow-delay">
+
+### 箭头与延迟
+
+悬停延迟使用秒，arrow 控制是否展示箭头。
+
+```tsx preview
+import { Popover, Button } from '@rockshin/tao-ui';
+export default function Example() {
+  return (
+    <Popover
+      title="Details"
+      content="Additional context appears after a short delay."
+      arrow={false}
+      mouseEnterDelay={0.4}
+      mouseLeaveDelay={0.2}
+    >
+      <Button>Hover for details</Button>
+    </Popover>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="popover-form-content">
+
+### 弹层中的表单
+
+弹层可以容纳输入和操作；提交后反馈结果并关闭。
+
+```tsx preview
+import { useState } from 'react';
+import { Popover, Input, Button, Stack } from '@rockshin/tao-ui';
+export default function Example() {
+  const [open, setOpen] = useState(false);
+  const [name, setName] = useState('Workspace');
+  return (
+    <Stack direction="vertical">
+      <Popover
+        trigger="click"
+        open={open}
+        onOpenChange={setOpen}
+        title="Rename"
+        content={
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              setName(String(new FormData(e.currentTarget).get('name')));
+              setOpen(false);
+            }}
+          >
+            <Stack direction="vertical">
+              <Input
+                name="name"
+                aria-label="New name"
+                defaultValue={name}
+                required
+              />
+              <Button type="submit">Save name</Button>
+            </Stack>
+          </form>
+        }
+      >
+        <Button>Rename project</Button>
+      </Popover>
+      <output>{name}</output>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+</div>
 
 ## API
 

@@ -3,6 +3,8 @@ title: Radio
 description: "Selects exactly one option from a mutually exclusive set. Includes usage guidance, a runnable example, and the complete API reference."
 ---
 
+import Preview from '../../_components/demo-preview';
+
 Selects exactly one option from a mutually exclusive set.
 
 ## When to use
@@ -18,7 +20,13 @@ Use RadioGroup when every option is visible and only one can be selected.
 
 - Do not use RadioGroup for very long option lists; use Select instead.
 
-## Basic usage
+## Examples
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="radio-example-1">
+
+### Basic usage
 
 ```tsx preview
 import { RadioGroup } from '@rockshin/tao-ui';
@@ -43,7 +51,11 @@ function RadioExample() {
 export default RadioExample;
 ```
 
-## Standalone states
+</section>
+
+<section className="tao-example" id="radio-example-2">
+
+### Standalone states
 
 ```tsx preview
 import { Radio, RadioGroup, Stack } from '@rockshin/tao-ui';
@@ -57,7 +69,9 @@ function RadioStates() {
       <Stack direction="horizontal" gap="lg">
         <Radio value="selected">Selected</Radio>
         <Radio value="idle">Unselected</Radio>
-        <Radio value="disabled" disabled>Disabled</Radio>
+        <Radio value="disabled" disabled>
+          Disabled
+        </Radio>
       </Stack>
     </RadioGroup>
   );
@@ -66,7 +80,11 @@ function RadioStates() {
 export default RadioStates;
 ```
 
-## Vertical group
+</section>
+
+<section className="tao-example" id="radio-example-3">
+
+### Vertical group
 
 ```tsx preview
 import { FormField, RadioGroup } from '@rockshin/tao-ui';
@@ -93,6 +111,117 @@ function VerticalRadioGroup() {
 
 export default VerticalRadioGroup;
 ```
+
+</section>
+
+<section className="tao-example" id="radio-controlled">
+
+### Controlled radio group
+
+Group onChange returns the selected value directly.
+
+```tsx preview
+import { useState } from 'react';
+import { RadioGroup, Stack } from '@rockshin/tao-ui';
+export default function Example() {
+  const [value, setValue] = useState('Weekly');
+  return (
+    <Stack direction="vertical">
+      <RadioGroup
+        options={['Daily', 'Weekly', 'Monthly']}
+        value={value}
+        onChange={setValue}
+      />
+      <output>Frequency: {value}</output>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="radio-vertical">
+
+### Vertical and disabled options
+
+Use a vertical layout for longer labels and disable individual options.
+
+```tsx preview
+import { RadioGroup } from '@rockshin/tao-ui';
+export default function Example() {
+  return (
+    <RadioGroup
+      direction="vertical"
+      defaultValue="standard"
+      options={[
+        { label: 'Standard delivery', value: 'standard' },
+        { label: 'Express delivery', value: 'express' },
+        { label: 'Same day (unavailable)', value: 'same-day', disabled: true },
+      ]}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="radio-native-form">
+
+### Native form submission
+
+Set a group name to read its selected value from FormData.
+
+```tsx preview
+import { useState } from 'react';
+import { RadioGroup, Button, Stack } from '@rockshin/tao-ui';
+export default function Example() {
+  const [result, setResult] = useState('');
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        setResult(String(new FormData(e.currentTarget).get('plan')));
+      }}
+    >
+      <Stack direction="vertical">
+        <RadioGroup name="plan" options={['Free', 'Pro']} defaultValue="Free" />
+        <Button type="submit">Read plan</Button>
+        <output>{result}</output>
+      </Stack>
+    </form>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="radio-sizes">
+
+### Radio group sizes
+
+Group options inherit size for consistent alignment and targets.
+
+```tsx preview
+import { RadioGroup, Stack } from '@rockshin/tao-ui';
+export default function Example() {
+  return (
+    <Stack direction="vertical">
+      {(['small', 'medium', 'large'] as const).map((size) => (
+        <RadioGroup
+          key={size}
+          size={size}
+          options={['A', 'B', 'C']}
+          defaultValue="A"
+        />
+      ))}
+    </Stack>
+  );
+}
+```
+
+</section>
+
+</div>
 
 ## API
 

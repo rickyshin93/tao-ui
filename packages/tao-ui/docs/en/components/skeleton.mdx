@@ -1,0 +1,163 @@
+---
+title: Skeleton
+description: "Preserves content structure while data is loading."
+---
+
+import Preview from '../../_components/demo-preview';
+
+Preserves content structure while data is loading.
+
+## When to use
+
+Use for the initial loading of known content. Match the final layout and replace the placeholder when real content becomes available.
+
+## Examples
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="skeleton-example-1">
+
+### Loading replacement
+
+Skeleton renders its children when loading is false.
+
+```tsx preview="iframe-follow"
+import { useState } from 'react';
+import { Button, Skeleton, Stack } from '@rockshin/tao-ui';
+
+export default function Example() {
+  const [loading, setLoading] = useState(true);
+  return (
+    <Stack gap="md">
+      <Button variant="secondary" onClick={() => setLoading((value) => !value)}>
+        {loading ? 'Show content' : 'Show skeleton'}
+      </Button>
+      <Skeleton loading={loading} active avatar paragraph={{ rows: 3 }}>
+        <article>
+          <h4>Workspace overview</h4>
+          <p>Your team has completed the first milestone.</p>
+        </article>
+      </Skeleton>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="skeleton-example-2">
+
+### Match the final layout
+
+Control avatar shape, title width and each paragraph line width.
+
+```tsx preview
+import { Skeleton } from '@rockshin/tao-ui';
+
+export default function Example() {
+  return (
+    <Skeleton
+      active
+      avatar={{ shape: 'square', size: 48 }}
+      title={{ width: '45%' }}
+      paragraph={{ rows: 3, width: ['100%', '88%', '62%'] }}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="skeleton-example-3">
+
+### Form and action placeholders
+
+Compound placeholders can be composed without the full article layout.
+
+```tsx preview
+import { Skeleton, Stack } from '@rockshin/tao-ui';
+
+export default function Example() {
+  return (
+    <Stack gap="md">
+      <Stack direction="horizontal" gap="md" align="center">
+        <Skeleton.Avatar active size="large" />
+        <Skeleton.Input active style={{ maxWidth: '100%' }} />
+      </Stack>
+      <Skeleton.Input active block />
+      <Stack direction="horizontal" gap="sm">
+        <Skeleton.Button active />
+        <Skeleton.Button active shape="round" />
+      </Stack>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="skeleton-example-4">
+
+### Images and custom nodes
+
+Skeleton.Image provides an image placeholder. Skeleton.Node can hold a custom silhouette.
+
+```tsx preview
+import { Skeleton, Stack } from '@rockshin/tao-ui';
+
+export default function Example() {
+  return (
+    <Stack direction="horizontal" gap="md" style={{ flexWrap: 'wrap' }}>
+      <Skeleton.Image active />
+      <Skeleton.Node active style={{ width: 140, height: 96 }}>
+        <svg viewBox="0 0 80 48" width="64" aria-hidden="true">
+          <path
+            d="M8 40V26h12v14H8zm24 0V14h12v26H32zm24 0V4h12v36H56z"
+            fill="currentColor"
+          />
+        </svg>
+      </Skeleton.Node>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="skeleton-example-5">
+
+### Rounded shapes and provider size
+
+Compound placeholders inherit TaoProvider size. Use semantic styles to adjust spacing without changing the loading structure.
+
+```tsx preview
+import { Skeleton, Stack, TaoProvider } from '@rockshin/tao-ui';
+
+export default function Example() {
+  return (
+    <TaoProvider size="small">
+      <Stack gap="md">
+        <Skeleton
+          round
+          title={false}
+          paragraph={{ rows: 2 }}
+          styles={{ root: { padding: 12 } }}
+        />
+        <Stack direction="horizontal" gap="sm" style={{ flexWrap: 'wrap' }}>
+          <Skeleton.Avatar />
+          <Skeleton.Button />
+          <Skeleton.Input />
+        </Stack>
+      </Stack>
+    </TaoProvider>
+  );
+}
+```
+
+</section>
+
+</div>
+
+## API
+
+<API moduleName="skeleton" />

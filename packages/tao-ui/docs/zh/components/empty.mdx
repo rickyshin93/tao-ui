@@ -1,0 +1,156 @@
+---
+title: Empty
+description: "说明集合为空的原因，并提供下一步操作。"
+---
+
+import Preview from '../../_components/demo-preview';
+
+说明集合为空的原因，并提供下一步操作。
+
+## 何时使用
+
+用于列表、搜索结果或面板中没有记录的状态。说明当前视图为什么为空，并给出可执行的下一步。
+
+## 示例
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="empty-example-1">
+
+### 默认与简洁插画
+
+内容区域较小时可使用简洁插画。
+
+```tsx preview="iframe-follow"
+import { Empty, Stack } from '@rockshin/tao-ui';
+
+export default function Example() {
+  return (
+    <Stack direction="horizontal" gap="lg" style={{ flexWrap: 'wrap' }}>
+      <Empty description="No projects yet" />
+      <Empty
+        image={Empty.PRESENTED_IMAGE_SIMPLE}
+        description="No matching results"
+      />
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="empty-example-2">
+
+### 创建第一条记录
+
+底部可放置操作按钮。此例仅在本地 React 状态中创建记录。
+
+```tsx preview
+import { useState } from 'react';
+import { Button, Empty } from '@rockshin/tao-ui';
+
+export default function Example() {
+  const [created, setCreated] = useState(false);
+  return created ? (
+    <div>
+      <p>Project Atlas is ready.</p>
+      <Button variant="secondary" onClick={() => setCreated(false)}>
+        Reset
+      </Button>
+    </div>
+  ) : (
+    <Empty description="Create your first project to start organizing work.">
+      <Button onClick={() => setCreated(true)}>Create project</Button>
+    </Empty>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="empty-example-3">
+
+### 自定义插画
+
+image 接收 React 节点，使用 styles.image 调整插画容器。
+
+```tsx preview
+import { Empty } from '@rockshin/tao-ui';
+
+export default function Example() {
+  return (
+    <Empty
+      image={
+        <svg viewBox="0 0 80 64" fill="none" aria-hidden="true">
+          <path
+            d="M12 22h56v34H12zM24 22V10h32v12M28 38h24"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinejoin="round"
+          />
+        </svg>
+      }
+      description="The archive is empty"
+      styles={{ image: { height: 72, color: 'var(--tao-primary)' } }}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="empty-example-4">
+
+### 继承全局语言
+
+省略 description 时使用 TaoProvider 的 locale.emptyDescription；显式 description 优先。
+
+```tsx preview
+import { Empty, Stack, TaoProvider, enUS, zhCN } from '@rockshin/tao-ui';
+
+export default function Example() {
+  return (
+    <Stack direction="horizontal" gap="lg" style={{ flexWrap: 'wrap' }}>
+      <TaoProvider locale={enUS}>
+        <Empty />
+      </TaoProvider>
+      <TaoProvider locale={zhCN}>
+        <Empty />
+      </TaoProvider>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="empty-example-5">
+
+### 紧凑与纯插画状态
+
+description={false} 隐藏描述；周围界面仍应有明确说明。
+
+```tsx preview
+import { Empty } from '@rockshin/tao-ui';
+
+export default function Example() {
+  return (
+    <section aria-label="No saved filters">
+      <h4>No saved filters</h4>
+      <Empty
+        image={Empty.PRESENTED_IMAGE_SIMPLE}
+        description={false}
+        styles={{ root: { padding: 12 }, image: { height: 32 } }}
+      />
+    </section>
+  );
+}
+```
+
+</section>
+
+</div>
+
+## API
+
+<API moduleName="empty" />

@@ -3,6 +3,8 @@ title: Drawer
 description: "Opens a side panel for related tasks without leaving the current page. Includes usage guidance, a runnable example, and the complete API reference."
 ---
 
+import Preview from '../../_components/demo-preview';
+
 Opens a side panel for related tasks without leaving the current page.
 
 ## When to use
@@ -18,7 +20,13 @@ Use Drawer for inspection, editing, or supporting workflows that should stay con
 
 - Do not stack multiple drawers for a single workflow.
 
-## Basic usage
+## Examples
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="drawer-example-1">
+
+### Basic usage
 
 ```tsx preview
 import { Button, Drawer } from '@rockshin/tao-ui';
@@ -29,8 +37,14 @@ function DrawerExample() {
 
   return (
     <>
-      <Button variant="secondary" onClick={() => setOpen(true)}>Open drawer</Button>
-      <Drawer open={open} onClose={() => setOpen(false)} title="Project settings">
+      <Button variant="secondary" onClick={() => setOpen(true)}>
+        Open drawer
+      </Button>
+      <Drawer
+        open={open}
+        onClose={() => setOpen(false)}
+        title="Project settings"
+      >
         Update settings without leaving the current page.
       </Drawer>
     </>
@@ -40,20 +54,28 @@ function DrawerExample() {
 export default DrawerExample;
 ```
 
-## Placement and size
+</section>
+
+<section className="tao-example" id="drawer-example-2">
+
+### Placement and size
 
 ```tsx preview
 import { Button, Drawer, Stack } from '@rockshin/tao-ui';
 import { useState } from 'react';
 
 function DrawerPlacement() {
-  const [placement, setPlacement] = useState(null);
+  const [placement, setPlacement] = useState<'right' | 'bottom' | null>(null);
 
   return (
     <>
       <Stack direction="horizontal" gap="md">
-        <Button variant="secondary" onClick={() => setPlacement('right')}>Right</Button>
-        <Button variant="secondary" onClick={() => setPlacement('bottom')}>Bottom</Button>
+        <Button variant="secondary" onClick={() => setPlacement('right')}>
+          Right
+        </Button>
+        <Button variant="secondary" onClick={() => setPlacement('bottom')}>
+          Bottom
+        </Button>
       </Stack>
       <Drawer
         open={placement !== null}
@@ -71,7 +93,11 @@ function DrawerPlacement() {
 export default DrawerPlacement;
 ```
 
-## Footer and extra actions
+</section>
+
+<section className="tao-example" id="drawer-example-3">
+
+### Footer and extra actions
 
 ```tsx preview
 import { Button, Drawer, Stack } from '@rockshin/tao-ui';
@@ -82,14 +108,22 @@ function DrawerFooter() {
 
   return (
     <>
-      <Button variant="secondary" onClick={() => setOpen(true)}>Edit settings</Button>
+      <Button variant="secondary" onClick={() => setOpen(true)}>
+        Edit settings
+      </Button>
       <Drawer
         open={open}
         title="Settings"
-        extra={<Button size="small" variant="ghost">Help</Button>}
+        extra={
+          <Button size="small" variant="ghost">
+            Help
+          </Button>
+        }
         footer={
           <Stack direction="horizontal" gap="sm">
-            <Button variant="ghost" onClick={() => setOpen(false)}>Cancel</Button>
+            <Button variant="ghost" onClick={() => setOpen(false)}>
+              Cancel
+            </Button>
             <Button onClick={() => setOpen(false)}>Save</Button>
           </Stack>
         }
@@ -104,7 +138,11 @@ function DrawerFooter() {
 export default DrawerFooter;
 ```
 
-## Resizable drawer
+</section>
+
+<section className="tao-example" id="drawer-example-4">
+
+### Resizable drawer
 
 ```tsx preview
 import { Button, Drawer } from '@rockshin/tao-ui';
@@ -112,11 +150,13 @@ import { useState } from 'react';
 
 function ResizableDrawer() {
   const [open, setOpen] = useState(false);
-  const [width, setWidth] = useState(null);
+  const [width, setWidth] = useState<number | null>(null);
 
   return (
     <>
-      <Button variant="secondary" onClick={() => setOpen(true)}>Open resizable drawer</Button>
+      <Button variant="secondary" onClick={() => setOpen(true)}>
+        Open resizable drawer
+      </Button>
       <Drawer
         open={open}
         title="Resizable"
@@ -131,6 +171,193 @@ function ResizableDrawer() {
 
 export default ResizableDrawer;
 ```
+
+</section>
+
+<section className="tao-example" id="drawer-with-footer-and-extra">
+
+### Header actions and footer
+
+Put actions in `extra` and `footer` so they remain visible while content scrolls.
+
+```tsx preview
+import { Button, Drawer, FormField, Input, Stack } from '@rockshin/tao-ui';
+
+import { useState } from 'react';
+
+export default function DrawerWithFooterAndExtra() {
+  function Demo() {
+    const [open, setOpen] = useState(false);
+    return (
+      <>
+        <Button variant="secondary" onClick={() => setOpen(true)}>
+          Open
+        </Button>
+        <Drawer
+          open={open}
+          onClose={() => setOpen(false)}
+          title="Edit Profile"
+          extra={
+            <Button variant="ghost" onClick={() => setOpen(false)}>
+              Reset
+            </Button>
+          }
+          footer={
+            <>
+              <Button variant="secondary" onClick={() => setOpen(false)}>
+                Cancel
+              </Button>
+              <Button variant="primary" onClick={() => setOpen(false)}>
+                Save
+              </Button>
+            </>
+          }
+        >
+          <Stack gap="md">
+            <FormField label="Name">
+              <Input placeholder="Your name" />
+            </FormField>
+            <FormField label="Bio">
+              <Input placeholder="Short bio" />
+            </FormField>
+          </Stack>
+        </Drawer>
+      </>
+    );
+  }
+  return <Demo />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="drawer-sizes">
+
+### Preset and custom sizes
+
+Use a size preset or set the required `width` or `height`.
+
+```tsx preview
+import { Button, Drawer, Stack } from '@rockshin/tao-ui';
+
+import { useState } from 'react';
+
+export default function DrawerSizes() {
+  function Demo() {
+    const [size, setSize] = useState<'default' | 'large' | null>(null);
+    return (
+      <Stack direction="horizontal" gap="md">
+        <Button variant="secondary" onClick={() => setSize('default')}>
+          default (378)
+        </Button>
+        <Button variant="secondary" onClick={() => setSize('large')}>
+          large (736)
+        </Button>
+        <Drawer
+          open={size != null}
+          onClose={() => setSize(null)}
+          title={`Size: ${size}`}
+          size={size ?? 'default'}
+        >
+          <p style={{ color: 'var(--tao-color-text-secondary)' }}>
+            Preset width via the `size` prop.
+          </p>
+        </Drawer>
+      </Stack>
+    );
+  }
+  return <Demo />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="drawer-no-mask-closable-config">
+
+### Mask and close controls
+
+Configure the mask, mask dismissal, and close button while keeping an explicit exit path.
+
+```tsx preview
+import { Button, Drawer } from '@rockshin/tao-ui';
+
+import { useState } from 'react';
+
+export default function DrawerNoMaskClosableConfig() {
+  function Demo() {
+    const [open, setOpen] = useState(false);
+    return (
+      <>
+        <Button variant="secondary" onClick={() => setOpen(true)}>
+          Open (mask click won't close)
+        </Button>
+        <Drawer
+          open={open}
+          onClose={() => setOpen(false)}
+          title="Locked"
+          maskClosable={false}
+          keyboard={false}
+          footer={
+            <Button variant="primary" onClick={() => setOpen(false)}>
+              Done
+            </Button>
+          }
+        >
+          <p style={{ color: 'var(--tao-color-text-secondary)' }}>
+            Mask click and Esc are disabled — close via the × or the footer
+            button.
+          </p>
+        </Drawer>
+      </>
+    );
+  }
+  return <Demo />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="drawer-resizable">
+
+### Resizable drawer
+
+`resizable` lets users drag the edge when a detail panel needs more workspace.
+
+```tsx preview
+import { Button, Drawer } from '@rockshin/tao-ui';
+
+import { useState } from 'react';
+
+export default function DrawerResizable() {
+  function Demo() {
+    const [open, setOpen] = useState(false);
+    const [size, setSize] = useState<number | null>(null);
+    return (
+      <>
+        <Button variant="secondary" onClick={() => setOpen(true)}>
+          Open resizable
+        </Button>
+        <Drawer
+          open={open}
+          onClose={() => setOpen(false)}
+          title="Drag the left edge"
+          resizable={{ onResize: (s) => setSize(Math.round(s)) }}
+        >
+          <p style={{ color: 'var(--tao-color-text-secondary)' }}>
+            Grab the inner edge and drag to resize. Current width:{' '}
+            {size != null ? `${size}px` : 'default'}
+          </p>
+        </Drawer>
+      </>
+    );
+  }
+  return <Demo />;
+}
+```
+
+</section>
+
+</div>
 
 ## API
 

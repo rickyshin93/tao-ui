@@ -3,6 +3,8 @@ title: ScrollArea
 description: 为受限区域提供跨浏览器一致的滚动条与阴影提示。页面涵盖适用场景、设计建议、多组可运行示例、交互状态与完整 API 参考。
 ---
 
+import Preview from '../../_components/demo-preview';
+
 为受限区域提供跨浏览器一致的滚动条与阴影提示。
 
 ## 何时使用
@@ -18,7 +20,13 @@ description: 为受限区域提供跨浏览器一致的滚动条与阴影提示�
 
 - 不要制造不必要的嵌套滚动区域。
 
-## 基础用法
+## 代码演示
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="scroll-area-example-1">
+
+### 基础用法
 
 ```tsx preview
 import { ScrollArea } from '@rockshin/tao-ui';
@@ -27,7 +35,10 @@ function ScrollAreaExample() {
   return (
     <ScrollArea
       maxHeight={180}
-      style={{ border: '1px solid var(--tao-color-border-secondary)', borderRadius: 8 }}
+      style={{
+        border: '1px solid var(--tao-color-border-secondary)',
+        borderRadius: 8,
+      }}
     >
       <div style={{ padding: 16 }}>
         {Array.from({ length: 12 }, (_, index) => (
@@ -41,7 +52,11 @@ function ScrollAreaExample() {
 export default ScrollAreaExample;
 ```
 
-## 水平与双轴滚动
+</section>
+
+<section className="tao-example" id="scroll-area-example-2">
+
+### 水平与双轴滚动
 
 ```tsx preview
 import { ScrollArea, Stack } from '@rockshin/tao-ui';
@@ -66,7 +81,11 @@ function ScrollDirections() {
 export default ScrollDirections;
 ```
 
-## 常驻滚动条与自定义尺寸
+</section>
+
+<section className="tao-example" id="scroll-area-example-3">
+
+### 常驻滚动条与自定义尺寸
 
 ```tsx preview
 import { ScrollArea, Stack } from '@rockshin/tao-ui';
@@ -90,6 +109,314 @@ function ScrollbarStyles() {
 
 export default ScrollbarStyles;
 ```
+
+</section>
+
+<section className="tao-example" id="scroll-area-horizontal">
+
+### 横向滚动
+
+为横向内容设置有限宽度，并用 `orientation` 显示对应滚动条。
+
+```tsx preview
+import { ScrollArea, Tag } from '@rockshin/tao-ui';
+
+const items = Array.from({ length: 50 }, (_, i) => `Item ${i + 1}`);
+
+export default function ScrollAreaHorizontal() {
+  return (
+    <ScrollArea
+      direction="horizontal"
+      maxWidth={400}
+      style={{
+        border: '1px solid var(--tao-color-border-secondary)',
+        borderRadius: 6,
+      }}
+    >
+      <div
+        style={{ display: 'flex', gap: 8, padding: 16, width: 'max-content' }}
+      >
+        {items.slice(0, 20).map((item) => (
+          <Tag key={item} color="primary">
+            {item}
+          </Tag>
+        ))}
+      </div>
+    </ScrollArea>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="scroll-area-both">
+
+### 双向滚动
+
+内容同时超出宽高时分别滚动，外层页面不承担内容的横向溢出。
+
+```tsx preview
+import { ScrollArea } from '@rockshin/tao-ui';
+
+const items = Array.from({ length: 50 }, (_, i) => `Item ${i + 1}`);
+
+export default function ScrollAreaBoth() {
+  return (
+    <ScrollArea
+      direction="both"
+      maxHeight={200}
+      maxWidth={300}
+      style={{
+        border: '1px solid var(--tao-color-border-secondary)',
+        borderRadius: 6,
+      }}
+    >
+      <div style={{ width: 600, padding: 16 }}>
+        {items.map((item) => (
+          <p
+            key={item}
+            style={{
+              margin: '0 0 8px',
+              color: 'var(--tao-color-text-secondary)',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {item} — This is a long line that overflows the container
+            horizontally to demonstrate both scrollbars.
+          </p>
+        ))}
+      </div>
+    </ScrollArea>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="scroll-area-always-visible">
+
+### 始终显示滚动条
+
+`type="always"` 保留滚动条轨道，适用于滚动能力需要更明显的区域。
+
+```tsx preview
+import { ScrollArea } from '@rockshin/tao-ui';
+
+const items = Array.from({ length: 50 }, (_, i) => `Item ${i + 1}`);
+
+export default function ScrollAreaAlwaysVisible() {
+  return (
+    <ScrollArea
+      type="always"
+      maxHeight={200}
+      style={{
+        border: '1px solid var(--tao-color-border-secondary)',
+        borderRadius: 6,
+      }}
+    >
+      <div style={{ padding: 16 }}>
+        {items.map((item) => (
+          <p
+            key={item}
+            style={{
+              margin: '0 0 8px',
+              color: 'var(--tao-color-text-secondary)',
+            }}
+          >
+            {item}
+          </p>
+        ))}
+      </div>
+    </ScrollArea>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="scroll-area-with-shadow">
+
+### 滚动边缘提示
+
+边缘阴影提示还有未显示的内容，滚动到底部后对应提示消失。
+
+```tsx preview
+import { ScrollArea } from '@rockshin/tao-ui';
+
+const items = Array.from({ length: 50 }, (_, i) => `Item ${i + 1}`);
+
+export default function ScrollAreaWithShadow() {
+  return (
+    <ScrollArea
+      scrollShadow
+      maxHeight={200}
+      style={{
+        border: '1px solid var(--tao-color-border-secondary)',
+        borderRadius: 6,
+      }}
+    >
+      <div style={{ padding: 16 }}>
+        {items.map((item) => (
+          <p
+            key={item}
+            style={{
+              margin: '0 0 8px',
+              color: 'var(--tao-color-text-secondary)',
+            }}
+          >
+            {item}
+          </p>
+        ))}
+      </div>
+    </ScrollArea>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="scroll-area-custom-size">
+
+### 滚动条尺寸
+
+调整滚动条尺寸，示例保留有界内容区域。
+
+```tsx preview
+import { ScrollArea, Stack } from '@rockshin/tao-ui';
+
+const items = Array.from({ length: 50 }, (_, i) => `Item ${i + 1}`);
+
+export default function ScrollAreaCustomSize() {
+  return (
+    <Stack gap="lg">
+      <div>
+        <p
+          style={{
+            fontSize: 13,
+            color: 'var(--tao-color-text-secondary)',
+            marginBottom: 8,
+          }}
+        >
+          Thin (4px)
+        </p>
+        <ScrollArea
+          type="always"
+          scrollbarSize={4}
+          maxHeight={150}
+          style={{
+            border: '1px solid var(--tao-color-border-secondary)',
+            borderRadius: 6,
+          }}
+        >
+          <div style={{ padding: 16 }}>
+            {items.slice(0, 30).map((item) => (
+              <p
+                key={item}
+                style={{
+                  margin: '0 0 8px',
+                  color: 'var(--tao-color-text-secondary)',
+                }}
+              >
+                {item}
+              </p>
+            ))}
+          </div>
+        </ScrollArea>
+      </div>
+      <div>
+        <p
+          style={{
+            fontSize: 13,
+            color: 'var(--tao-color-text-secondary)',
+            marginBottom: 8,
+          }}
+        >
+          Thick (10px)
+        </p>
+        <ScrollArea
+          type="always"
+          scrollbarSize={10}
+          maxHeight={150}
+          style={{
+            border: '1px solid var(--tao-color-border-secondary)',
+            borderRadius: 6,
+          }}
+        >
+          <div style={{ padding: 16 }}>
+            {items.slice(0, 30).map((item) => (
+              <p
+                key={item}
+                style={{
+                  margin: '0 0 8px',
+                  color: 'var(--tao-color-text-secondary)',
+                }}
+              >
+                {item}
+              </p>
+            ))}
+          </div>
+        </ScrollArea>
+      </div>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="scroll-area-horizontal-shadow">
+
+### 横向边缘提示
+
+横向滚动时使用两侧阴影提示内容延伸方向。
+
+```tsx preview
+import { ScrollArea } from '@rockshin/tao-ui';
+
+const items = Array.from({ length: 50 }, (_, i) => `Item ${i + 1}`);
+
+export default function ScrollAreaHorizontalShadow() {
+  return (
+    <ScrollArea
+      direction="horizontal"
+      scrollShadow
+      maxWidth={400}
+      style={{
+        border: '1px solid var(--tao-color-border-secondary)',
+        borderRadius: 6,
+      }}
+    >
+      <div
+        style={{ display: 'flex', gap: 8, padding: 16, width: 'max-content' }}
+      >
+        {items.slice(0, 30).map((item) => (
+          <div
+            key={item}
+            style={{
+              flexShrink: 0,
+              width: 100,
+              height: 60,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: 'var(--tao-color-fill-quaternary)',
+              borderRadius: 6,
+              fontSize: 13,
+              color: 'var(--tao-color-text-secondary)',
+            }}
+          >
+            {item}
+          </div>
+        ))}
+      </div>
+    </ScrollArea>
+  );
+}
+```
+
+</section>
+
+</div>
 
 ## API
 

@@ -1,0 +1,146 @@
+---
+title: BorderBeam
+description: "Highlights an active surface with a moving border light."
+---
+
+import Preview from '../../_components/demo-preview';
+
+Highlights an active surface with a moving border light.
+
+This native tao-ui component follows the public API of Ant Design 6.7.0. Appearance, theme tokens and Semantic DOM customization belong to tao-ui; configure themes with `TaoProvider`.
+
+Props follow the 6.7.0 beam API. The child must expose a native DOM ref or nativeElement handle. Motion uses transform and respects reduced-motion preferences.
+
+## When to use
+
+Use sparingly for a meaningful active or processing state. Keep an explicit text status alongside the effect.
+
+## Examples
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="border-beam-example-1">
+
+### Active card
+
+```tsx preview
+import { BorderBeam, Card } from "@rockshin/tao-ui";
+
+export default function Example() {
+  return (
+    <BorderBeam>
+      <Card title="Processing">12 tasks are running.</Card>
+    </BorderBeam>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="border-beam-example-2">
+
+### Count and duration
+
+```tsx preview
+import { BorderBeam, Card } from "@rockshin/tao-ui";
+
+export default function Example() {
+  return (
+    <BorderBeam count={2} duration={4} lineWidth={2}>
+      <Card title="Two beams">
+        Two highlights follow the same border with evenly spaced phases.
+      </Card>
+    </BorderBeam>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="border-beam-example-3">
+
+### Custom gradient and item overrides
+
+```tsx preview
+import { BorderBeam, Card } from "@rockshin/tao-ui";
+
+export default function Example() {
+  return (
+    <BorderBeam
+      items={[
+        {
+          color: [
+            { color: "#23877e", percent: 0 },
+            { color: "#8aa9ff", percent: 100 },
+          ],
+          size: 140,
+        },
+        { color: "#a26a42", size: 80, lineWidth: 2 },
+      ]}
+    >
+      <Card title="Independent beams">
+        Each item controls its own color, size and line width.
+      </Card>
+    </BorderBeam>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="border-beam-example-4">
+
+### Inset and nonuniform corners
+
+```tsx preview
+import { BorderBeam, Card } from "@rockshin/tao-ui";
+
+export default function Example() {
+  return (
+    <BorderBeam outset={0} lineWidth={2} size="35%">
+      <Card
+        title="Activity stream"
+        style={{ borderRadius: "20px 20px 0 0", overflow: "hidden" }}
+      >
+        The effect follows the top rounded corners and the square bottom
+        corners.
+      </Card>
+    </BorderBeam>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="border-beam-example-5">
+
+### Toggle a meaningful active state
+
+```tsx preview
+import { useState } from "react";
+import { BorderBeam, Button, Card } from "@rockshin/tao-ui";
+
+export default function Example() {
+  const [active, setActive] = useState(true);
+  return (
+    <div>
+      <Button onClick={() => setActive(!active)} style={{ marginBottom: 16 }}>
+        {active ? "Pause" : "Resume"}
+      </Button>
+      <BorderBeam count={2} items={active ? undefined : []}>
+        <Card title={active ? "Syncing changes" : "Paused"}>
+          The border animation follows the current state.
+        </Card>
+      </BorderBeam>
+    </div>
+  );
+}
+```
+
+</section>
+
+</div>
+
+## API
+
+<API moduleName="border-beam" />

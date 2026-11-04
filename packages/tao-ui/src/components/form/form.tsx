@@ -17,6 +17,9 @@ import {
 import { FormLayoutContext } from './form-context';
 import { FormItem, type FormItemProps } from './form-item';
 import './form.css';
+import { interopDefault } from '../../utils/interop-default';
+
+const RcFormComponent = /*#__PURE__*/ interopDefault(RcForm);
 
 export type FormSemanticPart = 'root';
 
@@ -53,20 +56,22 @@ function FormInner<Values = Record<string, unknown>>(
       {/* size/disabled ride the existing provider cascade — controls inside
           Form.Items pick them up without per-item plumbing. */}
       <TaoProvider size={size} disabled={disabled}>
-        <RcForm<Values>
+        <RcFormComponent<Values>
           ref={ref}
           className={cx(classNames?.root, className)}
           style={{ ...styles?.root, ...style }}
           {...rcProps}
         >
           {children}
-        </RcForm>
+        </RcFormComponent>
       </TaoProvider>
     </FormLayoutContext.Provider>
   );
 }
 
-const ForwardedForm = forwardRef(FormInner) as <Values = Record<string, unknown>>(
+const ForwardedForm = forwardRef(FormInner) as <
+  Values = Record<string, unknown>,
+>(
   props: FormProps<Values> & { ref?: React.Ref<FormInstance<Values>> },
 ) => React.ReactElement;
 
@@ -75,7 +80,9 @@ const ForwardedForm = forwardRef(FormInner) as <Values = Record<string, unknown>
  * InternalFormInstance (a superset of FormInstance), same source antd's
  * useFormInstance reads from.
  */
-function useFormInstance<Values = Record<string, unknown>>(): FormInstance<Values> {
+function useFormInstance<
+  Values = Record<string, unknown>,
+>(): FormInstance<Values> {
   return useContext(FieldContext) as unknown as FormInstance<Values>;
 }
 

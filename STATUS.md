@@ -1,6 +1,7 @@
 # STATUS
 
 ## Doing
+- 2026-11-05 Native expansion of 37 Ant Design catalog entries and the bilingual website are implemented; component, snippet and local website checks passed. Real React 18/19 tarball compatibility, final release gates and independent review also passed; public repository, Pages and 0.0.42 publication are next. Scope and acceptance: `goals/2026-11-04-component-expansion.md`.
 - 2026-10-20 Approve the staged `@rockshin/tao-icons@0.0.1` on npmjs.com: the registry currently shows the public `0.0.0-stage` placeholder, and the real version needs maintainer 2FA approval (Staged Packages -> Approve)
 
 ## Next
@@ -13,6 +14,13 @@
 - none
 
 ## Done
+- 2026-11-04 Expanded all 37 bilingual component references with runnable, copyable examples; added phone/desktop iframe previews and isolated notifications. Select examples and size-matched popup typography are accepted. Project gates, production/dev previews and desktop/mobile browser checks passed; deployment remains deferred.
+- 2026-11-04 Unified medium Input/Textarea default horizontal padding at 8px, including medium Input affix spacing; project gates, docs build and local desktop/390px browser checks passed with stable text positions across focus.
+- 2026-11-04 Fixed clipped Textarea focus rings in Rspress previews by reserving space inside the preview scroller; project gates, docs build and local desktop/390px browser checks passed.
+- 2026-11-04 Fixed responsive review items 1–6: mobile Select behavior/drafts, responsive tags, narrow layouts, touch targets, customization and configurable English/Chinese text. Project gates and local Chrome viewport/touch checks passed; see `packages/tao-ui/RESPONSIVE.md` for contract and device-validation scope.
+- 2026-11-04 Changed the global default border radius to 6px, including theme reset defaults and design documentation; project gates, theme inheritance/reset and local browser checks passed, docs preview rebuilt.
+- 2026-11-04 Fixed Switch label/handle overlap and loading-icon alignment across sizes, custom widths and RTL; bilingual examples now use balanced SVG state icons. Project gates and local desktop/mobile browser checks passed, production docs preview rebuilt.
+- 2026-11-04 Upgraded Rspress and official plugins to 2.1.0; completed bilingual home, Button and Select local website previews with interactive examples and code copying. Project gates, production browser checks and independent review passed; deployment deferred.
 - 2026-11-04 Released `@rockshin/tao-ui@0.0.41` fixing Select option-list scrolling; local/browser/CI checks passed, npm latest and downloaded package contents verified after publishing token replacement.
 - 2026-10-30 Released `@rockshin/tao-ui@0.0.40`; local and GitHub release checks passed and the version is available on npm.
 - 2026-10-28 ARIA: complete field, picker, overlay and selection semantics; fix reviewed native-label, required/disabled, range-draft and keyboard-focus regressions. Project gates, docs build, browser smoke and follow-up review pass; real screen-reader validation remains outside this local verification.
@@ -38,4 +46,6 @@
 - 2026-07 rollup: ship Sonner, dark mode and provider themes; improve editable pickers, searchable Select, and nested overlay behavior; align control layout and design documentation
 
 ## Known issues
+- Responsive controls: real iOS Safari/Android devices, software keyboards, safe areas and screen readers remain unverified; local Chrome emulation passed.
+- Select numeric popup widths retain the trigger's minimum width; the docs demonstrate a wider popup and explain this constraint.
 - GitHub Pages deployment is blocked while the repository is private on the current account plan; make it public or upgrade the plan before enabling Pages

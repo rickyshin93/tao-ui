@@ -1,0 +1,156 @@
+---
+title: Empty
+description: "Explains why a collection has no content and provides a useful next action."
+---
+
+import Preview from '../../_components/demo-preview';
+
+Explains why a collection has no content and provides a useful next action.
+
+## When to use
+
+Use inside lists, search results and compact panels when no records are available. Keep the explanation specific to the current view.
+
+## Examples
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="empty-example-1">
+
+### Default and simple illustrations
+
+Use the simple illustration in compact content areas.
+
+```tsx preview="iframe-follow"
+import { Empty, Stack } from '@rockshin/tao-ui';
+
+export default function Example() {
+  return (
+    <Stack direction="horizontal" gap="lg" style={{ flexWrap: 'wrap' }}>
+      <Empty description="No projects yet" />
+      <Empty
+        image={Empty.PRESENTED_IMAGE_SIMPLE}
+        description="No matching results"
+      />
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="empty-example-2">
+
+### Create the first item
+
+The footer can contain an action. This example creates an item only in local React state.
+
+```tsx preview
+import { useState } from 'react';
+import { Button, Empty } from '@rockshin/tao-ui';
+
+export default function Example() {
+  const [created, setCreated] = useState(false);
+  return created ? (
+    <div>
+      <p>Project Atlas is ready.</p>
+      <Button variant="secondary" onClick={() => setCreated(false)}>
+        Reset
+      </Button>
+    </div>
+  ) : (
+    <Empty description="Create your first project to start organizing work.">
+      <Button onClick={() => setCreated(true)}>Create project</Button>
+    </Empty>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="empty-example-3">
+
+### Custom illustration
+
+Pass a React node to image and adjust its container through styles.image.
+
+```tsx preview
+import { Empty } from '@rockshin/tao-ui';
+
+export default function Example() {
+  return (
+    <Empty
+      image={
+        <svg viewBox="0 0 80 64" fill="none" aria-hidden="true">
+          <path
+            d="M12 22h56v34H12zM24 22V10h32v12M28 38h24"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinejoin="round"
+          />
+        </svg>
+      }
+      description="The archive is empty"
+      styles={{ image: { height: 72, color: 'var(--tao-primary)' } }}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="empty-example-4">
+
+### Provider language
+
+Omitting description uses TaoProvider locale.emptyDescription. An explicit description takes priority.
+
+```tsx preview
+import { Empty, Stack, TaoProvider, enUS, zhCN } from '@rockshin/tao-ui';
+
+export default function Example() {
+  return (
+    <Stack direction="horizontal" gap="lg" style={{ flexWrap: 'wrap' }}>
+      <TaoProvider locale={enUS}>
+        <Empty />
+      </TaoProvider>
+      <TaoProvider locale={zhCN}>
+        <Empty />
+      </TaoProvider>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="empty-example-5">
+
+### Compact and image-only states
+
+Set description to false to hide it. Keep a visible explanation elsewhere in the surrounding interface.
+
+```tsx preview
+import { Empty } from '@rockshin/tao-ui';
+
+export default function Example() {
+  return (
+    <section aria-label="No saved filters">
+      <h4>No saved filters</h4>
+      <Empty
+        image={Empty.PRESENTED_IMAGE_SIMPLE}
+        description={false}
+        styles={{ root: { padding: 12 }, image: { height: 32 } }}
+      />
+    </section>
+  );
+}
+```
+
+</section>
+
+</div>
+
+## API
+
+<API moduleName="empty" />

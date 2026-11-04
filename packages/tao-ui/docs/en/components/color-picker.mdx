@@ -1,0 +1,268 @@
+---
+
+title: ColorPicker
+
+description: "Choose solid or gradient colors with precise Color objects, presets and format conversion."
+
+---
+
+import Preview from '../../_components/demo-preview';
+
+Choose solid or gradient colors with precise Color objects, presets and format conversion.
+
+The added API follows Ant Design 6.7.0; appearance, theming and Semantic DOM use tao-ui. Existing component APIs remain unchanged.
+
+## Examples
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="color-picker-controlled">
+
+### Controlled color
+
+Keep the Color object returned by onChange to retain precision while editing.
+
+```tsx preview
+import { ColorPicker, type Color } from '@rockshin/tao-ui';
+import { useState } from 'react';
+export default function Demo() {
+  const [color, setColor] = useState<string | Color>('#008888');
+  return (
+    <div>
+      <ColorPicker value={color} onChange={setColor} showText />
+      <p>{typeof color === 'string' ? color : color.toCssString()}</p>
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="color-picker-sizes">
+
+### Three sizes
+
+Sizes follow the compatible API: small, middle and large.
+
+```tsx preview
+import { ColorPicker, Stack } from '@rockshin/tao-ui';
+export default function Demo() {
+  return (
+    <Stack direction="horizontal" gap="md">
+      {(['small', 'middle', 'large'] as const).map((size) => (
+        <ColorPicker key={size} size={size} defaultValue="#008888" showText />
+      ))}
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="color-picker-gradient">
+
+### Gradients and stops
+
+Add, remove and move stops, or switch between solid and gradient modes.
+
+```tsx preview
+import { ColorPicker } from '@rockshin/tao-ui';
+export default function Demo() {
+  return (
+    <ColorPicker
+      mode={['single', 'gradient']}
+      defaultValue={[
+        { color: '#008888', percent: 0 },
+        { color: '#7c3aed', percent: 100 },
+      ]}
+      showText
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="color-picker-presets">
+
+### Grouped presets
+
+Group colors by use; presets can also contain gradients.
+
+```tsx preview
+import { ColorPicker } from '@rockshin/tao-ui';
+export default function Demo() {
+  return (
+    <ColorPicker
+      presets={[
+        {
+          label: 'Brand',
+          colors: ['#008888', '#7c3aed', '#ed6c02'],
+          defaultOpen: true,
+        },
+        {
+          label: 'Gradient',
+          colors: [
+            [
+              { color: '#008888', percent: 0 },
+              { color: '#ffffff', percent: 100 },
+            ],
+          ],
+        },
+      ]}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="color-picker-formats">
+
+### HEX, RGB and HSB
+
+Switch representations in the panel or lock the required format.
+
+```tsx preview
+import { ColorPicker, Stack } from '@rockshin/tao-ui';
+export default function Demo() {
+  return (
+    <Stack gap="md">
+      <ColorPicker defaultFormat="rgb" defaultValue="#00888880" showText />
+      <ColorPicker
+        format="hsb"
+        disabledFormat
+        defaultValue="#7c3aed"
+        showText
+      />
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="color-picker-alpha">
+
+### Alpha and clear
+
+disabledAlpha emits opaque colors; allowClear provides a transparent value.
+
+```tsx preview
+import { ColorPicker, Stack } from '@rockshin/tao-ui';
+export default function Demo() {
+  return (
+    <Stack direction="horizontal" gap="md">
+      <ColorPicker defaultValue="#00888880" allowClear showText />
+      <ColorPicker defaultValue="#008888" disabledAlpha showText />
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="color-picker-complete">
+
+### Commit after editing
+
+Use onChangeComplete to commit a completed drag or edit.
+
+```tsx preview
+import { ColorPicker } from '@rockshin/tao-ui';
+import { useState } from 'react';
+export default function Demo() {
+  const [saved, setSaved] = useState('#008888');
+  return (
+    <div>
+      <ColorPicker
+        defaultValue={saved}
+        onChangeComplete={(color) => setSaved(color.toCssString())}
+      />
+      <p>Committed: {saved}</p>
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="color-picker-custom-panel">
+
+### Custom panel
+
+Compose Picker and Presets while retaining picker state and events.
+
+```tsx preview
+import { ColorPicker } from '@rockshin/tao-ui';
+export default function Demo() {
+  return (
+    <ColorPicker
+      presets={[{ label: 'Palette', colors: ['#008888', '#ed6c02'] }]}
+      panelRender={(_, { components: { Picker, Presets } }) => (
+        <div>
+          <strong>Project palette</strong>
+          <Presets />
+          <Picker />
+        </div>
+      )}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="color-picker-trigger">
+
+### Triggers and disabled state
+
+Use a custom button, hover activation or a disabled picker.
+
+```tsx preview
+import { ColorPicker, Button, Stack } from '@rockshin/tao-ui';
+export default function Demo() {
+  return (
+    <Stack direction="horizontal" gap="md">
+      <ColorPicker trigger="hover">
+        <Button variant="secondary">Hover for color</Button>
+      </ColorPicker>
+      <ColorPicker disabled defaultValue="#008888" showText />
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="color-picker-phone">
+
+### Phone palette
+
+The independent phone viewport constrains the panel and inherits the theme.
+
+```tsx preview="iframe-follow"
+import { ColorPicker, TaoProvider, zhCN } from '@rockshin/tao-ui';
+export default function Demo() {
+  return (
+    <TaoProvider locale={zhCN}>
+      <div style={{ padding: 16 }}>
+        <ColorPicker
+          showText
+          allowClear
+          mode={['single', 'gradient']}
+          defaultValue="#008888"
+        />
+      </div>
+    </TaoProvider>
+  );
+}
+```
+
+</section>
+
+</div>
+
+## API
+
+<API moduleName="color-picker" />

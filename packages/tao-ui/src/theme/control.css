@@ -232,3 +232,15 @@
   color: var(--tao-color-text-disabled);
   cursor: not-allowed;
 }
+
+/* Coarse primary pointers get 44px targets; fine-pointer density is unchanged. */
+@media (pointer: coarse) {
+  [data-tao-control] {
+    min-height: 44px;
+  }
+  [data-tao-control] input,
+  input[data-tao-control],
+  textarea[data-tao-control] {
+    font-size: max(16px, 1em);
+  }
+}

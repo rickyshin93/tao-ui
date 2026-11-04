@@ -1,0 +1,270 @@
+---
+
+title: QRCode
+
+description: "Generate scannable Canvas or SVG QR codes with icons, status and refresh controls."
+
+---
+
+import Preview from '../../_components/demo-preview';
+
+Generate scannable Canvas or SVG QR codes with icons, status and refresh controls.
+
+The added API follows Ant Design 6.7.0; appearance, theming and Semantic DOM use tao-ui. Existing component APIs remain unchanged.
+
+## Examples
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="qr-code-renderers">
+
+### Canvas and SVG
+
+Canvas supports bitmap export; SVG scales without losing detail.
+
+```tsx preview
+import { QRCode, Stack } from '@rockshin/tao-ui';
+export default function Demo() {
+  return (
+    <Stack direction="horizontal" gap="md">
+      <QRCode value="https://github.com/rickyshin93/tao-ui" />
+      <QRCode type="svg" value="https://github.com/rickyshin93/tao-ui" />
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="qr-code-value">
+
+### Dynamic value
+
+The code re-encodes when the value changes. Empty strings render no code.
+
+```tsx preview
+import { QRCode, Input, Stack } from '@rockshin/tao-ui';
+import { useState } from 'react';
+export default function Demo() {
+  const [value, setValue] = useState('tao-ui');
+  return (
+    <Stack gap="md">
+      <Input
+        value={value}
+        onChange={(event) => setValue(event.target.value)}
+        aria-label="QR content"
+      />
+      <QRCode value={value} />
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="qr-code-levels">
+
+### Error correction
+
+L, M, Q and H provide different recovery levels. Center icons usually need a higher level.
+
+```tsx preview
+import { QRCode, Stack } from '@rockshin/tao-ui';
+export default function Demo() {
+  return (
+    <Stack direction="horizontal" gap="md" style={{ flexWrap: 'wrap' }}>
+      {(['L', 'M', 'Q', 'H'] as const).map((level) => (
+        <div key={level}>
+          <QRCode
+            value="tao-ui component library"
+            errorLevel={level}
+            boostLevel={false}
+            size={130}
+          />
+          <p>{level}</p>
+        </div>
+      ))}
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="qr-code-states">
+
+### Status and refresh
+
+Expired codes show a refresh action. Loading and scanned states also cover the code.
+
+```tsx preview
+import { QRCode, Stack, Button, type QRStatus } from '@rockshin/tao-ui';
+import { useState } from 'react';
+export default function Demo() {
+  const [status, setStatus] = useState<QRStatus>('expired');
+  return (
+    <Stack gap="md">
+      <QRCode
+        value="demo-token"
+        status={status}
+        onRefresh={() => setStatus('active')}
+      />
+      <Stack direction="horizontal" gap="sm" style={{ flexWrap: 'wrap' }}>
+        {(['active', 'expired', 'loading', 'scanned'] as const).map((next) => (
+          <Button
+            key={next}
+            size="small"
+            variant="secondary"
+            onClick={() => setStatus(next)}
+          >
+            {next}
+          </Button>
+        ))}
+      </Stack>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="qr-code-colors">
+
+### Colors and quiet zone
+
+Keep high contrast. marginSize reserves the quiet zone in QR modules.
+
+```tsx preview
+import { QRCode } from '@rockshin/tao-ui';
+export default function Demo() {
+  return (
+    <QRCode
+      value="tao-ui"
+      color="#005b5b"
+      bgColor="#ffffff"
+      marginSize={4}
+      size={200}
+      bordered={false}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="qr-code-icon">
+
+### Center icon
+
+iconSize accepts one size or separate dimensions. A data URL avoids an external request.
+
+```tsx preview
+import { QRCode } from '@rockshin/tao-ui';
+const icon =
+  'data:image/svg+xml,' +
+  encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"><rect width="40" height="40" rx="6" fill="#008888"/><path d="M10 12h20M20 12v20" stroke="white" stroke-width="4"/></svg>',
+  );
+export default function Demo() {
+  return (
+    <QRCode
+      value="https://github.com/rickyshin93/tao-ui"
+      icon={icon}
+      iconSize={{ width: 32, height: 32 }}
+      errorLevel="H"
+      size={200}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="qr-code-download">
+
+### Download PNG
+
+Use the public ref to export the canvas. Cross-origin icons require a suitable CORS response.
+
+```tsx preview
+import { QRCode, Button, Stack, type QRCodeRef } from '@rockshin/tao-ui';
+import { useRef } from 'react';
+export default function Demo() {
+  const ref = useRef<QRCodeRef>(null);
+  return (
+    <Stack gap="md">
+      <QRCode
+        ref={ref}
+        value="https://github.com/rickyshin93/tao-ui"
+        bgColor="#ffffff"
+        color="#000000"
+        marginSize={4}
+      />
+      <Button
+        onClick={() => {
+          const canvas = ref.current!.nativeElement.querySelector('canvas')!;
+          const link = document.createElement('a');
+          link.download = 'tao-ui-qr.png';
+          link.href = canvas.toDataURL('image/png');
+          link.click();
+        }}
+      >
+        Download PNG
+      </Button>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="qr-code-custom-status">
+
+### Custom status
+
+statusRender receives status, translated text and the refresh callback.
+
+```tsx preview
+import { QRCode, Button } from '@rockshin/tao-ui';
+import { useState } from 'react';
+export default function Demo() {
+  const [expired, setExpired] = useState(true);
+  return (
+    <QRCode
+      value="custom-status"
+      status={expired ? 'expired' : 'active'}
+      onRefresh={() => setExpired(false)}
+      statusRender={({ onRefresh }) => (
+        <Button onClick={onRefresh}>Generate again</Button>
+      )}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="qr-code-phone">
+
+### Phone and locale
+
+size controls dimensions; status text follows the provider locale.
+
+```tsx preview="iframe-follow"
+import { QRCode, TaoProvider, zhCN } from '@rockshin/tao-ui';
+export default function Demo() {
+  return (
+    <TaoProvider locale={zhCN}>
+      <QRCode value="tao-ui" status="scanned" size={220} />
+    </TaoProvider>
+  );
+}
+```
+
+</section>
+
+</div>
+
+## API
+
+<API moduleName="qr-code" />

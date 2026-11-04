@@ -3,5 +3,5 @@
   "compilerOptions": {
     "noEmit": true
   },
-  "include": ["src/env.d.ts", "tests/public-types.test.tsx"]
+  "include": ["src/env.d.ts", "tests/public-types.test.tsx", "tests/**/type-contract.tsx"]
 }

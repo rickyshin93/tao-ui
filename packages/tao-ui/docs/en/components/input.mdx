@@ -3,6 +3,8 @@ title: Input
 description: "Single-line text input for short freeform values. Includes usage guidance, a runnable example, and the complete API reference."
 ---
 
+import Preview from '../../_components/demo-preview';
+
 Single-line text input for short freeform values.
 
 ## When to use
@@ -18,7 +20,13 @@ Use Input for short text values such as names, filters, search terms, and identi
 
 - Do not use the component outside its intended interaction model.
 
-## Basic usage
+## Examples
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="input-example-1">
+
+### Basic usage
 
 ```tsx preview
 import { Input, Stack } from '@rockshin/tao-ui';
@@ -37,7 +45,11 @@ function InputExample() {
 export default InputExample;
 ```
 
-## Variants
+</section>
+
+<section className="tao-example" id="input-example-2">
+
+### Variants
 
 ```tsx preview
 import { Input, Stack } from '@rockshin/tao-ui';
@@ -55,7 +67,11 @@ function InputVariants() {
 export default InputVariants;
 ```
 
-## Sizes and affixes
+</section>
+
+<section className="tao-example" id="input-example-3">
+
+### Sizes and affixes
 
 ```tsx preview
 import { Input, Stack } from '@rockshin/tao-ui';
@@ -63,8 +79,16 @@ import { Input, Stack } from '@rockshin/tao-ui';
 function InputSizes() {
   return (
     <Stack gap="md" style={{ maxWidth: 400 }}>
-      <Input size="small" prefix={<span aria-hidden="true">⌕</span>} placeholder="Small search" />
-      <Input size="medium" suffix={<span>USD</span>} placeholder="Medium amount" />
+      <Input
+        size="small"
+        prefix={<span aria-hidden="true">⌕</span>}
+        placeholder="Small search"
+      />
+      <Input
+        size="medium"
+        suffix={<span>USD</span>}
+        placeholder="Medium amount"
+      />
       <Input size="large" placeholder="Large input" />
     </Stack>
   );
@@ -72,6 +96,224 @@ function InputSizes() {
 
 export default InputSizes;
 ```
+
+</section>
+
+<section className="tao-example" id="input-sizes">
+
+### Three sizes
+
+Choose a size for regular forms, compact toolbars, or spacious layouts.
+
+```tsx preview
+import { Input, Stack } from '@rockshin/tao-ui';
+export default function Example() {
+  return (
+    <Stack direction="vertical">
+      {(['small', 'medium', 'large'] as const).map((size) => (
+        <Input key={size} size={size} aria-label={size} placeholder={size} />
+      ))}
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="input-controlled">
+
+### Controlled value and reset
+
+Keep value and onChange in application state; reset updates the same state.
+
+```tsx preview
+import { useState } from 'react';
+import { Input, Button, Stack } from '@rockshin/tao-ui';
+export default function Example() {
+  const [value, setValue] = useState('tao-ui');
+  return (
+    <Stack direction="vertical">
+      <Input
+        aria-label="Project name"
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+      />
+      <Button onClick={() => setValue('')}>Clear</Button>
+      <output>{value || 'Empty'}</output>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="input-affixes">
+
+### Prefixes and suffixes
+
+Affixes show units or context while the input value contains only user data.
+
+```tsx preview
+import { Input, Stack } from '@rockshin/tao-ui';
+export default function Example() {
+  return (
+    <Stack direction="vertical">
+      <Input
+        aria-label="Website"
+        prefix="https://"
+        suffix=".com"
+        placeholder="example"
+      />
+      <Input
+        aria-label="Budget"
+        prefix="$"
+        suffix="USD"
+        type="number"
+        defaultValue="1200"
+      />
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="input-password">
+
+### Password visibility
+
+Toggle the native type with a named button that does not submit the form.
+
+```tsx preview
+import { useState } from 'react';
+import { Input, Button, Stack } from '@rockshin/tao-ui';
+export default function Example() {
+  const [visible, setVisible] = useState(false);
+  return (
+    <Stack direction="vertical">
+      <Input
+        aria-label="Password"
+        type={visible ? 'text' : 'password'}
+        defaultValue="example-password"
+        autoComplete="new-password"
+      />
+      <Button aria-pressed={visible} onClick={() => setVisible(!visible)}>
+        {visible ? 'Hide password' : 'Show password'}
+      </Button>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="input-search-submit">
+
+### Search on submit
+
+Use a native form for Enter and button submission, with results shown inline.
+
+```tsx preview
+import { useState } from 'react';
+import { Input, Button, Stack } from '@rockshin/tao-ui';
+export default function Example() {
+  const [query, setQuery] = useState('');
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        setQuery(String(new FormData(e.currentTarget).get('query')));
+      }}
+    >
+      <Stack direction="vertical">
+        <Input
+          name="query"
+          type="search"
+          aria-label="Search components"
+          placeholder="Search components"
+          required
+        />
+        <Button type="submit">Search</Button>
+        <output aria-live="polite">
+          {query ? `Searching for: ${query}` : 'Enter a component name'}
+        </output>
+      </Stack>
+    </form>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="input-native-constraints">
+
+### Native constraints and read-only
+
+Use native email, required, maxLength, and readOnly; application state decides error feedback.
+
+```tsx preview
+import { Input, Stack } from '@rockshin/tao-ui';
+export default function Example() {
+  return (
+    <Stack direction="vertical">
+      <Input
+        aria-label="Email"
+        type="email"
+        required
+        placeholder="name@example.com"
+      />
+      <Input
+        aria-label="Short code"
+        maxLength={6}
+        placeholder="Up to 6 characters"
+      />
+      <Input aria-label="Record ID" readOnly value="REC-1042" />
+      <Input
+        aria-label="Invalid value"
+        status="error"
+        defaultValue="Invalid value"
+      />
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="input-focus-ref">
+
+### Focus with a ref
+
+The ref points to the native input for restoring focus after another action.
+
+```tsx preview
+import { useRef } from 'react';
+import { Input, Button, Stack } from '@rockshin/tao-ui';
+export default function Example() {
+  const ref = useRef<HTMLInputElement>(null);
+  return (
+    <Stack direction="vertical">
+      <Input
+        ref={ref}
+        aria-label="Focus target"
+        defaultValue="Select this text"
+      />
+      <Button
+        onClick={() => {
+          ref.current?.focus();
+          ref.current?.select();
+        }}
+      >
+        Focus and select
+      </Button>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+</div>
 
 ## API
 

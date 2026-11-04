@@ -1,0 +1,8 @@
+@layer tao {
+  [data-tao-watermark] {
+    min-width: 0;
+  }
+  [data-tao-watermark-mark] {
+    box-sizing: border-box;
+  }
+}

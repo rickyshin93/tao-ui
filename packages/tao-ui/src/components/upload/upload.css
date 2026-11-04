@@ -1,0 +1,160 @@
+@layer components {
+  [data-tao-upload] {
+    display: inline-flex;
+    flex-direction: column;
+    gap: var(--tao-margin-xs);
+    max-width: 100%;
+    min-width: 0;
+    color: var(--tao-color-text);
+    font: var(--tao-font-size) / var(--tao-line-height) var(--tao-font-family);
+  }
+  [data-tao-upload-trigger] {
+    display: inline-flex;
+    align-items: center;
+  }
+  [data-tao-upload-trigger] > span {
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+  }
+  [data-tao-upload][data-type="drag"] {
+    display: flex;
+  }
+  [data-tao-upload][data-type="drag"] [data-tao-upload-trigger] {
+    justify-content: center;
+    min-height: 140px;
+    padding: var(--tao-padding-lg);
+    border: 1px dashed var(--tao-color-border);
+    border-radius: var(--tao-radius);
+    background: var(--tao-color-fill-quaternary);
+    text-align: center;
+  }
+  [data-tao-upload][data-type="drag"] [data-tao-upload-trigger] > span {
+    align-self: stretch;
+    flex: 1;
+    justify-content: center;
+    flex-direction: column;
+  }
+  [data-tao-upload][data-dragging] [data-tao-upload-trigger] {
+    border-color: var(--tao-primary);
+    background: var(--tao-primary-bg);
+  }
+  [data-tao-upload][data-disabled] [data-tao-upload-trigger] {
+    color: var(--tao-color-text-disabled);
+    cursor: not-allowed;
+  }
+  [data-tao-upload][data-disabled] [data-tao-upload-trigger] > span {
+    cursor: not-allowed;
+  }
+  [data-tao-upload-list] {
+    display: flex;
+    flex-direction: column;
+    gap: var(--tao-margin-xs);
+    min-width: 0;
+  }
+  [data-tao-upload-item] {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: var(--tao-margin-xs);
+    padding: var(--tao-padding-xxs);
+    border-radius: var(--tao-radius-sm);
+  }
+  [data-tao-upload-item]:hover {
+    background: var(--tao-color-bg-text-hover);
+  }
+  [data-tao-upload-item] > svg {
+    flex-shrink: 0;
+    color: var(--tao-color-text-secondary);
+  }
+  [data-tao-upload-details] {
+    display: flex;
+    flex: 1;
+    min-width: 0;
+    flex-direction: column;
+    overflow-wrap: anywhere;
+  }
+  [data-tao-upload-details] a {
+    color: var(--tao-primary);
+    text-decoration: none;
+  }
+  [data-tao-upload-actions] {
+    display: inline-flex;
+    flex-shrink: 0;
+    gap: 2px;
+  }
+  [data-tao-upload-actions] button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: 0;
+    border-radius: var(--tao-radius-sm);
+    background: transparent;
+    color: var(--tao-color-text-secondary);
+    cursor: pointer;
+  }
+  [data-tao-upload-actions] button:hover {
+    background: var(--tao-color-fill-secondary);
+  }
+  [data-tao-upload] :is(a, button, [role="button"]):focus-visible {
+    outline: 2px solid var(--tao-primary);
+    outline-offset: 2px;
+  }
+  [data-tao-upload-item][data-status="error"],
+  [data-tao-upload-error] {
+    color: var(--tao-error);
+  }
+  [data-tao-upload-error] {
+    font-size: var(--tao-font-size-sm);
+  }
+  [data-tao-upload-thumbnail] {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+  [data-tao-upload-thumbnail] img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  [data-tao-upload][data-list-type="picture"] [data-tao-upload-item] {
+    padding: var(--tao-padding-xs);
+    border: 1px solid var(--tao-color-border-secondary);
+  }
+  [data-tao-upload]:is(
+      [data-list-type="picture-card"],
+      [data-list-type="picture-circle"]
+    )
+    [data-tao-upload-list] {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  [data-tao-upload]:is(
+      [data-list-type="picture-card"],
+      [data-list-type="picture-circle"]
+    )
+    [data-tao-upload-item] {
+    width: 120px;
+    min-height: 144px;
+    flex-direction: column;
+    border: 1px solid var(--tao-color-border-secondary);
+    text-align: center;
+  }
+  [data-tao-upload][data-list-type="picture-circle"]
+    [data-tao-upload-thumbnail] {
+    border-radius: 50%;
+  }
+  @media (pointer: coarse) {
+    [data-tao-upload-actions] button {
+      min-width: 44px;
+      min-height: 44px;
+    }
+  }
+}

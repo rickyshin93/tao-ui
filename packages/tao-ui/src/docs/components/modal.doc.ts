@@ -12,6 +12,9 @@ export const modalDoc = {
   tests: ['tests/modal/modal.test.tsx'],
   semanticParts: [
     'root',
+    'container',
+    'wrapper',
+    'mask',
     'overlay',
     'header',
     'title',

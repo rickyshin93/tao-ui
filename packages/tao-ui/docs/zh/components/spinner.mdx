@@ -3,6 +3,8 @@ title: Spinner
 description: 展示局部、内容覆盖或全屏加载状态。页面涵盖适用场景、设计建议、多组可运行示例、交互状态与完整 API 参考。
 ---
 
+import Preview from '../../_components/demo-preview';
+
 展示局部、内容覆盖或全屏加载状态。
 
 ## 何时使用
@@ -18,7 +20,13 @@ description: 展示局部、内容覆盖或全屏加载状态。页面涵盖适�
 
 - 不要用 Spinner 掩盖没有结束条件的流程。
 
-## 基础用法
+## 代码演示
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="spinner-example-1">
+
+### 基础用法
 
 ```tsx preview
 import { Spinner, Stack } from '@rockshin/tao-ui';
@@ -36,7 +44,11 @@ function SpinnerExample() {
 export default SpinnerExample;
 ```
 
-## 提示与自定义指示器
+</section>
+
+<section className="tao-example" id="spinner-example-2">
+
+### 提示与自定义指示器
 
 ```tsx preview
 import { Spinner, Stack } from '@rockshin/tao-ui';
@@ -45,7 +57,10 @@ function SpinnerIndicators() {
   return (
     <Stack direction="horizontal" gap="lg" align="center">
       <Spinner tip="Loading data" />
-      <Spinner indicator={<span style={{ fontSize: 24 }}>◌</span>} tip="Custom" />
+      <Spinner
+        indicator={<span style={{ fontSize: 24 }}>◌</span>}
+        tip="Custom"
+      />
       <Spinner size="large" tip="Preparing preview" />
     </Stack>
   );
@@ -54,7 +69,11 @@ function SpinnerIndicators() {
 export default SpinnerIndicators;
 ```
 
-## 内容覆盖与延迟
+</section>
+
+<section className="tao-example" id="spinner-example-3">
+
+### 内容覆盖与延迟
 
 ```tsx preview
 import { Button, Spinner, Stack } from '@rockshin/tao-ui';
@@ -65,11 +84,20 @@ function SpinnerOverlay() {
 
   return (
     <Stack gap="md" style={{ maxWidth: 420 }}>
-      <Button variant="secondary" onClick={() => setSpinning((value) => !value)}>
+      <Button
+        variant="secondary"
+        onClick={() => setSpinning((value) => !value)}
+      >
         {spinning ? 'Stop' : 'Start'} loading
       </Button>
       <Spinner spinning={spinning} delay={200} tip="Loading content">
-        <div style={{ minHeight: 120, padding: 20, border: '1px solid var(--tao-color-border)' }}>
+        <div
+          style={{
+            minHeight: 120,
+            padding: 20,
+            border: '1px solid var(--tao-color-border)',
+          }}
+        >
           Content remains mounted below the overlay.
         </div>
       </Spinner>
@@ -79,6 +107,140 @@ function SpinnerOverlay() {
 
 export default SpinnerOverlay;
 ```
+
+</section>
+
+<section className="tao-example" id="spinner-wrap-content">
+
+### 内容加载遮罩
+
+spinning 控制内容区域的加载状态。
+
+```tsx preview
+import { Spinner, Stack } from '@rockshin/tao-ui';
+
+import { useState } from 'react';
+
+export default function SpinnerWrapContent() {
+  function Demo() {
+    const [spinning, setSpinning] = useState(true);
+    return (
+      <Stack gap="md" style={{ maxWidth: 360 }}>
+        <button type="button" onClick={() => setSpinning((s) => !s)}>
+          {spinning ? 'Stop' : 'Start'} loading
+        </button>
+        <Spinner spinning={spinning} tip="Loading">
+          <div
+            style={{
+              padding: 24,
+              border: '1px solid var(--tao-color-border)',
+              borderRadius: 8,
+              lineHeight: 1.6,
+            }}
+          >
+            <h4 style={{ margin: '0 0 8px' }}>Card title</h4>
+            <p style={{ margin: 0 }}>
+              Content stays in place and dims while the spinner overlays it.
+            </p>
+          </div>
+        </Spinner>
+      </Stack>
+    );
+  }
+  return <Demo />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="spinner-delay">
+
+### 延迟显示加载
+
+短暂请求可在 delay 之前结束，减少闪烁。
+
+```tsx preview
+import { Spinner, Stack } from '@rockshin/tao-ui';
+
+import { useState } from 'react';
+
+export default function SpinnerDelay() {
+  function Demo() {
+    const [spinning, setSpinning] = useState(false);
+    return (
+      <Stack gap="md" style={{ maxWidth: 360 }}>
+        <p style={{ color: 'var(--tao-color-text-secondary)', fontSize: 13 }}>
+          500ms delay — quick toggles won&apos;t flash the spinner.
+        </p>
+        <button type="button" onClick={() => setSpinning((s) => !s)}>
+          Toggle spinning ({String(spinning)})
+        </button>
+        <Spinner spinning={spinning} delay={500}>
+          <div
+            style={{
+              padding: 24,
+              border: '1px solid var(--tao-color-border)',
+              borderRadius: 8,
+            }}
+          >
+            Toggle quickly to see the delay in action.
+          </div>
+        </Spinner>
+      </Stack>
+    );
+  }
+  return <Demo />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="spinner-custom-indicator">
+
+### 自定义加载图标
+
+indicator 替换视觉图标，仍需提供清晰的状态文字。
+
+```tsx preview
+import { Spinner } from '@rockshin/tao-ui';
+
+export default function SpinnerCustomIndicator() {
+  return (
+    <Spinner
+      indicator={<span style={{ fontSize: 24 }}>⏳</span>}
+      tip="Please wait"
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="spinner-controlled">
+
+### 受控加载状态
+
+用外部状态控制 spinning，内容保留在原位置。
+
+```tsx preview
+import { useState } from 'react';
+import { Spinner, Switch, Stack } from '@rockshin/tao-ui';
+export default function Example() {
+  const [loading, setLoading] = useState(false);
+  return (
+    <Stack direction="vertical">
+      <Switch aria-label="Loading" checked={loading} onChange={setLoading} />
+      <Spinner spinning={loading} tip="Loading content">
+        <div style={{ padding: 24 }}>Your workspace content stays here.</div>
+      </Spinner>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+</div>
 
 ## API
 

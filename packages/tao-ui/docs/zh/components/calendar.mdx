@@ -1,0 +1,244 @@
+---
+
+title: Calendar
+
+description: "展示月份或年份，支持日程单元格、自定义页头与可选范围。"
+
+---
+
+import Preview from '../../_components/demo-preview';
+
+展示月份或年份，支持日程单元格、自定义页头与可选范围。
+
+新增 API 对齐 Ant Design 6.7.0，外观、主题与 Semantic DOM 使用 tao-ui。既有组件 API 保持原样。
+
+## 代码演示
+
+<div className="tao-demo-grid tao-demo-grid-wide">
+
+<section className="tao-example" id="calendar-basic">
+
+### 完整月历
+
+完整月历适合在单元格中展示日程。
+
+```tsx preview
+import { Calendar } from '@rockshin/tao-ui';
+import dayjs from 'dayjs';
+export default function Demo() {
+  return <Calendar defaultValue={dayjs('2026-11-04')} />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="calendar-compact">
+
+### 卡片月历
+
+fullscreen=false 使用适合侧栏与卡片的紧凑布局。
+
+```tsx preview
+import { Calendar } from '@rockshin/tao-ui';
+import dayjs from 'dayjs';
+export default function Demo() {
+  return (
+    <div style={{ maxWidth: 360 }}>
+      <Calendar fullscreen={false} defaultValue={dayjs('2026-11-04')} />
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="calendar-controlled">
+
+### 受控选择与来源
+
+onSelect 区分日期点击与页头切换；onChange 更新当前日期。
+
+```tsx preview
+import { Calendar } from '@rockshin/tao-ui';
+import dayjs from 'dayjs';
+import { useState } from 'react';
+export default function Demo() {
+  const [value, setValue] = useState(dayjs('2026-11-04'));
+  const [source, setSource] = useState('initial');
+  return (
+    <div>
+      <Calendar
+        value={value}
+        onChange={setValue}
+        onSelect={(_, info) => setSource(info.source)}
+      />
+      <p>
+        {value.format('YYYY-MM-DD')} · {source}
+      </p>
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="calendar-events">
+
+### 日程单元格
+
+cellRender 在默认单元格内显示日程，保留原有日期交互。
+
+```tsx preview
+import { Calendar, Badge } from '@rockshin/tao-ui';
+import dayjs from 'dayjs';
+export default function Demo() {
+  return (
+    <Calendar
+      defaultValue={dayjs('2026-11-04')}
+      cellRender={(date, info) =>
+        info.type === 'date' && [4, 12, 20].includes(date.date()) ? (
+          <Badge
+            status="processing"
+            text={date.date() === 4 ? 'Design review' : 'Team sync'}
+          />
+        ) : null
+      }
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="calendar-bounds">
+
+### 有效范围
+
+范围限制页头导航与日期选择。
+
+```tsx preview
+import { Calendar } from '@rockshin/tao-ui';
+import dayjs from 'dayjs';
+export default function Demo() {
+  return (
+    <Calendar
+      fullscreen={false}
+      defaultValue={dayjs('2026-11-10')}
+      validRange={[dayjs('2026-11-05'), dayjs('2026-12-20')]}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="calendar-weekends">
+
+### 禁用周末
+
+disabledDate 接收 Dayjs；返回 true 的日期无法选择。
+
+```tsx preview
+import { Calendar } from '@rockshin/tao-ui';
+export default function Demo() {
+  return (
+    <Calendar
+      fullscreen={false}
+      disabledDate={(date) => date.day() === 0 || date.day() === 6}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="calendar-year">
+
+### 年份与周序号
+
+切换月历与年历，或为月历显示周序号。
+
+```tsx preview
+import { Calendar, Button } from '@rockshin/tao-ui';
+import { useState } from 'react';
+export default function Demo() {
+  const [mode, setMode] = useState<'month' | 'year'>('year');
+  return (
+    <div>
+      <Button onClick={() => setMode(mode === 'year' ? 'month' : 'year')}>
+        Switch view
+      </Button>
+      <Calendar
+        mode={mode}
+        showWeek
+        onPanelChange={(_, next) => setMode(next)}
+      />
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="calendar-header">
+
+### 自定义页头
+
+页头回调提供值和模式更新方法，可接入自己的业务工具栏。
+
+```tsx preview
+import { Calendar, Button, Stack } from '@rockshin/tao-ui';
+export default function Demo() {
+  return (
+    <Calendar
+      fullscreen={false}
+      headerRender={({ value, onChange }) => (
+        <Stack direction="horizontal" gap="sm" align="center">
+          <Button
+            size="small"
+            variant="ghost"
+            onClick={() => onChange(value.subtract(1, 'month'))}
+          >
+            Previous
+          </Button>
+          <span>{value.format('YYYY-MM')}</span>
+          <Button
+            size="small"
+            variant="ghost"
+            onClick={() => onChange(value.add(1, 'month'))}
+          >
+            Next
+          </Button>
+        </Stack>
+      )}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="calendar-phone">
+
+### 手机与语言
+
+中文语言与紧凑月历继承提供者配置。
+
+```tsx preview="iframe-follow"
+import { Calendar, TaoProvider, zhCN } from '@rockshin/tao-ui';
+export default function Demo() {
+  return (
+    <TaoProvider locale={zhCN}>
+      <Calendar fullscreen={false} />
+    </TaoProvider>
+  );
+}
+```
+
+</section>
+
+</div>
+
+## API
+
+<API moduleName="calendar" />

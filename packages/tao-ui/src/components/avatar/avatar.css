@@ -1,0 +1,83 @@
+@layer components {
+  [data-tao-avatar] {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    box-sizing: border-box;
+    overflow: hidden;
+    width: var(--tao-control-height);
+    height: var(--tao-control-height);
+    color: var(--tao-color-text-secondary);
+    background: var(--tao-color-bg-container-disabled);
+    font-family: var(--tao-font-family);
+    font-size: var(--tao-font-size);
+    line-height: 1;
+    vertical-align: middle;
+    border-radius: 50%;
+  }
+  [data-tao-avatar][data-tao-shape="square"] {
+    border-radius: var(--tao-radius);
+  }
+  [data-tao-avatar][data-tao-size="small"] {
+    width: var(--tao-control-height-sm);
+    height: var(--tao-control-height-sm);
+    font-size: var(--tao-font-size-sm);
+  }
+  [data-tao-avatar][data-tao-size="large"] {
+    width: var(--tao-control-height-lg);
+    height: var(--tao-control-height-lg);
+    font-size: var(--tao-font-size-lg);
+  }
+  [data-tao-avatar] > img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  [data-tao-avatar-icon] {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 0;
+    font-size: 1.3em;
+  }
+  [data-tao-avatar-icon] > svg {
+    width: 1em;
+    height: 1em;
+  }
+  [data-tao-avatar-content] {
+    display: inline-block;
+    white-space: nowrap;
+    transform-origin: center;
+  }
+  [data-tao-avatar-group],
+  [data-tao-avatar-overflow-list] {
+    display: inline-flex;
+    align-items: center;
+  }
+  [data-tao-avatar-group] > [data-tao-avatar],
+  [data-tao-avatar-overflow] > [data-tao-avatar] {
+    border: calc(var(--tao-line-width) * 2) solid var(--tao-color-bg-container);
+  }
+  [data-tao-avatar-group] > * + * {
+    margin-inline-start: calc(var(--tao-margin-xs) * -1);
+  }
+  [data-tao-avatar-overflow] {
+    display: inline-flex;
+    padding: 0;
+    background: none;
+    border: 0;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+  [data-tao-avatar-overflow]:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 var(--tao-ring-width) var(--tao-control-outline);
+  }
+  [data-tao-avatar-overflow-list] {
+    gap: var(--tao-margin-xs);
+    flex-wrap: wrap;
+  }
+}

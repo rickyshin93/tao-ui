@@ -1,0 +1,255 @@
+---
+
+title: TimePicker
+
+description: "选择时间或时间范围，支持步长、不可选时段、格式和确认流程。"
+
+---
+
+import Preview from '../../_components/demo-preview';
+
+选择时间或时间范围，支持步长、不可选时段、格式和确认流程。
+
+新增 API 对齐 Ant Design 6.7.0，外观、主题与 Semantic DOM 使用 tao-ui。既有组件 API 保持原样。
+
+## 代码演示
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="time-picker-controlled">
+
+### 受控时间与清除
+
+值使用 Dayjs，清除时返回 null。
+
+```tsx preview
+import { TimePicker } from '@rockshin/tao-ui';
+import dayjs, { type Dayjs } from 'dayjs';
+import { useState } from 'react';
+export default function Demo() {
+  const [value, setValue] = useState<Dayjs | null>(
+    dayjs('2026-11-04T09:30:00'),
+  );
+  return (
+    <div>
+      <TimePicker value={value} onChange={setValue} />
+      <p>{value?.format('HH:mm:ss') ?? 'No time selected'}</p>
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="time-picker-formats">
+
+### 时分与 12 小时制
+
+format 决定显示的时间列；use12Hours 显示上午和下午。
+
+```tsx preview
+import { TimePicker, Stack } from '@rockshin/tao-ui';
+import dayjs from 'dayjs';
+export default function Demo() {
+  return (
+    <Stack gap="md">
+      <TimePicker format="HH:mm" defaultValue={dayjs('2026-11-04T09:30:00')} />
+      <TimePicker
+        use12Hours
+        format="h:mm a"
+        defaultValue={dayjs('2026-11-04T15:00:00')}
+      />
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="time-picker-steps">
+
+### 时间步长
+
+按 2 小时、15 分钟和 10 秒划分选项。
+
+```tsx preview
+import { TimePicker } from '@rockshin/tao-ui';
+export default function Demo() {
+  return <TimePicker hourStep={2} minuteStep={15} secondStep={10} />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="time-picker-disabled-time">
+
+### 工作时间限制
+
+限制上午 9 点至下午 6 点，并隐藏禁用的选项。
+
+```tsx preview
+import { TimePicker } from '@rockshin/tao-ui';
+export default function Demo() {
+  return (
+    <TimePicker
+      format="HH:mm"
+      hideDisabledOptions
+      disabledTime={() => ({
+        disabledHours: () =>
+          Array.from({ length: 24 }, (_, i) => i).filter(
+            (i) => i < 9 || i > 18,
+          ),
+        disabledMinutes: (hour) =>
+          hour === 18 ? Array.from({ length: 59 }, (_, i) => i + 1) : [],
+      })}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="time-picker-sizes">
+
+### 三种尺寸
+
+新增兼容组件的尺寸为 small、middle、large；省略时继承 TaoProvider。
+
+```tsx preview
+import { TimePicker, Stack } from '@rockshin/tao-ui';
+export default function Demo() {
+  return (
+    <Stack gap="md">
+      {(['small', 'middle', 'large'] as const).map((size) => (
+        <TimePicker key={size} size={size} format="HH:mm" placeholder={size} />
+      ))}
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="time-picker-variants">
+
+### 外观与状态
+
+外观、错误状态和禁用状态可以组合使用。
+
+```tsx preview
+import { TimePicker, Stack } from '@rockshin/tao-ui';
+export default function Demo() {
+  return (
+    <Stack gap="md">
+      <TimePicker variant="filled" />
+      <TimePicker variant="underlined" status="warning" />
+      <TimePicker status="error" />
+      <TimePicker disabled />
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="time-picker-range">
+
+### 时间范围
+
+RangePicker 同时提交开始与结束时间。
+
+```tsx preview
+import { TimePicker } from '@rockshin/tao-ui';
+import { useState } from 'react';
+export default function Demo() {
+  const [label, setLabel] = useState('Choose a range');
+  return (
+    <div>
+      <TimePicker.RangePicker
+        format="HH:mm"
+        minuteStep={15}
+        onChange={(_, strings) =>
+          setLabel(strings ? strings.join(' → ') : 'Cleared')
+        }
+      />
+      <p>{label}</p>
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="time-picker-confirmation">
+
+### 确认与立即选择
+
+needConfirm 控制是否先选择再确认。
+
+```tsx preview
+import { TimePicker, Stack } from '@rockshin/tao-ui';
+export default function Demo() {
+  return (
+    <Stack gap="md">
+      <TimePicker needConfirm format="HH:mm" placeholder="Confirm a time" />
+      <TimePicker
+        needConfirm={false}
+        format="HH:mm"
+        placeholder="Select immediately"
+      />
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="time-picker-footer">
+
+### 面板说明
+
+使用 renderExtraFooter 提供与选择有关的说明。
+
+```tsx preview
+import { TimePicker } from '@rockshin/tao-ui';
+export default function Demo() {
+  return (
+    <TimePicker
+      format="HH:mm"
+      renderExtraFooter={() => (
+        <span>All appointments use your local time.</span>
+      )}
+      styles={{ popup: { root: { maxWidth: 320 } } }}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="time-picker-phone">
+
+### 手机视口与中文
+
+示例在独立 iframe 中运行；切换手机与桌面观察弹层布局。
+
+```tsx preview="iframe-follow"
+import { TimePicker, TaoProvider, zhCN } from '@rockshin/tao-ui';
+export default function Demo() {
+  return (
+    <TaoProvider locale={zhCN}>
+      <div style={{ padding: 16 }}>
+        <TimePicker.RangePicker format="HH:mm" style={{ width: '100%' }} />
+      </div>
+    </TaoProvider>
+  );
+}
+```
+
+</section>
+
+</div>
+
+## API
+
+<API moduleName="time-picker" />

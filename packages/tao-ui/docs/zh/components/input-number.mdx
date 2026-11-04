@@ -3,6 +3,8 @@ title: InputNumber
 description: 输入并格式化货币、百分比及其他数值。页面涵盖适用场景、设计建议、多组可运行示例、交互状态与完整 API 参考。
 ---
 
+import Preview from '../../_components/demo-preview';
+
 输入并格式化货币、百分比及其他数值。
 
 ## 何时使用
@@ -18,7 +20,13 @@ description: 输入并格式化货币、百分比及其他数值。页面涵盖�
 
 - 普通文本或编号标识不要使用数值输入。
 
-## 基础用法
+## 代码演示
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="input-number-example-1">
+
+### 基础用法
 
 ```tsx preview
 import { InputNumber } from '@rockshin/tao-ui';
@@ -42,7 +50,11 @@ function InputNumberExample() {
 export default InputNumberExample;
 ```
 
-## 货币与百分比
+</section>
+
+<section className="tao-example" id="input-number-example-2">
+
+### 货币与百分比
 
 ```tsx preview
 import { InputNumber, Stack } from '@rockshin/tao-ui';
@@ -56,7 +68,12 @@ function InputNumberFormats() {
         decimalPlaces={2}
         thousandsSeparator=","
       />
-      <InputNumber defaultValue="0.42" isPercentage suffix="%" decimalPlaces={1} />
+      <InputNumber
+        defaultValue="0.42"
+        isPercentage
+        suffix="%"
+        decimalPlaces={1}
+      />
     </Stack>
   );
 }
@@ -64,7 +81,11 @@ function InputNumberFormats() {
 export default InputNumberFormats;
 ```
 
-## 尺寸、变体与范围
+</section>
+
+<section className="tao-example" id="input-number-example-3">
+
+### 尺寸、变体与范围
 
 ```tsx preview
 import { InputNumber, Stack } from '@rockshin/tao-ui';
@@ -73,7 +94,13 @@ function InputNumberStates() {
   return (
     <Stack gap="md">
       <InputNumber size="small" variant="outlined" placeholder="Small" />
-      <InputNumber size="medium" variant="filled" min={0} max={100} defaultValue="50" />
+      <InputNumber
+        size="medium"
+        variant="filled"
+        min={0}
+        max={100}
+        defaultValue="50"
+      />
       <InputNumber size="large" variant="borderless" error defaultValue="120" />
     </Stack>
   );
@@ -81,6 +108,312 @@ function InputNumberStates() {
 
 export default InputNumberStates;
 ```
+
+</section>
+
+<section className="tao-example" id="input-number-currency">
+
+### 货币格式
+
+千位分隔符、两位小数和前缀只改变展示，输出值便于业务计算。
+
+```tsx preview
+import { useState } from 'react';
+
+import { InputNumber } from '@rockshin/tao-ui';
+
+function ControlledWrapper(props: React.ComponentProps<typeof InputNumber>) {
+  const [value, setValue] = useState((props.value as string | undefined) ?? '');
+  return (
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 12,
+        minWidth: 0,
+        width: '100%',
+        maxWidth: 320,
+      }}
+    >
+      <InputNumber
+        {...props}
+        value={value}
+        onChange={(v) => {
+          setValue(v);
+          props.onChange?.(v);
+        }}
+      />
+      <code
+        style={{
+          background: 'var(--tao-color-bg-container)',
+          padding: 8,
+          borderRadius: 4,
+        }}
+      >
+        actual value: {JSON.stringify(value)}
+      </code>
+    </div>
+  );
+}
+
+export default function InputNumberCurrency() {
+  const args: React.ComponentProps<typeof InputNumber> = {
+    prefix: '€',
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+    decimalPlaces: 2,
+    value: '150000',
+    placeholder: 'Amount',
+  };
+  return <ControlledWrapper {...args} />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="input-number-with-suffix">
+
+### 前后缀
+
+用前后缀表达单位，避免将单位混入业务数值。
+
+```tsx preview
+import { useState } from 'react';
+
+import { InputNumber } from '@rockshin/tao-ui';
+
+function ControlledWrapper(props: React.ComponentProps<typeof InputNumber>) {
+  const [value, setValue] = useState((props.value as string | undefined) ?? '');
+  return (
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 12,
+        minWidth: 0,
+        width: '100%',
+        maxWidth: 320,
+      }}
+    >
+      <InputNumber
+        {...props}
+        value={value}
+        onChange={(v) => {
+          setValue(v);
+          props.onChange?.(v);
+        }}
+      />
+      <code
+        style={{
+          background: 'var(--tao-color-bg-container)',
+          padding: 8,
+          borderRadius: 4,
+        }}
+      >
+        actual value: {JSON.stringify(value)}
+      </code>
+    </div>
+  );
+}
+
+export default function InputNumberWithSuffix() {
+  const args: React.ComponentProps<typeof InputNumber> = {
+    suffix: 'USD',
+    prefix: '$',
+    decimalPlaces: 2,
+    placeholder: 'Try 1234567',
+  };
+  return <ControlledWrapper {...args} />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="input-number-sizes">
+
+### 三种尺寸
+
+比较三种输入尺寸，数值处理规则保持一致。
+
+```tsx preview
+import { InputNumber } from '@rockshin/tao-ui';
+
+export default function InputNumberSizes() {
+  const args: React.ComponentProps<typeof InputNumber> = {
+    thousandsSeparator: ',',
+  };
+  return (
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 12,
+        minWidth: 0,
+        width: '100%',
+        maxWidth: 320,
+      }}
+    >
+      <InputNumber {...args} size="small" prefix="¥" value="1000" />
+      <InputNumber {...args} size="medium" prefix="¥" value="1000" />
+      <InputNumber {...args} size="large" prefix="¥" value="1000" />
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="input-number-variants">
+
+### 外观变体
+
+在不同外观下使用相同的受控输入逻辑。
+
+```tsx preview
+import { InputNumber } from '@rockshin/tao-ui';
+
+export default function InputNumberVariants() {
+  const args: React.ComponentProps<typeof InputNumber> = {
+    thousandsSeparator: ',',
+  };
+  return (
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 12,
+        minWidth: 0,
+        width: '100%',
+        maxWidth: 320,
+      }}
+    >
+      <InputNumber {...args} variant="outlined" prefix="¥" value="1000" />
+      <InputNumber {...args} variant="filled" prefix="¥" value="1000" />
+      <InputNumber {...args} variant="borderless" prefix="¥" value="1000" />
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="input-number-percentage">
+
+### 百分比
+
+配置小数精度和百分号后缀，本例不自动换算百分比与小数。
+
+```tsx preview
+import { useState } from 'react';
+
+import { InputNumber } from '@rockshin/tao-ui';
+
+function ControlledWrapper(props: React.ComponentProps<typeof InputNumber>) {
+  const [value, setValue] = useState((props.value as string | undefined) ?? '');
+  return (
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 12,
+        minWidth: 0,
+        width: '100%',
+        maxWidth: 320,
+      }}
+    >
+      <InputNumber
+        {...props}
+        value={value}
+        onChange={(v) => {
+          setValue(v);
+          props.onChange?.(v);
+        }}
+      />
+      <code
+        style={{
+          background: 'var(--tao-color-bg-container)',
+          padding: 8,
+          borderRadius: 4,
+        }}
+      >
+        actual value: {JSON.stringify(value)}
+      </code>
+    </div>
+  );
+}
+
+export default function InputNumberPercentage() {
+  const args: React.ComponentProps<typeof InputNumber> = {
+    isPercentage: true,
+    decimalPlaces: 2,
+    suffix: '%',
+    placeholder: 'Type 50 → actual is 0.5',
+  };
+  return <ControlledWrapper {...args} />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="input-number-clamped-range">
+
+### 数值上下限
+
+设置允许的范围，输入和失焦后的值应遵循范围配置。
+
+```tsx preview
+import { useState } from 'react';
+
+import { InputNumber } from '@rockshin/tao-ui';
+
+function ControlledWrapper(props: React.ComponentProps<typeof InputNumber>) {
+  const [value, setValue] = useState((props.value as string | undefined) ?? '');
+  return (
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 12,
+        minWidth: 0,
+        width: '100%',
+        maxWidth: 320,
+      }}
+    >
+      <InputNumber
+        {...props}
+        value={value}
+        onChange={(v) => {
+          setValue(v);
+          props.onChange?.(v);
+        }}
+      />
+      <code
+        style={{
+          background: 'var(--tao-color-bg-container)',
+          padding: 8,
+          borderRadius: 4,
+        }}
+      >
+        actual value: {JSON.stringify(value)}
+      </code>
+    </div>
+  );
+}
+
+export default function InputNumberClampedRange() {
+  const args: React.ComponentProps<typeof InputNumber> = {
+    min: 0,
+    max: 100,
+    decimalPlaces: 0,
+    placeholder: 'Type 999, blur to clamp to 100',
+  };
+  return <ControlledWrapper {...args} />;
+}
+```
+
+</section>
+
+</div>
 
 ## API
 

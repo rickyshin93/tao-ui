@@ -3,6 +3,8 @@ title: FormSection
 description: "Groups related form fields with a title and optional description. Includes usage guidance, a runnable example, and the complete API reference."
 ---
 
+import Preview from '../../_components/demo-preview';
+
 Groups related form fields with a title and optional description.
 
 ## When to use
@@ -18,7 +20,13 @@ Use FormSection to break long forms into scannable groups.
 
 - Do not use the component outside its intended interaction model.
 
-## Basic usage
+## Examples
+
+<div className="tao-demo-grid tao-demo-grid-wide">
+
+<section className="tao-example" id="form-section-example-1">
+
+### Basic usage
 
 ```tsx preview
 import { FormField, FormSection, Input } from '@rockshin/tao-ui';
@@ -39,7 +47,11 @@ function FormSectionExample() {
 export default FormSectionExample;
 ```
 
-## Multiple field groups
+</section>
+
+<section className="tao-example" id="form-section-example-2">
+
+### Multiple field groups
 
 ```tsx preview
 import { FormField, FormSection, Input, Stack } from '@rockshin/tao-ui';
@@ -52,7 +64,10 @@ function FormSectionGroups() {
           <Input placeholder="Rihua Chen" />
         </FormField>
       </FormSection>
-      <FormSection title="Contact" description="Where account notices are sent.">
+      <FormSection
+        title="Contact"
+        description="Where account notices are sent."
+      >
         <FormField label="Email">
           <Input placeholder="you@example.com" />
         </FormField>
@@ -64,7 +79,11 @@ function FormSectionGroups() {
 export default FormSectionGroups;
 ```
 
-## Semantic parts
+</section>
+
+<section className="tao-example" id="form-section-example-3">
+
+### Semantic parts
 
 ```tsx preview
 import { FormSection } from '@rockshin/tao-ui';
@@ -87,6 +106,121 @@ function CustomizedFormSection() {
 
 export default CustomizedFormSection;
 ```
+
+</section>
+
+<section className="tao-example" id="form-section-native-form">
+
+### Complete form composition
+
+Compose layout, fields, and actions with native submission feedback.
+
+```tsx preview
+import { useState } from 'react';
+import {
+  FormLayout,
+  FormSection,
+  FormField,
+  FormActions,
+  Input,
+  Textarea,
+  Button,
+} from '@rockshin/tao-ui';
+export default function Example() {
+  const [saved, setSaved] = useState('');
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        setSaved(String(new FormData(e.currentTarget).get('name')));
+      }}
+      onReset={() => setSaved('')}
+    >
+      <FormLayout>
+        <FormSection title="Profile" description="Public workspace information">
+          <FormField label="Display name" required>
+            <Input name="name" required defaultValue="Alex" />
+          </FormField>
+          <FormField label="Bio" description="A short introduction">
+            <Textarea name="bio" autoSize />
+          </FormField>
+        </FormSection>
+        <FormActions>
+          <Button type="reset">Reset</Button>
+          <Button type="submit" variant="primary">
+            Save
+          </Button>
+        </FormActions>
+        <output aria-live="polite">
+          {saved ? `Saved ${saved}` : 'No changes saved'}
+        </output>
+      </FormLayout>
+    </form>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="form-section-optional-description">
+
+### Optional descriptions
+
+A title can stand alone; add description when extra context helps.
+
+```tsx preview
+import { FormSection, FormLayout, Input } from '@rockshin/tao-ui';
+export default function Example() {
+  return (
+    <FormLayout>
+      <FormSection title="Contact">
+        <Input aria-label="Contact address" />
+      </FormSection>
+      <FormSection
+        title="Internal notes"
+        description="Visible to workspace members only"
+      >
+        <Input aria-label="Internal notes" />
+      </FormSection>
+    </FormLayout>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="form-section-semantic">
+
+### Section styling
+
+Use header and body semantic parts to style a section.
+
+```tsx preview
+import { FormSection, FormField, Input } from '@rockshin/tao-ui';
+export default function Example() {
+  return (
+    <FormSection
+      title="Billing"
+      styles={{
+        root: {
+          border: '1px solid var(--tao-color-border)',
+          borderRadius: 6,
+          padding: 16,
+        },
+        body: { paddingTop: 8 },
+      }}
+    >
+      <FormField label="Company">
+        <Input />
+      </FormField>
+    </FormSection>
+  );
+}
+```
+
+</section>
+
+</div>
 
 ## API
 

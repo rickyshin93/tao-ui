@@ -3,6 +3,8 @@ title: ContextMenu
 description: "Displays contextual actions from a right click or long press interaction. Includes usage guidance, a runnable example, and the complete API reference."
 ---
 
+import Preview from '../../_components/demo-preview';
+
 Displays contextual actions from a right click or long press interaction.
 
 ## When to use
@@ -18,7 +20,13 @@ Use ContextMenu for secondary actions attached to an object or region.
 
 - Do not put primary workflows only inside a context menu.
 
-## Basic usage
+## Examples
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="context-menu-example-1">
+
+### Basic usage
 
 ```tsx preview
 import { ContextMenu } from '@rockshin/tao-ui';
@@ -36,7 +44,13 @@ function ContextMenuExample() {
         ],
       }}
     >
-      <div style={{ padding: 32, border: '1px dashed var(--tao-color-border)', borderRadius: 8 }}>
+      <div
+        style={{
+          padding: 32,
+          border: '1px dashed var(--tao-color-border)',
+          borderRadius: 8,
+        }}
+      >
         Right-click this area
       </div>
     </ContextMenu>
@@ -46,7 +60,11 @@ function ContextMenuExample() {
 export default ContextMenuExample;
 ```
 
-## Groups, disabled items, and submenus
+</section>
+
+<section className="tao-example" id="context-menu-example-2">
+
+### Groups, disabled items, and submenus
 
 ```tsx preview
 import { ContextMenu } from '@rockshin/tao-ui';
@@ -77,7 +95,13 @@ function ContextMenuGroups() {
         ],
       }}
     >
-      <div style={{ padding: 32, border: '1px dashed var(--tao-color-border)', borderRadius: 8 }}>
+      <div
+        style={{
+          padding: 32,
+          border: '1px dashed var(--tao-color-border)',
+          borderRadius: 8,
+        }}
+      >
         Right-click for grouped actions
       </div>
     </ContextMenu>
@@ -87,7 +111,11 @@ function ContextMenuGroups() {
 export default ContextMenuGroups;
 ```
 
-## Selectable menu items
+</section>
+
+<section className="tao-example" id="context-menu-example-3">
+
+### Selectable menu items
 
 ```tsx preview
 import { ContextMenu } from '@rockshin/tao-ui';
@@ -109,7 +137,13 @@ function SelectableContextMenu() {
         ],
       }}
     >
-      <div style={{ padding: 32, border: '1px dashed var(--tao-color-border)', borderRadius: 8 }}>
+      <div
+        style={{
+          padding: 32,
+          border: '1px dashed var(--tao-color-border)',
+          borderRadius: 8,
+        }}
+      >
         Current density: {selected[0]}
       </div>
     </ContextMenu>
@@ -118,6 +152,178 @@ function SelectableContextMenu() {
 
 export default SelectableContextMenu;
 ```
+
+</section>
+
+<section className="tao-example" id="context-menu-groups-and-submenu">
+
+### Groups and submenus
+
+Organize actions with groups and nested `children`; mark destructive actions with `danger`. Right-click the area.
+
+```tsx preview
+import { ContextMenu } from '@rockshin/tao-ui';
+
+function Area({ children = 'Right-click here' }: { children?: string }) {
+  return (
+    <div
+      style={{
+        display: 'grid',
+        placeItems: 'center',
+        width: 320,
+        height: 160,
+        border: '1px dashed var(--tao-color-border)',
+        borderRadius: 8,
+        color: 'var(--tao-color-text-tertiary)',
+        fontSize: 13,
+        userSelect: 'none',
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+export default function ContextMenuGroupsAndSubmenu() {
+  return (
+    <ContextMenu
+      menu={{
+        items: [
+          {
+            type: 'group',
+            label: 'View',
+            children: [
+              { key: 'zoom-in', label: 'Zoom in' },
+              { key: 'zoom-out', label: 'Zoom out' },
+            ],
+          },
+          { type: 'divider' },
+          {
+            key: 'share',
+            label: 'Share',
+            children: [
+              { key: 'mail', label: 'Email' },
+              { key: 'link', label: 'Copy link' },
+            ],
+          },
+          { key: 'rename', label: 'Rename' },
+          { key: 'delete', label: 'Delete', danger: true },
+        ],
+      }}
+    >
+      <Area />
+    </ContextMenu>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="context-menu-selectable">
+
+### Selectable menu items
+
+Keep selection in `selectedKeys` and `onSelect`, for example for view preferences.
+
+```tsx preview
+import { ContextMenu } from '@rockshin/tao-ui';
+
+import { useState } from 'react';
+
+function Area({ children = 'Right-click here' }: { children?: string }) {
+  return (
+    <div
+      style={{
+        display: 'grid',
+        placeItems: 'center',
+        width: 320,
+        height: 160,
+        border: '1px dashed var(--tao-color-border)',
+        borderRadius: 8,
+        color: 'var(--tao-color-text-tertiary)',
+        fontSize: 13,
+        userSelect: 'none',
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+export default function ContextMenuSelectable() {
+  const [checked, setChecked] = useState<string[]>(['grid']);
+  return (
+    <ContextMenu
+      menu={{
+        selectable: true,
+        multiple: true,
+        selectedKeys: checked,
+        onSelect: ({ selectedKeys }) => setChecked(selectedKeys),
+        items: [
+          { key: 'grid', label: 'Show grid' },
+          { key: 'ruler', label: 'Show ruler' },
+          { key: 'guides', label: 'Show guides' },
+        ],
+      }}
+    >
+      <Area>{`Right-click — ${checked.length} shown`}</Area>
+    </ContextMenu>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="context-menu-disabled">
+
+### Disabled context menu
+
+`disabled` turns off the custom menu. Keep essential actions available outside a context menu.
+
+```tsx preview
+import { ContextMenu, type MenuItem } from '@rockshin/tao-ui';
+
+function Area({ children = 'Right-click here' }: { children?: string }) {
+  return (
+    <div
+      style={{
+        display: 'grid',
+        placeItems: 'center',
+        width: 320,
+        height: 160,
+        border: '1px dashed var(--tao-color-border)',
+        borderRadius: 8,
+        color: 'var(--tao-color-text-tertiary)',
+        fontSize: 13,
+        userSelect: 'none',
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+export default function ContextMenuDisabled() {
+  return (
+    <ContextMenu
+      menu={{
+        items: [
+          { key: 'undo', label: 'Undo', extra: '⌘Z' },
+          { key: 'redo', label: 'Redo', disabled: true, extra: '⇧⌘Z' },
+          { type: 'divider' },
+          { key: 'select-all', label: 'Select all', extra: '⌘A' },
+        ] as MenuItem[],
+      }}
+    >
+      <Area />
+    </ContextMenu>
+  );
+}
+```
+
+</section>
+
+</div>
 
 ## API
 

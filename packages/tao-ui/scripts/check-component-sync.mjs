@@ -27,6 +27,12 @@ const program = ts.createProgram(
   parsedTsConfig.options,
 );
 const typeChecker = program.getTypeChecker();
+const publicModule = typeChecker.getSymbolAtLocation(
+  program.getSourceFile(join(rootDir, 'src/index.tsx')),
+);
+const publicExports = new Set(
+  typeChecker.getExportsOfModule(publicModule).map((symbol) => symbol.name),
+);
 
 const ignoredValueExports = new Set([
   'cx',
@@ -73,14 +79,6 @@ function parseValueExports() {
   }
 
   return values;
-}
-
-function memberName(member) {
-  if (!member.name) return undefined;
-  if (ts.isIdentifier(member.name) || ts.isStringLiteral(member.name)) {
-    return member.name.text;
-  }
-  return undefined;
 }
 
 function semanticPartsFromType(node) {
@@ -131,7 +129,8 @@ function checkSemanticContract(doc) {
   const propsType = exportedDeclaration(
     sourceFile,
     propsTypeName,
-    ts.isInterfaceDeclaration,
+    (node) =>
+      ts.isInterfaceDeclaration(node) || ts.isTypeAliasDeclaration(node),
   );
 
   if (!semanticType) {
@@ -156,15 +155,15 @@ function checkSemanticContract(doc) {
   }
 
   if (!propsType) {
-    addViolation(doc.displayName, `Missing ${propsTypeName} interface.`);
+    addViolation(doc.displayName, `Missing ${propsTypeName} type.`);
     return;
   }
 
   for (const propName of ['classNames', 'styles']) {
-    const member = propsType.members.find(
-      (candidate) => memberName(candidate) === propName,
-    );
-    if (!member?.type) {
+    const member = typeChecker
+      .getTypeAtLocation(propsType)
+      .getProperty(propName);
+    if (!member) {
       addViolation(
         doc.displayName,
         `Missing ${propName} prop for ${semanticTypeName}.`,
@@ -212,7 +211,7 @@ for (const doc of docs) {
   }
 
   for (const exportName of doc.exports) {
-    if (!indexSource.includes(exportName)) {
+    if (!publicExports.has(exportName)) {
       addViolation(
         doc.displayName,
         `Documented export "${exportName}" is not exported from src/index.tsx.`,

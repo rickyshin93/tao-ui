@@ -1,0 +1,29 @@
+[data-tao-empty] {
+  padding-block: var(--tao-padding-lg);
+  color: var(--tao-color-text-secondary);
+  font-family: var(--tao-font-family);
+  font-size: var(--tao-font-size);
+  line-height: var(--tao-line-height);
+  text-align: center;
+}
+[data-tao-empty-image] {
+  height: 88px;
+  margin-block-end: var(--tao-margin-sm);
+  color: var(--tao-color-border);
+}
+[data-tao-empty-image] > :is(svg, img) {
+  display: inline-block;
+  max-width: 100%;
+  height: 100%;
+  object-fit: contain;
+  vertical-align: top;
+}
+[data-tao-empty][data-tao-simple] [data-tao-empty-image] {
+  height: 48px;
+}
+[data-tao-empty-description] {
+  overflow-wrap: anywhere;
+}
+[data-tao-empty-footer] {
+  margin-block-start: var(--tao-margin-md);
+}

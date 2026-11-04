@@ -1,0 +1,263 @@
+---
+title: Listy
+description: "Renders scrollable item collections with grouping and optional virtualization."
+---
+
+import Preview from '../../_components/demo-preview';
+
+Renders scrollable item collections with grouping and optional virtualization.
+
+## When to use
+
+Use for long scrollable collections. The data prop is items, each item needs a stable rowKey, and itemRender defines the row. Selection belongs to your row controls.
+
+## Examples
+
+<div className="tao-demo-grid tao-demo-grid-wide">
+
+<section className="tao-example" id="listy-example-1">
+
+### Basic items
+
+Virtualization is off by default. Set height to create a bounded scrolling region.
+
+```tsx preview="iframe-follow"
+import { Listy } from '@rockshin/tao-ui';
+const items = Array.from({ length: 60 }, (_, index) => ({
+  id: `item-${index}`,
+  name: `Record ${index + 1}`,
+  team: index < 20 ? 'Design' : index < 40 ? 'Engineering' : 'Operations',
+}));
+
+export default function Example() {
+  return (
+    <Listy
+      items={items.slice(0, 8)}
+      rowKey="id"
+      height={230}
+      itemRender={(item) => (
+        <span>
+          {item.name} · {item.team}
+        </span>
+      )}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="listy-example-2">
+
+### One thousand virtual rows
+
+virtual renders the visible window instead of mounting every row at once.
+
+```tsx preview
+import { Listy } from '@rockshin/tao-ui';
+
+const items = Array.from({ length: 1000 }, (_, index) => ({
+  id: index,
+  label: `Activity ${index + 1}`,
+}));
+export default function Example() {
+  return (
+    <Listy
+      virtual
+      items={items}
+      rowKey="id"
+      height={276}
+      itemRender={(item, index) => (
+        <span>
+          {item.label} <small>· row {index + 1}</small>
+        </span>
+      )}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="listy-example-3">
+
+### Grouped rows and sticky headings
+
+group.key chooses a group; group.title renders its header. sticky keeps the current heading visible inside this list.
+
+```tsx preview
+import { Listy } from '@rockshin/tao-ui';
+const items = Array.from({ length: 60 }, (_, index) => ({
+  id: `item-${index}`,
+  name: `Record ${index + 1}`,
+  team: index < 20 ? 'Design' : index < 40 ? 'Engineering' : 'Operations',
+}));
+
+export default function Example() {
+  return (
+    <Listy
+      items={items}
+      rowKey="id"
+      height={276}
+      virtual
+      sticky
+      group={{
+        key: (item) => item.team,
+        title: (team, records) => `${team} (${records.length})`,
+      }}
+      itemRender={(item) => item.name}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="listy-example-4">
+
+### Scroll to a record or group
+
+The ref accepts an item key, group key, numeric offset or a coordinate object.
+
+```tsx preview
+import { useRef } from 'react';
+import { Button, Listy, Stack } from '@rockshin/tao-ui';
+import type { ListyRef } from '@rockshin/tao-ui';
+const items = Array.from({ length: 60 }, (_, index) => ({
+  id: `item-${index}`,
+  name: `Record ${index + 1}`,
+  team: index < 20 ? 'Design' : index < 40 ? 'Engineering' : 'Operations',
+}));
+
+export default function Example() {
+  const ref = useRef<ListyRef>(null);
+  return (
+    <Stack gap="md">
+      <Stack direction="horizontal" gap="sm" style={{ flexWrap: 'wrap' }}>
+        <Button
+          variant="secondary"
+          onClick={() =>
+            ref.current?.scrollTo({ key: 'item-45', align: 'top' })
+          }
+        >
+          Record 46
+        </Button>
+        <Button
+          variant="secondary"
+          onClick={() =>
+            ref.current?.scrollTo({ groupKey: 'Engineering', align: 'top' })
+          }
+        >
+          Engineering
+        </Button>
+        <Button variant="secondary" onClick={() => ref.current?.scrollTo(0)}>
+          Top
+        </Button>
+      </Stack>
+      <Listy
+        ref={ref}
+        items={items}
+        rowKey="id"
+        height={230}
+        virtual
+        sticky
+        group={{ key: (item) => item.team, title: (team) => team }}
+        itemRender={(item) => item.name}
+      />
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="listy-example-5">
+
+### Wide content and RTL
+
+scrollWidth enables horizontal scrolling for rows wider than the viewport. Toggle direction to inspect RTL behavior.
+
+```tsx preview="iframe-follow"
+import { useState } from 'react';
+import { Button, Listy, Stack } from '@rockshin/tao-ui';
+const items = Array.from({ length: 60 }, (_, index) => ({
+  id: `item-${index}`,
+  name: `Record ${index + 1}`,
+  team: index < 20 ? 'Design' : index < 40 ? 'Engineering' : 'Operations',
+}));
+
+export default function Example() {
+  const [rtl, setRtl] = useState(false);
+  return (
+    <Stack gap="md">
+      <Button variant="secondary" onClick={() => setRtl((value) => !value)}>
+        {rtl ? 'Use LTR' : 'Use RTL'}
+      </Button>
+      <Listy
+        items={items.slice(0, 10)}
+        rowKey="id"
+        height={230}
+        scrollWidth={700}
+        direction={rtl ? 'rtl' : 'ltr'}
+        itemRender={(item) => (
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              gap: 32,
+            }}
+          >
+            <span>{item.name}</span>
+            <span>{item.team}</span>
+            <span>Updated today</span>
+          </div>
+        )}
+      />
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="listy-example-6">
+
+### Scroll events and semantic styles
+
+onScroll exposes the scrolling element. rowHoverable controls row highlighting.
+
+```tsx preview
+import { useState } from 'react';
+import { Listy, Stack } from '@rockshin/tao-ui';
+const items = Array.from({ length: 60 }, (_, index) => ({
+  id: `item-${index}`,
+  name: `Record ${index + 1}`,
+  team: index < 20 ? 'Design' : index < 40 ? 'Engineering' : 'Operations',
+}));
+
+export default function Example() {
+  const [offset, setOffset] = useState(0);
+  return (
+    <Stack gap="sm">
+      <output>Scroll offset: {Math.round(offset)} px</output>
+      <Listy
+        items={items}
+        rowKey="id"
+        height={230}
+        rowHoverable={false}
+        onScroll={(event) => setOffset(event.currentTarget.scrollTop)}
+        styles={{ root: { borderRadius: 12 }, item: { paddingInline: 20 } }}
+        itemRender={(item) => item.name}
+      />
+    </Stack>
+  );
+}
+```
+
+</section>
+
+</div>
+
+## API
+
+<API moduleName="listy" />

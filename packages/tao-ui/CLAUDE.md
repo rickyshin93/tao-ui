@@ -55,7 +55,7 @@ export interface ExampleProps {
 - CSS 变量前缀 `--tao-*`，data 属性 `data-tao-*`
 - theme.css 和 control.css 在 `src/index.tsx` 顶层统一导入，组件 CSS 不需要 `@import theme`
 - **不要动 package.json 的 `sideEffects`**——白名单里显式列了 `./dist/index.js` 和 `./src/index.tsx`，让 tree-shaker 保留入口的 CSS 副作用（否则 Storybook/rspack/esbuild 严格模式会悄悄丢掉 theme.css，组件全变透明；已复现过一次）。tree-shaking 按 export 粒度工作，未用到的组件仍会被剪掉，不影响体积。
-- 用 data 属性驱动样式，不用 className
+- 自有 DOM 用 data 属性驱动样式，不用 className。底层 rc 引擎生成的 DOM 无法注入 data 属性时，允许在组件的 `data-tao-*` 根作用域内匹配其稳定结构类；消费方的 `className` 仍仅用于语义定制。
 - 颜色用 OKLCH + `color-mix()`；**彩色 × 中性色（bg-base / bg-container）的混色用 `in oklab`**——`in oklch` 会按最短弧插值色相，低比例混色会被中性色的 hue（70 / 0）带偏，蓝色主题色变成粉/桃色灰（table hover、selected 已踩过）
 - 动画只允许 `opacity`, `transform`, `background-color`, `border-color`, `color`
 

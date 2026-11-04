@@ -3,6 +3,8 @@ title: HeadlessInputNumber
 description: "Headless numeric input primitives and hook for custom number entry experiences. Includes usage guidance, a runnable example, and the complete API reference."
 ---
 
+import Preview from '../../_components/demo-preview';
+
 Headless numeric input primitives and hook for custom number entry experiences.
 
 ## When to use
@@ -18,7 +20,13 @@ Use the headless API when tao-ui styling is not appropriate but number formattin
 
 - Do not use the component outside its intended interaction model.
 
-## Basic usage
+## Examples
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="headless-input-number-example-1">
+
+### Basic usage
 
 ```tsx preview
 import { HeadlessInputNumber } from '@rockshin/tao-ui';
@@ -42,7 +50,11 @@ function HeadlessInputNumberExample() {
 export default HeadlessInputNumberExample;
 ```
 
-## Formatting and affixes
+</section>
+
+<section className="tao-example" id="headless-input-number-example-2">
+
+### Formatting and affixes
 
 ```tsx preview
 import { HeadlessInputNumber, Stack } from '@rockshin/tao-ui';
@@ -70,7 +82,11 @@ function HeadlessNumberFormats() {
 export default HeadlessNumberFormats;
 ```
 
-## Locale separators and bounds
+</section>
+
+<section className="tao-example" id="headless-input-number-example-3">
+
+### Locale separators and bounds
 
 ```tsx preview
 import { HeadlessInputNumber, Stack } from '@rockshin/tao-ui';
@@ -84,13 +100,438 @@ function HeadlessNumberConstraints() {
         decimalSeparator=","
         decimalPlaces={2}
       />
-      <HeadlessInputNumber defaultValue="50" min={0} max={100} suffix=" units" />
+      <HeadlessInputNumber
+        defaultValue="50"
+        min={0}
+        max={100}
+        suffix=" units"
+      />
     </Stack>
   );
 }
 
 export default HeadlessNumberConstraints;
 ```
+
+</section>
+
+<section className="tao-example" id="headless-input-number-with-thousand-separator">
+
+### Thousands separators
+
+Configure grouping and decimal separators and compare display with the emitted value.
+
+```tsx preview
+import { useState } from 'react';
+
+import { HeadlessInputNumber } from '@rockshin/tao-ui';
+
+function ControlledWrapper(
+  props: React.ComponentProps<typeof HeadlessInputNumber>,
+) {
+  const [value, setValue] = useState((props.value as string | undefined) ?? '');
+  return (
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 12,
+        minWidth: 0,
+        width: '100%',
+        maxWidth: 320,
+      }}
+    >
+      <HeadlessInputNumber
+        {...props}
+        value={value}
+        onChange={(v) => {
+          setValue(v);
+          props.onChange?.(v);
+        }}
+      />
+      <code
+        style={{
+          background: 'var(--tao-color-bg-container)',
+          padding: 8,
+          borderRadius: 4,
+        }}
+      >
+        actual value: {JSON.stringify(value)}
+      </code>
+    </div>
+  );
+}
+
+export default function HeadlessInputNumberWithThousandSeparator() {
+  const args: React.ComponentProps<typeof HeadlessInputNumber> = {
+    placeholder: 'Try 1234567',
+    decimalPlaces: 2,
+    thousandsSeparator: ',',
+    decimalSeparator: '.',
+  };
+  return <ControlledWrapper {...args} />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="headless-input-number-with-prefix-suffix">
+
+### Affix formatting
+
+Configure unit or currency affixes while the headless input handles numeric values.
+
+```tsx preview
+import { useState } from 'react';
+
+import { HeadlessInputNumber } from '@rockshin/tao-ui';
+
+function ControlledWrapper(
+  props: React.ComponentProps<typeof HeadlessInputNumber>,
+) {
+  const [value, setValue] = useState((props.value as string | undefined) ?? '');
+  return (
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 12,
+        minWidth: 0,
+        width: '100%',
+        maxWidth: 320,
+      }}
+    >
+      <HeadlessInputNumber
+        {...props}
+        value={value}
+        onChange={(v) => {
+          setValue(v);
+          props.onChange?.(v);
+        }}
+      />
+      <code
+        style={{
+          background: 'var(--tao-color-bg-container)',
+          padding: 8,
+          borderRadius: 4,
+        }}
+      >
+        actual value: {JSON.stringify(value)}
+      </code>
+    </div>
+  );
+}
+
+export default function HeadlessInputNumberWithPrefixSuffix() {
+  const args: React.ComponentProps<typeof HeadlessInputNumber> = {
+    prefix: '$',
+    suffix: 'USD',
+    decimalPlaces: 2,
+  };
+  return <ControlledWrapper {...args} />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="headless-input-number-percentage">
+
+### Percentage values
+
+Use a percent suffix and precision; define percentage conversion in application logic.
+
+```tsx preview
+import { useState } from 'react';
+
+import { HeadlessInputNumber } from '@rockshin/tao-ui';
+
+function ControlledWrapper(
+  props: React.ComponentProps<typeof HeadlessInputNumber>,
+) {
+  const [value, setValue] = useState((props.value as string | undefined) ?? '');
+  return (
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 12,
+        minWidth: 0,
+        width: '100%',
+        maxWidth: 320,
+      }}
+    >
+      <HeadlessInputNumber
+        {...props}
+        value={value}
+        onChange={(v) => {
+          setValue(v);
+          props.onChange?.(v);
+        }}
+      />
+      <code
+        style={{
+          background: 'var(--tao-color-bg-container)',
+          padding: 8,
+          borderRadius: 4,
+        }}
+      >
+        actual value: {JSON.stringify(value)}
+      </code>
+    </div>
+  );
+}
+
+export default function HeadlessInputNumberPercentage() {
+  const args: React.ComponentProps<typeof HeadlessInputNumber> = {
+    isPercentage: true,
+    decimalPlaces: 2,
+    suffix: '%',
+    placeholder: 'Type 50 → actual is 0.5',
+  };
+  return <ControlledWrapper {...args} />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="headless-input-number-allow-negative">
+
+### Negative values
+
+Allow negative input and compare intermediate editing states with complete values.
+
+```tsx preview
+import { useState } from 'react';
+
+import { HeadlessInputNumber } from '@rockshin/tao-ui';
+
+function ControlledWrapper(
+  props: React.ComponentProps<typeof HeadlessInputNumber>,
+) {
+  const [value, setValue] = useState((props.value as string | undefined) ?? '');
+  return (
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 12,
+        minWidth: 0,
+        width: '100%',
+        maxWidth: 320,
+      }}
+    >
+      <HeadlessInputNumber
+        {...props}
+        value={value}
+        onChange={(v) => {
+          setValue(v);
+          props.onChange?.(v);
+        }}
+      />
+      <code
+        style={{
+          background: 'var(--tao-color-bg-container)',
+          padding: 8,
+          borderRadius: 4,
+        }}
+      >
+        actual value: {JSON.stringify(value)}
+      </code>
+    </div>
+  );
+}
+
+export default function HeadlessInputNumberAllowNegative() {
+  const args: React.ComponentProps<typeof HeadlessInputNumber> = {
+    allowNegative: true,
+    placeholder: 'Type -123.45',
+  };
+  return <ControlledWrapper {...args} />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="headless-input-number-clamped-range">
+
+### Range limits
+
+Constrain accepted values with bounds and observe blur behavior.
+
+```tsx preview
+import { useState } from 'react';
+
+import { HeadlessInputNumber } from '@rockshin/tao-ui';
+
+function ControlledWrapper(
+  props: React.ComponentProps<typeof HeadlessInputNumber>,
+) {
+  const [value, setValue] = useState((props.value as string | undefined) ?? '');
+  return (
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 12,
+        minWidth: 0,
+        width: '100%',
+        maxWidth: 320,
+      }}
+    >
+      <HeadlessInputNumber
+        {...props}
+        value={value}
+        onChange={(v) => {
+          setValue(v);
+          props.onChange?.(v);
+        }}
+      />
+      <code
+        style={{
+          background: 'var(--tao-color-bg-container)',
+          padding: 8,
+          borderRadius: 4,
+        }}
+      >
+        actual value: {JSON.stringify(value)}
+      </code>
+    </div>
+  );
+}
+
+export default function HeadlessInputNumberClampedRange() {
+  const args: React.ComponentProps<typeof HeadlessInputNumber> = {
+    min: 0,
+    max: 100,
+    decimalPlaces: 0,
+    placeholder: 'Type 999, blur to clamp to 100',
+  };
+  return <ControlledWrapper {...args} />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="headless-input-number-pad-on-blur-always">
+
+### Pad decimals on blur
+
+Pad decimal places to the configured precision when editing ends.
+
+```tsx preview
+import { useState } from 'react';
+
+import { HeadlessInputNumber } from '@rockshin/tao-ui';
+
+function ControlledWrapper(
+  props: React.ComponentProps<typeof HeadlessInputNumber>,
+) {
+  const [value, setValue] = useState((props.value as string | undefined) ?? '');
+  return (
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 12,
+        minWidth: 0,
+        width: '100%',
+        maxWidth: 320,
+      }}
+    >
+      <HeadlessInputNumber
+        {...props}
+        value={value}
+        onChange={(v) => {
+          setValue(v);
+          props.onChange?.(v);
+        }}
+      />
+      <code
+        style={{
+          background: 'var(--tao-color-bg-container)',
+          padding: 8,
+          borderRadius: 4,
+        }}
+      >
+        actual value: {JSON.stringify(value)}
+      </code>
+    </div>
+  );
+}
+
+export default function HeadlessInputNumberPadOnBlurAlways() {
+  const args: React.ComponentProps<typeof HeadlessInputNumber> = {
+    padDecimalsOnBlur: 'always',
+    decimalPlaces: 2,
+    placeholder: 'Type 5, blur to see 5.00',
+  };
+  return <ControlledWrapper {...args} />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="headless-input-number-european-locale">
+
+### Localized separators
+
+Use a dot for grouping and a comma for decimal separation.
+
+```tsx preview
+import { useState } from 'react';
+
+import { HeadlessInputNumber } from '@rockshin/tao-ui';
+
+function ControlledWrapper(
+  props: React.ComponentProps<typeof HeadlessInputNumber>,
+) {
+  const [value, setValue] = useState((props.value as string | undefined) ?? '');
+  return (
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 12,
+        minWidth: 0,
+        width: '100%',
+        maxWidth: 320,
+      }}
+    >
+      <HeadlessInputNumber
+        {...props}
+        value={value}
+        onChange={(v) => {
+          setValue(v);
+          props.onChange?.(v);
+        }}
+      />
+      <code
+        style={{
+          background: 'var(--tao-color-bg-container)',
+          padding: 8,
+          borderRadius: 4,
+        }}
+      >
+        actual value: {JSON.stringify(value)}
+      </code>
+    </div>
+  );
+}
+
+export default function HeadlessInputNumberEuropeanLocale() {
+  const args: React.ComponentProps<typeof HeadlessInputNumber> = {
+    decimalSeparator: ',',
+    thousandsSeparator: '.',
+    decimalPlaces: 2,
+    placeholder: '1.234,56',
+  };
+  return <ControlledWrapper {...args} />;
+}
+```
+
+</section>
+
+</div>
 
 ## API
 

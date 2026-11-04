@@ -3,6 +3,8 @@ title: FormLayout
 description: "Arranges form content with consistent label and control alignment. Includes usage guidance, a runnable example, and the complete API reference."
 ---
 
+import Preview from '../../_components/demo-preview';
+
 Arranges form content with consistent label and control alignment.
 
 ## When to use
@@ -18,10 +20,23 @@ Use FormLayout to keep dense forms aligned and predictable.
 
 - Do not use the component outside its intended interaction model.
 
-## Basic usage
+## Examples
+
+<div className="tao-demo-grid tao-demo-grid-wide">
+
+<section className="tao-example" id="form-layout-example-1">
+
+### Basic usage
 
 ```tsx preview
-import { Button, FormActions, FormField, FormLayout, FormSection, Input } from '@rockshin/tao-ui';
+import {
+  Button,
+  FormActions,
+  FormField,
+  FormLayout,
+  FormSection,
+  Input,
+} from '@rockshin/tao-ui';
 
 function FormLayoutExample() {
   return (
@@ -42,10 +57,21 @@ function FormLayoutExample() {
 export default FormLayoutExample;
 ```
 
-## Multiple sections
+</section>
+
+<section className="tao-example" id="form-layout-example-2">
+
+### Multiple sections
 
 ```tsx preview
-import { Button, FormActions, FormField, FormLayout, FormSection, Input } from '@rockshin/tao-ui';
+import {
+  Button,
+  FormActions,
+  FormField,
+  FormLayout,
+  FormSection,
+  Input,
+} from '@rockshin/tao-ui';
 
 function CompleteFormLayout() {
   return (
@@ -55,7 +81,10 @@ function CompleteFormLayout() {
           <Input placeholder="Rihua Chen" />
         </FormField>
       </FormSection>
-      <FormSection title="Contact" description="Used for account notifications.">
+      <FormSection
+        title="Contact"
+        description="Used for account notifications."
+      >
         <FormField label="Email" required>
           <Input placeholder="you@example.com" />
         </FormField>
@@ -71,7 +100,11 @@ function CompleteFormLayout() {
 export default CompleteFormLayout;
 ```
 
-## Semantic customization
+</section>
+
+<section className="tao-example" id="form-layout-example-3">
+
+### Semantic customization
 
 ```tsx preview
 import { Button, FormActions, FormLayout } from '@rockshin/tao-ui';
@@ -89,6 +122,136 @@ function CustomizedFormLayout() {
 
 export default CustomizedFormLayout;
 ```
+
+</section>
+
+<section className="tao-example" id="form-layout-native-form">
+
+### Complete form composition
+
+Compose layout, fields, and actions with native submission feedback.
+
+```tsx preview
+import { useState } from 'react';
+import {
+  FormLayout,
+  FormSection,
+  FormField,
+  FormActions,
+  Input,
+  Textarea,
+  Button,
+} from '@rockshin/tao-ui';
+export default function Example() {
+  const [saved, setSaved] = useState('');
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        setSaved(String(new FormData(e.currentTarget).get('name')));
+      }}
+      onReset={() => setSaved('')}
+    >
+      <FormLayout>
+        <FormSection title="Profile" description="Public workspace information">
+          <FormField label="Display name" required>
+            <Input name="name" required defaultValue="Alex" />
+          </FormField>
+          <FormField label="Bio" description="A short introduction">
+            <Textarea name="bio" autoSize />
+          </FormField>
+        </FormSection>
+        <FormActions>
+          <Button type="reset">Reset</Button>
+          <Button type="submit" variant="primary">
+            Save
+          </Button>
+        </FormActions>
+        <output aria-live="polite">
+          {saved ? `Saved ${saved}` : 'No changes saved'}
+        </output>
+      </FormLayout>
+    </form>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="form-layout-responsive-grid">
+
+### Responsive form columns
+
+Use CSS Grid on the semantic root to collapse to one column when space is limited.
+
+```tsx preview="iframe-follow"
+import { FormLayout, FormField, Input } from '@rockshin/tao-ui';
+export default function Example() {
+  return (
+    <FormLayout
+      styles={{
+        root: {
+          display: 'grid',
+          gridTemplateColumns:
+            'repeat(auto-fit, minmax(min(100%, 240px), 1fr))',
+          gap: 16,
+        },
+      }}
+    >
+      <FormField label="First name">
+        <Input />
+      </FormField>
+      <FormField label="Last name">
+        <Input />
+      </FormField>
+      <FormField label="Email">
+        <Input type="email" />
+      </FormField>
+      <FormField label="Organization">
+        <Input />
+      </FormField>
+    </FormLayout>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="form-layout-sections">
+
+### Grouped form sections
+
+Use section titles for hierarchy and the outer layout for spacing.
+
+```tsx preview
+import {
+  FormLayout,
+  FormSection,
+  FormField,
+  Input,
+  Switch,
+} from '@rockshin/tao-ui';
+export default function Example() {
+  return (
+    <FormLayout>
+      <FormSection title="Account" description="Identity and contact">
+        <FormField label="Name">
+          <Input />
+        </FormField>
+      </FormSection>
+      <FormSection title="Notifications" description="Delivery preferences">
+        <FormField label="Email updates">
+          <Switch aria-label="Email updates" defaultChecked />
+        </FormField>
+      </FormSection>
+    </FormLayout>
+  );
+}
+```
+
+</section>
+
+</div>
 
 ## API
 

@@ -3,6 +3,8 @@ title: Collapsible
 description: "Shows and hides a region of content while keeping disclosure state accessible. Includes usage guidance, a runnable example, and the complete API reference."
 ---
 
+import Preview from '../../_components/demo-preview';
+
 Shows and hides a region of content while keeping disclosure state accessible.
 
 ## When to use
@@ -18,7 +20,13 @@ Use Collapsible to hide secondary details while preserving a lightweight page la
 
 - Do not hide required form inputs in a collapsed region without a clear cue.
 
-## Basic usage
+## Examples
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="collapsible-example-1">
+
+### Basic usage
 
 ```tsx preview
 import { Collapsible } from '@rockshin/tao-ui';
@@ -29,7 +37,8 @@ function CollapsibleExample() {
       <Collapsible.Trigger>Toggle implementation details</Collapsible.Trigger>
       <Collapsible.Content>
         <p style={{ margin: '12px 0 0' }}>
-          The content remains mounted while its accessible disclosure state changes.
+          The content remains mounted while its accessible disclosure state
+          changes.
         </p>
       </Collapsible.Content>
     </Collapsible>
@@ -39,7 +48,11 @@ function CollapsibleExample() {
 export default CollapsibleExample;
 ```
 
-## Controlled state
+</section>
+
+<section className="tao-example" id="collapsible-example-2">
+
+### Controlled state
 
 ```tsx preview
 import { Button, Collapsible, Stack } from '@rockshin/tao-ui';
@@ -65,7 +78,11 @@ function ControlledCollapsible() {
 export default ControlledCollapsible;
 ```
 
-## Disabled disclosure
+</section>
+
+<section className="tao-example" id="collapsible-example-3">
+
+### Disabled disclosure
 
 ```tsx preview
 import { Collapsible, Stack } from '@rockshin/tao-ui';
@@ -75,11 +92,15 @@ function DisabledCollapsible() {
     <Stack gap="md">
       <Collapsible disabled>
         <Collapsible.Trigger>Unavailable details</Collapsible.Trigger>
-        <Collapsible.Content>This content cannot be opened.</Collapsible.Content>
+        <Collapsible.Content>
+          This content cannot be opened.
+        </Collapsible.Content>
       </Collapsible>
       <Collapsible defaultOpen>
         <Collapsible.Trigger>Open by default</Collapsible.Trigger>
-        <Collapsible.Content>Visible supporting information.</Collapsible.Content>
+        <Collapsible.Content>
+          Visible supporting information.
+        </Collapsible.Content>
       </Collapsible>
     </Stack>
   );
@@ -87,6 +108,167 @@ function DisabledCollapsible() {
 
 export default DisabledCollapsible;
 ```
+
+</section>
+
+<section className="tao-example" id="collapsible-controlled">
+
+### Controlled expansion
+
+Synchronize external actions and panel state with `open` and `onOpenChange`.
+
+```tsx preview
+import { Collapsible } from '@rockshin/tao-ui';
+
+import { useState } from 'react';
+
+const triggerStyle: React.CSSProperties = {
+  padding: '8px 12px',
+  border: '1px solid var(--tao-color-border)',
+  borderRadius: 'var(--tao-radius-md)',
+  background: 'var(--tao-color-bg-container)',
+};
+
+const panelStyle: React.CSSProperties = {
+  marginTop: 8,
+  padding: 12,
+  border: '1px solid var(--tao-color-border-secondary)',
+  borderRadius: 'var(--tao-radius-md)',
+};
+
+export default function CollapsibleControlled() {
+  const [open, setOpen] = useState(false);
+  return (
+    <div style={{ width: 320 }}>
+      <div style={{ marginBottom: 8 }}>State: {open ? 'open' : 'closed'}</div>
+      <Collapsible open={open} onOpenChange={setOpen}>
+        <Collapsible.Trigger style={triggerStyle}>
+          {open ? 'Hide' : 'Show'}
+        </Collapsible.Trigger>
+        <Collapsible.Content>
+          <div style={panelStyle}>Controlled from parent state.</div>
+        </Collapsible.Content>
+      </Collapsible>
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="collapsible-disabled">
+
+### Disabled disclosure
+
+`disabled` prevents toggling while allowing existing expanded content to remain readable.
+
+```tsx preview
+import { Collapsible } from '@rockshin/tao-ui';
+
+const triggerStyle: React.CSSProperties = {
+  padding: '8px 12px',
+  border: '1px solid var(--tao-color-border)',
+  borderRadius: 'var(--tao-radius-md)',
+  background: 'var(--tao-color-bg-container)',
+};
+
+const panelStyle: React.CSSProperties = {
+  marginTop: 8,
+  padding: 12,
+  border: '1px solid var(--tao-color-border-secondary)',
+  borderRadius: 'var(--tao-radius-md)',
+};
+
+export default function CollapsibleDisabled() {
+  return (
+    <Collapsible disabled>
+      <Collapsible.Trigger style={triggerStyle}>
+        Can't toggle
+      </Collapsible.Trigger>
+      <Collapsible.Content>
+        <div style={panelStyle}>You should never see this.</div>
+      </Collapsible.Content>
+    </Collapsible>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="collapsible-with-chevron">
+
+### Custom trigger content
+
+Combine a title, summary, and direction indicator in one accessible trigger.
+
+```tsx preview
+import { Collapsible } from '@rockshin/tao-ui';
+
+const panelStyle: React.CSSProperties = {
+  marginTop: 8,
+  padding: 12,
+  border: '1px solid var(--tao-color-border-secondary)',
+  borderRadius: 'var(--tao-radius-md)',
+};
+
+function Chevron() {
+  return (
+    <span data-tao-collapsible-chevron="">
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <path d="m6 9 6 6 6-6" />
+      </svg>
+    </span>
+  );
+}
+
+export default function CollapsibleWithChevron() {
+  return (
+    <Collapsible defaultOpen>
+      <Collapsible.Trigger asChild>
+        <button
+          type="button"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 8,
+            padding: '8px 12px',
+            border: '1px solid var(--tao-color-border)',
+            borderRadius: 'var(--tao-radius-md)',
+            background: 'var(--tao-color-bg-container)',
+            cursor: 'pointer',
+            font: 'inherit',
+            color: 'var(--tao-color-text)',
+          }}
+        >
+          <span style={{ fontWeight: 500 }}>Order #4189</span>
+          <Chevron />
+        </button>
+      </Collapsible.Trigger>
+      <Collapsible.Content>
+        <div style={panelStyle}>
+          <div>Status: Shipped</div>
+          <div>Carrier: Tao Express</div>
+        </div>
+      </Collapsible.Content>
+    </Collapsible>
+  );
+}
+```
+
+</section>
+
+</div>
 
 ## API
 

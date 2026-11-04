@@ -3,6 +3,8 @@ title: FormField
 description: "Associates labels, help text, validation state, and controls. Includes usage guidance, a runnable example, and the complete API reference."
 ---
 
+import Preview from '../../_components/demo-preview';
+
 Associates labels, help text, validation state, and controls.
 
 ## When to use
@@ -18,7 +20,13 @@ Use FormField to provide accessible labeling and status text around a single con
 
 - Do not use the component outside its intended interaction model.
 
-## Basic usage
+## Examples
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="form-field-example-1">
+
+### Basic usage
 
 ```tsx preview
 import { FormField, Input } from '@rockshin/tao-ui';
@@ -38,7 +46,11 @@ function FormFieldExample() {
 export default FormFieldExample;
 ```
 
-## Description and error states
+</section>
+
+<section className="tao-example" id="form-field-example-2">
+
+### Description and error states
 
 ```tsx preview
 import { FormField, Input, Stack } from '@rockshin/tao-ui';
@@ -49,7 +61,11 @@ function FormFieldStates() {
       <FormField label="Workspace name" description="Visible to all members.">
         <Input placeholder="Acme Design" />
       </FormField>
-      <FormField label="Slug" required error="Use lowercase letters and hyphens only.">
+      <FormField
+        label="Slug"
+        required
+        error="Use lowercase letters and hyphens only."
+      >
         <Input value="Acme Team" error readOnly />
       </FormField>
     </Stack>
@@ -59,7 +75,11 @@ function FormFieldStates() {
 export default FormFieldStates;
 ```
 
-## Semantic parts
+</section>
+
+<section className="tao-example" id="form-field-example-3">
+
+### Semantic parts
 
 ```tsx preview
 import { FormField, Input } from '@rockshin/tao-ui';
@@ -81,6 +101,113 @@ function CustomizedFormField() {
 
 export default CustomizedFormField;
 ```
+
+</section>
+
+<section className="tao-example" id="form-field-native-form">
+
+### Complete form composition
+
+Compose layout, fields, and actions with native submission feedback.
+
+```tsx preview
+import { useState } from 'react';
+import {
+  FormLayout,
+  FormSection,
+  FormField,
+  FormActions,
+  Input,
+  Textarea,
+  Button,
+} from '@rockshin/tao-ui';
+export default function Example() {
+  const [saved, setSaved] = useState('');
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        setSaved(String(new FormData(e.currentTarget).get('name')));
+      }}
+      onReset={() => setSaved('')}
+    >
+      <FormLayout>
+        <FormSection title="Profile" description="Public workspace information">
+          <FormField label="Display name" required>
+            <Input name="name" required defaultValue="Alex" />
+          </FormField>
+          <FormField label="Bio" description="A short introduction">
+            <Textarea name="bio" autoSize />
+          </FormField>
+        </FormSection>
+        <FormActions>
+          <Button type="reset">Reset</Button>
+          <Button type="submit" variant="primary">
+            Save
+          </Button>
+        </FormActions>
+        <output aria-live="polite">
+          {saved ? `Saved ${saved}` : 'No changes saved'}
+        </output>
+      </FormLayout>
+    </form>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="form-field-error">
+
+### Error feedback and recovery
+
+Update errors with input while the field label remains associated with its control.
+
+```tsx preview
+import { useState } from 'react';
+import { FormField, Input } from '@rockshin/tao-ui';
+export default function Example() {
+  const [value, setValue] = useState('');
+  return (
+    <FormField
+      label="Project code"
+      required
+      error={value.length < 3 ? 'Enter at least 3 characters' : undefined}
+    >
+      <Input value={value} onChange={(e) => setValue(e.target.value)} />
+    </FormField>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="form-field-explicit-id">
+
+### Explicit association
+
+Use htmlFor and an input id when integrating existing form identifiers; useId avoids duplicates.
+
+```tsx preview
+import { useId } from 'react';
+import { FormField, Input } from '@rockshin/tao-ui';
+export default function Example() {
+  const id = useId();
+  return (
+    <FormField
+      label="Account email"
+      htmlFor={id}
+      description="Used for account notifications"
+    >
+      <Input id={id} type="email" />
+    </FormField>
+  );
+}
+```
+
+</section>
+
+</div>
 
 ## API
 

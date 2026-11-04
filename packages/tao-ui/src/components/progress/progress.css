@@ -1,0 +1,170 @@
+[data-tao-progress] {
+  --tao-progress-color: var(--tao-color-primary);
+  --tao-progress-rail: var(--tao-color-fill-tertiary);
+  display: inline-block;
+  max-width: 100%;
+  color: var(--tao-color-text);
+  font-family: var(--tao-font-family);
+  font-size: var(--tao-font-size);
+  line-height: var(--tao-line-height);
+  font-variant-numeric: tabular-nums;
+}
+[data-tao-progress][data-tao-status="success"] {
+  --tao-progress-color: var(--tao-color-success);
+}
+[data-tao-progress][data-tao-status="exception"] {
+  --tao-progress-color: var(--tao-color-error);
+}
+[data-tao-progress][data-tao-type="line"] {
+  width: 100%;
+}
+[data-tao-progress-body] {
+  position: relative;
+  max-width: 100%;
+}
+[data-tao-type="line"] > [data-tao-progress-body] {
+  display: flex;
+  align-items: center;
+  gap: var(--tao-padding-xs);
+}
+[data-tao-type="line"] [data-tao-progress-rail] {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  background: var(--tao-progress-rail);
+  border-radius: var(--tao-radius);
+}
+[data-tao-type="line"] [data-tao-progress-track] {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  border-radius: inherit;
+  background: var(--tao-progress-color);
+}
+[data-tao-type="line"] [data-tao-progress-track][data-tao-success] {
+  background: var(--tao-color-success);
+}
+[data-tao-progress-indicator] {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+}
+[data-tao-status="success"] [data-tao-progress-indicator],
+[data-tao-status="exception"] [data-tao-progress-indicator] {
+  color: var(--tao-progress-color);
+}
+[data-tao-type="line"][data-tao-info-position="outer"][data-tao-info-align="start"]
+  [data-tao-progress-indicator] {
+  order: -1;
+}
+[data-tao-type="line"][data-tao-info-position="outer"][data-tao-info-align="center"]
+  > [data-tao-progress-body]:not([data-tao-progress-steps]) {
+  flex-direction: column;
+}
+[data-tao-type="line"][data-tao-info-position="outer"][data-tao-info-align="center"]
+  [data-tao-progress-rail] {
+  width: 100%;
+  flex: auto;
+}
+[data-tao-type="line"][data-tao-info-position="inner"]
+  [data-tao-progress-rail] {
+  min-height: calc(var(--tao-font-size) + 4px);
+}
+[data-tao-type="line"][data-tao-info-position="inner"]
+  [data-tao-progress-rail]
+  > [data-tao-progress-indicator] {
+  position: absolute;
+  inset-block: 1px;
+  inset-inline-end: 3px;
+  padding-inline: 3px;
+  border-radius: calc(var(--tao-radius) / 2);
+  color: var(--tao-color-text);
+  background: var(--tao-color-bg-container);
+  font-size: var(--tao-font-size-sm);
+  line-height: 1;
+}
+[data-tao-type="line"][data-tao-info-position="inner"][data-tao-info-align="start"]
+  [data-tao-progress-rail]
+  > [data-tao-progress-indicator] {
+  inset-inline-start: 3px;
+  inset-inline-end: auto;
+}
+[data-tao-type="line"][data-tao-info-position="inner"][data-tao-info-align="center"]
+  [data-tao-progress-rail]
+  > [data-tao-progress-indicator] {
+  inset-inline: 0;
+  width: max-content;
+  margin-inline: auto;
+}
+[data-tao-progress-steps] {
+  gap: 2px !important;
+  flex-wrap: wrap;
+}
+[data-tao-progress-step] {
+  display: block;
+  flex: none;
+  border-radius: 1px;
+  background: var(--tao-progress-rail);
+}
+[data-tao-progress-step][data-tao-active] {
+  background: var(--tao-progress-color);
+}
+[data-tao-progress-steps] [data-tao-progress-indicator] {
+  margin-inline-start: var(--tao-margin-xs);
+}
+[data-tao-progress-circle] {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+[data-tao-progress-circle] [data-tao-progress-rail] {
+  stroke: var(--tao-progress-rail);
+}
+[data-tao-progress-circle] [data-tao-progress-track],
+[data-tao-progress-circle] [data-tao-progress-step][data-tao-active] {
+  stroke: var(--tao-progress-color);
+}
+[data-tao-progress-circle] [data-tao-progress-step]:not([data-tao-active]) {
+  stroke: var(--tao-progress-rail);
+}
+[data-tao-progress-circle] [data-tao-progress-track][data-tao-success] {
+  stroke: var(--tao-color-success);
+}
+[data-tao-type="circle"] [data-tao-progress-indicator],
+[data-tao-type="dashboard"] [data-tao-progress-indicator] {
+  position: absolute;
+  inset: 0;
+}
+[data-tao-gap-placement="start"]:dir(rtl) > svg,
+[data-tao-gap-placement="end"]:dir(rtl) > svg {
+  transform: scaleX(-1);
+}
+[data-tao-type="line"][data-tao-status="active"]
+  [data-tao-progress-track]:not([data-tao-success])::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--tao-color-text-light-solid);
+  transform-origin: left;
+  animation: tao-progress-active calc(var(--tao-motion-unit) * 20) ease-out
+    infinite;
+}
+@keyframes tao-progress-active {
+  0% {
+    transform: scaleX(0);
+    opacity: 0.35;
+  }
+  100% {
+    transform: scaleX(1);
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-tao-progress-track]::after {
+    animation: none !important;
+  }
+}

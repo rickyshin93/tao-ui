@@ -8,6 +8,8 @@ import {
   useRef,
 } from 'react';
 import { type TaoTokenName, taoTokenVars } from '../theme/tokens';
+import { enUS, type TaoLocale } from './locale';
+export { enUS, zhCN, type TaoLocale } from './locale';
 
 // ---- Seed Token ----
 
@@ -121,6 +123,7 @@ export type TaoVariant = 'outlined' | 'filled' | 'borderless';
 export type TaoStatus = 'error' | 'warning';
 
 export interface TaoConfig {
+  locale: TaoLocale;
   size: TaoSize;
   disabled: boolean;
   variant: TaoVariant;
@@ -146,17 +149,20 @@ const TaoConfigContext = createContext<TaoConfigContextValue>({
   mode: 'light',
   compact: false,
   tokenStyle: {},
+  locale: enUS,
 });
 
 export function useTaoConfig(): TaoConfig {
-  const { size, disabled, variant, mode, compact } = useContext(TaoConfigContext);
+  const { size, disabled, variant, mode, compact, locale } =
+    useContext(TaoConfigContext);
   return useMemo(
-    () => ({ size, disabled, variant, mode, compact }),
-    [size, disabled, variant, mode, compact],
+    () => ({ size, disabled, variant, mode, compact, locale }),
+    [size, disabled, variant, mode, compact, locale],
   );
 }
 
-function useTaoInternalConfig(): TaoConfigContextValue {
+/** Internal component access for token propagation through third-party portals. */
+export function useTaoInternalConfig(): TaoConfigContextValue {
   return useContext(TaoConfigContext);
 }
 
@@ -227,6 +233,8 @@ export function TaoPortalScope({
 // ---- Provider ----
 
 export interface TaoProviderProps {
+  /** Select and calendar text; missing keys inherit from the parent (English at the root). */
+  locale?: Partial<TaoLocale>;
   children: ReactNode;
   theme?: TaoThemeConfig;
   size?: TaoSize;
@@ -268,7 +276,7 @@ const DEFAULT_TOKEN_STYLE = {
   '--tao-color-text-base': 'oklch(0.155 0.01 70)',
   '--tao-color-bg-surface': 'oklch(1 0 0)',
   '--tao-color-text-light-solid': 'oklch(0.985 0.004 70)',
-  '--tao-radius': '10px',
+  '--tao-radius': '6px',
   '--tao-font-size': '14px',
   '--tao-control-height': '32px',
   '--tao-size-unit': '4px',
@@ -310,6 +318,7 @@ function kebabCase(key: string): string {
 const UNITLESS_COMPONENT_TOKEN_KEYS = new Set(['fontWeight']);
 
 export function TaoProvider({
+  locale: localeProp,
   theme,
   size,
   disabled,
@@ -317,6 +326,13 @@ export function TaoProvider({
   children,
 }: TaoProviderProps) {
   const parentConfig = useContext(TaoConfigContext);
+  const locale = useMemo(
+    () =>
+      localeProp
+        ? { ...parentConfig.locale, ...localeProp }
+        : parentConfig.locale,
+    [parentConfig.locale, localeProp],
+  );
   const inherit = theme?.inherit ?? true;
   const themeKey = useStableThemeKey(theme?.token, theme?.components);
 
@@ -411,6 +427,7 @@ export function TaoProvider({
       mode,
       compact,
       tokenStyle,
+      locale,
     }),
     [
       size,
@@ -423,6 +440,7 @@ export function TaoProvider({
       mode,
       compact,
       tokenStyle,
+      locale,
     ],
   );
 

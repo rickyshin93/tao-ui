@@ -1,0 +1,139 @@
+---
+title: Divider
+description: "Separates content into readable sections or inline groups."
+---
+
+import Preview from '../../_components/demo-preview';
+
+Separates content into readable sections or inline groups.
+
+This native tao-ui component follows the public API of Ant Design 6.7.0. Appearance, theme tokens and Semantic DOM customization belong to tao-ui; configure themes with `TaoProvider`.
+
+Use titlePlacement for the title position and orientation for the axis. TaoProvider controls the default size.
+
+## When to use
+
+Use separators when nearby content has a meaningful boundary.
+
+## Examples
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="divider-example-1">
+
+### Sections and titles
+
+```tsx preview
+import { Divider } from "@rockshin/tao-ui";
+
+export default function Example() {
+  return (
+    <div>
+      <p>Workspace overview</p>
+      <Divider>Activity</Divider>
+      <p>Recent changes and updates.</p>
+      <Divider />
+      <p>End of report.</p>
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="divider-example-2">
+
+### Title placement
+
+```tsx preview
+import { Divider } from "@rockshin/tao-ui";
+
+export default function Example() {
+  return (
+    <div>
+      <Divider titlePlacement="start">Start</Divider>
+      <Divider titlePlacement="center">Center</Divider>
+      <Divider titlePlacement="end">End</Divider>
+      <Divider plain>Plain label</Divider>
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="divider-example-3">
+
+### Line styles and spacing
+
+```tsx preview
+import { Divider } from "@rockshin/tao-ui";
+
+export default function Example() {
+  return (
+    <div>
+      <Divider size="small">Small</Divider>
+      <Divider variant="dashed" size="medium">
+        Dashed
+      </Divider>
+      <Divider variant="dotted" size="large">
+        Dotted
+      </Divider>
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="divider-example-4">
+
+### Inline separators and RTL
+
+```tsx preview
+import { Divider } from "@rockshin/tao-ui";
+
+export default function Example() {
+  return (
+    <div dir="rtl">
+      Overview
+      <Divider orientation="vertical" />
+      Activity
+      <Divider orientation="vertical" />
+      Settings
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="divider-example-5">
+
+### Semantic styling
+
+```tsx preview
+import { Divider } from "@rockshin/tao-ui";
+
+export default function Example() {
+  return (
+    <Divider
+      titlePlacement="start"
+      styles={{
+        rail: { borderColor: "var(--tao-color-primary)" },
+        content: { color: "var(--tao-color-primary)", marginInlineStart: 0 },
+      }}
+    >
+      Custom section
+    </Divider>
+  );
+}
+```
+
+</section>
+
+</div>
+
+## API
+
+<API moduleName="divider" />

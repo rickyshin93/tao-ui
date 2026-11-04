@@ -1,0 +1,248 @@
+---
+title: List
+description: "展示重复记录，支持元信息、操作、分页和响应式网格。"
+---
+
+import Preview from '../../_components/demo-preview';
+
+展示重复记录，支持元信息、操作、分页和响应式网格。
+
+## 何时使用
+
+适合比纯文本丰富、又不需要表格列对齐的内容。需要明确的虚拟滚动时使用 Listy。
+
+## 示例
+
+<div className="tao-demo-grid tao-demo-grid-wide">
+
+<section className="tao-example" id="list-example-1">
+
+### 元信息与头像
+
+List.Item.Meta 组合头像、标题和描述。
+
+```tsx preview="iframe-follow"
+import { Avatar, List } from '@rockshin/tao-ui';
+
+const people = [
+  { id: 'a', name: 'Alex Chen', role: 'Design lead' },
+  { id: 'b', name: 'Morgan Lee', role: 'Frontend engineer' },
+  { id: 'c', name: 'Sam Rivera', role: 'Product manager' },
+];
+export default function Example() {
+  return (
+    <List
+      bordered
+      header="Workspace members"
+      dataSource={people}
+      rowKey="id"
+      renderItem={(person) => (
+        <List.Item>
+          <List.Item.Meta
+            avatar={<Avatar>{person.name[0]}</Avatar>}
+            title={person.name}
+            description={person.role}
+          />
+        </List.Item>
+      )}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="list-example-2">
+
+### 垂直内容与操作
+
+itemLayout="vertical" 适合文章式内容，extra 提供独立的辅助区域。
+
+```tsx preview
+import { useState } from 'react';
+import { Button, List, Tag } from '@rockshin/tao-ui';
+
+export default function Example() {
+  const [saved, setSaved] = useState(false);
+  return (
+    <List itemLayout="vertical">
+      <List.Item
+        extra={<Tag>Guide</Tag>}
+        actions={[
+          <Button
+            key="save"
+            variant="secondary"
+            size="small"
+            onClick={() => setSaved((value) => !value)}
+          >
+            {saved ? 'Saved' : 'Save article'}
+          </Button>,
+        ]}
+      >
+        <List.Item.Meta
+          title="Designing clear interfaces"
+          description="Updated today · 5 min read"
+        />
+        <p>
+          Keep actions close to the information they affect, and use a
+          consistent visual hierarchy.
+        </p>
+      </List.Item>
+    </List>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="list-example-3">
+
+### 分页与每页条数
+
+List 按当前页切分 dataSource。服务端分页时应传入当前页记录和明确的 total。
+
+```tsx preview
+import { List } from '@rockshin/tao-ui';
+
+const records = Array.from({ length: 24 }, (_, index) => ({
+  id: index,
+  title: `Release note ${index + 1}`,
+}));
+export default function Example() {
+  return (
+    <List
+      bordered
+      dataSource={records}
+      rowKey="id"
+      pagination={{
+        defaultPageSize: 4,
+        pageSizeOptions: [4, 8, 12],
+        showSizeChanger: true,
+        showQuickJumper: true,
+        showTotal: (total) => `${total} notes`,
+      }}
+      renderItem={(item) => <List.Item>{item.title}</List.Item>}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="list-example-4">
+
+### 响应式网格
+
+网格从手机的一列调整为宽视口的三列。
+
+```tsx preview="iframe-follow"
+import { Card, List } from '@rockshin/tao-ui';
+
+const records = [
+  'Research',
+  'Design',
+  'Engineering',
+  'Content',
+  'Operations',
+  'Support',
+];
+export default function Example() {
+  return (
+    <List
+      grid={{ gutter: [16, 16], xs: 1, sm: 2, lg: 3 }}
+      dataSource={records}
+      renderItem={(title) => (
+        <List.Item key={title}>
+          <Card title={title}>Workspace team</Card>
+        </List.Item>
+      )}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="list-example-5">
+
+### 加载、空态与加载更多
+
+此例追加本地记录。真实请求可使用 loading，locale.emptyText 用于业务空态。
+
+```tsx preview
+import { useState } from 'react';
+import { Button, Empty, List, Stack } from '@rockshin/tao-ui';
+
+export default function Example() {
+  const [count, setCount] = useState(0);
+  const [loading, setLoading] = useState(false);
+  return (
+    <Stack gap="md">
+      <Button variant="secondary" onClick={() => setLoading((value) => !value)}>
+        {loading ? 'Hide loading' : 'Show loading'}
+      </Button>
+      <List
+        loading={loading}
+        dataSource={Array.from(
+          { length: count },
+          (_, index) => `Activity ${index + 1}`,
+        )}
+        locale={{
+          emptyText: (
+            <Empty
+              image={Empty.PRESENTED_IMAGE_SIMPLE}
+              description="No activity yet"
+            />
+          ),
+        }}
+        loadMore={
+          <Button
+            variant="secondary"
+            onClick={() => setCount((value) => value + 3)}
+          >
+            Add three records
+          </Button>
+        }
+        renderItem={(item) => <List.Item key={item}>{item}</List.Item>}
+      />
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="list-example-6">
+
+### 紧凑列表与语义样式
+
+split={false} 移除行分隔线，header 和 footer 可独立定制。
+
+```tsx preview
+import { List } from '@rockshin/tao-ui';
+
+export default function Example() {
+  return (
+    <List
+      size="small"
+      split={false}
+      header="Recent workspaces"
+      footer="All changes saved"
+      styles={{
+        header: { fontWeight: 600 },
+        footer: { color: 'var(--tao-color-text-secondary)' },
+      }}
+      dataSource={['Atlas', 'Northstar', 'Studio']}
+      renderItem={(item) => <List.Item key={item}>{item}</List.Item>}
+    />
+  );
+}
+```
+
+</section>
+
+</div>
+
+## API
+
+<API moduleName="list" />

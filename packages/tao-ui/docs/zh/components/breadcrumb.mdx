@@ -3,6 +3,8 @@ title: Breadcrumb
 description: 展示用户当前所处的页面或视图层级。页面涵盖适用场景、设计建议、多组可运行示例、交互状态与完整 API 参考。
 ---
 
+import Preview from '../../_components/demo-preview';
+
 展示用户当前所处的页面或视图层级。
 
 ## 何时使用
@@ -18,7 +20,13 @@ description: 展示用户当前所处的页面或视图层级。页面涵盖适�
 
 - 不要把 Breadcrumb 当作主导航。
 
-## 基础用法
+## 代码演示
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="breadcrumb-example-1">
+
+### 基础用法
 
 ```tsx preview
 import { Breadcrumb } from '@rockshin/tao-ui';
@@ -27,8 +35,8 @@ function BreadcrumbExample() {
   return (
     <Breadcrumb
       items={[
-        { title: 'Home', href: '/' },
-        { title: 'Components', href: '/components/button' },
+        { title: 'Home', href: '#breadcrumb-example-1' },
+        { title: 'Components', href: '#breadcrumb-example-1' },
         { title: 'Breadcrumb' },
       ]}
     />
@@ -38,15 +46,19 @@ function BreadcrumbExample() {
 export default BreadcrumbExample;
 ```
 
-## 分隔符与路径折叠
+</section>
+
+<section className="tao-example" id="breadcrumb-example-2">
+
+### 分隔符与路径折叠
 
 ```tsx preview
-import { Breadcrumb, Stack } from '@rockshin/tao-ui';
+import { Breadcrumb, Stack, TaoProvider } from '@rockshin/tao-ui';
 
 function BreadcrumbSeparators() {
   const items = [
-    { title: 'Home', href: '/' },
-    { title: 'Settings', href: '/settings' },
+    { title: 'Home', href: '#breadcrumb-example-1' },
+    { title: 'Settings', href: '#breadcrumb-example-1' },
     { title: 'Profile' },
   ];
 
@@ -57,10 +69,10 @@ function BreadcrumbSeparators() {
       <Breadcrumb
         maxItems={3}
         items={[
-          { title: 'Home', href: '/' },
-          { title: 'Workspace', href: '/workspace' },
-          { title: 'Projects', href: '/projects' },
-          { title: 'tao-ui', href: '/projects/tao-ui' },
+          { title: 'Home', href: '#breadcrumb-example-1' },
+          { title: 'Workspace', href: '#breadcrumb-example-1' },
+          { title: 'Projects', href: '#breadcrumb-example-1' },
+          { title: 'tao-ui', href: '#breadcrumb-example-1' },
           { title: 'Settings' },
         ]}
       />
@@ -71,29 +83,203 @@ function BreadcrumbSeparators() {
 export default BreadcrumbSeparators;
 ```
 
-## 禁用项与尺寸
+</section>
+
+<section className="tao-example" id="breadcrumb-example-3">
+
+### 禁用项与尺寸
 
 ```tsx preview
-import { Breadcrumb, Stack } from '@rockshin/tao-ui';
+import { Breadcrumb, Stack, TaoProvider } from '@rockshin/tao-ui';
 
 function BreadcrumbStates() {
   const items = [
-    { title: 'Home', href: '/' },
-    { title: 'Archived', href: '/archived', disabled: true },
+    { title: 'Home', href: '#breadcrumb-example-1' },
+    { title: 'Archived', href: '#breadcrumb-example-1', disabled: true },
     { title: 'Item' },
   ];
 
   return (
     <Stack gap="md">
-      <Breadcrumb size="small" items={items} />
-      <Breadcrumb size="medium" items={items} />
-      <Breadcrumb size="large" items={items} />
+      <TaoProvider size="small">
+        <Breadcrumb items={items} />
+      </TaoProvider>
+      <TaoProvider size="medium">
+        <Breadcrumb items={items} />
+      </TaoProvider>
+      <TaoProvider size="large">
+        <Breadcrumb items={items} />
+      </TaoProvider>
     </Stack>
   );
 }
 
 export default BreadcrumbStates;
 ```
+
+</section>
+
+<section className="tao-example" id="breadcrumb-custom-separator">
+
+### 自定义分隔符
+
+通过 `separator` 调整路径分隔符，不改变链接和当前页语义。
+
+```tsx preview
+import { Breadcrumb, Stack, TaoProvider } from '@rockshin/tao-ui';
+
+export default function BreadcrumbCustomSeparator() {
+  return (
+    <Stack gap="md">
+      <Breadcrumb
+        separator="/"
+        items={[
+          { title: 'Home', href: '#breadcrumb-example-1' },
+          { title: 'Docs', href: '#breadcrumb-example-1' },
+          { title: 'Guide' },
+        ]}
+      />
+      <Breadcrumb
+        separator="›"
+        items={[
+          { title: 'Home', href: '#breadcrumb-example-1' },
+          { title: 'Settings', href: '#breadcrumb-example-1' },
+          { title: 'Profile' },
+        ]}
+      />
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="breadcrumb-collapsed">
+
+### 折叠长路径
+
+`maxItems` 折叠中间路径，点击省略入口查看被隐藏的层级。
+
+```tsx preview
+import { Breadcrumb } from '@rockshin/tao-ui';
+
+export default function BreadcrumbCollapsed() {
+  return (
+    <Breadcrumb
+      maxItems={3}
+      items={[
+        { title: 'Home', href: '#breadcrumb-example-1' },
+        { title: 'Group', href: '#breadcrumb-example-1' },
+        { title: 'Section', href: '#breadcrumb-example-1' },
+        { title: 'Subsection', href: '#breadcrumb-example-1' },
+        { title: 'Current Page' },
+      ]}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="breadcrumb-disabled">
+
+### 不可用的路径项
+
+将不可跳转的层级标为 `disabled`，当前页仍显示完整名称。
+
+```tsx preview
+import { Breadcrumb } from '@rockshin/tao-ui';
+
+export default function BreadcrumbDisabled() {
+  return (
+    <Breadcrumb
+      items={[
+        { title: 'Home', href: '#breadcrumb-example-1' },
+        { title: 'Archived', href: '#breadcrumb-example-1', disabled: true },
+        { title: 'Item' },
+      ]}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="breadcrumb-custom-link">
+
+### 自定义链接渲染
+
+使用 `itemRender` 接入应用的链接组件，保留普通链接可访问行为。
+
+```tsx preview
+import { Breadcrumb } from '@rockshin/tao-ui';
+
+export default function BreadcrumbCustomLink() {
+  return (
+    <Breadcrumb
+      items={[
+        { title: 'Home', key: 'home' },
+        { title: 'Library', key: 'library' },
+        { title: 'Data' },
+      ]}
+      itemRender={(item, { isLast }) =>
+        isLast ? (
+          item.title
+        ) : (
+          // Any custom element works — e.g. a router <Link>. Slot merges the
+          // breadcrumb link styles onto it instead of adding another <a>.
+          <a href="#breadcrumb-example-1">{item.title}</a>
+        )
+      }
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="breadcrumb-sizes">
+
+### 路径尺寸
+
+用 TaoProvider 的 `size` 匹配紧凑工具栏或宽松页面标题区。
+
+```tsx preview
+import { Breadcrumb, Stack, TaoProvider } from '@rockshin/tao-ui';
+
+export default function BreadcrumbSizes() {
+  return (
+    <Stack gap="md">
+      {(['small', 'medium', 'large'] as const).map((size) => (
+        <div key={size}>
+          <p
+            style={{
+              fontSize: 13,
+              color: 'var(--tao-color-text-secondary)',
+              marginBottom: 4,
+            }}
+          >
+            {size}
+          </p>
+          <TaoProvider size={size}>
+            <Breadcrumb
+              items={[
+                { title: 'Home', href: '#breadcrumb-example-1' },
+                { title: 'List', href: '#breadcrumb-example-1' },
+                { title: 'Detail' },
+              ]}
+            />
+          </TaoProvider>
+        </div>
+      ))}
+    </Stack>
+  );
+}
+```
+
+</section>
+
+</div>
 
 ## API
 

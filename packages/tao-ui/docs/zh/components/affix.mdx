@@ -1,0 +1,178 @@
+---
+title: Affix
+description: "在内容越过滚动容器边界时将其固定。"
+---
+
+import Preview from '../../_components/demo-preview';
+
+在内容越过滚动容器边界时将其固定。
+
+组件采用 tao-ui 原生实现，公共 API 对齐 Ant Design 6.7.0。外观、主题 token 与 Semantic DOM 定制遵循 tao-ui，主题通过 `TaoProvider` 配置。
+
+Affix 使用 fixed 定位与占位元素，target 返回 Window 或 HTMLElement；偏移量相对该目标计算。
+
+## 何时使用
+
+在明确的滚动目标中保留少量常用操作；示例均使用独立滚动容器。
+
+## 代码演示
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="affix-example-1">
+
+### 顶部边界
+
+```tsx preview="iframe-follow"
+import { useRef } from "react";
+import { Affix, Button } from "@rockshin/tao-ui";
+
+export default function Example() {
+  const target = useRef<HTMLDivElement>(null);
+  return (
+    <div
+      ref={target}
+      style={{
+        height: 230,
+        overflow: "auto",
+        border: "1px solid var(--tao-color-border)",
+        borderRadius: 6,
+      }}
+    >
+      <div style={{ height: 70, padding: 16 }}>Scroll down in this panel.</div>
+      <Affix target={() => target.current} offsetTop={12}>
+        <Button variant="primary">Pinned actions</Button>
+      </Affix>
+      <div style={{ height: 600, padding: 16 }}>More content</div>
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="affix-example-2">
+
+### 观察固定状态
+
+```tsx preview="iframe-follow"
+import { useRef, useState } from "react";
+import { Affix, Button } from "@rockshin/tao-ui";
+
+export default function Example() {
+  const target = useRef<HTMLDivElement>(null);
+  const [affixed, setAffixed] = useState(false);
+  return (
+    <div>
+      <p aria-live="polite">
+        {affixed ? "Actions are pinned" : "Actions are in the document flow"}
+      </p>
+      <div
+        ref={target}
+        style={{
+          height: 230,
+          overflow: "auto",
+          border: "1px solid var(--tao-color-border)",
+          borderRadius: 6,
+        }}
+      >
+        <div style={{ height: 70 }} />
+        <Affix
+          target={() => target.current}
+          onChange={(value) => setAffixed(Boolean(value))}
+        >
+          <Button>Actions</Button>
+        </Affix>
+        <div style={{ height: 600 }} />
+      </div>
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="affix-example-3">
+
+### 底部边界
+
+```tsx preview="iframe-follow"
+import { useRef } from "react";
+import { Affix, Button } from "@rockshin/tao-ui";
+
+export default function Example() {
+  const target = useRef<HTMLDivElement>(null);
+  return (
+    <div
+      ref={target}
+      style={{
+        height: 230,
+        overflow: "auto",
+        border: "1px solid var(--tao-color-border)",
+        borderRadius: 6,
+      }}
+    >
+      <div style={{ height: 600, padding: 16 }}>
+        Scroll to the end to return the action to its original position.
+      </div>
+      <Affix target={() => target.current} offsetBottom={12}>
+        <Button variant="primary">Bottom actions</Button>
+      </Affix>
+      <div style={{ height: 50 }} />
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="affix-example-4">
+
+### 改变偏移与更新位置
+
+```tsx preview="iframe-follow"
+import { useRef, useState } from "react";
+import { Affix, Button, type AffixRef } from "@rockshin/tao-ui";
+
+export default function Example() {
+  const target = useRef<HTMLDivElement>(null);
+  const affix = useRef<AffixRef>(null);
+  const [offset, setOffset] = useState(8);
+  return (
+    <div>
+      <Button onClick={() => setOffset(offset === 8 ? 32 : 8)}>
+        Offset: {offset}px
+      </Button>{" "}
+      <Button onClick={() => affix.current?.updatePosition()}>
+        Recalculate
+      </Button>
+      <div
+        ref={target}
+        style={{
+          ...{
+            height: 230,
+            overflow: "auto",
+            border: "1px solid var(--tao-color-border)",
+            borderRadius: 6,
+          },
+          marginTop: 16,
+        }}
+      >
+        <div style={{ height: 50 }} />
+        <Affix ref={affix} target={() => target.current} offsetTop={offset}>
+          <Button>Tools</Button>
+        </Affix>
+        <div style={{ height: 600 }} />
+      </div>
+    </div>
+  );
+}
+```
+
+</section>
+
+</div>
+
+## API
+
+<API moduleName="affix" />

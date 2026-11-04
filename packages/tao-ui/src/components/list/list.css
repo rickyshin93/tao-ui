@@ -1,0 +1,338 @@
+[data-tao-list] {
+  --tao-list-gap-x: 0px;
+  --tao-list-gap-y: 0px;
+  color: var(--tao-color-text);
+  font-family: var(--tao-font-family);
+  font-size: var(--tao-font-size-base);
+  line-height: var(--tao-line-height);
+  min-width: 0;
+  --tao-list-padding: 16px;
+}
+[data-tao-list][data-tao-size="small"] {
+  --tao-list-padding: 12px;
+}
+[data-tao-list][data-tao-size="large"] {
+  --tao-list-padding: 24px;
+}
+[data-tao-list][data-tao-bordered] {
+  border: 1px solid var(--tao-color-border);
+  border-radius: var(--tao-radius);
+}
+[data-tao-list-header],
+[data-tao-list-footer],
+[data-tao-list-item] {
+  padding-block: var(--tao-list-padding);
+}
+[data-tao-list][data-tao-bordered]
+  :is(
+    [data-tao-list-header],
+    [data-tao-list-footer],
+    [data-tao-list-item],
+    [data-tao-list-empty]
+  ) {
+  padding-inline: var(--tao-list-padding);
+}
+[data-tao-list][data-tao-split]
+  :is(
+    [data-tao-list-header],
+    [data-tao-list-item-wrapper]:not(:last-child) > [data-tao-list-item]
+  ) {
+  border-bottom: 1px solid var(--tao-color-border-secondary);
+}
+[data-tao-list][data-tao-split] [data-tao-list-footer] {
+  border-top: 1px solid var(--tao-color-border-secondary);
+}
+[data-tao-list-item] {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+}
+[data-tao-list-item-main],
+[data-tao-list-meta-content] {
+  min-width: 0;
+  flex: 1;
+  overflow-wrap: anywhere;
+}
+[data-tao-list-item][data-tao-layout="vertical"] {
+  align-items: flex-start;
+}
+[data-tao-list-meta] {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  min-width: 0;
+}
+[data-tao-list-meta-avatar] {
+  flex-shrink: 0;
+}
+[data-tao-list-meta-title] {
+  margin: 0 0 4px;
+  color: var(--tao-color-text);
+  font-size: var(--tao-font-size-base);
+  font-weight: 600;
+}
+[data-tao-list-meta-description] {
+  color: var(--tao-color-text-secondary);
+}
+[data-tao-list-item-actions] {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  color: var(--tao-color-text-secondary);
+}
+[data-tao-list-item-actions] > li + li {
+  border-inline-start: 1px solid var(--tao-color-border-secondary);
+  padding-inline-start: 16px;
+}
+[data-tao-list-item][data-tao-layout="vertical"] [data-tao-list-item-actions] {
+  margin-top: 16px;
+}
+[data-tao-list-item-extra] {
+  max-width: 45%;
+  flex-shrink: 0;
+}
+[data-tao-list-item-extra] :is(img, video) {
+  max-width: 100%;
+}
+[data-tao-list-empty] {
+  padding: 24px;
+  color: var(--tao-color-text-secondary);
+  text-align: center;
+}
+[data-tao-list-loading] {
+  min-height: 56px;
+}
+[data-tao-list-pagination] {
+  display: flex;
+  justify-content: flex-end;
+  padding: 16px 0;
+}
+[data-tao-list][data-tao-bordered] [data-tao-list-pagination] {
+  padding-inline: var(--tao-list-padding);
+}
+[data-tao-list-pagination][data-tao-align="start"] {
+  justify-content: flex-start;
+}
+[data-tao-list-pagination][data-tao-align="center"] {
+  justify-content: center;
+}
+[data-tao-list][data-tao-grid] [data-tao-list-items] {
+  display: grid;
+  grid-template-columns: repeat(
+      var(--tao-list-current-columns, var(--tao-list-columns)),
+      minmax(0, 1fr)
+    );
+  column-gap: var(--tao-list-current-gap-x, var(--tao-list-gap-x, 0));
+  row-gap: var(--tao-list-current-gap-y, var(--tao-list-gap-y, 0));
+}
+[data-tao-list-item][data-tao-grid] {
+  display: block;
+}
+[data-tao-list][data-tao-grid][data-tao-split]
+  [data-tao-list-item-wrapper]:not(:last-child)
+  > [data-tao-list-item] {
+  border-bottom: 0;
+}
+@media (max-width: 575px) {
+  [data-tao-list] {
+    --tao-list-current-columns: var(
+      --tao-list-columns-xs,
+      var(--tao-list-columns)
+    );
+    --tao-list-current-gap-x: var(--tao-list-gap-x-xs, var(--tao-list-gap-x));
+    --tao-list-current-gap-y: var(--tao-list-gap-y-xs, var(--tao-list-gap-y));
+  }
+  [data-tao-list-item] {
+    flex-wrap: wrap;
+  }
+  [data-tao-list-item-extra] {
+    max-width: 100%;
+  }
+}
+@media (min-width: 576px) {
+  [data-tao-list] {
+    --tao-list-current-columns: var(
+      --tao-list-columns-sm,
+      var(--tao-list-columns)
+    );
+    --tao-list-current-gap-x: var(--tao-list-gap-x-sm, var(--tao-list-gap-x));
+    --tao-list-current-gap-y: var(--tao-list-gap-y-sm, var(--tao-list-gap-y));
+  }
+}
+@media (min-width: 768px) {
+  [data-tao-list] {
+    --tao-list-current-columns: var(
+      --tao-list-columns-md,
+      var(--tao-list-columns-sm, var(--tao-list-columns))
+    );
+    --tao-list-current-gap-x: var(
+      --tao-list-gap-x-md,
+      var(--tao-list-gap-x-sm, var(--tao-list-gap-x))
+    );
+    --tao-list-current-gap-y: var(
+      --tao-list-gap-y-md,
+      var(--tao-list-gap-y-sm, var(--tao-list-gap-y))
+    );
+  }
+}
+@media (min-width: 992px) {
+  [data-tao-list] {
+    --tao-list-current-columns: var(
+      --tao-list-columns-lg,
+      var(
+        --tao-list-columns-md,
+        var(--tao-list-columns-sm, var(--tao-list-columns))
+      )
+    );
+    --tao-list-current-gap-x: var(
+      --tao-list-gap-x-lg,
+      var(--tao-list-gap-x-md, var(--tao-list-gap-x-sm, var(--tao-list-gap-x)))
+    );
+    --tao-list-current-gap-y: var(
+      --tao-list-gap-y-lg,
+      var(--tao-list-gap-y-md, var(--tao-list-gap-y-sm, var(--tao-list-gap-y)))
+    );
+  }
+}
+@media (min-width: 1200px) {
+  [data-tao-list] {
+    --tao-list-current-columns: var(
+      --tao-list-columns-xl,
+      var(
+        --tao-list-columns-lg,
+        var(
+          --tao-list-columns-md,
+          var(--tao-list-columns-sm, var(--tao-list-columns))
+        )
+      )
+    );
+    --tao-list-current-gap-x: var(
+      --tao-list-gap-x-xl,
+      var(
+        --tao-list-gap-x-lg,
+        var(
+          --tao-list-gap-x-md,
+          var(--tao-list-gap-x-sm, var(--tao-list-gap-x))
+        )
+      )
+    );
+    --tao-list-current-gap-y: var(
+      --tao-list-gap-y-xl,
+      var(
+        --tao-list-gap-y-lg,
+        var(
+          --tao-list-gap-y-md,
+          var(--tao-list-gap-y-sm, var(--tao-list-gap-y))
+        )
+      )
+    );
+  }
+}
+@media (min-width: 1600px) {
+  [data-tao-list] {
+    --tao-list-current-columns: var(
+      --tao-list-columns-xxl,
+      var(
+        --tao-list-columns-xl,
+        var(
+          --tao-list-columns-lg,
+          var(
+            --tao-list-columns-md,
+            var(--tao-list-columns-sm, var(--tao-list-columns))
+          )
+        )
+      )
+    );
+    --tao-list-current-gap-x: var(
+      --tao-list-gap-x-xxl,
+      var(
+        --tao-list-gap-x-xl,
+        var(
+          --tao-list-gap-x-lg,
+          var(
+            --tao-list-gap-x-md,
+            var(--tao-list-gap-x-sm, var(--tao-list-gap-x))
+          )
+        )
+      )
+    );
+    --tao-list-current-gap-y: var(
+      --tao-list-gap-y-xxl,
+      var(
+        --tao-list-gap-y-xl,
+        var(
+          --tao-list-gap-y-lg,
+          var(
+            --tao-list-gap-y-md,
+            var(--tao-list-gap-y-sm, var(--tao-list-gap-y))
+          )
+        )
+      )
+    );
+  }
+}
+@media (min-width: 2000px) {
+  [data-tao-list] {
+    --tao-list-current-columns: var(
+      --tao-list-columns-xxxl,
+      var(
+        --tao-list-columns-xxl,
+        var(
+          --tao-list-columns-xl,
+          var(
+            --tao-list-columns-lg,
+            var(
+              --tao-list-columns-md,
+              var(--tao-list-columns-sm, var(--tao-list-columns))
+            )
+          )
+        )
+      )
+    );
+    --tao-list-current-gap-x: var(
+      --tao-list-gap-x-xxxl,
+      var(
+        --tao-list-gap-x-xxl,
+        var(
+          --tao-list-gap-x-xl,
+          var(
+            --tao-list-gap-x-lg,
+            var(
+              --tao-list-gap-x-md,
+              var(--tao-list-gap-x-sm, var(--tao-list-gap-x))
+            )
+          )
+        )
+      )
+    );
+    --tao-list-current-gap-y: var(
+      --tao-list-gap-y-xxxl,
+      var(
+        --tao-list-gap-y-xxl,
+        var(
+          --tao-list-gap-y-xl,
+          var(
+            --tao-list-gap-y-lg,
+            var(
+              --tao-list-gap-y-md,
+              var(--tao-list-gap-y-sm, var(--tao-list-gap-y))
+            )
+          )
+        )
+      )
+    );
+  }
+}
+
+[data-tao-list-items] {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+[data-tao-list-item-wrapper] {
+  min-width: 0;
+}

@@ -3,6 +3,8 @@ title: DatePicker
 description: 输入或选择单个日期，并可选择时间。页面涵盖适用场景、设计建议、多组可运行示例、交互状态与完整 API 参考。
 ---
 
+import Preview from '../../_components/demo-preview';
+
 输入或选择单个日期，并可选择时间。
 
 ## 何时使用
@@ -18,7 +20,13 @@ description: 输入或选择单个日期，并可选择时间。页面涵盖适�
 
 - 选择久远日期时，不要强迫用户只能逐月翻阅日历。
 
-## 基础用法
+## 代码演示
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="date-picker-example-1">
+
+### 基础用法
 
 ```tsx preview
 import { DatePicker, FormField } from '@rockshin/tao-ui';
@@ -30,7 +38,11 @@ function DatePickerExample() {
 
   return (
     <FormField label="Start date">
-      <DatePicker value={value} onChange={setValue} placeholder="Select a date" />
+      <DatePicker
+        value={value}
+        onChange={setValue}
+        placeholder="Select a date"
+      />
     </FormField>
   );
 }
@@ -38,7 +50,11 @@ function DatePickerExample() {
 export default DatePickerExample;
 ```
 
-## 选择模式
+</section>
+
+<section className="tao-example" id="date-picker-example-2">
+
+### 选择模式
 
 ```tsx preview
 import { DatePicker, Stack } from '@rockshin/tao-ui';
@@ -52,9 +68,24 @@ function DatePickerModes() {
 
   return (
     <Stack gap="md" style={{ maxWidth: 320 }}>
-      <DatePicker value={date} onChange={setDate} picker="date" placeholder="Select date" />
-      <DatePicker value={month} onChange={setMonth} picker="month" placeholder="Select month" />
-      <DatePicker value={year} onChange={setYear} picker="year" placeholder="Select year" />
+      <DatePicker
+        value={date}
+        onChange={setDate}
+        picker="date"
+        placeholder="Select date"
+      />
+      <DatePicker
+        value={month}
+        onChange={setMonth}
+        picker="month"
+        placeholder="Select month"
+      />
+      <DatePicker
+        value={year}
+        onChange={setYear}
+        picker="year"
+        placeholder="Select year"
+      />
     </Stack>
   );
 }
@@ -62,7 +93,11 @@ function DatePickerModes() {
 export default DatePickerModes;
 ```
 
-## 时间、预设与禁用日期
+</section>
+
+<section className="tao-example" id="date-picker-example-3">
+
+### 时间、预设与禁用日期
 
 ```tsx preview
 import { DatePicker, Stack } from '@rockshin/tao-ui';
@@ -76,7 +111,12 @@ function AdvancedDatePicker() {
 
   return (
     <Stack gap="md" style={{ maxWidth: 320 }}>
-      <DatePicker value={dateTime} onChange={setDateTime} showTime placeholder="Select date and time" />
+      <DatePicker
+        value={dateTime}
+        onChange={setDateTime}
+        showTime
+        placeholder="Select date and time"
+      />
       <DatePicker
         value={preset}
         onChange={setPreset}
@@ -97,6 +137,330 @@ function AdvancedDatePicker() {
 
 export default AdvancedDatePicker;
 ```
+
+</section>
+
+<section className="tao-example" id="date-picker-with-time">
+
+### 日期与时间
+
+`showTime` 将日期和时间组合选择，格式应同时包含需要展示的部分。
+
+```tsx preview
+import { DatePicker, FormField, Stack } from '@rockshin/tao-ui';
+
+import type { Dayjs } from 'dayjs';
+
+import dayjs from 'dayjs';
+
+import { useState } from 'react';
+
+export default function DatePickerWithTime() {
+  function Demo() {
+    const [val, setVal] = useState<Dayjs | null>(dayjs());
+    return (
+      <Stack gap="md" style={{ maxWidth: 300 }}>
+        <FormField label="Date & Time">
+          <DatePicker value={val} onChange={(d) => setVal(d)} showTime />
+        </FormField>
+        <p style={{ fontSize: 13, color: 'var(--tao-color-text-secondary)' }}>
+          Value: {val ? val.format('YYYY-MM-DD HH:mm:ss') : 'none'}
+        </p>
+      </Stack>
+    );
+  }
+  return <Demo />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="date-picker-with-presets">
+
+### 常用日期预设
+
+用 `presets` 提供常见日期，减少重复打开日历和定位日期的操作。
+
+```tsx preview
+import { DatePicker, FormField, Stack } from '@rockshin/tao-ui';
+
+import type { Dayjs } from 'dayjs';
+
+import dayjs from 'dayjs';
+
+import { useState } from 'react';
+
+export default function DatePickerWithPresets() {
+  function Demo() {
+    const [val, setVal] = useState<Dayjs | null>(null);
+    return (
+      <Stack gap="md" style={{ maxWidth: 300 }}>
+        <FormField label="With Presets">
+          <DatePicker
+            value={val}
+            onChange={(d) => setVal(d)}
+            presets={[
+              { label: 'Today', value: dayjs() },
+              { label: 'Yesterday', value: dayjs().subtract(1, 'day') },
+              { label: 'Last week', value: dayjs().subtract(7, 'day') },
+              { label: 'Last month', value: dayjs().subtract(1, 'month') },
+            ]}
+          />
+        </FormField>
+      </Stack>
+    );
+  }
+  return <Demo />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="date-picker-disabled-dates">
+
+### 限制可选日期
+
+`disabledDate` 按业务规则限制日期；本例使用本地日期计算。
+
+```tsx preview
+import { DatePicker, FormField, Stack } from '@rockshin/tao-ui';
+
+import type { Dayjs } from 'dayjs';
+
+import dayjs from 'dayjs';
+
+import { useState } from 'react';
+
+export default function DatePickerDisabledDates() {
+  function Demo() {
+    const [val, setVal] = useState<Dayjs | null>(null);
+    return (
+      <Stack gap="md" style={{ maxWidth: 300 }}>
+        <FormField label="Only future dates">
+          <DatePicker
+            value={val}
+            onChange={(d) => setVal(d)}
+            disabledDate={(d) => d.isBefore(dayjs(), 'day')}
+          />
+        </FormField>
+        <FormField label="With min/max">
+          <DatePicker
+            value={val}
+            onChange={(d) => setVal(d)}
+            minDate={dayjs().subtract(7, 'day')}
+            maxDate={dayjs().add(30, 'day')}
+          />
+        </FormField>
+      </Stack>
+    );
+  }
+  return <Demo />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="date-picker-mobile-date-picker">
+
+### 手机日期抽屉
+
+通过 `mobile` 在桌面也能试用抽屉，确认操作完成后提交选中日期。
+
+```tsx preview
+import { DatePicker, FormField, Stack } from '@rockshin/tao-ui';
+
+import type { Dayjs } from 'dayjs';
+
+import dayjs from 'dayjs';
+
+import { useState } from 'react';
+
+export default function DatePickerMobileDatePicker() {
+  function Demo() {
+    const [val, setVal] = useState<Dayjs | null>(null);
+    return (
+      <Stack gap="md" style={{ maxWidth: 300 }}>
+        <p style={{ color: 'var(--tao-color-text-secondary)', fontSize: 13 }}>
+          Using <code>mobile</code> prop to force Drawer mode.
+        </p>
+        <FormField label="Mobile DatePicker">
+          <DatePicker
+            value={val}
+            onChange={(d) => setVal(d)}
+            mobile
+            presets={[
+              { label: 'Today', value: dayjs() },
+              { label: 'Yesterday', value: dayjs().subtract(1, 'day') },
+            ]}
+          />
+        </FormField>
+      </Stack>
+    );
+  }
+  return <Demo />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="date-picker-sizes">
+
+### 尺寸与外观
+
+选择不同尺寸与 variant，匹配页面中的其他输入控件。
+
+```tsx preview
+import { DatePicker, Stack } from '@rockshin/tao-ui';
+export default function Example() {
+  return (
+    <Stack direction="vertical">
+      {(['small', 'medium', 'large'] as const).map((size) => (
+        <DatePicker key={size} size={size} />
+      ))}
+      <DatePicker variant="filled" />
+      <DatePicker variant="borderless" />
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="date-picker-status">
+
+### 状态与禁用
+
+error 与 warning 表达校验状态，disabled 用于不可编辑的值。
+
+```tsx preview
+import { DatePicker, Stack } from '@rockshin/tao-ui';
+export default function Example() {
+  return (
+    <Stack direction="vertical">
+      <DatePicker status="error" />
+      <DatePicker status="warning" />
+      <DatePicker disabled />
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="date-picker-mobile">
+
+### 移动端选择
+
+在手机预览中打开选择器，体验抽屉内的选择、确认和清空。
+
+```tsx preview="iframe-follow"
+import { DatePicker, TaoProvider, zhCN } from '@rockshin/tao-ui';
+export default function Example() {
+  return (
+    <TaoProvider locale={zhCN}>
+      <DatePicker allowClear />
+    </TaoProvider>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="date-picker-locale">
+
+### 切换语言
+
+通过 TaoProvider 的 locale 同步内置按钮、占位文字与日历标签。
+
+```tsx preview
+import { useState } from 'react';
+import {
+  DatePicker,
+  TaoProvider,
+  zhCN,
+  enUS,
+  Button,
+  Stack,
+} from '@rockshin/tao-ui';
+export default function Example() {
+  const [chinese, setChinese] = useState(false);
+  return (
+    <Stack direction="vertical">
+      <Button onClick={() => setChinese(!chinese)}>
+        {chinese ? 'Switch to English' : '切换到中文'}
+      </Button>
+      <TaoProvider locale={chinese ? zhCN : enUS}>
+        <DatePicker />
+      </TaoProvider>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="date-picker-bounded">
+
+### 限制日期范围
+
+minDate 与 maxDate 同时限制输入和日历导航，示例固定为 2026 年以便复现。
+
+```tsx preview
+import dayjs from 'dayjs';
+import { DatePicker } from '@rockshin/tao-ui';
+export default function Example() {
+  return (
+    <DatePicker
+      minDate={dayjs('2026-01-01')}
+      maxDate={dayjs('2026-12-31')}
+      defaultValue={dayjs('2026-06-10')}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="date-picker-controlled">
+
+### 受控值与清空
+
+在 onChange 中保存值；清空后将值设为 null。
+
+```tsx preview
+import { useState } from 'react';
+import type { Dayjs } from 'dayjs';
+import { DatePicker, Button, Stack } from '@rockshin/tao-ui';
+export default function Example() {
+  const [value, setValue] = useState<Dayjs | null>(null);
+  return (
+    <Stack direction="vertical">
+      <DatePicker value={value} onChange={setValue} allowClear />
+      <Button onClick={() => setValue(null)}>Clear value</Button>
+      <output>{value?.format('YYYY-MM-DD') || 'No selection'}</output>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="date-picker-format">
+
+### 自定义显示格式
+
+format 控制显示文本，值仍是 Dayjs；不要将显示格式误认为存储格式。
+
+```tsx preview
+import { DatePicker } from '@rockshin/tao-ui';
+export default function Example() {
+  return <DatePicker format="DD/MM/YYYY" />;
+}
+```
+
+</section>
+
+</div>
 
 ## API
 

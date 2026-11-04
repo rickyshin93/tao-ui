@@ -739,9 +739,13 @@ input[data-tao-range-input]::placeholder {
 [data-tao-range-panel] [data-tao-picker-panel] {
   padding: 0 var(--tao-padding-xs) var(--tao-padding-xs);
   width: 280px;
+  min-width: 0;
+  flex: 1;
 }
 
 [data-tao-range-panel] {
+  max-width: calc(100vw - 24px);
+  box-sizing: border-box;
   font-family: var(--tao-font-family);
   padding: var(--tao-padding-xs);
 }

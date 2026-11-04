@@ -113,3 +113,10 @@
 [data-tao-checkbox-group][data-tao-direction="horizontal"] {
   flex-direction: row;
 }
+
+@media (pointer: coarse) {
+  [data-tao-checkbox-wrapper] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}

@@ -1,0 +1,206 @@
+---
+title: FloatButton
+description: "Provides persistent floating actions and a return-to-top control."
+---
+
+import Preview from '../../_components/demo-preview';
+
+Provides persistent floating actions and a return-to-top control.
+
+This native tao-ui component follows the public API of Ant Design 6.7.0. Appearance, theme tokens and Semantic DOM customization belong to tao-ui; configure themes with `TaoProvider`.
+
+Buttons, Group and BackTop follow 6.7.0. Tooltips and badges use tao-ui components; scroll animations respect reduced motion. Fixed controls are isolated in iframe previews.
+
+## When to use
+
+Use for a few actions that apply across the current screen. Provide accessible labels for icon-only buttons.
+
+## Examples
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="float-button-example-1">
+
+### Basic action and tooltip
+
+```tsx preview="iframe-follow"
+import { useState } from "react";
+import { FloatButton } from "@rockshin/tao-ui";
+
+export default function Example() {
+  const [count, setCount] = useState(0);
+  return (
+    <div style={{ minHeight: 220 }}>
+      <p>Action count: {count}</p>
+      <FloatButton
+        tooltip="Create item"
+        aria-label="Create item"
+        type="primary"
+        onClick={() => setCount(count + 1)}
+      />
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="float-button-example-2">
+
+### Shape, content and badge
+
+```tsx preview="iframe-follow"
+import { FloatButton } from "@rockshin/tao-ui";
+
+export default function Example() {
+  return (
+    <div style={{ minHeight: 220 }}>
+      <FloatButton
+        content="Help"
+        shape="square"
+        tooltip="Help"
+        style={{ insetInlineEnd: 84 }}
+      />
+      <FloatButton content="Chat" badge={{ count: 8 }} tooltip="Messages" />
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="float-button-example-3">
+
+### Click group and placement
+
+```tsx preview="iframe-follow"
+import { useState } from "react";
+import { FloatButton } from "@rockshin/tao-ui";
+
+export default function Example() {
+  const [selected, setSelected] = useState("None");
+  return (
+    <div style={{ minHeight: 260 }}>
+      <p>Selected: {selected}</p>
+      <FloatButton.Group
+        trigger="click"
+        tooltip="Actions"
+        aria-label="Actions"
+        placement="left"
+        shape="square"
+      >
+        <FloatButton content="A" onClick={() => setSelected("Action A")} />
+        <FloatButton content="B" onClick={() => setSelected("Action B")} />
+      </FloatButton.Group>
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="float-button-example-4">
+
+### Controlled group
+
+```tsx preview="iframe-follow"
+import { useState } from "react";
+import { Button, FloatButton } from "@rockshin/tao-ui";
+
+export default function Example() {
+  const [open, setOpen] = useState(false);
+  return (
+    <div style={{ minHeight: 260 }}>
+      <Button onClick={() => setOpen(!open)}>
+        {open ? "Close actions" : "Open actions"}
+      </Button>
+      <FloatButton.Group
+        trigger="click"
+        open={open}
+        onOpenChange={setOpen}
+        tooltip="Actions"
+        aria-label="Actions"
+      >
+        <FloatButton content="One" />
+        <FloatButton content="Two" />
+      </FloatButton.Group>
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="float-button-example-5">
+
+### Hover and disabled actions
+
+```tsx preview="iframe-follow"
+import { FloatButton } from "@rockshin/tao-ui";
+
+export default function Example() {
+  return (
+    <div style={{ minHeight: 260 }}>
+      <FloatButton.Group
+        trigger="hover"
+        tooltip="More actions"
+        aria-label="More actions"
+      >
+        <FloatButton content="Ready" />
+        <FloatButton content="Locked" disabled />
+      </FloatButton.Group>
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="float-button-example-6">
+
+### Return to a scroll container top
+
+```tsx preview="iframe-follow"
+import { useRef } from "react";
+import { FloatButton } from "@rockshin/tao-ui";
+
+export default function Example() {
+  const target = useRef<HTMLDivElement>(null);
+  return (
+    <div>
+      <div
+        ref={target}
+        style={{
+          height: 260,
+          overflow: "auto",
+          border: "1px solid var(--tao-color-border)",
+          padding: 16,
+        }}
+      >
+        <p>Scroll down to reveal BackTop.</p>
+        <div
+          style={{
+            height: 900,
+            background:
+              "linear-gradient(var(--tao-color-fill-tertiary), transparent)",
+          }}
+        />
+      </div>
+      <FloatButton.BackTop
+        target={() => target.current!}
+        visibilityHeight={120}
+        showProgress
+        duration={250}
+      />
+    </div>
+  );
+}
+```
+
+</section>
+
+</div>
+
+## API
+
+<API moduleName="float-button" />

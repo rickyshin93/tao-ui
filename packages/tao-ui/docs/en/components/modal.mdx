@@ -3,6 +3,8 @@ title: Modal
 description: "Displays a focused dialog for decisions, forms, and interruptive information. Includes usage guidance, a runnable example, and the complete API reference."
 ---
 
+import Preview from '../../_components/demo-preview';
+
 Displays a focused dialog for decisions, forms, and interruptive information.
 
 ## When to use
@@ -18,7 +20,13 @@ Use Modal for focused tasks or decisions. Static helpers such as Modal.confirm m
 
 - Do not use nested modals for multi-step workflows.
 
-## Basic usage
+## Examples
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="modal-example-1">
+
+### Basic usage
 
 ```tsx preview
 import { Button, Modal } from '@rockshin/tao-ui';
@@ -29,7 +37,9 @@ function ModalExample() {
 
   return (
     <>
-      <Button variant="secondary" onClick={() => setOpen(true)}>Open modal</Button>
+      <Button variant="secondary" onClick={() => setOpen(true)}>
+        Open modal
+      </Button>
       <Modal
         open={open}
         title="Archive project?"
@@ -45,7 +55,11 @@ function ModalExample() {
 export default ModalExample;
 ```
 
-## Confirmation loading
+</section>
+
+<section className="tao-example" id="modal-example-2">
+
+### Confirmation loading
 
 ```tsx preview
 import { Button, Modal } from '@rockshin/tao-ui';
@@ -65,7 +79,9 @@ function LoadingModal() {
 
   return (
     <>
-      <Button variant="secondary" onClick={() => setOpen(true)}>Publish</Button>
+      <Button variant="secondary" onClick={() => setOpen(true)}>
+        Publish
+      </Button>
       <Modal
         open={open}
         title="Publish changes?"
@@ -82,25 +98,37 @@ function LoadingModal() {
 export default LoadingModal;
 ```
 
-## Custom and absent footers
+</section>
+
+<section className="tao-example" id="modal-example-3">
+
+### Custom and absent footers
 
 ```tsx preview
 import { Button, Modal, Stack } from '@rockshin/tao-ui';
 import { useState } from 'react';
 
 function ModalFooters() {
-  const [mode, setMode] = useState(null);
+  const [mode, setMode] = useState<'custom' | 'none' | null>(null);
 
   return (
     <>
       <Stack direction="horizontal" gap="md">
-        <Button variant="secondary" onClick={() => setMode('custom')}>Custom footer</Button>
-        <Button variant="secondary" onClick={() => setMode('none')}>No footer</Button>
+        <Button variant="secondary" onClick={() => setMode('custom')}>
+          Custom footer
+        </Button>
+        <Button variant="secondary" onClick={() => setMode('none')}>
+          No footer
+        </Button>
       </Stack>
       <Modal
         open={mode !== null}
         title={mode === 'custom' ? 'Custom footer' : 'Informational modal'}
-        footer={mode === 'custom' ? <Button onClick={() => setMode(null)}>Done</Button> : null}
+        footer={
+          mode === 'custom' ? (
+            <Button onClick={() => setMode(null)}>Done</Button>
+          ) : null
+        }
         onClose={() => setMode(null)}
       >
         Footer content is optional and can be replaced.
@@ -112,7 +140,11 @@ function ModalFooters() {
 export default ModalFooters;
 ```
 
-## Imperative dialogs
+</section>
+
+<section className="tao-example" id="modal-example-4">
+
+### Imperative dialogs
 
 ```tsx preview
 import { Button, Modal, Stack } from '@rockshin/tao-ui';
@@ -120,15 +152,389 @@ import { Button, Modal, Stack } from '@rockshin/tao-ui';
 function ImperativeModals() {
   return (
     <Stack direction="horizontal" gap="md">
-      <Button variant="secondary" onClick={() => Modal.info({ title: 'Information', content: 'Your export is ready.' })}>Info</Button>
-      <Button variant="secondary" onClick={() => Modal.success({ title: 'Saved', content: 'Changes were saved.' })}>Success</Button>
-      <Button variant="destructive" onClick={() => Modal.confirm({ title: 'Delete project?', content: 'This cannot be undone.' })}>Confirm</Button>
+      <Button
+        variant="secondary"
+        onClick={() =>
+          Modal.info({ title: 'Information', content: 'Your export is ready.' })
+        }
+      >
+        Info
+      </Button>
+      <Button
+        variant="secondary"
+        onClick={() =>
+          Modal.success({ title: 'Saved', content: 'Changes were saved.' })
+        }
+      >
+        Success
+      </Button>
+      <Button
+        variant="destructive"
+        onClick={() =>
+          Modal.confirm({
+            title: 'Delete project?',
+            content: 'This cannot be undone.',
+          })
+        }
+      >
+        Confirm
+      </Button>
     </Stack>
   );
 }
 
 export default ImperativeModals;
 ```
+
+</section>
+
+<section className="tao-example" id="modal-confirm-loading">
+
+### Async confirmation
+
+A local delay simulates submission; `confirmLoading` communicates progress and prevents duplicate confirmation.
+
+```tsx preview
+import { Button, Modal } from '@rockshin/tao-ui';
+
+import { useState } from 'react';
+
+export default function ModalConfirmLoading() {
+  function Demo() {
+    const [open, setOpen] = useState(false);
+    const [loading, setLoading] = useState(false);
+    return (
+      <>
+        <Button variant="secondary" onClick={() => setOpen(true)}>
+          Open Confirm
+        </Button>
+        <Modal
+          open={open}
+          title="Delete item?"
+          confirmLoading={loading}
+          okText="Delete"
+          onClose={() => setOpen(false)}
+          onOk={() => {
+            setLoading(true);
+            setTimeout(() => {
+              setLoading(false);
+              setOpen(false);
+            }, 1500);
+          }}
+        >
+          <p>This action cannot be undone.</p>
+        </Modal>
+      </>
+    );
+  }
+  return <Demo />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="modal-custom-footer">
+
+### Custom footer
+
+Replace the default actions with `footer` for a multi-step or specialized flow.
+
+```tsx preview
+import { Button, Modal } from '@rockshin/tao-ui';
+
+import { useState } from 'react';
+
+export default function ModalCustomFooter() {
+  function Demo() {
+    const [open, setOpen] = useState(false);
+    return (
+      <>
+        <Button variant="secondary" onClick={() => setOpen(true)}>
+          Open
+        </Button>
+        <Modal
+          open={open}
+          title="Custom footer"
+          width={420}
+          onClose={() => setOpen(false)}
+          footer={
+            <Button variant="primary" onClick={() => setOpen(false)}>
+              Got it
+            </Button>
+          }
+        >
+          <p>Single-action footer.</p>
+        </Modal>
+      </>
+    );
+  }
+  return <Demo />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="modal-footer-render-fn">
+
+### Extend the default footer
+
+Use the footer render function to preserve the built-in buttons while adding actions.
+
+```tsx preview
+import { Button, Modal, Stack } from '@rockshin/tao-ui';
+
+import { useState } from 'react';
+
+export default function ModalFooterRenderFn() {
+  function Demo() {
+    const [open, setOpen] = useState(false);
+    return (
+      <>
+        <Button variant="secondary" onClick={() => setOpen(true)}>
+          Open
+        </Button>
+        <Modal
+          open={open}
+          title="Compose around defaults"
+          onClose={() => setOpen(false)}
+          onOk={() => setOpen(false)}
+          footer={(origin, { CancelBtn }) => (
+            <Stack direction="horizontal" gap="sm" style={{ width: '100%' }}>
+              <Button variant="ghost" onClick={() => setOpen(false)}>
+                Read later
+              </Button>
+              <span style={{ flex: 1 }} />
+              <CancelBtn />
+              {origin}
+            </Stack>
+          )}
+        >
+          <p>
+            The render-prop footer receives the default node plus{' '}
+            <code>OkBtn</code> / <code>CancelBtn</code> so you can keep defaults
+            and add your own.
+          </p>
+        </Modal>
+      </>
+    );
+  }
+  return <Demo />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="modal-button-props">
+
+### Confirm and cancel button props
+
+Configure the confirm and cancel buttons separately for destructive or unavailable actions.
+
+```tsx preview
+import { Button, Modal } from '@rockshin/tao-ui';
+
+import { useState } from 'react';
+
+export default function ModalButtonProps() {
+  function Demo() {
+    const [open, setOpen] = useState(false);
+    return (
+      <>
+        <Button variant="secondary" onClick={() => setOpen(true)}>
+          Open
+        </Button>
+        <Modal
+          open={open}
+          title="Delete item?"
+          okText="Delete"
+          okButtonProps={{ variant: 'destructive' }}
+          cancelButtonProps={{ variant: 'ghost' }}
+          onClose={() => setOpen(false)}
+          onOk={() => setOpen(false)}
+        >
+          <p>OK is a destructive button via okButtonProps.</p>
+        </Modal>
+      </>
+    );
+  }
+  return <Demo />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="modal-keep-alive">
+
+### Preserve content between openings
+
+Preserving children allows editing to continue after reopening. Enter text, close, and reopen.
+
+```tsx preview
+import { Button, FormField, Input, Modal } from '@rockshin/tao-ui';
+
+import { useState } from 'react';
+
+export default function ModalKeepAlive() {
+  function Demo() {
+    const [open, setOpen] = useState(false);
+    return (
+      <>
+        <Button variant="secondary" onClick={() => setOpen(true)}>
+          Open (state preserved across reopen)
+        </Button>
+        <Modal
+          open={open}
+          title="destroyOnHidden = false"
+          destroyOnHidden={false}
+          onClose={() => setOpen(false)}
+          onOk={() => setOpen(false)}
+        >
+          <FormField label="Type, close, reopen — text stays">
+            <Input placeholder="I survive close" />
+          </FormField>
+        </Modal>
+      </>
+    );
+  }
+  return <Demo />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="modal-imperative-confirm">
+
+### Imperative confirmation
+
+`Modal.confirm` creates a one-off confirmation. This example uses a local delay for async behavior.
+
+```tsx preview
+import { Button, Modal, Stack } from '@rockshin/tao-ui';
+
+export default function ModalImperativeConfirm() {
+  return (
+    <Stack direction="horizontal" gap="sm">
+      <Button
+        variant="destructive"
+        onClick={() =>
+          Modal.confirm({
+            title: 'Delete item?',
+            content: 'This action cannot be undone.',
+            okText: 'Delete',
+            okButtonProps: { variant: 'destructive' },
+            onOk: () => new Promise((res) => setTimeout(res, 1200)),
+          })
+        }
+      >
+        confirm (async OK)
+      </Button>
+      <Button
+        variant="secondary"
+        onClick={() => Modal.info({ title: 'Info', content: 'FYI.' })}
+      >
+        info
+      </Button>
+      <Button
+        variant="secondary"
+        onClick={() => Modal.success({ title: 'Saved!' })}
+      >
+        success
+      </Button>
+      <Button
+        variant="secondary"
+        onClick={() => Modal.error({ title: 'Something broke' })}
+      >
+        error
+      </Button>
+      <Button
+        variant="secondary"
+        onClick={() =>
+          Modal.warning({ title: 'Heads up', content: 'Check your input.' })
+        }
+      >
+        warning
+      </Button>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="modal-use-modal-hook">
+
+### Context-aware confirmation
+
+`Modal.useModal` returns an instance and context holder; render the holder within application providers.
+
+```tsx preview
+import { Button, Modal } from '@rockshin/tao-ui';
+
+export default function ModalUseModalHook() {
+  function Demo() {
+    const [modal, contextHolder] = Modal.useModal();
+    return (
+      <>
+        <Button
+          variant="secondary"
+          onClick={() =>
+            modal.confirm({
+              title: 'Context-aware confirm',
+              content: 'Inherits TaoProvider config & theme.',
+            })
+          }
+        >
+          useModal confirm
+        </Button>
+        {contextHolder}
+      </>
+    );
+  }
+  return <Demo />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="modal-responsive-width">
+
+### Responsive modal width
+
+Set widths by breakpoint so the dialog adapts to the screen and content wraps naturally.
+
+```tsx preview="iframe-follow"
+import { Button, Modal } from '@rockshin/tao-ui';
+
+import { useState } from 'react';
+
+export default function ModalResponsiveWidth() {
+  function Demo() {
+    const [open, setOpen] = useState(false);
+    return (
+      <>
+        <Button variant="secondary" onClick={() => setOpen(true)}>
+          Open Responsive Modal
+        </Button>
+        <Modal
+          open={open}
+          title="Responsive Width"
+          width={{ xs: 'calc(100vw - 32px)', md: 640, xl: 800 }}
+          onClose={() => setOpen(false)}
+          onOk={() => setOpen(false)}
+        >
+          Resize the viewport: full-width on phones, 640px from md up, 800px
+          from xl up.
+        </Modal>
+      </>
+    );
+  }
+  return <Demo />;
+}
+```
+
+</section>
+
+</div>
 
 ## API
 

@@ -1,0 +1,454 @@
+---
+title: App
+description: "Provides scoped message, notification and modal instances with application context."
+---
+
+import Preview from '../../_components/demo-preview';
+
+Provides scoped message, notification and modal instances with application context.
+
+## When to use
+
+Wrap the consuming subtree with App, then call App.useApp() inside a descendant. Put TaoProvider and any custom context providers outside App so feedback content inherits them. Each example has an isolated preview.
+
+## Examples
+
+<div className="tao-demo-grid tao-demo-grid-wide">
+
+<section className="tao-example" id="app-example-1">
+
+### Scoped messages
+
+The hook must run below App. Each instance owns its messages and can destroy only its own notices.
+
+```tsx preview="iframe-follow"
+import { App, Button, Stack } from '@rockshin/tao-ui';
+
+function Actions() {
+  const { message } = App.useApp();
+  return (
+    <Stack direction="horizontal" gap="sm" style={{ flexWrap: 'wrap' }}>
+      <Button onClick={() => message.success('Changes saved')}>Success</Button>
+      <Button
+        variant="secondary"
+        onClick={() => message.info('A new version is ready')}
+      >
+        Info
+      </Button>
+      <Button
+        variant="secondary"
+        onClick={() => message.warning('Storage is almost full')}
+      >
+        Warning
+      </Button>
+      <Button
+        variant="secondary"
+        onClick={() => message.error('Unable to save changes')}
+      >
+        Error
+      </Button>
+      <Button variant="secondary" onClick={() => message.destroy()}>
+        Clear messages
+      </Button>
+    </Stack>
+  );
+}
+export default function Example() {
+  return (
+    <App message={{ maxCount: 3 }}>
+      <Actions />
+    </App>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="app-example-2">
+
+### Keyed updates and close promises
+
+A message result is both a close function and a thenable. Reusing key updates the existing message.
+
+```tsx preview="iframe-follow"
+import { useRef, useState } from 'react';
+import { App, Button, Stack } from '@rockshin/tao-ui';
+import type { AppMessageType } from '@rockshin/tao-ui';
+
+function Actions() {
+  const { message } = App.useApp();
+  const close = useRef<AppMessageType | null>(null);
+  const [status, setStatus] = useState('Idle');
+  return (
+    <Stack gap="md">
+      <Stack direction="horizontal" gap="sm" style={{ flexWrap: 'wrap' }}>
+        <Button
+          onClick={() => {
+            setStatus('Running');
+            close.current = message.loading({
+              key: 'job',
+              content: 'Preparing local preview…',
+              duration: 0,
+            });
+            close.current.then(() => setStatus('Message closed'));
+          }}
+        >
+          Start
+        </Button>
+        <Button
+          variant="secondary"
+          onClick={() =>
+            message.success({
+              key: 'job',
+              content: 'Preview ready',
+              duration: 0,
+            })
+          }
+        >
+          Update
+        </Button>
+        <Button variant="secondary" onClick={() => close.current?.()}>
+          Close
+        </Button>
+      </Stack>
+      <output>{status}</output>
+    </Stack>
+  );
+}
+export default function Example() {
+  return (
+    <App>
+      <Actions />
+    </App>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="app-example-3">
+
+### Notifications with actions and progress
+
+duration is measured in seconds. showProgress visualizes the auto-close timer; hovering pauses it by default.
+
+```tsx preview="iframe-follow"
+import { App, Button, Stack } from '@rockshin/tao-ui';
+
+function Actions() {
+  const { notification } = App.useApp();
+  return (
+    <Stack direction="horizontal" gap="sm" style={{ flexWrap: 'wrap' }}>
+      <Button
+        onClick={() =>
+          notification.success({
+            key: 'export',
+            title: 'Export ready',
+            description: 'The sample report is ready to review.',
+            duration: 8,
+            showProgress: true,
+            actions: (
+              <Button
+                size="small"
+                onClick={() => notification.destroy('export')}
+              >
+                Dismiss
+              </Button>
+            ),
+          })
+        }
+      >
+        Timed notification
+      </Button>
+      <Button
+        variant="secondary"
+        onClick={() =>
+          notification.info({
+            title: 'Review needed',
+            description: 'This notification stays open until dismissed.',
+            duration: 0,
+            placement: 'bottomRight',
+          })
+        }
+      >
+        Persistent notification
+      </Button>
+    </Stack>
+  );
+}
+export default function Example() {
+  return (
+    <App notification={{ placement: 'topRight', stack: { threshold: 3 } }}>
+      <Actions />
+    </App>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="app-example-4">
+
+### Await a confirmation
+
+The result resolves to true for confirmation and false for cancellation. This demo changes local state only.
+
+```tsx preview="iframe-follow"
+import { useState } from 'react';
+import { App, Button, Stack } from '@rockshin/tao-ui';
+
+function Actions() {
+  const { modal } = App.useApp();
+  const [status, setStatus] = useState('Project is active');
+  return (
+    <Stack gap="md">
+      <Button
+        onClick={async () => {
+          const accepted = await modal.confirm({
+            title: 'Archive this project?',
+            content: 'You can restore it from archived projects.',
+            okText: 'Archive',
+            cancelText: 'Keep project',
+          });
+          setStatus(
+            accepted ? 'Project archived in this demo' : 'Project is active',
+          );
+        }}
+      >
+        Archive project
+      </Button>
+      <output>{status}</output>
+    </Stack>
+  );
+}
+export default function Example() {
+  return (
+    <App>
+      <Actions />
+    </App>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="app-example-5">
+
+### Async confirmation and retry
+
+Returning a promise keeps the action busy. Rejection keeps the modal open. This local simulation deliberately fails once, then succeeds.
+
+```tsx preview="iframe-follow"
+import { App, Button } from '@rockshin/tao-ui';
+
+function Actions() {
+  const { modal } = App.useApp();
+  return (
+    <Button
+      onClick={() => {
+        let attempts = 0;
+        const dialog = modal.confirm({
+          title: 'Save sample changes?',
+          content:
+            'The first attempt demonstrates an error. Try again to finish.',
+          onOk: async () => {
+            await new Promise((resolve) => window.setTimeout(resolve, 700));
+            attempts += 1;
+            if (attempts === 1) {
+              dialog.update({
+                content: 'The simulated save failed. Choose OK to retry.',
+              });
+              throw new Error('Simulated save failure');
+            }
+          },
+        });
+      }}
+    >
+      Try async confirmation
+    </Button>
+  );
+}
+export default function Example() {
+  return (
+    <App>
+      <Actions />
+    </App>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="app-example-6">
+
+### Update and destroy a modal
+
+The returned handle updates content or closes the dialog. A custom footer can retain the supplied OkBtn and CancelBtn.
+
+```tsx preview="iframe-follow"
+import { App, Button, Stack } from '@rockshin/tao-ui';
+
+function Actions() {
+  const { modal } = App.useApp();
+  return (
+    <Button
+      onClick={() => {
+        const dialog = modal.info({
+          title: 'Preview version 1',
+          content: 'Review the current draft.',
+          footer: (_, { OkBtn }) => (
+            <Stack
+              direction="horizontal"
+              gap="sm"
+              style={{ justifyContent: 'flex-end', flexWrap: 'wrap' }}
+            >
+              <Button
+                variant="secondary"
+                onClick={() =>
+                  dialog.update({
+                    title: 'Preview version 2',
+                    content: 'The draft has been updated.',
+                  })
+                }
+              >
+                Update
+              </Button>
+              <Button variant="secondary" onClick={() => dialog.destroy()}>
+                Close
+              </Button>
+              <OkBtn />
+            </Stack>
+          ),
+        });
+      }}
+    >
+      Open editable preview
+    </Button>
+  );
+}
+export default function Example() {
+  return (
+    <App>
+      <Actions />
+    </App>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="app-example-7">
+
+### Theme, locale and custom context
+
+Feedback portals retain provider tokens and React context. Locale supplies default confirmation and close labels.
+
+```tsx preview="iframe-follow"
+import { createContext, useContext } from 'react';
+import { App, Button, Stack, TaoProvider, zhCN } from '@rockshin/tao-ui';
+
+const Workspace = createContext('');
+function Details() {
+  return <span>Workspace: {useContext(Workspace)}</span>;
+}
+function Actions() {
+  const { notification, modal } = App.useApp();
+  return (
+    <Stack direction="horizontal" gap="sm" style={{ flexWrap: 'wrap' }}>
+      <Button
+        onClick={() =>
+          notification.info({
+            title: 'Workspace context',
+            description: <Details />,
+          })
+        }
+      >
+        Show notification
+      </Button>
+      <Button
+        variant="secondary"
+        onClick={() =>
+          modal.confirm({ title: 'Continue?', content: <Details /> })
+        }
+      >
+        Show confirmation
+      </Button>
+    </Stack>
+  );
+}
+export default function Example() {
+  return (
+    <TaoProvider
+      locale={zhCN}
+      theme={{
+        token: { colorPrimary: '#315de2' },
+        components: { Button: { primaryColor: '#fff' } },
+      }}
+    >
+      <Workspace.Provider value="Northstar">
+        <App>
+          <Actions />
+        </App>
+      </Workspace.Provider>
+    </TaoProvider>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="app-example-8">
+
+### Independent scopes and custom roots
+
+Two App instances keep separate message stores. component changes the wrapper element; component={false} omits only that wrapper.
+
+```tsx preview="iframe-follow"
+import { App, Button, Stack } from '@rockshin/tao-ui';
+
+function Actions({ name }: { name: string }) {
+  const { message } = App.useApp();
+  return (
+    <Stack direction="horizontal" gap="sm" style={{ flexWrap: 'wrap' }}>
+      <Button
+        onClick={() =>
+          message.info({
+            key: 'status',
+            content: `${name} workspace ready`,
+            duration: 0,
+          })
+        }
+      >
+        Show {name}
+      </Button>
+      <Button variant="secondary" onClick={() => message.destroy()}>
+        Clear {name}
+      </Button>
+    </Stack>
+  );
+}
+export default function Example() {
+  return (
+    <Stack gap="md">
+      <App
+        component="section"
+        message={{ top: 16 }}
+        styles={{ root: { padding: 12 } }}
+      >
+        <Actions name="First" />
+      </App>
+      <App component={false} message={{ top: 80 }}>
+        <Actions name="Second" />
+      </App>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+</div>
+
+## API
+
+<API moduleName="app" />

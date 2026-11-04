@@ -2,6 +2,8 @@
 
 A component library for React 18.2 and 19 with semantic DOM customization and OKLCH-based theming.
 
+Documentation: [English](https://rickyshin93.github.io/tao-ui/) · [简体中文](https://rickyshin93.github.io/tao-ui/zh/).
+
 ## Features
 
 - **React 18.2 and 19** — supports React 18.2 as the minimum version and React 19, with React Compiler optimizations.
@@ -48,6 +50,20 @@ Desktop date inputs expose `combobox` semantics: ArrowDown opens the calendar an
 Name Tabs with `aria-label` or `aria-labelledby`. Give Modal, Drawer and Popover a visible `title` or an explicit ARIA name; Popconfirm uses its question as the dialog name. Spinner accepts an ARIA name (default `Loading` when no tip is present), and wrapped content reports `aria-busy` throughout loading, including its display delay.
 
 Automated regression checks cover DOM semantics and keyboard interactions in React 18/19. They do not replace testing your composed screens with a browser and screen reader.
+
+### Responsive controls and language
+
+Select, DatePicker and RangePicker adapt to the viewport. Select keeps its current editing surface while open, supports `maxTagCount="responsive"`, and shares selection limits, controlled search and tag creation across desktop and mobile. Coarse pointers receive larger targets for basic controls.
+
+```tsx
+import { TaoProvider, zhCN } from '@rockshin/tao-ui/provider';
+
+<TaoProvider locale={zhCN}>
+  <App />
+</TaoProvider>
+```
+
+Select and calendar text defaults to English (`enUS`). Override individual keys with `locale={{ ...zhCN, done: '确认' }}`. Nested providers inherit omitted keys, including in portals. This does not change date value formats or Day.js global locale. See [responsive behavior and customization](./RESPONSIVE.md) for scope and verification boundaries.
 
 ### Component imports
 
@@ -98,13 +114,17 @@ import '@fontsource/geist-mono/400.css';
 
 | Category | Components |
 |----------|-----------|
-| General | `Button` |
-| Layout | `Stack`, `FormLayout`, `Splitter` |
-| Navigation | `Tabs`, `Pagination`, `Breadcrumb`, `Menu`, `Dropdown`, `ContextMenu` |
-| Data Entry | `Form`, `Input`, `Textarea`, `InputNumber`, `Select`, `Checkbox`, `Radio`, `Switch`, `DatePicker`, `RangePicker`, `FormField`, `FormSection`, `FormActions` |
-| Data Display | `Table`, `Tag`, `ScrollArea`, `Collapsible`, `Tooltip`, `Popover` |
-| Feedback | `Modal`, `Drawer`, `Sonner`, `Spinner`, `Alert`, `Popconfirm` |
-| Config | `TaoProvider`, `useTaoConfig`, `useTaoToken` |
+| General | `Button`, `FloatButton` |
+| Layout | `Stack`, `FormLayout`, `Splitter`, `Divider`, `Masonry` |
+| Navigation | `Tabs`, `Pagination`, `Breadcrumb`, `Menu`, `Dropdown`, `ContextMenu`, `Affix` |
+| Data Entry | `Form`, `Input`, `Textarea`, `InputNumber`, `Select`, `Checkbox`, `Radio`, `Switch`, `DatePicker`, `RangePicker`, `FormField`, `FormSection`, `FormActions`, `AutoComplete`, `Cascader`, `ColorPicker`, `Mentions`, `Rate`, `Slider`, `TimePicker`, `Transfer`, `TreeSelect`, `Upload` |
+| Data Display | `Table`, `Tag`, `ScrollArea`, `Collapsible`, `Tooltip`, `Popover`, `Avatar`, `Badge`, `BorderBeam`, `Calendar`, `Card`, `Carousel`, `Descriptions`, `Empty`, `Image`, `List`, `Listy`, `QRCode`, `Segmented`, `Statistic`, `Timeline`, `Tour`, `Tree`, `Watermark` |
+| Feedback | `Modal`, `Drawer`, `Sonner`, `Spinner`, `Alert`, `Popconfirm`, `Progress`, `Result`, `Skeleton` |
+| Config | `TaoProvider`, `App`, `useTaoConfig`, `useTaoToken` |
+
+The 0.0.42 catalog adds 36 visual entries and the `GetProps`, `GetProp` and `GetRef` type utilities. New entries follow Ant Design 6.7.0 public APIs with tao-ui themes, Semantic DOM and component styles. Complex controls reuse low-level rc engines; `antd` is not a runtime dependency. Existing tao-ui APIs are unchanged. See the [compatibility scope](./ANTD-COMPATIBILITY.md) for the included APIs and boundaries.
+
+Import types from the root or `@rockshin/tao-ui/util`. Compound APIs share their component entry, including `TimePicker.RangePicker`, `Tree.DirectoryTree`, `Image.PreviewGroup`, `Upload.Dragger`, `FloatButton.BackTop` and `App.useApp()`.
 
 Responsive helpers: `useBreakpoint`, `useIsMobile`, plus breakpoint-map props on
 `Stack` (`direction`/`gap`/`align`), `Modal` (`width`), and `Table` (column
@@ -126,6 +146,12 @@ Package metadata uses an explicit subpath import:
 import { componentDocs, getComponentDoc } from '@rockshin/tao-ui/meta';
 ```
 
+## Documentation preview
+
+From the repository root, run `bun run doc --port 4173` for the bilingual component reference, or `bun run doc:build` for the static build. All component pages include runnable examples with source expansion and copying. Phone previews run in a 390 × 640 iframe, with a 960 × 560 desktop mode; scaling the outer frame preserves the actual inner viewport. The frame follows site appearance and isolates toast containers. It does not emulate native browser engines, touch hardware, or software keyboards.
+
 ## License
 
 [MIT](./LICENSE) © rickyshin
+
+See [third-party notices](./THIRD_PARTY_NOTICES.md) for the upstream API reference attribution.

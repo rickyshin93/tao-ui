@@ -3,6 +3,8 @@ title: Form
 description: "Collects and validates field values with an antd-aligned API for rules, dependencies, and Form.List, backed by the rc-form engine."
 ---
 
+import Preview from '../../_components/demo-preview';
+
 Collects and validates field values with an antd-aligned API (rules, dependencies, Form.List) on top of the rc-form engine.
 
 ## When to use
@@ -21,67 +23,114 @@ Use Form with Form.Item when fields need a value store, rule validation, or subm
 - Do not bind the same name in two mounted Form.Items.
 - Do not mix manual value/onChange props with a bound Form.Item on the same control.
 
-## Basic usage
+## Examples
+
+<div className="tao-demo-grid tao-demo-grid-wide">
+
+<section className="tao-example" id="form-example-1">
+
+### Basic usage
 
 ```tsx preview
+import { useState } from 'react';
 import { Button, Form, Input } from '@rockshin/tao-ui';
 
 function FormExample() {
+  const [feedback, setFeedback] = useState('');
   return (
-    <Form
-      initialValues={{ email: '' }}
-      onFinish={(values) => console.log(values)}
-      style={{ maxWidth: 400 }}
-    >
-      <Form.Item
-        name="email"
-        label="Email"
-        rules={[{ required: true, message: 'Enter your email.' }]}
+    <>
+      <Form
+        initialValues={{ email: '' }}
+        onFinish={(values) => setFeedback(JSON.stringify(values))}
+        style={{ maxWidth: 400 }}
       >
-        <Input placeholder="you@example.com" />
-      </Form.Item>
-      <Button type="submit">Create account</Button>
-    </Form>
+        <Form.Item
+          name="email"
+          label="Email"
+          rules={[{ required: true, message: 'Enter your email.' }]}
+        >
+          <Input placeholder="you@example.com" />
+        </Form.Item>
+        <Button type="submit">Create account</Button>
+      </Form>
+      <output
+        aria-live="polite"
+        style={{
+          display: 'block',
+          marginTop: 12,
+          whiteSpace: 'pre-wrap',
+          overflowWrap: 'anywhere',
+        }}
+      >
+        {feedback}
+      </output>
+    </>
   );
 }
 
 export default FormExample;
 ```
 
-## Validation
+</section>
+
+<section className="tao-example" id="form-example-2">
+
+### Validation
 
 ```tsx preview
+import { useState } from 'react';
 import { Button, Form, Input } from '@rockshin/tao-ui';
 
 function ValidatedForm() {
+  const [feedback, setFeedback] = useState('');
   return (
-    <Form onFinish={(values) => console.log(values)} style={{ maxWidth: 420 }}>
-      <Form.Item
-        name="username"
-        label="Username"
-        rules={[
-          { required: true, message: 'Enter a username.' },
-          { min: 3, message: 'Use at least 3 characters.' },
-        ]}
+    <>
+      <Form
+        onFinish={(values) => setFeedback(JSON.stringify(values))}
+        style={{ maxWidth: 420 }}
       >
-        <Input placeholder="username" />
-      </Form.Item>
-      <Form.Item
-        name="email"
-        label="Email"
-        rules={[{ required: true, message: 'Enter an email.' }]}
+        <Form.Item
+          name="username"
+          label="Username"
+          rules={[
+            { required: true, message: 'Enter a username.' },
+            { min: 3, message: 'Use at least 3 characters.' },
+          ]}
+        >
+          <Input placeholder="username" />
+        </Form.Item>
+        <Form.Item
+          name="email"
+          label="Email"
+          rules={[{ required: true, message: 'Enter an email.' }]}
+        >
+          <Input type="email" placeholder="you@example.com" />
+        </Form.Item>
+        <Button type="submit">Submit</Button>
+      </Form>
+      <output
+        aria-live="polite"
+        style={{
+          display: 'block',
+          marginTop: 12,
+          whiteSpace: 'pre-wrap',
+          overflowWrap: 'anywhere',
+        }}
       >
-        <Input type="email" placeholder="you@example.com" />
-      </Form.Item>
-      <Button type="submit">Submit</Button>
-    </Form>
+        {feedback}
+      </output>
+    </>
   );
 }
 
 export default ValidatedForm;
 ```
 
-## Horizontal layout
+</section>
+
+<section className="tao-example" id="form-example-3">
+
+### Horizontal layout
 
 ```tsx preview
 import { Button, Form, Input } from '@rockshin/tao-ui';
@@ -102,6 +151,205 @@ function HorizontalForm() {
 
 export default HorizontalForm;
 ```
+
+</section>
+
+<section className="tao-example" id="form-complete-form">
+
+### Complete form
+
+Combine fields, sections, and actions into an end-to-end entry and submission flow.
+
+```tsx preview
+import {
+  Button,
+  FormActions,
+  FormField,
+  FormLayout,
+  FormSection,
+  Input,
+  Select,
+  Stack,
+} from '@rockshin/tao-ui';
+
+export default function FormCompleteForm() {
+  return (
+    <FormLayout>
+      <FormSection
+        title="Personal Information"
+        description="Basic details about you."
+      >
+        <Stack direction="horizontal" gap="md">
+          <FormField label="First name" required>
+            <Input value="Rihua" />
+          </FormField>
+          <FormField label="Last name" required>
+            <Input value="Chen" />
+          </FormField>
+        </Stack>
+        <FormField label="Email" required>
+          <Input value="rihua@example.com" prefix={<span>✉️</span>} />
+        </FormField>
+        <FormField label="Phone" description="Optional. Used for recovery.">
+          <Input placeholder="138 0000 0000" prefix={<span>+86</span>} />
+        </FormField>
+      </FormSection>
+
+      <FormSection title="Preferences" description="Configure your workspace.">
+        <FormField label="Language">
+          <Select
+            options={[
+              { label: '简体中文', value: 'zh' },
+              { label: 'English', value: 'en' },
+            ]}
+            value="zh"
+          />
+        </FormField>
+        <FormField label="Timezone">
+          <Select
+            options={[
+              { label: 'Asia/Shanghai (UTC+8)', value: 'cst' },
+              { label: 'America/New_York (UTC-5)', value: 'est' },
+            ]}
+            value="cst"
+          />
+        </FormField>
+      </FormSection>
+
+      <FormActions>
+        <Button variant="ghost">Cancel</Button>
+        <Button variant="primary">Save Changes</Button>
+      </FormActions>
+    </FormLayout>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="form-form-cross-field">
+
+### Cross-field validation
+
+Validate against another field and update feedback when the related value changes.
+
+```tsx preview
+import { Button, Form, FormActions, Input, Stack } from '@rockshin/tao-ui';
+
+export default function FormFormCrossField() {
+  return (
+    <Form layout="horizontal" style={{ maxWidth: 460 }}>
+      <Stack gap="md">
+        <Form.Item
+          name="password"
+          label="Password"
+          rules={[{ required: true, message: 'Password is required' }]}
+        >
+          <Input type="password" />
+        </Form.Item>
+        <Form.Item
+          name="confirm"
+          label="Confirm"
+          dependencies={['password']}
+          rules={[
+            ({ getFieldValue }) => ({
+              validator: (_, value) =>
+                !value || getFieldValue('password') === value
+                  ? Promise.resolve()
+                  : Promise.reject(new Error('Passwords do not match')),
+            }),
+          ]}
+        >
+          <Input type="password" />
+        </Form.Item>
+        <FormActions>
+          <Button type="submit" variant="primary">
+            Change password
+          </Button>
+        </FormActions>
+      </Stack>
+    </Form>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="form-form-dynamic-list">
+
+### Dynamic field lists
+
+Add and remove repeated fields with `Form.List`, keeping form values and field indexes aligned.
+
+```tsx preview
+import { useState } from 'react';
+import { Button, Form, FormActions, Input, Stack } from '@rockshin/tao-ui';
+
+export default function FormFormDynamicList() {
+  const [feedback, setFeedback] = useState('');
+  return (
+    <>
+      <Form
+        style={{ maxWidth: 400 }}
+        initialValues={{ members: [''] }}
+        onFinish={(values) => setFeedback(JSON.stringify(values, null, 2))}
+      >
+        <Stack gap="md">
+          <Form.List name="members">
+            {(fields, { add, remove }) => (
+              <>
+                {fields.map((field, index) => (
+                  <Stack
+                    key={field.key}
+                    direction="horizontal"
+                    gap="sm"
+                    align="start"
+                  >
+                    <Form.Item
+                      name={field.name}
+                      label={index === 0 ? 'Members' : undefined}
+                      noStyle={index !== 0}
+                      rules={[{ required: true, message: 'Required' }]}
+                    >
+                      <Input placeholder="member name" />
+                    </Form.Item>
+                    <Button variant="ghost" onClick={() => remove(field.name)}>
+                      Remove
+                    </Button>
+                  </Stack>
+                ))}
+                <Button variant="secondary" onClick={() => add()}>
+                  Add member
+                </Button>
+              </>
+            )}
+          </Form.List>
+          <FormActions>
+            <Button type="submit" variant="primary">
+              Save
+            </Button>
+          </FormActions>
+        </Stack>
+      </Form>
+      <output
+        aria-live="polite"
+        style={{
+          display: 'block',
+          marginTop: 12,
+          whiteSpace: 'pre-wrap',
+          overflowWrap: 'anywhere',
+        }}
+      >
+        {feedback}
+      </output>
+    </>
+  );
+}
+```
+
+</section>
+
+</div>
 
 ## API
 

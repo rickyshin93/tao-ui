@@ -2,13 +2,13 @@ import { useSyncExternalStore } from 'react';
 
 /**
  * Responsive breakpoints — values aligned with antd v6
- * (`xs <576 / sm ≥576 / md ≥768 / lg ≥992 / xl ≥1200 / xxl ≥1600`).
+ * (`xs <576 / sm ≥576 / md ≥768 / lg ≥992 / xl ≥1200 / xxl ≥1600 / xxxl ≥1920`).
  *
  * CSS custom properties cannot be referenced from @media queries, so
  * breakpoints live as JS constants only; component CSS keeps its own
  * hardcoded media queries where needed.
  */
-export type TaoBreakpoint = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl';
+export type TaoBreakpoint = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl' | 'xxxl';
 
 export type TaoBreakpointMap<T = boolean> = Partial<Record<TaoBreakpoint, T>>;
 
@@ -19,7 +19,15 @@ export type TaoBreakpointMap<T = boolean> = Partial<Record<TaoBreakpoint, T>>;
 export type TaoResponsiveValue<T> = T | TaoBreakpointMap<T>;
 
 /** Largest-first order used when resolving responsive values. */
-const BREAKPOINTS_DESC: TaoBreakpoint[] = ['xxl', 'xl', 'lg', 'md', 'sm', 'xs'];
+const BREAKPOINTS_DESC: TaoBreakpoint[] = [
+  'xxxl',
+  'xxl',
+  'xl',
+  'lg',
+  'md',
+  'sm',
+  'xs',
+];
 
 /** `xs` is the only max-width query (phones); all others are min-width. */
 const BREAKPOINT_QUERIES: Record<TaoBreakpoint, string> = {
@@ -29,6 +37,7 @@ const BREAKPOINT_QUERIES: Record<TaoBreakpoint, string> = {
   lg: '(min-width: 992px)',
   xl: '(min-width: 1200px)',
   xxl: '(min-width: 1600px)',
+  xxxl: '(min-width: 1920px)',
 };
 
 const EMPTY_SCREENS: TaoBreakpointMap = {};

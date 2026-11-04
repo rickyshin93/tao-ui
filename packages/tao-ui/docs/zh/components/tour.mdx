@@ -1,0 +1,375 @@
+---
+title: Tour
+description: "通过目标定位、聚光遮罩、自定义操作和键盘导航组织分步引导。"
+---
+
+import Preview from '../../_components/demo-preview';
+
+通过目标定位、聚光遮罩、自定义操作和键盘导航组织分步引导。
+
+每个示例都可以独立复制运行。带设备预览的示例可通过工具栏切换桌面与手机宽度。
+
+带遮罩的居中步骤，以及 `disabledInteraction` 步骤，会将键盘焦点限制在向导内。允许操作目标的步骤使用非模态语义，目标仍可获得焦点。关闭后焦点返回启动位置。
+
+## 示例
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="tour-basic">
+
+### 在目标之间引导
+
+Tour 打开后从 ref 读取目标元素，Next 切换到下一目标。
+
+```tsx preview="iframe-follow"
+import { useRef, useState } from 'react';
+import { Button, Tour } from '@rockshin/tao-ui';
+export default function BasicTour() {
+  const [open, setOpen] = useState(false);
+  const upload = useRef<HTMLButtonElement>(null);
+  const save = useRef<HTMLButtonElement>(null);
+  return (
+    <div style={{ padding: 24, minHeight: 300 }}>
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+        <Button ref={upload}>Upload</Button>
+        <Button ref={save}>Save</Button>
+        <Button onClick={() => setOpen(true)}>Start tour</Button>
+      </div>
+      <Tour
+        open={open}
+        onClose={() => setOpen(false)}
+        steps={[
+          {
+            title: 'Upload a file',
+            description: 'Choose a document to begin.',
+            target: () => upload.current!,
+          },
+          {
+            title: 'Save changes',
+            description: 'Review your work, then save.',
+            target: () => save.current!,
+          },
+        ]}
+      />
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="tour-controlled">
+
+### 受控当前步骤
+
+将 current 和 open 保存在状态中，再次开始前重置步骤。
+
+```tsx preview="iframe-follow"
+import { useRef, useState } from 'react';
+import { Button, Tour } from '@rockshin/tao-ui';
+export default function ControlledTour() {
+  const [open, setOpen] = useState(false);
+  const [current, setCurrent] = useState(0);
+  const upload = useRef<HTMLButtonElement>(null);
+  const save = useRef<HTMLButtonElement>(null);
+  return (
+    <div style={{ padding: 24, minHeight: 300 }}>
+      <div style={{ display: 'flex', gap: 8 }}>
+        <Button ref={upload}>Upload</Button>
+        <Button ref={save}>Save</Button>
+        <Button
+          onClick={() => {
+            setCurrent(0);
+            setOpen(true);
+          }}
+        >
+          Start again
+        </Button>
+      </div>
+      <p>Current step: {current + 1}</p>
+      <Tour
+        open={open}
+        current={current}
+        onChange={setCurrent}
+        onClose={() => setOpen(false)}
+        steps={[
+          {
+            title: 'Upload a file',
+            description: 'Choose a document to begin.',
+            target: () => upload.current!,
+          },
+          {
+            title: 'Save changes',
+            description: 'Review your work, then save.',
+            target: () => save.current!,
+          },
+        ]}
+      />
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="tour-centered">
+
+### 居中的介绍步骤
+
+省略 target 时，步骤作为介绍面板居中显示。
+
+```tsx preview="iframe-follow"
+import { useState } from 'react';
+import { Button, Tour } from '@rockshin/tao-ui';
+export default function CenteredTour() {
+  const [open, setOpen] = useState(false);
+  return (
+    <div style={{ padding: 24, minHeight: 300 }}>
+      <Button onClick={() => setOpen(true)}>Welcome tour</Button>
+      <Tour
+        open={open}
+        onClose={() => setOpen(false)}
+        steps={[
+          {
+            title: 'Welcome to your workspace',
+            description:
+              'Organize documents, review changes and share results from one place.',
+          },
+          {
+            title: 'Ready to begin',
+            description: 'Choose Done to close this introduction.',
+          },
+        ]}
+      />
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="tour-primary">
+
+### 主色强调与封面
+
+type="primary" 改变面板强调方式，每步可添加封面图片或其他 React 内容。
+
+```tsx preview="iframe-follow"
+import { useState } from 'react';
+import { Button, Tour } from '@rockshin/tao-ui';
+const photo = (color: string) =>
+  `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400"><rect width="600" height="400" fill="${color}"/><circle cx="420" cy="110" r="46" fill="#fff5"/><path d="M0 400L220 120L420 400Z" fill="#fff8"/><path d="M200 400L430 200L600 400Z" fill="#fff4"/></svg>`)}`;
+export default function PrimaryTour() {
+  const [open, setOpen] = useState(false);
+  return (
+    <div style={{ padding: 24, minHeight: 300 }}>
+      <Button onClick={() => setOpen(true)}>Discover the workspace</Button>
+      <Tour
+        open={open}
+        type="primary"
+        onClose={() => setOpen(false)}
+        steps={[
+          {
+            title: 'A clear place to start',
+            description: 'Create your first project when you are ready.',
+            cover: <img src={photo('#496f5d')} alt="Mountain illustration" />,
+          },
+        ]}
+      />
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="tour-mask">
+
+### 遮罩、间距与交互
+
+gap 控制高亮区域与目标之间的间距，disabledInteraction 阻止点击高亮目标。
+
+```tsx preview="iframe-follow"
+import { useRef, useState } from 'react';
+import { Button, Tour } from '@rockshin/tao-ui';
+export default function SpotlightTour() {
+  const [open, setOpen] = useState(false);
+  const upload = useRef<HTMLButtonElement>(null);
+  const save = useRef<HTMLButtonElement>(null);
+  return (
+    <div style={{ padding: 24, minHeight: 300 }}>
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+        <Button ref={upload}>Upload</Button>
+        <Button ref={save}>Save</Button>
+        <Button onClick={() => setOpen(true)}>Start tour</Button>
+      </div>
+      <Tour
+        open={open}
+        onClose={() => setOpen(false)}
+        gap={{ offset: 10, radius: 10 }}
+        mask={{ color: 'rgba(25,34,46,.65)' }}
+        disabledInteraction
+        steps={[
+          {
+            title: 'Upload a file',
+            description: 'Choose a document to begin.',
+            target: () => upload.current!,
+          },
+          {
+            title: 'Save changes',
+            description: 'Review your work, then save.',
+            target: () => save.current!,
+          },
+        ]}
+      />
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="tour-actions">
+
+### 自定义指示器与操作
+
+保留默认操作并增加 Skip；每步的按钮属性可修改文字与事件。
+
+```tsx preview="iframe-follow"
+import { useRef, useState } from 'react';
+import { Button, Tour } from '@rockshin/tao-ui';
+export default function CustomTourActions() {
+  const [open, setOpen] = useState(false);
+  const upload = useRef<HTMLButtonElement>(null);
+  const save = useRef<HTMLButtonElement>(null);
+  return (
+    <div style={{ padding: 24, minHeight: 300 }}>
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+        <Button ref={upload}>Upload</Button>
+        <Button ref={save}>Save</Button>
+        <Button onClick={() => setOpen(true)}>Start tour</Button>
+      </div>
+      <Tour
+        open={open}
+        onClose={() => setOpen(false)}
+        indicatorsRender={(current, total) => (
+          <span>
+            {current + 1} / {total}
+          </span>
+        )}
+        actionsRender={(actions) => (
+          <>
+            <Button size="small" variant="ghost" onClick={() => setOpen(false)}>
+              Skip
+            </Button>
+            {actions}
+          </>
+        )}
+        steps={[
+          {
+            title: 'Upload a file',
+            target: () => upload.current!,
+            nextButtonProps: { children: 'Continue' },
+          },
+          {
+            title: 'Save changes',
+            target: () => save.current!,
+            nextButtonProps: { children: 'Got it' },
+          },
+        ]}
+      />
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="tour-nonmodal">
+
+### 非模态引导
+
+mask:false 保持页面清晰可见；keyboard:false 禁用步骤快捷键与 Escape，本例仍可通过 Done 关闭。
+
+```tsx preview="iframe-follow"
+import { useRef, useState } from 'react';
+import { Button, Tour } from '@rockshin/tao-ui';
+export default function NonModalTour() {
+  const [open, setOpen] = useState(false);
+  const target = useRef<HTMLButtonElement>(null);
+  return (
+    <div style={{ padding: 24, minHeight: 300 }}>
+      <Button ref={target} onClick={() => setOpen(true)}>
+        Show a hint
+      </Button>
+      <Tour
+        open={open}
+        onClose={() => setOpen(false)}
+        mask={false}
+        keyboard={false}
+        closable={false}
+        steps={[
+          {
+            title: 'Save your work',
+            description: 'You can continue interacting with the page.',
+            target: () => target.current!,
+          },
+        ]}
+      />
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="tour-mobile">
+
+### 窄屏引导
+
+面板会围绕目标翻转与偏移，保持在手机视口内。
+
+```tsx preview="iframe-follow"
+import { useRef, useState } from 'react';
+import { Button, Tour } from '@rockshin/tao-ui';
+export default function MobileTour() {
+  const [open, setOpen] = useState(false);
+  const upload = useRef<HTMLButtonElement>(null);
+  const save = useRef<HTMLButtonElement>(null);
+  return (
+    <div style={{ padding: 16, minHeight: 360 }}>
+      <h3>Start your project</h3>
+      <p>Follow two steps to upload and save.</p>
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+        <Button ref={upload}>Upload</Button>
+        <Button ref={save}>Save</Button>
+        <Button onClick={() => setOpen(true)}>Start tour</Button>
+      </div>
+      <Tour
+        open={open}
+        onClose={() => setOpen(false)}
+        steps={[
+          {
+            title: 'Upload a file',
+            description: 'Choose a document to begin.',
+            target: () => upload.current!,
+          },
+          {
+            title: 'Save changes',
+            description: 'Review your work, then save.',
+            target: () => save.current!,
+          },
+        ]}
+      />
+    </div>
+  );
+}
+```
+
+</section>
+
+</div>
+
+## API
+
+<API moduleName="tour" />

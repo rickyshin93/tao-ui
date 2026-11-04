@@ -1,0 +1,27 @@
+@layer tao {
+  [data-tao-statistic] {
+    color: var(--tao-color-text);
+    font: var(--tao-font-size) / var(--tao-line-height) var(--tao-font-family);
+    min-width: 0;
+  }
+  [data-tao-statistic-header] {
+    margin-bottom: 4px;
+  }
+  [data-tao-statistic-title] {
+    color: var(--tao-color-text-secondary);
+  }
+  [data-tao-statistic-content] {
+    font-size: 24px;
+    font-variant-numeric: tabular-nums;
+    overflow-wrap: anywhere;
+  }
+  [data-tao-statistic-prefix] {
+    margin-inline-end: 4px;
+  }
+  [data-tao-statistic-suffix] {
+    margin-inline-start: 4px;
+  }
+  [data-tao-statistic-decimal] {
+    font-size: 0.67em;
+  }
+}

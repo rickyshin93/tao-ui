@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useTaoConfig } from '../../../provider/tao-provider';
 import type { TimeConfig } from '../types';
 
 interface TimePanelProps {
@@ -19,6 +20,7 @@ export function TimePanel({
   config,
   scrollKey,
 }: TimePanelProps) {
+  const { locale } = useTaoConfig();
   const hourStep = config?.hourStep ?? 1;
   const minuteStep = config?.minuteStep ?? 1;
   const secondStep = config?.secondStep ?? 1;
@@ -53,21 +55,21 @@ export function TimePanel({
         values={hours}
         selected={hour}
         onSelect={(v) => onChange(v, minute, second)}
-        label="Hour"
+        label={locale.hour}
         scrollKey={scrollKey}
       />
       <TimeColumn
         values={minutes}
         selected={minute}
         onSelect={(v) => onChange(hour, v, second)}
-        label="Minute"
+        label={locale.minute}
         scrollKey={scrollKey}
       />
       <TimeColumn
         values={seconds}
         selected={second}
         onSelect={(v) => onChange(hour, minute, v)}
-        label="Second"
+        label={locale.second}
         scrollKey={scrollKey}
       />
     </div>

@@ -241,3 +241,10 @@
     outline: none;
   }
 }
+
+@media (pointer: coarse) {
+  button[data-tao-button] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}

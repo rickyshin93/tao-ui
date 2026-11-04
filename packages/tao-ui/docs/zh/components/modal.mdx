@@ -3,6 +3,8 @@ title: Modal
 description: 在受保护的焦点上下文中展示需要用户处理的对话框。页面涵盖适用场景、设计建议、多组可运行示例、交互状态与完整 API 参考。
 ---
 
+import Preview from '../../_components/demo-preview';
+
 在受保护的焦点上下文中展示需要用户处理的对话框。
 
 ## 何时使用
@@ -19,7 +21,13 @@ description: 在受保护的焦点上下文中展示需要用户处理的对话�
 
 - 不需要中断或焦点保护的内容不要放进 Modal。
 
-## 基础用法
+## 代码演示
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="modal-example-1">
+
+### 基础用法
 
 ```tsx preview
 import { Button, Modal } from '@rockshin/tao-ui';
@@ -30,7 +38,9 @@ function ModalExample() {
 
   return (
     <>
-      <Button variant="secondary" onClick={() => setOpen(true)}>Open modal</Button>
+      <Button variant="secondary" onClick={() => setOpen(true)}>
+        Open modal
+      </Button>
       <Modal
         open={open}
         title="Archive project?"
@@ -46,7 +56,11 @@ function ModalExample() {
 export default ModalExample;
 ```
 
-## 确认加载状态
+</section>
+
+<section className="tao-example" id="modal-example-2">
+
+### 确认加载状态
 
 ```tsx preview
 import { Button, Modal } from '@rockshin/tao-ui';
@@ -66,7 +80,9 @@ function LoadingModal() {
 
   return (
     <>
-      <Button variant="secondary" onClick={() => setOpen(true)}>Publish</Button>
+      <Button variant="secondary" onClick={() => setOpen(true)}>
+        Publish
+      </Button>
       <Modal
         open={open}
         title="Publish changes?"
@@ -83,25 +99,37 @@ function LoadingModal() {
 export default LoadingModal;
 ```
 
-## 自定义与无页脚
+</section>
+
+<section className="tao-example" id="modal-example-3">
+
+### 自定义与无页脚
 
 ```tsx preview
 import { Button, Modal, Stack } from '@rockshin/tao-ui';
 import { useState } from 'react';
 
 function ModalFooters() {
-  const [mode, setMode] = useState(null);
+  const [mode, setMode] = useState<'custom' | 'none' | null>(null);
 
   return (
     <>
       <Stack direction="horizontal" gap="md">
-        <Button variant="secondary" onClick={() => setMode('custom')}>Custom footer</Button>
-        <Button variant="secondary" onClick={() => setMode('none')}>No footer</Button>
+        <Button variant="secondary" onClick={() => setMode('custom')}>
+          Custom footer
+        </Button>
+        <Button variant="secondary" onClick={() => setMode('none')}>
+          No footer
+        </Button>
       </Stack>
       <Modal
         open={mode !== null}
         title={mode === 'custom' ? 'Custom footer' : 'Informational modal'}
-        footer={mode === 'custom' ? <Button onClick={() => setMode(null)}>Done</Button> : null}
+        footer={
+          mode === 'custom' ? (
+            <Button onClick={() => setMode(null)}>Done</Button>
+          ) : null
+        }
         onClose={() => setMode(null)}
       >
         Footer content is optional and can be replaced.
@@ -113,7 +141,11 @@ function ModalFooters() {
 export default ModalFooters;
 ```
 
-## 命令式对话框
+</section>
+
+<section className="tao-example" id="modal-example-4">
+
+### 命令式对话框
 
 ```tsx preview
 import { Button, Modal, Stack } from '@rockshin/tao-ui';
@@ -121,15 +153,389 @@ import { Button, Modal, Stack } from '@rockshin/tao-ui';
 function ImperativeModals() {
   return (
     <Stack direction="horizontal" gap="md">
-      <Button variant="secondary" onClick={() => Modal.info({ title: 'Information', content: 'Your export is ready.' })}>Info</Button>
-      <Button variant="secondary" onClick={() => Modal.success({ title: 'Saved', content: 'Changes were saved.' })}>Success</Button>
-      <Button variant="destructive" onClick={() => Modal.confirm({ title: 'Delete project?', content: 'This cannot be undone.' })}>Confirm</Button>
+      <Button
+        variant="secondary"
+        onClick={() =>
+          Modal.info({ title: 'Information', content: 'Your export is ready.' })
+        }
+      >
+        Info
+      </Button>
+      <Button
+        variant="secondary"
+        onClick={() =>
+          Modal.success({ title: 'Saved', content: 'Changes were saved.' })
+        }
+      >
+        Success
+      </Button>
+      <Button
+        variant="destructive"
+        onClick={() =>
+          Modal.confirm({
+            title: 'Delete project?',
+            content: 'This cannot be undone.',
+          })
+        }
+      >
+        Confirm
+      </Button>
     </Stack>
   );
 }
 
 export default ImperativeModals;
 ```
+
+</section>
+
+<section className="tao-example" id="modal-confirm-loading">
+
+### 异步确认
+
+用本地延迟模拟提交，`confirmLoading` 在等待期间提供加载状态并避免重复确认。
+
+```tsx preview
+import { Button, Modal } from '@rockshin/tao-ui';
+
+import { useState } from 'react';
+
+export default function ModalConfirmLoading() {
+  function Demo() {
+    const [open, setOpen] = useState(false);
+    const [loading, setLoading] = useState(false);
+    return (
+      <>
+        <Button variant="secondary" onClick={() => setOpen(true)}>
+          Open Confirm
+        </Button>
+        <Modal
+          open={open}
+          title="Delete item?"
+          confirmLoading={loading}
+          okText="Delete"
+          onClose={() => setOpen(false)}
+          onOk={() => {
+            setLoading(true);
+            setTimeout(() => {
+              setLoading(false);
+              setOpen(false);
+            }, 1500);
+          }}
+        >
+          <p>This action cannot be undone.</p>
+        </Modal>
+      </>
+    );
+  }
+  return <Demo />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="modal-custom-footer">
+
+### 自定义页脚
+
+`footer` 替换默认操作区，用于多步骤或特殊提交场景。
+
+```tsx preview
+import { Button, Modal } from '@rockshin/tao-ui';
+
+import { useState } from 'react';
+
+export default function ModalCustomFooter() {
+  function Demo() {
+    const [open, setOpen] = useState(false);
+    return (
+      <>
+        <Button variant="secondary" onClick={() => setOpen(true)}>
+          Open
+        </Button>
+        <Modal
+          open={open}
+          title="Custom footer"
+          width={420}
+          onClose={() => setOpen(false)}
+          footer={
+            <Button variant="primary" onClick={() => setOpen(false)}>
+              Got it
+            </Button>
+          }
+        >
+          <p>Single-action footer.</p>
+        </Modal>
+      </>
+    );
+  }
+  return <Demo />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="modal-footer-render-fn">
+
+### 扩展默认按钮
+
+通过页脚渲染函数保留默认按钮能力，同时增加附加操作。
+
+```tsx preview
+import { Button, Modal, Stack } from '@rockshin/tao-ui';
+
+import { useState } from 'react';
+
+export default function ModalFooterRenderFn() {
+  function Demo() {
+    const [open, setOpen] = useState(false);
+    return (
+      <>
+        <Button variant="secondary" onClick={() => setOpen(true)}>
+          Open
+        </Button>
+        <Modal
+          open={open}
+          title="Compose around defaults"
+          onClose={() => setOpen(false)}
+          onOk={() => setOpen(false)}
+          footer={(origin, { CancelBtn }) => (
+            <Stack direction="horizontal" gap="sm" style={{ width: '100%' }}>
+              <Button variant="ghost" onClick={() => setOpen(false)}>
+                Read later
+              </Button>
+              <span style={{ flex: 1 }} />
+              <CancelBtn />
+              {origin}
+            </Stack>
+          )}
+        >
+          <p>
+            The render-prop footer receives the default node plus{' '}
+            <code>OkBtn</code> / <code>CancelBtn</code> so you can keep defaults
+            and add your own.
+          </p>
+        </Modal>
+      </>
+    );
+  }
+  return <Demo />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="modal-button-props">
+
+### 确认与取消按钮属性
+
+分别配置按钮文案和属性，让危险操作或暂不可用状态更明确。
+
+```tsx preview
+import { Button, Modal } from '@rockshin/tao-ui';
+
+import { useState } from 'react';
+
+export default function ModalButtonProps() {
+  function Demo() {
+    const [open, setOpen] = useState(false);
+    return (
+      <>
+        <Button variant="secondary" onClick={() => setOpen(true)}>
+          Open
+        </Button>
+        <Modal
+          open={open}
+          title="Delete item?"
+          okText="Delete"
+          okButtonProps={{ variant: 'destructive' }}
+          cancelButtonProps={{ variant: 'ghost' }}
+          onClose={() => setOpen(false)}
+          onOk={() => setOpen(false)}
+        >
+          <p>OK is a destructive button via okButtonProps.</p>
+        </Modal>
+      </>
+    );
+  }
+  return <Demo />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="modal-keep-alive">
+
+### 保留关闭前的内容
+
+关闭时保留子组件，可让再次打开后继续编辑；试着输入后关闭再打开。
+
+```tsx preview
+import { Button, FormField, Input, Modal } from '@rockshin/tao-ui';
+
+import { useState } from 'react';
+
+export default function ModalKeepAlive() {
+  function Demo() {
+    const [open, setOpen] = useState(false);
+    return (
+      <>
+        <Button variant="secondary" onClick={() => setOpen(true)}>
+          Open (state preserved across reopen)
+        </Button>
+        <Modal
+          open={open}
+          title="destroyOnHidden = false"
+          destroyOnHidden={false}
+          onClose={() => setOpen(false)}
+          onOk={() => setOpen(false)}
+        >
+          <FormField label="Type, close, reopen — text stays">
+            <Input placeholder="I survive close" />
+          </FormField>
+        </Modal>
+      </>
+    );
+  }
+  return <Demo />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="modal-imperative-confirm">
+
+### 命令式确认
+
+`Modal.confirm` 创建一次性确认；示例使用本地延迟模拟异步操作。
+
+```tsx preview
+import { Button, Modal, Stack } from '@rockshin/tao-ui';
+
+export default function ModalImperativeConfirm() {
+  return (
+    <Stack direction="horizontal" gap="sm">
+      <Button
+        variant="destructive"
+        onClick={() =>
+          Modal.confirm({
+            title: 'Delete item?',
+            content: 'This action cannot be undone.',
+            okText: 'Delete',
+            okButtonProps: { variant: 'destructive' },
+            onOk: () => new Promise((res) => setTimeout(res, 1200)),
+          })
+        }
+      >
+        confirm (async OK)
+      </Button>
+      <Button
+        variant="secondary"
+        onClick={() => Modal.info({ title: 'Info', content: 'FYI.' })}
+      >
+        info
+      </Button>
+      <Button
+        variant="secondary"
+        onClick={() => Modal.success({ title: 'Saved!' })}
+      >
+        success
+      </Button>
+      <Button
+        variant="secondary"
+        onClick={() => Modal.error({ title: 'Something broke' })}
+      >
+        error
+      </Button>
+      <Button
+        variant="secondary"
+        onClick={() =>
+          Modal.warning({ title: 'Heads up', content: 'Check your input.' })
+        }
+      >
+        warning
+      </Button>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="modal-use-modal-hook">
+
+### 在上下文中使用确认
+
+`Modal.useModal` 返回实例与上下文节点，在应用 Provider 范围内渲染该节点。
+
+```tsx preview
+import { Button, Modal } from '@rockshin/tao-ui';
+
+export default function ModalUseModalHook() {
+  function Demo() {
+    const [modal, contextHolder] = Modal.useModal();
+    return (
+      <>
+        <Button
+          variant="secondary"
+          onClick={() =>
+            modal.confirm({
+              title: 'Context-aware confirm',
+              content: 'Inherits TaoProvider config & theme.',
+            })
+          }
+        >
+          useModal confirm
+        </Button>
+        {contextHolder}
+      </>
+    );
+  }
+  return <Demo />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="modal-responsive-width">
+
+### 响应式弹窗宽度
+
+通过断点宽度配置让弹窗适应屏幕，内容保持自然换行。
+
+```tsx preview="iframe-follow"
+import { Button, Modal } from '@rockshin/tao-ui';
+
+import { useState } from 'react';
+
+export default function ModalResponsiveWidth() {
+  function Demo() {
+    const [open, setOpen] = useState(false);
+    return (
+      <>
+        <Button variant="secondary" onClick={() => setOpen(true)}>
+          Open Responsive Modal
+        </Button>
+        <Modal
+          open={open}
+          title="Responsive Width"
+          width={{ xs: 'calc(100vw - 32px)', md: 640, xl: 800 }}
+          onClose={() => setOpen(false)}
+          onOk={() => setOpen(false)}
+        >
+          Resize the viewport: full-width on phones, 640px from md up, 800px
+          from xl up.
+        </Modal>
+      </>
+    );
+  }
+  return <Demo />;
+}
+```
+
+</section>
+
+</div>
 
 ## API
 

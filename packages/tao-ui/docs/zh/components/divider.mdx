@@ -1,0 +1,139 @@
+---
+title: Divider
+description: "将内容分为清晰的区块或行内分组。"
+---
+
+import Preview from '../../_components/demo-preview';
+
+将内容分为清晰的区块或行内分组。
+
+组件采用 tao-ui 原生实现，公共 API 对齐 Ant Design 6.7.0。外观、主题 token 与 Semantic DOM 定制遵循 tao-ui，主题通过 `TaoProvider` 配置。
+
+使用 titlePlacement 控制标题位置，orientation 控制方向；默认尺寸继承 TaoProvider。
+
+## 何时使用
+
+用于区分相邻内容中的不同区块。
+
+## 代码演示
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="divider-example-1">
+
+### 区块与标题
+
+```tsx preview
+import { Divider } from "@rockshin/tao-ui";
+
+export default function Example() {
+  return (
+    <div>
+      <p>Workspace overview</p>
+      <Divider>Activity</Divider>
+      <p>Recent changes and updates.</p>
+      <Divider />
+      <p>End of report.</p>
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="divider-example-2">
+
+### 标题位置
+
+```tsx preview
+import { Divider } from "@rockshin/tao-ui";
+
+export default function Example() {
+  return (
+    <div>
+      <Divider titlePlacement="start">Start</Divider>
+      <Divider titlePlacement="center">Center</Divider>
+      <Divider titlePlacement="end">End</Divider>
+      <Divider plain>Plain label</Divider>
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="divider-example-3">
+
+### 线条与间距
+
+```tsx preview
+import { Divider } from "@rockshin/tao-ui";
+
+export default function Example() {
+  return (
+    <div>
+      <Divider size="small">Small</Divider>
+      <Divider variant="dashed" size="medium">
+        Dashed
+      </Divider>
+      <Divider variant="dotted" size="large">
+        Dotted
+      </Divider>
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="divider-example-4">
+
+### 行内分隔与 RTL
+
+```tsx preview
+import { Divider } from "@rockshin/tao-ui";
+
+export default function Example() {
+  return (
+    <div dir="rtl">
+      Overview
+      <Divider orientation="vertical" />
+      Activity
+      <Divider orientation="vertical" />
+      Settings
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="divider-example-5">
+
+### 语义样式
+
+```tsx preview
+import { Divider } from "@rockshin/tao-ui";
+
+export default function Example() {
+  return (
+    <Divider
+      titlePlacement="start"
+      styles={{
+        rail: { borderColor: "var(--tao-color-primary)" },
+        content: { color: "var(--tao-color-primary)", marginInlineStart: 0 },
+      }}
+    >
+      Custom section
+    </Divider>
+  );
+}
+```
+
+</section>
+
+</div>
+
+## API
+
+<API moduleName="divider" />

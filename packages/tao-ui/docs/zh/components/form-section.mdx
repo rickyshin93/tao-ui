@@ -3,6 +3,8 @@ title: FormSection
 description: 使用标题和说明组织一组相关表单字段。页面涵盖适用场景、设计建议、多组可运行示例、交互状态与完整 API 参考。
 ---
 
+import Preview from '../../_components/demo-preview';
+
 使用标题和说明组织一组相关表单字段。
 
 ## 何时使用
@@ -18,7 +20,13 @@ description: 使用标题和说明组织一组相关表单字段。页面涵盖�
 
 - 不要为每个单独字段创建区段。
 
-## 基础用法
+## 代码演示
+
+<div className="tao-demo-grid tao-demo-grid-wide">
+
+<section className="tao-example" id="form-section-example-1">
+
+### 基础用法
 
 ```tsx preview
 import { FormField, FormSection, Input } from '@rockshin/tao-ui';
@@ -39,7 +47,11 @@ function FormSectionExample() {
 export default FormSectionExample;
 ```
 
-## 多组字段
+</section>
+
+<section className="tao-example" id="form-section-example-2">
+
+### 多组字段
 
 ```tsx preview
 import { FormField, FormSection, Input, Stack } from '@rockshin/tao-ui';
@@ -52,7 +64,10 @@ function FormSectionGroups() {
           <Input placeholder="Rihua Chen" />
         </FormField>
       </FormSection>
-      <FormSection title="Contact" description="Where account notices are sent.">
+      <FormSection
+        title="Contact"
+        description="Where account notices are sent."
+      >
         <FormField label="Email">
           <Input placeholder="you@example.com" />
         </FormField>
@@ -64,7 +79,11 @@ function FormSectionGroups() {
 export default FormSectionGroups;
 ```
 
-## 语义部件
+</section>
+
+<section className="tao-example" id="form-section-example-3">
+
+### 语义部件
 
 ```tsx preview
 import { FormSection } from '@rockshin/tao-ui';
@@ -87,6 +106,121 @@ function CustomizedFormSection() {
 
 export default CustomizedFormSection;
 ```
+
+</section>
+
+<section className="tao-example" id="form-section-native-form">
+
+### 完整表单组合
+
+组合布局、字段与操作区，用原生提交展示保存结果。
+
+```tsx preview
+import { useState } from 'react';
+import {
+  FormLayout,
+  FormSection,
+  FormField,
+  FormActions,
+  Input,
+  Textarea,
+  Button,
+} from '@rockshin/tao-ui';
+export default function Example() {
+  const [saved, setSaved] = useState('');
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        setSaved(String(new FormData(e.currentTarget).get('name')));
+      }}
+      onReset={() => setSaved('')}
+    >
+      <FormLayout>
+        <FormSection title="Profile" description="Public workspace information">
+          <FormField label="Display name" required>
+            <Input name="name" required defaultValue="Alex" />
+          </FormField>
+          <FormField label="Bio" description="A short introduction">
+            <Textarea name="bio" autoSize />
+          </FormField>
+        </FormSection>
+        <FormActions>
+          <Button type="reset">Reset</Button>
+          <Button type="submit" variant="primary">
+            Save
+          </Button>
+        </FormActions>
+        <output aria-live="polite">
+          {saved ? `Saved ${saved}` : 'No changes saved'}
+        </output>
+      </FormLayout>
+    </form>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="form-section-optional-description">
+
+### 可选说明
+
+标题可独立使用；有必要补充上下文时再显示 description。
+
+```tsx preview
+import { FormSection, FormLayout, Input } from '@rockshin/tao-ui';
+export default function Example() {
+  return (
+    <FormLayout>
+      <FormSection title="Contact">
+        <Input aria-label="Contact address" />
+      </FormSection>
+      <FormSection
+        title="Internal notes"
+        description="Visible to workspace members only"
+      >
+        <Input aria-label="Internal notes" />
+      </FormSection>
+    </FormLayout>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="form-section-semantic">
+
+### 分组外观
+
+通过 header 与 body 语义部件调整分组样式。
+
+```tsx preview
+import { FormSection, FormField, Input } from '@rockshin/tao-ui';
+export default function Example() {
+  return (
+    <FormSection
+      title="Billing"
+      styles={{
+        root: {
+          border: '1px solid var(--tao-color-border)',
+          borderRadius: 6,
+          padding: 16,
+        },
+        body: { paddingTop: 8 },
+      }}
+    >
+      <FormField label="Company">
+        <Input />
+      </FormField>
+    </FormSection>
+  );
+}
+```
+
+</section>
+
+</div>
 
 ## API
 

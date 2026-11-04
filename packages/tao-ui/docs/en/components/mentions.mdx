@@ -1,0 +1,313 @@
+---
+title: Mentions
+description: "Text areas with prefix-triggered suggestions, keyboard insertion, async options and automatic sizing."
+---
+
+import Preview from '../../_components/demo-preview';
+
+Text areas with prefix-triggered suggestions, keyboard insertion, async options and automatic sizing.
+
+Each example can be copied and run independently. Use the device control on framed previews to switch between desktop and phone widths.
+
+Sizes are `small`, `medium` and `large`; the compatible `middle` alias uses the same dimensions as `medium`.
+
+## Examples
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="mentions-basic">
+
+### Controlled mentions
+
+Typing @ opens suggestions. getMentions extracts matching tokens from the resulting text.
+
+```tsx preview
+import { useState } from 'react';
+import { Mentions } from '@rockshin/tao-ui';
+const people = [
+  { value: 'alice', label: 'Alice Chen' },
+  { value: 'bob', label: 'Bob Li' },
+  { value: 'carol', label: 'Carol Wu' },
+];
+export default function BasicMentions() {
+  const [value, setValue] = useState('Hi @alice ');
+  return (
+    <div>
+      <Mentions
+        aria-label="Message"
+        value={value}
+        onChange={setValue}
+        options={people}
+        rows={3}
+        allowClear
+        placeholder="Type @ to mention a person"
+      />
+      <p>
+        Mentions:{' '}
+        {Mentions.getMentions(value)
+          .map((item) => item.value)
+          .join(', ') || 'none'}
+      </p>
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="mentions-prefix">
+
+### Multiple prefixes
+
+onSearch receives the active prefix, so each prefix can offer its own options.
+
+```tsx preview
+import { useState } from 'react';
+import { Mentions } from '@rockshin/tao-ui';
+const people = [
+  { value: 'alice', label: 'Alice Chen' },
+  { value: 'bob', label: 'Bob Li' },
+  { value: 'carol', label: 'Carol Wu' },
+];
+const topics = [
+  { value: 'design', label: 'Design' },
+  { value: 'release', label: 'Release' },
+];
+export default function PrefixMentions() {
+  const [prefix, setPrefix] = useState('@');
+  return (
+    <Mentions
+      aria-label="Message with people and topics"
+      prefix={['@', '#']}
+      onSearch={(_text, active) => setPrefix(active)}
+      options={prefix === '@' ? people : topics}
+      placeholder="Use @ for people or # for topics"
+      rows={3}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="mentions-autosize">
+
+### Automatic height
+
+autoSize grows from two to six rows. More content scrolls inside the textarea.
+
+```tsx preview
+import { Mentions } from '@rockshin/tao-ui';
+const people = [
+  { value: 'alice', label: 'Alice Chen' },
+  { value: 'bob', label: 'Bob Li' },
+  { value: 'carol', label: 'Carol Wu' },
+];
+export default function GrowingMentions() {
+  return (
+    <Mentions
+      aria-label="Growing message"
+      options={people}
+      autoSize={{ minRows: 2, maxRows: 6 }}
+      allowClear
+      placeholder="Type several lines, then mention @alice"
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="mentions-filter">
+
+### Custom matching and disabled choices
+
+The filter can match labels as well as values. Disabled options remain visible but cannot be inserted.
+
+```tsx preview
+import { Mentions } from '@rockshin/tao-ui';
+const options = [
+  { value: 'alice', label: 'Alice — Design' },
+  { value: 'bob', label: 'Bob — Engineering' },
+  { value: 'archived', label: 'Archived user', disabled: true },
+];
+export default function FilteredMentions() {
+  return (
+    <Mentions
+      aria-label="Reviewer"
+      options={options}
+      filterOption={(search, option) =>
+        `${option.value} ${options.find((item) => item.value === option.value)?.label}`
+          .toLowerCase()
+          .includes(search.toLowerCase())
+      }
+      placeholder="Try @design"
+      rows={3}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="mentions-async">
+
+### Asynchronous suggestions
+
+This local example simulates a search delay and shows the loading state while waiting.
+
+```tsx preview
+import { useEffect, useState } from 'react';
+import { Mentions } from '@rockshin/tao-ui';
+const people = [
+  { value: 'alice', label: 'Alice Chen' },
+  { value: 'bob', label: 'Bob Li' },
+  { value: 'carol', label: 'Carol Wu' },
+];
+export default function AsyncMentions() {
+  const [search, setSearch] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [options, setOptions] = useState(people);
+  useEffect(() => {
+    setLoading(true);
+    const timer = setTimeout(() => {
+      setOptions(
+        people.filter((item) => item.value.includes(search.toLowerCase())),
+      );
+      setLoading(false);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [search]);
+  return (
+    <Mentions
+      aria-label="Search people"
+      options={options}
+      loading={loading}
+      filterOption={false}
+      onSearch={setSearch}
+      placeholder="Type @ and a name"
+      rows={3}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="mentions-popup">
+
+### Custom popup content
+
+popupRender retains the option menu and adds contextual help.
+
+```tsx preview
+import { Mentions } from '@rockshin/tao-ui';
+const people = [
+  { value: 'alice', label: 'Alice Chen' },
+  { value: 'bob', label: 'Bob Li' },
+  { value: 'carol', label: 'Carol Wu' },
+];
+export default function MentionHelp() {
+  return (
+    <Mentions
+      aria-label="Comment"
+      options={people}
+      rows={3}
+      popupRender={(menu) => (
+        <div>
+          {menu}
+          <div
+            style={{
+              padding: '8px 12px',
+              fontSize: 12,
+              opacity: 0.6,
+              borderTop: '1px solid var(--tao-color-border-secondary)',
+            }}
+          >
+            ↑ ↓ to navigate · Enter to insert
+          </div>
+        </div>
+      )}
+      placeholder="Mention @someone"
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="mentions-appearance">
+
+### Variants and validation
+
+Variants, sizes and validation status follow the shared control theme.
+
+```tsx preview
+import { Mentions } from '@rockshin/tao-ui';
+const people = [
+  { value: 'alice', label: 'Alice Chen' },
+  { value: 'bob', label: 'Bob Li' },
+  { value: 'carol', label: 'Carol Wu' },
+];
+export default function MentionAppearance() {
+  return (
+    <div style={{ display: 'grid', gap: 12 }}>
+      <Mentions
+        options={people}
+        size="small"
+        variant="filled"
+        placeholder="Small filled"
+      />
+      <Mentions
+        options={people}
+        size="middle"
+        variant="underlined"
+        status="error"
+        placeholder="A reviewer is required"
+      />
+      <Mentions options={people} disabled defaultValue="Assigned to @alice" />
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="mentions-mobile">
+
+### Mention on a phone
+
+The popup follows the caret. Try top placement and a growing textarea in the phone preview.
+
+```tsx preview="iframe-follow"
+import { Mentions } from '@rockshin/tao-ui';
+const people = [
+  { value: 'alice', label: 'Alice Chen' },
+  { value: 'bob', label: 'Bob Li' },
+  { value: 'carol', label: 'Carol Wu' },
+];
+export default function MobileMentions() {
+  return (
+    <div style={{ padding: 16 }}>
+      <h3>Team update</h3>
+      <p>Type @ to include a teammate.</p>
+      <Mentions
+        aria-label="Team update"
+        options={people}
+        placement="top"
+        autoSize={{ minRows: 4, maxRows: 8 }}
+        allowClear
+        style={{ width: '100%' }}
+      />
+    </div>
+  );
+}
+```
+
+</section>
+
+</div>
+
+## API
+
+<API moduleName="mentions" />

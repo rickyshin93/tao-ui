@@ -3,6 +3,8 @@ title: Steps
 description: "Guides users through the ordered stages of a task. Includes usage guidance, runnable examples for every type and variant, and the complete API reference."
 ---
 
+import Preview from '../../_components/demo-preview';
+
 Guides users through the ordered stages of a task.
 
 ## When to use
@@ -22,7 +24,13 @@ Use Steps when the work has a sequence — a checkout flow, an onboarding wizard
 - Do not use Steps for a single indeterminate operation; use Spinner.
 - Do not set `status` per item unless a step genuinely failed or was skipped.
 
-## Basic usage
+## Examples
+
+<div className="tao-demo-grid tao-demo-grid-wide">
+
+<section className="tao-example" id="steps-example-1">
+
+### Basic usage
 
 ```tsx preview
 import { Steps } from '@rockshin/tao-ui';
@@ -43,7 +51,11 @@ function StepsExample() {
 export default StepsExample;
 ```
 
-## Vertical and clickable
+</section>
+
+<section className="tao-example" id="steps-example-2">
+
+### Vertical and clickable
 
 `onChange` receives the absolute step index. Clicking the current step is a no-op, and `disabled` items never become interactive.
 
@@ -78,7 +90,11 @@ function ClickableSteps() {
 export default ClickableSteps;
 ```
 
-## Status, variants, and sizes
+</section>
+
+<section className="tao-example" id="steps-example-3">
+
+### Status, variants, and sizes
 
 `status` sets the state of the current step; every other step derives its own state from position. `variant` picks a solid or outlined icon treatment and `size` switches density.
 
@@ -104,7 +120,11 @@ function StepsStatus() {
 export default StepsStatus;
 ```
 
-## Types
+</section>
+
+<section className="tao-example" id="steps-example-4">
+
+### Types
 
 `type` changes the whole shape of the bar: `dot` replaces numbered icons with small dots, `navigation` turns each step into a clickable tab with an underline, and `panel` renders steps as contiguous notched panels.
 
@@ -122,7 +142,7 @@ function StepsTypes() {
   const [current, setCurrent] = useState(1);
 
   return (
-    <Stack gap="xl">
+    <Stack gap="lg">
       <Steps items={items} current={current} type="dot" />
       <Steps
         items={items}
@@ -150,7 +170,11 @@ function StepsTypes() {
 export default StepsTypes;
 ```
 
-## Inline
+</section>
+
+<section className="tao-example" id="steps-example-5">
+
+### Inline
 
 `type="inline"` renders a compact dot strip whose descriptions live in tooltips. `offset` shifts the strip along its axis and `titlePlacement` moves the label under the dot.
 
@@ -190,7 +214,11 @@ function InlineSteps() {
 export default InlineSteps;
 ```
 
-## Progress and max count
+</section>
+
+<section className="tao-example" id="steps-example-6">
+
+### Progress and max count
 
 `percent` draws a progress ring around the current icon. `maxCount` collapses long flows, folding the hidden range into a disabled ellipsis step while `onChange` keeps reporting the original indexes.
 
@@ -205,7 +233,7 @@ const items = [
 
 function StepsProgress() {
   return (
-    <Stack gap="xl">
+    <Stack gap="lg">
       <Steps items={items} current={1} percent={60} />
       <Steps
         current={3}
@@ -221,7 +249,11 @@ function StepsProgress() {
 export default StepsProgress;
 ```
 
-## Custom icons
+</section>
+
+<section className="tao-example" id="steps-example-7">
+
+### Custom icons
 
 `items[].icon` replaces a single step's glyph. `iconRender` replaces every glyph and receives the step index, the active flag, and an `Icon` component that renders the semantic icon container.
 
@@ -261,7 +293,11 @@ function CustomIconSteps() {
 export default CustomIconSteps;
 ```
 
-## Semantic DOM styling
+</section>
+
+<section className="tao-example" id="steps-example-8">
+
+### Semantic DOM styling
 
 Every part of a step is addressable through `classNames` and `styles`, and each item can override its own parts.
 
@@ -285,6 +321,441 @@ function StyledSteps() {
 
 export default StyledSteps;
 ```
+
+</section>
+
+<section className="tao-example" id="steps-clickable">
+
+### Clickable steps
+
+Maintain `current` with `onChange` and update the displayed content after a step changes.
+
+```tsx preview
+import { Stack, Steps } from '@rockshin/tao-ui';
+
+import { useState } from 'react';
+
+const basicItems = [
+  { title: 'Finished', content: 'This step is done.' },
+  { title: 'In Progress', content: 'Working on it now.' },
+  { title: 'Waiting', content: 'Not started yet.' },
+];
+
+export default function StepsClickable() {
+  function Demo() {
+    const [current, setCurrent] = useState(0);
+    return (
+      <Stack gap="md">
+        <Steps items={basicItems} current={current} onChange={setCurrent} />
+        <p style={{ color: 'var(--tao-color-text-secondary)', fontSize: 13 }}>
+          current: {current}
+        </p>
+      </Stack>
+    );
+  }
+  return <Demo />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="steps-error-status">
+
+### Current step error
+
+`status="error"` marks the current step as failed; explain the cause in adjacent content.
+
+```tsx preview
+import { Steps } from '@rockshin/tao-ui';
+
+const basicItems = [
+  { title: 'Finished', content: 'This step is done.' },
+  { title: 'In Progress', content: 'Working on it now.' },
+  { title: 'Waiting', content: 'Not started yet.' },
+];
+
+export default function StepsErrorStatus() {
+  return <Steps items={basicItems} current={1} status="error" />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="steps-per-step-status">
+
+### Per-step status
+
+Set status per item for workflows that combine completed, failed, and waiting steps.
+
+```tsx preview
+import { Steps } from '@rockshin/tao-ui';
+
+export default function StepsPerStepStatus() {
+  return (
+    <Steps
+      current={2}
+      items={[
+        { title: 'Done', content: 'Finished.' },
+        { title: 'Failed', content: 'Something broke.', status: 'error' },
+        { title: 'Running', content: 'In progress.' },
+        { title: 'Queued', content: 'Not started.' },
+      ]}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="steps-title-placement">
+
+### Title placement
+
+Choose where titles sit relative to step indicators to suit the available space.
+
+```tsx preview
+import { Stack, Steps } from '@rockshin/tao-ui';
+
+const basicItems = [
+  { title: 'Finished', content: 'This step is done.' },
+  { title: 'In Progress', content: 'Working on it now.' },
+  { title: 'Waiting', content: 'Not started yet.' },
+];
+
+export default function StepsTitlePlacement() {
+  return (
+    <Stack gap="lg">
+      <Steps items={basicItems} current={1} titlePlacement="horizontal" />
+      <Steps items={basicItems} current={1} titlePlacement="vertical" />
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="steps-with-progress">
+
+### Progress within a step
+
+Use `percent` for progress within the current step and change it in this example.
+
+```tsx preview
+import { Stack, Steps } from '@rockshin/tao-ui';
+
+import { useState } from 'react';
+
+const basicItems = [
+  { title: 'Finished', content: 'This step is done.' },
+  { title: 'In Progress', content: 'Working on it now.' },
+  { title: 'Waiting', content: 'Not started yet.' },
+];
+
+export default function StepsWithProgress() {
+  function Demo() {
+    const [percent, setPercent] = useState(40);
+    return (
+      <Stack gap="md">
+        <Steps
+          items={basicItems}
+          current={1}
+          percent={percent}
+          onChange={() => setPercent((p) => (p >= 100 ? 10 : p + 30))}
+        />
+        <p style={{ color: 'var(--tao-color-text-secondary)', fontSize: 13 }}>
+          percent: {percent}
+        </p>
+      </Stack>
+    );
+  }
+  return <Demo />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="steps-dot-style">
+
+### Dot steps
+
+`type="dot"` uses compact nodes for tracking status.
+
+```tsx preview
+import { Steps } from '@rockshin/tao-ui';
+
+const basicItems = [
+  { title: 'Finished', content: 'This step is done.' },
+  { title: 'In Progress', content: 'Working on it now.' },
+  { title: 'Waiting', content: 'Not started yet.' },
+];
+
+export default function StepsDotStyle() {
+  return <Steps items={basicItems} current={1} type="dot" />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="steps-dot-with-custom-dot">
+
+### Custom step dots
+
+Customize step dots with a render callback while retaining titles and status.
+
+```tsx preview
+import { Steps } from '@rockshin/tao-ui';
+
+const basicItems = [
+  { title: 'Finished', content: 'This step is done.' },
+  { title: 'In Progress', content: 'Working on it now.' },
+  { title: 'Waiting', content: 'Not started yet.' },
+];
+
+export default function StepsDotWithCustomDot() {
+  return (
+    <Steps
+      items={basicItems}
+      current={1}
+      type="dot"
+      iconRender={() => (
+        <span
+          style={{
+            width: 10,
+            height: 10,
+            borderRadius: '50%',
+            background: 'currentColor',
+          }}
+        />
+      )}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="steps-navigation">
+
+### Navigation steps
+
+Navigation steps support switching between stages of a workflow.
+
+```tsx preview
+import { Steps } from '@rockshin/tao-ui';
+
+import { useState } from 'react';
+
+export default function StepsNavigation() {
+  function Demo() {
+    const [current, setCurrent] = useState(0);
+    return (
+      <Steps
+        type="navigation"
+        current={current}
+        onChange={setCurrent}
+        items={[
+          { title: 'Step 1', content: 'First' },
+          { title: 'Step 2', content: 'Second' },
+          { title: 'Step 3', content: 'Third' },
+        ]}
+      />
+    );
+  }
+  return <Demo />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="steps-panel">
+
+### Panel steps
+
+Panel steps provide a larger area for titles, descriptions, and interaction.
+
+```tsx preview
+import { Stack, Steps } from '@rockshin/tao-ui';
+
+import { useState } from 'react';
+
+export default function StepsPanel() {
+  function Demo() {
+    const [current, setCurrent] = useState(1);
+    return (
+      <Stack gap="lg">
+        <Steps
+          type="panel"
+          current={current}
+          onChange={setCurrent}
+          items={[
+            { title: 'One' },
+            { title: 'Two' },
+            { title: 'Three' },
+            { title: 'Four' },
+          ]}
+        />
+        <Steps
+          type="panel"
+          variant="outlined"
+          current={current}
+          onChange={setCurrent}
+          items={[
+            { title: 'One' },
+            { title: 'Two' },
+            { title: 'Three' },
+            { title: 'Four' },
+          ]}
+        />
+      </Stack>
+    );
+  }
+  return <Demo />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="steps-max-count">
+
+### Limit visible steps
+
+Use `maxCount` for a long workflow and observe how the visible range follows the current step.
+
+```tsx preview
+import { Steps } from '@rockshin/tao-ui';
+
+export default function StepsMaxCount() {
+  return (
+    <Steps
+      current={3}
+      maxCount={5}
+      items={Array.from({ length: 10 }, (_, index) => ({
+        title: `Step ${index + 1}`,
+      }))}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="steps-disabled-step">
+
+### Disabled steps
+
+Disable unavailable steps without disabling navigation to the others.
+
+```tsx preview
+import { Steps } from '@rockshin/tao-ui';
+
+export default function StepsDisabledStep() {
+  return (
+    <Steps
+      current={1}
+      onChange={() => {}}
+      items={[
+        { title: 'First' },
+        { title: 'Second' },
+        { title: 'Locked', disabled: true },
+      ]}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="steps-ellipsis">
+
+### Long title ellipsis
+
+Truncate long titles in constrained space and put detail in step content.
+
+```tsx preview
+import { Stack, Steps } from '@rockshin/tao-ui';
+
+const basicItems = [
+  { title: 'Finished', content: 'This step is done.' },
+  { title: 'In Progress', content: 'Working on it now.' },
+  { title: 'Waiting', content: 'Not started yet.' },
+];
+
+export default function StepsEllipsis() {
+  return (
+    <Stack gap="lg">
+      <div style={{ maxWidth: 520 }}>
+        <Steps items={basicItems} current={1} ellipsis />
+      </div>
+      <div style={{ maxWidth: 520 }}>
+        <Steps
+          items={[
+            {
+              title: 'A rather long first title',
+              subTitle: 'with a subtitle',
+              content: 'And a long description that will be truncated.',
+            },
+            { title: 'Second', content: 'Also truncated when needed.' },
+          ]}
+          current={0}
+          ellipsis
+        />
+      </div>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="steps-initial">
+
+### Initial step number
+
+Use `initial` to offset displayed numbers while keeping the component index contract for `current`.
+
+```tsx preview
+import { Steps } from '@rockshin/tao-ui';
+
+const basicItems = [
+  { title: 'Finished', content: 'This step is done.' },
+  { title: 'In Progress', content: 'Working on it now.' },
+  { title: 'Waiting', content: 'Not started yet.' },
+];
+
+export default function StepsInitial() {
+  return <Steps items={basicItems} initial={2} current={3} />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="steps-provider-inherit">
+
+### Inherit provider settings
+
+Inherit size and appearance settings and override them on an individual Steps instance.
+
+```tsx preview
+import { Steps, TaoProvider } from '@rockshin/tao-ui';
+
+const basicItems = [
+  { title: 'Finished', content: 'This step is done.' },
+  { title: 'In Progress', content: 'Working on it now.' },
+  { title: 'Waiting', content: 'Not started yet.' },
+];
+
+export default function StepsProviderInherit() {
+  return (
+    <TaoProvider size="small">
+      <Steps items={basicItems} current={1} variant="outlined" />
+    </TaoProvider>
+  );
+}
+```
+
+</section>
+
+</div>
 
 ## API
 

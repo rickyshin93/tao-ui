@@ -1,0 +1,200 @@
+---
+title: Result
+description: "Shows the outcome of a completed operation, including recovery actions."
+---
+
+import Preview from '../../_components/demo-preview';
+
+Shows the outcome of a completed operation, including recovery actions.
+
+## When to use
+
+Use after a meaningful operation or for a full-page error. For transient updates use a message or notification.
+
+## Examples
+
+<div className="tao-demo-grid tao-demo-grid-wide">
+
+<section className="tao-example" id="result-example-1">
+
+### Success with a next step
+
+Actions should explain what happens next. The example action updates only its local status.
+
+```tsx preview="iframe-follow"
+import { useState } from 'react';
+import { Button, Result } from '@rockshin/tao-ui';
+
+export default function Example() {
+  const [opened, setOpened] = useState(false);
+  return (
+    <Result
+      status="success"
+      title="Workspace created"
+      subTitle={
+        opened
+          ? 'The workspace overview is selected.'
+          : 'Invite teammates or continue to your workspace.'
+      }
+      extra={<Button onClick={() => setOpened(true)}>Open workspace</Button>}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="result-example-2">
+
+### Information, warning and error
+
+Choose a status based on the outcome; changing the icon alone does not explain the issue.
+
+```tsx preview
+import { useState } from 'react';
+import { Button, Result, Stack } from '@rockshin/tao-ui';
+import type { ResultStatusType } from '@rockshin/tao-ui';
+
+export default function Example() {
+  const [status, setStatus] = useState<ResultStatusType>('info');
+  return (
+    <>
+      <Stack direction="horizontal" gap="sm" style={{ flexWrap: 'wrap' }}>
+        {(['info', 'warning', 'error'] as const).map((value) => (
+          <Button
+            key={value}
+            variant="secondary"
+            onClick={() => setStatus(value)}
+          >
+            {value}
+          </Button>
+        ))}
+      </Stack>
+      <Result
+        status={status}
+        title={
+          status === 'error'
+            ? 'Import failed'
+            : status === 'warning'
+              ? 'Review required'
+              : 'Import is queued'
+        }
+        subTitle="Open the import details to see the next step."
+      />
+    </>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="result-example-3">
+
+### HTTP error pages
+
+403, 404 and 500 provide dedicated illustrations. Supply application-specific titles and recovery guidance.
+
+```tsx preview
+import { useState } from 'react';
+import { Button, Result, Stack } from '@rockshin/tao-ui';
+
+export default function Example() {
+  const [status, setStatus] = useState<403 | 404 | 500>(404);
+  const titles = {
+    403: 'Access required',
+    404: 'Page not found',
+    500: 'Unable to load this page',
+  };
+  return (
+    <>
+      <Stack direction="horizontal" gap="sm">
+        {([403, 404, 500] as const).map((value) => (
+          <Button
+            key={value}
+            variant="secondary"
+            onClick={() => setStatus(value)}
+          >
+            {value}
+          </Button>
+        ))}
+      </Stack>
+      <Result
+        status={status}
+        title={titles[status]}
+        subTitle="Check your access or return to your workspace."
+      />
+    </>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="result-example-4">
+
+### Failure details
+
+Use children for actionable details, and keep the main title brief.
+
+```tsx preview
+import { Result } from '@rockshin/tao-ui';
+
+export default function Example() {
+  return (
+    <Result
+      status="error"
+      title="Two records need attention"
+      subTitle="Fix the highlighted fields before retrying."
+    >
+      <ul>
+        <li>Row 12: enter a valid email address.</li>
+        <li>Row 28: choose a workspace owner.</li>
+      </ul>
+    </Result>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="result-example-5">
+
+### Custom icon and semantic styles
+
+Customize the icon, title and body independently through Semantic DOM.
+
+```tsx preview
+import { Result } from '@rockshin/tao-ui';
+
+export default function Example() {
+  return (
+    <Result
+      icon={
+        <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+          <path
+            d="M8 12h32v24H8zM8 12l16 13 16-13"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinejoin="round"
+          />
+        </svg>
+      }
+      title="Invitation prepared"
+      subTitle="Review the recipient before sending."
+      styles={{
+        icon: { color: 'var(--tao-primary)' },
+        title: { fontSize: 20 },
+        root: { padding: 20 },
+      }}
+    />
+  );
+}
+```
+
+</section>
+
+</div>
+
+## API
+
+<API moduleName="result" />

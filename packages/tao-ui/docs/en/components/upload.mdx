@@ -1,0 +1,274 @@
+---
+
+title: Upload
+
+description: "Select, drop and manage files with real requests, custom uploads and controlled lists."
+
+---
+
+import Preview from '../../_components/demo-preview';
+
+Select, drop and manage files with real requests, custom uploads and controlled lists.
+
+The added API follows Ant Design 6.7.0; appearance, theming and Semantic DOM use tao-ui. Existing component APIs remain unchanged.
+
+## Examples
+
+<div className="tao-demo-grid tao-demo-grid-wide">
+
+<section className="tao-example" id="upload-local">
+
+### Select without uploading
+
+This example keeps files locally. Returning false from beforeUpload prevents requests.
+
+```tsx preview
+import { Upload, Button } from '@rockshin/tao-ui';
+export default function Demo() {
+  return (
+    <Upload beforeUpload={() => false}>
+      <Button>Select document</Button>
+    </Upload>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="upload-controlled">
+
+### Controlled file list
+
+Own fileList through onChange; the clear button updates the same state.
+
+```tsx preview
+import { Upload, Button, Stack, type UploadFile } from '@rockshin/tao-ui';
+import { useState } from 'react';
+export default function Demo() {
+  const [files, setFiles] = useState<UploadFile[]>([]);
+  return (
+    <Stack gap="md">
+      <Upload
+        fileList={files}
+        beforeUpload={() => false}
+        onChange={(info) => setFiles(info.fileList)}
+      >
+        <Button>Select files</Button>
+      </Upload>
+      <Button variant="secondary" onClick={() => setFiles([])}>
+        Clear list
+      </Button>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="upload-validation">
+
+### Validate and ignore files
+
+LIST_IGNORE excludes rejected files from the list. Browser accept is only a selection hint.
+
+```tsx preview
+import { Upload, Button } from '@rockshin/tao-ui';
+import { useState } from 'react';
+export default function Demo() {
+  const [error, setError] = useState('');
+  return (
+    <div>
+      <Upload
+        accept="image/*"
+        beforeUpload={(file) => {
+          if (!file.type.startsWith('image/')) {
+            setError('Choose an image file.');
+            return Upload.LIST_IGNORE;
+          }
+          setError('');
+          return false;
+        }}
+      >
+        <Button>Select image</Button>
+      </Upload>
+      <p role="status">{error}</p>
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="upload-multiple">
+
+### Multiple files and limits
+
+maxCount caps the list length; one replaces the current file.
+
+```tsx preview
+import { Upload, Button, Stack } from '@rockshin/tao-ui';
+export default function Demo() {
+  return (
+    <Stack gap="md">
+      <Upload multiple maxCount={3} beforeUpload={() => false}>
+        <Button>Select up to three files</Button>
+      </Upload>
+      <Upload maxCount={1} beforeUpload={() => false}>
+        <Button variant="secondary">Replace single file</Button>
+      </Upload>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="upload-drag">
+
+### Drop zone
+
+Drop files or click to select. This example makes no network request.
+
+```tsx preview
+import { Upload } from '@rockshin/tao-ui';
+export default function Demo() {
+  return (
+    <Upload.Dragger multiple beforeUpload={() => false}>
+      <p>Drop documents here</p>
+      <p>Or click to select from your device.</p>
+    </Upload.Dragger>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="upload-pictures">
+
+### Picture lists
+
+Local images generate thumbnails. Card and circle lists suit image collections.
+
+```tsx preview
+import { Upload, Button, Stack } from '@rockshin/tao-ui';
+export default function Demo() {
+  return (
+    <Stack gap="md">
+      <Upload listType="picture" accept="image/*" beforeUpload={() => false}>
+        <Button>Select picture</Button>
+      </Upload>
+      <Upload
+        listType="picture-card"
+        accept="image/*"
+        beforeUpload={() => false}
+      >
+        Add image
+      </Upload>
+      <Upload
+        listType="picture-circle"
+        accept="image/*"
+        beforeUpload={() => false}
+      >
+        Add avatar
+      </Upload>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="upload-remove">
+
+### Confirm removal
+
+onRemove can reject removal synchronously or asynchronously. This example protects files with a switch.
+
+```tsx preview
+import { Upload, Button, Switch } from '@rockshin/tao-ui';
+import { useState } from 'react';
+export default function Demo() {
+  const [locked, setLocked] = useState(true);
+  return (
+    <div>
+      <label>
+        <Switch checked={locked} onChange={setLocked} /> Protect files
+      </label>
+      <Upload beforeUpload={() => false} onRemove={() => !locked}>
+        <Button>Select file</Button>
+      </Upload>
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="upload-extra">
+
+### Extra list information
+
+Render per-file information and choose which list actions appear.
+
+```tsx preview
+import { Upload, Button } from '@rockshin/tao-ui';
+export default function Demo() {
+  return (
+    <Upload
+      beforeUpload={() => false}
+      showUploadList={{
+        extra: (file) => (
+          <small>{Math.ceil((file.size ?? 0) / 1024)} KB · local file</small>
+        ),
+        showDownloadIcon: false,
+      }}
+    >
+      <Button>Select document</Button>
+    </Upload>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="upload-phone">
+
+### Phone selection and paste
+
+pastable accepts clipboard files. The browser and device control available file sources.
+
+```tsx preview="iframe-follow"
+import { Upload, Button } from '@rockshin/tao-ui';
+export default function Demo() {
+  return (
+    <Upload pastable multiple beforeUpload={() => false} listType="picture">
+      <Button>Select or paste images</Button>
+    </Upload>
+  );
+}
+```
+
+</section>
+
+</div>
+
+## API
+
+<API moduleName="upload" />
+
+## Connect an upload service
+
+The live examples keep files locally and send no data. Real uploads need a server endpoint: set action to its URL, or use customRequest for your own request, progress and abort behavior.
+
+```tsx
+import { Upload, Button } from '@rockshin/tao-ui';
+
+// The application must implement this endpoint.
+export function ServerUpload() {
+  return (
+    <Upload action="/api/uploads" name="file" data={{ folder: 'documents' }}>
+      <Button>Upload to server</Button>
+    </Upload>
+  );
+}
+```

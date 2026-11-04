@@ -1,0 +1,73 @@
+@layer components {
+  [data-tao-divider] {
+    --tao-divider-line-style: solid;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    inline-size: 100%;
+    min-inline-size: 0;
+    margin-block: var(--tao-margin-lg);
+    color: var(--tao-color-text);
+    font: inherit;
+    font-family: var(--tao-font-family);
+    font-weight: var(--tao-font-weight-strong);
+  }
+  [data-tao-divider][data-tao-variant="dashed"] {
+    --tao-divider-line-style: dashed;
+  }
+  [data-tao-divider][data-tao-variant="dotted"] {
+    --tao-divider-line-style: dotted;
+  }
+  [data-tao-divider]:not([data-tao-has-title]),
+  [data-tao-divider-rail] {
+    border-block-start: var(--tao-line-width) var(--tao-divider-line-style)
+      var(--tao-color-border-secondary);
+  }
+  [data-tao-divider][data-tao-size="small"] {
+    margin-block: var(--tao-margin-xs);
+  }
+  [data-tao-divider][data-tao-size="medium"] {
+    margin-block: var(--tao-margin-md);
+  }
+  [data-tao-divider][data-tao-plain] {
+    font-weight: 400;
+    font-size: var(--tao-font-size);
+  }
+  [data-tao-divider-rail] {
+    flex: 1;
+    min-inline-size: 0;
+  }
+  [data-tao-divider-content] {
+    padding-inline: var(--tao-padding-md);
+  }
+  [data-tao-divider][data-tao-placement="start"]
+    [data-tao-divider-rail="start"],
+  [data-tao-divider][data-tao-placement="end"] [data-tao-divider-rail="end"],
+  [data-tao-divider][data-tao-placement="left"]:dir(ltr)
+    [data-tao-divider-rail="start"],
+  [data-tao-divider][data-tao-placement="left"]:dir(rtl)
+    [data-tao-divider-rail="end"],
+  [data-tao-divider][data-tao-placement="right"]:dir(ltr)
+    [data-tao-divider-rail="end"],
+  [data-tao-divider][data-tao-placement="right"]:dir(rtl)
+    [data-tao-divider-rail="start"] {
+    flex: 0 0 5%;
+  }
+  [data-tao-divider][data-tao-custom-margin][data-tao-placement="start"]
+    [data-tao-divider-rail="start"],
+  [data-tao-divider][data-tao-custom-margin][data-tao-placement="end"]
+    [data-tao-divider-rail="end"] {
+    flex-basis: 0;
+  }
+  [data-tao-divider][data-tao-orientation="vertical"] {
+    display: inline-block;
+    inline-size: 0;
+    block-size: 0.9em;
+    margin-block: 0;
+    margin-inline: var(--tao-margin-xs);
+    vertical-align: middle;
+    border-block-start: 0;
+    border-inline-start: var(--tao-line-width) var(--tao-divider-line-style)
+      var(--tao-color-border-secondary);
+  }
+}

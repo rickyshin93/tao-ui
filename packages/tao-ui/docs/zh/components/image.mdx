@@ -1,0 +1,277 @@
+---
+title: Image
+description: "支持全屏预览、图片组切换、缩放旋转、失败回退与进度占位的图片组件。"
+---
+
+import Preview from '../../_components/demo-preview';
+
+支持全屏预览、图片组切换、缩放旋转、失败回退与进度占位的图片组件。
+
+每个示例都可以独立复制运行。带设备预览的示例可通过工具栏切换桌面与手机宽度。
+
+## 示例
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="image-basic">
+
+### 预览图片
+
+点击图片或聚焦后按 Enter 打开预览，Escape 关闭并恢复焦点。
+
+```tsx preview="iframe-follow"
+import { Image } from '@rockshin/tao-ui';
+const photo = (color: string) =>
+  `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400"><rect width="600" height="400" fill="${color}"/><circle cx="420" cy="110" r="46" fill="#fff5"/><path d="M0 400L220 120L420 400Z" fill="#fff8"/><path d="M200 400L430 200L600 400Z" fill="#fff4"/></svg>`)}`;
+export default function BasicImage() {
+  return (
+    <div style={{ padding: 16 }}>
+      <Image
+        src={photo('#496f5d')}
+        alt="Illustrated green mountains"
+        width={260}
+      />
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="image-group">
+
+### 浏览图片组
+
+PreviewGroup 注册子图片，支持按钮或方向键切换前后图片。
+
+```tsx preview="iframe-follow"
+import { Image } from '@rockshin/tao-ui';
+const photo = (color: string) =>
+  `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400"><rect width="600" height="400" fill="${color}"/><circle cx="420" cy="110" r="46" fill="#fff5"/><path d="M0 400L220 120L420 400Z" fill="#fff8"/><path d="M200 400L430 200L600 400Z" fill="#fff4"/></svg>`)}`;
+export default function ImageGallery() {
+  return (
+    <div style={{ padding: 16, display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+      <Image.PreviewGroup>
+        <Image src={photo('#496f5d')} alt="Green mountains" width={150} />
+        <Image src={photo('#6d5c91')} alt="Purple mountains" width={150} />
+        <Image src={photo('#9c6d43')} alt="Golden mountains" width={150} />
+      </Image.PreviewGroup>
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="image-controlled">
+
+### 受控打开预览
+
+通过 open 和 onOpenChange 控制预览，可以从其他操作按钮打开。
+
+```tsx preview="iframe-follow"
+import { useState } from 'react';
+import { Button, Image } from '@rockshin/tao-ui';
+const photo = (color: string) =>
+  `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400"><rect width="600" height="400" fill="${color}"/><circle cx="420" cy="110" r="46" fill="#fff5"/><path d="M0 400L220 120L420 400Z" fill="#fff8"/><path d="M200 400L430 200L600 400Z" fill="#fff4"/></svg>`)}`;
+export default function ControlledPreview() {
+  const [open, setOpen] = useState(false);
+  return (
+    <div style={{ padding: 16, display: 'grid', gap: 12 }}>
+      <Button onClick={() => setOpen(true)}>Open original</Button>
+      <Image
+        src={photo('#6d5c91')}
+        alt="Purple mountains"
+        width={180}
+        preview={{ open, onOpenChange: setOpen }}
+      />
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="image-fallback">
+
+### 失败回退与仅缩略图
+
+源图加载失败后显示 fallback；preview:false 让图片保持普通展示。
+
+```tsx preview
+import { Image } from '@rockshin/tao-ui';
+const photo = (color: string) =>
+  `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400"><rect width="600" height="400" fill="${color}"/><circle cx="420" cy="110" r="46" fill="#fff5"/><path d="M0 400L220 120L420 400Z" fill="#fff8"/><path d="M200 400L430 200L600 400Z" fill="#fff4"/></svg>`)}`;
+export default function ImageFallback() {
+  return (
+    <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+      <Image
+        src="data:image/png;base64,broken"
+        fallback={photo('#9c6d43')}
+        alt="Fallback illustration"
+        width={180}
+        preview={false}
+      />
+      <Image
+        src={photo('#496f5d')}
+        alt="Non-interactive thumbnail"
+        width={180}
+        preview={false}
+      />
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="image-progress">
+
+### 进度占位
+
+进度由应用提供；本例通过滑块控制进度，到达 100% 后展示图片。
+
+```tsx preview
+import { useState } from 'react';
+import { Image } from '@rockshin/tao-ui';
+const photo = (color: string) =>
+  `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400"><rect width="600" height="400" fill="${color}"/><circle cx="420" cy="110" r="46" fill="#fff5"/><path d="M0 400L220 120L420 400Z" fill="#fff8"/><path d="M200 400L430 200L600 400Z" fill="#fff4"/></svg>`)}`;
+export default function ImageProgress() {
+  const [percent, setPercent] = useState(45);
+  return (
+    <div style={{ display: 'grid', gap: 12 }}>
+      <Image
+        src={photo('#496f5d')}
+        alt="Uploaded illustration"
+        width={240}
+        height={160}
+        preview={false}
+        placeholder={percent < 100 ? { progress: { percent } } : undefined}
+      />
+      <label>
+        Progress{' '}
+        <input
+          type="range"
+          min={0}
+          max={100}
+          value={percent}
+          onChange={(event) => setPercent(Number(event.target.value))}
+        />
+      </label>
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="image-cover">
+
+### 自定义遮罩提示与样式
+
+定制悬停提示和图片语义部件，同时保留预览行为。
+
+```tsx preview="iframe-follow"
+import { Image } from '@rockshin/tao-ui';
+const photo = (color: string) =>
+  `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400"><rect width="600" height="400" fill="${color}"/><circle cx="420" cy="110" r="46" fill="#fff5"/><path d="M0 400L220 120L420 400Z" fill="#fff8"/><path d="M200 400L430 200L600 400Z" fill="#fff4"/></svg>`)}`;
+export default function ImageCover() {
+  return (
+    <div style={{ padding: 16 }}>
+      <Image
+        src={photo('#6d5c91')}
+        alt="Purple landscape"
+        width={240}
+        styles={{
+          root: { overflow: 'hidden', borderRadius: 12 },
+          image: { aspectRatio: '3 / 2', objectFit: 'cover' },
+          cover: { fontSize: 14 },
+        }}
+        preview={{
+          cover: { coverNode: 'Open landscape', placement: 'bottom' },
+        }}
+      />
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="image-actions">
+
+### 自定义预览操作
+
+actionsRender 接收默认工具栏与变换操作，本例增加 Reset。
+
+```tsx preview="iframe-follow"
+import { Image } from '@rockshin/tao-ui';
+const photo = (color: string) =>
+  `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400"><rect width="600" height="400" fill="${color}"/><circle cx="420" cy="110" r="46" fill="#fff5"/><path d="M0 400L220 120L420 400Z" fill="#fff8"/><path d="M200 400L430 200L600 400Z" fill="#fff4"/></svg>`)}`;
+export default function ImageActions() {
+  return (
+    <div style={{ padding: 16 }}>
+      <Image
+        src={photo('#9c6d43')}
+        alt="Golden landscape"
+        width={240}
+        preview={{
+          actionsRender: (actions, info) => (
+            <>
+              {actions}
+              <button
+                type="button"
+                style={{ width: 'auto', paddingInline: 12, fontSize: 14 }}
+                onClick={info.actions.onReset}
+              >
+                Reset
+              </button>
+            </>
+          ),
+        }}
+      />
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="image-mobile">
+
+### 手机图片预览
+
+全屏预览为操作栏和安全区预留空间，可在手机壳中检查缩放、适配与切换。
+
+```tsx preview="iframe-follow"
+import { Image } from '@rockshin/tao-ui';
+const photo = (color: string) =>
+  `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400"><rect width="600" height="400" fill="${color}"/><circle cx="420" cy="110" r="46" fill="#fff5"/><path d="M0 400L220 120L420 400Z" fill="#fff8"/><path d="M200 400L430 200L600 400Z" fill="#fff4"/></svg>`)}`;
+export default function MobileGallery() {
+  return (
+    <div style={{ padding: 16 }}>
+      <h3>Project gallery</h3>
+      <Image.PreviewGroup>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(2,minmax(0,1fr))',
+            gap: 12,
+          }}
+        >
+          <Image src={photo('#496f5d')} alt="Green landscape" width="100%" />
+          <Image src={photo('#6d5c91')} alt="Purple landscape" width="100%" />
+        </div>
+      </Image.PreviewGroup>
+    </div>
+  );
+}
+```
+
+</section>
+
+</div>
+
+## API
+
+<API moduleName="image" />

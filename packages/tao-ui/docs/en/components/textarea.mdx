@@ -3,6 +3,8 @@ title: Textarea
 description: "Multi-line text input with optional auto sizing. Includes usage guidance, a runnable example, and the complete API reference."
 ---
 
+import Preview from '../../_components/demo-preview';
+
 Multi-line text input with optional auto sizing.
 
 ## When to use
@@ -18,7 +20,13 @@ Use Textarea for longer freeform content such as descriptions, notes, and commen
 
 - Do not use the component outside its intended interaction model.
 
-## Basic usage
+## Examples
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="textarea-example-1">
+
+### Basic usage
 
 ```tsx preview
 import { Stack, Textarea } from '@rockshin/tao-ui';
@@ -27,7 +35,10 @@ function TextareaExample() {
   return (
     <Stack gap="md" style={{ maxWidth: 420 }}>
       <Textarea placeholder="Write a description" />
-      <Textarea defaultValue="Autosize grows with its content." autoSize={{ minRows: 2, maxRows: 5 }} />
+      <Textarea
+        defaultValue="Autosize grows with its content."
+        autoSize={{ minRows: 2, maxRows: 5 }}
+      />
       <Textarea value="Invalid content" error readOnly />
     </Stack>
   );
@@ -36,7 +47,11 @@ function TextareaExample() {
 export default TextareaExample;
 ```
 
-## Variants
+</section>
+
+<section className="tao-example" id="textarea-example-2">
+
+### Variants
 
 ```tsx preview
 import { Stack, Textarea } from '@rockshin/tao-ui';
@@ -54,7 +69,11 @@ function TextareaVariants() {
 export default TextareaVariants;
 ```
 
-## Sizes and autosize
+</section>
+
+<section className="tao-example" id="textarea-example-3">
+
+### Sizes and autosize
 
 ```tsx preview
 import { Stack, Textarea } from '@rockshin/tao-ui';
@@ -63,7 +82,11 @@ function TextareaSizes() {
   return (
     <Stack gap="md" style={{ maxWidth: 420 }}>
       <Textarea size="small" placeholder="Small" />
-      <Textarea size="medium" autoSize={{ minRows: 2, maxRows: 5 }} defaultValue="Autosize grows with content." />
+      <Textarea
+        size="medium"
+        autoSize={{ minRows: 2, maxRows: 5 }}
+        defaultValue="Autosize grows with content."
+      />
       <Textarea size="large" placeholder="Large" />
     </Stack>
   );
@@ -71,6 +94,151 @@ function TextareaSizes() {
 
 export default TextareaSizes;
 ```
+
+</section>
+
+<section className="tao-example" id="textarea-controlled-limit">
+
+### Controlled text and character count
+
+Native maxLength limits input; controlled state displays the character count.
+
+```tsx preview
+import { useState } from 'react';
+import { Textarea, Stack } from '@rockshin/tao-ui';
+export default function Example() {
+  const [text, setText] = useState('');
+  return (
+    <Stack direction="vertical">
+      <Textarea
+        aria-label="Description"
+        value={text}
+        maxLength={120}
+        onChange={(e) => setText(e.target.value)}
+      />
+      <output>{text.length} / 120</output>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="textarea-bounded-autosize">
+
+### Bounded automatic height
+
+Enter multiple lines to grow between minRows and maxRows.
+
+```tsx preview
+import { Textarea } from '@rockshin/tao-ui';
+export default function Example() {
+  return (
+    <Textarea
+      aria-label="Notes"
+      autoSize={{ minRows: 2, maxRows: 6 }}
+      placeholder="Enter multiple lines…"
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="textarea-states">
+
+### Read-only, disabled, and error
+
+Distinguish readable content, unavailable input, and an error requiring correction.
+
+```tsx preview
+import { Textarea, Stack } from '@rockshin/tao-ui';
+export default function Example() {
+  return (
+    <Stack direction="vertical">
+      <Textarea
+        aria-label="Read-only notes"
+        readOnly
+        value="This record is locked."
+      />
+      <Textarea
+        aria-label="Disabled notes"
+        disabled
+        defaultValue="Unavailable"
+      />
+      <Textarea
+        aria-label="Invalid notes"
+        status="error"
+        defaultValue="A reason is required."
+      />
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="textarea-native-form">
+
+### Submit and reset
+
+Read content by name and use reset to restore the default value.
+
+```tsx preview
+import { useState } from 'react';
+import { Textarea, Button, Stack } from '@rockshin/tao-ui';
+export default function Example() {
+  const [saved, setSaved] = useState('');
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        setSaved(String(new FormData(e.currentTarget).get('notes')));
+      }}
+      onReset={() => setSaved('')}
+    >
+      <Stack direction="vertical">
+        <Textarea
+          name="notes"
+          aria-label="Review notes"
+          defaultValue="Ready for review"
+        />
+        <Stack>
+          <Button type="submit">Save notes</Button>
+          <Button type="reset">Reset</Button>
+        </Stack>
+        <output aria-live="polite">{saved}</output>
+      </Stack>
+    </form>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="textarea-semantic">
+
+### Semantic styling
+
+Style the textarea semantic part while retaining component states and focus behavior.
+
+```tsx preview
+import { Textarea } from '@rockshin/tao-ui';
+export default function Example() {
+  return (
+    <Textarea
+      aria-label="Code notes"
+      autoSize
+      styles={{ textarea: { fontFamily: 'monospace', lineHeight: 1.8 } }}
+      defaultValue="const ready = true;"
+    />
+  );
+}
+```
+
+</section>
+
+</div>
 
 ## API
 

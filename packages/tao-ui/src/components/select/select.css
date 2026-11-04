@@ -182,22 +182,10 @@ button[data-tao-select-clear] {
   font: inherit;
 }
 
-[data-tao-select][data-tao-inline-search]
-  [data-tao-select-icons][data-tao-clearable]
-  [data-tao-select-clear] {
+/* Keep clear discoverable by keyboard and touch as well as pointer. */
+[data-tao-select-icons][data-tao-clearable]
+[data-tao-select-icon]:not([data-tao-select-loading-slot]) {
   display: none;
-}
-
-[data-tao-select][data-tao-inline-search]:hover
-  [data-tao-select-icons][data-tao-clearable]
-  [data-tao-select-icon] {
-  display: none;
-}
-
-[data-tao-select][data-tao-inline-search]:hover
-  [data-tao-select-icons][data-tao-clearable]
-  [data-tao-select-clear] {
-  display: flex;
 }
 
 [data-tao-select-icon] {
@@ -265,6 +253,9 @@ button[data-tao-select-clear] {
    Dropdown Content
    =========================== */
 [data-tao-select-content] {
+  --tao-select-height: var(--tao-control-height);
+  --tao-select-font-size: var(--tao-font-size-base);
+  font-size: var(--tao-select-font-size);
   background: var(--tao-color-bg-elevated);
   border: var(--tao-line-width) solid var(--tao-color-border);
   border-radius: var(--tao-radius-lg);
@@ -279,6 +270,16 @@ button[data-tao-select-clear] {
 
 [data-tao-select-content][data-state="open"] {
   animation-name: tao-select-in;
+}
+
+[data-tao-select-content][data-tao-size="small"] {
+  --tao-select-height: var(--tao-control-height-sm);
+  --tao-select-font-size: var(--tao-font-size-sm);
+}
+
+[data-tao-select-content][data-tao-size="large"] {
+  --tao-select-height: var(--tao-control-height-lg);
+  --tao-select-font-size: var(--tao-font-size-lg);
 }
 
 /* popupMatchSelectWidth={false}: fit the widest option instead of the trigger */
@@ -302,7 +303,7 @@ button[data-tao-select-clear] {
   display: flex;
   align-items: center;
   gap: var(--tao-padding-xs);
-  min-height: var(--tao-control-height);
+  min-height: var(--tao-select-height);
   padding: var(--tao-padding-xs) var(--tao-padding-sm);
   border-block-end: var(--tao-line-width) solid
     var(--tao-color-border-secondary);
@@ -312,12 +313,12 @@ button[data-tao-select-clear] {
 
 [data-tao-select-search-input] {
   flex: 1;
-  height: calc(var(--tao-control-height) - var(--tao-padding-xs) * 2);
+  height: calc(var(--tao-select-height) - var(--tao-padding-xs) * 2);
   border: none;
   outline: none;
   background: transparent;
   font-family: var(--tao-font-family);
-  font-size: var(--tao-font-size-base);
+  font-size: var(--tao-select-font-size);
   line-height: 1;
   color: var(--tao-color-text);
   min-width: 0;
@@ -364,9 +365,9 @@ legend[data-tao-select-group-label] {
   width: 100%;
   box-sizing: border-box;
   align-items: center;
-  min-height: var(--tao-control-height);
+  min-height: var(--tao-select-height);
   padding-inline: var(--tao-padding-sm);
-  font-size: var(--tao-font-size-base);
+  font-size: var(--tao-select-font-size);
   font-family: var(--tao-font-family);
   line-height: 1;
   color: var(--tao-color-text);
@@ -556,4 +557,51 @@ legend[data-tao-select-group-label] {
 /* In multi mode, selected items show their own checkmark */
 [data-tao-select-item][data-tao-selected] {
   font-weight: var(--tao-font-weight-medium);
+}
+
+/* Measure overflowed tags without exposing duplicate focus targets. */
+[data-tao-select-responsive-tags] {
+  display: flex;
+  align-items: center;
+  position: relative;
+  flex: 1 1 0%;
+  min-width: 0;
+  gap: 4px;
+  overflow: hidden;
+}
+[data-tao-select][data-tao-inline-search][data-tao-multiple]
+  [data-tao-select-values]:has([data-tao-select-responsive-tags])
+  > [data-tao-select-trigger-input] {
+  flex: 0 0 4ch;
+}
+[data-tao-select-tag-measure] {
+  display: inline-flex;
+  flex: none;
+}
+[data-tao-select-responsive-tags] [data-tao-select-tag-rest] {
+  box-sizing: border-box;
+  flex: none;
+  max-width: 100%;
+  overflow: hidden;
+}
+[data-tao-select-responsive-tags] [data-tao-overflow] {
+  position: absolute;
+  visibility: hidden;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+@media (pointer: coarse) {
+  [data-tao-select] [data-tao-select-clear] {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  [data-tao-select] [data-tao-select-tag] {
+    height: 44px;
+  }
+  [data-tao-select] [data-tao-select-tag-close] {
+    width: 44px;
+    height: 44px;
+    margin-inline: 0;
+  }
 }

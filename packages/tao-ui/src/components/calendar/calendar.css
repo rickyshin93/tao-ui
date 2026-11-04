@@ -1,0 +1,149 @@
+@layer components {
+  [data-tao-calendar] {
+    width: 100%;
+    min-width: 0;
+    color: var(--tao-color-text);
+    background: var(--tao-color-bg-container);
+    border-radius: var(--tao-radius);
+    font: var(--tao-font-size) / var(--tao-line-height) var(--tao-font-family);
+  }
+  [data-tao-calendar-header] {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--tao-margin-xs);
+    padding: var(--tao-padding-sm);
+  }
+  [data-tao-calendar-header] select,
+  [data-tao-calendar-modes] label {
+    height: var(--tao-control-height);
+    padding-inline: var(--tao-padding-sm);
+    border: 1px solid var(--tao-color-border);
+    border-radius: var(--tao-radius-sm);
+    background: var(--tao-color-bg-container);
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+  }
+  [data-tao-calendar-modes] {
+    display: inline-flex;
+  }
+  [data-tao-calendar-modes] label {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    border-radius: 0;
+  }
+  [data-tao-calendar-modes] label:first-child {
+    border-start-start-radius: var(--tao-radius-sm);
+    border-end-start-radius: var(--tao-radius-sm);
+  }
+  [data-tao-calendar-modes] label:last-child {
+    border-start-end-radius: var(--tao-radius-sm);
+    border-end-end-radius: var(--tao-radius-sm);
+  }
+  [data-tao-calendar-modes] label[data-selected] {
+    color: var(--tao-color-primary);
+    border-color: var(--tao-color-primary);
+    background: var(--tao-primary-bg);
+  }
+  [data-tao-calendar] :is(select, button):focus-visible {
+    outline: 2px solid var(--tao-color-primary);
+    outline-offset: 2px;
+  }
+  [data-tao-calendar-modes] input {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+  }
+  [data-tao-calendar-modes] label:has(input:focus-visible) {
+    outline: 2px solid var(--tao-color-primary);
+    outline-offset: 2px;
+  }
+  [data-tao-calendar] table {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+  }
+  [data-tao-calendar] th {
+    padding: var(--tao-padding-xs);
+    color: var(--tao-color-text-secondary);
+    font-weight: 500;
+    text-align: end;
+  }
+  [data-tao-calendar] td {
+    padding: 3px;
+    color: var(--tao-color-text-disabled);
+    vertical-align: top;
+    cursor: pointer;
+  }
+  [data-tao-calendar] td[class*="-cell-in-view"] {
+    color: var(--tao-color-text);
+  }
+  [data-tao-calendar-cell] {
+    min-width: 0;
+    min-height: 100px;
+    padding: var(--tao-padding-xs);
+    border-top: 2px solid var(--tao-color-border-secondary);
+    transition: background-color var(--tao-motion-duration-fast);
+  }
+  [data-tao-calendar-value] {
+    display: block;
+    text-align: end;
+  }
+  [data-tao-calendar-events] {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  [data-tao-calendar]
+    td:not([class*="-cell-disabled"]):hover
+    [data-tao-calendar-cell] {
+    background: var(--tao-color-bg-text-hover);
+  }
+  [data-tao-calendar] td[class*="-cell-selected"] [data-tao-calendar-cell] {
+    background: var(--tao-primary-bg);
+    color: var(--tao-color-primary);
+  }
+  [data-tao-calendar-cell][data-today] {
+    border-top-color: var(--tao-color-primary);
+  }
+  [data-tao-calendar] td[class*="-cell-disabled"] {
+    color: var(--tao-color-text-disabled);
+    cursor: not-allowed;
+    background: var(--tao-color-fill-tertiary);
+  }
+  [data-tao-calendar][data-fullscreen="false"] {
+    border: 1px solid var(--tao-color-border-secondary);
+  }
+  [data-tao-calendar][data-fullscreen="false"] th {
+    text-align: center;
+  }
+  [data-tao-calendar][data-fullscreen="false"] [data-tao-calendar-cell] {
+    min-height: 32px;
+    padding: 5px;
+    border-top: 0;
+    border-radius: var(--tao-radius-sm);
+  }
+  [data-tao-calendar][data-fullscreen="false"] [data-tao-calendar-value] {
+    text-align: center;
+  }
+  [data-tao-calendar][data-fullscreen="false"] [data-today] {
+    box-shadow: inset 0 0 0 1px var(--tao-color-primary);
+  }
+  @media (max-width: 575px) {
+    [data-tao-calendar-cell] {
+      min-height: 64px;
+      padding: 4px;
+    }
+    [data-tao-calendar-header] {
+      justify-content: center;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    [data-tao-calendar-cell] {
+      transition: none;
+    }
+  }
+}

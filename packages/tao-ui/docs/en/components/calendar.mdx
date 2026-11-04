@@ -1,0 +1,244 @@
+---
+
+title: Calendar
+
+description: "Display months or years with event cells, custom headers and selectable ranges."
+
+---
+
+import Preview from '../../_components/demo-preview';
+
+Display months or years with event cells, custom headers and selectable ranges.
+
+The added API follows Ant Design 6.7.0; appearance, theming and Semantic DOM use tao-ui. Existing component APIs remain unchanged.
+
+## Examples
+
+<div className="tao-demo-grid tao-demo-grid-wide">
+
+<section className="tao-example" id="calendar-basic">
+
+### Full month calendar
+
+A full calendar provides space for events inside each day.
+
+```tsx preview
+import { Calendar } from '@rockshin/tao-ui';
+import dayjs from 'dayjs';
+export default function Demo() {
+  return <Calendar defaultValue={dayjs('2026-11-04')} />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="calendar-compact">
+
+### Compact calendar
+
+fullscreen=false uses a compact layout for sidebars and cards.
+
+```tsx preview
+import { Calendar } from '@rockshin/tao-ui';
+import dayjs from 'dayjs';
+export default function Demo() {
+  return (
+    <div style={{ maxWidth: 360 }}>
+      <Calendar fullscreen={false} defaultValue={dayjs('2026-11-04')} />
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="calendar-controlled">
+
+### Controlled selection and source
+
+onSelect distinguishes day clicks from header changes; onChange updates the value.
+
+```tsx preview
+import { Calendar } from '@rockshin/tao-ui';
+import dayjs from 'dayjs';
+import { useState } from 'react';
+export default function Demo() {
+  const [value, setValue] = useState(dayjs('2026-11-04'));
+  const [source, setSource] = useState('initial');
+  return (
+    <div>
+      <Calendar
+        value={value}
+        onChange={setValue}
+        onSelect={(_, info) => setSource(info.source)}
+      />
+      <p>
+        {value.format('YYYY-MM-DD')} · {source}
+      </p>
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="calendar-events">
+
+### Event cells
+
+cellRender adds events inside the default cell while keeping date interaction.
+
+```tsx preview
+import { Calendar, Badge } from '@rockshin/tao-ui';
+import dayjs from 'dayjs';
+export default function Demo() {
+  return (
+    <Calendar
+      defaultValue={dayjs('2026-11-04')}
+      cellRender={(date, info) =>
+        info.type === 'date' && [4, 12, 20].includes(date.date()) ? (
+          <Badge
+            status="processing"
+            text={date.date() === 4 ? 'Design review' : 'Team sync'}
+          />
+        ) : null
+      }
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="calendar-bounds">
+
+### Valid range
+
+The range constrains both header navigation and day selection.
+
+```tsx preview
+import { Calendar } from '@rockshin/tao-ui';
+import dayjs from 'dayjs';
+export default function Demo() {
+  return (
+    <Calendar
+      fullscreen={false}
+      defaultValue={dayjs('2026-11-10')}
+      validRange={[dayjs('2026-11-05'), dayjs('2026-12-20')]}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="calendar-weekends">
+
+### Disable weekends
+
+disabledDate receives Dayjs; dates returning true cannot be selected.
+
+```tsx preview
+import { Calendar } from '@rockshin/tao-ui';
+export default function Demo() {
+  return (
+    <Calendar
+      fullscreen={false}
+      disabledDate={(date) => date.day() === 0 || date.day() === 6}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="calendar-year">
+
+### Year view and week numbers
+
+Switch between month and year views, or display week numbers.
+
+```tsx preview
+import { Calendar, Button } from '@rockshin/tao-ui';
+import { useState } from 'react';
+export default function Demo() {
+  const [mode, setMode] = useState<'month' | 'year'>('year');
+  return (
+    <div>
+      <Button onClick={() => setMode(mode === 'year' ? 'month' : 'year')}>
+        Switch view
+      </Button>
+      <Calendar
+        mode={mode}
+        showWeek
+        onPanelChange={(_, next) => setMode(next)}
+      />
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="calendar-header">
+
+### Custom header
+
+The header receives value and mode setters for a custom toolbar.
+
+```tsx preview
+import { Calendar, Button, Stack } from '@rockshin/tao-ui';
+export default function Demo() {
+  return (
+    <Calendar
+      fullscreen={false}
+      headerRender={({ value, onChange }) => (
+        <Stack direction="horizontal" gap="sm" align="center">
+          <Button
+            size="small"
+            variant="ghost"
+            onClick={() => onChange(value.subtract(1, 'month'))}
+          >
+            Previous
+          </Button>
+          <span>{value.format('YYYY-MM')}</span>
+          <Button
+            size="small"
+            variant="ghost"
+            onClick={() => onChange(value.add(1, 'month'))}
+          >
+            Next
+          </Button>
+        </Stack>
+      )}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="calendar-phone">
+
+### Phone and locale
+
+The compact calendar inherits Chinese text from the provider.
+
+```tsx preview="iframe-follow"
+import { Calendar, TaoProvider, zhCN } from '@rockshin/tao-ui';
+export default function Demo() {
+  return (
+    <TaoProvider locale={zhCN}>
+      <Calendar fullscreen={false} />
+    </TaoProvider>
+  );
+}
+```
+
+</section>
+
+</div>
+
+## API
+
+<API moduleName="calendar" />

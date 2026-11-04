@@ -1,0 +1,9 @@
+@layer tao {
+  [data-tao-affix] {
+    min-width: 0;
+  }
+  [data-tao-affix-content][data-tao-affixed] {
+    z-index: calc(var(--tao-z-index-base) + 10);
+    box-sizing: border-box;
+  }
+}

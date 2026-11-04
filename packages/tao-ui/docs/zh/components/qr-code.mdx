@@ -1,0 +1,270 @@
+---
+
+title: QRCode
+
+description: "生成可扫描的 Canvas 或 SVG 二维码，支持图标、状态和刷新。"
+
+---
+
+import Preview from '../../_components/demo-preview';
+
+生成可扫描的 Canvas 或 SVG 二维码，支持图标、状态和刷新。
+
+新增 API 对齐 Ant Design 6.7.0，外观、主题与 Semantic DOM 使用 tao-ui。既有组件 API 保持原样。
+
+## 代码演示
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="qr-code-renderers">
+
+### Canvas 与 SVG
+
+Canvas 可导出位图；SVG 可无损缩放。
+
+```tsx preview
+import { QRCode, Stack } from '@rockshin/tao-ui';
+export default function Demo() {
+  return (
+    <Stack direction="horizontal" gap="md">
+      <QRCode value="https://github.com/rickyshin93/tao-ui" />
+      <QRCode type="svg" value="https://github.com/rickyshin93/tao-ui" />
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="qr-code-value">
+
+### 动态内容
+
+值变化时重新编码；空字符串不渲染二维码。
+
+```tsx preview
+import { QRCode, Input, Stack } from '@rockshin/tao-ui';
+import { useState } from 'react';
+export default function Demo() {
+  const [value, setValue] = useState('tao-ui');
+  return (
+    <Stack gap="md">
+      <Input
+        value={value}
+        onChange={(event) => setValue(event.target.value)}
+        aria-label="QR content"
+      />
+      <QRCode value={value} />
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="qr-code-levels">
+
+### 容错级别
+
+L、M、Q、H 提供不同容错能力；中心图标通常使用较高级别。
+
+```tsx preview
+import { QRCode, Stack } from '@rockshin/tao-ui';
+export default function Demo() {
+  return (
+    <Stack direction="horizontal" gap="md" style={{ flexWrap: 'wrap' }}>
+      {(['L', 'M', 'Q', 'H'] as const).map((level) => (
+        <div key={level}>
+          <QRCode
+            value="tao-ui component library"
+            errorLevel={level}
+            boostLevel={false}
+            size={130}
+          />
+          <p>{level}</p>
+        </div>
+      ))}
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="qr-code-states">
+
+### 状态与刷新
+
+过期状态显示刷新按钮；加载和已扫描状态也会覆盖二维码。
+
+```tsx preview
+import { QRCode, Stack, Button, type QRStatus } from '@rockshin/tao-ui';
+import { useState } from 'react';
+export default function Demo() {
+  const [status, setStatus] = useState<QRStatus>('expired');
+  return (
+    <Stack gap="md">
+      <QRCode
+        value="demo-token"
+        status={status}
+        onRefresh={() => setStatus('active')}
+      />
+      <Stack direction="horizontal" gap="sm" style={{ flexWrap: 'wrap' }}>
+        {(['active', 'expired', 'loading', 'scanned'] as const).map((next) => (
+          <Button
+            key={next}
+            size="small"
+            variant="secondary"
+            onClick={() => setStatus(next)}
+          >
+            {next}
+          </Button>
+        ))}
+      </Stack>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="qr-code-colors">
+
+### 颜色与留白
+
+保持高对比度；marginSize 以二维码模块为单位保留边缘空白。
+
+```tsx preview
+import { QRCode } from '@rockshin/tao-ui';
+export default function Demo() {
+  return (
+    <QRCode
+      value="tao-ui"
+      color="#005b5b"
+      bgColor="#ffffff"
+      marginSize={4}
+      size={200}
+      bordered={false}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="qr-code-icon">
+
+### 中心图标
+
+iconSize 支持统一尺寸或独立宽高，图标使用数据 URL 避免外部请求。
+
+```tsx preview
+import { QRCode } from '@rockshin/tao-ui';
+const icon =
+  'data:image/svg+xml,' +
+  encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"><rect width="40" height="40" rx="6" fill="#008888"/><path d="M10 12h20M20 12v20" stroke="white" stroke-width="4"/></svg>',
+  );
+export default function Demo() {
+  return (
+    <QRCode
+      value="https://github.com/rickyshin93/tao-ui"
+      icon={icon}
+      iconSize={{ width: 32, height: 32 }}
+      errorLevel="H"
+      size={200}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="qr-code-download">
+
+### 下载 PNG
+
+通过公开 ref 定位 Canvas 并导出；图标跨域时需要正确的 CORS 响应。
+
+```tsx preview
+import { QRCode, Button, Stack, type QRCodeRef } from '@rockshin/tao-ui';
+import { useRef } from 'react';
+export default function Demo() {
+  const ref = useRef<QRCodeRef>(null);
+  return (
+    <Stack gap="md">
+      <QRCode
+        ref={ref}
+        value="https://github.com/rickyshin93/tao-ui"
+        bgColor="#ffffff"
+        color="#000000"
+        marginSize={4}
+      />
+      <Button
+        onClick={() => {
+          const canvas = ref.current!.nativeElement.querySelector('canvas')!;
+          const link = document.createElement('a');
+          link.download = 'tao-ui-qr.png';
+          link.href = canvas.toDataURL('image/png');
+          link.click();
+        }}
+      >
+        Download PNG
+      </Button>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="qr-code-custom-status">
+
+### 自定义状态
+
+statusRender 接收状态、语言文本和刷新回调。
+
+```tsx preview
+import { QRCode, Button } from '@rockshin/tao-ui';
+import { useState } from 'react';
+export default function Demo() {
+  const [expired, setExpired] = useState(true);
+  return (
+    <QRCode
+      value="custom-status"
+      status={expired ? 'expired' : 'active'}
+      onRefresh={() => setExpired(false)}
+      statusRender={({ onRefresh }) => (
+        <Button onClick={onRefresh}>Generate again</Button>
+      )}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="qr-code-phone">
+
+### 手机与语言
+
+尺寸由 size 控制；状态文案继承 TaoProvider 的语言。
+
+```tsx preview="iframe-follow"
+import { QRCode, TaoProvider, zhCN } from '@rockshin/tao-ui';
+export default function Demo() {
+  return (
+    <TaoProvider locale={zhCN}>
+      <QRCode value="tao-ui" status="scanned" size={220} />
+    </TaoProvider>
+  );
+}
+```
+
+</section>
+
+</div>
+
+## API
+
+<API moduleName="qr-code" />

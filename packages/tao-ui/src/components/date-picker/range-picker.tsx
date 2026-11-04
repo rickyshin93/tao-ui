@@ -112,7 +112,7 @@ export const RangePicker = forwardRef(function RangePicker(
     minDate,
     maxDate,
     presets,
-    placeholder = ['Start date', 'End date'],
+    placeholder: placeholderProp,
     separator = '~',
     size,
     variant,
@@ -132,6 +132,10 @@ export const RangePicker = forwardRef(function RangePicker(
   const [keyboardFocusRequested, setKeyboardFocusRequested] = useState(false);
   const returnFocusRef = useRef<HTMLInputElement | null>(null);
   const ctx = useTaoConfig();
+  const placeholder = placeholderProp ?? [
+    ctx.locale.startDate,
+    ctx.locale.endDate,
+  ];
   const resolvedSize = size ?? ctx.size;
   const resolvedVariant = variant ?? ctx.variant;
   const startDisabled =
@@ -423,7 +427,7 @@ export const RangePicker = forwardRef(function RangePicker(
             type="button"
             data-tao-calendar-nav-btn=""
             onClick={() => setViewDateStart(viewDateStart.subtract(1, 'year'))}
-            aria-label="Previous year"
+            aria-label={ctx.locale.previousYear}
           >
             <DoubleLeftIcon />
           </button>
@@ -431,23 +435,25 @@ export const RangePicker = forwardRef(function RangePicker(
             type="button"
             data-tao-calendar-nav-btn=""
             onClick={() => setViewDateStart(viewDateStart.subtract(1, 'month'))}
-            aria-label="Previous month"
+            aria-label={ctx.locale.previousMonth}
           >
             <LeftIcon />
           </button>
         </div>
         <div data-tao-range-titles="">
           <span data-tao-range-title="">
-            {viewDateStart.format('MMM YYYY')}
+            {ctx.locale.monthTitle(viewDateStart.month(), viewDateStart.year())}
           </span>
-          <span data-tao-range-title="">{viewDateEnd.format('MMM YYYY')}</span>
+          <span data-tao-range-title="">
+            {ctx.locale.monthTitle(viewDateEnd.month(), viewDateEnd.year())}
+          </span>
         </div>
         <div data-tao-calendar-nav="">
           <button
             type="button"
             data-tao-calendar-nav-btn=""
             onClick={() => setViewDateStart(viewDateStart.add(1, 'month'))}
-            aria-label="Next month"
+            aria-label={ctx.locale.nextMonth}
           >
             <RightIcon />
           </button>
@@ -455,7 +461,7 @@ export const RangePicker = forwardRef(function RangePicker(
             type="button"
             data-tao-calendar-nav-btn=""
             onClick={() => setViewDateStart(viewDateStart.add(1, 'year'))}
-            aria-label="Next year"
+            aria-label={ctx.locale.nextYear}
           >
             <DoubleRightIcon />
           </button>
@@ -526,7 +532,7 @@ export const RangePicker = forwardRef(function RangePicker(
             event.stopPropagation();
             handleClear(event);
           }}
-          aria-label="Clear"
+          aria-label={ctx.locale.clear}
           role="button"
           tabIndex={0}
           onKeyDown={(event) => {
@@ -798,7 +804,7 @@ export const RangePicker = forwardRef(function RangePicker(
           open={isOpen}
           onClose={() => setOpen(false)}
           placement="bottom"
-          title="Select date range"
+          title={ctx.locale.dateRange}
           height="85vh"
         >
           {panelContent}
@@ -815,7 +821,7 @@ export const RangePicker = forwardRef(function RangePicker(
           <Popover.Content
             id={popupId}
             ref={popupRef}
-            aria-label={props['aria-label'] ?? 'Select date range'}
+            aria-label={props['aria-label'] ?? ctx.locale.dateRange}
             data-tao-picker-dropdown=""
             sideOffset={4}
             align="start"

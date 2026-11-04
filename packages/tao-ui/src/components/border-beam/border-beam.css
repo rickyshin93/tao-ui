@@ -1,0 +1,35 @@
+@layer tao {
+  [data-tao-border-beam] {
+    position: absolute;
+    box-sizing: border-box;
+    border-radius: inherit;
+    z-index: 1;
+    overflow: hidden;
+    pointer-events: none;
+    mask:
+      linear-gradient(var(--tao-color-text) 0 0) content-box,
+      linear-gradient(var(--tao-color-text) 0 0);
+    mask-composite: exclude;
+  }
+  [data-tao-border-beam-light] {
+    position: absolute;
+    top: 0;
+    left: 0;
+    aspect-ratio: 1;
+    display: block;
+    opacity: 0.95;
+    background-image: linear-gradient(
+      to left,
+      var(--tao-color-primary) 0%,
+      var(--tao-primary-hover) 70%,
+      transparent
+    );
+    transform-origin: 90% 50%;
+    will-change: transform;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    [data-tao-border-beam] {
+      display: none;
+    }
+  }
+}

@@ -1,0 +1,192 @@
+---
+title: Statistic
+description: "Highlights numeric values, formatted metrics and elapsed time."
+---
+
+import Preview from '../../_components/demo-preview';
+
+Highlights numeric values, formatted metrics and elapsed time.
+
+This native tao-ui component follows the public API of Ant Design 6.7.0. Appearance, theme tokens and Semantic DOM customization belong to tao-ui; configure themes with `TaoProvider`.
+
+Numeric strings preserve large values; precision truncates decimal digits. Timer supports countdown/countup and the legacy Countdown alias.
+
+## When to use
+
+Use a clear title and unit so the value can be understood without surrounding context.
+
+## Examples
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="statistic-example-1">
+
+### Values and units
+
+```tsx preview
+import { Statistic } from "@rockshin/tao-ui";
+
+export default function Example() {
+  return (
+    <div
+      style={{
+        display: "flex",
+        gap: 16,
+        alignItems: "center",
+        flexWrap: "wrap",
+      }}
+    >
+      <Statistic title="Active users" value={12345} />
+      <Statistic title="Completion" value={93.5} suffix="%" />
+      <Statistic title="Balance" prefix="$" value={1842.6} precision={2} />
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="statistic-example-2">
+
+### Precision and separators
+
+```tsx preview
+import { Statistic } from "@rockshin/tao-ui";
+
+export default function Example() {
+  return (
+    <div
+      style={{
+        display: "flex",
+        gap: 16,
+        alignItems: "center",
+        flexWrap: "wrap",
+      }}
+    >
+      <Statistic
+        title="Precise string"
+        value="12345678901234567890.987"
+        precision={2}
+      />
+      <Statistic
+        title="Custom grouping"
+        value="1234567.89"
+        groupSeparator=" "
+        decimalSeparator=","
+      />
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="statistic-example-3">
+
+### Custom formatting and value render
+
+```tsx preview
+import { Statistic } from "@rockshin/tao-ui";
+
+export default function Example() {
+  return (
+    <Statistic
+      title="Storage used"
+      value={1536}
+      formatter={(value) => `${(Number(value) / 1024).toFixed(1)} GB`}
+      valueRender={(node) => <strong>{node}</strong>}
+      styles={{ value: { color: "var(--tao-color-success)" } }}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="statistic-example-4">
+
+### Loading state
+
+```tsx preview
+import { useState } from "react";
+import { Button, Statistic } from "@rockshin/tao-ui";
+
+export default function Example() {
+  const [loading, setLoading] = useState(true);
+  return (
+    <div>
+      <Statistic title="Monthly total" value={8421} loading={loading} />
+      <Button onClick={() => setLoading(!loading)} style={{ marginTop: 16 }}>
+        Toggle loading
+      </Button>
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="statistic-example-5">
+
+### Countdown with completion
+
+```tsx preview
+import { useState } from "react";
+import { Button, Statistic } from "@rockshin/tao-ui";
+
+export default function Example() {
+  const [deadline, setDeadline] = useState(() => Date.now() + 10000);
+  const [finished, setFinished] = useState(false);
+  return (
+    <div>
+      <Statistic.Timer
+        type="countdown"
+        title="Time remaining"
+        value={deadline}
+        format="mm:ss"
+        onFinish={() => setFinished(true)}
+      />
+      <p aria-live="polite">{finished ? "Finished" : "Running"}</p>
+      <Button
+        onClick={() => {
+          setDeadline(Date.now() + 10000);
+          setFinished(false);
+        }}
+      >
+        Restart 10 seconds
+      </Button>
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="statistic-example-6">
+
+### Elapsed time
+
+```tsx preview
+import { useState } from "react";
+import { Statistic } from "@rockshin/tao-ui";
+
+export default function Example() {
+  const [startedAt] = useState(() => Date.now() - 65000);
+  return (
+    <Statistic.Timer
+      type="countup"
+      title="Session duration"
+      value={startedAt}
+      format="HH:mm:ss [elapsed]"
+    />
+  );
+}
+```
+
+</section>
+
+</div>
+
+## API
+
+<API moduleName="statistic" />

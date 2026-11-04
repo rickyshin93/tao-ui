@@ -1,0 +1,38 @@
+[data-tao-qr-code] {
+  position: relative;
+  display: inline-flex;
+  box-sizing: border-box;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  color: var(--tao-color-text);
+  border-radius: var(--tao-radius);
+  font-family: var(--tao-font-family);
+  font-size: var(--tao-font-size);
+  line-height: var(--tao-line-height);
+}
+[data-tao-qr-code][data-bordered="true"] {
+  border: 1px solid var(--tao-color-border);
+}
+[data-tao-qr-code] > canvas,
+[data-tao-qr-code] > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+[data-tao-qr-cover] {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--tao-margin-xs);
+  border-radius: inherit;
+  background: color-mix(
+    in oklab,
+    var(--tao-color-bg-container) 94%,
+    transparent
+  );
+}

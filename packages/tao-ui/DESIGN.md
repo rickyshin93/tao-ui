@@ -27,10 +27,10 @@ typography:
     lineHeight: 1.5714
 rounded:
   xs: "2px"
-  sm: "8px"
-  md: "10px"
-  lg: "12px"
-  xl: "14px"
+  sm: "4px"
+  md: "6px"
+  lg: "8px"
+  xl: "10px"
 spacing:
   xs: "8px"
   sm: "12px"
@@ -130,7 +130,7 @@ interface TaoSeedToken {
   // （dark scope 覆盖用），未暴露到 JS token——有需求再加。
 
   // ---- 尺寸种子 ----
-  borderRadius: number;       // 基础圆角 px (默认: 10，shadcn 基线)
+  borderRadius: number;       // 基础圆角 px (默认: 6)
   fontSize: number;           // 基础字号 px (默认: 14)
   controlHeight: number;      // 控件基础高度 px (默认: 32)
   sizeUnit: number;           // 间距基础单位 px (默认: 4)
@@ -223,20 +223,20 @@ interface TaoSeedToken {
 
 #### 2.3.2 圆角派生
 
-shadcn 语义：sm/md/lg/xl 相对 base 递增，非等比（base=10 时 xs=2, sm=8, md=10, lg=12, xl=14）：
+shadcn 语义：sm/md/lg/xl 相对 base 递增，非等比（base=6 时 xs=2, sm=4, md=6, lg=8, xl=10）：
 
 ```css
 :root {
   /* == Seed == */
-  --tao-radius: 10px;   /* shadcn baseline */
+  --tao-radius: 6px;
 
   /* == 派生 == */
   --tao-radius-xs:   2px;
-  --tao-radius-sm:   calc(var(--tao-radius) - 2px);    /* 8 */
-  --tao-radius-md:   var(--tao-radius);                 /* 10 */
-  --tao-radius-lg:   calc(var(--tao-radius) + 2px);    /* 12 */
-  --tao-radius-xl:   calc(var(--tao-radius) + 4px);    /* 14 */
-  --tao-radius-2xl:  calc(var(--tao-radius) * 2);      /* 20 */
+  --tao-radius-sm:   calc(var(--tao-radius) - 2px);    /* 4 */
+  --tao-radius-md:   var(--tao-radius);                 /* 6 */
+  --tao-radius-lg:   calc(var(--tao-radius) + 2px);    /* 8 */
+  --tao-radius-xl:   calc(var(--tao-radius) + 4px);    /* 10 */
+  --tao-radius-2xl:  calc(var(--tao-radius) * 2);      /* 12 */
   --tao-radius-full: 9999px;
 }
 ```
@@ -968,7 +968,7 @@ import '@fontsource/geist-mono/400.css';
 
 ## Shapes
 
-由 Seed Token `borderRadius`(10) 自动派生。详见 §2.3.2。
+由 Seed Token `borderRadius`(6) 自动派生。详见 §2.3.2。
 
 规则：
 - 嵌套元素的圆角 = 外层圆角 - padding
@@ -1052,7 +1052,7 @@ API:
 ```
 尺寸 (消费 --tao-control-height 派生):
   sm:   h=control-height-sm(28px), px=padding-xs(8px), text=font-size-sm
-  md:   h=control-height(32px),    px=padding-sm(12px), text=font-size-base  (默认)
+  md:   h=control-height(32px),    px=padding-xs(8px), text=font-size-base  (默认；Textarea 同步)
   lg:   h=control-height-lg(36px), px=padding-sm(12px), text=font-size-lg
 
 状态:
@@ -1064,7 +1064,9 @@ API:
 
 结构:
   [prefix?] [input] [suffix?]
-  普通 prefix 与 input 间距=padding-sm；React SVG prefix 自动 overlay，input 左 padding=padding-sm + 16px + padding-sm
+  中号 prefix/suffix 靠边内边距及 prefix 与 input 间距=padding-xs(8px)；其他尺寸仍用 padding-sm
+  React SVG prefix 自动 overlay，input 起始 padding=对应前缀边距 + 16px + 对应前缀间距
+  Input / Textarea 聚焦前后保持相同的内边距与文字位置
   RangePicker 起止内容: text-align=start，禁止居中制造无意义的左侧留白
   PC DatePicker: 使用真实 input，按 format 严格解析，Enter/blur 提交；mobile 保持 button + Drawer
 ```
@@ -1161,27 +1163,17 @@ src/
 
 ---
 
-## 16. 文档站首页世界（curved-crease · 一道弧）
+## 16. 文档站（精简组件参考）
 
-> 适用于 `docs/index.mdx` + `theme/index.css` 的 `.tao-home` 范围，不影响组件库 token。
-> 真值源：`theme/index.css` 顶部的方向契约注释 + `.impeccable/surfaces/docs-index-mdx.md`。
+> 适用于中英文首页和全部组件参考页。站点样式由 `styles/rspress.css` 管理，
+> `theme/index.tsx` 使用原生 Layout 插槽和 HomeHero 扩展，不影响组件库 token。
+> 对应场景说明：`.impeccable/surfaces/docs-index-mdx.md`。
 
-首页是 Persuade 表面，采用与组件库不同但同源克制的「曲面折纸」世界：
-
-- **核心隐喻**：一道弧线让平纸获得刚性；一颗 Seed 让松散组件获得系统。布局由一支
-  超大半径圆规弧（r ≈ 1.3× 视口宽）统治——区块分界不用直线，用同一圆规族的弧。
-- **纸墨**：暖棉纸底 `oklch(0.956 0.02 86)`，暖近黑墨 `oklch(0.19 0.01 61)`；
-  发丝线 = 墨的 12–18% α；无点缀色（组件自身的语义色除外）。石墨阴影偏暖
-  （hue 75–87），过渡极软（200–400px），光从左上来。
-- **字体三声部**：EB Garamond italic = 几何学家的展示声部（仅展示行与图注）；
-  Geist Sans = UI 与正文；Geist Mono = 度量与读数（半径值、token 名、fig 编号）。
-  meta 标签用 tracked lowercase，不用全大写（PRODUCT.md 禁令覆盖世界语法）。
-- **图版语法**：区块即图版，编号 fig. i–v；引线 1px、40–45° 斜向、指向真实语义部件；
-  页边注记录真实产品事实（token 值、状态名）。每页至多一块炭黑板
-  （`oklch(0.27 0.008 280)`，反白骨色文字）——保留给 agent 契约。
-- **动效（编排级）**：弧线描画入场（stroke-dashoffset + pathLength=1）、
-  图版滚动揭示（opacity/translate/blur，ease-out-expo）、读数计数、
-  首屏折弯自动锁定到 `--tao-radius: 10px`。`prefers-reduced-motion` 直接呈现终态，
-  交互装置保持可用。
-- **暗色 = 夜间图版**：纸墨翻转（纸 `oklch(0.20 0.012 75)`，墨 `oklch(0.93 0.014 85)`），
-  弧与炭黑板延续，不另立世界。
+- **目标**：让访问者完成安装、查组件、试效果、复制代码和查 API；参考 antd 的交互组织，保留 tao-ui 视觉。
+- **首页**：简短介绍、安装命令和操作入口，搭配可编辑并有提交反馈的真实组件表单。下方直达 Button 和 Select 文档。
+- **组件页**：分类导航、示例卡片、页内目录和生成 API。按真实能力拆分独立示例，说明关键参数并维护可操作状态；代码就地展开和复制。常规示例桌面双列、手机单列；表格、复杂表单与布局示例使用通栏。
+- **配色与字体**：沿用 teal 品牌和中性表面；Geist Sans 与系统 CJK 字体；正文层级、边框和背景使用 Rspress 变量。深色模式同时应用到站点与真实示例。
+- **站点尺度**：首页标题 36–54px，分区标题 20–24px，正文 14–17px；代码和辅助信息 11–13px，手机版本标记 10px。控件圆角 5–8px，示例容器 12–16px。这些尺度仅属于站点，不覆盖库组件样式。
+- **交互与适配**：保留原生搜索、语言切换、导航抽屉和锚点恢复；代码及 API 宽表格局部横滚。复制失败明确提示，展开按钮保留键盘操作和状态语义。
+- **设备演示**：移动场景和通知示例使用独立 iframe；手机视口 390 × 640，桌面视口 960 × 560，外壳按可用宽度缩放但不改变内部视口。设备切换保留示例状态，深色模式跟随站点；手机壳不模拟操作系统、软键盘或触摸硬件。
+- **范围**：全部组件文档继续本地预览与验收，部署单独安排。

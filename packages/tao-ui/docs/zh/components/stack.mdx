@@ -3,6 +3,8 @@ title: Stack
 description: 以一致间距在行或列中排列子元素。页面涵盖适用场景、设计建议、多组可运行示例、交互状态与完整 API 参考。
 ---
 
+import Preview from '../../_components/demo-preview';
+
 以一致间距在行或列中排列子元素。
 
 ## 何时使用
@@ -18,7 +20,13 @@ description: 以一致间距在行或列中排列子元素。页面涵盖适用�
 
 - 具有更丰富语义的布局应使用对应容器。
 
-## 基础用法
+## 代码演示
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="stack-example-1">
+
+### 基础用法
 
 ```tsx preview
 import { Stack, Tag } from '@rockshin/tao-ui';
@@ -36,7 +44,11 @@ function StackExample() {
 export default StackExample;
 ```
 
-## 方向、间距与对齐
+</section>
+
+<section className="tao-example" id="stack-example-2">
+
+### 方向、间距与对齐
 
 ```tsx preview
 import { Stack, Tag } from '@rockshin/tao-ui';
@@ -59,7 +71,11 @@ function StackVariants() {
 export default StackVariants;
 ```
 
-## 响应式方向
+</section>
+
+<section className="tao-example" id="stack-example-3">
+
+### 响应式方向
 
 ```tsx preview
 import { Button, Stack } from '@rockshin/tao-ui';
@@ -79,6 +95,113 @@ function ResponsiveStack() {
 
 export default ResponsiveStack;
 ```
+
+</section>
+
+<section className="tao-example" id="stack-alignment">
+
+### 主轴与交叉轴对齐
+
+用 align 和 root 的 justifyContent 调整子项位置。
+
+```tsx preview
+import { Stack, Button } from '@rockshin/tao-ui';
+export default function Example() {
+  return (
+    <Stack
+      align="center"
+      styles={{
+        root: {
+          justifyContent: 'space-between',
+          minHeight: 100,
+          width: '100%',
+        },
+      }}
+    >
+      <Button>Start</Button>
+      <span>Centered vertically</span>
+      <Button>End</Button>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="stack-wrap">
+
+### 自然换行
+
+在语义 root 上启用 flexWrap，长工具栏可换行而不撑破页面。
+
+```tsx preview
+import { Stack, Button } from '@rockshin/tao-ui';
+export default function Example() {
+  return (
+    <Stack styles={{ root: { flexWrap: 'wrap' } }}>
+      {['Overview', 'Members', 'Permissions', 'Billing', 'Settings'].map(
+        (item) => (
+          <Button key={item}>{item}</Button>
+        ),
+      )}
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="stack-responsive">
+
+### 断点方向与间距
+
+窄视口纵向排列，较宽视口切换为横向；可用手机预览对比。
+
+```tsx preview="iframe-follow"
+import { Stack, Input, Button } from '@rockshin/tao-ui';
+export default function Example() {
+  return (
+    <Stack
+      direction={{ xs: 'vertical', md: 'horizontal' }}
+      gap={{ xs: 'sm', md: 'lg' }}
+      align="stretch"
+    >
+      <Input aria-label="Email address" placeholder="name@example.com" />
+      <Button variant="primary">Continue</Button>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="stack-nested">
+
+### 嵌套组织布局
+
+外层负责区块间距，内层负责相关操作的排列。
+
+```tsx preview
+import { Stack, Button } from '@rockshin/tao-ui';
+export default function Example() {
+  return (
+    <Stack direction="vertical" gap="lg">
+      <div>
+        <strong>Workspace</strong>
+        <p>Invite members and manage access.</p>
+      </div>
+      <Stack styles={{ root: { flexWrap: 'wrap' } }}>
+        <Button variant="primary">Invite member</Button>
+        <Button>Manage roles</Button>
+      </Stack>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+</div>
 
 ## API
 

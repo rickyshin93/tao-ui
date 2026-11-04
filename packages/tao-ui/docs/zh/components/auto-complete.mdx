@@ -1,0 +1,293 @@
+---
+title: AutoComplete
+description: "为可自由输入的文本提供建议项、分组、键盘补全与自定义输入框。"
+---
+
+import Preview from '../../_components/demo-preview';
+
+为可自由输入的文本提供建议项、分组、键盘补全与自定义输入框。
+
+每个示例都可以独立复制运行。带设备预览的示例可通过工具栏切换桌面与手机宽度。
+
+尺寸支持 `small`、`medium`、`large`；兼容别名 `middle` 与 `medium` 使用相同尺寸。
+
+## 示例
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="auto-complete-basic">
+
+### 自由输入与建议项
+
+输入值无需存在于选项列表中，使用 onChange 控制文本。
+
+```tsx preview
+import { useState } from 'react';
+import { AutoComplete } from '@rockshin/tao-ui';
+const options = [
+  { value: 'alice@example.com', label: 'Alice Chen' },
+  { value: 'bob@example.com', label: 'Bob Li' },
+  { value: 'design@example.com', label: 'Design team' },
+];
+export default function BasicAutoComplete() {
+  const [value, setValue] = useState('');
+  return (
+    <div>
+      <AutoComplete
+        value={value}
+        onChange={setValue}
+        options={options}
+        aria-label="Email"
+        placeholder="Type any email address"
+        allowClear
+        style={{ width: '100%' }}
+      />
+      <p>Value: {value || 'empty'}</p>
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="auto-complete-filter">
+
+### 按标签过滤
+
+搜索可匹配展示标签或存储值。
+
+```tsx preview
+import { AutoComplete } from '@rockshin/tao-ui';
+const options = [
+  { value: 'alice@example.com', label: 'Alice Chen' },
+  { value: 'bob@example.com', label: 'Bob Li' },
+  { value: 'design@example.com', label: 'Design team' },
+];
+export default function FilteredSuggestions() {
+  return (
+    <AutoComplete
+      options={options}
+      showSearch={{
+        filterOption: (text, option) =>
+          String(option?.label).toLowerCase().includes(text.toLowerCase()),
+      }}
+      placeholder="Search Alice or Bob"
+      style={{ width: '100%' }}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="auto-complete-keyboard">
+
+### 键盘预填
+
+方向键将当前建议项预填到输入框，Enter 确认选择。
+
+```tsx preview
+import { AutoComplete } from '@rockshin/tao-ui';
+const options = [
+  { value: 'alice@example.com', label: 'Alice Chen' },
+  { value: 'bob@example.com', label: 'Bob Li' },
+  { value: 'design@example.com', label: 'Design team' },
+];
+export default function KeyboardCompletion() {
+  return (
+    <AutoComplete
+      aria-label="Email completion"
+      options={options}
+      backfill
+      defaultActiveFirstOption
+      placeholder="Focus, then press ↓ and Enter"
+      style={{ width: '100%' }}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="auto-complete-input">
+
+### 复用自定义 Input
+
+单个输入元素子节点会成为编辑控件，并保留自身前缀与外观。
+
+```tsx preview
+import { AutoComplete, Input } from '@rockshin/tao-ui';
+const options = [
+  { value: 'alice@example.com', label: 'Alice Chen' },
+  { value: 'bob@example.com', label: 'Bob Li' },
+  { value: 'design@example.com', label: 'Design team' },
+];
+export default function CustomInput() {
+  return (
+    <AutoComplete options={options} style={{ width: '100%' }}>
+      <Input aria-label="Recipient" prefix="@" placeholder="Recipient" />
+    </AutoComplete>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="auto-complete-groups">
+
+### 分组建议
+
+使用分组标签组织选项，并定制选项内容。
+
+```tsx preview
+import { AutoComplete } from '@rockshin/tao-ui';
+export default function GroupedSuggestions() {
+  return (
+    <AutoComplete
+      options={[
+        {
+          label: 'People',
+          options: [
+            { value: 'alice@example.com', label: 'Alice Chen' },
+            { value: 'bob@example.com', label: 'Bob Li' },
+          ],
+        },
+        {
+          label: 'Teams',
+          options: [{ value: 'design@example.com', label: 'Design team' }],
+        },
+      ]}
+      optionRender={(option) => (
+        <div style={{ display: 'grid' }}>
+          <span>{option.label}</span>
+          <small style={{ opacity: 0.55 }}>{String(option.value)}</small>
+        </div>
+      )}
+      placeholder="People and teams"
+      style={{ width: '100%' }}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="auto-complete-async">
+
+### 延迟建议项
+
+本地示例在输入后等待 400 毫秒，并取消上一次模拟请求。
+
+```tsx preview
+import { useEffect, useState } from 'react';
+import { AutoComplete } from '@rockshin/tao-ui';
+export default function DelayedSuggestions() {
+  const [value, setValue] = useState('');
+  const [options, setOptions] = useState<{ value: string }[]>([]);
+  useEffect(() => {
+    setOptions([]);
+    if (!value) return;
+    const timer = setTimeout(
+      () =>
+        setOptions(
+          ['example.com', 'company.dev'].map((domain) => ({
+            value: `${value.split('@')[0]}@${domain}`,
+          })),
+        ),
+      400,
+    );
+    return () => clearTimeout(timer);
+  }, [value]);
+  return (
+    <AutoComplete
+      value={value}
+      onChange={setValue}
+      options={options}
+      placeholder="Type a username"
+      style={{ width: '100%' }}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="auto-complete-appearance">
+
+### 外观与状态
+
+size、variant、status 和 disabled 可覆盖 TaoProvider 默认值。
+
+```tsx preview
+import { AutoComplete } from '@rockshin/tao-ui';
+const options = [
+  { value: 'alice@example.com', label: 'Alice Chen' },
+  { value: 'bob@example.com', label: 'Bob Li' },
+  { value: 'design@example.com', label: 'Design team' },
+];
+export default function AutoCompleteAppearance() {
+  return (
+    <div style={{ display: 'grid', gap: 12 }}>
+      <AutoComplete options={options} size="small" placeholder="Small" />
+      <AutoComplete
+        options={options}
+        size="middle"
+        variant="filled"
+        placeholder="Filled"
+      />
+      <AutoComplete
+        options={options}
+        variant="underlined"
+        status="error"
+        placeholder="Required"
+      />
+      <AutoComplete
+        options={options}
+        disabled
+        defaultValue="alice@example.com"
+      />
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="auto-complete-mobile">
+
+### 窄屏表单中的建议
+
+在手机预览中输入、选择和清空；AutoComplete 在手机上保留可编辑输入框与弹层。
+
+```tsx preview="iframe-follow"
+import { AutoComplete } from '@rockshin/tao-ui';
+const options = [
+  { value: 'alice@example.com', label: 'Alice Chen' },
+  { value: 'bob@example.com', label: 'Bob Li' },
+  { value: 'design@example.com', label: 'Design team' },
+];
+export default function MobileAutoComplete() {
+  return (
+    <div style={{ padding: 16 }}>
+      <h3>Invite a teammate</h3>
+      <AutoComplete
+        aria-label="Teammate email"
+        options={options}
+        placeholder="Email address"
+        allowClear
+        size="large"
+        listHeight={200}
+        style={{ width: '100%' }}
+      />
+    </div>
+  );
+}
+```
+
+</section>
+
+</div>
+
+## API
+
+<API moduleName="auto-complete" />

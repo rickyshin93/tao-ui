@@ -3,6 +3,8 @@ title: FormField
 description: 组合标签、输入控件、说明、必填标记与错误信息。页面涵盖适用场景、设计建议、多组可运行示例、交互状态与完整 API 参考。
 ---
 
+import Preview from '../../_components/demo-preview';
+
 组合标签、输入控件、说明、必填标记与错误信息。
 
 ## 何时使用
@@ -18,7 +20,13 @@ description: 组合标签、输入控件、说明、必填标记与错误信息�
 
 - 不要仅用 placeholder 代替标签。
 
-## 基础用法
+## 代码演示
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="form-field-example-1">
+
+### 基础用法
 
 ```tsx preview
 import { FormField, Input } from '@rockshin/tao-ui';
@@ -38,7 +46,11 @@ function FormFieldExample() {
 export default FormFieldExample;
 ```
 
-## 说明与错误状态
+</section>
+
+<section className="tao-example" id="form-field-example-2">
+
+### 说明与错误状态
 
 ```tsx preview
 import { FormField, Input, Stack } from '@rockshin/tao-ui';
@@ -49,7 +61,11 @@ function FormFieldStates() {
       <FormField label="Workspace name" description="Visible to all members.">
         <Input placeholder="Acme Design" />
       </FormField>
-      <FormField label="Slug" required error="Use lowercase letters and hyphens only.">
+      <FormField
+        label="Slug"
+        required
+        error="Use lowercase letters and hyphens only."
+      >
         <Input value="Acme Team" error readOnly />
       </FormField>
     </Stack>
@@ -59,7 +75,11 @@ function FormFieldStates() {
 export default FormFieldStates;
 ```
 
-## 语义部件
+</section>
+
+<section className="tao-example" id="form-field-example-3">
+
+### 语义部件
 
 ```tsx preview
 import { FormField, Input } from '@rockshin/tao-ui';
@@ -81,6 +101,113 @@ function CustomizedFormField() {
 
 export default CustomizedFormField;
 ```
+
+</section>
+
+<section className="tao-example" id="form-field-native-form">
+
+### 完整表单组合
+
+组合布局、字段与操作区，用原生提交展示保存结果。
+
+```tsx preview
+import { useState } from 'react';
+import {
+  FormLayout,
+  FormSection,
+  FormField,
+  FormActions,
+  Input,
+  Textarea,
+  Button,
+} from '@rockshin/tao-ui';
+export default function Example() {
+  const [saved, setSaved] = useState('');
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        setSaved(String(new FormData(e.currentTarget).get('name')));
+      }}
+      onReset={() => setSaved('')}
+    >
+      <FormLayout>
+        <FormSection title="Profile" description="Public workspace information">
+          <FormField label="Display name" required>
+            <Input name="name" required defaultValue="Alex" />
+          </FormField>
+          <FormField label="Bio" description="A short introduction">
+            <Textarea name="bio" autoSize />
+          </FormField>
+        </FormSection>
+        <FormActions>
+          <Button type="reset">Reset</Button>
+          <Button type="submit" variant="primary">
+            Save
+          </Button>
+        </FormActions>
+        <output aria-live="polite">
+          {saved ? `Saved ${saved}` : 'No changes saved'}
+        </output>
+      </FormLayout>
+    </form>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="form-field-error">
+
+### 错误提示与修复
+
+字段错误随输入更新，label 与控件自动关联。
+
+```tsx preview
+import { useState } from 'react';
+import { FormField, Input } from '@rockshin/tao-ui';
+export default function Example() {
+  const [value, setValue] = useState('');
+  return (
+    <FormField
+      label="Project code"
+      required
+      error={value.length < 3 ? 'Enter at least 3 characters' : undefined}
+    >
+      <Input value={value} onChange={(e) => setValue(e.target.value)} />
+    </FormField>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="form-field-explicit-id">
+
+### 明确关联控件
+
+指定 htmlFor 和控件 id 可与已有表单标识对接；useId 避免多个示例冲突。
+
+```tsx preview
+import { useId } from 'react';
+import { FormField, Input } from '@rockshin/tao-ui';
+export default function Example() {
+  const id = useId();
+  return (
+    <FormField
+      label="Account email"
+      htmlFor={id}
+      description="Used for account notifications"
+    >
+      <Input id={id} type="email" />
+    </FormField>
+  );
+}
+```
+
+</section>
+
+</div>
 
 ## API
 

@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { spawnSync } from 'node:child_process';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -82,6 +83,23 @@ assert.ok(
   buttonCss.length < rootCss.length / 2,
   'Component import reduces CSS',
 );
+
+const ssrBuild = await Bun.build({
+  entrypoints: [join(root, 'scripts/fixtures/package-ssr.tsx')],
+  target: 'node',
+  format: 'esm',
+  external: ['react', 'react-dom', 'react-dom/*', 'react/jsx-runtime'],
+});
+assert.ok(ssrBuild.success, ssrBuild.logs.map(String).join('\n'));
+const ssrBundle = ssrBuild.outputs.find((file) => file.path.endsWith('.js'));
+assert.ok(ssrBundle, 'Node SSR bundle exists');
+const ssr = spawnSync('node', ['--input-type=module'], {
+  cwd: root,
+  input: await ssrBundle.text(),
+  encoding: 'utf8',
+});
+assert.equal(ssr.status, 0, `Built package SSR failed:\n${ssr.stderr}`);
+process.stdout.write(ssr.stdout);
 console.log(
   `Package exports passed; Button CSS ${buttonCss.length} bytes, root CSS ${rootCss.length} bytes.`,
 );

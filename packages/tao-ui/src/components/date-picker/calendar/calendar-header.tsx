@@ -1,4 +1,5 @@
 import type { Dayjs } from 'dayjs';
+import { useTaoConfig } from '../../../provider/tao-provider';
 import type { PanelMode } from '../types';
 
 interface CalendarHeaderProps {
@@ -14,6 +15,7 @@ export function CalendarHeader({
   onViewDateChange,
   onPanelModeChange,
 }: CalendarHeaderProps) {
+  const { locale } = useTaoConfig();
   const handlePrev = () => {
     if (panelMode === 'date') onViewDateChange(viewDate.subtract(1, 'month'));
     else if (panelMode === 'month')
@@ -55,7 +57,7 @@ export function CalendarHeader({
             type="button"
             data-tao-calendar-nav-btn=""
             onClick={handleSuperPrev}
-            aria-label="Previous year"
+            aria-label={locale.previousYear}
           >
             <DoubleLeftIcon />
           </button>
@@ -64,7 +66,7 @@ export function CalendarHeader({
           type="button"
           data-tao-calendar-nav-btn=""
           onClick={handlePrev}
-          aria-label="Previous"
+          aria-label={locale.previous}
         >
           <LeftIcon />
         </button>
@@ -78,7 +80,7 @@ export function CalendarHeader({
               data-tao-calendar-title-btn=""
               onClick={handleMonthClick}
             >
-              {viewDate.format('MMM')}
+              {locale.months[viewDate.month()]}
             </button>
             <button
               type="button"
@@ -110,7 +112,7 @@ export function CalendarHeader({
           type="button"
           data-tao-calendar-nav-btn=""
           onClick={handleNext}
-          aria-label="Next"
+          aria-label={locale.next}
         >
           <RightIcon />
         </button>
@@ -119,7 +121,7 @@ export function CalendarHeader({
             type="button"
             data-tao-calendar-nav-btn=""
             onClick={handleSuperNext}
-            aria-label="Next year"
+            aria-label={locale.nextYear}
           >
             <DoubleRightIcon />
           </button>

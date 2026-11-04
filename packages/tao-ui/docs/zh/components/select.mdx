@@ -1,34 +1,32 @@
 ---
-title: Select
-description: 从选项列表中选择单个或多个值，并支持搜索与移动端交互。页面涵盖适用场景、设计建议、多组可运行示例、交互状态与完整 API 参考。
+title: Select 选择器
+description: 单选、多选、标签输入、自动分词、自定义搜索、分组联动、异步加载、渲染定制、弹层控制、移动抽屉与表单提交，附可运行示例和完整 API。
 ---
 
-从选项列表中选择单个或多个值，并支持搜索与移动端交互。
+import Preview from '../../_components/demo-preview';
 
-## 何时使用
+从候选列表中选择一个或多个值，也可以搜索、创建标签和定制选项内容。下面按使用场景展示当前支持的能力，每个示例都可以独立复制运行。
 
-选项较多、不适合全部展开，或需要搜索和多选时使用 Select。
+示例通常随视口切换到手机抽屉；标注“桌面”的示例显式使用 `mobile={false}`，用于展示输入、菜单或弹层专属能力。
 
-**推荐**
+## 基础与外观
 
-- 选项标签简洁且可区分。
-- 大量选项启用搜索。
-- 多选时限制标签数量以避免撑破布局。
+<div className="tao-demo-grid">
 
-**避免**
+<section className="tao-example" id="select-basic">
 
-- 少量互斥选项优先使用 RadioGroup。
+### 基础用法
 
-## 基础用法
+用 `options` 定义选项，`defaultValue` 设置初始选择。`FormField` 为控件提供可访问的标签。
 
 ```tsx preview
 import { FormField, Select } from '@rockshin/tao-ui';
 
-function SelectExample() {
+export default function BasicSelect() {
   return (
     <FormField label="Framework">
       <Select
-        showSearch
+        defaultValue="react"
         placeholder="Choose a framework"
         options={[
           { label: 'React', value: 'react' },
@@ -39,94 +37,1424 @@ function SelectExample() {
     </FormField>
   );
 }
-
-export default SelectExample;
 ```
 
-## 搜索、清除与状态
+</section>
+
+<section className="tao-example" id="select-sizes">
+
+### 三种尺寸
+
+`small`、`medium`、`large` 分别适用于紧凑工具栏、常规表单和重点操作。桌面下拉选项的字号与行高同步变化；手机抽屉保留便于触摸的列表尺寸。
 
 ```tsx preview
-import { Select, Stack } from '@rockshin/tao-ui';
-
-const options = [
-  { label: 'React', value: 'react' },
-  { label: 'Vue', value: 'vue' },
-  { label: 'Svelte', value: 'svelte' },
-];
-
-function SelectStates() {
-  return (
-    <Stack gap="md" style={{ maxWidth: 420 }}>
-      <Select showSearch allowClear options={options} placeholder="Search frameworks" />
-      <Select status="error" options={options} placeholder="Error state" />
-      <Select status="warning" options={options} placeholder="Warning state" />
-      <Select loading options={[]} placeholder="Loading options" />
-    </Stack>
-  );
-}
-
-export default SelectStates;
-```
-
-## 多选
-
-```tsx preview
-import { Select, Stack } from '@rockshin/tao-ui';
+import { FormField, Select, Stack } from '@rockshin/tao-ui';
 
 const options = [
   { label: 'Design', value: 'design' },
   { label: 'Engineering', value: 'engineering' },
-  { label: 'Research', value: 'research' },
-  { label: 'Operations', value: 'operations' },
 ];
 
-function MultipleSelect() {
+export default function SelectSizes() {
   return (
-    <Stack gap="md" style={{ maxWidth: 520 }}>
-      <Select
-        mode="multiple"
-        defaultValue={['design', 'engineering']}
-        options={options}
-        placeholder="Choose teams"
-      />
-      <Select
-        mode="multiple"
-        maxTagCount={2}
-        allowClear
-        defaultValue={['design', 'engineering', 'research']}
-        options={options}
-      />
+    <Stack>
+      {(['small', 'medium', 'large'] as const).map((size) => (
+        <FormField key={size} label={size}>
+          <Select size={size} defaultValue="design" options={options} />
+        </FormField>
+      ))}
     </Stack>
   );
 }
-
-export default MultipleSelect;
 ```
 
-## 禁用选项与弹出位置
+</section>
+
+<section className="tao-example" id="select-variants">
+
+### 外观变体
+
+使用 `outlined`、`filled` 或 `borderless` 匹配表单所在的背景。变体也可以通过 `TaoProvider` 统一设置。
 
 ```tsx preview
-import { Select, Stack } from '@rockshin/tao-ui';
+import { FormField, Select, Stack } from '@rockshin/tao-ui';
+
+const options = [
+  { label: 'Personal', value: 'personal' },
+  { label: 'Team', value: 'team' },
+];
+
+export default function SelectVariants() {
+  return (
+    <Stack>
+      {(['outlined', 'filled', 'borderless'] as const).map((variant) => (
+        <FormField key={variant} label={variant}>
+          <Select variant={variant} defaultValue="team" options={options} />
+        </FormField>
+      ))}
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="select-disabled">
+
+### 禁用控件与选项
+
+选项上的 `disabled` 只禁用这一项；控件上的 `disabled` 禁用整个选择器，保留当前值供用户查看。
+
+```tsx preview
+import { FormField, Select, Stack } from '@rockshin/tao-ui';
+
+const options = [
+  { label: 'Starter', value: 'starter' },
+  { label: 'Team', value: 'team' },
+  { label: 'Enterprise — unavailable', value: 'enterprise', disabled: true },
+];
+
+export default function DisabledSelect() {
+  return (
+    <Stack>
+      <FormField label="Available plans">
+        <Select options={options} defaultValue="starter" />
+      </FormField>
+      <FormField label="Read-only plan">
+        <Select options={options} defaultValue="team" disabled />
+      </FormField>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="select-status">
+
+### 校验状态
+
+`status` 支持 `error` 和 `warning`。配合字段说明展示原因；错误状态同时设置 `aria-invalid`。
+
+```tsx preview
+import { FormField, Select, Stack } from '@rockshin/tao-ui';
 
 const options = [
   { label: 'Production', value: 'production' },
   { label: 'Staging', value: 'staging' },
-  { label: 'Legacy', value: 'legacy', disabled: true },
 ];
 
-function AdvancedSelect() {
+export default function SelectStatus() {
   return (
-    <Stack gap="md" style={{ maxWidth: 420 }}>
-      <Select options={options} defaultValue="staging" />
-      <Select placement="topRight" options={options} placeholder="Opens upward" />
-      <Select disabled options={options} defaultValue="production" />
+    <Stack>
+      <FormField
+        label="Environment"
+        error="Choose an environment before continuing."
+      >
+        <Select
+          status="error"
+          options={options}
+          placeholder="Choose an environment"
+        />
+      </FormField>
+      <FormField
+        label="Review environment"
+        description="Production changes need a review."
+      >
+        <Select status="warning" options={options} defaultValue="production" />
+      </FormField>
     </Stack>
   );
 }
-
-export default AdvancedSelect;
 ```
+
+</section>
+
+<section className="tao-example" id="select-controlled">
+
+### 受控选择
+
+使用 `value` 和 `onChange` 同步外部状态。单选清除时回调值为空字符串；下方按钮也可以修改选择。
+
+```tsx preview
+import { Button, FormField, Select, Stack } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+export default function ControlledSelect() {
+  const [value, setValue] = useState('react');
+  return (
+    <Stack>
+      <FormField label="Controlled framework">
+        <Select
+          value={value}
+          onChange={(next) => setValue(next as string)}
+          allowClear
+          options={[
+            { label: 'React', value: 'react' },
+            { label: 'Vue', value: 'vue' },
+          ]}
+          placeholder="Choose a framework"
+        />
+      </FormField>
+      <output aria-live="polite">Value: {value || '(empty)'}</output>
+      <Button variant="secondary" onClick={() => setValue('vue')}>
+        Select Vue
+      </Button>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+</div>
+
+## 多选与标签
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="select-multiple">
+
+### 多选
+
+`mode="multiple"` 使用字符串数组表示选中项。移除标签或再次点击选项取消选择，`allowClear` 一次清空全部。
+
+```tsx preview
+import { FormField, Select, Stack } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+export default function MultipleSelect() {
+  const [value, setValue] = useState<string[]>(['design', 'engineering']);
+  return (
+    <Stack>
+      <FormField label="Teams">
+        <Select
+          mode="multiple"
+          showSearch
+          allowClear
+          value={value}
+          onChange={(next) => setValue(next as string[])}
+          options={[
+            { label: 'Design', value: 'design' },
+            { label: 'Engineering', value: 'engineering' },
+            { label: 'Research', value: 'research' },
+            { label: 'Operations', value: 'operations' },
+          ]}
+          placeholder="Choose teams"
+        />
+      </FormField>
+      <output aria-live="polite">
+        Selected: {value.join(', ') || '(none)'}
+      </output>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="select-max-count">
+
+### 最大选择数量
+
+`maxCount` 限制可选数量；达到上限后，未选中的选项不可选。移除一项后恢复。本例固定桌面弹层。
+
+```tsx preview
+import { FormField, Select, Stack } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+export default function MaximumSelection() {
+  const [value, setValue] = useState<string[]>(['design']);
+  return (
+    <Stack>
+      <FormField label="Choose up to two teams">
+        <Select
+          mobile={false}
+          mode="multiple"
+          showSearch
+          maxCount={2}
+          value={value}
+          onChange={(next) => setValue(next as string[])}
+          options={['Design', 'Engineering', 'Research', 'Operations'].map(
+            (label) => ({ label, value: label.toLowerCase() }),
+          )}
+          placeholder="Choose teams"
+        />
+      </FormField>
+      <output aria-live="polite">{value.length} / 2 selected</output>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="select-tags">
+
+### 标签输入
+
+`mode="tags"` 配合 `showSearch` 允许输入新值。输入新标签后按 Enter 创建；`notFoundContent={null}` 隐藏没有匹配建议的空弹层。本例固定桌面输入模式。
+
+```tsx preview
+import { FormField, Select, Stack } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+export default function TagInput() {
+  const [value, setValue] = useState<string[]>(['design']);
+  return (
+    <Stack>
+      <FormField label="Project labels">
+        <Select
+          mobile={false}
+          mode="tags"
+          showSearch
+          allowClear
+          value={value}
+          onChange={(next) => setValue(next as string[])}
+          options={[
+            { label: 'design', value: 'design' },
+            { label: 'frontend', value: 'frontend' },
+          ]}
+          notFoundContent={null}
+          placeholder="Type a label and press Enter"
+        />
+      </FormField>
+      <output aria-live="polite">Labels: {value.join(', ') || '(none)'}</output>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="select-tokenization">
+
+### 自动分词
+
+粘贴 `design,frontend;docs` 后按 Enter，使用 `tokenSeparators` 批量创建标签并去重。`multiple` 模式只接受已有选项的值或文本，`tags` 还能创建新值。
+
+```tsx preview
+import { FormField, Select, Stack } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+export default function TokenizedTags() {
+  const [value, setValue] = useState<string[]>([]);
+  return (
+    <Stack>
+      <FormField
+        label="Batch labels"
+        description="Paste design,frontend;docs, then press Enter."
+      >
+        <Select
+          mobile={false}
+          mode="tags"
+          showSearch
+          tokenSeparators={[',', ';']}
+          options={[]}
+          notFoundContent={null}
+          value={value}
+          onChange={(next) => setValue(next as string[])}
+          placeholder="Separate labels with , or ;"
+        />
+      </FormField>
+      <output aria-live="polite">Labels: {value.join(', ') || '(none)'}</output>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="select-tag-overflow">
+
+### 标签数量与长度
+
+`maxTagCount` 控制显示数量，`maxTagTextLength` 截断长文本，`maxTagPlaceholder` 定制折叠提示。它们只改变展示，不减少实际选中值。
+
+```tsx preview
+import { FormField, Select } from '@rockshin/tao-ui';
+
+const options = [
+  'Product design',
+  'Frontend engineering',
+  'User research',
+  'Operations',
+].map((label) => ({ label, value: label }));
+
+export default function TagOverflow() {
+  return (
+    <FormField label="Team membership">
+      <Select
+        mode="multiple"
+        defaultValue={options.map((option) => option.value)}
+        options={options}
+        maxTagCount={2}
+        maxTagTextLength={8}
+        maxTagPlaceholder={(omitted) => `+${omitted.length} teams`}
+      />
+    </FormField>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="select-hide-selected">
+
+### 隐藏已选项
+
+`hideSelected` 从候选列表中移除已选择的项目。删除标签后，该项重新出现在列表。本例固定桌面弹层。
+
+```tsx preview
+import { FormField, Select } from '@rockshin/tao-ui';
+
+export default function HideSelected() {
+  return (
+    <FormField label="Assign reviewers">
+      <Select
+        mobile={false}
+        mode="multiple"
+        showSearch
+        hideSelected
+        defaultValue={['maya']}
+        options={['Maya', 'Noah', 'Lin', 'Sam'].map((label) => ({
+          label,
+          value: label.toLowerCase(),
+        }))}
+        placeholder="Choose reviewers"
+        notFoundContent="Everyone has been selected"
+      />
+    </FormField>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="select-events">
+
+### 选择与清除事件
+
+`onChange` 提供完整值与已有选项对象；`onSelect`、`onDeselect`、`onClear` 描述具体操作。新创建标签没有对应的已有选项对象。
+
+```tsx preview
+import { FormField, Select, Stack } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+export default function SelectionEvents() {
+  const [value, setValue] = useState<string[]>(['design']);
+  const [event, setEvent] = useState('No action yet');
+  return (
+    <Stack>
+      <FormField label="Event example">
+        <Select
+          mobile={false}
+          mode="multiple"
+          showSearch
+          allowClear
+          value={value}
+          onChange={(next) => setValue(next as string[])}
+          onSelect={(_, option) => setEvent(`Selected: ${option.label}`)}
+          onDeselect={(_, option) => setEvent(`Removed: ${option.label}`)}
+          onClear={() => setEvent('Cleared all selections')}
+          options={['Design', 'Engineering', 'Research'].map((label) => ({
+            label,
+            value: label.toLowerCase(),
+          }))}
+          placeholder="Choose teams"
+        />
+      </FormField>
+      <output aria-live="polite">{event}</output>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+</div>
+
+## 搜索与数据
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="select-search">
+
+### 搜索与清除
+
+`showSearch` 默认按选项文本进行不区分大小写的匹配。试着输入 `sv`；选择后可用清除按钮重选。
+
+```tsx preview
+import { FormField, Select } from '@rockshin/tao-ui';
+
+export default function SearchSelect() {
+  return (
+    <FormField label="Search frameworks">
+      <Select
+        showSearch
+        allowClear
+        options={[
+          { label: 'React', value: 'react' },
+          { label: 'Vue', value: 'vue' },
+          { label: 'Svelte', value: 'svelte' },
+          { label: 'Solid', value: 'solid' },
+        ]}
+        placeholder="Search by framework name"
+        notFoundContent="No matching frameworks"
+      />
+    </FormField>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="select-custom-filter">
+
+### 自定义搜索
+
+`filterOption` 可组合文本、值和描述等字段。这里输入城市名、机场代码或国家都能找到选项，例如 `hnd` 或 `Japan`。
+
+```tsx preview
+import { FormField, Select } from '@rockshin/tao-ui';
+
+export default function CustomFilter() {
+  return (
+    <FormField label="Destination">
+      <Select
+        showSearch
+        options={[
+          { label: 'Tokyo', value: 'HND', description: 'Japan' },
+          { label: 'Singapore', value: 'SIN', description: 'Singapore' },
+          { label: 'London', value: 'LHR', description: 'United Kingdom' },
+        ]}
+        filterOption={(input, option) =>
+          `${option.label} ${option.value} ${option.description}`
+            .toLowerCase()
+            .includes(input.toLowerCase())
+        }
+        placeholder="City, airport code, or country"
+      />
+    </FormField>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="select-controlled-search">
+
+### 受控搜索与保留关键词
+
+通过 `searchValue` 和 `onSearch` 管理关键词。受控时由调用方决定何时清空；非受控多选可用 `autoClearSearchValue={false}` 保留搜索词。本例固定桌面输入模式。
+
+```tsx preview
+import { Button, FormField, Select, Stack } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+export default function ControlledSearch() {
+  const [search, setSearch] = useState('');
+  return (
+    <Stack>
+      <FormField label="Search several teams">
+        <Select
+          mobile={false}
+          mode="multiple"
+          showSearch
+          searchValue={search}
+          onSearch={setSearch}
+          autoClearSearchValue={false}
+          options={['Product design', 'Product research', 'Engineering'].map(
+            (label) => ({ label, value: label }),
+          )}
+          placeholder="Try Product"
+        />
+      </FormField>
+      <output aria-live="polite">Query: {search || '(empty)'}</output>
+      <Button variant="secondary" onClick={() => setSearch('')}>
+        Clear query
+      </Button>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="select-groups">
+
+### 分组选项
+
+在选项的 `options` 中嵌套子项构成分组。搜索保留匹配项所属的组，分组标题不作为可选择值。
+
+```tsx preview
+import { FormField, Select } from '@rockshin/tao-ui';
+
+export default function GroupedSelect() {
+  return (
+    <FormField label="Technology">
+      <Select
+        showSearch
+        options={[
+          {
+            label: 'Frontend',
+            value: 'frontend',
+            options: [
+              { label: 'React', value: 'react' },
+              { label: 'Vue', value: 'vue' },
+            ],
+          },
+          {
+            label: 'Backend',
+            value: 'backend',
+            options: [
+              { label: 'Node.js', value: 'node' },
+              { label: 'Python', value: 'python' },
+            ],
+          },
+        ]}
+        placeholder="Choose a technology"
+      />
+    </FormField>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="select-coordinate">
+
+### 联动选择
+
+上游选择变化时同步更新下游选项和当前值，避免残留不属于新列表的值。这里由区域决定可选城市。
+
+```tsx preview
+import { FormField, Select, Stack } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+const cities: Record<string, string[]> = {
+  Asia: ['Tokyo', 'Singapore'],
+  Europe: ['London', 'Berlin'],
+};
+
+export default function DependentSelects() {
+  const [region, setRegion] = useState('Asia');
+  const [city, setCity] = useState('Tokyo');
+  return (
+    <Stack>
+      <FormField label="Region">
+        <Select
+          value={region}
+          options={Object.keys(cities).map((value) => ({
+            label: value,
+            value,
+          }))}
+          onChange={(next) => {
+            const region = next as string;
+            setRegion(region);
+            setCity(cities[region][0]);
+          }}
+        />
+      </FormField>
+      <FormField label="City">
+        <Select
+          value={city}
+          onChange={(next) => setCity(next as string)}
+          options={cities[region].map((value) => ({ label: value, value }))}
+        />
+      </FormField>
+      <output aria-live="polite">
+        {region} / {city}
+      </output>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="select-async">
+
+### 异步搜索与加载
+
+用本地数据和 500ms 延迟模拟搜索请求。输入变化时取消旧任务，配合 `loading`、受控搜索和空状态展示完整过程；真实项目可替换为接口请求。本例固定桌面输入模式。
+
+```tsx preview
+import { FormField, Select, type SelectOption } from '@rockshin/tao-ui';
+import { useEffect, useState } from 'react';
+
+const people = [
+  { label: 'Maya Chen', value: 'maya', description: 'Design' },
+  { label: 'Noah Kim', value: 'noah', description: 'Engineering' },
+  { label: 'Lin Wang', value: 'lin', description: 'Research' },
+];
+
+export default function AsyncSelect() {
+  const [search, setSearch] = useState('');
+  const [options, setOptions] = useState<SelectOption[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setLoading(true);
+    setOptions([]);
+    const timer = window.setTimeout(() => {
+      setOptions(
+        people.filter((person) =>
+          person.label.toLowerCase().includes(search.toLowerCase()),
+        ),
+      );
+      setLoading(false);
+    }, 500);
+    return () => window.clearTimeout(timer);
+  }, [search]);
+
+  return (
+    <FormField
+      label="Search people"
+      description="Local demo with a simulated 500ms request."
+    >
+      <Select
+        mobile={false}
+        showSearch
+        allowClear
+        searchValue={search}
+        onSearch={setSearch}
+        options={options}
+        loading={loading}
+        filterOption={() => true}
+        notFoundContent={loading ? 'Searching…' : 'No matching people'}
+        placeholder="Try Maya or Noah"
+      />
+    </FormField>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="select-empty">
+
+### 自定义空状态
+
+`notFoundContent` 可以是文本或 React 节点。空列表与筛选无结果时都会展示该内容；外部操作可补充选项。
+
+```tsx preview
+import { Button, FormField, Select, Stack } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+export default function EmptySelect() {
+  const [ready, setReady] = useState(false);
+  return (
+    <Stack>
+      <FormField label="Workspace">
+        <Select
+          options={ready ? [{ label: 'Design studio', value: 'studio' }] : []}
+          placeholder="Choose a workspace"
+          notFoundContent={<span>No workspaces yet. Add one below.</span>}
+        />
+      </FormField>
+      <Button
+        variant="secondary"
+        disabled={ready}
+        onClick={() => setReady(true)}
+      >
+        Add workspace
+      </Button>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+</div>
+
+## 内容与样式
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="select-details">
+
+### 选项图标与描述
+
+通过选项的 `icon` 和 `description` 提供辨识信息。保持 `label` 为简短文本，便于搜索和选中值展示。
+
+```tsx preview
+import { FormField, Select } from '@rockshin/tao-ui';
+
+function WorkspaceIcon() {
+  return (
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      aria-hidden="true"
+    >
+      <rect x="3" y="3" width="14" height="14" rx="3" />
+      <path d="M3 8h14M8 8v9" />
+    </svg>
+  );
+}
+
+export default function OptionDetails() {
+  return (
+    <FormField label="Switch workspace">
+      <Select
+        defaultValue="design"
+        options={[
+          {
+            label: 'Design studio',
+            value: 'design',
+            icon: <WorkspaceIcon />,
+            description: 'Components and visual systems',
+          },
+          {
+            label: 'Engineering',
+            value: 'engineering',
+            icon: <WorkspaceIcon />,
+            description: 'Application development',
+          },
+        ]}
+      />
+    </FormField>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="select-option-render">
+
+### 自定义选项内容
+
+`optionRender` 接收选项和展平后的索引。可以组合标题与辅助说明，选项的键盘和选择行为仍由 Select 负责。
+
+```tsx preview
+import { FormField, Select } from '@rockshin/tao-ui';
+
+export default function CustomOptions() {
+  return (
+    <FormField label="Subscription">
+      <Select
+        options={[
+          {
+            label: 'Starter',
+            value: 'starter',
+            description: 'For personal projects',
+          },
+          {
+            label: 'Team',
+            value: 'team',
+            description: 'For shared workspaces',
+          },
+        ]}
+        optionRender={(option, { index }) => (
+          <span style={{ display: 'grid', gap: 4 }}>
+            <strong>
+              {index + 1}. {option.label}
+            </strong>
+            <small style={{ color: 'var(--tao-color-text-secondary)' }}>
+              {option.description}
+            </small>
+          </span>
+        )}
+        placeholder="Compare plans"
+      />
+    </FormField>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="select-label-render">
+
+### 自定义选中内容
+
+`labelRender` 控制单选后的展示内容，可以与下拉列表中的文本不同。这里在城市名旁展示机场代码。
+
+```tsx preview
+import { FormField, Select } from '@rockshin/tao-ui';
+
+export default function CustomLabel() {
+  return (
+    <FormField label="Arrival airport">
+      <Select
+        defaultValue="HND"
+        options={[
+          { label: 'Tokyo', value: 'HND' },
+          { label: 'Singapore', value: 'SIN' },
+        ]}
+        labelRender={(option) => (
+          <span>
+            <strong>{option.value}</strong> · {option.label}
+          </span>
+        )}
+      />
+    </FormField>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="select-tag-render">
+
+### 自定义选择标签
+
+`tagRender` 定制多选标签。使用回调提供的 `closable`、`disabled` 和 `onClose` 保留删除行为；本例复用 tao-ui 的 `Tag`。
+
+```tsx preview
+import { FormField, Select, Tag } from '@rockshin/tao-ui';
+
+export default function CustomTags() {
+  return (
+    <FormField label="Project disciplines">
+      <Select
+        mobile={false}
+        mode="multiple"
+        showSearch
+        defaultValue={['design', 'engineering']}
+        options={['Design', 'Engineering', 'Research'].map((label) => ({
+          label,
+          value: label.toLowerCase(),
+        }))}
+        tagRender={({ label, value, closable, disabled, onClose }) => (
+          <Tag
+            color={value === 'design' ? 'primary' : 'success'}
+            closeIcon={closable}
+            disabled={disabled}
+            onClose={onClose}
+          >
+            {label}
+          </Tag>
+        )}
+      />
+    </FormField>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="select-icons">
+
+### 前后缀与操作图标
+
+`prefix` 添加前缀，`suffixIcon`、`allowClear.clearIcon`、`removeIcon` 与 `loadingIcon` 分别替换对应图标。自定义图标不改变清除和移除行为。
+
+```tsx preview
+import { FormField, Select, Spinner, Stack } from '@rockshin/tao-ui';
+
+const options = [
+  { label: 'Design', value: 'design' },
+  { label: 'Engineering', value: 'engineering' },
+];
+function Icon({ close = false }: { close?: boolean }) {
+  return (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 20 20"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      aria-hidden="true"
+    >
+      <path d={close ? 'm5 5 10 10M15 5 5 15' : 'm5 8 5 5 5-5'} />
+    </svg>
+  );
+}
+
+export default function CustomIcons() {
+  return (
+    <Stack>
+      <FormField label="Custom clear icon">
+        <Select
+          showSearch
+          defaultValue="design"
+          options={options}
+          prefix={<span>Team</span>}
+          suffixIcon={<Icon />}
+          allowClear={{ clearIcon: <Icon close /> }}
+        />
+      </FormField>
+      <FormField label="Custom remove icon">
+        <Select
+          mobile={false}
+          mode="multiple"
+          showSearch
+          defaultValue={['engineering']}
+          options={options}
+          removeIcon={<Icon close />}
+        />
+      </FormField>
+      <FormField label="Custom loading icon">
+        <Select
+          loading
+          loadingIcon={<Spinner size="small" />}
+          options={[]}
+          placeholder="Loading teams…"
+        />
+      </FormField>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="select-semantic">
+
+### 语义化样式
+
+通过 `styles` 和 `classNames` 定制公开语义部件，无需依赖内部类名。弹层通过 Portal 渲染时，也会使用指定的样式和类。
+
+```tsx preview
+import { FormField, Select } from '@rockshin/tao-ui';
+
+export default function SemanticSelect() {
+  return (
+    <>
+      <style>{`.select-example-popup { border-color: var(--tao-color-primary); }`}</style>
+      <FormField label="Styled team picker">
+        <Select
+          mobile={false}
+          showSearch
+          defaultValue="design"
+          options={[
+            { label: 'Design', value: 'design' },
+            { label: 'Engineering', value: 'engineering' },
+          ]}
+          classNames={{ popup: 'select-example-popup' }}
+          styles={{
+            root: { borderRadius: 12 },
+            item: { paddingBlock: 12 },
+            itemLabel: { fontWeight: 600 },
+          }}
+        />
+      </FormField>
+    </>
+  );
+}
+```
+
+</section>
+
+</div>
+
+## 弹层与交互
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="select-popup-render">
+
+### 扩展下拉菜单
+
+`popupRender` 保留原菜单并添加操作区。这里可以输入名称并创建新项目；新增按钮保留输入焦点。本例固定桌面弹层。
+
+```tsx preview
+import { Button, FormField, Input, Select } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+export default function ExtendedPopup() {
+  const [projects, setProjects] = useState(['Website', 'Mobile app']);
+  const [name, setName] = useState('');
+  function addProject() {
+    const label = name.trim();
+    if (!label || projects.includes(label)) return;
+    setProjects([...projects, label]);
+    setName('');
+  }
+  return (
+    <FormField label="Project">
+      <Select
+        mobile={false}
+        showSearch
+        options={projects.map((label) => ({ label, value: label }))}
+        placeholder="Choose or add a project"
+        popupRender={(menu) => (
+          <>
+            {menu}
+            <div
+              style={{
+                display: 'flex',
+                gap: 8,
+                padding: 12,
+                borderTop: '1px solid var(--tao-color-border)',
+              }}
+            >
+              <Input
+                aria-label="New project name"
+                value={name}
+                onChange={(event) => setName(event.target.value)}
+                placeholder="New project"
+              />
+              <Button
+                disabled={!name.trim() || projects.includes(name.trim())}
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={addProject}
+              >
+                Add
+              </Button>
+            </div>
+          </>
+        )}
+      />
+    </FormField>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="select-placement">
+
+### 弹出位置
+
+`placement` 指定上下方向与左右对齐；靠近视口边缘时仍会自动避让。本例固定桌面弹层。
+
+```tsx preview
+import { FormField, Select, Stack } from '@rockshin/tao-ui';
+
+export default function PopupPlacement() {
+  return (
+    <Stack>
+      {(['bottomLeft', 'bottomRight', 'topLeft', 'topRight'] as const).map(
+        (placement) => (
+          <FormField key={placement} label={placement}>
+            <Select
+              mobile={false}
+              placement={placement}
+              placeholder={placement}
+              options={[
+                { label: 'Design', value: 'design' },
+                { label: 'Engineering', value: 'engineering' },
+              ]}
+            />
+          </FormField>
+        ),
+      )}
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="select-dimensions">
+
+### 弹层宽度与列表滚动
+
+`popupMatchSelectWidth` 默认为与触发器同宽，也支持 `false` 或指定像素宽度。当前数字宽度仍受触发器最小宽度约束；这里用 200px 控件展示 240px 弹层。`listHeight` 限制选项区域高度，较长列表在内部滚动。本例为普通列表，不做虚拟滚动。
+
+```tsx preview
+import { FormField, Select, Stack } from '@rockshin/tao-ui';
+
+const options = Array.from({ length: 60 }, (_, index) => ({
+  label: `Workspace ${index + 1}`,
+  value: String(index + 1),
+}));
+
+export default function PopupDimensions() {
+  return (
+    <Stack>
+      <FormField label="Match trigger width">
+        <Select
+          mobile={false}
+          showSearch
+          options={options}
+          listHeight={160}
+          placeholder="Scroll through 60 workspaces"
+        />
+      </FormField>
+      <FormField label="Content width">
+        <Select
+          mobile={false}
+          options={options}
+          popupMatchSelectWidth={false}
+          listHeight={160}
+          placeholder="Fit option text"
+        />
+      </FormField>
+      <FormField label="240px popup">
+        <Select
+          mobile={false}
+          options={options}
+          popupMatchSelectWidth={240}
+          style={{ width: 200 }}
+          listHeight={160}
+          placeholder="Fixed popup width"
+        />
+      </FormField>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="select-open-focus">
+
+### 受控展开与焦点
+
+`open`、`onOpenChange` 控制弹层。通过 `ref` 调用 `focus()` 和 `blur()`，并在外部操作后保持明确的焦点去向。
+
+```tsx preview
+import {
+  Button,
+  FormField,
+  Select,
+  type SelectRef,
+  Stack,
+} from '@rockshin/tao-ui';
+import { useRef, useState } from 'react';
+
+export default function OpenAndFocus() {
+  const ref = useRef<SelectRef>(null);
+  const [open, setOpen] = useState(false);
+  return (
+    <Stack>
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+        <Button
+          variant="secondary"
+          onClick={() => {
+            ref.current?.focus();
+            setOpen(true);
+          }}
+        >
+          Open choices
+        </Button>
+        <Button
+          variant="secondary"
+          onClick={() => {
+            setOpen(false);
+            ref.current?.blur();
+          }}
+        >
+          Close and blur
+        </Button>
+      </div>
+      <FormField label="Controlled popup">
+        <Select
+          ref={ref}
+          mobile={false}
+          showSearch
+          open={open}
+          onOpenChange={setOpen}
+          options={[
+            { label: 'Design', value: 'design' },
+            { label: 'Engineering', value: 'engineering' },
+          ]}
+          placeholder="Choose a team"
+        />
+      </FormField>
+      <output aria-live="polite">Popup: {open ? 'open' : 'closed'}</output>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="select-portal">
+
+### 弹层挂载容器
+
+`getPopupContainer` 指定弹层所在的 DOM 容器。自定义容器需要留出弹层空间，并避免父级的裁剪样式遮挡。本例把弹层挂载在当前面板中。
+
+```tsx preview
+import { FormField, Select } from '@rockshin/tao-ui';
+import { useRef } from 'react';
+
+export default function PopupContainer() {
+  const container = useRef<HTMLDivElement>(null);
+  return (
+    <div ref={container} style={{ position: 'relative', minHeight: 160 }}>
+      <FormField label="Panel-local popup">
+        <Select
+          mobile={false}
+          showSearch
+          getPopupContainer={() => container.current!}
+          options={[
+            { label: 'Local workspace', value: 'local' },
+            { label: 'Shared workspace', value: 'shared' },
+          ]}
+          placeholder="Open inside this panel"
+        />
+      </FormField>
+    </div>
+  );
+}
+```
+
+</section>
+
+</div>
+
+## 移动与表单
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="select-mobile">
+
+### 移动端单选与多选
+
+默认随视口切换，`mobile` 可强制打开底部抽屉。单选立即确认；多选在点击 Done 后提交，直接关闭会放弃本次草稿。切换预览设备可对比桌面弹层与手机抽屉。
+
+```tsx preview="iframe-follow"
+import { FormField, Select, Stack } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+const options = ['Design', 'Engineering', 'Research', 'Operations'].map(
+  (label) => ({ label, value: label.toLowerCase() }),
+);
+
+export default function MobileSelect() {
+  const [value, setValue] = useState<string[]>(['design']);
+  return (
+    <Stack>
+      <FormField label="Mobile single choice">
+        <Select
+          showSearch
+          options={options}
+          placeholder="Choose one team"
+        />
+      </FormField>
+      <FormField label="Mobile multiple choices">
+        <Select
+          mode="multiple"
+          showSearch
+          options={options}
+          value={value}
+          onChange={(next) => setValue(next as string[])}
+          placeholder="Choose several teams"
+        />
+      </FormField>
+      <output aria-live="polite">
+        Committed: {value.join(', ') || '(none)'}
+      </output>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="select-provider">
+
+### 继承全局配置
+
+通过 `TaoProvider` 统一 `size`、`variant` 和 `disabled`；局部属性优先。下面第二个选择器覆盖了全局禁用与尺寸。
+
+```tsx preview
+import { FormField, Select, Stack, TaoProvider } from '@rockshin/tao-ui';
+
+const options = [
+  { label: 'Personal', value: 'personal' },
+  { label: 'Team', value: 'team' },
+];
+
+export default function ProviderSelect() {
+  return (
+    <TaoProvider size="small" variant="filled" disabled>
+      <Stack>
+        <FormField label="Inherited settings">
+          <Select defaultValue="personal" options={options} />
+        </FormField>
+        <FormField label="Local overrides">
+          <Select
+            size="medium"
+            disabled={false}
+            defaultValue="team"
+            options={options}
+          />
+        </FormField>
+      </Stack>
+    </TaoProvider>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="select-form">
+
+### 表单提交
+
+桌面单选可用 `name` 将值交给原生 `FormData`，字段标签使用 `id` 关联。多选和手机抽屉应通过受控值自行序列化。本例提交只显示结果，不发送请求。
+
+```tsx preview
+import { Button, FormField, Select, Stack } from '@rockshin/tao-ui';
+import { useId, useState } from 'react';
+
+export default function SelectForm() {
+  const id = useId();
+  const [result, setResult] = useState('Not submitted');
+  return (
+    <form
+      onSubmit={(event) => {
+        event.preventDefault();
+        const data = new FormData(event.currentTarget);
+        setResult(`Submitted team: ${data.get('team')}`);
+      }}
+    >
+      <Stack>
+        <FormField label="Team to submit" htmlFor={id}>
+          <Select
+            id={id}
+            name="team"
+            mobile={false}
+            showSearch
+            defaultValue="design"
+            options={[
+              { label: 'Design', value: 'design' },
+              { label: 'Engineering', value: 'engineering' },
+            ]}
+          />
+        </FormField>
+        <Button type="submit">Submit example</Button>
+        <output aria-live="polite">{result}</output>
+      </Stack>
+    </form>
+  );
+}
+```
+
+</section>
+
+</div>
+
+## 使用说明
+
+- 少量需要直接比较的互斥选项，优先使用 [Radio](/zh/components/radio)。
+- 单选使用字符串，多选和标签使用字符串数组；`onChange` 的第二个参数提供匹配到的已有选项。自由输入的新标签不保证有对应选项对象。
+- 标签数量示例使用数字 `maxTagCount`，便于观察固定数量的折叠效果。
+- 手机抽屉支持搜索、分组、自定义选项和单选/多选确认。标为桌面模式的示例使用 `mobile={false}`，便于演示输入与弹层操作；弹出位置、弹层宽度与挂载容器属于桌面弹层配置。
+- 桌面单选的 `name` 可用于原生表单提交。手机和多选使用受控值，在应用的提交逻辑中序列化。
 
 ## API
 
 <API moduleName="select" />
+
+### SelectOption
+
+| 属性 | 类型 | 说明 |
+| --- | --- | --- |
+| `label` | `ReactNode` | 选项文本；建议使用字符串，以便默认搜索和触发器展示。 |
+| `value` | `string` | 唯一值；分组也需要稳定的值。 |
+| `disabled` | `boolean` | 禁止选择或移除该项。 |
+| `icon` | `ReactNode` | 选项图标。 |
+| `description` | `ReactNode` | 选项辅助说明。 |
+| `options` | `SelectOption[]` | 子选项；存在时该项作为分组。 |
+
+### TagRenderProps
+
+`tagRender` 接收 `{ label, value, closable, disabled, onClose }`。用 `closable` 决定是否提供删除操作，并把删除动作交给 `onClose`。
+
+### SelectRef
+
+通过 `ref` 使用 `focus()`、`blur()` 与 `nativeElement`。避免依赖内部 DOM 层级。

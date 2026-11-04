@@ -1,0 +1,255 @@
+---
+
+title: TimePicker
+
+description: "Select a time or time range with steps, disabled intervals, formatting and confirmation."
+
+---
+
+import Preview from '../../_components/demo-preview';
+
+Select a time or time range with steps, disabled intervals, formatting and confirmation.
+
+The added API follows Ant Design 6.7.0; appearance, theming and Semantic DOM use tao-ui. Existing component APIs remain unchanged.
+
+## Examples
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="time-picker-controlled">
+
+### Controlled time and clear
+
+Values use Dayjs; clearing returns null.
+
+```tsx preview
+import { TimePicker } from '@rockshin/tao-ui';
+import dayjs, { type Dayjs } from 'dayjs';
+import { useState } from 'react';
+export default function Demo() {
+  const [value, setValue] = useState<Dayjs | null>(
+    dayjs('2026-11-04T09:30:00'),
+  );
+  return (
+    <div>
+      <TimePicker value={value} onChange={setValue} />
+      <p>{value?.format('HH:mm:ss') ?? 'No time selected'}</p>
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="time-picker-formats">
+
+### Formats and 12-hour clock
+
+The format controls the visible columns. use12Hours adds AM/PM.
+
+```tsx preview
+import { TimePicker, Stack } from '@rockshin/tao-ui';
+import dayjs from 'dayjs';
+export default function Demo() {
+  return (
+    <Stack gap="md">
+      <TimePicker format="HH:mm" defaultValue={dayjs('2026-11-04T09:30:00')} />
+      <TimePicker
+        use12Hours
+        format="h:mm a"
+        defaultValue={dayjs('2026-11-04T15:00:00')}
+      />
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="time-picker-steps">
+
+### Time steps
+
+Offer values in two-hour, fifteen-minute and ten-second steps.
+
+```tsx preview
+import { TimePicker } from '@rockshin/tao-ui';
+export default function Demo() {
+  return <TimePicker hourStep={2} minuteStep={15} secondStep={10} />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="time-picker-disabled-time">
+
+### Working hours
+
+Limit choices to 09:00–18:00 and hide unavailable options.
+
+```tsx preview
+import { TimePicker } from '@rockshin/tao-ui';
+export default function Demo() {
+  return (
+    <TimePicker
+      format="HH:mm"
+      hideDisabledOptions
+      disabledTime={() => ({
+        disabledHours: () =>
+          Array.from({ length: 24 }, (_, i) => i).filter(
+            (i) => i < 9 || i > 18,
+          ),
+        disabledMinutes: (hour) =>
+          hour === 18 ? Array.from({ length: 59 }, (_, i) => i + 1) : [],
+      })}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="time-picker-sizes">
+
+### Three sizes
+
+This compatible API uses small, middle and large; omitted sizes inherit TaoProvider.
+
+```tsx preview
+import { TimePicker, Stack } from '@rockshin/tao-ui';
+export default function Demo() {
+  return (
+    <Stack gap="md">
+      {(['small', 'middle', 'large'] as const).map((size) => (
+        <TimePicker key={size} size={size} format="HH:mm" placeholder={size} />
+      ))}
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="time-picker-variants">
+
+### Variants and states
+
+Combine variants with error, warning or disabled states.
+
+```tsx preview
+import { TimePicker, Stack } from '@rockshin/tao-ui';
+export default function Demo() {
+  return (
+    <Stack gap="md">
+      <TimePicker variant="filled" />
+      <TimePicker variant="underlined" status="warning" />
+      <TimePicker status="error" />
+      <TimePicker disabled />
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="time-picker-range">
+
+### Time range
+
+RangePicker submits the start and end values together.
+
+```tsx preview
+import { TimePicker } from '@rockshin/tao-ui';
+import { useState } from 'react';
+export default function Demo() {
+  const [label, setLabel] = useState('Choose a range');
+  return (
+    <div>
+      <TimePicker.RangePicker
+        format="HH:mm"
+        minuteStep={15}
+        onChange={(_, strings) =>
+          setLabel(strings ? strings.join(' → ') : 'Cleared')
+        }
+      />
+      <p>{label}</p>
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="time-picker-confirmation">
+
+### Confirmation behavior
+
+needConfirm controls whether selecting a value requires confirmation.
+
+```tsx preview
+import { TimePicker, Stack } from '@rockshin/tao-ui';
+export default function Demo() {
+  return (
+    <Stack gap="md">
+      <TimePicker needConfirm format="HH:mm" placeholder="Confirm a time" />
+      <TimePicker
+        needConfirm={false}
+        format="HH:mm"
+        placeholder="Select immediately"
+      />
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="time-picker-footer">
+
+### Panel footer
+
+Use renderExtraFooter for information relevant to the choice.
+
+```tsx preview
+import { TimePicker } from '@rockshin/tao-ui';
+export default function Demo() {
+  return (
+    <TimePicker
+      format="HH:mm"
+      renderExtraFooter={() => (
+        <span>All appointments use your local time.</span>
+      )}
+      styles={{ popup: { root: { maxWidth: 320 } } }}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="time-picker-phone">
+
+### Phone viewport and Chinese text
+
+The example runs in an independent iframe. Switch viewport sizes to inspect the popup.
+
+```tsx preview="iframe-follow"
+import { TimePicker, TaoProvider, zhCN } from '@rockshin/tao-ui';
+export default function Demo() {
+  return (
+    <TaoProvider locale={zhCN}>
+      <div style={{ padding: 16 }}>
+        <TimePicker.RangePicker format="HH:mm" style={{ width: '100%' }} />
+      </div>
+    </TaoProvider>
+  );
+}
+```
+
+</section>
+
+</div>
+
+## API
+
+<API moduleName="time-picker" />

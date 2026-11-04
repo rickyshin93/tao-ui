@@ -1,0 +1,203 @@
+---
+title: Badge
+description: "Shows counts, compact status indicators and ribbons."
+---
+
+import Preview from '../../_components/demo-preview';
+
+Shows counts, compact status indicators and ribbons.
+
+This native tao-ui component follows the public API of Ant Design 6.7.0. Appearance, theme tokens and Semantic DOM customization belong to tao-ui; configure themes with `TaoProvider`.
+
+Badge follows the 6.7.0 count/status API; colors and Ribbon surfaces use tao-ui tokens. Count changes update directly.
+
+## When to use
+
+Attach counts to a relevant control; include text when communicating status.
+
+## Examples
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="badge-example-1">
+
+### Counts, zero and overflow
+
+```tsx preview
+import { Avatar, Badge } from "@rockshin/tao-ui";
+
+export default function Example() {
+  return (
+    <div
+      style={{
+        display: "flex",
+        gap: 16,
+        alignItems: "center",
+        flexWrap: "wrap",
+      }}
+    >
+      <Badge count={5}>
+        <Avatar shape="square">A</Avatar>
+      </Badge>
+      <Badge count={0} showZero>
+        <Avatar shape="square">B</Avatar>
+      </Badge>
+      <Badge count={120}>
+        <Avatar shape="square">C</Avatar>
+      </Badge>
+      <Badge count={120} overflowCount={999}>
+        <Avatar shape="square">D</Avatar>
+      </Badge>
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="badge-example-2">
+
+### Change a count
+
+```tsx preview
+import { useState } from "react";
+import { Badge, Button } from "@rockshin/tao-ui";
+
+export default function Example() {
+  const [count, setCount] = useState(5);
+  return (
+    <div
+      style={{
+        display: "flex",
+        gap: 16,
+        alignItems: "center",
+        flexWrap: "wrap",
+      }}
+    >
+      <Badge count={count} showZero />
+      <Button onClick={() => setCount(Math.max(0, count - 1))}>−</Button>
+      <Button onClick={() => setCount(count + 1)}>+</Button>
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="badge-example-3">
+
+### Dot and small indicators
+
+```tsx preview
+import { Badge, Button } from "@rockshin/tao-ui";
+
+export default function Example() {
+  return (
+    <div
+      style={{
+        display: "flex",
+        gap: 16,
+        alignItems: "center",
+        flexWrap: "wrap",
+      }}
+    >
+      <Badge dot>
+        <Button>Updates</Button>
+      </Badge>
+      <Badge count={8} size="small">
+        <Button>Messages</Button>
+      </Badge>
+      <Badge dot={false}>
+        <Button>Read</Button>
+      </Badge>
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="badge-example-4">
+
+### Status labels
+
+```tsx preview
+import { Badge } from "@rockshin/tao-ui";
+
+export default function Example() {
+  return (
+    <div style={{ display: "flex", gap: 16, flexDirection: "column" }}>
+      <Badge status="success" text="Synced" />
+      <Badge status="processing" text="Processing" />
+      <Badge status="warning" text="Needs review" />
+      <Badge status="error" text="Failed" />
+      <Badge status="default" text="Idle" />
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="badge-example-5">
+
+### Custom color and offset
+
+```tsx preview
+import { Avatar, Badge } from "@rockshin/tao-ui";
+
+export default function Example() {
+  return (
+    <div
+      style={{
+        display: "flex",
+        gap: 16,
+        alignItems: "center",
+        flexWrap: "wrap",
+      }}
+    >
+      <Badge count="New" color="#365e67" offset={[10, 4]}>
+        <Avatar size={56} shape="square">
+          AL
+        </Avatar>
+      </Badge>
+      <Badge color="#8b5c3c" text="Custom status" />
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="badge-example-6">
+
+### Ribbon placement
+
+```tsx preview
+import { Badge, Card } from "@rockshin/tao-ui";
+
+export default function Example() {
+  return (
+    <div style={{ display: "grid", gap: 24 }}>
+      <Badge.Ribbon text="Featured">
+        <Card title="Team plan">Shared workspace and collaboration.</Card>
+      </Badge.Ribbon>
+      <Badge.Ribbon
+        text="Preview"
+        color="var(--tao-color-success)"
+        placement="start"
+      >
+        <Card title="New workflow">Try the updated workflow.</Card>
+      </Badge.Ribbon>
+    </div>
+  );
+}
+```
+
+</section>
+
+</div>
+
+## API
+
+<API moduleName="badge" />

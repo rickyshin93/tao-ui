@@ -3,6 +3,8 @@ title: Dropdown
 description: "Opens a menu of actions or navigation choices from a trigger. Includes usage guidance, a runnable example, and the complete API reference."
 ---
 
+import Preview from '../../_components/demo-preview';
+
 Opens a menu of actions or navigation choices from a trigger.
 
 ## When to use
@@ -18,7 +20,13 @@ Use Dropdown for compact action sets that do not need to stay visible.
 
 - Do not use Dropdown as a replacement for visible primary navigation.
 
-## Basic usage
+## Examples
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="dropdown-example-1">
+
+### Basic usage
 
 ```tsx preview
 import { Button, Dropdown } from '@rockshin/tao-ui';
@@ -43,7 +51,11 @@ function DropdownExample() {
 export default DropdownExample;
 ```
 
-## Groups and submenus
+</section>
+
+<section className="tao-example" id="dropdown-example-2">
+
+### Groups and submenus
 
 ```tsx preview
 import { Button, Dropdown } from '@rockshin/tao-ui';
@@ -82,9 +94,14 @@ function DropdownGroups() {
 export default DropdownGroups;
 ```
 
-## Trigger, arrow, and split button
+</section>
+
+<section className="tao-example" id="dropdown-example-3">
+
+### Trigger, arrow, and split button
 
 ```tsx preview
+import { useState } from 'react';
 import { Button, Dropdown, Stack } from '@rockshin/tao-ui';
 
 const items = [
@@ -93,23 +110,354 @@ const items = [
 ];
 
 function DropdownTriggers() {
+  const [feedback, setFeedback] = useState('');
   return (
-    <Stack direction="horizontal" gap="md">
-      <Dropdown trigger={['hover']} menu={{ items }}>
-        <Button variant="secondary">Hover</Button>
-      </Dropdown>
-      <Dropdown trigger={['click']} arrow menu={{ items }}>
-        <Button variant="secondary">Click with arrow</Button>
-      </Dropdown>
-      <Dropdown.Button menu={{ items }} onClick={() => console.log('save')}>
-        Save
-      </Dropdown.Button>
-    </Stack>
+    <>
+      <Stack direction="horizontal" gap="md">
+        <Dropdown trigger={['hover']} menu={{ items }}>
+          <Button variant="secondary">Hover</Button>
+        </Dropdown>
+        <Dropdown trigger={['click']} arrow menu={{ items }}>
+          <Button variant="secondary">Click with arrow</Button>
+        </Dropdown>
+        <Dropdown.Button menu={{ items }} onClick={() => setFeedback('save')}>
+          Save
+        </Dropdown.Button>
+      </Stack>
+      <output
+        aria-live="polite"
+        style={{
+          display: 'block',
+          marginTop: 12,
+          whiteSpace: 'pre-wrap',
+          overflowWrap: 'anywhere',
+        }}
+      >
+        {feedback}
+      </output>
+    </>
   );
 }
 
 export default DropdownTriggers;
 ```
+
+</section>
+
+<section className="tao-example" id="dropdown-with-icons-and-shortcuts">
+
+### Icons, shortcuts, and disabled items
+
+Items support icons and extra content. Shortcut text is a hint and does not register a global keyboard shortcut.
+
+```tsx preview
+import { Button, Dropdown } from '@rockshin/tao-ui';
+
+function FileIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      focusable="false"
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+      <path d="M14 2v6h6" />
+    </svg>
+  );
+}
+
+function CopyIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      focusable="false"
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <rect x="9" y="9" width="13" height="13" rx="2" />
+      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+    </svg>
+  );
+}
+
+function ClipboardIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      focusable="false"
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <rect x="8" y="2" width="8" height="4" rx="1" />
+      <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+    </svg>
+  );
+}
+
+export default function DropdownWithIconsAndShortcuts() {
+  return (
+    <Dropdown
+      menu={{
+        items: [
+          { key: 'new', label: 'New file', icon: <FileIcon />, extra: '⌘N' },
+          { key: 'copy', label: 'Copy', icon: <CopyIcon />, extra: '⌘C' },
+          {
+            key: 'paste',
+            label: 'Paste',
+            icon: <ClipboardIcon />,
+            extra: '⌘V',
+            disabled: true,
+          },
+        ],
+      }}
+    >
+      <Button variant="secondary">Actions</Button>
+    </Dropdown>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="dropdown-divider-and-group">
+
+### Groups and dividers
+
+Group related tasks and separate different categories with dividers.
+
+```tsx preview
+import { Button, Dropdown } from '@rockshin/tao-ui';
+
+export default function DropdownDividerAndGroup() {
+  return (
+    <Dropdown
+      menu={{
+        items: [
+          {
+            type: 'group',
+            label: 'Account',
+            children: [
+              { key: 'profile', label: 'Profile' },
+              { key: 'billing', label: 'Billing' },
+            ],
+          },
+          { type: 'divider' },
+          {
+            type: 'group',
+            label: 'Workspace',
+            children: [
+              { key: 'members', label: 'Members' },
+              { key: 'settings', label: 'Settings' },
+            ],
+          },
+          { type: 'divider' },
+          { key: 'logout', label: 'Log out', danger: true },
+        ],
+      }}
+    >
+      <Button variant="secondary">Account</Button>
+    </Dropdown>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="dropdown-submenu">
+
+### Nested submenus
+
+Nested `children` create submenus that remain navigable with arrow keys.
+
+```tsx preview
+import { Button, Dropdown, type MenuItem } from '@rockshin/tao-ui';
+
+export default function DropdownSubmenu() {
+  return (
+    <Dropdown
+      menu={{
+        items: [
+          { key: 'back', label: 'Back' },
+          { key: 'forward', label: 'Forward', disabled: true },
+          { type: 'divider' },
+          {
+            key: 'share',
+            label: 'Share',
+            children: [
+              { key: 'mail', label: 'Email' },
+              { key: 'message', label: 'Message' },
+              {
+                key: 'more',
+                label: 'More',
+                children: [
+                  { key: 'twitter', label: 'Twitter' },
+                  { key: 'facebook', label: 'Facebook' },
+                ],
+              },
+            ],
+          },
+          { key: 'delete', label: 'Delete', danger: true, extra: '⌫' },
+        ],
+      }}
+    >
+      <Button variant="secondary">Right menu</Button>
+    </Dropdown>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="dropdown-selectable">
+
+### Controlled menu selection
+
+Manage selected keys in application state for view modes or filtering choices.
+
+```tsx preview
+import { Button, Dropdown, Stack } from '@rockshin/tao-ui';
+
+import { useState } from 'react';
+
+export default function DropdownSelectable() {
+  const [single, setSingle] = useState<string[]>(['md']);
+  const [multi, setMulti] = useState<string[]>(['bold']);
+  return (
+    <Stack direction="horizontal" gap="lg">
+      <Dropdown
+        menu={{
+          selectable: true,
+          selectedKeys: single,
+          onSelect: ({ selectedKeys }) => setSingle(selectedKeys),
+          items: [
+            { key: 'sm', label: 'Small' },
+            { key: 'md', label: 'Medium' },
+            { key: 'lg', label: 'Large' },
+          ],
+        }}
+      >
+        <Button variant="secondary">Size: {single[0]}</Button>
+      </Dropdown>
+
+      <Dropdown
+        menu={{
+          selectable: true,
+          multiple: true,
+          selectedKeys: multi,
+          onSelect: ({ selectedKeys }) => setMulti(selectedKeys),
+          items: [
+            { key: 'bold', label: 'Bold' },
+            { key: 'italic', label: 'Italic' },
+            { key: 'underline', label: 'Underline' },
+          ],
+        }}
+      >
+        <Button variant="secondary">Format ({multi.length})</Button>
+      </Dropdown>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="dropdown-placement">
+
+### Menu placement
+
+Configure `placement`; the popup still avoids viewport edges.
+
+```tsx preview
+import { Button, Dropdown, type MenuItem } from '@rockshin/tao-ui';
+
+const basicItems: MenuItem[] = [
+  { key: 'profile', label: 'Profile' },
+  { key: 'billing', label: 'Billing' },
+  { key: 'settings', label: 'Settings' },
+];
+
+export default function DropdownPlacement() {
+  return (
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(3, auto)',
+        gap: 12,
+        width: 'fit-content',
+      }}
+    >
+      {(
+        [
+          'topLeft',
+          'top',
+          'topRight',
+          'bottomLeft',
+          'bottom',
+          'bottomRight',
+        ] as const
+      ).map((p) => (
+        <Dropdown key={p} placement={p} menu={{ items: basicItems }}>
+          <Button variant="secondary">{p}</Button>
+        </Dropdown>
+      ))}
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="dropdown-trigger">
+
+### Trigger behavior
+
+Try click and hover triggers; retain a click entry point for touch devices.
+
+```tsx preview
+import { Button, Dropdown, type MenuItem, Stack } from '@rockshin/tao-ui';
+
+const basicItems: MenuItem[] = [
+  { key: 'profile', label: 'Profile' },
+  { key: 'billing', label: 'Billing' },
+  { key: 'settings', label: 'Settings' },
+];
+
+export default function DropdownTrigger() {
+  return (
+    <Stack direction="horizontal" gap="lg">
+      <Dropdown trigger={['hover']} menu={{ items: basicItems }}>
+        <Button variant="secondary">Hover me</Button>
+      </Dropdown>
+      <Dropdown trigger={['click']} arrow menu={{ items: basicItems }}>
+        <Button variant="secondary">Click (with arrow)</Button>
+      </Dropdown>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+</div>
 
 ## API
 

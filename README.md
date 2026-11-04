@@ -2,6 +2,8 @@
 
 Bun workspaces monorepo for the tao-ui design system.
 
+Documentation: [English](https://rickyshin93.github.io/tao-ui/) · [简体中文](https://rickyshin93.github.io/tao-ui/zh/).
+
 | Package | Name | What it is |
 | --- | --- | --- |
 | [`packages/tao-ui`](./packages/tao-ui) | `@rockshin/tao-ui` | React 18.2/19 component library: semantic DOM customization, OKLCH theming, Storybook, Rspress docs |
@@ -25,6 +27,8 @@ bun run storybook      # tao-ui Storybook
 ```
 
 Root scripts delegate to a package with `bun run --filter`; every command can also be run inside `packages/tao-ui` or `packages/icons`.
+
+The bilingual documentation site uses Rspress 2.1. Run `bun run doc --port 4173` for a local preview. The catalog covers 73 visual component entries and the Util type reference, with expandable, copyable examples. Mobile and responsive examples use independent phone/desktop iframe viewports; toast examples are isolated in their own previews. Chinese routes use `/zh/components/<component>`; English routes omit `/zh`. Use `bun run doc:build` to verify the static site. The Pages workflow publishes under `/tao-ui/` when `main` changes.
 
 ## Package scripts
 

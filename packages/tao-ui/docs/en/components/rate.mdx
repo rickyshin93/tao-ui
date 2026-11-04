@@ -1,0 +1,201 @@
+---
+title: Rate
+description: "Lets people choose a rating with full or half steps."
+---
+
+import Preview from '../../_components/demo-preview';
+
+Lets people choose a rating with full or half steps.
+
+## When to use
+
+Use for a short ordered scale. Add a visible label and explain what the highest and lowest ratings mean.
+
+## Examples
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="rate-example-1">
+
+### Controlled half-star rating
+
+Arrow keys move the rating. allowHalf enables half steps and tooltips explain each whole-star score.
+
+```tsx preview="iframe-follow"
+import { useState } from 'react';
+import { Rate, Stack } from '@rockshin/tao-ui';
+
+export default function Example() {
+  const [value, setValue] = useState(3.5);
+  return (
+    <Stack gap="sm">
+      <span>How was your experience?</span>
+      <Rate
+        value={value}
+        onChange={setValue}
+        allowHalf
+        aria-label="Experience rating"
+        tooltips={['Poor', 'Fair', 'Good', 'Very good', 'Excellent']}
+      />
+      <output>{value} / 5</output>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="rate-example-2">
+
+### Allow or prevent clearing
+
+With allowClear enabled, clicking the selected score again resets it to zero.
+
+```tsx preview
+import { Rate, Stack } from '@rockshin/tao-ui';
+
+export default function Example() {
+  return (
+    <Stack gap="md">
+      <div>
+        <p>Click the selected star to clear</p>
+        <Rate defaultValue={3} aria-label="Clearable rating" />
+      </div>
+      <div>
+        <p>A value is always retained</p>
+        <Rate
+          defaultValue={3}
+          allowClear={false}
+          aria-label="Required rating"
+        />
+      </div>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="rate-example-3">
+
+### Read-only and disabled
+
+readOnly presents an existing score; disabled communicates that the control is unavailable.
+
+```tsx preview
+import { Rate, Stack } from '@rockshin/tao-ui';
+
+export default function Example() {
+  return (
+    <Stack gap="md">
+      <div>
+        <p>Average: 4.5</p>
+        <Rate value={4.5} allowHalf readOnly aria-label="Average rating" />
+      </div>
+      <div>
+        <p>Rating unavailable</p>
+        <Rate defaultValue={3} disabled aria-label="Unavailable rating" />
+      </div>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="rate-example-4">
+
+### Custom characters and count
+
+character can be a node or a function of the item index.
+
+```tsx preview
+import { Rate, Stack } from '@rockshin/tao-ui';
+
+export default function Example() {
+  return (
+    <Stack gap="md">
+      <Rate
+        count={3}
+        defaultValue={2}
+        character="♥"
+        aria-label="Three-heart rating"
+      />
+      <Rate
+        count={5}
+        defaultValue={3}
+        character={({ index }) => (
+          <span style={{ fontSize: 18 }}>{(index ?? 0) + 1}</span>
+        )}
+        aria-label="Numeric rating"
+      />
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="rate-example-5">
+
+### Sizes and provider defaults
+
+small, middle and large are accepted. The native medium spelling is also supported.
+
+```tsx preview
+import { Rate, Stack, TaoProvider } from '@rockshin/tao-ui';
+
+export default function Example() {
+  return (
+    <TaoProvider size="small">
+      <Stack gap="md">
+        <Rate defaultValue={3} aria-label="Inherited small rating" />
+        <Rate defaultValue={3} size="middle" aria-label="Medium rating" />
+        <Rate defaultValue={3} size="large" aria-label="Large rating" />
+      </Stack>
+    </TaoProvider>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="rate-example-6">
+
+### Focus and semantic customization
+
+Use the ref when another action needs to move focus into the rating control.
+
+```tsx preview
+import { useRef } from 'react';
+import { Button, Rate, Stack } from '@rockshin/tao-ui';
+import type { RateRef } from '@rockshin/tao-ui';
+
+export default function Example() {
+  const ref = useRef<RateRef>(null);
+  return (
+    <Stack gap="md">
+      <Button variant="secondary" onClick={() => ref.current?.focus()}>
+        Focus rating
+      </Button>
+      <Rate
+        ref={ref}
+        defaultValue={4}
+        aria-label="Custom rating"
+        styles={{
+          root: { color: 'var(--tao-primary)' },
+          item: { marginInlineEnd: 8 },
+        }}
+      />
+    </Stack>
+  );
+}
+```
+
+</section>
+
+</div>
+
+## API
+
+<API moduleName="rate" />

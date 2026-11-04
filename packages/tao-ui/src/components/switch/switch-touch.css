@@ -1,0 +1,18 @@
+/* Preserve the visual track while reserving space for a 44px touch target. */
+@media (pointer: coarse) {
+  button[data-tao-switch][data-tao-size] {
+    margin-block: 11px;
+  }
+  button[data-tao-switch][data-tao-size="small"] {
+    margin: 14px 8px;
+  }
+  button[data-tao-switch]::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: max(100%, 44px);
+    height: 44px;
+    transform: translate(-50%, -50%);
+  }
+}

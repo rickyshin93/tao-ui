@@ -3,6 +3,8 @@ title: Tag
 description: 使用紧凑标签展示类别、状态或可选择筛选条件。页面涵盖适用场景、设计建议、多组可运行示例、交互状态与完整 API 参考。
 ---
 
+import Preview from '../../_components/demo-preview';
+
 使用紧凑标签展示类别、状态或可选择筛选条件。
 
 ## 何时使用
@@ -18,7 +20,13 @@ description: 使用紧凑标签展示类别、状态或可选择筛选条件。�
 
 - 不要用大量彩色 Tag 制造视觉噪音。
 
-## 基础用法
+## 代码演示
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="tag-example-1">
+
+### 基础用法
 
 ```tsx preview
 import { Stack, Tag } from '@rockshin/tao-ui';
@@ -38,7 +46,11 @@ function TagExample() {
 export default TagExample;
 ```
 
-## 变体
+</section>
+
+<section className="tao-example" id="tag-example-2">
+
+### 变体
 
 ```tsx preview
 import { Stack, Tag } from '@rockshin/tao-ui';
@@ -47,18 +59,34 @@ function TagVariants() {
   return (
     <Stack gap="md">
       <Stack direction="horizontal" gap="sm">
-        <Tag variant="filled" color="primary">Filled</Tag>
-        <Tag variant="filled" color="success">Success</Tag>
-        <Tag variant="filled" color="warning">Warning</Tag>
+        <Tag variant="filled" color="primary">
+          Filled
+        </Tag>
+        <Tag variant="filled" color="success">
+          Success
+        </Tag>
+        <Tag variant="filled" color="warning">
+          Warning
+        </Tag>
       </Stack>
       <Stack direction="horizontal" gap="sm">
-        <Tag variant="solid" color="primary">Solid</Tag>
-        <Tag variant="solid" color="success">Success</Tag>
-        <Tag variant="solid" color="error">Error</Tag>
+        <Tag variant="solid" color="primary">
+          Solid
+        </Tag>
+        <Tag variant="solid" color="success">
+          Success
+        </Tag>
+        <Tag variant="solid" color="error">
+          Error
+        </Tag>
       </Stack>
       <Stack direction="horizontal" gap="sm">
-        <Tag variant="outlined" color="primary">Outlined</Tag>
-        <Tag variant="outlined" color="warning">Warning</Tag>
+        <Tag variant="outlined" color="primary">
+          Outlined
+        </Tag>
+        <Tag variant="outlined" color="warning">
+          Warning
+        </Tag>
       </Stack>
     </Stack>
   );
@@ -67,26 +95,59 @@ function TagVariants() {
 export default TagVariants;
 ```
 
-## 自定义颜色与可关闭标签
+</section>
+
+<section className="tao-example" id="tag-example-3">
+
+### 自定义颜色与可关闭标签
 
 ```tsx preview
+import { useState } from 'react';
 import { Stack, Tag } from '@rockshin/tao-ui';
 
 function CustomTags() {
+  const [feedback, setFeedback] = useState('');
   return (
-    <Stack direction="horizontal" gap="sm">
-      <Tag color="#245b57" variant="solid">Custom teal</Tag>
-      <Tag color="#8a5a21" variant="outlined">Custom ochre</Tag>
-      <Tag color="primary" closeIcon onClose={() => console.log('closed')}>Closable</Tag>
-      <Tag disabled color="primary" variant="solid">Disabled</Tag>
-    </Stack>
+    <>
+      <Stack direction="horizontal" gap="sm">
+        <Tag color="#245b57" variant="solid">
+          Custom teal
+        </Tag>
+        <Tag color="#8a5a21" variant="outlined">
+          Custom ochre
+        </Tag>
+        {feedback !== 'closed' && (
+          <Tag color="primary" closeIcon onClose={() => setFeedback('closed')}>
+            Closable
+          </Tag>
+        )}
+        <Tag disabled color="primary" variant="solid">
+          Disabled
+        </Tag>
+      </Stack>
+      <output
+        aria-live="polite"
+        style={{
+          display: 'block',
+          marginTop: 12,
+          whiteSpace: 'pre-wrap',
+          overflowWrap: 'anywhere',
+        }}
+      >
+        {feedback}
+      </output>
+    </>
   );
 }
 
 export default CustomTags;
 ```
 
-## 可选择标签
+</section>
+
+<section className="tao-example" id="tag-example-4">
+
+### 可选择标签
 
 ```tsx preview
 import { CheckableTag, Stack } from '@rockshin/tao-ui';
@@ -102,7 +163,11 @@ function CheckableTags() {
           key={label}
           checked={selected.includes(label)}
           onChange={(checked) =>
-            setSelected((items) => checked ? [...items, label] : items.filter((item) => item !== label))
+            setSelected((items) =>
+              checked
+                ? [...items, label]
+                : items.filter((item) => item !== label),
+            )
           }
         >
           {label}
@@ -114,6 +179,165 @@ function CheckableTags() {
 
 export default CheckableTags;
 ```
+
+</section>
+
+<section className="tao-example" id="tag-custom-color">
+
+### 自定义颜色
+
+用颜色参数表达业务分类，文字仍应直接说明含义。
+
+```tsx preview
+import { Stack, Tag } from '@rockshin/tao-ui';
+
+export default function TagCustomColor() {
+  return (
+    <Stack gap="md">
+      <Stack direction="horizontal" gap="sm">
+        <Tag color="#6366f1">Indigo</Tag>
+        <Tag color="#ec4899">Pink</Tag>
+        <Tag color="#14b8a6">Teal</Tag>
+        <Tag color="#f97316">Orange</Tag>
+        <Tag color="#8b5cf6">Violet</Tag>
+      </Stack>
+      <Stack direction="horizontal" gap="sm">
+        <Tag color="#6366f1" variant="solid">
+          Indigo
+        </Tag>
+        <Tag color="#ec4899" variant="solid">
+          Pink
+        </Tag>
+        <Tag color="#14b8a6" variant="solid">
+          Teal
+        </Tag>
+        <Tag color="#f97316" variant="solid">
+          Orange
+        </Tag>
+        <Tag color="#8b5cf6" variant="solid">
+          Violet
+        </Tag>
+      </Stack>
+      <Stack direction="horizontal" gap="sm">
+        <Tag color="#6366f1" variant="outlined">
+          Indigo
+        </Tag>
+        <Tag color="#ec4899" variant="outlined">
+          Pink
+        </Tag>
+        <Tag color="#14b8a6" variant="outlined">
+          Teal
+        </Tag>
+        <Tag color="#f97316" variant="outlined">
+          Orange
+        </Tag>
+        <Tag color="#8b5cf6" variant="outlined">
+          Violet
+        </Tag>
+      </Stack>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="tag-with-icon">
+
+### 带图标的标签
+
+图标提供辅助识别，标签文本保留完整业务含义。
+
+```tsx preview
+import { Stack, Tag } from '@rockshin/tao-ui';
+
+export default function TagWithIcon() {
+  return (
+    <Stack direction="horizontal" gap="sm">
+      <Tag icon={<span>🔥</span>} color="error">
+        Hot
+      </Tag>
+      <Tag icon={<span>✅</span>} color="success">
+        Done
+      </Tag>
+      <Tag icon={<span>⚡</span>} color="warning">
+        Fast
+      </Tag>
+      <Tag icon={<span>🏷️</span>}>Label</Tag>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="tag-checkable">
+
+### 可选择标签
+
+通过 `checked` 与变更回调实现轻量的分类筛选。
+
+```tsx preview
+import { CheckableTag, Stack } from '@rockshin/tao-ui';
+
+import { useState } from 'react';
+
+export default function TagCheckable() {
+  function Demo() {
+    const [selected, setSelected] = useState<string[]>(['react']);
+    const options = ['react', 'vue', 'angular', 'svelte', 'solid'];
+    return (
+      <Stack direction="horizontal" gap="sm">
+        {options.map((opt) => (
+          <CheckableTag
+            key={opt}
+            checked={selected.includes(opt)}
+            onChange={(checked) =>
+              setSelected((prev) =>
+                checked ? [...prev, opt] : prev.filter((x) => x !== opt),
+              )
+            }
+          >
+            {opt}
+          </CheckableTag>
+        ))}
+      </Stack>
+    );
+  }
+  return <Demo />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="tag-disabled">
+
+### 不可操作标签
+
+禁用时停止选择或移除操作，保留标签内容供查看。
+
+```tsx preview
+import { CheckableTag, Stack, Tag } from '@rockshin/tao-ui';
+
+export default function TagDisabled() {
+  return (
+    <Stack direction="horizontal" gap="sm">
+      <Tag disabled>Disabled</Tag>
+      <Tag disabled color="primary" variant="solid">
+        Disabled Solid
+      </Tag>
+      <Tag disabled onClose={() => {}}>
+        Can't Close
+      </Tag>
+      <CheckableTag disabled>Can't Check</CheckableTag>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+</div>
 
 ## API
 

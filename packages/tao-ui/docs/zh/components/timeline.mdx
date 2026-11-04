@@ -1,0 +1,180 @@
+---
+title: Timeline
+description: "沿垂直或水平轨道展示事件与里程碑。"
+---
+
+import Preview from '../../_components/demo-preview';
+
+沿垂直或水平轨道展示事件与里程碑。
+
+组件采用 tao-ui 原生实现，公共 API 对齐 Ant Design 6.7.0。外观、主题 token 与 Semantic DOM 定制遵循 tao-ui，主题通过 `TaoProvider` 配置。
+
+支持 6.7.0 title/content/placement API 及旧 label/children/position 别名；数字 titleSpan 使用 24 栏比例。
+
+## 何时使用
+
+用于活动历史与事件序列。需要选择当前步骤时使用 Steps。
+
+## 代码演示
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="timeline-example-1">
+
+### 事件历史
+
+```tsx preview
+import { Timeline } from "@rockshin/tao-ui";
+
+const items = [
+  { title: "09:00", content: "Workspace created", color: "green" },
+  { title: "09:20", content: "Members invited" },
+  { title: "09:45", content: "First task completed" },
+];
+
+export default function Example() {
+  return <Timeline items={items} />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="timeline-example-2">
+
+### 位置与标题宽度
+
+```tsx preview="iframe-follow"
+import { Timeline } from "@rockshin/tao-ui";
+
+const items = [
+  { title: "09:00", content: "Workspace created", color: "green" },
+  { title: "09:20", content: "Members invited" },
+  { title: "09:45", content: "First task completed" },
+];
+
+export default function Example() {
+  return <Timeline mode="alternate" titleSpan="30%" items={items} />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="timeline-example-3">
+
+### 水平时间线
+
+```tsx preview="iframe-follow"
+import { Timeline } from "@rockshin/tao-ui";
+
+const items = [
+  { title: "09:00", content: "Workspace created", color: "green" },
+  { title: "09:20", content: "Members invited" },
+  { title: "09:45", content: "First task completed" },
+];
+
+export default function Example() {
+  return <Timeline orientation="horizontal" mode="alternate" items={items} />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="timeline-example-4">
+
+### 待处理与倒序
+
+```tsx preview
+import { useState } from "react";
+import { Button, Timeline } from "@rockshin/tao-ui";
+
+const items = [
+  { title: "09:00", content: "Workspace created", color: "green" },
+  { title: "09:20", content: "Members invited" },
+  { title: "09:45", content: "First task completed" },
+];
+
+export default function Example() {
+  const [reverse, setReverse] = useState(false);
+  return (
+    <div>
+      <Button onClick={() => setReverse(!reverse)} style={{ marginBottom: 16 }}>
+        Reverse order
+      </Button>
+      <Timeline
+        items={items}
+        pending="Waiting for confirmation"
+        reverse={reverse}
+      />
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="timeline-example-5">
+
+### 图标、颜色与加载
+
+```tsx preview
+import { Timeline } from "@rockshin/tao-ui";
+
+export default function Example() {
+  return (
+    <Timeline
+      variant="filled"
+      items={[
+        {
+          title: "Done",
+          content: "Changes saved",
+          color: "green",
+          icon: <span aria-hidden="true">✓</span>,
+        },
+        {
+          title: "Review",
+          content: "Waiting for review",
+          color: "var(--tao-color-warning)",
+        },
+        { title: "Sync", content: "Synchronizing", loading: true },
+      ]}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="timeline-example-6">
+
+### 语义定制
+
+```tsx preview
+import { Timeline } from "@rockshin/tao-ui";
+
+export default function Example() {
+  return (
+    <Timeline
+      items={[
+        {
+          title: "Milestone",
+          content: "Release candidate ready",
+          styles: {
+            title: { fontWeight: 700 },
+            rail: { borderStyle: "dashed" },
+          },
+        },
+        { title: "Next", content: "Publish after review" },
+      ]}
+      styles={{ itemContent: { color: "var(--tao-color-text-secondary)" } }}
+    />
+  );
+}
+```
+
+</section>
+
+</div>
+
+## API
+
+<API moduleName="timeline" />

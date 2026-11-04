@@ -1,0 +1,275 @@
+---
+title: Masonry
+description: "Arranges cards of different heights into balanced columns."
+---
+
+import Preview from '../../_components/demo-preview';
+
+Arranges cards of different heights into balanced columns.
+
+This native tao-ui component follows the public API of Ant Design 6.7.0. Appearance, theme tokens and Semantic DOM customization belong to tao-ui; configure themes with `TaoProvider`.
+
+The 6.7.0 items/itemRender contract supports responsive columns and fresh resize tracking. Layout uses native positioning; DOM order remains the input order.
+
+## When to use
+
+Use for galleries or varied content cards where row alignment is unnecessary.
+
+## Examples
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="masonry-example-1">
+
+### Balanced columns
+
+```tsx preview
+import { Masonry } from "@rockshin/tao-ui";
+
+const items = [100, 160, 80, 130, 90, 150].map((height, key) => ({
+  key,
+  height,
+  data: { title: `Tile ${key + 1}` },
+}));
+
+export default function Example() {
+  return (
+    <Masonry
+      columns={3}
+      gutter={16}
+      items={items}
+      itemRender={({ data }) => (
+        <div
+          style={{
+            height: "100%",
+            boxSizing: "border-box",
+            padding: 16,
+            borderRadius: 6,
+            background: "var(--tao-color-fill-secondary)",
+          }}
+        >
+          {data.title}
+        </div>
+      )}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="masonry-example-2">
+
+### Responsive columns and gutters
+
+```tsx preview="iframe-follow"
+import { Masonry } from "@rockshin/tao-ui";
+
+const items = [100, 160, 80, 130, 90, 150].map((height, key) => ({
+  key,
+  height,
+  data: { title: `Tile ${key + 1}` },
+}));
+
+export default function Example() {
+  return (
+    <Masonry
+      columns={{ xs: 1, sm: 2, lg: 3 }}
+      gutter={[{ xs: 8, sm: 16 }, 16]}
+      items={items}
+      itemRender={({ data }) => (
+        <div
+          style={{
+            height: "100%",
+            boxSizing: "border-box",
+            padding: 16,
+            borderRadius: 6,
+            background: "var(--tao-color-fill-secondary)",
+          }}
+        >
+          {data.title}
+        </div>
+      )}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="masonry-example-3">
+
+### Assign a column
+
+```tsx preview
+import { Masonry } from "@rockshin/tao-ui";
+
+const items = [100, 160, 80, 130, 90, 150].map((height, key) => ({
+  key,
+  height,
+  data: { title: `Tile ${key + 1}` },
+}));
+
+export default function Example() {
+  return (
+    <Masonry
+      columns={3}
+      gutter={16}
+      items={items.map((item, index) => ({
+        ...item,
+        column: index === 0 ? 2 : undefined,
+      }))}
+      itemRender={({ data }) => (
+        <div
+          style={{
+            height: "100%",
+            boxSizing: "border-box",
+            padding: 16,
+            borderRadius: 6,
+            background: "var(--tao-color-fill-secondary)",
+          }}
+        >
+          {data.title}
+        </div>
+      )}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="masonry-example-4">
+
+### Track changing content heights
+
+```tsx preview="iframe-follow"
+import { useState } from "react";
+import { Button, Masonry } from "@rockshin/tao-ui";
+
+export default function Example() {
+  const [expanded, setExpanded] = useState(false);
+  return (
+    <div>
+      <Button
+        onClick={() => setExpanded(!expanded)}
+        style={{ marginBottom: 16 }}
+      >
+        Toggle details
+      </Button>
+      <Masonry
+        columns={{ xs: 1, sm: 2 }}
+        gutter={16}
+        fresh
+        items={[
+          {
+            key: "one",
+            data: 1,
+            children: (
+              <div
+                style={{
+                  padding: 16,
+                  background: "var(--tao-color-fill-secondary)",
+                  borderRadius: 6,
+                }}
+              >
+                <h4>Details</h4>
+                {expanded ? (
+                  <p>
+                    A longer description changes the card height and the
+                    following cards are positioned again.
+                  </p>
+                ) : (
+                  <p>Short summary.</p>
+                )}
+              </div>
+            ),
+          },
+          ...[2, 3, 4].map((key) => ({
+            key,
+            data: key,
+            height: 80 + key * 12,
+            children: (
+              <div
+                style={{
+                  height: "100%",
+                  padding: 16,
+                  boxSizing: "border-box",
+                  background: "var(--tao-color-fill-secondary)",
+                  borderRadius: 6,
+                }}
+              >
+                Card {key}
+              </div>
+            ),
+          })),
+        ]}
+      />
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="masonry-example-5">
+
+### Reorder and inspect layout
+
+```tsx preview
+import { useState } from "react";
+import { Button, Masonry } from "@rockshin/tao-ui";
+
+const items = [100, 160, 80, 130, 90, 150].map((height, key) => ({
+  key,
+  height,
+  data: { title: `Tile ${key + 1}` },
+}));
+
+export default function Example() {
+  const [reversed, setReversed] = useState(false);
+  const [columns, setColumns] = useState("");
+  return (
+    <div>
+      <Button
+        onClick={() => setReversed(!reversed)}
+        style={{ marginBottom: 16 }}
+      >
+        Reverse items
+      </Button>
+      <Masonry
+        columns={2}
+        gutter={12}
+        items={reversed ? [...items].reverse() : items}
+        onLayoutChange={(order) =>
+          setColumns(
+            order.map((item) => `${item.key} → ${item.column + 1}`).join(", "),
+          )
+        }
+        itemRender={({ data }) => (
+          <div
+            style={{
+              height: "100%",
+              boxSizing: "border-box",
+              padding: 16,
+              borderRadius: 6,
+              background: "var(--tao-color-fill-secondary)",
+            }}
+          >
+            {data.title}
+          </div>
+        )}
+      />
+      <p>Item → column: {columns}</p>
+    </div>
+  );
+}
+```
+
+</section>
+
+</div>
+
+## API
+
+<API moduleName="masonry" />

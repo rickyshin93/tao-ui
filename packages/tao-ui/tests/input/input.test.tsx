@@ -68,7 +68,7 @@ test('prefix keeps standard input start padding', () => {
     /\[data-tao-input\] \[data-tao-prefix\] \+ input \{([^}]+)\}/,
   )?.[1];
 
-  expect(rule).toContain('padding-inline-start: var(--tao-padding-sm);');
+  expect(rule).toContain('padding-inline-start: var(--tao-input-affix-padding);');
 });
 
 test('inner input geometrically centers its native line box', () => {
@@ -135,7 +135,7 @@ test('React SVG prefix becomes an overlay and reserves input space', () => {
   )?.[1];
 
   expect(rule).toMatch(
-    /padding-inline-start:\s*calc\(\s*var\(--tao-padding-sm\)\s*\+\s*16px\s*\+\s*var\(--tao-padding-sm\)\s*\);/,
+    /padding-inline-start:\s*calc\(\s*var\(--tao-input-affix-padding\)\s*\+\s*16px\s*\+\s*var\(--tao-input-affix-padding\)\s*\);/,
   );
 });
 

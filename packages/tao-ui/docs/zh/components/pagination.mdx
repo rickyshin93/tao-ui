@@ -3,6 +3,8 @@ title: Pagination
 description: 在较大数据集合的分页之间导航。页面涵盖适用场景、设计建议、多组可运行示例、交互状态与完整 API 参考。
 ---
 
+import Preview from '../../_components/demo-preview';
+
 在较大数据集合的分页之间导航。
 
 ## 何时使用
@@ -18,7 +20,13 @@ description: 在较大数据集合的分页之间导航。页面涵盖适用场�
 
 - 少量内容不需要分页。
 
-## 基础用法
+## 代码演示
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="pagination-example-1">
+
+### 基础用法
 
 ```tsx preview
 import { Pagination } from '@rockshin/tao-ui';
@@ -41,7 +49,11 @@ function PaginationExample() {
 export default PaginationExample;
 ```
 
-## 尺寸
+</section>
+
+<section className="tao-example" id="pagination-example-2">
+
+### 尺寸
 
 ```tsx preview
 import { Pagination, Stack } from '@rockshin/tao-ui';
@@ -59,7 +71,11 @@ function PaginationSizes() {
 export default PaginationSizes;
 ```
 
-## 每页数量与总数
+</section>
+
+<section className="tao-example" id="pagination-example-3">
+
+### 每页数量与总数
 
 ```tsx preview
 import { Pagination } from '@rockshin/tao-ui';
@@ -86,6 +102,96 @@ function PaginationPageSize() {
 
 export default PaginationPageSize;
 ```
+
+</section>
+
+<section className="tao-example" id="pagination-with-total">
+
+### 显示数据总量
+
+`showTotal` 可以展示当前记录区间与总数量。
+
+```tsx preview
+import { Pagination } from '@rockshin/tao-ui';
+
+import { useState } from 'react';
+
+export default function PaginationWithTotal() {
+  function Demo() {
+    const [page, setPage] = useState(1);
+    return (
+      <Pagination
+        total={95}
+        current={page}
+        pageSize={10}
+        onChange={(p) => setPage(p)}
+        showTotal={(t, [s, e]) => `${s}-${e} of ${t}`}
+      />
+    );
+  }
+  return <Demo />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="pagination-size-changer">
+
+### 切换每页条数
+
+将页码和每页数量一起维护，数据请求应使用变更后的两个值。
+
+```tsx preview
+import { Pagination } from '@rockshin/tao-ui';
+
+import { useState } from 'react';
+
+export default function PaginationSizeChanger() {
+  function Demo() {
+    const [page, setPage] = useState(1);
+    const [ps, setPs] = useState(10);
+    return (
+      <Pagination
+        total={200}
+        current={page}
+        pageSize={ps}
+        onChange={(p, s) => {
+          setPage(p);
+          setPs(s);
+        }}
+        showSizeChanger
+      />
+    );
+  }
+  return <Demo />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="pagination-sizes">
+
+### 分页尺寸
+
+尺寸影响分页按钮的密度，可与所在列表或表格匹配。
+
+```tsx preview
+import { Pagination } from '@rockshin/tao-ui';
+
+export default function PaginationSizes() {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <Pagination total={50} size="small" />
+      <Pagination total={50} size="medium" />
+      <Pagination total={50} size="large" />
+    </div>
+  );
+}
+```
+
+</section>
+
+</div>
 
 ## API
 

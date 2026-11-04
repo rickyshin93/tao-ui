@@ -1,0 +1,200 @@
+---
+title: Result
+description: "展示操作结果，并提供继续或恢复操作。"
+---
+
+import Preview from '../../_components/demo-preview';
+
+展示操作结果，并提供继续或恢复操作。
+
+## 何时使用
+
+用于重要操作完成后或整页错误状态。短暂状态提示使用 message 或 notification。
+
+## 示例
+
+<div className="tao-demo-grid tao-demo-grid-wide">
+
+<section className="tao-example" id="result-example-1">
+
+### 成功与下一步
+
+操作按钮应说明下一步行为；此例仅更新本地状态。
+
+```tsx preview="iframe-follow"
+import { useState } from 'react';
+import { Button, Result } from '@rockshin/tao-ui';
+
+export default function Example() {
+  const [opened, setOpened] = useState(false);
+  return (
+    <Result
+      status="success"
+      title="Workspace created"
+      subTitle={
+        opened
+          ? 'The workspace overview is selected.'
+          : 'Invite teammates or continue to your workspace.'
+      }
+      extra={<Button onClick={() => setOpened(true)}>Open workspace</Button>}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="result-example-2">
+
+### 信息、警告与错误
+
+根据操作结果选择状态，并通过文字说明问题。
+
+```tsx preview
+import { useState } from 'react';
+import { Button, Result, Stack } from '@rockshin/tao-ui';
+import type { ResultStatusType } from '@rockshin/tao-ui';
+
+export default function Example() {
+  const [status, setStatus] = useState<ResultStatusType>('info');
+  return (
+    <>
+      <Stack direction="horizontal" gap="sm" style={{ flexWrap: 'wrap' }}>
+        {(['info', 'warning', 'error'] as const).map((value) => (
+          <Button
+            key={value}
+            variant="secondary"
+            onClick={() => setStatus(value)}
+          >
+            {value}
+          </Button>
+        ))}
+      </Stack>
+      <Result
+        status={status}
+        title={
+          status === 'error'
+            ? 'Import failed'
+            : status === 'warning'
+              ? 'Review required'
+              : 'Import is queued'
+        }
+        subTitle="Open the import details to see the next step."
+      />
+    </>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="result-example-3">
+
+### HTTP 错误页面
+
+403、404、500 提供独立插画；标题和恢复建议由应用提供。
+
+```tsx preview
+import { useState } from 'react';
+import { Button, Result, Stack } from '@rockshin/tao-ui';
+
+export default function Example() {
+  const [status, setStatus] = useState<403 | 404 | 500>(404);
+  const titles = {
+    403: 'Access required',
+    404: 'Page not found',
+    500: 'Unable to load this page',
+  };
+  return (
+    <>
+      <Stack direction="horizontal" gap="sm">
+        {([403, 404, 500] as const).map((value) => (
+          <Button
+            key={value}
+            variant="secondary"
+            onClick={() => setStatus(value)}
+          >
+            {value}
+          </Button>
+        ))}
+      </Stack>
+      <Result
+        status={status}
+        title={titles[status]}
+        subTitle="Check your access or return to your workspace."
+      />
+    </>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="result-example-4">
+
+### 错误详情
+
+children 用于展示可处理的详细原因，主标题保持简短。
+
+```tsx preview
+import { Result } from '@rockshin/tao-ui';
+
+export default function Example() {
+  return (
+    <Result
+      status="error"
+      title="Two records need attention"
+      subTitle="Fix the highlighted fields before retrying."
+    >
+      <ul>
+        <li>Row 12: enter a valid email address.</li>
+        <li>Row 28: choose a workspace owner.</li>
+      </ul>
+    </Result>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="result-example-5">
+
+### 自定义图标与语义样式
+
+使用 Semantic DOM 分别定制图标、标题和正文。
+
+```tsx preview
+import { Result } from '@rockshin/tao-ui';
+
+export default function Example() {
+  return (
+    <Result
+      icon={
+        <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+          <path
+            d="M8 12h32v24H8zM8 12l16 13 16-13"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinejoin="round"
+          />
+        </svg>
+      }
+      title="Invitation prepared"
+      subTitle="Review the recipient before sending."
+      styles={{
+        icon: { color: 'var(--tao-primary)' },
+        title: { fontSize: 20 },
+        root: { padding: 20 },
+      }}
+    />
+  );
+}
+```
+
+</section>
+
+</div>
+
+## API
+
+<API moduleName="result" />

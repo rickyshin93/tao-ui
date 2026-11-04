@@ -1,0 +1,333 @@
+---
+title: Carousel
+description: "Slides with native arrows and dots, automatic playback, fade transitions, responsive layouts and ref controls."
+---
+
+import Preview from '../../_components/demo-preview';
+
+Slides with native arrows and dots, automatic playback, fade transitions, responsive layouts and ref controls.
+
+Each example can be copied and run independently. Use the device control on framed previews to switch between desktop and phone widths.
+
+## Examples
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="carousel-basic">
+
+### Arrows and dots
+
+Dots navigate directly to a slide. arrows enables previous/next controls.
+
+```tsx preview
+import { Carousel } from '@rockshin/tao-ui';
+const slides = ['Explore', 'Review', 'Publish'].map((label, index) => (
+  <div key={label}>
+    <div
+      style={{
+        height: 180,
+        display: 'grid',
+        placeItems: 'center',
+        fontSize: 24,
+        color: '#27342d',
+        background: ['#e7eee9', '#eee9f5', '#f2ece3'][index],
+      }}
+    >
+      {label}
+    </div>
+  </div>
+));
+export default function BasicCarousel() {
+  return <Carousel arrows>{slides}</Carousel>;
+}
+```
+
+</section>
+
+<section className="tao-example" id="carousel-ref">
+
+### Imperative navigation
+
+The ref exposes goTo, next and prev while afterChange reports the settled slide index.
+
+```tsx preview
+import { useRef, useState } from 'react';
+import { Button, Carousel, type CarouselRef } from '@rockshin/tao-ui';
+const slides = ['Explore', 'Review', 'Publish'].map((label, index) => (
+  <div key={label}>
+    <div
+      style={{
+        height: 180,
+        display: 'grid',
+        placeItems: 'center',
+        fontSize: 24,
+        color: '#27342d',
+        background: ['#e7eee9', '#eee9f5', '#f2ece3'][index],
+      }}
+    >
+      {label}
+    </div>
+  </div>
+));
+export default function CarouselControls() {
+  const ref = useRef<CarouselRef>(null);
+  const [current, setCurrent] = useState(0);
+  return (
+    <div style={{ display: 'grid', gap: 12 }}>
+      <Carousel ref={ref} afterChange={setCurrent}>
+        {slides}
+      </Carousel>
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+        <Button onClick={() => ref.current?.prev()}>Previous</Button>
+        <Button onClick={() => ref.current?.goTo(2, true)}>Go to third</Button>
+        <Button onClick={() => ref.current?.next()}>Next</Button>
+        <output>Slide {current + 1}</output>
+      </div>
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="carousel-autoplay">
+
+### Automatic playback
+
+autoplaySpeed controls the interval. dotDuration shows elapsed time on the active indicator.
+
+```tsx preview
+import { Carousel } from '@rockshin/tao-ui';
+const slides = ['Explore', 'Review', 'Publish'].map((label, index) => (
+  <div key={label}>
+    <div
+      style={{
+        height: 180,
+        display: 'grid',
+        placeItems: 'center',
+        fontSize: 24,
+        color: '#27342d',
+        background: ['#e7eee9', '#eee9f5', '#f2ece3'][index],
+      }}
+    >
+      {label}
+    </div>
+  </div>
+));
+export default function AutoplayCarousel() {
+  return (
+    <Carousel
+      autoplay={{ dotDuration: true }}
+      autoplaySpeed={3000}
+      pauseOnHover
+      pauseOnFocus
+    >
+      {slides}
+    </Carousel>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="carousel-fade">
+
+### Fade transition
+
+effect="fade" changes the transition while keeping the same navigation API.
+
+```tsx preview
+import { Carousel } from '@rockshin/tao-ui';
+const slides = ['Explore', 'Review', 'Publish'].map((label, index) => (
+  <div key={label}>
+    <div
+      style={{
+        height: 180,
+        display: 'grid',
+        placeItems: 'center',
+        fontSize: 24,
+        color: '#27342d',
+        background: ['#e7eee9', '#eee9f5', '#f2ece3'][index],
+      }}
+    >
+      {label}
+    </div>
+  </div>
+));
+export default function FadingCarousel() {
+  return (
+    <Carousel effect="fade" arrows speed={450}>
+      {slides}
+    </Carousel>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="carousel-vertical">
+
+### Vertical slides
+
+Placing dots at start or end enables vertical slides unless vertical is explicitly overridden.
+
+```tsx preview
+import { Carousel } from '@rockshin/tao-ui';
+const slides = ['Explore', 'Review', 'Publish'].map((label, index) => (
+  <div key={label}>
+    <div
+      style={{
+        height: 180,
+        display: 'grid',
+        placeItems: 'center',
+        fontSize: 24,
+        color: '#27342d',
+        background: ['#e7eee9', '#eee9f5', '#f2ece3'][index],
+      }}
+    >
+      {label}
+    </div>
+  </div>
+));
+export default function VerticalCarousel() {
+  return (
+    <Carousel dotPlacement="end" draggable>
+      {slides}
+    </Carousel>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="carousel-responsive">
+
+### Multiple visible slides
+
+Responsive settings show two slides on wider screens and one below 480 px.
+
+```tsx preview="iframe-follow"
+import { Carousel } from '@rockshin/tao-ui';
+const slides = ['Explore', 'Review', 'Publish'].map((label, index) => (
+  <div key={label}>
+    <div
+      style={{
+        height: 180,
+        display: 'grid',
+        placeItems: 'center',
+        fontSize: 24,
+        color: '#27342d',
+        background: ['#e7eee9', '#eee9f5', '#f2ece3'][index],
+      }}
+    >
+      {label}
+    </div>
+  </div>
+));
+export default function ResponsiveCarousel() {
+  return (
+    <Carousel
+      slidesToShow={2}
+      slidesToScroll={1}
+      arrows
+      draggable
+      responsive={[{ breakpoint: 480, settings: { slidesToShow: 1 } }]}
+    >
+      {slides}
+    </Carousel>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="carousel-paging">
+
+### Custom pagination
+
+customPaging changes each dot button; semantic styles position the dots as a group.
+
+```tsx preview
+import { Carousel } from '@rockshin/tao-ui';
+const slides = ['Explore', 'Review', 'Publish'].map((label, index) => (
+  <div key={label}>
+    <div
+      style={{
+        height: 180,
+        display: 'grid',
+        placeItems: 'center',
+        fontSize: 24,
+        color: '#27342d',
+        background: ['#e7eee9', '#eee9f5', '#f2ece3'][index],
+      }}
+    >
+      {label}
+    </div>
+  </div>
+));
+export default function NumberedCarousel() {
+  return (
+    <Carousel
+      styles={{ dots: { bottom: 30, gap: 12 } }}
+      customPaging={(index) => (
+        <button
+          type="button"
+          aria-label={`Go to slide ${index + 1}`}
+          style={{ width: 24, height: 24, borderRadius: '50%', fontSize: 12 }}
+        >
+          {index + 1}
+        </button>
+      )}
+    >
+      {slides}
+    </Carousel>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="carousel-mobile">
+
+### Swipe on a phone
+
+Touch swiping is enabled by default. draggable also enables mouse dragging for desktop previews.
+
+```tsx preview="iframe-follow"
+import { Carousel } from '@rockshin/tao-ui';
+const slides = ['Explore', 'Review', 'Publish'].map((label, index) => (
+  <div key={label}>
+    <div
+      style={{
+        height: 180,
+        display: 'grid',
+        placeItems: 'center',
+        fontSize: 24,
+        color: '#27342d',
+        background: ['#e7eee9', '#eee9f5', '#f2ece3'][index],
+      }}
+    >
+      {label}
+    </div>
+  </div>
+));
+export default function MobileCarousel() {
+  return (
+    <div style={{ padding: 16 }}>
+      <h3>Discover the workflow</h3>
+      <Carousel draggable arrows>
+        {slides}
+      </Carousel>
+      <p>Swipe left or right to switch slides.</p>
+    </div>
+  );
+}
+```
+
+</section>
+
+</div>
+
+## API
+
+<API moduleName="carousel" />

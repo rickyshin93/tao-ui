@@ -1,8 +1,29 @@
 {
   "schemaVersion": 1,
   "packageName": "@rockshin/tao-ui",
-  "generatedAt": "2026-10-15T04:34:03.126Z",
+  "generatedAt": "2026-11-04T16:10:01.752Z",
   "components": [
+    {
+      "name": "affix",
+      "displayName": "Affix",
+      "category": "Navigation",
+      "description": "Affixes content to a window or scroll container boundary.",
+      "exports": [
+        "Affix"
+      ],
+      "source": "src/components/affix/affix.tsx",
+      "story": "stories/affix.stories.tsx",
+      "tests": [
+        "tests/affix/affix.test.tsx"
+      ],
+      "semanticParts": [
+        "root",
+        "content"
+      ],
+      "usage": {
+        "description": "Affixes content to a window or scroll container boundary."
+      }
+    },
     {
       "name": "alert",
       "displayName": "Alert",
@@ -94,6 +115,184 @@
           "description": "Right-side action slot, e.g. a button."
         }
       ]
+    },
+    {
+      "name": "app",
+      "displayName": "App",
+      "category": "Config",
+      "description": "Scopes imperative messages, notifications and confirmation dialogs to the current React tree and TaoProvider theme.",
+      "exports": [
+        "App"
+      ],
+      "source": "src/components/app/app.tsx",
+      "story": "stories/app.stories.tsx",
+      "tests": [
+        "tests/app/app.test.tsx"
+      ],
+      "semanticParts": [
+        "root"
+      ],
+      "keywords": [
+        "app",
+        "message",
+        "notification",
+        "modal",
+        "context"
+      ],
+      "related": [
+        "TaoProvider",
+        "Modal",
+        "Sonner"
+      ],
+      "usage": {
+        "description": "Place App below TaoProvider, then call App.useApp() from descendant components. Messages return callable close handles that can be awaited; confirmation dialogs return update, destroy and then.",
+        "bestPractices": [
+          "Create feedback in event handlers or effects.",
+          "Await modal confirmation when the next action depends on the user’s choice.",
+          "Keep an App instance mounted for the lifetime of its feedback."
+        ],
+        "avoid": [
+          "Do not call App.useApp() above its App provider.",
+          "Do not use transient messages for information that must remain available."
+        ]
+      }
+    },
+    {
+      "name": "auto-complete",
+      "displayName": "AutoComplete",
+      "category": "Data Entry",
+      "description": "Editable text input with searchable suggestions, keyboard completion and custom input support.",
+      "exports": [
+        "AutoComplete"
+      ],
+      "source": "src/components/auto-complete/auto-complete.tsx",
+      "story": "stories/auto-complete.stories.tsx",
+      "tests": [
+        "tests/auto-complete/auto-complete.test.tsx"
+      ],
+      "semanticParts": [
+        "root",
+        "prefix",
+        "input",
+        "placeholder",
+        "content",
+        "clear",
+        "popup.root",
+        "popup.list",
+        "popup.listItem"
+      ],
+      "keywords": [
+        "autocomplete",
+        "suggestion",
+        "search",
+        "input"
+      ],
+      "related": [
+        "Input",
+        "Select",
+        "Mentions"
+      ],
+      "usage": {
+        "description": "Use AutoComplete when free-form input is valid and suggestions help users finish typing.",
+        "bestPractices": [
+          "Control value with onChange and fetch suggestions with onSearch.",
+          "Provide stable values and concise option labels.",
+          "Give custom input elements an accessible name."
+        ],
+        "avoid": [
+          "Do not use onSearch as the only controlled-value update during composition.",
+          "Use Select when users must choose from a closed list."
+        ]
+      }
+    },
+    {
+      "name": "avatar",
+      "displayName": "Avatar",
+      "category": "Data Display",
+      "description": "Represents people with images, icons or automatically fitted initials.",
+      "exports": [
+        "Avatar"
+      ],
+      "source": "src/components/avatar/avatar.tsx",
+      "story": "stories/avatar.stories.tsx",
+      "tests": [
+        "tests/avatar/avatar.test.tsx"
+      ],
+      "semanticParts": [
+        "root",
+        "image",
+        "icon",
+        "content"
+      ],
+      "keywords": [
+        "profile",
+        "person",
+        "group"
+      ],
+      "usage": {
+        "description": "Use Avatar for a person or account; group related people with Avatar.Group.",
+        "bestPractices": [
+          "Provide meaningful image alternative text.",
+          "Supply initials or an icon as an image fallback."
+        ],
+        "avoid": [
+          "Do not rely on an image alone to identify an account."
+        ]
+      }
+    },
+    {
+      "name": "badge",
+      "displayName": "Badge",
+      "category": "Data Display",
+      "description": "Adds notification counts, status indicators or a ribbon to content.",
+      "exports": [
+        "Badge"
+      ],
+      "source": "src/components/badge/badge.tsx",
+      "story": "stories/badge.stories.tsx",
+      "tests": [
+        "tests/badge/badge.test.tsx"
+      ],
+      "semanticParts": [
+        "root",
+        "indicator"
+      ],
+      "keywords": [
+        "count",
+        "status",
+        "notification",
+        "ribbon"
+      ],
+      "usage": {
+        "description": "Use Badge for compact counts or a status next to a label.",
+        "bestPractices": [
+          "Pair status colors with meaningful text."
+        ],
+        "avoid": [
+          "Do not use a count badge for long descriptions."
+        ]
+      }
+    },
+    {
+      "name": "border-beam",
+      "displayName": "BorderBeam",
+      "category": "General",
+      "description": "Animates a highlighted beam around the border of its child.",
+      "exports": [
+        "BorderBeam"
+      ],
+      "source": "src/components/border-beam/border-beam.tsx",
+      "story": "stories/border-beam.stories.tsx",
+      "tests": [
+        "tests/border-beam/border-beam.test.tsx"
+      ],
+      "semanticParts": [
+        "root",
+        "beam"
+      ],
+      "usage": {
+        "description": "Animates a highlighted beam around the border of its child."
+      }
     },
     {
       "name": "breadcrumb",
@@ -211,6 +410,166 @@
       ]
     },
     {
+      "name": "calendar",
+      "displayName": "Calendar",
+      "category": "Data Display",
+      "description": "Browse a month or year and place events inside date cells.",
+      "exports": [
+        "Calendar"
+      ],
+      "source": "src/components/calendar/calendar.tsx",
+      "story": "stories/calendar.stories.tsx",
+      "tests": [
+        "tests/calendar/calendar.test.tsx"
+      ],
+      "semanticParts": [
+        "root",
+        "header",
+        "body",
+        "content",
+        "item",
+        "itemContent"
+      ],
+      "keywords": [
+        "calendar",
+        "date",
+        "events",
+        "month",
+        "year"
+      ],
+      "related": [
+        "DatePicker",
+        "TimePicker"
+      ],
+      "usage": {
+        "description": "Use Calendar to browse schedules and select a day without opening a popup.",
+        "bestPractices": [
+          "Use validRange to bound the available dates.",
+          "Use cellRender for date-specific events.",
+          "Use fullscreen=false for compact embedded calendars."
+        ],
+        "avoid": [
+          "Do not mutate the Day.js values passed to callbacks."
+        ]
+      }
+    },
+    {
+      "name": "card",
+      "displayName": "Card",
+      "category": "Data Display",
+      "description": "Groups related content with an optional heading, cover, tabs and actions.",
+      "exports": [
+        "Card"
+      ],
+      "source": "src/components/card/card.tsx",
+      "story": "stories/card.stories.tsx",
+      "tests": [
+        "tests/card/card.test.tsx"
+      ],
+      "semanticParts": [
+        "root",
+        "header",
+        "body",
+        "extra",
+        "title",
+        "actions",
+        "cover"
+      ],
+      "keywords": [
+        "container",
+        "content",
+        "metadata",
+        "panel"
+      ],
+      "usage": {
+        "description": "Use Card for a distinct content item; Card.Meta organizes its identity and description.",
+        "bestPractices": [
+          "Keep titles short and actions specific."
+        ],
+        "avoid": [
+          "Do not wrap every page section in nested cards."
+        ]
+      }
+    },
+    {
+      "name": "carousel",
+      "displayName": "Carousel",
+      "category": "Data Display",
+      "description": "Swipeable slides with fade, directional dots, autoplay, arrows and imperative navigation.",
+      "exports": [
+        "Carousel"
+      ],
+      "source": "src/components/carousel/carousel.tsx",
+      "story": "stories/carousel.stories.tsx",
+      "tests": [
+        "tests/carousel/carousel.test.tsx"
+      ],
+      "semanticParts": [
+        "root",
+        "dots"
+      ],
+      "usage": {
+        "description": "Swipeable slides with fade, directional dots, autoplay, arrows and imperative navigation.",
+        "bestPractices": [
+          "Provide meaningful labels and concise content.",
+          "Keep controlled state synchronized through the change callbacks."
+        ]
+      }
+    },
+    {
+      "name": "cascader",
+      "displayName": "Cascader",
+      "category": "Data Entry",
+      "description": "Choose paths through hierarchical options with search, lazy loading, multiple selection and an inline panel.",
+      "exports": [
+        "Cascader",
+        "CascaderPanel"
+      ],
+      "source": "src/components/cascader/cascader.tsx",
+      "story": "stories/cascader.stories.tsx",
+      "tests": [
+        "tests/cascader/cascader.test.tsx"
+      ],
+      "semanticParts": [
+        "root",
+        "prefix",
+        "suffix",
+        "input",
+        "clear",
+        "placeholder",
+        "content",
+        "item",
+        "itemContent",
+        "itemRemove",
+        "popup.root",
+        "popup.list",
+        "popup.listItem"
+      ],
+      "keywords": [
+        "cascade",
+        "select",
+        "path",
+        "hierarchy",
+        "location"
+      ],
+      "related": [
+        "TreeSelect",
+        "Select"
+      ],
+      "usage": {
+        "description": "Use Cascader when users select a complete path such as region, department or category.",
+        "bestPractices": [
+          "Use stable values at each level.",
+          "Enable changeOnSelect when parent paths are valid choices.",
+          "Use Cascader.Panel when the hierarchy should stay visible."
+        ],
+        "avoid": [
+          "Do not combine lazy loadData with search over unloaded options.",
+          "Do not flatten paths before handling onChange."
+        ]
+      }
+    },
+    {
       "name": "checkbox",
       "displayName": "Checkbox",
       "category": "Data Entry",
@@ -305,6 +664,51 @@
       }
     },
     {
+      "name": "color-picker",
+      "displayName": "ColorPicker",
+      "category": "Data Entry",
+      "description": "Choose single or gradient colors with hex, RGB, HSB and alpha controls.",
+      "exports": [
+        "ColorPicker"
+      ],
+      "source": "src/components/color-picker/color-picker.tsx",
+      "story": "stories/color-picker.stories.tsx",
+      "tests": [
+        "tests/color-picker/color-picker.test.tsx"
+      ],
+      "semanticParts": [
+        "root",
+        "body",
+        "content",
+        "description",
+        "popup.root",
+        "popup.container"
+      ],
+      "keywords": [
+        "color",
+        "palette",
+        "gradient",
+        "hex",
+        "rgb",
+        "hsb"
+      ],
+      "related": [
+        "Popover",
+        "Input"
+      ],
+      "usage": {
+        "description": "Keep the returned Color object when precision matters and call toCssString for use in CSS.",
+        "bestPractices": [
+          "Use presets for a constrained brand palette.",
+          "Use disabledAlpha when transparency is not supported.",
+          "Use onChangeComplete when a finished edit should be committed."
+        ],
+        "avoid": [
+          "Do not discard the Color object during a drag if precision matters."
+        ]
+      }
+    },
+    {
       "name": "context-menu",
       "displayName": "ContextMenu",
       "category": "Navigation",
@@ -387,6 +791,64 @@
         ],
         "avoid": [
           "Do not force calendar navigation for dates far in the past without typed input."
+        ]
+      }
+    },
+    {
+      "name": "descriptions",
+      "displayName": "Descriptions",
+      "category": "Data Display",
+      "description": "Displays labeled record fields with responsive columns and flexible spans.",
+      "exports": [
+        "Descriptions"
+      ],
+      "source": "src/components/descriptions/descriptions.tsx",
+      "story": "stories/descriptions.stories.tsx",
+      "tests": [
+        "tests/descriptions/descriptions.test.tsx"
+      ],
+      "semanticParts": [
+        "root",
+        "header",
+        "title",
+        "extra",
+        "label",
+        "content"
+      ],
+      "usage": {
+        "description": "Use Descriptions for read-only details; use Form for editable fields."
+      }
+    },
+    {
+      "name": "divider",
+      "displayName": "Divider",
+      "category": "Layout",
+      "description": "Separates sections or inline actions with an optional title.",
+      "exports": [
+        "Divider"
+      ],
+      "source": "src/components/divider/divider.tsx",
+      "story": "stories/divider.stories.tsx",
+      "tests": [
+        "tests/divider/divider.test.tsx"
+      ],
+      "semanticParts": [
+        "root",
+        "rail",
+        "content"
+      ],
+      "keywords": [
+        "separator",
+        "line",
+        "section"
+      ],
+      "usage": {
+        "description": "Use a divider when spacing alone cannot explain a section boundary.",
+        "bestPractices": [
+          "Use vertical dividers between short inline actions."
+        ],
+        "avoid": [
+          "Do not put titles inside vertical dividers."
         ]
       }
     },
@@ -476,6 +938,67 @@
         "avoid": [
           "Do not use Dropdown as a replacement for visible primary navigation."
         ]
+      }
+    },
+    {
+      "name": "empty",
+      "displayName": "Empty",
+      "category": "Data Display",
+      "description": "Shows a localized empty state with an illustration, description and optional action.",
+      "exports": [
+        "Empty"
+      ],
+      "source": "src/components/empty/empty.tsx",
+      "story": "stories/empty.stories.tsx",
+      "tests": [
+        "tests/empty/empty.test.tsx"
+      ],
+      "semanticParts": [
+        "root",
+        "image",
+        "description",
+        "footer"
+      ],
+      "keywords": [
+        "empty",
+        "feedback",
+        "status"
+      ],
+      "related": [
+        "Button",
+        "Result"
+      ],
+      "usage": {
+        "description": "Shows a localized empty state with an illustration, description and optional action.",
+        "bestPractices": [
+          "Explain the current state and offer a useful next action.",
+          "Keep descriptions concise and localized."
+        ],
+        "avoid": [
+          "Do not replace an actionable error with an unexplained empty state."
+        ]
+      }
+    },
+    {
+      "name": "float-button",
+      "displayName": "FloatButton",
+      "category": "General",
+      "description": "Provides floating actions, grouped controls and a scroll-to-top action.",
+      "exports": [
+        "FloatButton"
+      ],
+      "source": "src/components/float-button/float-button.tsx",
+      "story": "stories/float-button.stories.tsx",
+      "tests": [
+        "tests/float-button/float-button.test.tsx"
+      ],
+      "semanticParts": [
+        "root",
+        "icon",
+        "content"
+      ],
+      "usage": {
+        "description": "Provides floating actions, grouped controls and a scroll-to-top action."
       }
     },
     {
@@ -725,6 +1248,43 @@
       }
     },
     {
+      "name": "image",
+      "displayName": "Image",
+      "category": "Data Display",
+      "description": "Images with keyboard-accessible preview, grouping, transforms, fallbacks and upload progress.",
+      "exports": [
+        "Image",
+        "ImagePreviewGroup"
+      ],
+      "source": "src/components/image/image.tsx",
+      "story": "stories/image.stories.tsx",
+      "tests": [
+        "tests/image/image.test.tsx"
+      ],
+      "semanticParts": [
+        "root",
+        "image",
+        "cover",
+        "popup.root",
+        "popup.mask",
+        "popup.body",
+        "popup.footer",
+        "popup.actions",
+        "popup.close",
+        "placeholder.progress.root",
+        "placeholder.progress.content",
+        "placeholder.progress.rail",
+        "placeholder.progress.indicator"
+      ],
+      "usage": {
+        "description": "Images with keyboard-accessible preview, grouping, transforms, fallbacks and upload progress.",
+        "bestPractices": [
+          "Provide meaningful labels and concise content.",
+          "Keep controlled state synchronized through the change callbacks."
+        ]
+      }
+    },
+    {
       "name": "input",
       "displayName": "Input",
       "category": "Data Entry",
@@ -800,6 +1360,150 @@
       }
     },
     {
+      "name": "list",
+      "displayName": "List",
+      "category": "Data Display",
+      "description": "Displays records with metadata, actions, loading, pagination and responsive columns.",
+      "exports": [
+        "List"
+      ],
+      "source": "src/components/list/list.tsx",
+      "story": "stories/list.stories.tsx",
+      "tests": [
+        "tests/list/list.test.tsx"
+      ],
+      "semanticParts": [
+        "root",
+        "header",
+        "items",
+        "footer",
+        "pagination",
+        "empty"
+      ],
+      "keywords": [
+        "list",
+        "records",
+        "pagination"
+      ],
+      "related": [
+        "Card",
+        "Listy",
+        "Empty"
+      ],
+      "usage": {
+        "description": "Compose repeated content with List.Item and List.Item.Meta.",
+        "bestPractices": [
+          "Supply stable row keys for changing records.",
+          "Use a responsive grid for cards and pagination for bounded pages."
+        ],
+        "avoid": [
+          "Use Listy with virtualization for very large scrollable lists."
+        ]
+      }
+    },
+    {
+      "name": "listy",
+      "displayName": "Listy",
+      "category": "Data Display",
+      "description": "Renders grouped or virtualized lists with precise item, group and position scrolling.",
+      "exports": [
+        "Listy"
+      ],
+      "source": "src/components/listy/listy.tsx",
+      "story": "stories/listy.stories.tsx",
+      "tests": [
+        "tests/listy/listy.test.tsx"
+      ],
+      "semanticParts": [
+        "root",
+        "item",
+        "groupHeader"
+      ],
+      "keywords": [
+        "list",
+        "virtual",
+        "group",
+        "scroll"
+      ],
+      "related": [
+        "List",
+        "Table"
+      ],
+      "usage": {
+        "description": "Render long lists and grouped records without mounting the entire data set.",
+        "bestPractices": [
+          "Provide stable rowKey values and a height when virtual is enabled.",
+          "Use scrollTo with keys when records can change order."
+        ],
+        "avoid": [
+          "Do not enable virtual scrolling without a bounded height."
+        ]
+      }
+    },
+    {
+      "name": "masonry",
+      "displayName": "Masonry",
+      "category": "Data Display",
+      "description": "Arranges variable-height content in responsive balanced columns.",
+      "exports": [
+        "Masonry"
+      ],
+      "source": "src/components/masonry/masonry.tsx",
+      "story": "stories/masonry.stories.tsx",
+      "tests": [
+        "tests/masonry/masonry.test.tsx"
+      ],
+      "semanticParts": [
+        "root",
+        "item"
+      ],
+      "usage": {
+        "description": "Arranges variable-height content in responsive balanced columns."
+      }
+    },
+    {
+      "name": "mentions",
+      "displayName": "Mentions",
+      "category": "Data Entry",
+      "description": "Insert mentions into multiline text using configurable prefixes, search suggestions and keyboard selection.",
+      "exports": [
+        "Mentions"
+      ],
+      "source": "src/components/mentions/mentions.tsx",
+      "story": "stories/mentions.stories.tsx",
+      "tests": [
+        "tests/mentions/mentions.test.tsx"
+      ],
+      "semanticParts": [
+        "root",
+        "textarea",
+        "popup",
+        "suffix"
+      ],
+      "keywords": [
+        "mention",
+        "textarea",
+        "people",
+        "tag"
+      ],
+      "related": [
+        "Textarea",
+        "AutoComplete"
+      ],
+      "usage": {
+        "description": "Use Mentions for comments and messages that refer to people, topics or identifiers.",
+        "bestPractices": [
+          "Use onSearch to fetch suggestions and loading while they arrive.",
+          "Use unique option values that are meaningful in the resulting text.",
+          "Use Mentions.getMentions with the same prefix and split configuration."
+        ],
+        "avoid": [
+          "Keep prefix and split consistent when parsing stored text.",
+          "Do not use labels as insertion values when identifiers differ."
+        ]
+      }
+    },
+    {
       "name": "modal",
       "displayName": "Modal",
       "category": "Feedback",
@@ -814,6 +1518,9 @@
       ],
       "semanticParts": [
         "root",
+        "container",
+        "wrapper",
+        "mask",
         "overlay",
         "header",
         "title",
@@ -1135,6 +1842,86 @@
       ]
     },
     {
+      "name": "progress",
+      "displayName": "Progress",
+      "category": "Feedback",
+      "description": "Shows measured completion with line, circle, dashboard or stepped progress indicators.",
+      "exports": [
+        "Progress"
+      ],
+      "source": "src/components/progress/progress.tsx",
+      "story": "stories/progress.stories.tsx",
+      "tests": [
+        "tests/progress/progress.test.tsx"
+      ],
+      "semanticParts": [
+        "root",
+        "body",
+        "rail",
+        "track",
+        "indicator"
+      ],
+      "keywords": [
+        "progress",
+        "feedback",
+        "loading"
+      ],
+      "related": [
+        "Spinner",
+        "Skeleton"
+      ],
+      "usage": {
+        "description": "Shows measured completion with line, circle, dashboard or stepped progress indicators.",
+        "bestPractices": [
+          "Choose a shape that matches the content and available space.",
+          "Provide meaningful labels and real loading state."
+        ],
+        "avoid": [
+          "Do not show fabricated progress or leave loading states unresolved."
+        ]
+      }
+    },
+    {
+      "name": "qr-code",
+      "displayName": "QRCode",
+      "category": "Data Display",
+      "description": "Encode a value as a canvas or SVG QR code with status and refresh controls.",
+      "exports": [
+        "QRCode"
+      ],
+      "source": "src/components/qr-code/qr-code.tsx",
+      "story": "stories/qr-code.stories.tsx",
+      "tests": [
+        "tests/qr-code/qr-code.test.tsx"
+      ],
+      "semanticParts": [
+        "root",
+        "cover"
+      ],
+      "keywords": [
+        "qr",
+        "code",
+        "scan",
+        "canvas",
+        "svg"
+      ],
+      "related": [
+        "Image",
+        "Spinner"
+      ],
+      "usage": {
+        "description": "Provide a stable value and choose canvas for bitmap download or SVG for resolution-independent output.",
+        "bestPractices": [
+          "Use a high-contrast foreground and background.",
+          "Keep the quiet zone clear.",
+          "Use onRefresh for expired tokens."
+        ],
+        "avoid": [
+          "Do not use a large center icon with low error correction."
+        ]
+      }
+    },
+    {
       "name": "radio",
       "displayName": "Radio",
       "category": "Data Entry",
@@ -1212,6 +1999,84 @@
       }
     },
     {
+      "name": "rate",
+      "displayName": "Rate",
+      "category": "Data Entry",
+      "description": "Collects or displays a rating with half steps, keyboard control and custom symbols.",
+      "exports": [
+        "Rate"
+      ],
+      "source": "src/components/rate/rate.tsx",
+      "story": "stories/rate.stories.tsx",
+      "tests": [
+        "tests/rate/rate.test.tsx"
+      ],
+      "semanticParts": [
+        "root",
+        "item"
+      ],
+      "keywords": [
+        "rate",
+        "rating",
+        "stars"
+      ],
+      "related": [
+        "Slider",
+        "Form"
+      ],
+      "usage": {
+        "description": "Collect or show a bounded rating.",
+        "bestPractices": [
+          "Label the rating with aria-label or aria-labelledby.",
+          "Use readOnly for results and allowHalf only when precision is meaningful."
+        ],
+        "avoid": [
+          "Do not rely on color alone to explain a rating scale."
+        ]
+      }
+    },
+    {
+      "name": "result",
+      "displayName": "Result",
+      "category": "Feedback",
+      "description": "Communicates an operation result or error page with status, explanation and next actions.",
+      "exports": [
+        "Result"
+      ],
+      "source": "src/components/result/result.tsx",
+      "story": "stories/result.stories.tsx",
+      "tests": [
+        "tests/result/result.test.tsx"
+      ],
+      "semanticParts": [
+        "root",
+        "title",
+        "subTitle",
+        "body",
+        "extra",
+        "icon"
+      ],
+      "keywords": [
+        "result",
+        "feedback",
+        "status"
+      ],
+      "related": [
+        "Button",
+        "Empty"
+      ],
+      "usage": {
+        "description": "Communicates an operation result or error page with status, explanation and next actions.",
+        "bestPractices": [
+          "Explain the current state and offer a useful next action.",
+          "Keep descriptions concise and localized."
+        ],
+        "avoid": [
+          "Do not replace an actionable error with an unexplained empty state."
+        ]
+      }
+    },
+    {
       "name": "scroll-area",
       "displayName": "ScrollArea",
       "category": "Data Display",
@@ -1244,6 +2109,29 @@
           "Constrain height explicitly.",
           "Avoid hiding important actions below a small scroll region."
         ]
+      }
+    },
+    {
+      "name": "segmented",
+      "displayName": "Segmented",
+      "category": "Data Entry",
+      "description": "Selects one option from a compact accessible radio group.",
+      "exports": [
+        "Segmented"
+      ],
+      "source": "src/components/segmented/segmented.tsx",
+      "story": "stories/segmented.stories.tsx",
+      "tests": [
+        "tests/segmented/segmented.test.tsx"
+      ],
+      "semanticParts": [
+        "root",
+        "item",
+        "label",
+        "icon"
+      ],
+      "usage": {
+        "description": "Use Segmented for a small set of related views or modes."
       }
     },
     {
@@ -1298,6 +2186,87 @@
         ],
         "avoid": [
           "Do not use Select for arbitrary text entry."
+        ]
+      }
+    },
+    {
+      "name": "skeleton",
+      "displayName": "Skeleton",
+      "category": "Feedback",
+      "description": "Displays theme-aware loading placeholders for content, avatars, controls and images.",
+      "exports": [
+        "Skeleton"
+      ],
+      "source": "src/components/skeleton/skeleton.tsx",
+      "story": "stories/skeleton.stories.tsx",
+      "tests": [
+        "tests/skeleton/skeleton.test.tsx"
+      ],
+      "semanticParts": [
+        "root",
+        "header",
+        "section",
+        "avatar",
+        "title",
+        "paragraph"
+      ],
+      "keywords": [
+        "skeleton",
+        "feedback",
+        "loading"
+      ],
+      "related": [
+        "Spinner",
+        "Progress"
+      ],
+      "usage": {
+        "description": "Displays theme-aware loading placeholders for content, avatars, controls and images.",
+        "bestPractices": [
+          "Choose a shape that matches the content and available space.",
+          "Provide meaningful labels and real loading state."
+        ],
+        "avoid": [
+          "Do not show fabricated progress or leave loading states unresolved."
+        ]
+      }
+    },
+    {
+      "name": "slider",
+      "displayName": "Slider",
+      "category": "Data Entry",
+      "description": "Selects a numeric value or editable range using pointer, touch and keyboard input.",
+      "exports": [
+        "Slider"
+      ],
+      "source": "src/components/slider/slider.tsx",
+      "story": "stories/slider.stories.tsx",
+      "tests": [
+        "tests/slider/slider.test.tsx"
+      ],
+      "semanticParts": [
+        "root",
+        "rail",
+        "tracks",
+        "track",
+        "handle"
+      ],
+      "keywords": [
+        "slider",
+        "range",
+        "number"
+      ],
+      "related": [
+        "InputNumber",
+        "Rate"
+      ],
+      "usage": {
+        "description": "Adjust numeric values within explicit bounds.",
+        "bestPractices": [
+          "Label every handle and choose a meaningful step.",
+          "Use onChangeComplete for expensive work after a drag finishes."
+        ],
+        "avoid": [
+          "Do not use a slider when users need to enter an exact unbounded number."
         ]
       }
     },
@@ -1473,6 +2442,32 @@
           "defaultValue": "'stretch'"
         }
       ]
+    },
+    {
+      "name": "statistic",
+      "displayName": "Statistic",
+      "category": "Data Display",
+      "description": "Formats metrics and live count-up or countdown timers.",
+      "exports": [
+        "Statistic"
+      ],
+      "source": "src/components/statistic/statistic.tsx",
+      "story": "stories/statistic.stories.tsx",
+      "tests": [
+        "tests/statistic/statistic.test.tsx"
+      ],
+      "semanticParts": [
+        "root",
+        "header",
+        "title",
+        "content",
+        "value",
+        "prefix",
+        "suffix"
+      ],
+      "usage": {
+        "description": "Use Statistic to emphasize a single metric with a clear title and unit."
+      }
     },
     {
       "name": "steps",
@@ -1797,6 +2792,78 @@
       }
     },
     {
+      "name": "timeline",
+      "displayName": "Timeline",
+      "category": "Data Display",
+      "description": "Shows ordered events with timestamps, indicators and alternate layouts.",
+      "exports": [
+        "Timeline"
+      ],
+      "source": "src/components/timeline/timeline.tsx",
+      "story": "stories/timeline.stories.tsx",
+      "tests": [
+        "tests/timeline/timeline.test.tsx"
+      ],
+      "semanticParts": [
+        "root",
+        "item",
+        "itemWrapper",
+        "itemIcon",
+        "itemSection",
+        "itemHeader",
+        "itemTitle",
+        "itemContent",
+        "itemRail"
+      ],
+      "usage": {
+        "description": "Use Timeline for chronological events and their current progress."
+      }
+    },
+    {
+      "name": "time-picker",
+      "displayName": "TimePicker",
+      "category": "Data Entry",
+      "description": "Select or type a time, or a time range, with Day.js values and configurable precision.",
+      "exports": [
+        "TimePicker",
+        "TimeRangePicker"
+      ],
+      "source": "src/components/time-picker/time-picker.tsx",
+      "story": "stories/time-picker.stories.tsx",
+      "tests": [
+        "tests/time-picker/time-picker.test.tsx"
+      ],
+      "semanticParts": [
+        "root",
+        "prefix",
+        "input",
+        "suffix",
+        "popup"
+      ],
+      "keywords": [
+        "time",
+        "hours",
+        "minutes",
+        "range",
+        "dayjs"
+      ],
+      "related": [
+        "DatePicker",
+        "RangePicker"
+      ],
+      "usage": {
+        "description": "Use TimePicker when a form needs a time without a calendar date; use TimePicker.RangePicker for start and end times.",
+        "bestPractices": [
+          "Use format and step intervals that match the task.",
+          "Express unavailable times with disabledTime.",
+          "Keep controlled values synchronized in onChange."
+        ],
+        "avoid": [
+          "Do not treat a timezone-free time as a complete timestamp."
+        ]
+      }
+    },
+    {
       "name": "tooltip",
       "displayName": "Tooltip",
       "category": "Data Display",
@@ -1870,6 +2937,250 @@
           "description": "Custom content background color."
         }
       ]
+    },
+    {
+      "name": "tour",
+      "displayName": "Tour",
+      "category": "Feedback",
+      "description": "Guided steps anchored to page elements with a spotlight mask, custom content and accessible actions.",
+      "exports": [
+        "Tour"
+      ],
+      "source": "src/components/tour/tour.tsx",
+      "story": "stories/tour.stories.tsx",
+      "tests": [
+        "tests/tour/tour.test.tsx"
+      ],
+      "semanticParts": [
+        "root",
+        "cover",
+        "close",
+        "mask",
+        "section",
+        "footer",
+        "actions",
+        "indicator",
+        "indicators",
+        "header",
+        "title",
+        "description"
+      ],
+      "usage": {
+        "description": "Guided steps anchored to page elements with a spotlight mask, custom content and accessible actions.",
+        "bestPractices": [
+          "Provide meaningful labels and concise content.",
+          "Keep controlled state synchronized through the change callbacks."
+        ]
+      }
+    },
+    {
+      "name": "transfer",
+      "displayName": "Transfer",
+      "category": "Data Entry",
+      "description": "Moves selected records between searchable, paginated source and target lists.",
+      "exports": [
+        "Transfer"
+      ],
+      "source": "src/components/transfer/transfer.tsx",
+      "story": "stories/transfer.stories.tsx",
+      "tests": [
+        "tests/transfer/transfer.test.tsx"
+      ],
+      "semanticParts": [
+        "root",
+        "section",
+        "header",
+        "title",
+        "body",
+        "list",
+        "item",
+        "itemIcon",
+        "itemContent",
+        "footer",
+        "actions"
+      ],
+      "keywords": [
+        "transfer",
+        "selection",
+        "dual-list"
+      ],
+      "related": [
+        "Checkbox",
+        "List",
+        "Table"
+      ],
+      "usage": {
+        "description": "Assign records by moving them between source and target lists.",
+        "bestPractices": [
+          "Keep targetKeys controlled and update them in onChange.",
+          "Use stable keys and searchable labels for large data sets."
+        ],
+        "avoid": [
+          "Do not treat selectedKeys as assigned items; only targetKeys represents the target list."
+        ]
+      }
+    },
+    {
+      "name": "tree",
+      "displayName": "Tree",
+      "category": "Data Display",
+      "description": "Navigate, select and check hierarchical data with keyboard navigation, lazy loading and virtual scrolling.",
+      "exports": [
+        "Tree",
+        "DirectoryTree"
+      ],
+      "source": "src/components/tree/tree.tsx",
+      "story": "stories/tree.stories.tsx",
+      "tests": [
+        "tests/tree/tree.test.tsx"
+      ],
+      "semanticParts": [
+        "root",
+        "item",
+        "itemIcon",
+        "itemTitle",
+        "itemSwitcher"
+      ],
+      "keywords": [
+        "tree",
+        "hierarchy",
+        "directory",
+        "files",
+        "selection"
+      ],
+      "related": [
+        "TreeSelect",
+        "Cascader"
+      ],
+      "usage": {
+        "description": "Use Tree for hierarchical information. DirectoryTree adds file-explorer selection with Ctrl/Command and Shift modifiers.",
+        "bestPractices": [
+          "Give every node a unique stable key.",
+          "Use controlled expandedKeys when asynchronously supplied data needs expansion.",
+          "Supply an accessible name and use height for large virtual trees."
+        ],
+        "avoid": [
+          "Do not use defaultExpandAll to control data that arrives after mount.",
+          "Do not assume parent and child checks are independent unless checkStrictly is enabled."
+        ]
+      }
+    },
+    {
+      "name": "tree-select",
+      "displayName": "TreeSelect",
+      "category": "Data Entry",
+      "description": "Select hierarchical values with search, checkable trees, lazy loading and virtual scrolling.",
+      "exports": [
+        "TreeSelect"
+      ],
+      "source": "src/components/tree-select/tree-select.tsx",
+      "story": "stories/tree-select.stories.tsx",
+      "tests": [
+        "tests/tree-select/tree-select.test.tsx"
+      ],
+      "semanticParts": [
+        "root",
+        "prefix",
+        "suffix",
+        "input",
+        "clear",
+        "placeholder",
+        "content",
+        "item",
+        "itemContent",
+        "itemRemove",
+        "popup.root",
+        "popup.item",
+        "popup.itemTitle",
+        "popup.itemSwitcher"
+      ],
+      "keywords": [
+        "tree",
+        "select",
+        "hierarchy",
+        "search",
+        "checkbox"
+      ],
+      "related": [
+        "Tree",
+        "Cascader",
+        "Select"
+      ],
+      "usage": {
+        "description": "Use TreeSelect when a form value comes from a hierarchy and users need to search or check multiple nodes.",
+        "bestPractices": [
+          "Give every node a unique value.",
+          "Use showSearch.treeNodeFilterProp to search meaningful labels.",
+          "Use treeCheckStrictly for independent parent and child values."
+        ],
+        "avoid": [
+          "Do not use default expansion props to control asynchronously arriving data.",
+          "Do not expect loadData to run while filtering."
+        ]
+      }
+    },
+    {
+      "name": "upload",
+      "displayName": "Upload",
+      "category": "Data Entry",
+      "description": "Select, transform, upload and manage files with real request progress and cancellation.",
+      "exports": [
+        "Upload"
+      ],
+      "source": "src/components/upload/upload.tsx",
+      "story": "stories/upload.stories.tsx",
+      "tests": [
+        "tests/upload/upload.test.tsx"
+      ],
+      "semanticParts": [
+        "root",
+        "list",
+        "item",
+        "trigger"
+      ],
+      "keywords": [
+        "upload",
+        "file",
+        "drop",
+        "request",
+        "progress"
+      ],
+      "related": [
+        "Button",
+        "Progress"
+      ],
+      "usage": {
+        "description": "Provide an upload action or a customRequest transport, or return false from beforeUpload to manage files locally.",
+        "bestPractices": [
+          "Return Upload.LIST_IGNORE to keep rejected files out of the list.",
+          "Use onChange to synchronize controlled fileList values.",
+          "Return an abort handler from customRequest for cancellation."
+        ],
+        "avoid": [
+          "Do not mark a file successful until the server confirms it."
+        ]
+      }
+    },
+    {
+      "name": "watermark",
+      "displayName": "Watermark",
+      "category": "General",
+      "description": "Repeats a text or image watermark over content and inherited dialog panels.",
+      "exports": [
+        "Watermark"
+      ],
+      "source": "src/components/watermark/watermark.tsx",
+      "story": "stories/watermark.stories.tsx",
+      "tests": [
+        "tests/watermark/watermark.test.tsx"
+      ],
+      "semanticParts": [
+        "root",
+        "mark"
+      ],
+      "usage": {
+        "description": "Repeats a text or image watermark over content and inherited dialog panels."
+      }
     }
   ]
 }

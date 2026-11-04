@@ -1,0 +1,368 @@
+---
+title: TreeSelect
+description: "从层级选项中选择值，支持搜索、多选与父子联动勾选。"
+---
+
+import Preview from '../../_components/demo-preview';
+
+从层级选项中选择值，支持搜索、多选与父子联动勾选。
+
+每个示例都可以独立复制运行。带设备预览的示例可通过工具栏切换桌面与手机宽度。
+
+尺寸支持 `small`、`medium`、`large`；兼容别名 `middle` 与 `medium` 使用相同尺寸。
+
+## 示例
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="tree-select-basic">
+
+### 可搜索的单选
+
+使用 treeNodeFilterProp="title" 按节点标题搜索。
+
+```tsx preview
+import { TreeSelect } from '@rockshin/tao-ui';
+const treeData = [
+  {
+    value: 'product',
+    title: 'Product',
+    children: [
+      { value: 'design', title: 'Design' },
+      { value: 'research', title: 'Research' },
+    ],
+  },
+  {
+    value: 'engineering',
+    title: 'Engineering',
+    children: [
+      { value: 'web', title: 'Web' },
+      { value: 'platform', title: 'Platform' },
+    ],
+  },
+];
+export default function BasicTreeSelect() {
+  return (
+    <TreeSelect
+      aria-label="Team"
+      treeData={treeData}
+      showSearch
+      treeNodeFilterProp="title"
+      treeDefaultExpandAll
+      allowClear
+      placeholder="Choose a team"
+      style={{ width: '100%' }}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="tree-select-multiple">
+
+### 受控多选
+
+通过值数组控制多选，响应式标签折叠让输入区保持紧凑。
+
+```tsx preview
+import { useState } from 'react';
+import { TreeSelect } from '@rockshin/tao-ui';
+const treeData = [
+  {
+    value: 'product',
+    title: 'Product',
+    children: [
+      { value: 'design', title: 'Design' },
+      { value: 'research', title: 'Research' },
+    ],
+  },
+  {
+    value: 'engineering',
+    title: 'Engineering',
+    children: [
+      { value: 'web', title: 'Web' },
+      { value: 'platform', title: 'Platform' },
+    ],
+  },
+];
+export default function MultipleTeams() {
+  const [value, setValue] = useState<string[]>(['design', 'web']);
+  return (
+    <TreeSelect<string[]>
+      aria-label="Teams"
+      multiple
+      value={value}
+      onChange={setValue}
+      treeData={treeData}
+      treeDefaultExpandAll
+      maxTagCount="responsive"
+      style={{ width: '100%' }}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="tree-select-checks">
+
+### 父子联动勾选
+
+全部可用后代被选中后，SHOW_PARENT 仅展示父节点标签。
+
+```tsx preview
+import { TreeSelect } from '@rockshin/tao-ui';
+const treeData = [
+  {
+    value: 'product',
+    title: 'Product',
+    children: [
+      { value: 'design', title: 'Design' },
+      { value: 'research', title: 'Research' },
+    ],
+  },
+  {
+    value: 'engineering',
+    title: 'Engineering',
+    children: [
+      { value: 'web', title: 'Web' },
+      { value: 'platform', title: 'Platform' },
+    ],
+  },
+];
+export default function CheckedTeams() {
+  return (
+    <TreeSelect
+      aria-label="Access teams"
+      treeData={treeData}
+      treeCheckable
+      treeDefaultExpandAll
+      defaultValue={['design', 'research']}
+      showCheckedStrategy={TreeSelect.SHOW_PARENT}
+      allowClear
+      style={{ width: '100%' }}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="tree-select-label">
+
+### 保留选中标签
+
+labelInValue 返回包含 value 与展示标签的对象。
+
+```tsx preview
+import { useState } from 'react';
+import { TreeSelect, type TreeSelectLabeledValue } from '@rockshin/tao-ui';
+const treeData = [
+  {
+    value: 'product',
+    title: 'Product',
+    children: [
+      { value: 'design', title: 'Design' },
+      { value: 'research', title: 'Research' },
+    ],
+  },
+  {
+    value: 'engineering',
+    title: 'Engineering',
+    children: [
+      { value: 'web', title: 'Web' },
+      { value: 'platform', title: 'Platform' },
+    ],
+  },
+];
+export default function LabeledTeam() {
+  const [value, setValue] = useState<TreeSelectLabeledValue>({
+    value: 'design',
+    label: 'Design',
+  });
+  return (
+    <div>
+      <TreeSelect<TreeSelectLabeledValue>
+        labelInValue
+        value={value}
+        onChange={setValue}
+        treeData={treeData}
+        treeDefaultExpandAll
+        style={{ width: '100%' }}
+      />
+      <p>Value: {value.value}</p>
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="tree-select-simple">
+
+### 带父 ID 的扁平数据
+
+treeDataSimpleMode 将 id/pId 记录转换为层级结构。
+
+```tsx preview
+import { TreeSelect } from '@rockshin/tao-ui';
+export default function FlatTeams() {
+  return (
+    <TreeSelect
+      aria-label="Organization"
+      treeDataSimpleMode
+      treeDefaultExpandAll
+      placeholder="Choose a team"
+      treeData={[
+        { id: 1, pId: 0, value: 'company', title: 'Company' },
+        { id: 2, pId: 1, value: 'sales', title: 'Sales' },
+        { id: 3, pId: 1, value: 'support', title: 'Support' },
+      ]}
+      style={{ width: '100%' }}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="tree-select-fields">
+
+### 映射字段名称
+
+服务端字段名称不同时，映射 label、value 和 children。
+
+```tsx preview
+import { TreeSelect } from '@rockshin/tao-ui';
+export default function CustomFields() {
+  return (
+    <TreeSelect
+      aria-label="Region"
+      fieldNames={{ label: 'name', value: 'id', children: 'nodes' }}
+      treeDefaultExpandAll
+      treeData={[
+        {
+          id: 'asia',
+          name: 'Asia',
+          nodes: [
+            { id: 'cn', name: 'China' },
+            { id: 'jp', name: 'Japan' },
+          ],
+        },
+      ]}
+      placeholder="Choose a region"
+      style={{ width: '100%' }}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="tree-select-appearance">
+
+### 尺寸、外观与状态
+
+组件局部外观属性优先于 Provider 默认值。
+
+```tsx preview
+import { TreeSelect } from '@rockshin/tao-ui';
+const treeData = [
+  {
+    value: 'product',
+    title: 'Product',
+    children: [
+      { value: 'design', title: 'Design' },
+      { value: 'research', title: 'Research' },
+    ],
+  },
+  {
+    value: 'engineering',
+    title: 'Engineering',
+    children: [
+      { value: 'web', title: 'Web' },
+      { value: 'platform', title: 'Platform' },
+    ],
+  },
+];
+export default function TreeSelectAppearance() {
+  return (
+    <div style={{ display: 'grid', gap: 12 }}>
+      <TreeSelect size="small" defaultValue="design" treeData={treeData} />
+      <TreeSelect
+        size="middle"
+        variant="filled"
+        treeData={treeData}
+        status="warning"
+        placeholder="Review selection"
+      />
+      <TreeSelect
+        size="large"
+        variant="underlined"
+        treeData={treeData}
+        status="error"
+        placeholder="Team required"
+      />
+      <TreeSelect disabled defaultValue="web" treeData={treeData} />
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="tree-select-mobile">
+
+### 窄屏选择
+
+弹层保持在手机视口内；TreeSelect 在桌面与手机上都使用树形弹层。
+
+```tsx preview="iframe-follow"
+import { TreeSelect } from '@rockshin/tao-ui';
+const treeData = [
+  {
+    value: 'product',
+    title: 'Product',
+    children: [
+      { value: 'design', title: 'Design' },
+      { value: 'research', title: 'Research' },
+    ],
+  },
+  {
+    value: 'engineering',
+    title: 'Engineering',
+    children: [
+      { value: 'web', title: 'Web' },
+      { value: 'platform', title: 'Platform' },
+    ],
+  },
+];
+export default function MobileTreeSelect() {
+  return (
+    <div style={{ padding: 16 }}>
+      <h3>Choose project teams</h3>
+      <TreeSelect
+        aria-label="Project teams"
+        treeData={treeData}
+        treeCheckable
+        treeDefaultExpandAll
+        showSearch
+        treeNodeFilterProp="title"
+        maxTagCount="responsive"
+        listHeight={240}
+        allowClear
+        style={{ width: '100%' }}
+      />
+    </div>
+  );
+}
+```
+
+</section>
+
+</div>
+
+## API
+
+<API moduleName="tree-select" />

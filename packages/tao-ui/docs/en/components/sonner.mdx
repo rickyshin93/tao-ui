@@ -3,6 +3,8 @@ title: Sonner
 description: "Displays temporary toast notifications with optional actions and provider-aware theming. Usage guidance, runnable example, and API reference."
 ---
 
+import Preview from '../../_components/demo-preview';
+
 Displays temporary toast notifications with optional actions and provider-aware theming.
 
 ## When to use
@@ -18,9 +20,17 @@ Mount one Sonner near app root, then call toast() imperatively from event handle
 
 - Do not use toast notifications for blocking confirmations.
 
-## Basic usage
+## Examples
 
-```tsx preview
+Each example runs independently, and notifications stay inside its preview. Applications normally mount one `Sonner` host.
+
+<div className="tao-demo-grid tao-demo-grid-wide">
+
+<section className="tao-example" id="sonner-example-1">
+
+### Basic usage
+
+```tsx preview="iframe-follow"
 import { Button, Sonner, toast } from '@rockshin/tao-ui';
 
 function SonnerExample() {
@@ -44,19 +54,48 @@ function SonnerExample() {
 export default SonnerExample;
 ```
 
-## Semantic and rich-color toasts
+</section>
 
-```tsx preview
+<section className="tao-example" id="sonner-example-2">
+
+### Semantic and rich-color toasts
+
+```tsx preview="iframe-follow"
 import { Button, Sonner, Stack, toast } from '@rockshin/tao-ui';
 
 function SemanticToasts() {
   return (
     <>
       <Stack direction="horizontal" gap="sm">
-        <Button variant="secondary" onClick={() => toast.info({ title: 'Info', description: 'A new version is ready.' })}>Info</Button>
-        <Button variant="secondary" onClick={() => toast.success({ title: 'Saved' })}>Success</Button>
-        <Button variant="secondary" onClick={() => toast.warning({ title: 'Almost full' })}>Warning</Button>
-        <Button variant="secondary" onClick={() => toast.error({ title: 'Build failed' })}>Error</Button>
+        <Button
+          variant="secondary"
+          onClick={() =>
+            toast.info({
+              title: 'Info',
+              description: 'A new version is ready.',
+            })
+          }
+        >
+          Info
+        </Button>
+        <Button
+          variant="secondary"
+          onClick={() => toast.success({ title: 'Saved' })}
+        >
+          Success
+        </Button>
+        <Button
+          variant="secondary"
+          onClick={() => toast.warning({ title: 'Almost full' })}
+        >
+          Warning
+        </Button>
+        <Button
+          variant="secondary"
+          onClick={() => toast.error({ title: 'Build failed' })}
+        >
+          Error
+        </Button>
       </Stack>
       <Sonner richColors closeButton />
     </>
@@ -66,12 +105,17 @@ function SemanticToasts() {
 export default SemanticToasts;
 ```
 
-## Loading and promise lifecycle
+</section>
 
-```tsx preview
+<section className="tao-example" id="sonner-example-3">
+
+### Loading and promise lifecycle
+
+```tsx preview="iframe-follow"
 import { Button, Sonner, Stack, toast } from '@rockshin/tao-ui';
 
-const wait = (duration) => new Promise((resolve) => window.setTimeout(resolve, duration));
+const wait = (duration: number) =>
+  new Promise((resolve) => window.setTimeout(resolve, duration));
 
 function AsyncToasts() {
   return (
@@ -109,9 +153,13 @@ function AsyncToasts() {
 export default AsyncToasts;
 ```
 
-## Actions, positions, and stack limits
+</section>
 
-```tsx preview
+<section className="tao-example" id="sonner-example-4">
+
+### Actions, positions, and stack limits
+
+```tsx preview="iframe-follow"
 import { Button, Sonner, Stack, toast } from '@rockshin/tao-ui';
 
 function ActionToasts() {
@@ -122,16 +170,24 @@ function ActionToasts() {
           onClick={() =>
             toast({
               title: 'Message sent',
-              action: { label: 'Undo', onClick: () => toast.success({ title: 'Send reverted' }) },
+              action: {
+                label: 'Undo',
+                onClick: () => toast.success({ title: 'Send reverted' }),
+              },
             })
           }
         >
           With action
         </Button>
-        <Button variant="secondary" onClick={() => toast.info({ title: 'Top right' })}>
+        <Button
+          variant="secondary"
+          onClick={() => toast.info({ title: 'Top right' })}
+        >
           Positioned
         </Button>
-        <Button variant="ghost" onClick={() => toast.dismiss()}>Dismiss all</Button>
+        <Button variant="ghost" onClick={() => toast.dismiss()}>
+          Dismiss all
+        </Button>
       </Stack>
       <Sonner position="top-right" visibleToasts={3} closeButton />
     </>
@@ -140,6 +196,296 @@ function ActionToasts() {
 
 export default ActionToasts;
 ```
+
+</section>
+
+<section className="tao-example" id="sonner-rich-colors">
+
+### Semantic colors
+
+richColors distinguishes status notifications.
+
+```tsx preview="iframe-follow"
+import { Button, Sonner, Stack, toast } from '@rockshin/tao-ui';
+
+export default function SonnerRichColors() {
+  return (
+    <>
+      <Stack direction="horizontal" gap="sm">
+        <Button
+          onClick={() =>
+            toast.info({
+              title: 'Deploy started',
+              description: 'We will notify you when it finishes.',
+              action: { label: 'View' },
+            })
+          }
+        >
+          Info
+        </Button>
+        <Button
+          variant="secondary"
+          onClick={() =>
+            toast.error({
+              title: 'Build failed',
+              description: 'Check logs and retry.',
+              cancel: { label: 'Dismiss' },
+            })
+          }
+        >
+          Error
+        </Button>
+      </Stack>
+      <Sonner richColors closeButton />
+    </>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="sonner-actions">
+
+### Notification actions
+
+action and cancel provide related actions.
+
+```tsx preview="iframe-follow"
+import { Button, Sonner, Stack, toast } from '@rockshin/tao-ui';
+
+export default function SonnerActions() {
+  return (
+    <>
+      <Stack direction="horizontal" gap="sm">
+        <Button
+          onClick={() =>
+            toast({
+              title: 'Message sent',
+              description: 'Your message has been delivered.',
+              action: {
+                label: 'Undo',
+                onClick: () =>
+                  toast.warning({
+                    title: 'Send reverted',
+                    description: 'Draft restored to composer.',
+                  }),
+              },
+              cancel: { label: 'Dismiss' },
+            })
+          }
+        >
+          Undo toast
+        </Button>
+        <Button
+          variant="secondary"
+          onClick={() =>
+            toast.warning({
+              title: 'Storage almost full',
+              description: 'Delete unused files or upgrade your plan.',
+              action: { label: 'Manage storage' },
+            })
+          }
+        >
+          Warning action
+        </Button>
+      </Stack>
+      <Sonner closeButton richColors />
+    </>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="sonner-positions">
+
+### Toast positions
+
+Choose the toast position; notifications remain inside the preview window.
+
+```tsx preview="iframe-follow"
+import { Button, Sonner, Stack, toast } from '@rockshin/tao-ui';
+
+export default function SonnerPositions() {
+  return (
+    <>
+      <Stack
+        direction="horizontal"
+        gap="sm"
+        styles={{ root: { flexWrap: 'wrap' } }}
+      >
+        <Button
+          onClick={() =>
+            toast({
+              title: 'Top left',
+              description: 'Positioned in the top-left corner.',
+            })
+          }
+        >
+          Trigger
+        </Button>
+      </Stack>
+      <Sonner position="top-left" />
+    </>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="sonner-stack-and-limit">
+
+### Stacking and visible limits
+
+visibleToasts limits the number of simultaneously visible notifications.
+
+```tsx preview="iframe-follow"
+import { Button, Sonner, Stack, toast } from '@rockshin/tao-ui';
+
+export default function SonnerStackAndLimit() {
+  return (
+    <>
+      <Stack direction="horizontal" gap="sm">
+        <Button
+          onClick={() => {
+            for (let index = 1; index <= 5; index += 1) {
+              toast({
+                title: `Queued task #${index}`,
+                description: `Background job ${index} is now running.`,
+              });
+            }
+          }}
+        >
+          Push 5 toasts
+        </Button>
+        <Button variant="ghost" onClick={() => toast.dismiss()}>
+          Clear all
+        </Button>
+      </Stack>
+      <Sonner visibleToasts={3} />
+    </>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="sonner-custom-duration">
+
+### Toast duration
+
+Override duration per toast and provide dismissal for persistent messages.
+
+```tsx preview="iframe-follow"
+import { Button, Sonner, Stack, toast } from '@rockshin/tao-ui';
+
+export default function SonnerCustomDuration() {
+  return (
+    <>
+      <Stack direction="horizontal" gap="sm">
+        <Button
+          onClick={() =>
+            toast({
+              title: 'Autosaves enabled',
+              description: 'This one disappears quickly.',
+              duration: 1200,
+            })
+          }
+        >
+          Short
+        </Button>
+        <Button
+          variant="secondary"
+          onClick={() =>
+            toast({
+              title: 'Manual review needed',
+              description: 'This one stays longer for attention.',
+              duration: 8000,
+            })
+          }
+        >
+          Long
+        </Button>
+      </Stack>
+      <Sonner closeButton />
+    </>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="sonner-form-submit">
+
+### Submission feedback
+
+A local delay simulates submission feedback for pending, success, and error states.
+
+```tsx preview="iframe-follow"
+import { Button, Sonner, Stack, toast } from '@rockshin/tao-ui';
+
+function wait(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+export default function SonnerFormSubmit() {
+  return (
+    <>
+      <Stack direction="horizontal" gap="sm">
+        <Button
+          onClick={async () => {
+            await toast.promise(wait(1200), {
+              loading: {
+                title: 'Submitting form',
+                description: 'Validating fields and saving changes.',
+              },
+              success: {
+                title: 'Profile updated',
+                description: 'Name, email, and preferences are saved.',
+              },
+              error: {
+                title: 'Submit failed',
+              },
+            });
+          }}
+        >
+          Submit profile
+        </Button>
+        <Button
+          variant="secondary"
+          onClick={() =>
+            toast
+              .promise(
+                wait(1200).then(() => {
+                  throw new Error('Card declined');
+                }),
+                {
+                  loading: {
+                    title: 'Submitting payment',
+                    description: 'Contacting payment gateway.',
+                  },
+                  success: { title: 'Paid' },
+                  error: (error) => ({
+                    title: 'Payment failed',
+                    description: (error as Error).message,
+                  }),
+                },
+              )
+              .catch(() => undefined)
+          }
+        >
+          Submit payment
+        </Button>
+      </Stack>
+      <Sonner richColors />
+    </>
+  );
+}
+```
+
+</section>
+
+</div>
 
 ## API
 

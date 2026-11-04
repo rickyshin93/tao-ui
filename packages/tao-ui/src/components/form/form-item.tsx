@@ -110,7 +110,7 @@ export function FormItem<Values = Record<string, unknown>>({
   classNames,
   styles,
   children,
-}: FormItemProps<Values>) {
+}: FormItemProps<Values>): ReactNode {
   const { layout } = useFormLayout();
   const requiredMark =
     required ??

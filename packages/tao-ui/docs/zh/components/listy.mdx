@@ -1,0 +1,263 @@
+---
+title: Listy
+description: "展示可滚动条目，支持分组和可选的虚拟渲染。"
+---
+
+import Preview from '../../_components/demo-preview';
+
+展示可滚动条目，支持分组和可选的虚拟渲染。
+
+## 何时使用
+
+用于较长的滚动列表。数据通过 items 传入，rowKey 提供稳定标识，itemRender 定义行内容。选择行为由行内控件负责。
+
+## 示例
+
+<div className="tao-demo-grid tao-demo-grid-wide">
+
+<section className="tao-example" id="listy-example-1">
+
+### 基础条目
+
+默认关闭虚拟渲染。设置 height 可创建有界的滚动区域。
+
+```tsx preview="iframe-follow"
+import { Listy } from '@rockshin/tao-ui';
+const items = Array.from({ length: 60 }, (_, index) => ({
+  id: `item-${index}`,
+  name: `Record ${index + 1}`,
+  team: index < 20 ? 'Design' : index < 40 ? 'Engineering' : 'Operations',
+}));
+
+export default function Example() {
+  return (
+    <Listy
+      items={items.slice(0, 8)}
+      rowKey="id"
+      height={230}
+      itemRender={(item) => (
+        <span>
+          {item.name} · {item.team}
+        </span>
+      )}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="listy-example-2">
+
+### 一千条虚拟列表
+
+virtual 仅渲染可见窗口中的条目，避免一次挂载全部行。
+
+```tsx preview
+import { Listy } from '@rockshin/tao-ui';
+
+const items = Array.from({ length: 1000 }, (_, index) => ({
+  id: index,
+  label: `Activity ${index + 1}`,
+}));
+export default function Example() {
+  return (
+    <Listy
+      virtual
+      items={items}
+      rowKey="id"
+      height={276}
+      itemRender={(item, index) => (
+        <span>
+          {item.label} <small>· row {index + 1}</small>
+        </span>
+      )}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="listy-example-3">
+
+### 分组与固定组标题
+
+group.key 决定分组，group.title 渲染组标题。sticky 将当前组标题保留在此列表的滚动区域中。
+
+```tsx preview
+import { Listy } from '@rockshin/tao-ui';
+const items = Array.from({ length: 60 }, (_, index) => ({
+  id: `item-${index}`,
+  name: `Record ${index + 1}`,
+  team: index < 20 ? 'Design' : index < 40 ? 'Engineering' : 'Operations',
+}));
+
+export default function Example() {
+  return (
+    <Listy
+      items={items}
+      rowKey="id"
+      height={276}
+      virtual
+      sticky
+      group={{
+        key: (item) => item.team,
+        title: (team, records) => `${team} (${records.length})`,
+      }}
+      itemRender={(item) => item.name}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="listy-example-4">
+
+### 滚动到记录或分组
+
+ref 接收记录 key、分组 key、数字偏移或坐标对象。
+
+```tsx preview
+import { useRef } from 'react';
+import { Button, Listy, Stack } from '@rockshin/tao-ui';
+import type { ListyRef } from '@rockshin/tao-ui';
+const items = Array.from({ length: 60 }, (_, index) => ({
+  id: `item-${index}`,
+  name: `Record ${index + 1}`,
+  team: index < 20 ? 'Design' : index < 40 ? 'Engineering' : 'Operations',
+}));
+
+export default function Example() {
+  const ref = useRef<ListyRef>(null);
+  return (
+    <Stack gap="md">
+      <Stack direction="horizontal" gap="sm" style={{ flexWrap: 'wrap' }}>
+        <Button
+          variant="secondary"
+          onClick={() =>
+            ref.current?.scrollTo({ key: 'item-45', align: 'top' })
+          }
+        >
+          Record 46
+        </Button>
+        <Button
+          variant="secondary"
+          onClick={() =>
+            ref.current?.scrollTo({ groupKey: 'Engineering', align: 'top' })
+          }
+        >
+          Engineering
+        </Button>
+        <Button variant="secondary" onClick={() => ref.current?.scrollTo(0)}>
+          Top
+        </Button>
+      </Stack>
+      <Listy
+        ref={ref}
+        items={items}
+        rowKey="id"
+        height={230}
+        virtual
+        sticky
+        group={{ key: (item) => item.team, title: (team) => team }}
+        itemRender={(item) => item.name}
+      />
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="listy-example-5">
+
+### 横向内容与 RTL
+
+scrollWidth 允许宽于视口的行横向滚动，切换 direction 可查看 RTL 行为。
+
+```tsx preview="iframe-follow"
+import { useState } from 'react';
+import { Button, Listy, Stack } from '@rockshin/tao-ui';
+const items = Array.from({ length: 60 }, (_, index) => ({
+  id: `item-${index}`,
+  name: `Record ${index + 1}`,
+  team: index < 20 ? 'Design' : index < 40 ? 'Engineering' : 'Operations',
+}));
+
+export default function Example() {
+  const [rtl, setRtl] = useState(false);
+  return (
+    <Stack gap="md">
+      <Button variant="secondary" onClick={() => setRtl((value) => !value)}>
+        {rtl ? 'Use LTR' : 'Use RTL'}
+      </Button>
+      <Listy
+        items={items.slice(0, 10)}
+        rowKey="id"
+        height={230}
+        scrollWidth={700}
+        direction={rtl ? 'rtl' : 'ltr'}
+        itemRender={(item) => (
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              gap: 32,
+            }}
+          >
+            <span>{item.name}</span>
+            <span>{item.team}</span>
+            <span>Updated today</span>
+          </div>
+        )}
+      />
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="listy-example-6">
+
+### 滚动事件与语义样式
+
+onScroll 提供滚动元素，rowHoverable 控制行悬停高亮。
+
+```tsx preview
+import { useState } from 'react';
+import { Listy, Stack } from '@rockshin/tao-ui';
+const items = Array.from({ length: 60 }, (_, index) => ({
+  id: `item-${index}`,
+  name: `Record ${index + 1}`,
+  team: index < 20 ? 'Design' : index < 40 ? 'Engineering' : 'Operations',
+}));
+
+export default function Example() {
+  const [offset, setOffset] = useState(0);
+  return (
+    <Stack gap="sm">
+      <output>Scroll offset: {Math.round(offset)} px</output>
+      <Listy
+        items={items}
+        rowKey="id"
+        height={230}
+        rowHoverable={false}
+        onScroll={(event) => setOffset(event.currentTarget.scrollTop)}
+        styles={{ root: { borderRadius: 12 }, item: { paddingInline: 20 } }}
+        itemRender={(item) => item.name}
+      />
+    </Stack>
+  );
+}
+```
+
+</section>
+
+</div>
+
+## API
+
+<API moduleName="listy" />

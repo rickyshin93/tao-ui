@@ -3,6 +3,8 @@ title: Tooltip
 description: "Shows a brief informational popup when hovering or focusing an element. Includes usage guidance, a runnable example, and the complete API reference."
 ---
 
+import Preview from '../../_components/demo-preview';
+
 Shows a brief informational popup when hovering or focusing an element.
 
 ## When to use
@@ -18,7 +20,13 @@ Use Tooltip for short contextual hints on hover or focus. The popup is portaled 
 
 - Do not put critical information or interactive content inside a Tooltip.
 
-## Basic usage
+## Examples
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="tooltip-example-1">
+
+### Basic usage
 
 ```tsx preview
 import { Button, Tooltip } from '@rockshin/tao-ui';
@@ -34,7 +42,11 @@ function TooltipExample() {
 export default TooltipExample;
 ```
 
-## Placements
+</section>
+
+<section className="tao-example" id="tooltip-example-2">
+
+### Placements
 
 ```tsx preview
 import { Button, Stack, Tooltip } from '@rockshin/tao-ui';
@@ -42,10 +54,18 @@ import { Button, Stack, Tooltip } from '@rockshin/tao-ui';
 function TooltipPlacements() {
   return (
     <Stack direction="horizontal" gap="md">
-      <Tooltip title="Top" placement="top"><Button variant="secondary">Top</Button></Tooltip>
-      <Tooltip title="Bottom" placement="bottom"><Button variant="secondary">Bottom</Button></Tooltip>
-      <Tooltip title="Left" placement="left"><Button variant="secondary">Left</Button></Tooltip>
-      <Tooltip title="Right" placement="right"><Button variant="secondary">Right</Button></Tooltip>
+      <Tooltip title="Top" placement="top">
+        <Button variant="secondary">Top</Button>
+      </Tooltip>
+      <Tooltip title="Bottom" placement="bottom">
+        <Button variant="secondary">Bottom</Button>
+      </Tooltip>
+      <Tooltip title="Left" placement="left">
+        <Button variant="secondary">Left</Button>
+      </Tooltip>
+      <Tooltip title="Right" placement="right">
+        <Button variant="secondary">Right</Button>
+      </Tooltip>
     </Stack>
   );
 }
@@ -53,7 +73,11 @@ function TooltipPlacements() {
 export default TooltipPlacements;
 ```
 
-## Arrow, color, and controlled visibility
+</section>
+
+<section className="tao-example" id="tooltip-example-3">
+
+### Arrow, color, and controlled visibility
 
 ```tsx preview
 import { Button, Stack, Tooltip } from '@rockshin/tao-ui';
@@ -61,15 +85,145 @@ import { Button, Stack, Tooltip } from '@rockshin/tao-ui';
 function TooltipStyles() {
   return (
     <Stack direction="horizontal" gap="md">
-      <Tooltip title="No arrow" arrow={false}><Button variant="secondary">No arrow</Button></Tooltip>
-      <Tooltip title="Brand color" color="#245b57"><Button variant="secondary">Custom color</Button></Tooltip>
-      <Tooltip title="Always visible" open><Button variant="secondary">Controlled</Button></Tooltip>
+      <Tooltip title="No arrow" arrow={false}>
+        <Button variant="secondary">No arrow</Button>
+      </Tooltip>
+      <Tooltip title="Brand color" color="#245b57">
+        <Button variant="secondary">Custom color</Button>
+      </Tooltip>
+      <Tooltip title="Focus also opens this hint">
+        <Button variant="secondary">Focus for a hint</Button>
+      </Tooltip>
     </Stack>
   );
 }
 
 export default TooltipStyles;
 ```
+
+</section>
+
+<section className="tao-example" id="tooltip-no-arrow">
+
+### Hide the arrow
+
+Set arrow=false to remove the pointer.
+
+```tsx preview
+import { Button, Tooltip } from '@rockshin/tao-ui';
+
+export default function TooltipNoArrow() {
+  return (
+    <Tooltip title="No arrow tooltip" arrow={false}>
+      <Button variant="secondary">No arrow</Button>
+    </Tooltip>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="tooltip-controlled">
+
+### Controlled tooltip
+
+Synchronize visibility through open and onOpenChange.
+
+```tsx preview
+import { useState } from 'react';
+import { Button, Stack, Tooltip } from '@rockshin/tao-ui';
+export default function Example() {
+  const [open, setOpen] = useState(false);
+  return (
+    <Stack direction="horizontal">
+      <Button onClick={() => setOpen(!open)}>
+        {open ? 'Hide hint' : 'Show hint'}
+      </Button>
+      <Tooltip open={open} onOpenChange={setOpen} title="Controlled hint">
+        <Button>Hint target</Button>
+      </Tooltip>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="tooltip-custom-color">
+
+### Custom color
+
+color customizes the background; retain readable contrast.
+
+```tsx preview
+import { Button, Stack, Tooltip } from '@rockshin/tao-ui';
+
+export default function TooltipCustomColor() {
+  return (
+    <Stack direction="horizontal" gap="md" align="center">
+      <Tooltip title="Brand primary" color="#1677ff">
+        <Button variant="secondary">#1677ff</Button>
+      </Tooltip>
+      <Tooltip title="Warm orange" color="#f76b15">
+        <Button variant="secondary">#f76b15</Button>
+      </Tooltip>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="tooltip-delay">
+
+### Hover delays
+
+Delays use seconds; keyboard focus does not wait for a hover delay.
+
+```tsx preview
+import { Tooltip, Button } from '@rockshin/tao-ui';
+export default function Example() {
+  return (
+    <Tooltip
+      title="Wait 0.6 seconds on hover"
+      mouseEnterDelay={0.6}
+      mouseLeaveDelay={0.2}
+    >
+      <Button>Hover or focus</Button>
+    </Tooltip>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="tooltip-empty">
+
+### Conditional content
+
+An empty title disables the tooltip so hints only appear when useful.
+
+```tsx preview
+import { useState } from 'react';
+import { Tooltip, Button, Stack } from '@rockshin/tao-ui';
+export default function Example() {
+  const [enabled, setEnabled] = useState(true);
+  return (
+    <Stack direction="vertical">
+      <Button onClick={() => setEnabled(!enabled)}>
+        {enabled ? 'Disable hint' : 'Enable hint'}
+      </Button>
+      <Tooltip title={enabled ? 'Additional information' : null}>
+        <Button>Hint target</Button>
+      </Tooltip>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+</div>
 
 ## API
 

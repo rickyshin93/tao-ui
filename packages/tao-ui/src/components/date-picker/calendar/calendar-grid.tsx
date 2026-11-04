@@ -8,9 +8,8 @@ import {
   useRef,
   useState,
 } from 'react';
+import { useTaoConfig } from '../../../provider/tao-provider';
 import { getCalendarWeeks } from './use-calendar';
-
-const WEEKDAYS = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
 
 interface CalendarGridProps {
   viewDate: Dayjs;
@@ -50,6 +49,7 @@ export function CalendarGrid({
   cellClassName,
   cellStyle,
 }: CalendarGridProps) {
+  const { locale } = useTaoConfig();
   const weeks = getCalendarWeeks(viewDate);
   const today = dayjs();
   const currentMonth = viewDate.month();
@@ -168,14 +168,14 @@ export function CalendarGrid({
     <table
       data-tao-calendar-grid=""
       role="grid"
-      aria-label={viewDate.format('MMMM YYYY')}
+      aria-label={locale.calendarTitle(viewDate.month(), viewDate.year())}
       aria-multiselectable={isRangeMode || undefined}
       className={className}
       style={style}
     >
       <thead>
         <tr>
-          {WEEKDAYS.map((d) => (
+          {locale.weekdays.map((d) => (
             <th key={d} data-tao-calendar-weekday="">
               {d}
             </th>

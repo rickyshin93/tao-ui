@@ -1,0 +1,246 @@
+---
+title: Card
+description: "Groups related content, actions and tabbed views in a surface."
+---
+
+import Preview from '../../_components/demo-preview';
+
+Groups related content, actions and tabbed views in a surface.
+
+This native tao-ui component follows the public API of Ant Design 6.7.0. Appearance, theme tokens and Semantic DOM customization belong to tao-ui; configure themes with `TaoProvider`.
+
+The public Card API follows 6.7.0; styling uses tao-ui tokens and Semantic DOM. Tabs use the low-level rc tabs engine with native tao-ui styles.
+
+## When to use
+
+Use cards for self-contained records. Use explicit links or buttons for actions.
+
+## Examples
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="card-example-1">
+
+### Title and extra action
+
+```tsx preview
+import { useState } from "react";
+import { Button, Card } from "@rockshin/tao-ui";
+
+export default function Example() {
+  const [saved, setSaved] = useState(false);
+  return (
+    <Card
+      title="Workspace"
+      extra={
+        <Button size="small" onClick={() => setSaved(!saved)}>
+          {saved ? "Saved" : "Save"}
+        </Button>
+      }
+    >
+      Keep related project information together.
+    </Card>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="card-example-2">
+
+### Sizes and variants
+
+```tsx preview
+import { Card } from "@rockshin/tao-ui";
+
+export default function Example() {
+  return (
+    <div style={{ display: "flex", gap: 16, flexDirection: "column" }}>
+      <Card size="small" title="Small card">
+        Compact details.
+      </Card>
+      <Card title="Outlined card">Default surface.</Card>
+      <div
+        style={{ padding: 16, background: "var(--tao-color-fill-tertiary)" }}
+      >
+        <Card variant="borderless" title="Borderless">
+          A surface inside a shaded region.
+        </Card>
+      </div>
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="card-example-3">
+
+### Cover, metadata and actions
+
+```tsx preview
+import { useState } from "react";
+import { Avatar, Button, Card } from "@rockshin/tao-ui";
+
+export default function Example() {
+  const [saved, setSaved] = useState(false);
+  const [message, setMessage] = useState("");
+  return (
+    <Card
+      hoverable
+      cover={
+        <div
+          style={{
+            height: 110,
+            background: "linear-gradient(120deg, #e6ded0, #91b2b1)",
+          }}
+        />
+      }
+      actions={[
+        <Button key="save" size="small" onClick={() => setSaved(!saved)}>
+          {saved ? "Saved" : "Save"}
+        </Button>,
+        <Button
+          key="share"
+          size="small"
+          onClick={() => setMessage("Read-only access for all team members")}
+        >
+          Details
+        </Button>,
+      ]}
+    >
+      <Card.Meta
+        avatar={<Avatar>AL</Avatar>}
+        title="Design notes"
+        description={message || "Updated today by Ada"}
+      />
+    </Card>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="card-example-4">
+
+### Controlled tabs
+
+```tsx preview
+import { useState } from "react";
+import { Card } from "@rockshin/tao-ui";
+
+export default function Example() {
+  const [tab, setTab] = useState("overview");
+  return (
+    <Card
+      title="Project"
+      tabList={[
+        { key: "overview", label: "Overview" },
+        { key: "activity", label: "Activity" },
+      ]}
+      activeTabKey={tab}
+      onTabChange={setTab}
+      tabProps={{ animated: true }}
+    >
+      <p>
+        {tab === "overview"
+          ? "Project summary and owners."
+          : "The latest project activity."}
+      </p>
+    </Card>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="card-example-5">
+
+### Loading content
+
+```tsx preview
+import { useState } from "react";
+import { Button, Card } from "@rockshin/tao-ui";
+
+export default function Example() {
+  const [loading, setLoading] = useState(true);
+  return (
+    <div>
+      <Button onClick={() => setLoading(!loading)} style={{ marginBottom: 16 }}>
+        Toggle loading
+      </Button>
+      <Card title="Account" loading={loading}>
+        <Card.Meta title="Ada Lovelace" description="Team workspace owner" />
+      </Card>
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="card-example-6">
+
+### Grid and inner cards
+
+```tsx preview="iframe-follow"
+import { Card } from "@rockshin/tao-ui";
+
+export default function Example() {
+  return (
+    <div>
+      <Card title="Regions">
+        {["Asia", "Europe", "Americas"].map((region) => (
+          <Card.Grid
+            key={region}
+            style={{ width: "33.333%", textAlign: "center" }}
+          >
+            {region}
+          </Card.Grid>
+        ))}
+      </Card>
+      <Card title="Account" style={{ marginTop: 16 }}>
+        <Card type="inner" title="Billing">
+          Monthly subscription.
+        </Card>
+      </Card>
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="card-example-7">
+
+### Semantic styles and theme
+
+```tsx preview
+import { Card, TaoProvider } from "@rockshin/tao-ui";
+
+export default function Example() {
+  return (
+    <TaoProvider
+      theme={{ mode: "dark", token: { colorPrimary: "oklch(0.7 0.1 195)" } }}
+    >
+      <Card
+        title="Local theme"
+        styles={{
+          header: { borderBottomColor: "var(--tao-color-primary)" },
+          body: { padding: 20 },
+        }}
+      >
+        This card inherits its local tokens and dark surface.
+      </Card>
+    </TaoProvider>
+  );
+}
+```
+
+</section>
+
+</div>
+
+## API
+
+<API moduleName="card" />

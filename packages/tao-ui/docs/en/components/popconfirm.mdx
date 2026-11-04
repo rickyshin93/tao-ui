@@ -3,6 +3,8 @@ title: Popconfirm
 description: "Shows a compact confirmation popup anchored to a trigger element, with OK and Cancel actions. Usage guidance, runnable example, and API reference."
 ---
 
+import Preview from '../../_components/demo-preview';
+
 Shows a compact confirmation popup anchored to a trigger element, with OK and Cancel actions.
 
 ## When to use
@@ -19,58 +21,102 @@ Use Popconfirm for lightweight inline confirmations such as delete actions, wher
 - Do not use Popconfirm for irreversible high-risk operations; use Modal.confirm instead.
 - Do not put forms or rich interactions inside a Popconfirm.
 
-## Basic usage
+## Examples
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="popconfirm-example-1">
+
+### Basic usage
 
 ```tsx preview
+import { useState } from 'react';
 import { Button, Popconfirm } from '@rockshin/tao-ui';
 
 function PopconfirmExample() {
+  const [feedback, setFeedback] = useState('');
   return (
-    <Popconfirm
-      title="Delete this item?"
-      description="This action cannot be undone."
-      onConfirm={() => console.log('confirmed')}
-    >
-      <Button variant="destructive">Delete</Button>
-    </Popconfirm>
+    <>
+      <Popconfirm
+        title="Delete this item?"
+        description="This action cannot be undone."
+        onConfirm={() => setFeedback('confirmed')}
+      >
+        <Button variant="destructive">Delete</Button>
+      </Popconfirm>
+      <output
+        aria-live="polite"
+        style={{
+          display: 'block',
+          marginTop: 12,
+          whiteSpace: 'pre-wrap',
+          overflowWrap: 'anywhere',
+        }}
+      >
+        {feedback}
+      </output>
+    </>
   );
 }
 
 export default PopconfirmExample;
 ```
 
-## Description and custom labels
+</section>
+
+<section className="tao-example" id="popconfirm-example-2">
+
+### Description and custom labels
 
 ```tsx preview
+import { useState } from 'react';
 import { Button, Popconfirm, Stack } from '@rockshin/tao-ui';
 
 function PopconfirmVariants() {
+  const [feedback, setFeedback] = useState('');
   return (
-    <Stack direction="horizontal" gap="md">
-      <Popconfirm
-        title="Delete item?"
-        description="This action cannot be undone."
-        onConfirm={() => console.log('delete')}
+    <>
+      <Stack direction="horizontal" gap="md">
+        <Popconfirm
+          title="Delete item?"
+          description="This action cannot be undone."
+          onConfirm={() => setFeedback('delete')}
+        >
+          <Button variant="destructive">Delete</Button>
+        </Popconfirm>
+        <Popconfirm
+          title="Leave this page?"
+          description="Unsaved changes will be lost."
+          okText="Leave"
+          cancelText="Stay"
+          onConfirm={() => setFeedback('leave')}
+        >
+          <Button variant="secondary">Leave page</Button>
+        </Popconfirm>
+      </Stack>
+      <output
+        aria-live="polite"
+        style={{
+          display: 'block',
+          marginTop: 12,
+          whiteSpace: 'pre-wrap',
+          overflowWrap: 'anywhere',
+        }}
       >
-        <Button variant="destructive">Delete</Button>
-      </Popconfirm>
-      <Popconfirm
-        title="Leave this page?"
-        description="Unsaved changes will be lost."
-        okText="Leave"
-        cancelText="Stay"
-        onConfirm={() => console.log('leave')}
-      >
-        <Button variant="secondary">Leave page</Button>
-      </Popconfirm>
-    </Stack>
+        {feedback}
+      </output>
+    </>
   );
 }
 
 export default PopconfirmVariants;
 ```
 
-## Button props and disabled state
+</section>
+
+<section className="tao-example" id="popconfirm-example-3">
+
+### Button props and disabled state
 
 ```tsx preview
 import { Button, Popconfirm, Stack } from '@rockshin/tao-ui';
@@ -94,6 +140,92 @@ function PopconfirmStates() {
 
 export default PopconfirmStates;
 ```
+
+</section>
+
+<section className="tao-example" id="popconfirm-outcome">
+
+### Confirm and cancel outcomes
+
+Handle both callbacks and show the chosen outcome inline.
+
+```tsx preview
+import { useState } from 'react';
+import { Popconfirm, Button, Stack } from '@rockshin/tao-ui';
+export default function Example() {
+  const [result, setResult] = useState('No decision yet');
+  return (
+    <Stack direction="vertical">
+      <Popconfirm
+        title="Archive this item?"
+        description="This is a local demonstration."
+        onConfirm={() => setResult('Archived')}
+        onCancel={() => setResult('Kept')}
+      >
+        <Button>Archive</Button>
+      </Popconfirm>
+      <output aria-live="polite">{result}</output>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="popconfirm-disabled">
+
+### Conditional availability
+
+disabled prevents opening; a separate switch demonstrates availability.
+
+```tsx preview
+import { useState } from 'react';
+import { Popconfirm, Button, Switch, Stack } from '@rockshin/tao-ui';
+export default function Example() {
+  const [enabled, setEnabled] = useState(false);
+  return (
+    <Stack direction="vertical">
+      <Switch
+        aria-label="Allow archive"
+        checked={enabled}
+        onChange={setEnabled}
+      />
+      <Popconfirm title="Archive item?" disabled={!enabled}>
+        <Button disabled={!enabled}>Archive item</Button>
+      </Popconfirm>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="popconfirm-placement">
+
+### Placement and icon
+
+placement sets the preferred direction, and icon=null hides the default warning icon.
+
+```tsx preview
+import { Popconfirm, Button } from '@rockshin/tao-ui';
+export default function Example() {
+  return (
+    <Popconfirm
+      title="Apply changes?"
+      placement="bottomRight"
+      icon={null}
+      okText="Apply"
+      cancelText="Keep editing"
+    >
+      <Button>Apply changes</Button>
+    </Popconfirm>
+  );
+}
+```
+
+</section>
+
+</div>
 
 ## API
 

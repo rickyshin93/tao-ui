@@ -3,6 +3,8 @@ title: FormActions
 description: 统一排列表单中的提交、取消与次要操作。页面涵盖适用场景、设计建议、多组可运行示例、交互状态与完整 API 参考。
 ---
 
+import Preview from '../../_components/demo-preview';
+
 统一排列表单中的提交、取消与次要操作。
 
 ## 何时使用
@@ -18,7 +20,13 @@ description: 统一排列表单中的提交、取消与次要操作。页面涵�
 
 - 不要把无关操作混入表单操作区。
 
-## 基础用法
+## 代码演示
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="form-actions-example-1">
+
+### 基础用法
 
 ```tsx preview
 import { Button, FormActions } from '@rockshin/tao-ui';
@@ -35,7 +43,11 @@ function FormActionsExample() {
 export default FormActionsExample;
 ```
 
-## 次要与破坏性操作
+</section>
+
+<section className="tao-example" id="form-actions-example-2">
+
+### 次要与破坏性操作
 
 ```tsx preview
 import { Button, FormActions } from '@rockshin/tao-ui';
@@ -53,7 +65,11 @@ function FormActionVariants() {
 export default FormActionVariants;
 ```
 
-## 语义化对齐
+</section>
+
+<section className="tao-example" id="form-actions-example-3">
+
+### 语义化对齐
 
 ```tsx preview
 import { Button, FormActions } from '@rockshin/tao-ui';
@@ -69,6 +85,116 @@ function CustomizedFormActions() {
 
 export default CustomizedFormActions;
 ```
+
+</section>
+
+<section className="tao-example" id="form-actions-native-form">
+
+### 完整表单组合
+
+组合布局、字段与操作区，用原生提交展示保存结果。
+
+```tsx preview
+import { useState } from 'react';
+import {
+  FormLayout,
+  FormSection,
+  FormField,
+  FormActions,
+  Input,
+  Textarea,
+  Button,
+} from '@rockshin/tao-ui';
+export default function Example() {
+  const [saved, setSaved] = useState('');
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        setSaved(String(new FormData(e.currentTarget).get('name')));
+      }}
+      onReset={() => setSaved('')}
+    >
+      <FormLayout>
+        <FormSection title="Profile" description="Public workspace information">
+          <FormField label="Display name" required>
+            <Input name="name" required defaultValue="Alex" />
+          </FormField>
+          <FormField label="Bio" description="A short introduction">
+            <Textarea name="bio" autoSize />
+          </FormField>
+        </FormSection>
+        <FormActions>
+          <Button type="reset">Reset</Button>
+          <Button type="submit" variant="primary">
+            Save
+          </Button>
+        </FormActions>
+        <output aria-live="polite">
+          {saved ? `Saved ${saved}` : 'No changes saved'}
+        </output>
+      </FormLayout>
+    </form>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="form-actions-alignment">
+
+### 对齐与换行
+
+通过 root 样式设置对齐，窄屏保留自然换行。
+
+```tsx preview
+import { FormActions, Button } from '@rockshin/tao-ui';
+export default function Example() {
+  return (
+    <FormActions
+      styles={{ root: { justifyContent: 'space-between', flexWrap: 'wrap' } }}
+    >
+      <Button>Back</Button>
+      <Button variant="primary">Continue</Button>
+    </FormActions>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="form-actions-pending">
+
+### 操作等待状态
+
+等待时统一禁用操作并显示加载；按钮可结束本地演示状态。
+
+```tsx preview
+import { useState } from 'react';
+import { FormActions, Button, Stack } from '@rockshin/tao-ui';
+export default function Example() {
+  const [pending, setPending] = useState(false);
+  return (
+    <Stack direction="vertical">
+      <FormActions>
+        <Button disabled={pending}>Cancel</Button>
+        <Button loading={pending} onClick={() => setPending(true)}>
+          Save
+        </Button>
+      </FormActions>
+      {pending && (
+        <Button onClick={() => setPending(false)}>
+          Finish simulated request
+        </Button>
+      )}
+    </Stack>
+  );
+}
+```
+
+</section>
+
+</div>
 
 ## API
 

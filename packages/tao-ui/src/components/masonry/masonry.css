@@ -1,0 +1,11 @@
+@layer tao {
+  [data-tao-masonry] {
+    position: relative;
+    min-width: 0;
+  }
+  [data-tao-masonry-item] {
+    box-sizing: border-box;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+}

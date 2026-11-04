@@ -1,0 +1,377 @@
+---
+title: Tree
+description: "Hierarchical data with selection, checkboxes, async children, dragging and virtual scrolling."
+---
+
+import Preview from '../../_components/demo-preview';
+
+Hierarchical data with selection, checkboxes, async children, dragging and virtual scrolling.
+
+Each example can be copied and run independently. Use the device control on framed previews to switch between desktop and phone widths.
+
+## Examples
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="tree-basic">
+
+### Expand and select
+
+Use stable keys for nodes. Arrow keys navigate the tree; Enter selects the active node.
+
+```tsx preview
+import { Tree } from '@rockshin/tao-ui';
+const nodes = [
+  {
+    key: 'workspace',
+    title: 'Workspace',
+    children: [
+      {
+        key: 'design',
+        title: 'Design',
+        children: [{ key: 'tokens', title: 'tokens.json', isLeaf: true }],
+      },
+      {
+        key: 'engineering',
+        title: 'Engineering',
+        children: [{ key: 'readme', title: 'README.md', isLeaf: true }],
+      },
+    ],
+  },
+];
+export default function BasicTree() {
+  return (
+    <Tree
+      aria-label="Project files"
+      treeData={nodes}
+      defaultExpandedKeys={['workspace']}
+      showLine
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="tree-controlled">
+
+### Controlled checks
+
+Checking a parent includes its enabled descendants. Keep the returned keys in state.
+
+```tsx preview
+import { useState, type Key } from 'react';
+import { Tree } from '@rockshin/tao-ui';
+const nodes = [
+  {
+    key: 'workspace',
+    title: 'Workspace',
+    children: [
+      {
+        key: 'design',
+        title: 'Design',
+        children: [{ key: 'tokens', title: 'tokens.json', isLeaf: true }],
+      },
+      {
+        key: 'engineering',
+        title: 'Engineering',
+        children: [{ key: 'readme', title: 'README.md', isLeaf: true }],
+      },
+    ],
+  },
+];
+export default function ControlledTree() {
+  const [checked, setChecked] = useState<Key[]>(['tokens']);
+  return (
+    <div>
+      <Tree
+        checkable
+        defaultExpandAll
+        treeData={nodes}
+        checkedKeys={checked}
+        onCheck={(keys) =>
+          setChecked(Array.isArray(keys) ? keys : keys.checked)
+        }
+      />
+      <output>Checked: {checked.join(', ') || 'none'}</output>
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="tree-strict">
+
+### Independent and disabled checks
+
+checkStrictly separates parent and child checks. disabled and disableCheckbox have different scopes.
+
+```tsx preview
+import { Tree } from '@rockshin/tao-ui';
+export default function StrictChecks() {
+  return (
+    <Tree
+      checkable
+      checkStrictly
+      defaultExpandAll
+      defaultCheckedKeys={['root']}
+      treeData={[
+        {
+          key: 'root',
+          title: 'Independent parent',
+          children: [
+            { key: 'a', title: 'Selectable child' },
+            { key: 'b', title: 'Checkbox disabled', disableCheckbox: true },
+            { key: 'c', title: 'Entire node disabled', disabled: true },
+          ],
+        },
+      ]}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="tree-directory">
+
+### Directory tree
+
+DirectoryTree adds folder/file icons and familiar range or modifier-key selection when multiple is enabled.
+
+```tsx preview
+import { Tree } from '@rockshin/tao-ui';
+const nodes = [
+  {
+    key: 'workspace',
+    title: 'Workspace',
+    children: [
+      {
+        key: 'design',
+        title: 'Design',
+        children: [{ key: 'tokens', title: 'tokens.json', isLeaf: true }],
+      },
+      {
+        key: 'engineering',
+        title: 'Engineering',
+        children: [{ key: 'readme', title: 'README.md', isLeaf: true }],
+      },
+    ],
+  },
+];
+export default function FileBrowser() {
+  return (
+    <Tree.DirectoryTree
+      aria-label="Files"
+      multiple
+      defaultExpandAll
+      treeData={nodes}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="tree-render">
+
+### Custom titles and semantics
+
+titleRender decorates content without changing node keys. Semantic styles target the real title slot.
+
+```tsx preview
+import { Tree, type DataNode } from '@rockshin/tao-ui';
+const nodes: DataNode[] = [
+  {
+    key: 'workspace',
+    title: 'Workspace',
+    children: [
+      {
+        key: 'design',
+        title: 'Design',
+        children: [{ key: 'tokens', title: 'tokens.json', isLeaf: true }],
+      },
+      {
+        key: 'engineering',
+        title: 'Engineering',
+        children: [{ key: 'readme', title: 'README.md', isLeaf: true }],
+      },
+    ],
+  },
+];
+export default function CustomTitles() {
+  return (
+    <Tree
+      treeData={nodes}
+      defaultExpandAll
+      showLine={{ showLeafIcon: false }}
+      titleRender={(node) => (
+        <span>
+          {node.title as string}
+          {node.isLeaf && (
+            <small style={{ marginInlineStart: 8, opacity: 0.55 }}>file</small>
+          )}
+        </span>
+      )}
+      styles={{ itemTitle: { fontWeight: 500 } }}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="tree-async">
+
+### Load children on demand
+
+This local example simulates a delayed result. Resolve loadData after updating the parent node.
+
+```tsx preview
+import { useState } from 'react';
+import { Tree, type DataNode } from '@rockshin/tao-ui';
+export default function AsyncTree() {
+  const [nodes, setNodes] = useState<DataNode[]>([
+    { key: 'reports', title: 'Reports' },
+  ]);
+  return (
+    <Tree
+      treeData={nodes}
+      loadData={async (node) => {
+        if (node.children) return;
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        setNodes([
+          {
+            key: 'reports',
+            title: 'Reports',
+            children: [
+              { key: 'annual', title: 'Annual report', isLeaf: true },
+              { key: 'monthly', title: 'Monthly report', isLeaf: true },
+            ],
+          },
+        ]);
+      }}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="tree-virtual">
+
+### Virtual list and scrollTo
+
+A bounded height enables virtual rendering. The ref scrolls to a key even when its row is outside the viewport.
+
+```tsx preview
+import { useRef } from 'react';
+import { Button, Tree, type TreeRef } from '@rockshin/tao-ui';
+const nodes = Array.from({ length: 500 }, (_, index) => ({
+  key: `row-${index}`,
+  title: `Document ${index + 1}`,
+}));
+export default function VirtualTree() {
+  const ref = useRef<TreeRef>(null);
+  return (
+    <div style={{ display: 'grid', gap: 12 }}>
+      <Button
+        onClick={() => ref.current?.scrollTo({ key: 'row-399', align: 'top' })}
+      >
+        Jump to document 400
+      </Button>
+      <Tree ref={ref} treeData={nodes} height={220} virtual blockNode />
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="tree-drag">
+
+### Reorder a flat tree
+
+This example allows drops between rows and stores the new order. Nested moves can use the same onDrop contract.
+
+```tsx preview
+import { useState } from 'react';
+import { Tree } from '@rockshin/tao-ui';
+export default function ReorderTree() {
+  const [nodes, setNodes] = useState(
+    ['Inbox', 'In review', 'Published'].map((title) => ({ key: title, title })),
+  );
+  return (
+    <Tree
+      treeData={nodes}
+      draggable
+      blockNode
+      allowDrop={({ dropPosition }) => dropPosition !== 0}
+      onDrop={(info) => {
+        const moving = nodes.find((node) => node.key === info.dragNode.key)!;
+        const next = nodes.filter((node) => node.key !== moving.key);
+        const at = next.findIndex((node) => node.key === info.node.key);
+        const offset =
+          info.dropPosition - Number(info.node.pos.split('-').at(-1));
+        next.splice(at + (offset > 0 ? 1 : 0), 0, moving);
+        setNodes(next);
+      }}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="tree-mobile">
+
+### Tree in a narrow pane
+
+Use the phone preview to expand and check nodes within a bounded scroller.
+
+```tsx preview="iframe-follow"
+import { Tree } from '@rockshin/tao-ui';
+const nodes = [
+  {
+    key: 'workspace',
+    title: 'Workspace',
+    children: [
+      {
+        key: 'design',
+        title: 'Design',
+        children: [{ key: 'tokens', title: 'tokens.json', isLeaf: true }],
+      },
+      {
+        key: 'engineering',
+        title: 'Engineering',
+        children: [{ key: 'readme', title: 'README.md', isLeaf: true }],
+      },
+    ],
+  },
+];
+export default function MobileTree() {
+  return (
+    <div style={{ padding: 16 }}>
+      <h3>Project access</h3>
+      <Tree
+        aria-label="Access permissions"
+        treeData={nodes}
+        checkable
+        defaultExpandAll
+        blockNode
+        height={280}
+        styles={{ item: { minHeight: 40 } }}
+      />
+    </div>
+  );
+}
+```
+
+</section>
+
+</div>
+
+## API
+
+<API moduleName="tree" />

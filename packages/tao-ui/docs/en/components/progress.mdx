@@ -1,0 +1,244 @@
+---
+title: Progress
+description: "Displays measurable completion with lines, circles or dashboard arcs."
+---
+
+import Preview from '../../_components/demo-preview';
+
+Displays measurable completion with lines, circles or dashboard arcs.
+
+## When to use
+
+Use percent for measured progress. Give each progress indicator an accessible label that identifies the operation.
+
+## Examples
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="progress-example-1">
+
+### Controlled progress
+
+This local demo changes percent in increments of ten.
+
+```tsx preview="iframe-follow"
+import { useState } from 'react';
+import { Button, Progress, Stack } from '@rockshin/tao-ui';
+
+export default function Example() {
+  const [percent, setPercent] = useState(40);
+  return (
+    <Stack gap="md">
+      <Progress percent={percent} aria-label="Import completion" />
+      <Stack direction="horizontal" gap="sm">
+        <Button
+          variant="secondary"
+          onClick={() => setPercent((value) => Math.max(0, value - 10))}
+        >
+          Decrease
+        </Button>
+        <Button
+          onClick={() => setPercent((value) => Math.min(100, value + 10))}
+        >
+          Increase
+        </Button>
+      </Stack>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="progress-example-2">
+
+### Statuses
+
+Active indicates ongoing work; exception identifies a failed operation.
+
+```tsx preview
+import { Progress, Stack } from '@rockshin/tao-ui';
+
+export default function Example() {
+  return (
+    <Stack gap="md">
+      <Progress percent={45} status="active" aria-label="Uploading" />
+      <Progress percent={68} status="exception" aria-label="Upload failed" />
+      <Progress percent={100} status="success" aria-label="Upload completed" />
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="progress-example-3">
+
+### Circle and dashboard
+
+Dashboard gapDegree and gapPlacement control the opening of the arc.
+
+```tsx preview
+import { Progress, Stack } from '@rockshin/tao-ui';
+
+export default function Example() {
+  return (
+    <Stack direction="horizontal" gap="lg" style={{ flexWrap: 'wrap' }}>
+      <Progress
+        type="circle"
+        percent={75}
+        size={104}
+        aria-label="Storage used"
+      />
+      <Progress
+        type="dashboard"
+        percent={75}
+        size={104}
+        gapDegree={90}
+        gapPlacement="bottom"
+        aria-label="Quota used"
+      />
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="progress-example-4">
+
+### Gradients and success segments
+
+success.percent identifies the completed part of the overall percent.
+
+```tsx preview
+import { Progress, Stack } from '@rockshin/tao-ui';
+
+export default function Example() {
+  return (
+    <Stack gap="md">
+      <Progress
+        percent={80}
+        success={{ percent: 35 }}
+        aria-label="Processed records"
+      />
+      <Progress
+        percent={85}
+        strokeColor={{ from: '#3b82f6', to: '#14b8a6' }}
+        aria-label="Export completion"
+      />
+      <Progress
+        type="circle"
+        percent={75}
+        size={96}
+        strokeColor={{ '0%': '#3b82f6', '100%': '#14b8a6' }}
+        aria-label="Sync completion"
+      />
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="progress-example-5">
+
+### Discrete steps
+
+Use steps for a fixed number of units; circle steps also accept an explicit gap.
+
+```tsx preview
+import { Progress, Stack } from '@rockshin/tao-ui';
+
+export default function Example() {
+  return (
+    <Stack gap="md">
+      <Progress
+        percent={60}
+        steps={5}
+        strokeColor={['#3b82f6', '#3b82f6', '#14b8a6']}
+        aria-label="Three of five tasks complete"
+      />
+      <Progress
+        type="circle"
+        percent={70}
+        steps={{ count: 10, gap: 3 }}
+        size={108}
+        aria-label="Seven of ten checks complete"
+      />
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="progress-example-6">
+
+### Label placement and formatting
+
+Place text inside the track or replace the percentage with task units.
+
+```tsx preview
+import { Progress, Stack } from '@rockshin/tao-ui';
+
+export default function Example() {
+  return (
+    <Stack gap="md">
+      <Progress
+        percent={65}
+        size={['100%', 24]}
+        percentPosition={{ align: 'center', type: 'inner' }}
+        aria-label="Import progress"
+      />
+      <Progress
+        percent={60}
+        format={(value) => `${Math.round((value ?? 0) / 10)} / 10 files`}
+        aria-label="Processed files"
+      />
+      <Progress percent={45} showInfo={false} aria-label="Background sync" />
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="progress-example-7">
+
+### Size and semantic styles
+
+Numeric sizes set line height or circle diameter; a tuple sets line width and height.
+
+```tsx preview
+import { Progress, Stack } from '@rockshin/tao-ui';
+
+export default function Example() {
+  return (
+    <Stack gap="md">
+      <Progress percent={55} size="small" aria-label="Small progress" />
+      <Progress
+        percent={55}
+        size={['100%', 16]}
+        strokeLinecap="butt"
+        aria-label="Thick progress"
+      />
+      <Progress
+        type="circle"
+        percent={55}
+        size={72}
+        styles={{ indicator: { fontWeight: 600 } }}
+        aria-label="Compact circle"
+      />
+    </Stack>
+  );
+}
+```
+
+</section>
+
+</div>
+
+## API
+
+<API moduleName="progress" />

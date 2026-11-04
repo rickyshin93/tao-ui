@@ -1,0 +1,184 @@
+---
+title: Segmented
+description: "从紧凑选项中选择单个视图或模式。"
+---
+
+import Preview from '../../_components/demo-preview';
+
+从紧凑选项中选择单个视图或模式。
+
+组件采用 tao-ui 原生实现，公共 API 对齐 Ant Design 6.7.0。外观、主题 token 与 Semantic DOM 定制遵循 tao-ui，主题通过 `TaoProvider` 配置。
+
+6.7.0 value/options API 使用原生单选控件与 tao-ui 动效实现；尺寸继承 TaoProvider，减弱动态效果时关闭移动高亮。
+
+## 何时使用
+
+适合少量紧密相关的选项，原生单选控件支持表单提交与键盘选择。
+
+## 代码演示
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="segmented-example-1">
+
+### 基础选择
+
+```tsx preview
+import { Segmented } from "@rockshin/tao-ui";
+
+export default function Example() {
+  return <Segmented options={["Day", "Week", "Month"]} defaultValue="Week" />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="segmented-example-2">
+
+### 受控选择
+
+```tsx preview
+import { useState } from "react";
+import { Segmented } from "@rockshin/tao-ui";
+
+export default function Example() {
+  const [view, setView] = useState("List");
+  return (
+    <div>
+      <Segmented<string>
+        options={["List", "Board", "Calendar"]}
+        value={view}
+        onChange={setView}
+      />
+      <p>Current view: {view}</p>
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="segmented-example-3">
+
+### 尺寸与圆形风格
+
+```tsx preview
+import { Segmented } from "@rockshin/tao-ui";
+
+export default function Example() {
+  return (
+    <div style={{ display: "flex", gap: 16, flexDirection: "column" }}>
+      <Segmented size="small" options={["A", "B", "C"]} />
+      <Segmented size="medium" shape="round" options={["A", "B", "C"]} />
+      <Segmented
+        size="large"
+        block
+        options={["Overview", "Activity", "Settings"]}
+      />
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="segmented-example-4">
+
+### 禁用选项与自定义标签
+
+```tsx preview="iframe-follow"
+import { Segmented } from "@rockshin/tao-ui";
+
+export default function Example() {
+  return (
+    <div style={{ display: "flex", gap: 16, flexDirection: "column" }}>
+      <Segmented
+        options={[
+          {
+            value: "open",
+            label: "Open",
+            icon: <span aria-hidden="true">○</span>,
+          },
+          { value: "closed", label: "Closed", disabled: true },
+          {
+            value: "all",
+            label: "All records",
+            tooltip: "Includes archived records",
+          },
+        ]}
+      />
+      <Segmented disabled options={["Day", "Week"]} />
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="segmented-example-5">
+
+### 垂直排列与 RTL
+
+```tsx preview
+import { Segmented } from "@rockshin/tao-ui";
+
+export default function Example() {
+  return (
+    <div
+      style={{
+        display: "flex",
+        gap: 16,
+        alignItems: "center",
+        flexWrap: "wrap",
+      }}
+    >
+      <Segmented
+        orientation="vertical"
+        options={["Overview", "Activity", "Settings"]}
+      />
+      <Segmented direction="rtl" options={["One", "Two", "Three"]} />
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="segmented-example-6">
+
+### 提交原生表单
+
+```tsx preview
+import { useState } from "react";
+import { Button, Segmented } from "@rockshin/tao-ui";
+
+export default function Example() {
+  const [submitted, setSubmitted] = useState("");
+  return (
+    <form
+      onSubmit={(event) => {
+        event.preventDefault();
+        setSubmitted(String(new FormData(event.currentTarget).get("period")));
+      }}
+    >
+      <Segmented
+        name="period"
+        options={["Day", "Week", "Month"]}
+        defaultValue="Week"
+      />
+      <Button type="submit" style={{ marginLeft: 12 }}>
+        Apply
+      </Button>
+      <p>Submitted: {submitted || "—"}</p>
+    </form>
+  );
+}
+```
+
+</section>
+
+</div>
+
+## API
+
+<API moduleName="segmented" />

@@ -1,7 +1,11 @@
+@import "./switch-touch.css";
+
 /*
  * Switch — mirrors antd rc-switch structure:
  *   <button data-tao-switch>
- *     <div data-tao-switch-handle />       ← absolute positioned
+ *     <span data-tao-switch-handle-track> ← travels across the available width
+ *       <span data-tao-switch-handle />
+ *     </span>
  *     <span data-tao-switch-inner>         ← overflow hidden, padding shifts for handle
  *       <span data-tao-switch-inner-checked />    ← stacked via negative margin-top
  *       <span data-tao-switch-inner-unchecked />
@@ -78,11 +82,18 @@ button[data-tao-switch][disabled] {
 /* ===========================
    Handle (absolute positioned circle)
    =========================== */
-[data-tao-switch-handle] {
+[data-tao-switch-handle-track] {
   position: absolute;
   top: 2px;
+  bottom: 2px;
   inset-inline-start: 2px;
   transition: transform var(--tao-motion-duration-mid) ease-in-out;
+}
+
+[data-tao-switch-handle] {
+  position: absolute;
+  top: 0;
+  inset-inline-start: 0;
 }
 
 [data-tao-switch-handle]::before {
@@ -105,9 +116,8 @@ button[data-tao-switch][data-tao-size="medium"] [data-tao-switch-handle] {
   width: 18px;
   height: 18px;
 }
-button[data-tao-switch][data-tao-size="medium"][data-tao-checked]
-  [data-tao-switch-handle] {
-  transform: translateX(22px);
+button[data-tao-switch][data-tao-size="medium"] [data-tao-switch-handle-track] {
+  inset-inline-end: 20px;
 }
 
 /* Small handle: 12×12 */
@@ -115,20 +125,15 @@ button[data-tao-switch][data-tao-size="small"] [data-tao-switch-handle] {
   width: 12px;
   height: 12px;
 }
-button[data-tao-switch][data-tao-size="small"][data-tao-checked]
-  [data-tao-switch-handle] {
-  transform: translateX(12px);
+button[data-tao-switch][data-tao-size="small"] [data-tao-switch-handle-track] {
+  inset-inline-end: 14px;
 }
 
-:dir(rtl)
-  button[data-tao-switch][data-tao-size="medium"][data-tao-checked]
-  [data-tao-switch-handle] {
-  transform: translateX(-22px);
+button[data-tao-switch][data-tao-checked] [data-tao-switch-handle-track] {
+  transform: translateX(100%);
 }
-:dir(rtl)
-  button[data-tao-switch][data-tao-size="small"][data-tao-checked]
-  [data-tao-switch-handle] {
-  transform: translateX(-12px);
+button[data-tao-switch][data-tao-checked]:dir(rtl) [data-tao-switch-handle-track] {
+  transform: translateX(-100%);
 }
 
 /* Active: handle stretches (antd: inset -30%) */
@@ -146,9 +151,9 @@ button[data-tao-switch][data-tao-checked]:not([disabled]):active
 [data-tao-switch-handle] [data-tao-switch-loading] {
   position: absolute;
   top: 50%;
-  inset-inline-start: 50%;
+  left: 50%;
   transform: translate(-50%, -50%);
-  animation: tao-spin calc(var(--tao-motion-unit) * 8) linear infinite;
+  animation: tao-switch-spin calc(var(--tao-motion-unit) * 8) linear infinite;
   color: var(--tao-color-text-secondary);
   z-index: 1;
 }
@@ -165,7 +170,7 @@ button[data-tao-switch][data-tao-checked] [data-tao-switch-loading] {
   color: var(--tao-primary);
 }
 
-@keyframes tao-spin {
+@keyframes tao-switch-spin {
   from {
     transform: translate(-50%, -50%) rotate(0deg);
   }
@@ -194,6 +199,8 @@ button[data-tao-switch][data-tao-checked] [data-tao-switch-loading] {
 [data-tao-switch-inner-unchecked] {
   display: block;
   color: white;
+  white-space: nowrap;
+  justify-content: center;
   pointer-events: none;
   transition:
     margin-inline-start var(--tao-motion-duration-mid) ease-in-out,

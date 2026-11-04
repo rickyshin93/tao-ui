@@ -1,0 +1,368 @@
+---
+title: TreeSelect
+description: "Select values from hierarchical options with search, multiple selection and linked checkboxes."
+---
+
+import Preview from '../../_components/demo-preview';
+
+Select values from hierarchical options with search, multiple selection and linked checkboxes.
+
+Each example can be copied and run independently. Use the device control on framed previews to switch between desktop and phone widths.
+
+Sizes are `small`, `medium` and `large`; the compatible `middle` alias uses the same dimensions as `medium`.
+
+## Examples
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="tree-select-basic">
+
+### Searchable single selection
+
+Use treeNodeFilterProp="title" when the title is the searchable label.
+
+```tsx preview
+import { TreeSelect } from '@rockshin/tao-ui';
+const treeData = [
+  {
+    value: 'product',
+    title: 'Product',
+    children: [
+      { value: 'design', title: 'Design' },
+      { value: 'research', title: 'Research' },
+    ],
+  },
+  {
+    value: 'engineering',
+    title: 'Engineering',
+    children: [
+      { value: 'web', title: 'Web' },
+      { value: 'platform', title: 'Platform' },
+    ],
+  },
+];
+export default function BasicTreeSelect() {
+  return (
+    <TreeSelect
+      aria-label="Team"
+      treeData={treeData}
+      showSearch
+      treeNodeFilterProp="title"
+      treeDefaultExpandAll
+      allowClear
+      placeholder="Choose a team"
+      style={{ width: '100%' }}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="tree-select-multiple">
+
+### Controlled multiple values
+
+Use a value array and responsive tag overflow for a compact input.
+
+```tsx preview
+import { useState } from 'react';
+import { TreeSelect } from '@rockshin/tao-ui';
+const treeData = [
+  {
+    value: 'product',
+    title: 'Product',
+    children: [
+      { value: 'design', title: 'Design' },
+      { value: 'research', title: 'Research' },
+    ],
+  },
+  {
+    value: 'engineering',
+    title: 'Engineering',
+    children: [
+      { value: 'web', title: 'Web' },
+      { value: 'platform', title: 'Platform' },
+    ],
+  },
+];
+export default function MultipleTeams() {
+  const [value, setValue] = useState<string[]>(['design', 'web']);
+  return (
+    <TreeSelect<string[]>
+      aria-label="Teams"
+      multiple
+      value={value}
+      onChange={setValue}
+      treeData={treeData}
+      treeDefaultExpandAll
+      maxTagCount="responsive"
+      style={{ width: '100%' }}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="tree-select-checks">
+
+### Parent and child checks
+
+SHOW_PARENT displays the parent when all enabled descendants are selected.
+
+```tsx preview
+import { TreeSelect } from '@rockshin/tao-ui';
+const treeData = [
+  {
+    value: 'product',
+    title: 'Product',
+    children: [
+      { value: 'design', title: 'Design' },
+      { value: 'research', title: 'Research' },
+    ],
+  },
+  {
+    value: 'engineering',
+    title: 'Engineering',
+    children: [
+      { value: 'web', title: 'Web' },
+      { value: 'platform', title: 'Platform' },
+    ],
+  },
+];
+export default function CheckedTeams() {
+  return (
+    <TreeSelect
+      aria-label="Access teams"
+      treeData={treeData}
+      treeCheckable
+      treeDefaultExpandAll
+      defaultValue={['design', 'research']}
+      showCheckedStrategy={TreeSelect.SHOW_PARENT}
+      allowClear
+      style={{ width: '100%' }}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="tree-select-label">
+
+### Keep the selected label
+
+labelInValue returns an object containing the value and its rendered label.
+
+```tsx preview
+import { useState } from 'react';
+import { TreeSelect, type TreeSelectLabeledValue } from '@rockshin/tao-ui';
+const treeData = [
+  {
+    value: 'product',
+    title: 'Product',
+    children: [
+      { value: 'design', title: 'Design' },
+      { value: 'research', title: 'Research' },
+    ],
+  },
+  {
+    value: 'engineering',
+    title: 'Engineering',
+    children: [
+      { value: 'web', title: 'Web' },
+      { value: 'platform', title: 'Platform' },
+    ],
+  },
+];
+export default function LabeledTeam() {
+  const [value, setValue] = useState<TreeSelectLabeledValue>({
+    value: 'design',
+    label: 'Design',
+  });
+  return (
+    <div>
+      <TreeSelect<TreeSelectLabeledValue>
+        labelInValue
+        value={value}
+        onChange={setValue}
+        treeData={treeData}
+        treeDefaultExpandAll
+        style={{ width: '100%' }}
+      />
+      <p>Value: {value.value}</p>
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="tree-select-simple">
+
+### Flat data with parent IDs
+
+treeDataSimpleMode converts id/pId records into a tree without changing your API response shape.
+
+```tsx preview
+import { TreeSelect } from '@rockshin/tao-ui';
+export default function FlatTeams() {
+  return (
+    <TreeSelect
+      aria-label="Organization"
+      treeDataSimpleMode
+      treeDefaultExpandAll
+      placeholder="Choose a team"
+      treeData={[
+        { id: 1, pId: 0, value: 'company', title: 'Company' },
+        { id: 2, pId: 1, value: 'sales', title: 'Sales' },
+        { id: 3, pId: 1, value: 'support', title: 'Support' },
+      ]}
+      style={{ width: '100%' }}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="tree-select-fields">
+
+### Map field names
+
+Map label, value and children when server data uses different names.
+
+```tsx preview
+import { TreeSelect } from '@rockshin/tao-ui';
+export default function CustomFields() {
+  return (
+    <TreeSelect
+      aria-label="Region"
+      fieldNames={{ label: 'name', value: 'id', children: 'nodes' }}
+      treeDefaultExpandAll
+      treeData={[
+        {
+          id: 'asia',
+          name: 'Asia',
+          nodes: [
+            { id: 'cn', name: 'China' },
+            { id: 'jp', name: 'Japan' },
+          ],
+        },
+      ]}
+      placeholder="Choose a region"
+      style={{ width: '100%' }}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="tree-select-appearance">
+
+### Sizes, variants and status
+
+Local appearance props override the provider defaults.
+
+```tsx preview
+import { TreeSelect } from '@rockshin/tao-ui';
+const treeData = [
+  {
+    value: 'product',
+    title: 'Product',
+    children: [
+      { value: 'design', title: 'Design' },
+      { value: 'research', title: 'Research' },
+    ],
+  },
+  {
+    value: 'engineering',
+    title: 'Engineering',
+    children: [
+      { value: 'web', title: 'Web' },
+      { value: 'platform', title: 'Platform' },
+    ],
+  },
+];
+export default function TreeSelectAppearance() {
+  return (
+    <div style={{ display: 'grid', gap: 12 }}>
+      <TreeSelect size="small" defaultValue="design" treeData={treeData} />
+      <TreeSelect
+        size="middle"
+        variant="filled"
+        treeData={treeData}
+        status="warning"
+        placeholder="Review selection"
+      />
+      <TreeSelect
+        size="large"
+        variant="underlined"
+        treeData={treeData}
+        status="error"
+        placeholder="Team required"
+      />
+      <TreeSelect disabled defaultValue="web" treeData={treeData} />
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="tree-select-mobile">
+
+### Narrow-screen selection
+
+The popup stays within the phone viewport. TreeSelect uses its tree popup on both desktop and mobile.
+
+```tsx preview="iframe-follow"
+import { TreeSelect } from '@rockshin/tao-ui';
+const treeData = [
+  {
+    value: 'product',
+    title: 'Product',
+    children: [
+      { value: 'design', title: 'Design' },
+      { value: 'research', title: 'Research' },
+    ],
+  },
+  {
+    value: 'engineering',
+    title: 'Engineering',
+    children: [
+      { value: 'web', title: 'Web' },
+      { value: 'platform', title: 'Platform' },
+    ],
+  },
+];
+export default function MobileTreeSelect() {
+  return (
+    <div style={{ padding: 16 }}>
+      <h3>Choose project teams</h3>
+      <TreeSelect
+        aria-label="Project teams"
+        treeData={treeData}
+        treeCheckable
+        treeDefaultExpandAll
+        showSearch
+        treeNodeFilterProp="title"
+        maxTagCount="responsive"
+        listHeight={240}
+        allowClear
+        style={{ width: '100%' }}
+      />
+    </div>
+  );
+}
+```
+
+</section>
+
+</div>
+
+## API
+
+<API moduleName="tree-select" />

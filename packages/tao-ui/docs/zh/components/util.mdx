@@ -1,0 +1,73 @@
+---
+
+title: Util
+
+description: "从组件与公开属性推导 TypeScript 类型，不需要运行时工具。"
+
+---
+
+import Preview from '../../_components/demo-preview';
+
+从组件与公开属性推导 TypeScript 类型，不需要运行时工具。
+
+## GetProps
+
+获取组件的 props 类型，也支持 Context 值与普通属性对象。
+
+```tsx preview
+import { Button, type GetProps } from '@rockshin/tao-ui';
+const props: GetProps<typeof Button> = {
+  variant: 'secondary',
+  children: 'Typed button',
+};
+export default function Demo() {
+  return <Button {...props} />;
+}
+```
+
+## GetProp
+
+获取某个非空属性的类型；第三个参数 Return 可提取函数属性的返回值。
+
+```tsx preview
+import { Select, type GetProp } from '@rockshin/tao-ui';
+const options: GetProp<typeof Select, 'options'> = [
+  { value: 'design', label: 'Design' },
+  { value: 'engineering', label: 'Engineering' },
+];
+export default function Demo() {
+  return <Select options={options} placeholder="Typed options" />;
+}
+```
+
+```tsx
+import type { GetProp } from '@rockshin/tao-ui';
+type SearchProps = { onSearch?: (query: string) => Promise<string[]> };
+type SearchResult = GetProp<SearchProps, 'onSearch', 'Return'>; // Promise<string[]>
+```
+
+## GetRef
+
+推导组件 ref 指向的公开实例，直接用于 useRef。
+
+```tsx preview
+import { Input, Button, Stack, type GetRef } from '@rockshin/tao-ui';
+import { useRef } from 'react';
+export default function Demo() {
+  const input = useRef<GetRef<typeof Input>>(null);
+  return (
+    <Stack gap="md">
+      <Input ref={input} placeholder="Focus target" />
+      <Button onClick={() => input.current?.focus()}>Focus input</Button>
+    </Stack>
+  );
+}
+```
+
+## 按需导入
+
+```tsx
+import type { GetProps, GetProp, GetRef } from '@rockshin/tao-ui/util';
+```
+
+这些导出只存在于类型系统，不会增加浏览器运行时代码。

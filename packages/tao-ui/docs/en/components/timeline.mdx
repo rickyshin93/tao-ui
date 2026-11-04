@@ -1,0 +1,180 @@
+---
+title: Timeline
+description: "Orders events and milestones along a vertical or horizontal rail."
+---
+
+import Preview from '../../_components/demo-preview';
+
+Orders events and milestones along a vertical or horizontal rail.
+
+This native tao-ui component follows the public API of Ant Design 6.7.0. Appearance, theme tokens and Semantic DOM customization belong to tao-ui; configure themes with `TaoProvider`.
+
+The 6.7.0 title/content/placement API is supported alongside legacy label/children/position aliases. Numeric titleSpan uses a 24-column proportion.
+
+## When to use
+
+Use for activity history or a sequence of events, not for selecting a current step.
+
+## Examples
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="timeline-example-1">
+
+### Event history
+
+```tsx preview
+import { Timeline } from "@rockshin/tao-ui";
+
+const items = [
+  { title: "09:00", content: "Workspace created", color: "green" },
+  { title: "09:20", content: "Members invited" },
+  { title: "09:45", content: "First task completed" },
+];
+
+export default function Example() {
+  return <Timeline items={items} />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="timeline-example-2">
+
+### Placement and title width
+
+```tsx preview="iframe-follow"
+import { Timeline } from "@rockshin/tao-ui";
+
+const items = [
+  { title: "09:00", content: "Workspace created", color: "green" },
+  { title: "09:20", content: "Members invited" },
+  { title: "09:45", content: "First task completed" },
+];
+
+export default function Example() {
+  return <Timeline mode="alternate" titleSpan="30%" items={items} />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="timeline-example-3">
+
+### Horizontal timeline
+
+```tsx preview="iframe-follow"
+import { Timeline } from "@rockshin/tao-ui";
+
+const items = [
+  { title: "09:00", content: "Workspace created", color: "green" },
+  { title: "09:20", content: "Members invited" },
+  { title: "09:45", content: "First task completed" },
+];
+
+export default function Example() {
+  return <Timeline orientation="horizontal" mode="alternate" items={items} />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="timeline-example-4">
+
+### Pending and reverse order
+
+```tsx preview
+import { useState } from "react";
+import { Button, Timeline } from "@rockshin/tao-ui";
+
+const items = [
+  { title: "09:00", content: "Workspace created", color: "green" },
+  { title: "09:20", content: "Members invited" },
+  { title: "09:45", content: "First task completed" },
+];
+
+export default function Example() {
+  const [reverse, setReverse] = useState(false);
+  return (
+    <div>
+      <Button onClick={() => setReverse(!reverse)} style={{ marginBottom: 16 }}>
+        Reverse order
+      </Button>
+      <Timeline
+        items={items}
+        pending="Waiting for confirmation"
+        reverse={reverse}
+      />
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="timeline-example-5">
+
+### Icons, colors and loading
+
+```tsx preview
+import { Timeline } from "@rockshin/tao-ui";
+
+export default function Example() {
+  return (
+    <Timeline
+      variant="filled"
+      items={[
+        {
+          title: "Done",
+          content: "Changes saved",
+          color: "green",
+          icon: <span aria-hidden="true">✓</span>,
+        },
+        {
+          title: "Review",
+          content: "Waiting for review",
+          color: "var(--tao-color-warning)",
+        },
+        { title: "Sync", content: "Synchronizing", loading: true },
+      ]}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="timeline-example-6">
+
+### Semantic customization
+
+```tsx preview
+import { Timeline } from "@rockshin/tao-ui";
+
+export default function Example() {
+  return (
+    <Timeline
+      items={[
+        {
+          title: "Milestone",
+          content: "Release candidate ready",
+          styles: {
+            title: { fontWeight: 700 },
+            rail: { borderStyle: "dashed" },
+          },
+        },
+        { title: "Next", content: "Publish after review" },
+      ]}
+      styles={{ itemContent: { color: "var(--tao-color-text-secondary)" } }}
+    />
+  );
+}
+```
+
+</section>
+
+</div>
+
+## API
+
+<API moduleName="timeline" />

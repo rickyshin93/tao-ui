@@ -1,0 +1,206 @@
+---
+title: FloatButton
+description: "提供持续可见的悬浮操作与返回顶部控件。"
+---
+
+import Preview from '../../_components/demo-preview';
+
+提供持续可见的悬浮操作与返回顶部控件。
+
+组件采用 tao-ui 原生实现，公共 API 对齐 Ant Design 6.7.0。外观、主题 token 与 Semantic DOM 定制遵循 tao-ui，主题通过 `TaoProvider` 配置。
+
+按钮、Group 与 BackTop 遵循 6.7.0；提示与徽标使用 tao-ui 组件，滚动动画遵循减弱动态效果偏好；固定控件在 iframe 中预览。
+
+## 何时使用
+
+适合跨当前页面使用的少量操作，纯图标按钮需提供可访问名称。
+
+## 代码演示
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="float-button-example-1">
+
+### 基础操作与提示
+
+```tsx preview="iframe-follow"
+import { useState } from "react";
+import { FloatButton } from "@rockshin/tao-ui";
+
+export default function Example() {
+  const [count, setCount] = useState(0);
+  return (
+    <div style={{ minHeight: 220 }}>
+      <p>Action count: {count}</p>
+      <FloatButton
+        tooltip="Create item"
+        aria-label="Create item"
+        type="primary"
+        onClick={() => setCount(count + 1)}
+      />
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="float-button-example-2">
+
+### 形状、文字与徽标
+
+```tsx preview="iframe-follow"
+import { FloatButton } from "@rockshin/tao-ui";
+
+export default function Example() {
+  return (
+    <div style={{ minHeight: 220 }}>
+      <FloatButton
+        content="Help"
+        shape="square"
+        tooltip="Help"
+        style={{ insetInlineEnd: 84 }}
+      />
+      <FloatButton content="Chat" badge={{ count: 8 }} tooltip="Messages" />
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="float-button-example-3">
+
+### 点击展开分组与位置
+
+```tsx preview="iframe-follow"
+import { useState } from "react";
+import { FloatButton } from "@rockshin/tao-ui";
+
+export default function Example() {
+  const [selected, setSelected] = useState("None");
+  return (
+    <div style={{ minHeight: 260 }}>
+      <p>Selected: {selected}</p>
+      <FloatButton.Group
+        trigger="click"
+        tooltip="Actions"
+        aria-label="Actions"
+        placement="left"
+        shape="square"
+      >
+        <FloatButton content="A" onClick={() => setSelected("Action A")} />
+        <FloatButton content="B" onClick={() => setSelected("Action B")} />
+      </FloatButton.Group>
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="float-button-example-4">
+
+### 受控分组
+
+```tsx preview="iframe-follow"
+import { useState } from "react";
+import { Button, FloatButton } from "@rockshin/tao-ui";
+
+export default function Example() {
+  const [open, setOpen] = useState(false);
+  return (
+    <div style={{ minHeight: 260 }}>
+      <Button onClick={() => setOpen(!open)}>
+        {open ? "Close actions" : "Open actions"}
+      </Button>
+      <FloatButton.Group
+        trigger="click"
+        open={open}
+        onOpenChange={setOpen}
+        tooltip="Actions"
+        aria-label="Actions"
+      >
+        <FloatButton content="One" />
+        <FloatButton content="Two" />
+      </FloatButton.Group>
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="float-button-example-5">
+
+### 悬停展开与禁用操作
+
+```tsx preview="iframe-follow"
+import { FloatButton } from "@rockshin/tao-ui";
+
+export default function Example() {
+  return (
+    <div style={{ minHeight: 260 }}>
+      <FloatButton.Group
+        trigger="hover"
+        tooltip="More actions"
+        aria-label="More actions"
+      >
+        <FloatButton content="Ready" />
+        <FloatButton content="Locked" disabled />
+      </FloatButton.Group>
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="float-button-example-6">
+
+### 返回滚动容器顶部
+
+```tsx preview="iframe-follow"
+import { useRef } from "react";
+import { FloatButton } from "@rockshin/tao-ui";
+
+export default function Example() {
+  const target = useRef<HTMLDivElement>(null);
+  return (
+    <div>
+      <div
+        ref={target}
+        style={{
+          height: 260,
+          overflow: "auto",
+          border: "1px solid var(--tao-color-border)",
+          padding: 16,
+        }}
+      >
+        <p>Scroll down to reveal BackTop.</p>
+        <div
+          style={{
+            height: 900,
+            background:
+              "linear-gradient(var(--tao-color-fill-tertiary), transparent)",
+          }}
+        />
+      </div>
+      <FloatButton.BackTop
+        target={() => target.current!}
+        visibilityHeight={120}
+        showProgress
+        duration={250}
+      />
+    </div>
+  );
+}
+```
+
+</section>
+
+</div>
+
+## API
+
+<API moduleName="float-button" />

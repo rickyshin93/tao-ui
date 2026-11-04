@@ -48,7 +48,7 @@
     --tao-color-text-light-solid: oklch(0.985 0.004 70);
 
     /* Size seeds */
-    --tao-radius: 10px; /* shadcn baseline */
+    --tao-radius: 6px;
     --tao-font-size: 14px;
     --tao-control-height: 32px;
     --tao-control-width: 200px; /* default width for Input/Select/DatePicker; override per-instance or use 100% for full width */
@@ -249,7 +249,7 @@
     /* ===========================
        DERIVED: Radius
        shadcn 语义：sm/md/lg/xl 都相对 base 递增，非等比。
-       base=10 时: xs=2, sm=8, md=10, lg=12, xl=14
+       base=6 时: xs=2, sm=4, md=6, lg=8, xl=10
        =========================== */
     --tao-radius-xs: 2px;
     --tao-radius-sm: calc(var(--tao-radius) - 2px);

@@ -1,0 +1,73 @@
+---
+
+title: Util
+
+description: "Infer TypeScript types from components and their public props without a runtime helper."
+
+---
+
+import Preview from '../../_components/demo-preview';
+
+Infer TypeScript types from components and their public props without a runtime helper.
+
+## GetProps
+
+Read the props of a component, a Context value or an existing props object.
+
+```tsx preview
+import { Button, type GetProps } from '@rockshin/tao-ui';
+const props: GetProps<typeof Button> = {
+  variant: 'secondary',
+  children: 'Typed button',
+};
+export default function Demo() {
+  return <Button {...props} />;
+}
+```
+
+## GetProp
+
+Read a non-nullable property type; the third argument Return extracts a function property’s return type.
+
+```tsx preview
+import { Select, type GetProp } from '@rockshin/tao-ui';
+const options: GetProp<typeof Select, 'options'> = [
+  { value: 'design', label: 'Design' },
+  { value: 'engineering', label: 'Engineering' },
+];
+export default function Demo() {
+  return <Select options={options} placeholder="Typed options" />;
+}
+```
+
+```tsx
+import type { GetProp } from '@rockshin/tao-ui';
+type SearchProps = { onSearch?: (query: string) => Promise<string[]> };
+type SearchResult = GetProp<SearchProps, 'onSearch', 'Return'>; // Promise<string[]>
+```
+
+## GetRef
+
+Infer the public instance accepted by a component ref and use it with useRef.
+
+```tsx preview
+import { Input, Button, Stack, type GetRef } from '@rockshin/tao-ui';
+import { useRef } from 'react';
+export default function Demo() {
+  const input = useRef<GetRef<typeof Input>>(null);
+  return (
+    <Stack gap="md">
+      <Input ref={input} placeholder="Focus target" />
+      <Button onClick={() => input.current?.focus()}>Focus input</Button>
+    </Stack>
+  );
+}
+```
+
+## Subpath import
+
+```tsx
+import type { GetProps, GetProp, GetRef } from '@rockshin/tao-ui/util';
+```
+
+These exports exist only in the type system and add no browser runtime code.

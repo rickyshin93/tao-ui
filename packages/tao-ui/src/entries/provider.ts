@@ -5,10 +5,12 @@ import '../theme/control.css';
 
 export {
   type ButtonComponentToken,
+  enUS,
   type FormFieldComponentToken,
   type InputComponentToken,
   type TaoComponentTokenMap,
   type TaoConfig,
+  type TaoLocale,
   TaoProvider,
   type TaoProviderProps,
   type TaoSeedToken,
@@ -19,4 +21,5 @@ export {
   type TaoVariant,
   useTaoConfig,
   useTaoToken,
+  zhCN,
 } from '../provider/tao-provider';

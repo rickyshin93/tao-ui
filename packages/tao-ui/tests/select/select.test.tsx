@@ -29,36 +29,36 @@ test.each([
   { name: 'desktop', mobile: false, showSearch: false },
   { name: 'searchable', mobile: false, showSearch: true },
   { name: 'mobile', mobile: true, showSearch: false },
-])('forwards explicit field accessibility props to the $name control', ({
-  mobile,
-  showSearch,
-}) => {
-  render(
-    <>
-      <p id="select-help">Preferred interface language</p>
-      <p id="select-error">Unavailable language</p>
-      <Select
-        id="named-select"
-        mobile={mobile}
-        showSearch={showSearch}
-        defaultValue="zh"
-        options={[{ label: 'Chinese', value: 'zh' }]}
-        aria-label="Interface language"
-        aria-describedby="select-help"
-        aria-errormessage="select-error"
-        aria-invalid="true"
-        aria-required="true"
-      />
-    </>,
-  );
-  const control = screen.getByRole(mobile ? 'button' : 'combobox', {
-    name: 'Interface language',
-  });
-  expect(control).toHaveAttribute('id', 'named-select');
-  expect(control).toHaveAccessibleDescription('Preferred interface language');
-  expect(control).toHaveAccessibleErrorMessage('Unavailable language');
-  expect(control).toHaveAttribute('aria-required', 'true');
-});
+])(
+  'forwards explicit field accessibility props to the $name control',
+  ({ mobile, showSearch }) => {
+    render(
+      <>
+        <p id="select-help">Preferred interface language</p>
+        <p id="select-error">Unavailable language</p>
+        <Select
+          id="named-select"
+          mobile={mobile}
+          showSearch={showSearch}
+          defaultValue="zh"
+          options={[{ label: 'Chinese', value: 'zh' }]}
+          aria-label="Interface language"
+          aria-describedby="select-help"
+          aria-errormessage="select-error"
+          aria-invalid="true"
+          aria-required="true"
+        />
+      </>,
+    );
+    const control = screen.getByRole(mobile ? 'button' : 'combobox', {
+      name: 'Interface language',
+    });
+    expect(control).toHaveAttribute('id', 'named-select');
+    expect(control).toHaveAccessibleDescription('Preferred interface language');
+    expect(control).toHaveAccessibleErrorMessage('Unavailable language');
+    expect(control).toHaveAttribute('aria-required', 'true');
+  },
+);
 
 test('displays selected option label', () => {
   render(
@@ -926,6 +926,190 @@ test('mobile + multiple: Done commits and closes drawer', async () => {
   expect(screen.queryByRole('dialog')).toBeNull();
 });
 
+test('mobile multiple selection enforces maxCount before committing', async () => {
+  const onChange = rs.fn();
+  render(
+    <Select
+      mobile
+      defaultOpen
+      mode="multiple"
+      maxCount={1}
+      options={[
+        { label: 'Apple', value: 'a' },
+        { label: 'Banana', value: 'b' },
+      ]}
+      onChange={onChange}
+    />,
+  );
+  await userEvent.click(screen.getByRole('button', { name: 'Apple' }));
+  expect(screen.getByRole('button', { name: 'Banana' })).toBeDisabled();
+  await userEvent.click(screen.getByRole('button', { name: 'Done' }));
+  expect(onChange).toHaveBeenCalledWith(
+    ['a'],
+    [{ label: 'Apple', value: 'a' }],
+  );
+});
+
+test('mobile search respects controlled text and reports edits', () => {
+  const onSearch = rs.fn();
+  const { rerender } = render(
+    <Select
+      mobile
+      defaultOpen
+      showSearch
+      searchValue="Apple"
+      onSearch={onSearch}
+      options={[]}
+    />,
+  );
+  const input = screen.getByRole('textbox', { name: 'Search options' });
+  expect(input).toHaveValue('Apple');
+  fireEvent.change(input, { target: { value: 'Banana' } });
+  expect(onSearch).toHaveBeenCalledWith('Banana');
+  expect(input).toHaveValue('Apple');
+  rerender(
+    <Select
+      mobile
+      defaultOpen
+      showSearch
+      searchValue="Banana"
+      onSearch={onSearch}
+      options={[]}
+    />,
+  );
+  expect(input).toHaveValue('Banana');
+});
+
+test('mobile tags creates values and applies token separators before Done', async () => {
+  const onChange = rs.fn();
+  render(
+    <Select
+      mobile
+      defaultOpen
+      mode="tags"
+      showSearch
+      options={[]}
+      tokenSeparators={[',']}
+      onChange={onChange}
+    />,
+  );
+  const input = screen.getByRole('textbox', { name: 'Search options' });
+  fireEvent.change(input, { target: { value: 'First,Second' } });
+  fireEvent.keyDown(input, { key: 'Enter' });
+  expect(onChange).not.toHaveBeenCalled();
+  expect(screen.getByRole('button', { name: 'First' })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
+  await userEvent.click(screen.getByRole('button', { name: 'Second' }));
+  await userEvent.click(screen.getByRole('button', { name: 'Done' }));
+  expect(onChange).toHaveBeenCalledWith(['First'], []);
+});
+
+test('an open mobile Select retains its draft and presentation across breakpoint changes', async () => {
+  const onChange = rs.fn();
+  const options = [{ value: 'a', label: 'Apple' }];
+  const { rerender } = render(
+    <Select
+      mobile
+      defaultOpen
+      mode="multiple"
+      options={options}
+      onChange={onChange}
+    />,
+  );
+  await userEvent.click(screen.getByRole('button', { name: 'Apple' }));
+  rerender(
+    <Select
+      mobile={false}
+      defaultOpen
+      mode="multiple"
+      options={options}
+      onChange={onChange}
+    />,
+  );
+  expect(screen.getByRole('button', { name: 'Apple' })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
+  await userEvent.click(screen.getByRole('button', { name: 'Done' }));
+  expect(onChange).toHaveBeenCalledWith(['a'], options);
+  await userEvent.click(screen.getByRole('combobox'));
+  expect(screen.getByRole('listbox')).toBeInTheDocument();
+});
+
+test('mobile popup forwards semantic parts and popupRender', () => {
+  render(
+    <Select
+      mobile
+      defaultOpen
+      showSearch
+      options={[{ value: 'a', label: 'Apple' }]}
+      classNames={{
+        popup: 'custom-popup',
+        item: 'custom-item',
+        searchInput: 'custom-input',
+      }}
+      styles={{ item: { color: 'red' } }}
+      popupRender={(menu) => <section aria-label="Custom menu">{menu}</section>}
+    />,
+  );
+  expect(
+    screen.getByRole('region', { name: 'Custom menu' }),
+  ).toBeInTheDocument();
+  expect(screen.getByRole('dialog')).toHaveClass('custom-popup');
+  expect(screen.getByRole('textbox', { name: 'Search options' })).toHaveClass(
+    'custom-input',
+  );
+  expect(screen.getByRole('button', { name: 'Apple' })).toHaveClass(
+    'custom-item',
+  );
+  expect(screen.getByRole('button', { name: 'Apple' })).toHaveStyle({
+    color: 'red',
+  });
+});
+
+test('mobile clear is available before hover and does not open the drawer', async () => {
+  const onChange = rs.fn();
+  render(
+    <Select
+      mobile
+      allowClear
+      defaultValue="a"
+      options={[{ value: 'a', label: 'Apple' }]}
+      onChange={onChange}
+    />,
+  );
+  await userEvent.click(screen.getByRole('button', { name: 'Clear' }));
+  expect(onChange).toHaveBeenCalledWith('', undefined);
+  expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+});
+
+test('Select inherits configurable text through nested providers and portals', () => {
+  render(
+    <TaoProvider
+      locale={{
+        select: '选择',
+        searchPlaceholder: '搜索…',
+        searchOptions: '搜索选项',
+        done: '完成',
+        noResults: '暂无结果',
+      }}
+    >
+      <TaoProvider>
+        <Select mobile defaultOpen mode="multiple" showSearch options={[]} />
+      </TaoProvider>
+    </TaoProvider>,
+  );
+  expect(screen.getByRole('dialog', { name: '选择' })).toBeInTheDocument();
+  expect(screen.getByRole('textbox', { name: '搜索选项' })).toHaveAttribute(
+    'placeholder',
+    '搜索…',
+  );
+  expect(screen.getByRole('button', { name: '完成' })).toBeInTheDocument();
+  expect(screen.getByText('暂无结果')).toBeInTheDocument();
+});
+
 test('multiple selection notifies change before select, deselect and clear', async () => {
   const alpha = { label: 'Alpha', value: 'a' };
   const beta = { label: 'Beta', value: 'b' };
@@ -971,62 +1155,61 @@ test('multiple selection notifies change before select, deselect and clear', asy
   expect(document.querySelectorAll('[data-tao-select-tag]')).toHaveLength(0);
 });
 
-test.each([
-  undefined,
-  'multiple',
-  'tags',
-] as const)('%s controlled selection accepts only parent updates, including explicit undefined', async (mode) => {
-  const alpha = { label: 'Alpha', value: 'a' };
-  const beta = { label: 'Beta', value: 'b' };
-  const updatedBeta = { label: 'Updated Beta', value: 'b' };
-  const events: unknown[][] = [];
-  const props = {
-    mobile: false,
-    showSearch: true,
-    open: true,
-    mode,
-    placeholder: 'Pick',
-    onChange: (value: unknown, options: unknown) =>
-      events.push(['change', value, options]),
-    onSelect: (value: unknown, option: unknown) =>
-      events.push(['select', value, option]),
-    onDeselect: (value: unknown, option: unknown) =>
-      events.push(['deselect', value, option]),
-  };
-  const { container, rerender } = render(
-    <Select
-      {...props}
-      options={[alpha, beta]}
-      value={undefined}
-      defaultValue={mode ? ['b'] : 'b'}
-    />,
-  );
-  const trigger = container.querySelector('[data-tao-select]');
-  expect(trigger).not.toHaveTextContent('Beta');
-  await userEvent.click(screen.getByRole('option', { name: 'Alpha' }));
-  expect(events).toEqual([
-    ['change', mode ? ['a'] : 'a', mode ? [alpha] : alpha],
-    ['select', 'a', alpha],
-  ]);
-  expect(trigger).not.toHaveTextContent('Alpha');
+test.each([undefined, 'multiple', 'tags'] as const)(
+  '%s controlled selection accepts only parent updates, including explicit undefined',
+  async (mode) => {
+    const alpha = { label: 'Alpha', value: 'a' };
+    const beta = { label: 'Beta', value: 'b' };
+    const updatedBeta = { label: 'Updated Beta', value: 'b' };
+    const events: unknown[][] = [];
+    const props = {
+      mobile: false,
+      showSearch: true,
+      open: true,
+      mode,
+      placeholder: 'Pick',
+      onChange: (value: unknown, options: unknown) =>
+        events.push(['change', value, options]),
+      onSelect: (value: unknown, option: unknown) =>
+        events.push(['select', value, option]),
+      onDeselect: (value: unknown, option: unknown) =>
+        events.push(['deselect', value, option]),
+    };
+    const { container, rerender } = render(
+      <Select
+        {...props}
+        options={[alpha, beta]}
+        value={undefined}
+        defaultValue={mode ? ['b'] : 'b'}
+      />,
+    );
+    const trigger = container.querySelector('[data-tao-select]');
+    expect(trigger).not.toHaveTextContent('Beta');
+    await userEvent.click(screen.getByRole('option', { name: 'Alpha' }));
+    expect(events).toEqual([
+      ['change', mode ? ['a'] : 'a', mode ? [alpha] : alpha],
+      ['select', 'a', alpha],
+    ]);
+    expect(trigger).not.toHaveTextContent('Alpha');
 
-  rerender(
-    <Select
-      {...props}
-      options={[alpha, updatedBeta]}
-      value={mode ? ['b'] : 'b'}
-    />,
-  );
-  expect(trigger).toHaveTextContent('Updated Beta');
-  expect(events).toHaveLength(2);
-  events.length = 0;
-  await userEvent.click(screen.getByRole('option', { name: 'Updated Beta' }));
-  expect(events).toEqual([
-    ['change', mode ? [] : 'b', mode ? [] : updatedBeta],
-    [mode ? 'deselect' : 'select', 'b', updatedBeta],
-  ]);
-  expect(trigger).toHaveTextContent('Updated Beta');
-});
+    rerender(
+      <Select
+        {...props}
+        options={[alpha, updatedBeta]}
+        value={mode ? ['b'] : 'b'}
+      />,
+    );
+    expect(trigger).toHaveTextContent('Updated Beta');
+    expect(events).toHaveLength(2);
+    events.length = 0;
+    await userEvent.click(screen.getByRole('option', { name: 'Updated Beta' }));
+    expect(events).toEqual([
+      ['change', mode ? [] : 'b', mode ? [] : updatedBeta],
+      [mode ? 'deselect' : 'select', 'b', updatedBeta],
+    ]);
+    expect(trigger).toHaveTextContent('Updated Beta');
+  },
+);
 
 test('tag tokens notify once in canonical order and omit synthetic options', () => {
   const alpha = { label: 'Alpha', value: 'a' };
@@ -1093,35 +1276,38 @@ test('mobile draft commit notifies change then additions and removals, while can
   expect(trigger).toHaveTextContent('Alpha');
 });
 
-test.each([
-  undefined,
-  'multiple',
-  'tags',
-] as const)('%s mode keeps defaultValue editable when value is omitted', async (mode) => {
-  render(
-    <Select
-      mode={mode}
-      mobile={false}
-      open
-      defaultValue={mode ? ['a'] : 'a'}
-      options={[
-        { label: 'Alpha', value: 'a' },
-        { label: 'Beta', value: 'b' },
-      ]}
-    />,
-  );
-  expect(document.querySelector('[data-tao-select]')).toHaveTextContent(
-    'Alpha',
-  );
-  await userEvent.click(screen.getByRole('option', { name: 'Beta' }));
-  expect(document.querySelector('[data-tao-select]')).toHaveTextContent('Beta');
-  if (mode)
-    expect(document.querySelectorAll('[data-tao-select-tag]')).toHaveLength(2);
-  else
-    expect(document.querySelector('[data-tao-select]')).not.toHaveTextContent(
+test.each([undefined, 'multiple', 'tags'] as const)(
+  '%s mode keeps defaultValue editable when value is omitted',
+  async (mode) => {
+    render(
+      <Select
+        mode={mode}
+        mobile={false}
+        open
+        defaultValue={mode ? ['a'] : 'a'}
+        options={[
+          { label: 'Alpha', value: 'a' },
+          { label: 'Beta', value: 'b' },
+        ]}
+      />,
+    );
+    expect(document.querySelector('[data-tao-select]')).toHaveTextContent(
       'Alpha',
     );
-});
+    await userEvent.click(screen.getByRole('option', { name: 'Beta' }));
+    expect(document.querySelector('[data-tao-select]')).toHaveTextContent(
+      'Beta',
+    );
+    if (mode)
+      expect(document.querySelectorAll('[data-tao-select-tag]')).toHaveLength(
+        2,
+      );
+    else
+      expect(document.querySelector('[data-tao-select]')).not.toHaveTextContent(
+        'Alpha',
+      );
+  },
+);
 
 test('token separators normalize labels, ignore disabled options and deduplicate canonical values', () => {
   const onChange = rs.fn();
@@ -1193,63 +1379,63 @@ test('token separators retain controlled selection and enforce maxCount after no
   expect(document.querySelectorAll('[data-tao-select-tag]')).toHaveLength(1);
 });
 
-test.each([
-  'local',
-  'provider',
-])('mobile Select respects %s disabled on pointer and keyboard activation', async (source) => {
-  const onOpenChange = rs.fn();
-  render(
-    <TaoProvider disabled={source === 'provider'}>
-      <Select
-        mobile
-        disabled={source === 'local' ? true : undefined}
-        placeholder="Pick"
-        options={[{ label: 'Alpha', value: 'a' }]}
-        onOpenChange={onOpenChange}
-      />
-    </TaoProvider>,
-  );
-  const trigger = screen.getByRole('button', { name: 'Pick' });
-  await userEvent.click(trigger);
-  fireEvent.keyDown(trigger, { key: 'Enter' });
-  fireEvent.keyDown(trigger, { key: ' ' });
-  expect(onOpenChange).not.toHaveBeenCalled();
-  expect(screen.queryByRole('dialog')).toBeNull();
-  expect(trigger).toHaveAttribute('data-disabled');
-});
+test.each(['local', 'provider'])(
+  'mobile Select respects %s disabled on pointer and keyboard activation',
+  async (source) => {
+    const onOpenChange = rs.fn();
+    render(
+      <TaoProvider disabled={source === 'provider'}>
+        <Select
+          mobile
+          disabled={source === 'local' ? true : undefined}
+          placeholder="Pick"
+          options={[{ label: 'Alpha', value: 'a' }]}
+          onOpenChange={onOpenChange}
+        />
+      </TaoProvider>,
+    );
+    const trigger = screen.getByRole('button', { name: 'Pick' });
+    await userEvent.click(trigger);
+    fireEvent.keyDown(trigger, { key: 'Enter' });
+    fireEvent.keyDown(trigger, { key: ' ' });
+    expect(onOpenChange).not.toHaveBeenCalled();
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(trigger).toHaveAttribute('data-disabled');
+  },
+);
 
-test.each([
-  'single',
-  'multiple',
-])('mobile %s selection becomes disabled while its drawer is open', async (mode) => {
-  const onChange = rs.fn();
-  const select = (disabled: boolean) => (
-    <TaoProvider disabled={disabled}>
-      <Select
-        mobile
-        defaultOpen
-        mode={mode === 'multiple' ? 'multiple' : undefined}
-        showSearch
-        options={[{ label: 'Alpha', value: 'a' }]}
-        onChange={onChange}
-      />
-    </TaoProvider>
-  );
-  const { rerender } = render(select(false));
-  if (mode === 'multiple')
-    await userEvent.click(screen.getByRole('button', { name: 'Alpha' }));
-  rerender(select(true));
-  const option = screen.getByRole('button', { name: 'Alpha' });
-  expect(option).toBeDisabled();
-  expect(screen.getByPlaceholderText('Search...')).toBeDisabled();
-  await userEvent.click(option);
-  if (mode === 'multiple') {
-    const done = screen.getByRole('button', { name: 'Done' });
-    expect(done).toBeDisabled();
-    await userEvent.click(done);
-  }
-  expect(onChange).not.toHaveBeenCalled();
-});
+test.each(['single', 'multiple'])(
+  'mobile %s selection becomes disabled while its drawer is open',
+  async (mode) => {
+    const onChange = rs.fn();
+    const select = (disabled: boolean) => (
+      <TaoProvider disabled={disabled}>
+        <Select
+          mobile
+          defaultOpen
+          mode={mode === 'multiple' ? 'multiple' : undefined}
+          showSearch
+          options={[{ label: 'Alpha', value: 'a' }]}
+          onChange={onChange}
+        />
+      </TaoProvider>
+    );
+    const { rerender } = render(select(false));
+    if (mode === 'multiple')
+      await userEvent.click(screen.getByRole('button', { name: 'Alpha' }));
+    rerender(select(true));
+    const option = screen.getByRole('button', { name: 'Alpha' });
+    expect(option).toBeDisabled();
+    expect(screen.getByPlaceholderText('Search...')).toBeDisabled();
+    await userEvent.click(option);
+    if (mode === 'multiple') {
+      const done = screen.getByRole('button', { name: 'Done' });
+      expect(done).toBeDisabled();
+      await userEvent.click(done);
+    }
+    expect(onChange).not.toHaveBeenCalled();
+  },
+);
 
 test('local disabled=false still overrides mobile Select provider disabled', async () => {
   const onChange = rs.fn();
@@ -1269,58 +1455,56 @@ test('local disabled=false still overrides mobile Select provider disabled', asy
   expect(onChange).toHaveBeenCalledWith('a', { label: 'Alpha', value: 'a' });
 });
 
-test.each([
-  'Enter',
-  'Escape',
-  'ArrowDown',
-  'ArrowUp',
-])('Select leaves %s to the input method during composition', (key) => {
-  const onChange = rs.fn();
-  render(
-    <Select
-      mobile={false}
-      showSearch
-      mode="tags"
-      options={[
-        { label: 'Alpha', value: 'a' },
-        { label: 'Beta', value: 'b' },
-      ]}
-      filterOption={() => true}
-      onChange={onChange}
-    />,
-  );
-  const input = screen.getByRole('combobox');
-  fireEvent.change(input, { target: { value: '中文' } });
-  if (key === 'ArrowUp') fireEvent.keyDown(input, { key: 'ArrowDown' });
-  const activeOption = input.getAttribute('aria-activedescendant');
-  fireEvent.compositionStart(input);
-  fireEvent.keyDown(input, { key });
-  expect(onChange).not.toHaveBeenCalled();
-  expect(input).toHaveValue('中文');
-  expect(input).toHaveAttribute('aria-expanded', 'true');
-  expect(input.getAttribute('aria-activedescendant')).toBe(activeOption);
-});
+test.each(['Enter', 'Escape', 'ArrowDown', 'ArrowUp'])(
+  'Select leaves %s to the input method during composition',
+  (key) => {
+    const onChange = rs.fn();
+    render(
+      <Select
+        mobile={false}
+        showSearch
+        mode="tags"
+        options={[
+          { label: 'Alpha', value: 'a' },
+          { label: 'Beta', value: 'b' },
+        ]}
+        filterOption={() => true}
+        onChange={onChange}
+      />,
+    );
+    const input = screen.getByRole('combobox');
+    fireEvent.change(input, { target: { value: '中文' } });
+    if (key === 'ArrowUp') fireEvent.keyDown(input, { key: 'ArrowDown' });
+    const activeOption = input.getAttribute('aria-activedescendant');
+    fireEvent.compositionStart(input);
+    fireEvent.keyDown(input, { key });
+    expect(onChange).not.toHaveBeenCalled();
+    expect(input).toHaveValue('中文');
+    expect(input).toHaveAttribute('aria-expanded', 'true');
+    expect(input.getAttribute('aria-activedescendant')).toBe(activeOption);
+  },
+);
 
-test.each([
-  { isComposing: true },
-  { keyCode: 229 },
-])('Select ignores native composing Enter %j', (nativeState) => {
-  const onChange = rs.fn();
-  render(
-    <Select
-      mobile={false}
-      showSearch
-      mode="tags"
-      options={[]}
-      onChange={onChange}
-    />,
-  );
-  const input = screen.getByRole('combobox');
-  fireEvent.change(input, { target: { value: '中文' } });
-  fireEvent.keyDown(input, { key: 'Enter', ...nativeState });
-  expect(onChange).not.toHaveBeenCalled();
-  expect(input).toHaveValue('中文');
-});
+test.each([{ isComposing: true }, { keyCode: 229 }])(
+  'Select ignores native composing Enter %j',
+  (nativeState) => {
+    const onChange = rs.fn();
+    render(
+      <Select
+        mobile={false}
+        showSearch
+        mode="tags"
+        options={[]}
+        onChange={onChange}
+      />,
+    );
+    const input = screen.getByRole('combobox');
+    fireEvent.change(input, { target: { value: '中文' } });
+    fireEvent.keyDown(input, { key: 'Enter', ...nativeState });
+    expect(onChange).not.toHaveBeenCalled();
+    expect(input).toHaveValue('中文');
+  },
+);
 
 test('Select defers token separators until composition ends and then accepts normal submission', () => {
   const onChange = rs.fn();

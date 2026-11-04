@@ -3,6 +3,8 @@ title: Steps
 description: "引导用户按顺序完成多阶段任务的步骤条。页面涵盖适用场景、设计建议、各类型与变体的可运行示例、交互状态与完整 API 参考。"
 ---
 
+import Preview from '../../_components/demo-preview';
+
 引导用户按顺序完成多阶段的任务。
 
 ## 何时使用
@@ -22,7 +24,13 @@ description: "引导用户按顺序完成多阶段任务的步骤条。页面涵
 - 不要用 Steps 表示单一的不确定操作，请使用 Spinner。
 - 除非某一步确实失败或被跳过，否则不要逐项设置 `status`。
 
-## 基础用法
+## 代码演示
+
+<div className="tao-demo-grid tao-demo-grid-wide">
+
+<section className="tao-example" id="steps-example-1">
+
+### 基础用法
 
 ```tsx preview
 import { Steps } from '@rockshin/tao-ui';
@@ -43,7 +51,11 @@ function StepsExample() {
 export default StepsExample;
 ```
 
-## 垂直与可点击
+</section>
+
+<section className="tao-example" id="steps-example-2">
+
+### 垂直与可点击
 
 `onChange` 回调收到的是绝对步骤序号。点击当前步骤不会触发回调，`disabled` 的步骤始终不可交互。
 
@@ -78,7 +90,11 @@ function ClickableSteps() {
 export default ClickableSteps;
 ```
 
-## 状态、变体与尺寸
+</section>
+
+<section className="tao-example" id="steps-example-3">
+
+### 状态、变体与尺寸
 
 `status` 设置当前步骤的状态，其余步骤的状态由与当前位置的关系推导。`variant` 决定图标是实心还是描边，`size` 切换密度。
 
@@ -104,7 +120,11 @@ function StepsStatus() {
 export default StepsStatus;
 ```
 
-## 类型
+</section>
+
+<section className="tao-example" id="steps-example-4">
+
+### 类型
 
 `type` 改变整条步骤条的形态：`dot` 用小圆点替代数字图标，`navigation` 把每步变成带下划线指示的可点击标签，`panel` 则把步骤渲染成彼此咬合的缺口面板。
 
@@ -122,7 +142,7 @@ function StepsTypes() {
   const [current, setCurrent] = useState(1);
 
   return (
-    <Stack gap="xl">
+    <Stack gap="lg">
       <Steps items={items} current={current} type="dot" />
       <Steps
         items={items}
@@ -150,7 +170,11 @@ function StepsTypes() {
 export default StepsTypes;
 ```
 
-## 内联
+</section>
+
+<section className="tao-example" id="steps-example-5">
+
+### 内联
 
 `type="inline"` 渲染一条紧凑的圆点条，说明文字改由 Tooltip 承载。`offset` 沿主轴推移整条步骤条，`titlePlacement` 把标题移到圆点下方。
 
@@ -190,7 +214,11 @@ function InlineSteps() {
 export default InlineSteps;
 ```
 
-## 进度与最大数量
+</section>
+
+<section className="tao-example" id="steps-example-6">
+
+### 进度与最大数量
 
 `percent` 会在当前图标外圈画出进度环。`maxCount` 用于收拢过长的流程：被隐藏的区间折叠为一个禁用的省略步骤，而 `onChange` 依旧回传原始序号。
 
@@ -205,7 +233,7 @@ const items = [
 
 function StepsProgress() {
   return (
-    <Stack gap="xl">
+    <Stack gap="lg">
       <Steps items={items} current={1} percent={60} />
       <Steps
         current={3}
@@ -221,7 +249,11 @@ function StepsProgress() {
 export default StepsProgress;
 ```
 
-## 自定义图标
+</section>
+
+<section className="tao-example" id="steps-example-7">
+
+### 自定义图标
 
 `items[].icon` 替换单个步骤的图标。`iconRender` 替换全部图标，并会收到步骤序号、是否为当前步骤，以及用于渲染语义化图标容器的 `Icon` 组件。
 
@@ -261,7 +293,11 @@ function CustomIconSteps() {
 export default CustomIconSteps;
 ```
 
-## 语义化 DOM 定制
+</section>
+
+<section className="tao-example" id="steps-example-8">
+
+### 语义化 DOM 定制
 
 每个部件都可以通过 `classNames` 与 `styles` 定位，单个步骤也能覆盖自己的部件。
 
@@ -285,6 +321,441 @@ function StyledSteps() {
 
 export default StyledSteps;
 ```
+
+</section>
+
+<section className="tao-example" id="steps-clickable">
+
+### 可点击切换
+
+维护 `current` 并处理 `onChange`，步骤切换后同步展示当前内容。
+
+```tsx preview
+import { Stack, Steps } from '@rockshin/tao-ui';
+
+import { useState } from 'react';
+
+const basicItems = [
+  { title: 'Finished', content: 'This step is done.' },
+  { title: 'In Progress', content: 'Working on it now.' },
+  { title: 'Waiting', content: 'Not started yet.' },
+];
+
+export default function StepsClickable() {
+  function Demo() {
+    const [current, setCurrent] = useState(0);
+    return (
+      <Stack gap="md">
+        <Steps items={basicItems} current={current} onChange={setCurrent} />
+        <p style={{ color: 'var(--tao-color-text-secondary)', fontSize: 13 }}>
+          current: {current}
+        </p>
+      </Stack>
+    );
+  }
+  return <Demo />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="steps-error-status">
+
+### 当前步骤出错
+
+`status="error"` 明确标识当前步骤失败，错误原因由旁边的说明表达。
+
+```tsx preview
+import { Steps } from '@rockshin/tao-ui';
+
+const basicItems = [
+  { title: 'Finished', content: 'This step is done.' },
+  { title: 'In Progress', content: 'Working on it now.' },
+  { title: 'Waiting', content: 'Not started yet.' },
+];
+
+export default function StepsErrorStatus() {
+  return <Steps items={basicItems} current={1} status="error" />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="steps-per-step-status">
+
+### 独立步骤状态
+
+为单个步骤设置状态，可表达部分完成、失败和等待并存的流程。
+
+```tsx preview
+import { Steps } from '@rockshin/tao-ui';
+
+export default function StepsPerStepStatus() {
+  return (
+    <Steps
+      current={2}
+      items={[
+        { title: 'Done', content: 'Finished.' },
+        { title: 'Failed', content: 'Something broke.', status: 'error' },
+        { title: 'Running', content: 'In progress.' },
+        { title: 'Queued', content: 'Not started.' },
+      ]}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="steps-title-placement">
+
+### 标题位置
+
+控制标题相对步骤图形的位置，匹配可用空间。
+
+```tsx preview
+import { Stack, Steps } from '@rockshin/tao-ui';
+
+const basicItems = [
+  { title: 'Finished', content: 'This step is done.' },
+  { title: 'In Progress', content: 'Working on it now.' },
+  { title: 'Waiting', content: 'Not started yet.' },
+];
+
+export default function StepsTitlePlacement() {
+  return (
+    <Stack gap="lg">
+      <Steps items={basicItems} current={1} titlePlacement="horizontal" />
+      <Steps items={basicItems} current={1} titlePlacement="vertical" />
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="steps-with-progress">
+
+### 步骤内进度
+
+通过 `percent` 展示当前步骤的进度，示例可切换进度值。
+
+```tsx preview
+import { Stack, Steps } from '@rockshin/tao-ui';
+
+import { useState } from 'react';
+
+const basicItems = [
+  { title: 'Finished', content: 'This step is done.' },
+  { title: 'In Progress', content: 'Working on it now.' },
+  { title: 'Waiting', content: 'Not started yet.' },
+];
+
+export default function StepsWithProgress() {
+  function Demo() {
+    const [percent, setPercent] = useState(40);
+    return (
+      <Stack gap="md">
+        <Steps
+          items={basicItems}
+          current={1}
+          percent={percent}
+          onChange={() => setPercent((p) => (p >= 100 ? 10 : p + 30))}
+        />
+        <p style={{ color: 'var(--tao-color-text-secondary)', fontSize: 13 }}>
+          percent: {percent}
+        </p>
+      </Stack>
+    );
+  }
+  return <Demo />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="steps-dot-style">
+
+### 点状步骤
+
+`type="dot"` 使用更紧凑的节点，适合状态追踪。
+
+```tsx preview
+import { Steps } from '@rockshin/tao-ui';
+
+const basicItems = [
+  { title: 'Finished', content: 'This step is done.' },
+  { title: 'In Progress', content: 'Working on it now.' },
+  { title: 'Waiting', content: 'Not started yet.' },
+];
+
+export default function StepsDotStyle() {
+  return <Steps items={basicItems} current={1} type="dot" />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="steps-dot-with-custom-dot">
+
+### 自定义步骤点
+
+通过渲染回调定制步骤点，保留标题与状态信息。
+
+```tsx preview
+import { Steps } from '@rockshin/tao-ui';
+
+const basicItems = [
+  { title: 'Finished', content: 'This step is done.' },
+  { title: 'In Progress', content: 'Working on it now.' },
+  { title: 'Waiting', content: 'Not started yet.' },
+];
+
+export default function StepsDotWithCustomDot() {
+  return (
+    <Steps
+      items={basicItems}
+      current={1}
+      type="dot"
+      iconRender={() => (
+        <span
+          style={{
+            width: 10,
+            height: 10,
+            borderRadius: '50%',
+            background: 'currentColor',
+          }}
+        />
+      )}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="steps-navigation">
+
+### 导航型步骤
+
+导航型步骤适合在多个流程阶段之间切换。
+
+```tsx preview
+import { Steps } from '@rockshin/tao-ui';
+
+import { useState } from 'react';
+
+export default function StepsNavigation() {
+  function Demo() {
+    const [current, setCurrent] = useState(0);
+    return (
+      <Steps
+        type="navigation"
+        current={current}
+        onChange={setCurrent}
+        items={[
+          { title: 'Step 1', content: 'First' },
+          { title: 'Step 2', content: 'Second' },
+          { title: 'Step 3', content: 'Third' },
+        ]}
+      />
+    );
+  }
+  return <Demo />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="steps-panel">
+
+### 面板型步骤
+
+面板型步骤为标题和说明提供更大的操作区域。
+
+```tsx preview
+import { Stack, Steps } from '@rockshin/tao-ui';
+
+import { useState } from 'react';
+
+export default function StepsPanel() {
+  function Demo() {
+    const [current, setCurrent] = useState(1);
+    return (
+      <Stack gap="lg">
+        <Steps
+          type="panel"
+          current={current}
+          onChange={setCurrent}
+          items={[
+            { title: 'One' },
+            { title: 'Two' },
+            { title: 'Three' },
+            { title: 'Four' },
+          ]}
+        />
+        <Steps
+          type="panel"
+          variant="outlined"
+          current={current}
+          onChange={setCurrent}
+          items={[
+            { title: 'One' },
+            { title: 'Two' },
+            { title: 'Three' },
+            { title: 'Four' },
+          ]}
+        />
+      </Stack>
+    );
+  }
+  return <Demo />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="steps-max-count">
+
+### 限制可见步骤
+
+用 `maxCount` 折叠较长流程，移动当前步骤时观察显示范围变化。
+
+```tsx preview
+import { Steps } from '@rockshin/tao-ui';
+
+export default function StepsMaxCount() {
+  return (
+    <Steps
+      current={3}
+      maxCount={5}
+      items={Array.from({ length: 10 }, (_, index) => ({
+        title: `Step ${index + 1}`,
+      }))}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="steps-disabled-step">
+
+### 禁用某个步骤
+
+单独禁用不可进入的步骤，不影响其他可点击步骤。
+
+```tsx preview
+import { Steps } from '@rockshin/tao-ui';
+
+export default function StepsDisabledStep() {
+  return (
+    <Steps
+      current={1}
+      onChange={() => {}}
+      items={[
+        { title: 'First' },
+        { title: 'Second' },
+        { title: 'Locked', disabled: true },
+      ]}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="steps-ellipsis">
+
+### 长标题截断
+
+长标题在受限宽度内截断，详细解释放在步骤内容中。
+
+```tsx preview
+import { Stack, Steps } from '@rockshin/tao-ui';
+
+const basicItems = [
+  { title: 'Finished', content: 'This step is done.' },
+  { title: 'In Progress', content: 'Working on it now.' },
+  { title: 'Waiting', content: 'Not started yet.' },
+];
+
+export default function StepsEllipsis() {
+  return (
+    <Stack gap="lg">
+      <div style={{ maxWidth: 520 }}>
+        <Steps items={basicItems} current={1} ellipsis />
+      </div>
+      <div style={{ maxWidth: 520 }}>
+        <Steps
+          items={[
+            {
+              title: 'A rather long first title',
+              subTitle: 'with a subtitle',
+              content: 'And a long description that will be truncated.',
+            },
+            { title: 'Second', content: 'Also truncated when needed.' },
+          ]}
+          current={0}
+          ellipsis
+        />
+      </div>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="steps-initial">
+
+### 起始序号
+
+通过 `initial` 调整显示序号，`current` 仍使用组件约定的索引。
+
+```tsx preview
+import { Steps } from '@rockshin/tao-ui';
+
+const basicItems = [
+  { title: 'Finished', content: 'This step is done.' },
+  { title: 'In Progress', content: 'Working on it now.' },
+  { title: 'Waiting', content: 'Not started yet.' },
+];
+
+export default function StepsInitial() {
+  return <Steps items={basicItems} initial={2} current={3} />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="steps-provider-inherit">
+
+### 继承全局配置
+
+继承尺寸与外观配置，也可以在单个步骤组件上覆盖。
+
+```tsx preview
+import { Steps, TaoProvider } from '@rockshin/tao-ui';
+
+const basicItems = [
+  { title: 'Finished', content: 'This step is done.' },
+  { title: 'In Progress', content: 'Working on it now.' },
+  { title: 'Waiting', content: 'Not started yet.' },
+];
+
+export default function StepsProviderInherit() {
+  return (
+    <TaoProvider size="small">
+      <Steps items={basicItems} current={1} variant="outlined" />
+    </TaoProvider>
+  );
+}
+```
+
+</section>
+
+</div>
 
 ## API
 

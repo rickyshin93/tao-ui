@@ -3,6 +3,8 @@ title: Switch
 description: 立即切换一个布尔设置，并展示当前开关状态。页面涵盖适用场景、设计建议、多组可运行示例、交互状态与完整 API 参考。
 ---
 
+import Preview from '../../_components/demo-preview';
+
 立即切换一个布尔设置，并展示当前开关状态。
 
 ## 何时使用
@@ -18,7 +20,13 @@ description: 立即切换一个布尔设置，并展示当前开关状态。页�
 
 - 需要提交确认或选择多个值时不要使用 Switch。
 
-## 基础用法
+## 代码演示
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="switch-example-1">
+
+### 基础用法
 
 ```tsx preview
 import { Stack, Switch } from '@rockshin/tao-ui';
@@ -39,7 +47,11 @@ function SwitchExample() {
 export default SwitchExample;
 ```
 
-## 标签与尺寸
+</section>
+
+<section className="tao-example" id="switch-example-2">
+
+### 标签与尺寸
 
 ```tsx preview
 import { Stack, Switch } from '@rockshin/tao-ui';
@@ -49,7 +61,40 @@ function SwitchLabels() {
     <Stack direction="horizontal" gap="lg" align="center">
       <Switch size="small" defaultChecked />
       <Switch checkedChildren="ON" unCheckedChildren="OFF" defaultChecked />
-      <Switch checkedChildren="✓" unCheckedChildren="×" />
+      <Switch
+        aria-label="接收通知"
+        checkedChildren={
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 16 16"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <path d="m3 8 3 3 7-7" />
+          </svg>
+        }
+        unCheckedChildren={
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 16 16"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <path d="m4 4 8 8m0-8-8 8" />
+          </svg>
+        }
+      />
     </Stack>
   );
 }
@@ -57,7 +102,11 @@ function SwitchLabels() {
 export default SwitchLabels;
 ```
 
-## 加载与禁用状态
+</section>
+
+<section className="tao-example" id="switch-example-3">
+
+### 加载与禁用状态
 
 ```tsx preview
 import { Stack, Switch } from '@rockshin/tao-ui';
@@ -74,6 +123,122 @@ function SwitchStates() {
 
 export default SwitchStates;
 ```
+
+</section>
+
+<section className="tao-example" id="switch-controlled">
+
+### 受控开关
+
+onChange 返回布尔值，可直接与设置状态同步。
+
+```tsx preview
+import { useState } from 'react';
+import { Switch, Stack } from '@rockshin/tao-ui';
+export default function Example() {
+  const [enabled, setEnabled] = useState(true);
+  return (
+    <Stack direction="vertical">
+      <Switch
+        aria-label="Notifications"
+        checked={enabled}
+        onChange={setEnabled}
+      />
+      <output>
+        {enabled ? 'Notifications enabled' : 'Notifications disabled'}
+      </output>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="switch-loading-state">
+
+### 加载期间禁止重复切换
+
+使用独立按钮切换 loading，观察开关的等待状态。
+
+```tsx preview
+import { useState } from 'react';
+import { Switch, Button, Stack } from '@rockshin/tao-ui';
+export default function Example() {
+  const [loading, setLoading] = useState(false);
+  return (
+    <Stack direction="vertical">
+      <Switch aria-label="Sync" loading={loading} defaultChecked />
+      <Button onClick={() => setLoading(!loading)}>
+        {loading ? 'Finish loading' : 'Start loading'}
+      </Button>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="switch-labels">
+
+### 状态文字与尺寸
+
+简短文字适合双态开关，大小尺寸都应保持完整可读。
+
+```tsx preview
+import { Switch, Stack } from '@rockshin/tao-ui';
+export default function Example() {
+  return (
+    <Stack direction="vertical">
+      <Switch
+        aria-label="Access"
+        checkedChildren="On"
+        unCheckedChildren="Off"
+        defaultChecked
+      />
+      <Switch
+        size="small"
+        aria-label="Compact access"
+        checkedChildren="On"
+        unCheckedChildren="Off"
+        defaultChecked
+      />
+      <Switch
+        aria-label="Locked access"
+        checkedChildren="On"
+        unCheckedChildren="Off"
+        defaultChecked
+        disabled
+      />
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="switch-provider">
+
+### 共享尺寸与禁用
+
+多个开关可继承配置，局部 disabled 可以覆盖。
+
+```tsx preview
+import { Switch, TaoProvider, Stack } from '@rockshin/tao-ui';
+export default function Example() {
+  return (
+    <TaoProvider size="small" disabled>
+      <Stack>
+        <Switch aria-label="Inherited disabled" defaultChecked />
+        <Switch aria-label="Enabled override" disabled={false} />
+      </Stack>
+    </TaoProvider>
+  );
+}
+```
+
+</section>
+
+</div>
 
 ## API
 

@@ -12,5 +12,5 @@
       "@rockshin/tao-ui": ["./src/index.tsx"]
     }
   },
-  "include": ["src", "docs", "rspress.config.ts"]
+  "include": ["src", "docs", "theme", "rspress.config.ts"]
 }

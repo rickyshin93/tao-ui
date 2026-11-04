@@ -23,8 +23,24 @@ test('token helpers are available from both the root and the tokens subpath', ()
 });
 
 test('metadata registry contains every documented component', () => {
-  expect(metadataExports.componentDocs).toHaveLength(37);
-  for (const name of ['alert', 'form', 'popconfirm', 'popover', 'tooltip']) {
+  expect(metadataExports.componentDocs).toHaveLength(73);
+  for (const component of metadataExports.componentDocs) {
+    for (const exportedName of component.exports) {
+      expect(exportedName in publicExports).toBe(true);
+    }
+  }
+  for (const name of [
+    'alert',
+    'form',
+    'popconfirm',
+    'popover',
+    'tooltip',
+    'app',
+    'upload',
+    'tree',
+    'time-picker',
+    'border-beam',
+  ]) {
     expect(metadataExports.getComponentDoc(name)?.name).toBe(name);
   }
 });

@@ -1,0 +1,248 @@
+---
+title: List
+description: "Displays repeated records with metadata, actions, pagination or a responsive grid."
+---
+
+import Preview from '../../_components/demo-preview';
+
+Displays repeated records with metadata, actions, pagination or a responsive grid.
+
+## When to use
+
+Use for content that needs more structure than plain text but fewer aligned columns than a table. Use Listy when you need explicit virtual scrolling.
+
+## Examples
+
+<div className="tao-demo-grid tao-demo-grid-wide">
+
+<section className="tao-example" id="list-example-1">
+
+### Metadata and avatars
+
+List.Item.Meta composes an avatar, title and description.
+
+```tsx preview="iframe-follow"
+import { Avatar, List } from '@rockshin/tao-ui';
+
+const people = [
+  { id: 'a', name: 'Alex Chen', role: 'Design lead' },
+  { id: 'b', name: 'Morgan Lee', role: 'Frontend engineer' },
+  { id: 'c', name: 'Sam Rivera', role: 'Product manager' },
+];
+export default function Example() {
+  return (
+    <List
+      bordered
+      header="Workspace members"
+      dataSource={people}
+      rowKey="id"
+      renderItem={(person) => (
+        <List.Item>
+          <List.Item.Meta
+            avatar={<Avatar>{person.name[0]}</Avatar>}
+            title={person.name}
+            description={person.role}
+          />
+        </List.Item>
+      )}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="list-example-2">
+
+### Vertical content and actions
+
+Use itemLayout="vertical" for article-like content. extra is a separate supporting region.
+
+```tsx preview
+import { useState } from 'react';
+import { Button, List, Tag } from '@rockshin/tao-ui';
+
+export default function Example() {
+  const [saved, setSaved] = useState(false);
+  return (
+    <List itemLayout="vertical">
+      <List.Item
+        extra={<Tag>Guide</Tag>}
+        actions={[
+          <Button
+            key="save"
+            variant="secondary"
+            size="small"
+            onClick={() => setSaved((value) => !value)}
+          >
+            {saved ? 'Saved' : 'Save article'}
+          </Button>,
+        ]}
+      >
+        <List.Item.Meta
+          title="Designing clear interfaces"
+          description="Updated today · 5 min read"
+        />
+        <p>
+          Keep actions close to the information they affect, and use a
+          consistent visual hierarchy.
+        </p>
+      </List.Item>
+    </List>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="list-example-3">
+
+### Pagination and page size
+
+List slices dataSource for the current page. For server paging, pass the page records and total explicitly.
+
+```tsx preview
+import { List } from '@rockshin/tao-ui';
+
+const records = Array.from({ length: 24 }, (_, index) => ({
+  id: index,
+  title: `Release note ${index + 1}`,
+}));
+export default function Example() {
+  return (
+    <List
+      bordered
+      dataSource={records}
+      rowKey="id"
+      pagination={{
+        defaultPageSize: 4,
+        pageSizeOptions: [4, 8, 12],
+        showSizeChanger: true,
+        showQuickJumper: true,
+        showTotal: (total) => `${total} notes`,
+      }}
+      renderItem={(item) => <List.Item>{item.title}</List.Item>}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="list-example-4">
+
+### Responsive grid
+
+The grid changes from one column on a phone to three columns on larger viewports.
+
+```tsx preview="iframe-follow"
+import { Card, List } from '@rockshin/tao-ui';
+
+const records = [
+  'Research',
+  'Design',
+  'Engineering',
+  'Content',
+  'Operations',
+  'Support',
+];
+export default function Example() {
+  return (
+    <List
+      grid={{ gutter: [16, 16], xs: 1, sm: 2, lg: 3 }}
+      dataSource={records}
+      renderItem={(title) => (
+        <List.Item key={title}>
+          <Card title={title}>Workspace team</Card>
+        </List.Item>
+      )}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="list-example-5">
+
+### Loading, empty and load more
+
+This demo appends local records. Use loading for real requests and locale.emptyText for an application-specific empty state.
+
+```tsx preview
+import { useState } from 'react';
+import { Button, Empty, List, Stack } from '@rockshin/tao-ui';
+
+export default function Example() {
+  const [count, setCount] = useState(0);
+  const [loading, setLoading] = useState(false);
+  return (
+    <Stack gap="md">
+      <Button variant="secondary" onClick={() => setLoading((value) => !value)}>
+        {loading ? 'Hide loading' : 'Show loading'}
+      </Button>
+      <List
+        loading={loading}
+        dataSource={Array.from(
+          { length: count },
+          (_, index) => `Activity ${index + 1}`,
+        )}
+        locale={{
+          emptyText: (
+            <Empty
+              image={Empty.PRESENTED_IMAGE_SIMPLE}
+              description="No activity yet"
+            />
+          ),
+        }}
+        loadMore={
+          <Button
+            variant="secondary"
+            onClick={() => setCount((value) => value + 3)}
+          >
+            Add three records
+          </Button>
+        }
+        renderItem={(item) => <List.Item key={item}>{item}</List.Item>}
+      />
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="list-example-6">
+
+### Compact rows and semantic styles
+
+Disable split to remove row separators and customize header/footer regions independently.
+
+```tsx preview
+import { List } from '@rockshin/tao-ui';
+
+export default function Example() {
+  return (
+    <List
+      size="small"
+      split={false}
+      header="Recent workspaces"
+      footer="All changes saved"
+      styles={{
+        header: { fontWeight: 600 },
+        footer: { color: 'var(--tao-color-text-secondary)' },
+      }}
+      dataSource={['Atlas', 'Northstar', 'Studio']}
+      renderItem={(item) => <List.Item key={item}>{item}</List.Item>}
+    />
+  );
+}
+```
+
+</section>
+
+</div>
+
+## API
+
+<API moduleName="list" />

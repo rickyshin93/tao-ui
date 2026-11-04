@@ -1,0 +1,313 @@
+---
+title: Mentions
+description: "在文本域中通过前缀触发建议，支持键盘插入、异步选项与自动高度。"
+---
+
+import Preview from '../../_components/demo-preview';
+
+在文本域中通过前缀触发建议，支持键盘插入、异步选项与自动高度。
+
+每个示例都可以独立复制运行。带设备预览的示例可通过工具栏切换桌面与手机宽度。
+
+尺寸支持 `small`、`medium`、`large`；兼容别名 `middle` 与 `medium` 使用相同尺寸。
+
+## 示例
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="mentions-basic">
+
+### 受控提及
+
+输入 @ 打开建议列表，getMentions 从最终文本中提取匹配词条。
+
+```tsx preview
+import { useState } from 'react';
+import { Mentions } from '@rockshin/tao-ui';
+const people = [
+  { value: 'alice', label: 'Alice Chen' },
+  { value: 'bob', label: 'Bob Li' },
+  { value: 'carol', label: 'Carol Wu' },
+];
+export default function BasicMentions() {
+  const [value, setValue] = useState('Hi @alice ');
+  return (
+    <div>
+      <Mentions
+        aria-label="Message"
+        value={value}
+        onChange={setValue}
+        options={people}
+        rows={3}
+        allowClear
+        placeholder="Type @ to mention a person"
+      />
+      <p>
+        Mentions:{' '}
+        {Mentions.getMentions(value)
+          .map((item) => item.value)
+          .join(', ') || 'none'}
+      </p>
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="mentions-prefix">
+
+### 多个触发前缀
+
+onSearch 会接收当前前缀，不同前缀可以对应不同的选项。
+
+```tsx preview
+import { useState } from 'react';
+import { Mentions } from '@rockshin/tao-ui';
+const people = [
+  { value: 'alice', label: 'Alice Chen' },
+  { value: 'bob', label: 'Bob Li' },
+  { value: 'carol', label: 'Carol Wu' },
+];
+const topics = [
+  { value: 'design', label: 'Design' },
+  { value: 'release', label: 'Release' },
+];
+export default function PrefixMentions() {
+  const [prefix, setPrefix] = useState('@');
+  return (
+    <Mentions
+      aria-label="Message with people and topics"
+      prefix={['@', '#']}
+      onSearch={(_text, active) => setPrefix(active)}
+      options={prefix === '@' ? people : topics}
+      placeholder="Use @ for people or # for topics"
+      rows={3}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="mentions-autosize">
+
+### 自动高度
+
+autoSize 将高度限制为两到六行，超过后在文本域内滚动。
+
+```tsx preview
+import { Mentions } from '@rockshin/tao-ui';
+const people = [
+  { value: 'alice', label: 'Alice Chen' },
+  { value: 'bob', label: 'Bob Li' },
+  { value: 'carol', label: 'Carol Wu' },
+];
+export default function GrowingMentions() {
+  return (
+    <Mentions
+      aria-label="Growing message"
+      options={people}
+      autoSize={{ minRows: 2, maxRows: 6 }}
+      allowClear
+      placeholder="Type several lines, then mention @alice"
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="mentions-filter">
+
+### 自定义匹配与禁用项
+
+过滤函数可同时匹配标签和值；禁用选项仍然展示，但不能插入。
+
+```tsx preview
+import { Mentions } from '@rockshin/tao-ui';
+const options = [
+  { value: 'alice', label: 'Alice — Design' },
+  { value: 'bob', label: 'Bob — Engineering' },
+  { value: 'archived', label: 'Archived user', disabled: true },
+];
+export default function FilteredMentions() {
+  return (
+    <Mentions
+      aria-label="Reviewer"
+      options={options}
+      filterOption={(search, option) =>
+        `${option.value} ${options.find((item) => item.value === option.value)?.label}`
+          .toLowerCase()
+          .includes(search.toLowerCase())
+      }
+      placeholder="Try @design"
+      rows={3}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="mentions-async">
+
+### 异步建议
+
+此本地示例模拟搜索延迟，并在等待时显示 loading 状态。
+
+```tsx preview
+import { useEffect, useState } from 'react';
+import { Mentions } from '@rockshin/tao-ui';
+const people = [
+  { value: 'alice', label: 'Alice Chen' },
+  { value: 'bob', label: 'Bob Li' },
+  { value: 'carol', label: 'Carol Wu' },
+];
+export default function AsyncMentions() {
+  const [search, setSearch] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [options, setOptions] = useState(people);
+  useEffect(() => {
+    setLoading(true);
+    const timer = setTimeout(() => {
+      setOptions(
+        people.filter((item) => item.value.includes(search.toLowerCase())),
+      );
+      setLoading(false);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [search]);
+  return (
+    <Mentions
+      aria-label="Search people"
+      options={options}
+      loading={loading}
+      filterOption={false}
+      onSearch={setSearch}
+      placeholder="Type @ and a name"
+      rows={3}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="mentions-popup">
+
+### 自定义弹层内容
+
+popupRender 保留选项菜单，同时补充上下文提示。
+
+```tsx preview
+import { Mentions } from '@rockshin/tao-ui';
+const people = [
+  { value: 'alice', label: 'Alice Chen' },
+  { value: 'bob', label: 'Bob Li' },
+  { value: 'carol', label: 'Carol Wu' },
+];
+export default function MentionHelp() {
+  return (
+    <Mentions
+      aria-label="Comment"
+      options={people}
+      rows={3}
+      popupRender={(menu) => (
+        <div>
+          {menu}
+          <div
+            style={{
+              padding: '8px 12px',
+              fontSize: 12,
+              opacity: 0.6,
+              borderTop: '1px solid var(--tao-color-border-secondary)',
+            }}
+          >
+            ↑ ↓ to navigate · Enter to insert
+          </div>
+        </div>
+      )}
+      placeholder="Mention @someone"
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="mentions-appearance">
+
+### 外观与校验状态
+
+外观、尺寸和校验状态遵循共享控件主题。
+
+```tsx preview
+import { Mentions } from '@rockshin/tao-ui';
+const people = [
+  { value: 'alice', label: 'Alice Chen' },
+  { value: 'bob', label: 'Bob Li' },
+  { value: 'carol', label: 'Carol Wu' },
+];
+export default function MentionAppearance() {
+  return (
+    <div style={{ display: 'grid', gap: 12 }}>
+      <Mentions
+        options={people}
+        size="small"
+        variant="filled"
+        placeholder="Small filled"
+      />
+      <Mentions
+        options={people}
+        size="middle"
+        variant="underlined"
+        status="error"
+        placeholder="A reviewer is required"
+      />
+      <Mentions options={people} disabled defaultValue="Assigned to @alice" />
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="mentions-mobile">
+
+### 手机中的提及
+
+弹层跟随光标位置；在手机预览中体验向上弹出和自动增高的文本域。
+
+```tsx preview="iframe-follow"
+import { Mentions } from '@rockshin/tao-ui';
+const people = [
+  { value: 'alice', label: 'Alice Chen' },
+  { value: 'bob', label: 'Bob Li' },
+  { value: 'carol', label: 'Carol Wu' },
+];
+export default function MobileMentions() {
+  return (
+    <div style={{ padding: 16 }}>
+      <h3>Team update</h3>
+      <p>Type @ to include a teammate.</p>
+      <Mentions
+        aria-label="Team update"
+        options={people}
+        placement="top"
+        autoSize={{ minRows: 4, maxRows: 8 }}
+        allowClear
+        style={{ width: '100%' }}
+      />
+    </div>
+  );
+}
+```
+
+</section>
+
+</div>
+
+## API
+
+<API moduleName="mentions" />

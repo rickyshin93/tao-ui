@@ -5,12 +5,32 @@
   },
   {
     "type": "file",
+    "name": "border-beam",
+    "label": "BorderBeam 边框光束"
+  },
+  {
+    "type": "file",
     "name": "button",
-    "label": "Button"
+    "label": "Button 按钮"
+  },
+  {
+    "type": "file",
+    "name": "float-button",
+    "label": "FloatButton 悬浮按钮"
+  },
+  {
+    "type": "file",
+    "name": "watermark",
+    "label": "Watermark 水印"
   },
   {
     "type": "section-header",
     "label": "布局"
+  },
+  {
+    "type": "file",
+    "name": "divider",
+    "label": "Divider 分割线"
   },
   {
     "type": "file",
@@ -30,6 +50,11 @@
   {
     "type": "section-header",
     "label": "导航"
+  },
+  {
+    "type": "file",
+    "name": "affix",
+    "label": "Affix 固钉"
   },
   {
     "type": "file",
@@ -67,8 +92,23 @@
   },
   {
     "type": "file",
+    "name": "auto-complete",
+    "label": "AutoComplete 自动完成"
+  },
+  {
+    "type": "file",
+    "name": "cascader",
+    "label": "Cascader 级联选择"
+  },
+  {
+    "type": "file",
     "name": "checkbox",
     "label": "Checkbox"
+  },
+  {
+    "type": "file",
+    "name": "color-picker",
+    "label": "ColorPicker 颜色选择器"
   },
   {
     "type": "file",
@@ -97,11 +137,6 @@
   },
   {
     "type": "file",
-    "name": "headless-input-number",
-    "label": "HeadlessInputNumber"
-  },
-  {
-    "type": "file",
     "name": "input",
     "label": "Input"
   },
@@ -109,6 +144,11 @@
     "type": "file",
     "name": "input-number",
     "label": "InputNumber"
+  },
+  {
+    "type": "file",
+    "name": "mentions",
+    "label": "Mentions 提及"
   },
   {
     "type": "file",
@@ -122,8 +162,23 @@
   },
   {
     "type": "file",
+    "name": "rate",
+    "label": "Rate 评分"
+  },
+  {
+    "type": "file",
+    "name": "segmented",
+    "label": "Segmented 分段控制"
+  },
+  {
+    "type": "file",
     "name": "select",
-    "label": "Select"
+    "label": "Select 选择器"
+  },
+  {
+    "type": "file",
+    "name": "slider",
+    "label": "Slider 滑动输入"
   },
   {
     "type": "file",
@@ -136,8 +191,53 @@
     "label": "Textarea"
   },
   {
+    "type": "file",
+    "name": "time-picker",
+    "label": "TimePicker 时间选择器"
+  },
+  {
+    "type": "file",
+    "name": "transfer",
+    "label": "Transfer 穿梭框"
+  },
+  {
+    "type": "file",
+    "name": "tree-select",
+    "label": "TreeSelect 树选择"
+  },
+  {
+    "type": "file",
+    "name": "upload",
+    "label": "Upload 上传"
+  },
+  {
     "type": "section-header",
     "label": "数据展示"
+  },
+  {
+    "type": "file",
+    "name": "avatar",
+    "label": "Avatar 头像"
+  },
+  {
+    "type": "file",
+    "name": "badge",
+    "label": "Badge 徽标"
+  },
+  {
+    "type": "file",
+    "name": "calendar",
+    "label": "Calendar 日历"
+  },
+  {
+    "type": "file",
+    "name": "card",
+    "label": "Card 卡片"
+  },
+  {
+    "type": "file",
+    "name": "carousel",
+    "label": "Carousel 走马灯"
   },
   {
     "type": "file",
@@ -146,13 +246,53 @@
   },
   {
     "type": "file",
+    "name": "descriptions",
+    "label": "Descriptions 描述列表"
+  },
+  {
+    "type": "file",
+    "name": "empty",
+    "label": "Empty 空状态"
+  },
+  {
+    "type": "file",
+    "name": "image",
+    "label": "Image 图片"
+  },
+  {
+    "type": "file",
+    "name": "list",
+    "label": "List 列表"
+  },
+  {
+    "type": "file",
+    "name": "listy",
+    "label": "Listy 虚拟列表"
+  },
+  {
+    "type": "file",
+    "name": "masonry",
+    "label": "Masonry 瀑布流"
+  },
+  {
+    "type": "file",
     "name": "popover",
     "label": "Popover"
   },
   {
     "type": "file",
+    "name": "qr-code",
+    "label": "QRCode 二维码"
+  },
+  {
+    "type": "file",
     "name": "scroll-area",
     "label": "ScrollArea"
+  },
+  {
+    "type": "file",
+    "name": "statistic",
+    "label": "Statistic 统计数值"
   },
   {
     "type": "file",
@@ -166,8 +306,18 @@
   },
   {
     "type": "file",
+    "name": "timeline",
+    "label": "Timeline 时间轴"
+  },
+  {
+    "type": "file",
     "name": "tooltip",
     "label": "Tooltip"
+  },
+  {
+    "type": "file",
+    "name": "tree",
+    "label": "Tree 树"
   },
   {
     "type": "section-header",
@@ -195,6 +345,21 @@
   },
   {
     "type": "file",
+    "name": "progress",
+    "label": "Progress 进度条"
+  },
+  {
+    "type": "file",
+    "name": "result",
+    "label": "Result 结果"
+  },
+  {
+    "type": "file",
+    "name": "skeleton",
+    "label": "Skeleton 骨架屏"
+  },
+  {
+    "type": "file",
     "name": "sonner",
     "label": "Sonner"
   },
@@ -204,12 +369,36 @@
     "label": "Spinner"
   },
   {
+    "type": "file",
+    "name": "tour",
+    "label": "Tour 漫游式引导"
+  },
+  {
+    "type": "section-header",
+    "label": "无样式组件"
+  },
+  {
+    "type": "file",
+    "name": "headless-input-number",
+    "label": "HeadlessInputNumber"
+  },
+  {
     "type": "section-header",
     "label": "配置"
   },
   {
     "type": "file",
+    "name": "app",
+    "label": "App 应用"
+  },
+  {
+    "type": "file",
     "name": "tao-provider",
     "label": "TaoProvider"
+  },
+  {
+    "type": "file",
+    "name": "util",
+    "label": "Util 类型工具"
   }
 ]

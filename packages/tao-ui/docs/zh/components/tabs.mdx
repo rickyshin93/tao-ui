@@ -3,6 +3,8 @@ title: Tabs
 description: 在同一上下文中切换多个同级内容面板。页面涵盖适用场景、设计建议、多组可运行示例、交互状态与完整 API 参考。
 ---
 
+import Preview from '../../_components/demo-preview';
+
 在同一上下文中切换多个同级内容面板。
 
 ## 何时使用
@@ -18,7 +20,13 @@ description: 在同一上下文中切换多个同级内容面板。页面涵盖�
 
 - 不要用 Tabs 隐藏必须按顺序完成的步骤。
 
-## 基础用法
+## 代码演示
+
+<div className="tao-demo-grid tao-demo-grid-wide">
+
+<section className="tao-example" id="tabs-example-1">
+
+### 基础用法
 
 ```tsx preview
 import { Tabs } from '@rockshin/tao-ui';
@@ -38,7 +46,11 @@ function TabsExample() {
 export default TabsExample;
 ```
 
-## 卡片变体与尺寸
+</section>
+
+<section className="tao-example" id="tabs-example-2">
+
+### 卡片变体与尺寸
 
 ```tsx preview
 import { Stack, Tabs } from '@rockshin/tao-ui';
@@ -61,7 +73,11 @@ function TabVariants() {
 export default TabVariants;
 ```
 
-## 受控与禁用标签页
+</section>
+
+<section className="tao-example" id="tabs-example-3">
+
+### 受控与禁用标签页
 
 ```tsx preview
 import { Tabs } from '@rockshin/tao-ui';
@@ -77,7 +93,12 @@ function ControlledTabs() {
       items={[
         { key: 'general', label: 'General', children: 'General settings.' },
         { key: 'security', label: 'Security', children: 'Security settings.' },
-        { key: 'billing', label: 'Billing', children: 'Unavailable.', disabled: true },
+        {
+          key: 'billing',
+          label: 'Billing',
+          children: 'Unavailable.',
+          disabled: true,
+        },
       ]}
     />
   );
@@ -85,6 +106,218 @@ function ControlledTabs() {
 
 export default ControlledTabs;
 ```
+
+</section>
+
+<section className="tao-example" id="tabs-controlled">
+
+### 外部控制标签页
+
+通过 `activeKey` 与 `onChange` 把标签页状态纳入应用逻辑。
+
+```tsx preview
+import { Stack, Tabs } from '@rockshin/tao-ui';
+
+import { useState } from 'react';
+
+const basicItems = [
+  { key: 'general', label: 'General', children: 'General settings content.' },
+  {
+    key: 'security',
+    label: 'Security',
+    children: 'Security settings content.',
+  },
+  {
+    key: 'notifications',
+    label: 'Notifications',
+    children: 'Notification preferences.',
+  },
+];
+
+export default function TabsControlled() {
+  function Demo() {
+    const [key, setKey] = useState('security');
+    return (
+      <Stack gap="md">
+        <Tabs items={basicItems} activeKey={key} onChange={setKey} />
+        <p style={{ color: 'var(--tao-color-text-secondary)', fontSize: 13 }}>
+          activeKey: {key}
+        </p>
+      </Stack>
+    );
+  }
+  return <Demo />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="tabs-disabled-tab">
+
+### 禁用标签页
+
+禁用暂不可访问的内容入口，其他标签仍可切换。
+
+```tsx preview
+import { Tabs } from '@rockshin/tao-ui';
+
+export default function TabsDisabledTab() {
+  return (
+    <Tabs
+      items={[
+        { key: 'a', label: 'Active', children: 'This tab works.' },
+        { key: 'b', label: 'Also Active', children: 'This too.' },
+        {
+          key: 'c',
+          label: 'Disabled',
+          children: 'Cannot reach.',
+          disabled: true,
+        },
+      ]}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="tabs-card-sizes">
+
+### 卡片标签尺寸
+
+组合卡片变体与不同尺寸，对比密度与内容区域。
+
+```tsx preview
+import { Stack, Tabs } from '@rockshin/tao-ui';
+
+const basicItems = [
+  { key: 'general', label: 'General', children: 'General settings content.' },
+  {
+    key: 'security',
+    label: 'Security',
+    children: 'Security settings content.',
+  },
+  {
+    key: 'notifications',
+    label: 'Notifications',
+    children: 'Notification preferences.',
+  },
+];
+
+export default function TabsCardSizes() {
+  return (
+    <Stack gap="lg">
+      <div>
+        <p
+          style={{
+            fontSize: 13,
+            color: 'var(--tao-color-text-secondary)',
+            marginBottom: 8,
+          }}
+        >
+          small
+        </p>
+        <Tabs items={basicItems} variant="card" size="small" />
+      </div>
+      <div>
+        <p
+          style={{
+            fontSize: 13,
+            color: 'var(--tao-color-text-secondary)',
+            marginBottom: 8,
+          }}
+        >
+          medium
+        </p>
+        <Tabs items={basicItems} variant="card" size="medium" />
+      </div>
+      <div>
+        <p
+          style={{
+            fontSize: 13,
+            color: 'var(--tao-color-text-secondary)',
+            marginBottom: 8,
+          }}
+        >
+          large
+        </p>
+        <Tabs items={basicItems} variant="card" size="large" />
+      </div>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="tabs-provider-inherit">
+
+### 全局尺寸与局部覆盖
+
+继承 Provider 的尺寸，并在需要时为某组标签显式覆盖。
+
+```tsx preview
+import { Tabs, TaoProvider } from '@rockshin/tao-ui';
+
+const basicItems = [
+  { key: 'general', label: 'General', children: 'General settings content.' },
+  {
+    key: 'security',
+    label: 'Security',
+    children: 'Security settings content.',
+  },
+  {
+    key: 'notifications',
+    label: 'Notifications',
+    children: 'Notification preferences.',
+  },
+];
+
+export default function TabsProviderInherit() {
+  return (
+    <TaoProvider size="large">
+      <Tabs items={basicItems} variant="card" />
+    </TaoProvider>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="tabs-destroy-inactive">
+
+### 切换时销毁内容
+
+比较保留内容和销毁内容的行为；在面板中输入后切换可观察状态是否保留。
+
+```tsx preview
+import { Tabs } from '@rockshin/tao-ui';
+
+export default function TabsDestroyInactive() {
+  return (
+    <Tabs
+      items={[
+        {
+          key: 'a',
+          label: 'Tab A',
+          children: 'Only this panel is in DOM when active.',
+        },
+        { key: 'b', label: 'Tab B', children: 'Destroyed when not active.' },
+        {
+          key: 'c',
+          label: 'Tab C',
+          children: 'Also destroyed when not active.',
+        },
+      ]}
+      destroyInactiveTabPane
+    />
+  );
+}
+```
+
+</section>
+
+</div>
 
 ## API
 

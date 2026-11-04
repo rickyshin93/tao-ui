@@ -3,6 +3,8 @@ title: Pagination
 description: "Moves through paged data with current page and page-size controls. Includes usage guidance, a runnable example, and the complete API reference."
 ---
 
+import Preview from '../../_components/demo-preview';
+
 Moves through paged data with current page and page-size controls.
 
 ## When to use
@@ -18,7 +20,13 @@ Use Pagination when a collection is split into pages rather than infinitely load
 
 - Do not use the component outside its intended interaction model.
 
-## Basic usage
+## Examples
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="pagination-example-1">
+
+### Basic usage
 
 ```tsx preview
 import { Pagination } from '@rockshin/tao-ui';
@@ -41,7 +49,11 @@ function PaginationExample() {
 export default PaginationExample;
 ```
 
-## Sizes
+</section>
+
+<section className="tao-example" id="pagination-example-2">
+
+### Sizes
 
 ```tsx preview
 import { Pagination, Stack } from '@rockshin/tao-ui';
@@ -59,7 +71,11 @@ function PaginationSizes() {
 export default PaginationSizes;
 ```
 
-## Page size and totals
+</section>
+
+<section className="tao-example" id="pagination-example-3">
+
+### Page size and totals
 
 ```tsx preview
 import { Pagination } from '@rockshin/tao-ui';
@@ -86,6 +102,96 @@ function PaginationPageSize() {
 
 export default PaginationPageSize;
 ```
+
+</section>
+
+<section className="tao-example" id="pagination-with-total">
+
+### Display totals
+
+`showTotal` can describe the current record range and total count.
+
+```tsx preview
+import { Pagination } from '@rockshin/tao-ui';
+
+import { useState } from 'react';
+
+export default function PaginationWithTotal() {
+  function Demo() {
+    const [page, setPage] = useState(1);
+    return (
+      <Pagination
+        total={95}
+        current={page}
+        pageSize={10}
+        onChange={(p) => setPage(p)}
+        showTotal={(t, [s, e]) => `${s}-${e} of ${t}`}
+      />
+    );
+  }
+  return <Demo />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="pagination-size-changer">
+
+### Change page size
+
+Maintain page and page size together and use both updated values in a data request.
+
+```tsx preview
+import { Pagination } from '@rockshin/tao-ui';
+
+import { useState } from 'react';
+
+export default function PaginationSizeChanger() {
+  function Demo() {
+    const [page, setPage] = useState(1);
+    const [ps, setPs] = useState(10);
+    return (
+      <Pagination
+        total={200}
+        current={page}
+        pageSize={ps}
+        onChange={(p, s) => {
+          setPage(p);
+          setPs(s);
+        }}
+        showSizeChanger
+      />
+    );
+  }
+  return <Demo />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="pagination-sizes">
+
+### Pagination sizes
+
+Size controls the density of pagination buttons and can match the surrounding list.
+
+```tsx preview
+import { Pagination } from '@rockshin/tao-ui';
+
+export default function PaginationSizes() {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <Pagination total={50} size="small" />
+      <Pagination total={50} size="medium" />
+      <Pagination total={50} size="large" />
+    </div>
+  );
+}
+```
+
+</section>
+
+</div>
 
 ## API
 

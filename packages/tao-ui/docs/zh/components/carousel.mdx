@@ -1,0 +1,333 @@
+---
+title: Carousel
+description: "提供原生箭头与指示点、自动播放、淡入淡出、响应式布局及 ref 控制的轮播。"
+---
+
+import Preview from '../../_components/demo-preview';
+
+提供原生箭头与指示点、自动播放、淡入淡出、响应式布局及 ref 控制的轮播。
+
+每个示例都可以独立复制运行。带设备预览的示例可通过工具栏切换桌面与手机宽度。
+
+## 示例
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="carousel-basic">
+
+### 箭头与指示点
+
+指示点可直接跳转到某一页，arrows 启用前后切换按钮。
+
+```tsx preview
+import { Carousel } from '@rockshin/tao-ui';
+const slides = ['Explore', 'Review', 'Publish'].map((label, index) => (
+  <div key={label}>
+    <div
+      style={{
+        height: 180,
+        display: 'grid',
+        placeItems: 'center',
+        fontSize: 24,
+        color: '#27342d',
+        background: ['#e7eee9', '#eee9f5', '#f2ece3'][index],
+      }}
+    >
+      {label}
+    </div>
+  </div>
+));
+export default function BasicCarousel() {
+  return <Carousel arrows>{slides}</Carousel>;
+}
+```
+
+</section>
+
+<section className="tao-example" id="carousel-ref">
+
+### 通过 ref 导航
+
+ref 提供 goTo、next、prev；afterChange 返回切换后的页码。
+
+```tsx preview
+import { useRef, useState } from 'react';
+import { Button, Carousel, type CarouselRef } from '@rockshin/tao-ui';
+const slides = ['Explore', 'Review', 'Publish'].map((label, index) => (
+  <div key={label}>
+    <div
+      style={{
+        height: 180,
+        display: 'grid',
+        placeItems: 'center',
+        fontSize: 24,
+        color: '#27342d',
+        background: ['#e7eee9', '#eee9f5', '#f2ece3'][index],
+      }}
+    >
+      {label}
+    </div>
+  </div>
+));
+export default function CarouselControls() {
+  const ref = useRef<CarouselRef>(null);
+  const [current, setCurrent] = useState(0);
+  return (
+    <div style={{ display: 'grid', gap: 12 }}>
+      <Carousel ref={ref} afterChange={setCurrent}>
+        {slides}
+      </Carousel>
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+        <Button onClick={() => ref.current?.prev()}>Previous</Button>
+        <Button onClick={() => ref.current?.goTo(2, true)}>Go to third</Button>
+        <Button onClick={() => ref.current?.next()}>Next</Button>
+        <output>Slide {current + 1}</output>
+      </div>
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="carousel-autoplay">
+
+### 自动播放
+
+autoplaySpeed 控制播放间隔，dotDuration 在当前指示点上显示经过的时间。
+
+```tsx preview
+import { Carousel } from '@rockshin/tao-ui';
+const slides = ['Explore', 'Review', 'Publish'].map((label, index) => (
+  <div key={label}>
+    <div
+      style={{
+        height: 180,
+        display: 'grid',
+        placeItems: 'center',
+        fontSize: 24,
+        color: '#27342d',
+        background: ['#e7eee9', '#eee9f5', '#f2ece3'][index],
+      }}
+    >
+      {label}
+    </div>
+  </div>
+));
+export default function AutoplayCarousel() {
+  return (
+    <Carousel
+      autoplay={{ dotDuration: true }}
+      autoplaySpeed={3000}
+      pauseOnHover
+      pauseOnFocus
+    >
+      {slides}
+    </Carousel>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="carousel-fade">
+
+### 淡入淡出
+
+effect="fade" 切换为淡入淡出，导航 API 保持一致。
+
+```tsx preview
+import { Carousel } from '@rockshin/tao-ui';
+const slides = ['Explore', 'Review', 'Publish'].map((label, index) => (
+  <div key={label}>
+    <div
+      style={{
+        height: 180,
+        display: 'grid',
+        placeItems: 'center',
+        fontSize: 24,
+        color: '#27342d',
+        background: ['#e7eee9', '#eee9f5', '#f2ece3'][index],
+      }}
+    >
+      {label}
+    </div>
+  </div>
+));
+export default function FadingCarousel() {
+  return (
+    <Carousel effect="fade" arrows speed={450}>
+      {slides}
+    </Carousel>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="carousel-vertical">
+
+### 垂直轮播
+
+指示点放在 start 或 end 时默认使用垂直轮播，也可通过 vertical 显式覆盖。
+
+```tsx preview
+import { Carousel } from '@rockshin/tao-ui';
+const slides = ['Explore', 'Review', 'Publish'].map((label, index) => (
+  <div key={label}>
+    <div
+      style={{
+        height: 180,
+        display: 'grid',
+        placeItems: 'center',
+        fontSize: 24,
+        color: '#27342d',
+        background: ['#e7eee9', '#eee9f5', '#f2ece3'][index],
+      }}
+    >
+      {label}
+    </div>
+  </div>
+));
+export default function VerticalCarousel() {
+  return (
+    <Carousel dotPlacement="end" draggable>
+      {slides}
+    </Carousel>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="carousel-responsive">
+
+### 同时显示多页
+
+响应式配置在宽屏显示两页，480px 以下显示一页。
+
+```tsx preview="iframe-follow"
+import { Carousel } from '@rockshin/tao-ui';
+const slides = ['Explore', 'Review', 'Publish'].map((label, index) => (
+  <div key={label}>
+    <div
+      style={{
+        height: 180,
+        display: 'grid',
+        placeItems: 'center',
+        fontSize: 24,
+        color: '#27342d',
+        background: ['#e7eee9', '#eee9f5', '#f2ece3'][index],
+      }}
+    >
+      {label}
+    </div>
+  </div>
+));
+export default function ResponsiveCarousel() {
+  return (
+    <Carousel
+      slidesToShow={2}
+      slidesToScroll={1}
+      arrows
+      draggable
+      responsive={[{ breakpoint: 480, settings: { slidesToShow: 1 } }]}
+    >
+      {slides}
+    </Carousel>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="carousel-paging">
+
+### 自定义页码
+
+customPaging 定制各个指示按钮，语义样式控制整组指示点的位置。
+
+```tsx preview
+import { Carousel } from '@rockshin/tao-ui';
+const slides = ['Explore', 'Review', 'Publish'].map((label, index) => (
+  <div key={label}>
+    <div
+      style={{
+        height: 180,
+        display: 'grid',
+        placeItems: 'center',
+        fontSize: 24,
+        color: '#27342d',
+        background: ['#e7eee9', '#eee9f5', '#f2ece3'][index],
+      }}
+    >
+      {label}
+    </div>
+  </div>
+));
+export default function NumberedCarousel() {
+  return (
+    <Carousel
+      styles={{ dots: { bottom: 30, gap: 12 } }}
+      customPaging={(index) => (
+        <button
+          type="button"
+          aria-label={`Go to slide ${index + 1}`}
+          style={{ width: 24, height: 24, borderRadius: '50%', fontSize: 12 }}
+        >
+          {index + 1}
+        </button>
+      )}
+    >
+      {slides}
+    </Carousel>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="carousel-mobile">
+
+### 手机滑动切换
+
+默认支持触摸滑动，draggable 额外允许桌面预览中使用鼠标拖拽。
+
+```tsx preview="iframe-follow"
+import { Carousel } from '@rockshin/tao-ui';
+const slides = ['Explore', 'Review', 'Publish'].map((label, index) => (
+  <div key={label}>
+    <div
+      style={{
+        height: 180,
+        display: 'grid',
+        placeItems: 'center',
+        fontSize: 24,
+        color: '#27342d',
+        background: ['#e7eee9', '#eee9f5', '#f2ece3'][index],
+      }}
+    >
+      {label}
+    </div>
+  </div>
+));
+export default function MobileCarousel() {
+  return (
+    <div style={{ padding: 16 }}>
+      <h3>Discover the workflow</h3>
+      <Carousel draggable arrows>
+        {slides}
+      </Carousel>
+      <p>Swipe left or right to switch slides.</p>
+    </div>
+  );
+}
+```
+
+</section>
+
+</div>
+
+## API
+
+<API moduleName="carousel" />

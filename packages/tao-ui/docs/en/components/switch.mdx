@@ -3,6 +3,8 @@ title: Switch
 description: "Toggles a setting on or off with immediate effect. Includes usage guidance, a runnable example, and the complete API reference."
 ---
 
+import Preview from '../../_components/demo-preview';
+
 Toggles a setting on or off with immediate effect.
 
 ## When to use
@@ -18,7 +20,13 @@ Use Switch for settings that take effect immediately.
 
 - Do not use the component outside its intended interaction model.
 
-## Basic usage
+## Examples
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="switch-example-1">
+
+### Basic usage
 
 ```tsx preview
 import { Stack, Switch } from '@rockshin/tao-ui';
@@ -39,7 +47,11 @@ function SwitchExample() {
 export default SwitchExample;
 ```
 
-## Labels and sizes
+</section>
+
+<section className="tao-example" id="switch-example-2">
+
+### Labels and sizes
 
 ```tsx preview
 import { Stack, Switch } from '@rockshin/tao-ui';
@@ -49,7 +61,40 @@ function SwitchLabels() {
     <Stack direction="horizontal" gap="lg" align="center">
       <Switch size="small" defaultChecked />
       <Switch checkedChildren="ON" unCheckedChildren="OFF" defaultChecked />
-      <Switch checkedChildren="✓" unCheckedChildren="×" />
+      <Switch
+        aria-label="Receive notifications"
+        checkedChildren={
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 16 16"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <path d="m3 8 3 3 7-7" />
+          </svg>
+        }
+        unCheckedChildren={
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 16 16"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <path d="m4 4 8 8m0-8-8 8" />
+          </svg>
+        }
+      />
     </Stack>
   );
 }
@@ -57,7 +102,11 @@ function SwitchLabels() {
 export default SwitchLabels;
 ```
 
-## Loading and disabled states
+</section>
+
+<section className="tao-example" id="switch-example-3">
+
+### Loading and disabled states
 
 ```tsx preview
 import { Stack, Switch } from '@rockshin/tao-ui';
@@ -74,6 +123,122 @@ function SwitchStates() {
 
 export default SwitchStates;
 ```
+
+</section>
+
+<section className="tao-example" id="switch-controlled">
+
+### Controlled switch
+
+onChange returns a boolean that can directly update setting state.
+
+```tsx preview
+import { useState } from 'react';
+import { Switch, Stack } from '@rockshin/tao-ui';
+export default function Example() {
+  const [enabled, setEnabled] = useState(true);
+  return (
+    <Stack direction="vertical">
+      <Switch
+        aria-label="Notifications"
+        checked={enabled}
+        onChange={setEnabled}
+      />
+      <output>
+        {enabled ? 'Notifications enabled' : 'Notifications disabled'}
+      </output>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="switch-loading-state">
+
+### Loading prevents repeated toggles
+
+Use a separate button to toggle loading and inspect the waiting state.
+
+```tsx preview
+import { useState } from 'react';
+import { Switch, Button, Stack } from '@rockshin/tao-ui';
+export default function Example() {
+  const [loading, setLoading] = useState(false);
+  return (
+    <Stack direction="vertical">
+      <Switch aria-label="Sync" loading={loading} defaultChecked />
+      <Button onClick={() => setLoading(!loading)}>
+        {loading ? 'Finish loading' : 'Start loading'}
+      </Button>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="switch-labels">
+
+### State labels and sizes
+
+Keep state labels concise and readable at both sizes.
+
+```tsx preview
+import { Switch, Stack } from '@rockshin/tao-ui';
+export default function Example() {
+  return (
+    <Stack direction="vertical">
+      <Switch
+        aria-label="Access"
+        checkedChildren="On"
+        unCheckedChildren="Off"
+        defaultChecked
+      />
+      <Switch
+        size="small"
+        aria-label="Compact access"
+        checkedChildren="On"
+        unCheckedChildren="Off"
+        defaultChecked
+      />
+      <Switch
+        aria-label="Locked access"
+        checkedChildren="On"
+        unCheckedChildren="Off"
+        defaultChecked
+        disabled
+      />
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="switch-provider">
+
+### Shared size and disabled state
+
+Multiple switches inherit configuration; a local disabled prop can override it.
+
+```tsx preview
+import { Switch, TaoProvider, Stack } from '@rockshin/tao-ui';
+export default function Example() {
+  return (
+    <TaoProvider size="small" disabled>
+      <Stack>
+        <Switch aria-label="Inherited disabled" defaultChecked />
+        <Switch aria-label="Enabled override" disabled={false} />
+      </Stack>
+    </TaoProvider>
+  );
+}
+```
+
+</section>
+
+</div>
 
 ## API
 

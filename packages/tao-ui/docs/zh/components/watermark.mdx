@@ -1,0 +1,192 @@
+---
+title: Watermark
+description: "在内容与继承的弹层上重复绘制文字或图片水印。"
+---
+
+import Preview from '../../_components/demo-preview';
+
+在内容与继承的弹层上重复绘制文字或图片水印。
+
+组件采用 tao-ui 原生实现，公共 API 对齐 Ant Design 6.7.0。外观、主题 token 与 Semantic DOM 定制遵循 tao-ui，主题通过 `TaoProvider` 配置。
+
+Canvas 绘制遵循 6.7.0 content/font/gap/offset API；Modal 与 Drawer 默认继承，inherit=false 关闭门户继承；被移除或篡改的覆盖层会恢复。
+
+## 何时使用
+
+用于标记所有者、工作区或资料类别，同时保持正文可读。
+
+## 代码演示
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="watermark-example-1">
+
+### 文字水印
+
+```tsx preview
+import { Watermark } from "@rockshin/tao-ui";
+
+export default function Example() {
+  return (
+    <Watermark content="Tao workspace">
+      <div style={{ height: 220, padding: 20 }}>
+        <h4>Workspace report</h4>
+        <p>Content remains selectable and interactive.</p>
+      </div>
+    </Watermark>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="watermark-example-2">
+
+### 多行文字与字体
+
+```tsx preview
+import { Watermark } from "@rockshin/tao-ui";
+
+export default function Example() {
+  return (
+    <Watermark
+      content={[
+        { text: "CONFIDENTIAL", font: { fontWeight: 700, fontSize: 18 } },
+        { text: "Review copy", font: { fontSize: 12 } },
+      ]}
+      font={{ color: "rgba(80, 100, 110, 0.22)" }}
+    >
+      <div style={{ height: 240 }} />
+    </Watermark>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="watermark-example-3">
+
+### 旋转、间距与偏移
+
+```tsx preview
+import { Watermark } from "@rockshin/tao-ui";
+
+export default function Example() {
+  return (
+    <Watermark
+      content="Tao"
+      rotate={-35}
+      gap={[70, 60]}
+      offset={[50, 40]}
+      width={80}
+      height={30}
+    >
+      <div style={{ height: 220 }} />
+    </Watermark>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="watermark-example-4">
+
+### 图片与文字后备
+
+```tsx preview
+import { Watermark } from "@rockshin/tao-ui";
+
+const image = `data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="100" height="40"><text x="10" y="28" font-size="24" fill="#668b8b" opacity="0.5">TAO</text></svg>')}`;
+
+export default function Example() {
+  return (
+    <Watermark
+      image={image}
+      content="Tao"
+      width={100}
+      height={40}
+      gap={[80, 70]}
+    >
+      <div style={{ height: 240 }} />
+    </Watermark>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="watermark-example-5">
+
+### 继承到 Modal 与 Drawer
+
+```tsx preview="iframe-follow"
+import { useState } from "react";
+import { Button, Drawer, Modal, Watermark } from "@rockshin/tao-ui";
+
+export default function Example() {
+  const [panel, setPanel] = useState("");
+  return (
+    <Watermark content="Private">
+      <div style={{ minHeight: 220, padding: 20 }}>
+        <Button onClick={() => setPanel("modal")}>Open modal</Button>{" "}
+        <Button onClick={() => setPanel("drawer")}>Open drawer</Button>
+        <Modal
+          open={panel === "modal"}
+          onClose={() => setPanel("")}
+          title="Marked modal"
+          footer={null}
+        >
+          <div style={{ height: 150 }}>
+            This portaled panel inherits the watermark.
+          </div>
+        </Modal>
+        <Drawer
+          open={panel === "drawer"}
+          onClose={() => setPanel("")}
+          title="Marked drawer"
+        >
+          <p>The drawer inherits the same watermark.</p>
+        </Drawer>
+      </div>
+    </Watermark>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="watermark-example-6">
+
+### 关闭门户继承
+
+```tsx preview="iframe-follow"
+import { useState } from "react";
+import { Button, Modal, Watermark } from "@rockshin/tao-ui";
+
+export default function Example() {
+  const [open, setOpen] = useState(false);
+  return (
+    <Watermark content="Page only" inherit={false}>
+      <div style={{ minHeight: 220, padding: 20 }}>
+        <Button onClick={() => setOpen(true)}>Open unmarked modal</Button>
+        <Modal
+          open={open}
+          onClose={() => setOpen(false)}
+          title="No inherited mark"
+          footer={null}
+        >
+          Only the containing page has a watermark.
+        </Modal>
+      </div>
+    </Watermark>
+  );
+}
+```
+
+</section>
+
+</div>
+
+## API
+
+<API moduleName="watermark" />

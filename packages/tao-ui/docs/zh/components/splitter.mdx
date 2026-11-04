@@ -3,6 +3,8 @@ title: Splitter
 description: 通过可拖动分隔条调整相邻面板尺寸。页面涵盖适用场景、设计建议、多组可运行示例、交互状态与完整 API 参考。
 ---
 
+import Preview from '../../_components/demo-preview';
+
 通过可拖动分隔条调整相邻面板尺寸。
 
 ## 何时使用
@@ -18,14 +20,25 @@ description: 通过可拖动分隔条调整相邻面板尺寸。页面涵盖适�
 
 - 移动端或简单阅读页不要滥用分隔面板。
 
-## 基础用法
+## 代码演示
+
+<div className="tao-demo-grid tao-demo-grid-wide">
+
+<section className="tao-example" id="splitter-example-1">
+
+### 基础用法
 
 ```tsx preview
 import { Splitter } from '@rockshin/tao-ui';
 
 function SplitterExample() {
   return (
-    <div style={{ height: 220, border: '1px solid var(--tao-color-border-secondary)' }}>
+    <div
+      style={{
+        height: 220,
+        border: '1px solid var(--tao-color-border-secondary)',
+      }}
+    >
       <Splitter>
         <Splitter.Panel defaultSize="40%">
           <div style={{ padding: 16 }}>Navigation</div>
@@ -41,14 +54,23 @@ function SplitterExample() {
 export default SplitterExample;
 ```
 
-## 垂直与多面板
+</section>
+
+<section className="tao-example" id="splitter-example-2">
+
+### 垂直与多面板
 
 ```tsx preview
 import { Splitter } from '@rockshin/tao-ui';
 
 function SplitterLayouts() {
   return (
-    <div style={{ height: 280, border: '1px solid var(--tao-color-border-secondary)' }}>
+    <div
+      style={{
+        height: 280,
+        border: '1px solid var(--tao-color-border-secondary)',
+      }}
+    >
       <Splitter orientation="vertical">
         <Splitter.Panel defaultSize="35%" min={60}>
           <div style={{ padding: 16 }}>Preview</div>
@@ -67,14 +89,23 @@ function SplitterLayouts() {
 export default SplitterLayouts;
 ```
 
-## 可折叠面板
+</section>
+
+<section className="tao-example" id="splitter-example-3">
+
+### 可折叠面板
 
 ```tsx preview
 import { Splitter } from '@rockshin/tao-ui';
 
 function CollapsibleSplitter() {
   return (
-    <div style={{ height: 220, border: '1px solid var(--tao-color-border-secondary)' }}>
+    <div
+      style={{
+        height: 220,
+        border: '1px solid var(--tao-color-border-secondary)',
+      }}
+    >
       <Splitter>
         <Splitter.Panel defaultSize="30%" collapsible min={0}>
           <div style={{ padding: 16 }}>Collapsible navigation</div>
@@ -89,6 +120,284 @@ function CollapsibleSplitter() {
 
 export default CollapsibleSplitter;
 ```
+
+</section>
+
+<section className="tao-example" id="splitter-three-panels">
+
+### 三个面板
+
+多个 `Splitter.Panel` 共享可用空间，拖动相邻分隔条调整比例。
+
+```tsx preview
+import { Splitter } from '@rockshin/tao-ui';
+
+const Panel = Splitter.Panel;
+
+const boxStyle = (bg: string): React.CSSProperties => ({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  height: '100%',
+  minHeight: 40,
+  background: bg,
+  borderRadius: 4,
+  color: 'var(--tao-color-text-secondary)',
+  fontSize: 14,
+});
+
+export default function SplitterThreePanels() {
+  return (
+    <div
+      style={{
+        height: 200,
+        border: '1px solid var(--tao-color-border-secondary)',
+        borderRadius: 6,
+      }}
+    >
+      <Splitter>
+        <Panel defaultSize="25%" min={60}>
+          <div style={boxStyle('var(--tao-color-fill-quaternary)')}>
+            Sidebar
+          </div>
+        </Panel>
+        <Panel min={100}>
+          <div style={boxStyle('var(--tao-color-fill-tertiary)')}>Main</div>
+        </Panel>
+        <Panel defaultSize="25%" min={60}>
+          <div style={boxStyle('var(--tao-color-fill-quaternary)')}>Detail</div>
+        </Panel>
+      </Splitter>
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="splitter-collapsible">
+
+### 折叠面板
+
+允许辅助面板收起后恢复，保留主要工作区域。
+
+```tsx preview
+import { Splitter } from '@rockshin/tao-ui';
+
+const Panel = Splitter.Panel;
+
+const boxStyle = (bg: string): React.CSSProperties => ({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  height: '100%',
+  minHeight: 40,
+  background: bg,
+  borderRadius: 4,
+  color: 'var(--tao-color-text-secondary)',
+  fontSize: 14,
+});
+
+export default function SplitterCollapsible() {
+  return (
+    <div
+      style={{
+        height: 200,
+        border: '1px solid var(--tao-color-border-secondary)',
+        borderRadius: 6,
+      }}
+    >
+      <Splitter>
+        <Panel defaultSize="30%" collapsible min={0}>
+          <div style={boxStyle('var(--tao-color-fill-quaternary)')}>
+            Collapsible
+          </div>
+        </Panel>
+        <Panel>
+          <div style={boxStyle('var(--tao-color-fill-tertiary)')}>
+            Main Content
+          </div>
+        </Panel>
+      </Splitter>
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="splitter-min-max">
+
+### 尺寸上下限
+
+通过 `min` 与 `max` 约束拖动范围，避免内容缩小到不可操作。
+
+```tsx preview
+import { Splitter } from '@rockshin/tao-ui';
+
+const Panel = Splitter.Panel;
+
+const boxStyle = (bg: string): React.CSSProperties => ({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  height: '100%',
+  minHeight: 40,
+  background: bg,
+  borderRadius: 4,
+  color: 'var(--tao-color-text-secondary)',
+  fontSize: 14,
+});
+
+export default function SplitterMinMax() {
+  return (
+    <div
+      style={{
+        height: 200,
+        border: '1px solid var(--tao-color-border-secondary)',
+        borderRadius: 6,
+      }}
+    >
+      <Splitter>
+        <Panel defaultSize="30%" min={100} max={300}>
+          <div style={boxStyle('var(--tao-color-fill-quaternary)')}>
+            min:100 max:300
+          </div>
+        </Panel>
+        <Panel min={100}>
+          <div style={boxStyle('var(--tao-color-fill-tertiary)')}>min:100</div>
+        </Panel>
+      </Splitter>
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="splitter-controlled">
+
+### 受控面板尺寸
+
+监听尺寸变化并保存当前布局，可由应用逻辑重置布局。
+
+```tsx preview
+import { Splitter, Stack } from '@rockshin/tao-ui';
+
+import { useState } from 'react';
+
+const Panel = Splitter.Panel;
+
+const boxStyle = (bg: string): React.CSSProperties => ({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  height: '100%',
+  minHeight: 40,
+  background: bg,
+  borderRadius: 4,
+  color: 'var(--tao-color-text-secondary)',
+  fontSize: 14,
+});
+
+export default function SplitterControlled() {
+  function Demo() {
+    const [sizes, setSizes] = useState<number[]>([]);
+    return (
+      <Stack gap="sm">
+        <p style={{ fontSize: 13, color: 'var(--tao-color-text-secondary)' }}>
+          sizes: [{sizes.map((s) => Math.round(s)).join(', ')}]
+        </p>
+        <div
+          style={{
+            height: 200,
+            border: '1px solid var(--tao-color-border-secondary)',
+            borderRadius: 6,
+          }}
+        >
+          <Splitter onResize={setSizes}>
+            <Panel defaultSize="40%">
+              <div style={boxStyle('var(--tao-color-fill-quaternary)')}>
+                Left
+              </div>
+            </Panel>
+            <Panel>
+              <div style={boxStyle('var(--tao-color-fill-tertiary)')}>
+                Right
+              </div>
+            </Panel>
+          </Splitter>
+        </div>
+      </Stack>
+    );
+  }
+  return <Demo />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="splitter-nested">
+
+### 嵌套分栏
+
+横向与纵向分栏组合出编辑器布局，每个容器都有明确高度。
+
+```tsx preview
+import { Splitter } from '@rockshin/tao-ui';
+
+const Panel = Splitter.Panel;
+
+const boxStyle = (bg: string): React.CSSProperties => ({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  height: '100%',
+  minHeight: 40,
+  background: bg,
+  borderRadius: 4,
+  color: 'var(--tao-color-text-secondary)',
+  fontSize: 14,
+});
+
+export default function SplitterNested() {
+  return (
+    <div
+      style={{
+        height: 400,
+        border: '1px solid var(--tao-color-border-secondary)',
+        borderRadius: 6,
+      }}
+    >
+      <Splitter>
+        <Panel defaultSize="25%" collapsible min={0}>
+          <div style={boxStyle('var(--tao-color-fill-quaternary)')}>
+            Sidebar
+          </div>
+        </Panel>
+        <Panel>
+          <Splitter orientation="vertical">
+            <Panel defaultSize="70%">
+              <div style={boxStyle('var(--tao-color-fill-tertiary)')}>
+                Editor
+              </div>
+            </Panel>
+            <Panel collapsible min={0}>
+              <div style={boxStyle('var(--tao-color-fill-quaternary)')}>
+                Terminal
+              </div>
+            </Panel>
+          </Splitter>
+        </Panel>
+      </Splitter>
+    </div>
+  );
+}
+```
+
+</section>
+
+</div>
 
 ## API
 

@@ -19,6 +19,9 @@ import {
   Table,
   type TableColumn,
   Textarea,
+  TaoProvider,
+  zhCN,
+  type TaoLocale,
 } from '../src';
 
 const buttonRef = createRef<HTMLButtonElement>();
@@ -79,3 +82,8 @@ const fieldAria = {
 <Popover aria-label="Actions" content="Details">
   <button type="button">Open</button>
 </Popover>;
+
+const customLocale: Partial<TaoLocale> = { ...zhCN, done: 'Confirm' };
+<TaoProvider locale={customLocale}>
+  <Select options={[]} mode="tags" maxTagCount="responsive" />
+</TaoProvider>;

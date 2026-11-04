@@ -1,0 +1,178 @@
+---
+title: Affix
+description: "Pins content when it crosses a scroll container boundary."
+---
+
+import Preview from '../../_components/demo-preview';
+
+Pins content when it crosses a scroll container boundary.
+
+This native tao-ui component follows the public API of Ant Design 6.7.0. Appearance, theme tokens and Semantic DOM customization belong to tao-ui; configure themes with `TaoProvider`.
+
+Affix uses fixed positioning and a placeholder, not CSS sticky. target returns a Window or HTMLElement; offsets are measured from that target.
+
+## When to use
+
+Keep a small set of actions visible within a defined scroll target. The examples use a dedicated scroll container.
+
+## Examples
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="affix-example-1">
+
+### Top boundary
+
+```tsx preview="iframe-follow"
+import { useRef } from "react";
+import { Affix, Button } from "@rockshin/tao-ui";
+
+export default function Example() {
+  const target = useRef<HTMLDivElement>(null);
+  return (
+    <div
+      ref={target}
+      style={{
+        height: 230,
+        overflow: "auto",
+        border: "1px solid var(--tao-color-border)",
+        borderRadius: 6,
+      }}
+    >
+      <div style={{ height: 70, padding: 16 }}>Scroll down in this panel.</div>
+      <Affix target={() => target.current} offsetTop={12}>
+        <Button variant="primary">Pinned actions</Button>
+      </Affix>
+      <div style={{ height: 600, padding: 16 }}>More content</div>
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="affix-example-2">
+
+### Observe affixed state
+
+```tsx preview="iframe-follow"
+import { useRef, useState } from "react";
+import { Affix, Button } from "@rockshin/tao-ui";
+
+export default function Example() {
+  const target = useRef<HTMLDivElement>(null);
+  const [affixed, setAffixed] = useState(false);
+  return (
+    <div>
+      <p aria-live="polite">
+        {affixed ? "Actions are pinned" : "Actions are in the document flow"}
+      </p>
+      <div
+        ref={target}
+        style={{
+          height: 230,
+          overflow: "auto",
+          border: "1px solid var(--tao-color-border)",
+          borderRadius: 6,
+        }}
+      >
+        <div style={{ height: 70 }} />
+        <Affix
+          target={() => target.current}
+          onChange={(value) => setAffixed(Boolean(value))}
+        >
+          <Button>Actions</Button>
+        </Affix>
+        <div style={{ height: 600 }} />
+      </div>
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="affix-example-3">
+
+### Bottom boundary
+
+```tsx preview="iframe-follow"
+import { useRef } from "react";
+import { Affix, Button } from "@rockshin/tao-ui";
+
+export default function Example() {
+  const target = useRef<HTMLDivElement>(null);
+  return (
+    <div
+      ref={target}
+      style={{
+        height: 230,
+        overflow: "auto",
+        border: "1px solid var(--tao-color-border)",
+        borderRadius: 6,
+      }}
+    >
+      <div style={{ height: 600, padding: 16 }}>
+        Scroll to the end to return the action to its original position.
+      </div>
+      <Affix target={() => target.current} offsetBottom={12}>
+        <Button variant="primary">Bottom actions</Button>
+      </Affix>
+      <div style={{ height: 50 }} />
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="affix-example-4">
+
+### Change the offset and update position
+
+```tsx preview="iframe-follow"
+import { useRef, useState } from "react";
+import { Affix, Button, type AffixRef } from "@rockshin/tao-ui";
+
+export default function Example() {
+  const target = useRef<HTMLDivElement>(null);
+  const affix = useRef<AffixRef>(null);
+  const [offset, setOffset] = useState(8);
+  return (
+    <div>
+      <Button onClick={() => setOffset(offset === 8 ? 32 : 8)}>
+        Offset: {offset}px
+      </Button>{" "}
+      <Button onClick={() => affix.current?.updatePosition()}>
+        Recalculate
+      </Button>
+      <div
+        ref={target}
+        style={{
+          ...{
+            height: 230,
+            overflow: "auto",
+            border: "1px solid var(--tao-color-border)",
+            borderRadius: 6,
+          },
+          marginTop: 16,
+        }}
+      >
+        <div style={{ height: 50 }} />
+        <Affix ref={affix} target={() => target.current} offsetTop={offset}>
+          <Button>Tools</Button>
+        </Affix>
+        <div style={{ height: 600 }} />
+      </div>
+    </div>
+  );
+}
+```
+
+</section>
+
+</div>
+
+## API
+
+<API moduleName="affix" />

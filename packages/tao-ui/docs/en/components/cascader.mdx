@@ -1,0 +1,490 @@
+---
+title: Cascader
+description: "Choose complete paths through hierarchical options with search, multiple selection and a standalone panel."
+---
+
+import Preview from '../../_components/demo-preview';
+
+Choose complete paths through hierarchical options with search, multiple selection and a standalone panel.
+
+Each example can be copied and run independently. Use the device control on framed previews to switch between desktop and phone widths.
+
+Sizes are `small`, `medium` and `large`; the compatible `middle` alias uses the same dimensions as `medium`.
+
+## Examples
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="cascader-basic">
+
+### Choose a complete path
+
+The selected value contains each level in the chosen path.
+
+```tsx preview
+import { Cascader } from '@rockshin/tao-ui';
+const options = [
+  {
+    value: 'asia',
+    label: 'Asia',
+    children: [
+      {
+        value: 'china',
+        label: 'China',
+        children: [
+          { value: 'shanghai', label: 'Shanghai' },
+          { value: 'hangzhou', label: 'Hangzhou' },
+        ],
+      },
+      {
+        value: 'japan',
+        label: 'Japan',
+        children: [{ value: 'tokyo', label: 'Tokyo' }],
+      },
+    ],
+  },
+  {
+    value: 'europe',
+    label: 'Europe',
+    children: [
+      {
+        value: 'germany',
+        label: 'Germany',
+        children: [{ value: 'berlin', label: 'Berlin' }],
+      },
+    ],
+  },
+];
+export default function BasicCascader() {
+  return (
+    <Cascader
+      aria-label="Location"
+      options={options}
+      defaultValue={['asia', 'china', 'shanghai']}
+      allowClear
+      style={{ width: '100%' }}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="cascader-controlled">
+
+### Controlled path and display
+
+displayRender can shorten the displayed path while preserving every value in state.
+
+```tsx preview
+import { useState } from 'react';
+import { Cascader } from '@rockshin/tao-ui';
+const options = [
+  {
+    value: 'asia',
+    label: 'Asia',
+    children: [
+      {
+        value: 'china',
+        label: 'China',
+        children: [
+          { value: 'shanghai', label: 'Shanghai' },
+          { value: 'hangzhou', label: 'Hangzhou' },
+        ],
+      },
+      {
+        value: 'japan',
+        label: 'Japan',
+        children: [{ value: 'tokyo', label: 'Tokyo' }],
+      },
+    ],
+  },
+  {
+    value: 'europe',
+    label: 'Europe',
+    children: [
+      {
+        value: 'germany',
+        label: 'Germany',
+        children: [{ value: 'berlin', label: 'Berlin' }],
+      },
+    ],
+  },
+];
+export default function ControlledLocation() {
+  const [value, setValue] = useState<string[]>(['asia', 'japan', 'tokyo']);
+  return (
+    <div>
+      <Cascader
+        multiple={false}
+        options={options}
+        value={value}
+        onChange={setValue}
+        displayRender={(labels) => labels.at(-1)}
+        style={{ width: '100%' }}
+      />
+      <p>{value.join(' / ')}</p>
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="cascader-multiple">
+
+### Select multiple paths
+
+Multiple mode adds linked checkboxes. SHOW_CHILD keeps leaf paths in the visible selection.
+
+```tsx preview
+import { Cascader } from '@rockshin/tao-ui';
+const options = [
+  {
+    value: 'asia',
+    label: 'Asia',
+    children: [
+      {
+        value: 'china',
+        label: 'China',
+        children: [
+          { value: 'shanghai', label: 'Shanghai' },
+          { value: 'hangzhou', label: 'Hangzhou' },
+        ],
+      },
+      {
+        value: 'japan',
+        label: 'Japan',
+        children: [{ value: 'tokyo', label: 'Tokyo' }],
+      },
+    ],
+  },
+  {
+    value: 'europe',
+    label: 'Europe',
+    children: [
+      {
+        value: 'germany',
+        label: 'Germany',
+        children: [{ value: 'berlin', label: 'Berlin' }],
+      },
+    ],
+  },
+];
+export default function MultipleLocations() {
+  return (
+    <Cascader
+      options={options}
+      multiple
+      showCheckedStrategy={Cascader.SHOW_CHILD}
+      defaultValue={[['asia', 'china', 'shanghai']]}
+      maxTagCount="responsive"
+      placeholder="Choose locations"
+      style={{ width: '100%' }}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="cascader-search">
+
+### Search every level
+
+The search filter checks every label in a path. Selecting a result returns the full path.
+
+```tsx preview
+import { Cascader } from '@rockshin/tao-ui';
+const options = [
+  {
+    value: 'asia',
+    label: 'Asia',
+    children: [
+      {
+        value: 'china',
+        label: 'China',
+        children: [
+          { value: 'shanghai', label: 'Shanghai' },
+          { value: 'hangzhou', label: 'Hangzhou' },
+        ],
+      },
+      {
+        value: 'japan',
+        label: 'Japan',
+        children: [{ value: 'tokyo', label: 'Tokyo' }],
+      },
+    ],
+  },
+  {
+    value: 'europe',
+    label: 'Europe',
+    children: [
+      {
+        value: 'germany',
+        label: 'Germany',
+        children: [{ value: 'berlin', label: 'Berlin' }],
+      },
+    ],
+  },
+];
+export default function SearchLocations() {
+  return (
+    <Cascader
+      options={options}
+      showSearch={{
+        filter: (input, path) =>
+          path.some((option) =>
+            String(option.label).toLowerCase().includes(input.toLowerCase()),
+          ),
+      }}
+      placeholder="Search country or city"
+      style={{ width: '100%' }}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="cascader-intermediate">
+
+### Choose intermediate levels
+
+changeOnSelect allows a parent path to be selected. This example expands columns on pointer hover.
+
+```tsx preview
+import { Cascader } from '@rockshin/tao-ui';
+const options = [
+  {
+    value: 'asia',
+    label: 'Asia',
+    children: [
+      {
+        value: 'china',
+        label: 'China',
+        children: [
+          { value: 'shanghai', label: 'Shanghai' },
+          { value: 'hangzhou', label: 'Hangzhou' },
+        ],
+      },
+      {
+        value: 'japan',
+        label: 'Japan',
+        children: [{ value: 'tokyo', label: 'Tokyo' }],
+      },
+    ],
+  },
+  {
+    value: 'europe',
+    label: 'Europe',
+    children: [
+      {
+        value: 'germany',
+        label: 'Germany',
+        children: [{ value: 'berlin', label: 'Berlin' }],
+      },
+    ],
+  },
+];
+export default function IntermediateLocation() {
+  return (
+    <Cascader
+      options={options}
+      changeOnSelect
+      expandTrigger="hover"
+      placeholder="Choose a continent, country or city"
+      style={{ width: '100%' }}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="cascader-fields">
+
+### Map custom fields
+
+Field names let existing domain data remain unchanged.
+
+```tsx preview
+import { Cascader } from '@rockshin/tao-ui';
+export default function RegionFields() {
+  return (
+    <Cascader
+      fieldNames={{ label: 'name', value: 'code', children: 'regions' }}
+      options={[
+        {
+          code: 'cn',
+          name: 'China',
+          regions: [
+            { code: 'sh', name: 'Shanghai' },
+            { code: 'hz', name: 'Hangzhou' },
+          ],
+        },
+      ]}
+      placeholder="Choose a region"
+      style={{ width: '100%' }}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="cascader-async">
+
+### Load columns on demand
+
+The local delay stands in for a data request. Mark unresolved parents with isLeaf:false and update options after loading.
+
+```tsx preview
+import { useState } from 'react';
+import { Cascader, type DefaultOptionType } from '@rockshin/tao-ui';
+export default function AsyncLocations() {
+  const [options, setOptions] = useState<DefaultOptionType[]>([
+    { value: 'china', label: 'China', isLeaf: false },
+  ]);
+  return (
+    <Cascader
+      options={options}
+      changeOnSelect
+      loadData={async (selected) => {
+        const target = selected.at(-1)!;
+        target.loading = true;
+        setOptions([...options]);
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        target.loading = false;
+        target.children = [
+          { value: 'shanghai', label: 'Shanghai' },
+          { value: 'hangzhou', label: 'Hangzhou' },
+        ];
+        setOptions([...options]);
+      }}
+      placeholder="Load cities"
+      style={{ width: '100%' }}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="cascader-panel">
+
+### Use the standalone panel
+
+Cascader.Panel keeps the columns visible without a trigger input.
+
+```tsx preview
+import { Cascader } from '@rockshin/tao-ui';
+const options = [
+  {
+    value: 'asia',
+    label: 'Asia',
+    children: [
+      {
+        value: 'china',
+        label: 'China',
+        children: [
+          { value: 'shanghai', label: 'Shanghai' },
+          { value: 'hangzhou', label: 'Hangzhou' },
+        ],
+      },
+      {
+        value: 'japan',
+        label: 'Japan',
+        children: [{ value: 'tokyo', label: 'Tokyo' }],
+      },
+    ],
+  },
+  {
+    value: 'europe',
+    label: 'Europe',
+    children: [
+      {
+        value: 'germany',
+        label: 'Germany',
+        children: [{ value: 'berlin', label: 'Berlin' }],
+      },
+    ],
+  },
+];
+export default function LocationPanel() {
+  return (
+    <Cascader.Panel
+      options={options}
+      defaultValue={['asia', 'china', 'shanghai']}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="cascader-mobile">
+
+### Narrow popup columns
+
+Open all three levels in phone mode. The popup is constrained to the viewport and its columns scroll horizontally.
+
+```tsx preview="iframe-follow"
+import { Cascader } from '@rockshin/tao-ui';
+const options = [
+  {
+    value: 'asia',
+    label: 'Asia',
+    children: [
+      {
+        value: 'china',
+        label: 'China',
+        children: [
+          { value: 'shanghai', label: 'Shanghai' },
+          { value: 'hangzhou', label: 'Hangzhou' },
+        ],
+      },
+      {
+        value: 'japan',
+        label: 'Japan',
+        children: [{ value: 'tokyo', label: 'Tokyo' }],
+      },
+    ],
+  },
+  {
+    value: 'europe',
+    label: 'Europe',
+    children: [
+      {
+        value: 'germany',
+        label: 'Germany',
+        children: [{ value: 'berlin', label: 'Berlin' }],
+      },
+    ],
+  },
+];
+export default function MobileLocation() {
+  return (
+    <div style={{ padding: 16 }}>
+      <h3>Delivery location</h3>
+      <Cascader
+        aria-label="Delivery location"
+        size="middle"
+        options={options}
+        showSearch
+        allowClear
+        variant="filled"
+        style={{ width: '100%' }}
+      />
+    </div>
+  );
+}
+```
+
+</section>
+
+</div>
+
+## API
+
+<API moduleName="cascader" />

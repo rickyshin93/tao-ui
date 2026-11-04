@@ -3,6 +3,8 @@ title: Tooltip
 description: 在悬停或键盘聚焦时展示简短补充说明。页面涵盖适用场景、设计建议、多组可运行示例、交互状态与完整 API 参考。
 ---
 
+import Preview from '../../_components/demo-preview';
+
 在悬停或键盘聚焦时展示简短补充说明。
 
 ## 何时使用
@@ -18,7 +20,13 @@ description: 在悬停或键盘聚焦时展示简短补充说明。页面涵盖�
 
 - 关键说明或交互内容不要只放在 Tooltip 中。
 
-## 基础用法
+## 代码演示
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="tooltip-example-1">
+
+### 基础用法
 
 ```tsx preview
 import { Button, Tooltip } from '@rockshin/tao-ui';
@@ -34,7 +42,11 @@ function TooltipExample() {
 export default TooltipExample;
 ```
 
-## 弹出位置
+</section>
+
+<section className="tao-example" id="tooltip-example-2">
+
+### 弹出位置
 
 ```tsx preview
 import { Button, Stack, Tooltip } from '@rockshin/tao-ui';
@@ -42,10 +54,18 @@ import { Button, Stack, Tooltip } from '@rockshin/tao-ui';
 function TooltipPlacements() {
   return (
     <Stack direction="horizontal" gap="md">
-      <Tooltip title="Top" placement="top"><Button variant="secondary">Top</Button></Tooltip>
-      <Tooltip title="Bottom" placement="bottom"><Button variant="secondary">Bottom</Button></Tooltip>
-      <Tooltip title="Left" placement="left"><Button variant="secondary">Left</Button></Tooltip>
-      <Tooltip title="Right" placement="right"><Button variant="secondary">Right</Button></Tooltip>
+      <Tooltip title="Top" placement="top">
+        <Button variant="secondary">Top</Button>
+      </Tooltip>
+      <Tooltip title="Bottom" placement="bottom">
+        <Button variant="secondary">Bottom</Button>
+      </Tooltip>
+      <Tooltip title="Left" placement="left">
+        <Button variant="secondary">Left</Button>
+      </Tooltip>
+      <Tooltip title="Right" placement="right">
+        <Button variant="secondary">Right</Button>
+      </Tooltip>
     </Stack>
   );
 }
@@ -53,7 +73,11 @@ function TooltipPlacements() {
 export default TooltipPlacements;
 ```
 
-## 箭头、颜色与受控显示
+</section>
+
+<section className="tao-example" id="tooltip-example-3">
+
+### 箭头、颜色与受控显示
 
 ```tsx preview
 import { Button, Stack, Tooltip } from '@rockshin/tao-ui';
@@ -61,15 +85,145 @@ import { Button, Stack, Tooltip } from '@rockshin/tao-ui';
 function TooltipStyles() {
   return (
     <Stack direction="horizontal" gap="md">
-      <Tooltip title="No arrow" arrow={false}><Button variant="secondary">No arrow</Button></Tooltip>
-      <Tooltip title="Brand color" color="#245b57"><Button variant="secondary">Custom color</Button></Tooltip>
-      <Tooltip title="Always visible" open><Button variant="secondary">Controlled</Button></Tooltip>
+      <Tooltip title="No arrow" arrow={false}>
+        <Button variant="secondary">No arrow</Button>
+      </Tooltip>
+      <Tooltip title="Brand color" color="#245b57">
+        <Button variant="secondary">Custom color</Button>
+      </Tooltip>
+      <Tooltip title="Focus also opens this hint">
+        <Button variant="secondary">Focus for a hint</Button>
+      </Tooltip>
     </Stack>
   );
 }
 
 export default TooltipStyles;
 ```
+
+</section>
+
+<section className="tao-example" id="tooltip-no-arrow">
+
+### 不显示箭头
+
+arrow=false 去掉指向箭头。
+
+```tsx preview
+import { Button, Tooltip } from '@rockshin/tao-ui';
+
+export default function TooltipNoArrow() {
+  return (
+    <Tooltip title="No arrow tooltip" arrow={false}>
+      <Button variant="secondary">No arrow</Button>
+    </Tooltip>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="tooltip-controlled">
+
+### 受控提示
+
+用 open 与 onOpenChange 同步可见状态。
+
+```tsx preview
+import { useState } from 'react';
+import { Button, Stack, Tooltip } from '@rockshin/tao-ui';
+export default function Example() {
+  const [open, setOpen] = useState(false);
+  return (
+    <Stack direction="horizontal">
+      <Button onClick={() => setOpen(!open)}>
+        {open ? 'Hide hint' : 'Show hint'}
+      </Button>
+      <Tooltip open={open} onOpenChange={setOpen} title="Controlled hint">
+        <Button>Hint target</Button>
+      </Tooltip>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="tooltip-custom-color">
+
+### 自定义颜色
+
+color 自定义提示背景，使用时保证文字对比度。
+
+```tsx preview
+import { Button, Stack, Tooltip } from '@rockshin/tao-ui';
+
+export default function TooltipCustomColor() {
+  return (
+    <Stack direction="horizontal" gap="md" align="center">
+      <Tooltip title="Brand primary" color="#1677ff">
+        <Button variant="secondary">#1677ff</Button>
+      </Tooltip>
+      <Tooltip title="Warm orange" color="#f76b15">
+        <Button variant="secondary">#f76b15</Button>
+      </Tooltip>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="tooltip-delay">
+
+### 悬停延迟
+
+延迟以秒为单位，键盘焦点不等待悬停延迟。
+
+```tsx preview
+import { Tooltip, Button } from '@rockshin/tao-ui';
+export default function Example() {
+  return (
+    <Tooltip
+      title="Wait 0.6 seconds on hover"
+      mouseEnterDelay={0.6}
+      mouseLeaveDelay={0.2}
+    >
+      <Button>Hover or focus</Button>
+    </Tooltip>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="tooltip-empty">
+
+### 条件提示
+
+title 为空时禁用提示，适合仅在需要解释时显示。
+
+```tsx preview
+import { useState } from 'react';
+import { Tooltip, Button, Stack } from '@rockshin/tao-ui';
+export default function Example() {
+  const [enabled, setEnabled] = useState(true);
+  return (
+    <Stack direction="vertical">
+      <Button onClick={() => setEnabled(!enabled)}>
+        {enabled ? 'Disable hint' : 'Enable hint'}
+      </Button>
+      <Tooltip title={enabled ? 'Additional information' : null}>
+        <Button>Hint target</Button>
+      </Tooltip>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+</div>
 
 ## API
 

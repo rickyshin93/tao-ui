@@ -1,0 +1,192 @@
+---
+title: Statistic
+description: "突出展示数值、格式化指标与计时。"
+---
+
+import Preview from '../../_components/demo-preview';
+
+突出展示数值、格式化指标与计时。
+
+组件采用 tao-ui 原生实现，公共 API 对齐 Ant Design 6.7.0。外观、主题 token 与 Semantic DOM 定制遵循 tao-ui，主题通过 `TaoProvider` 配置。
+
+数字字符串保留大数精度；precision 截取小数位。Timer 支持倒计时与正计时，并保留旧 Countdown 别名。
+
+## 何时使用
+
+提供清晰标题与单位，使数值不依赖额外上下文也能理解。
+
+## 代码演示
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="statistic-example-1">
+
+### 数值与单位
+
+```tsx preview
+import { Statistic } from "@rockshin/tao-ui";
+
+export default function Example() {
+  return (
+    <div
+      style={{
+        display: "flex",
+        gap: 16,
+        alignItems: "center",
+        flexWrap: "wrap",
+      }}
+    >
+      <Statistic title="Active users" value={12345} />
+      <Statistic title="Completion" value={93.5} suffix="%" />
+      <Statistic title="Balance" prefix="$" value={1842.6} precision={2} />
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="statistic-example-2">
+
+### 精度与分隔符
+
+```tsx preview
+import { Statistic } from "@rockshin/tao-ui";
+
+export default function Example() {
+  return (
+    <div
+      style={{
+        display: "flex",
+        gap: 16,
+        alignItems: "center",
+        flexWrap: "wrap",
+      }}
+    >
+      <Statistic
+        title="Precise string"
+        value="12345678901234567890.987"
+        precision={2}
+      />
+      <Statistic
+        title="Custom grouping"
+        value="1234567.89"
+        groupSeparator=" "
+        decimalSeparator=","
+      />
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="statistic-example-3">
+
+### 自定义格式与数值渲染
+
+```tsx preview
+import { Statistic } from "@rockshin/tao-ui";
+
+export default function Example() {
+  return (
+    <Statistic
+      title="Storage used"
+      value={1536}
+      formatter={(value) => `${(Number(value) / 1024).toFixed(1)} GB`}
+      valueRender={(node) => <strong>{node}</strong>}
+      styles={{ value: { color: "var(--tao-color-success)" } }}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="statistic-example-4">
+
+### 加载状态
+
+```tsx preview
+import { useState } from "react";
+import { Button, Statistic } from "@rockshin/tao-ui";
+
+export default function Example() {
+  const [loading, setLoading] = useState(true);
+  return (
+    <div>
+      <Statistic title="Monthly total" value={8421} loading={loading} />
+      <Button onClick={() => setLoading(!loading)} style={{ marginTop: 16 }}>
+        Toggle loading
+      </Button>
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="statistic-example-5">
+
+### 倒计时与完成反馈
+
+```tsx preview
+import { useState } from "react";
+import { Button, Statistic } from "@rockshin/tao-ui";
+
+export default function Example() {
+  const [deadline, setDeadline] = useState(() => Date.now() + 10000);
+  const [finished, setFinished] = useState(false);
+  return (
+    <div>
+      <Statistic.Timer
+        type="countdown"
+        title="Time remaining"
+        value={deadline}
+        format="mm:ss"
+        onFinish={() => setFinished(true)}
+      />
+      <p aria-live="polite">{finished ? "Finished" : "Running"}</p>
+      <Button
+        onClick={() => {
+          setDeadline(Date.now() + 10000);
+          setFinished(false);
+        }}
+      >
+        Restart 10 seconds
+      </Button>
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="statistic-example-6">
+
+### 已用时间
+
+```tsx preview
+import { useState } from "react";
+import { Statistic } from "@rockshin/tao-ui";
+
+export default function Example() {
+  const [startedAt] = useState(() => Date.now() - 65000);
+  return (
+    <Statistic.Timer
+      type="countup"
+      title="Session duration"
+      value={startedAt}
+      format="HH:mm:ss [elapsed]"
+    />
+  );
+}
+```
+
+</section>
+
+</div>
+
+## API
+
+<API moduleName="statistic" />

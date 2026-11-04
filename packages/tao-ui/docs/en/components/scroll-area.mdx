@@ -3,6 +3,8 @@ title: ScrollArea
 description: "Provides a styled scroll container for overflow content. Includes usage guidance, a runnable example, and the complete API reference."
 ---
 
+import Preview from '../../_components/demo-preview';
+
 Provides a styled scroll container for overflow content.
 
 ## When to use
@@ -18,7 +20,13 @@ Use ScrollArea when a fixed region needs overflow behavior without changing page
 
 - Do not use the component outside its intended interaction model.
 
-## Basic usage
+## Examples
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="scroll-area-example-1">
+
+### Basic usage
 
 ```tsx preview
 import { ScrollArea } from '@rockshin/tao-ui';
@@ -27,7 +35,10 @@ function ScrollAreaExample() {
   return (
     <ScrollArea
       maxHeight={180}
-      style={{ border: '1px solid var(--tao-color-border-secondary)', borderRadius: 8 }}
+      style={{
+        border: '1px solid var(--tao-color-border-secondary)',
+        borderRadius: 8,
+      }}
     >
       <div style={{ padding: 16 }}>
         {Array.from({ length: 12 }, (_, index) => (
@@ -41,7 +52,11 @@ function ScrollAreaExample() {
 export default ScrollAreaExample;
 ```
 
-## Horizontal and two-axis scrolling
+</section>
+
+<section className="tao-example" id="scroll-area-example-2">
+
+### Horizontal and two-axis scrolling
 
 ```tsx preview
 import { ScrollArea, Stack } from '@rockshin/tao-ui';
@@ -66,7 +81,11 @@ function ScrollDirections() {
 export default ScrollDirections;
 ```
 
-## Persistent scrollbars and custom size
+</section>
+
+<section className="tao-example" id="scroll-area-example-3">
+
+### Persistent scrollbars and custom size
 
 ```tsx preview
 import { ScrollArea, Stack } from '@rockshin/tao-ui';
@@ -90,6 +109,314 @@ function ScrollbarStyles() {
 
 export default ScrollbarStyles;
 ```
+
+</section>
+
+<section className="tao-example" id="scroll-area-horizontal">
+
+### Horizontal scrolling
+
+Constrain the available width and use the appropriate scrollbar orientation for horizontal content.
+
+```tsx preview
+import { ScrollArea, Tag } from '@rockshin/tao-ui';
+
+const items = Array.from({ length: 50 }, (_, i) => `Item ${i + 1}`);
+
+export default function ScrollAreaHorizontal() {
+  return (
+    <ScrollArea
+      direction="horizontal"
+      maxWidth={400}
+      style={{
+        border: '1px solid var(--tao-color-border-secondary)',
+        borderRadius: 6,
+      }}
+    >
+      <div
+        style={{ display: 'flex', gap: 8, padding: 16, width: 'max-content' }}
+      >
+        {items.slice(0, 20).map((item) => (
+          <Tag key={item} color="primary">
+            {item}
+          </Tag>
+        ))}
+      </div>
+    </ScrollArea>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="scroll-area-both">
+
+### Both axes
+
+Scroll each axis when content exceeds both dimensions without widening the page.
+
+```tsx preview
+import { ScrollArea } from '@rockshin/tao-ui';
+
+const items = Array.from({ length: 50 }, (_, i) => `Item ${i + 1}`);
+
+export default function ScrollAreaBoth() {
+  return (
+    <ScrollArea
+      direction="both"
+      maxHeight={200}
+      maxWidth={300}
+      style={{
+        border: '1px solid var(--tao-color-border-secondary)',
+        borderRadius: 6,
+      }}
+    >
+      <div style={{ width: 600, padding: 16 }}>
+        {items.map((item) => (
+          <p
+            key={item}
+            style={{
+              margin: '0 0 8px',
+              color: 'var(--tao-color-text-secondary)',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {item} — This is a long line that overflows the container
+            horizontally to demonstrate both scrollbars.
+          </p>
+        ))}
+      </div>
+    </ScrollArea>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="scroll-area-always-visible">
+
+### Persistent scrollbars
+
+`type="always"` retains the scrollbar track when scrollability should be more visible.
+
+```tsx preview
+import { ScrollArea } from '@rockshin/tao-ui';
+
+const items = Array.from({ length: 50 }, (_, i) => `Item ${i + 1}`);
+
+export default function ScrollAreaAlwaysVisible() {
+  return (
+    <ScrollArea
+      type="always"
+      maxHeight={200}
+      style={{
+        border: '1px solid var(--tao-color-border-secondary)',
+        borderRadius: 6,
+      }}
+    >
+      <div style={{ padding: 16 }}>
+        {items.map((item) => (
+          <p
+            key={item}
+            style={{
+              margin: '0 0 8px',
+              color: 'var(--tao-color-text-secondary)',
+            }}
+          >
+            {item}
+          </p>
+        ))}
+      </div>
+    </ScrollArea>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="scroll-area-with-shadow">
+
+### Scroll edge shadows
+
+Edge shadows indicate hidden content and disappear when that edge is reached.
+
+```tsx preview
+import { ScrollArea } from '@rockshin/tao-ui';
+
+const items = Array.from({ length: 50 }, (_, i) => `Item ${i + 1}`);
+
+export default function ScrollAreaWithShadow() {
+  return (
+    <ScrollArea
+      scrollShadow
+      maxHeight={200}
+      style={{
+        border: '1px solid var(--tao-color-border-secondary)',
+        borderRadius: 6,
+      }}
+    >
+      <div style={{ padding: 16 }}>
+        {items.map((item) => (
+          <p
+            key={item}
+            style={{
+              margin: '0 0 8px',
+              color: 'var(--tao-color-text-secondary)',
+            }}
+          >
+            {item}
+          </p>
+        ))}
+      </div>
+    </ScrollArea>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="scroll-area-custom-size">
+
+### Scrollbar size
+
+Adjust scrollbar thickness while keeping the content area bounded.
+
+```tsx preview
+import { ScrollArea, Stack } from '@rockshin/tao-ui';
+
+const items = Array.from({ length: 50 }, (_, i) => `Item ${i + 1}`);
+
+export default function ScrollAreaCustomSize() {
+  return (
+    <Stack gap="lg">
+      <div>
+        <p
+          style={{
+            fontSize: 13,
+            color: 'var(--tao-color-text-secondary)',
+            marginBottom: 8,
+          }}
+        >
+          Thin (4px)
+        </p>
+        <ScrollArea
+          type="always"
+          scrollbarSize={4}
+          maxHeight={150}
+          style={{
+            border: '1px solid var(--tao-color-border-secondary)',
+            borderRadius: 6,
+          }}
+        >
+          <div style={{ padding: 16 }}>
+            {items.slice(0, 30).map((item) => (
+              <p
+                key={item}
+                style={{
+                  margin: '0 0 8px',
+                  color: 'var(--tao-color-text-secondary)',
+                }}
+              >
+                {item}
+              </p>
+            ))}
+          </div>
+        </ScrollArea>
+      </div>
+      <div>
+        <p
+          style={{
+            fontSize: 13,
+            color: 'var(--tao-color-text-secondary)',
+            marginBottom: 8,
+          }}
+        >
+          Thick (10px)
+        </p>
+        <ScrollArea
+          type="always"
+          scrollbarSize={10}
+          maxHeight={150}
+          style={{
+            border: '1px solid var(--tao-color-border-secondary)',
+            borderRadius: 6,
+          }}
+        >
+          <div style={{ padding: 16 }}>
+            {items.slice(0, 30).map((item) => (
+              <p
+                key={item}
+                style={{
+                  margin: '0 0 8px',
+                  color: 'var(--tao-color-text-secondary)',
+                }}
+              >
+                {item}
+              </p>
+            ))}
+          </div>
+        </ScrollArea>
+      </div>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="scroll-area-horizontal-shadow">
+
+### Horizontal edge shadows
+
+Use side shadows to indicate additional content while scrolling horizontally.
+
+```tsx preview
+import { ScrollArea } from '@rockshin/tao-ui';
+
+const items = Array.from({ length: 50 }, (_, i) => `Item ${i + 1}`);
+
+export default function ScrollAreaHorizontalShadow() {
+  return (
+    <ScrollArea
+      direction="horizontal"
+      scrollShadow
+      maxWidth={400}
+      style={{
+        border: '1px solid var(--tao-color-border-secondary)',
+        borderRadius: 6,
+      }}
+    >
+      <div
+        style={{ display: 'flex', gap: 8, padding: 16, width: 'max-content' }}
+      >
+        {items.slice(0, 30).map((item) => (
+          <div
+            key={item}
+            style={{
+              flexShrink: 0,
+              width: 100,
+              height: 60,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              background: 'var(--tao-color-fill-quaternary)',
+              borderRadius: 6,
+              fontSize: 13,
+              color: 'var(--tao-color-text-secondary)',
+            }}
+          >
+            {item}
+          </div>
+        ))}
+      </div>
+    </ScrollArea>
+  );
+}
+```
+
+</section>
+
+</div>
 
 ## API
 

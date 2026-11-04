@@ -1,0 +1,31 @@
+[data-tao-auto-complete] {
+  cursor: text;
+}
+[data-tao-auto-complete] > [class*="-content"] {
+  min-height: calc(
+    var(--tao-engine-font-size, var(--tao-font-size-base)) *
+    var(--tao-line-height)
+  );
+}
+[data-tao-auto-complete][data-tao-custom-input] {
+  position: relative;
+  display: inline-flex;
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+}
+[data-tao-auto-complete][data-tao-custom-input] [class$="-input"] {
+  position: relative;
+}
+[data-tao-auto-complete][data-tao-custom-input] > [class*="-content"] {
+  overflow: visible;
+  flex: 1;
+  min-width: 0;
+}
+[data-tao-auto-complete][data-tao-custom-input] textarea {
+  display: block;
+  resize: vertical;
+}

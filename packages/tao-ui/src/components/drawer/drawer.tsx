@@ -4,11 +4,12 @@ import {
   type CSSProperties,
   type ReactNode,
   type PointerEvent as ReactPointerEvent,
+  useCallback,
   useEffect,
   useRef,
   useState,
 } from 'react';
-import { TaoPortalScope } from '../../provider/tao-provider';
+import { TaoPortalScope, useTaoConfig } from '../../provider/tao-provider';
 import { DialogContent } from '../../utils/dialog-content';
 import { preventParentOutsideDismiss } from '../../utils/portal';
 import {
@@ -17,6 +18,7 @@ import {
   type SemanticStyles,
 } from '../../utils/semantic';
 import './drawer.css';
+import { useWatermarkPanelRef } from '../watermark/watermark-context';
 
 export type DrawerPlacement = 'top' | 'right' | 'bottom' | 'left';
 export type DrawerSize = 'default' | 'large';
@@ -110,6 +112,7 @@ export function Drawer({
   'aria-labelledby': ariaLabelledBy,
   'aria-describedby': ariaDescribedBy,
 }: DrawerProps) {
+  const { locale } = useTaoConfig();
   const prevOpen = useRef(open);
   useEffect(() => {
     if (prevOpen.current !== open) {
@@ -127,7 +130,15 @@ export function Drawer({
   // placement (and thus axis) changes.
   const resizeCfg = typeof resizable === 'object' ? resizable : undefined;
   const isResizable = !!resizable;
-  const contentRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement | null>(null);
+  const watermarkRef = useWatermarkPanelRef();
+  const panelRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      contentRef.current = node;
+      watermarkRef(node);
+    },
+    [watermarkRef],
+  );
   const dragRef = useRef<{ startPos: number; startSize: number } | null>(null);
   const [drag, setDrag] = useState<{
     horizontal: boolean;
@@ -206,7 +217,7 @@ export function Drawer({
           <DialogContent
             open={open}
             keepAlive={keepAlive}
-            contentRef={contentRef}
+            contentRef={panelRef}
             forceMount={forceMount}
             data-tao-drawer=""
             data-tao-placement={placement}
@@ -271,7 +282,7 @@ export function Drawer({
                       className={cx(classNames?.close)}
                       style={stylesProp?.close}
                       onClick={onClose}
-                      aria-label="Close"
+                      aria-label={locale.close}
                     >
                       {closeIcon ?? <CloseIcon />}
                     </button>

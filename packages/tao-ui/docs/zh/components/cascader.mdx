@@ -1,0 +1,490 @@
+---
+title: Cascader
+description: "通过搜索、多选或独立面板，从层级选项中选择完整路径。"
+---
+
+import Preview from '../../_components/demo-preview';
+
+通过搜索、多选或独立面板，从层级选项中选择完整路径。
+
+每个示例都可以独立复制运行。带设备预览的示例可通过工具栏切换桌面与手机宽度。
+
+尺寸支持 `small`、`medium`、`large`；兼容别名 `middle` 与 `medium` 使用相同尺寸。
+
+## 示例
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="cascader-basic">
+
+### 选择完整路径
+
+选中值按顺序包含路径中的各级 value。
+
+```tsx preview
+import { Cascader } from '@rockshin/tao-ui';
+const options = [
+  {
+    value: 'asia',
+    label: 'Asia',
+    children: [
+      {
+        value: 'china',
+        label: 'China',
+        children: [
+          { value: 'shanghai', label: 'Shanghai' },
+          { value: 'hangzhou', label: 'Hangzhou' },
+        ],
+      },
+      {
+        value: 'japan',
+        label: 'Japan',
+        children: [{ value: 'tokyo', label: 'Tokyo' }],
+      },
+    ],
+  },
+  {
+    value: 'europe',
+    label: 'Europe',
+    children: [
+      {
+        value: 'germany',
+        label: 'Germany',
+        children: [{ value: 'berlin', label: 'Berlin' }],
+      },
+    ],
+  },
+];
+export default function BasicCascader() {
+  return (
+    <Cascader
+      aria-label="Location"
+      options={options}
+      defaultValue={['asia', 'china', 'shanghai']}
+      allowClear
+      style={{ width: '100%' }}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="cascader-controlled">
+
+### 受控路径与展示
+
+displayRender 可以缩短展示文字，同时在状态中保留完整路径。
+
+```tsx preview
+import { useState } from 'react';
+import { Cascader } from '@rockshin/tao-ui';
+const options = [
+  {
+    value: 'asia',
+    label: 'Asia',
+    children: [
+      {
+        value: 'china',
+        label: 'China',
+        children: [
+          { value: 'shanghai', label: 'Shanghai' },
+          { value: 'hangzhou', label: 'Hangzhou' },
+        ],
+      },
+      {
+        value: 'japan',
+        label: 'Japan',
+        children: [{ value: 'tokyo', label: 'Tokyo' }],
+      },
+    ],
+  },
+  {
+    value: 'europe',
+    label: 'Europe',
+    children: [
+      {
+        value: 'germany',
+        label: 'Germany',
+        children: [{ value: 'berlin', label: 'Berlin' }],
+      },
+    ],
+  },
+];
+export default function ControlledLocation() {
+  const [value, setValue] = useState<string[]>(['asia', 'japan', 'tokyo']);
+  return (
+    <div>
+      <Cascader
+        multiple={false}
+        options={options}
+        value={value}
+        onChange={setValue}
+        displayRender={(labels) => labels.at(-1)}
+        style={{ width: '100%' }}
+      />
+      <p>{value.join(' / ')}</p>
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="cascader-multiple">
+
+### 选择多条路径
+
+多选模式提供联动复选框；SHOW_CHILD 展示已选叶子路径。
+
+```tsx preview
+import { Cascader } from '@rockshin/tao-ui';
+const options = [
+  {
+    value: 'asia',
+    label: 'Asia',
+    children: [
+      {
+        value: 'china',
+        label: 'China',
+        children: [
+          { value: 'shanghai', label: 'Shanghai' },
+          { value: 'hangzhou', label: 'Hangzhou' },
+        ],
+      },
+      {
+        value: 'japan',
+        label: 'Japan',
+        children: [{ value: 'tokyo', label: 'Tokyo' }],
+      },
+    ],
+  },
+  {
+    value: 'europe',
+    label: 'Europe',
+    children: [
+      {
+        value: 'germany',
+        label: 'Germany',
+        children: [{ value: 'berlin', label: 'Berlin' }],
+      },
+    ],
+  },
+];
+export default function MultipleLocations() {
+  return (
+    <Cascader
+      options={options}
+      multiple
+      showCheckedStrategy={Cascader.SHOW_CHILD}
+      defaultValue={[['asia', 'china', 'shanghai']]}
+      maxTagCount="responsive"
+      placeholder="Choose locations"
+      style={{ width: '100%' }}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="cascader-search">
+
+### 搜索路径中的各级文字
+
+过滤函数检查整条路径的标签，选择搜索结果后返回完整路径。
+
+```tsx preview
+import { Cascader } from '@rockshin/tao-ui';
+const options = [
+  {
+    value: 'asia',
+    label: 'Asia',
+    children: [
+      {
+        value: 'china',
+        label: 'China',
+        children: [
+          { value: 'shanghai', label: 'Shanghai' },
+          { value: 'hangzhou', label: 'Hangzhou' },
+        ],
+      },
+      {
+        value: 'japan',
+        label: 'Japan',
+        children: [{ value: 'tokyo', label: 'Tokyo' }],
+      },
+    ],
+  },
+  {
+    value: 'europe',
+    label: 'Europe',
+    children: [
+      {
+        value: 'germany',
+        label: 'Germany',
+        children: [{ value: 'berlin', label: 'Berlin' }],
+      },
+    ],
+  },
+];
+export default function SearchLocations() {
+  return (
+    <Cascader
+      options={options}
+      showSearch={{
+        filter: (input, path) =>
+          path.some((option) =>
+            String(option.label).toLowerCase().includes(input.toLowerCase()),
+          ),
+      }}
+      placeholder="Search country or city"
+      style={{ width: '100%' }}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="cascader-intermediate">
+
+### 选择中间层级
+
+changeOnSelect 允许选择中间路径；本例通过鼠标悬停展开下一列。
+
+```tsx preview
+import { Cascader } from '@rockshin/tao-ui';
+const options = [
+  {
+    value: 'asia',
+    label: 'Asia',
+    children: [
+      {
+        value: 'china',
+        label: 'China',
+        children: [
+          { value: 'shanghai', label: 'Shanghai' },
+          { value: 'hangzhou', label: 'Hangzhou' },
+        ],
+      },
+      {
+        value: 'japan',
+        label: 'Japan',
+        children: [{ value: 'tokyo', label: 'Tokyo' }],
+      },
+    ],
+  },
+  {
+    value: 'europe',
+    label: 'Europe',
+    children: [
+      {
+        value: 'germany',
+        label: 'Germany',
+        children: [{ value: 'berlin', label: 'Berlin' }],
+      },
+    ],
+  },
+];
+export default function IntermediateLocation() {
+  return (
+    <Cascader
+      options={options}
+      changeOnSelect
+      expandTrigger="hover"
+      placeholder="Choose a continent, country or city"
+      style={{ width: '100%' }}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="cascader-fields">
+
+### 映射自定义字段
+
+通过字段映射直接使用已有业务数据。
+
+```tsx preview
+import { Cascader } from '@rockshin/tao-ui';
+export default function RegionFields() {
+  return (
+    <Cascader
+      fieldNames={{ label: 'name', value: 'code', children: 'regions' }}
+      options={[
+        {
+          code: 'cn',
+          name: 'China',
+          regions: [
+            { code: 'sh', name: 'Shanghai' },
+            { code: 'hz', name: 'Hangzhou' },
+          ],
+        },
+      ]}
+      placeholder="Choose a region"
+      style={{ width: '100%' }}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="cascader-async">
+
+### 按需加载下一列
+
+此处用本地延迟模拟请求。未加载的父节点设置 isLeaf:false，加载后更新 options。
+
+```tsx preview
+import { useState } from 'react';
+import { Cascader, type DefaultOptionType } from '@rockshin/tao-ui';
+export default function AsyncLocations() {
+  const [options, setOptions] = useState<DefaultOptionType[]>([
+    { value: 'china', label: 'China', isLeaf: false },
+  ]);
+  return (
+    <Cascader
+      options={options}
+      changeOnSelect
+      loadData={async (selected) => {
+        const target = selected.at(-1)!;
+        target.loading = true;
+        setOptions([...options]);
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        target.loading = false;
+        target.children = [
+          { value: 'shanghai', label: 'Shanghai' },
+          { value: 'hangzhou', label: 'Hangzhou' },
+        ];
+        setOptions([...options]);
+      }}
+      placeholder="Load cities"
+      style={{ width: '100%' }}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="cascader-panel">
+
+### 独立面板
+
+Cascader.Panel 直接展示级联列，不使用输入触发器。
+
+```tsx preview
+import { Cascader } from '@rockshin/tao-ui';
+const options = [
+  {
+    value: 'asia',
+    label: 'Asia',
+    children: [
+      {
+        value: 'china',
+        label: 'China',
+        children: [
+          { value: 'shanghai', label: 'Shanghai' },
+          { value: 'hangzhou', label: 'Hangzhou' },
+        ],
+      },
+      {
+        value: 'japan',
+        label: 'Japan',
+        children: [{ value: 'tokyo', label: 'Tokyo' }],
+      },
+    ],
+  },
+  {
+    value: 'europe',
+    label: 'Europe',
+    children: [
+      {
+        value: 'germany',
+        label: 'Germany',
+        children: [{ value: 'berlin', label: 'Berlin' }],
+      },
+    ],
+  },
+];
+export default function LocationPanel() {
+  return (
+    <Cascader.Panel
+      options={options}
+      defaultValue={['asia', 'china', 'shanghai']}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="cascader-mobile">
+
+### 窄屏级联列
+
+在手机模式下展开三级选项。弹层限制在视口内，级联列可以横向滚动。
+
+```tsx preview="iframe-follow"
+import { Cascader } from '@rockshin/tao-ui';
+const options = [
+  {
+    value: 'asia',
+    label: 'Asia',
+    children: [
+      {
+        value: 'china',
+        label: 'China',
+        children: [
+          { value: 'shanghai', label: 'Shanghai' },
+          { value: 'hangzhou', label: 'Hangzhou' },
+        ],
+      },
+      {
+        value: 'japan',
+        label: 'Japan',
+        children: [{ value: 'tokyo', label: 'Tokyo' }],
+      },
+    ],
+  },
+  {
+    value: 'europe',
+    label: 'Europe',
+    children: [
+      {
+        value: 'germany',
+        label: 'Germany',
+        children: [{ value: 'berlin', label: 'Berlin' }],
+      },
+    ],
+  },
+];
+export default function MobileLocation() {
+  return (
+    <div style={{ padding: 16 }}>
+      <h3>Delivery location</h3>
+      <Cascader
+        aria-label="Delivery location"
+        size="middle"
+        options={options}
+        showSearch
+        allowClear
+        variant="filled"
+        style={{ width: '100%' }}
+      />
+    </div>
+  );
+}
+```
+
+</section>
+
+</div>
+
+## API
+
+<API moduleName="cascader" />

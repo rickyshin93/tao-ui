@@ -1,0 +1,163 @@
+---
+title: Skeleton
+description: "在数据加载时保留内容结构。"
+---
+
+import Preview from '../../_components/demo-preview';
+
+在数据加载时保留内容结构。
+
+## 何时使用
+
+适合已知结构内容的首次加载。占位应接近最终布局，数据就绪后替换为真实内容。
+
+## 示例
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="skeleton-example-1">
+
+### 加载与内容切换
+
+loading 为 false 时显示 children。
+
+```tsx preview="iframe-follow"
+import { useState } from 'react';
+import { Button, Skeleton, Stack } from '@rockshin/tao-ui';
+
+export default function Example() {
+  const [loading, setLoading] = useState(true);
+  return (
+    <Stack gap="md">
+      <Button variant="secondary" onClick={() => setLoading((value) => !value)}>
+        {loading ? 'Show content' : 'Show skeleton'}
+      </Button>
+      <Skeleton loading={loading} active avatar paragraph={{ rows: 3 }}>
+        <article>
+          <h4>Workspace overview</h4>
+          <p>Your team has completed the first milestone.</p>
+        </article>
+      </Skeleton>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="skeleton-example-2">
+
+### 匹配内容布局
+
+分别设置头像形状、标题宽度和每行正文宽度。
+
+```tsx preview
+import { Skeleton } from '@rockshin/tao-ui';
+
+export default function Example() {
+  return (
+    <Skeleton
+      active
+      avatar={{ shape: 'square', size: 48 }}
+      title={{ width: '45%' }}
+      paragraph={{ rows: 3, width: ['100%', '88%', '62%'] }}
+    />
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="skeleton-example-3">
+
+### 表单与按钮占位
+
+子组件可独立组合，无需使用完整文章占位结构。
+
+```tsx preview
+import { Skeleton, Stack } from '@rockshin/tao-ui';
+
+export default function Example() {
+  return (
+    <Stack gap="md">
+      <Stack direction="horizontal" gap="md" align="center">
+        <Skeleton.Avatar active size="large" />
+        <Skeleton.Input active style={{ maxWidth: '100%' }} />
+      </Stack>
+      <Skeleton.Input active block />
+      <Stack direction="horizontal" gap="sm">
+        <Skeleton.Button active />
+        <Skeleton.Button active shape="round" />
+      </Stack>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="skeleton-example-4">
+
+### 图片与自定义节点
+
+Skeleton.Image 提供图片占位；Skeleton.Node 可放置自定义轮廓。
+
+```tsx preview
+import { Skeleton, Stack } from '@rockshin/tao-ui';
+
+export default function Example() {
+  return (
+    <Stack direction="horizontal" gap="md" style={{ flexWrap: 'wrap' }}>
+      <Skeleton.Image active />
+      <Skeleton.Node active style={{ width: 140, height: 96 }}>
+        <svg viewBox="0 0 80 48" width="64" aria-hidden="true">
+          <path
+            d="M8 40V26h12v14H8zm24 0V14h12v26H32zm24 0V4h12v36H56z"
+            fill="currentColor"
+          />
+        </svg>
+      </Skeleton.Node>
+    </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="skeleton-example-5">
+
+### 圆角与全局尺寸
+
+子组件继承 TaoProvider 尺寸；语义样式可调整间距而无需改变占位结构。
+
+```tsx preview
+import { Skeleton, Stack, TaoProvider } from '@rockshin/tao-ui';
+
+export default function Example() {
+  return (
+    <TaoProvider size="small">
+      <Stack gap="md">
+        <Skeleton
+          round
+          title={false}
+          paragraph={{ rows: 2 }}
+          styles={{ root: { padding: 12 } }}
+        />
+        <Stack direction="horizontal" gap="sm" style={{ flexWrap: 'wrap' }}>
+          <Skeleton.Avatar />
+          <Skeleton.Button />
+          <Skeleton.Input />
+        </Stack>
+      </Stack>
+    </TaoProvider>
+  );
+}
+```
+
+</section>
+
+</div>
+
+## API
+
+<API moduleName="skeleton" />
