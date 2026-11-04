@@ -3,7 +3,7 @@
 - Source: User requests on 2026-11-04; `packages/tao-ui/ANTD-COMPATIBILITY.md`
 - Created: 2026-11-04
 - Execution mode: autonomous
-- Overall status: in_progress
+- Overall status: done
 
 ## 全局边界
 
@@ -1781,7 +1781,7 @@ Make the requested repository public and publish its completed GitHub Pages webs
 
 ## Goal 41 — Version 0.0.42 is published and consumable
 
-- Status: in_progress
+- Status: done
 - Depends on: Goal 40
 
 ### 1. 目标
@@ -1802,8 +1802,8 @@ Release @rockshin/tao-ui@0.0.42 using the repository release workflow and verify
 
 ### 4. 验收标准
 
-- [ ] GitHub release workflow succeeds; npm registry returns 0.0.42 and latest matches; downloaded tarball includes public entries/types/CSS and real consumers pass.
-- [ ] Actual commands/results and usable artifact URLs/paths are recorded.
+- [x] GitHub release workflow succeeds; npm registry returns 0.0.42 and latest matches; downloaded tarball includes public entries/types/CSS and real consumers pass.
+- [x] Actual commands/results and usable artifact URLs/paths are recorded.
 
 ### 5. 交付结果
 
@@ -1811,19 +1811,19 @@ Release @rockshin/tao-ui@0.0.42 using the repository release workflow and verify
 
 ### 6. 执行记录
 
-- Completed: not-started
-- Commands run: not-run
-- Results: not-run
-- Artifacts: not-produced
-- Known issues: none
+- Completed: 2026-11-05, npm 0.0.42 and live release acceptance.
+- Commands run: `RSPRESS_BASE=/tao-ui/ RSPRESS_SITE_ORIGIN=https://rickyshin93.github.io bun run release 0.0.42`; official npm packument query and `npm pack @rockshin/tao-ui@0.0.42 --registry=https://registry.npmjs.org/`; isolated React18/19 installed-tarball verifier; live browser checks requiring website badge v0.0.42.
+- Results: Release commit 8f538c0b5a67ab94516d3aebca93a3662596cc7d/tag v0.0.42 pushed. Release workflow 41890023729, CI 41890007210 and Pages 41890007301 succeeded. Official registry version and latest both 0.0.42. Downloaded 657-file tarball has shasum 73aa4a4cfb4c08260582e3849d5e2b8a220a9f30, matching publication. React18.2.0/19.3.1 consumers pass all 73 exports, public types and 15 engine SSR cases. Live website version and all five interaction groups passed.
+- Artifacts: https://www.npmjs.com/package/@rockshin/tao-ui/v/0.0.42 ; https://github.com/rickyshin93/tao-ui/releases/tag/v0.0.42 ; `.logs/expansion-0.0.42/release.log`, `npm-registry.json`, `registry-pack.json`, `consumer-registry-results.json`, `live-release/site-new-interactions.json`.
+- Known issues: Physical mobile devices and screen readers remain unverified. Existing React18 useLayoutEffect SSR warnings and upstream build/action deprecation warnings do not fail the verified gates.
 - Attempts: 0
-- Last failure: none
-- Next strategy: none
+- Last failure: none outstanding; npm processing delay resolved before registry verification.
+- Next strategy: none; requested release scope is complete.
 
 ## 全局验收
 
-- [ ] All Goal contracts have verified execution records.
-- [ ] Native component APIs, themes and end-to-end examples pass.
-- [ ] Required project gates and independent review pass.
-- [ ] Website, project documentation and STATUS.md reflect delivered behavior.
-- [ ] Public repository, live website and npm 0.0.42 are verified.
+- [x] All Goal contracts have verified execution records.
+- [x] Native component APIs, themes and end-to-end examples pass.
+- [x] Required project gates and independent review pass.
+- [x] Website, project documentation and STATUS.md reflect delivered behavior.
+- [x] Public repository, live website and npm 0.0.42 are verified.

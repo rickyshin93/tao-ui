@@ -1,7 +1,6 @@
 # STATUS
 
 ## Doing
-- 2026-11-05 Native expansion of 37 catalog entries and the complete bilingual website passed local gates, real React 18/19 tarball checks and independent review. Repository is public; CI, Pages and live website interactions passed. Publishing and verifying npm 0.0.42 remains. Acceptance: `goals/2026-11-04-component-expansion.md`.
 - 2026-10-20 Approve the staged `@rockshin/tao-icons@0.0.1` on npmjs.com: the registry currently shows the public `0.0.0-stage` placeholder, and the real version needs maintainer 2FA approval (Staged Packages -> Approve)
 
 ## Next
@@ -14,6 +13,7 @@
 - none
 
 ## Done
+- 2026-11-05 Released `@rockshin/tao-ui@0.0.42`: added 37 native catalog entries, completed bilingual runnable examples, made the repository public and deployed Pages. Local/CI/browser gates and real npm React18/19 consumers passed.
 - 2026-11-04 Expanded all 37 bilingual component references with runnable, copyable examples; added phone/desktop iframe previews and isolated notifications. Select examples and size-matched popup typography are accepted. Project gates, production/dev previews and desktop/mobile browser checks passed; deployment remains deferred.
 - 2026-11-04 Unified medium Input/Textarea default horizontal padding at 8px, including medium Input affix spacing; project gates, docs build and local desktop/390px browser checks passed with stable text positions across focus.
 - 2026-11-04 Fixed clipped Textarea focus rings in Rspress previews by reserving space inside the preview scroller; project gates, docs build and local desktop/390px browser checks passed.
