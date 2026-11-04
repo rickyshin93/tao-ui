@@ -1,7 +1,7 @@
 # STATUS
 
 ## Doing
-- 2026-11-04 Select scrolling fixed for `@rockshin/tao-ui@0.0.41`; local gates, browser checks and CI validation passed; tag/GitHub Release created, npm publish blocked by registry E404 (run 41810854171). Requires working npm publishing access; local npm is not logged in.
+- 2026-11-04 Select scrolling fixed for `@rockshin/tao-ui@0.0.41`; local/browser/CI validation passed; tag/GitHub Release created. After token replacement, npm rejects direct publishing with E403 E_STAGE_REQUIRED: the new token is stage-only (run 41810854171, attempt 2). Publication pending a compatible publishing route.
 - 2026-10-20 Approve the staged `@rockshin/tao-icons@0.0.1` on npmjs.com: the registry currently shows the public `0.0.0-stage` placeholder, and the real version needs maintainer 2FA approval (Staged Packages -> Approve)
 
 ## Next
