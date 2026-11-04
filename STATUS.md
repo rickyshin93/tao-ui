@@ -1,7 +1,6 @@
 # STATUS
 
 ## Doing
-- 2026-11-04 Select scrolling fixed for `@rockshin/tao-ui@0.0.41`; local/browser/CI validation passed; tag/GitHub Release created. After token replacement, npm rejects direct publishing with E403 E_STAGE_REQUIRED: the new token is stage-only (run 41810854171, attempt 2). Publication pending a compatible publishing route.
 - 2026-10-20 Approve the staged `@rockshin/tao-icons@0.0.1` on npmjs.com: the registry currently shows the public `0.0.0-stage` placeholder, and the real version needs maintainer 2FA approval (Staged Packages -> Approve)
 
 ## Next
@@ -14,6 +13,7 @@
 - none
 
 ## Done
+- 2026-11-04 Released `@rockshin/tao-ui@0.0.41` fixing Select option-list scrolling; local/browser/CI checks passed, npm latest and downloaded package contents verified after publishing token replacement.
 - 2026-10-30 Released `@rockshin/tao-ui@0.0.40`; local and GitHub release checks passed and the version is available on npm.
 - 2026-10-28 ARIA: complete field, picker, overlay and selection semantics; fix reviewed native-label, required/disabled, range-draft and keyboard-focus regressions. Project gates, docs build, browser smoke and follow-up review pass; real screen-reader validation remains outside this local verification.
 - 2026-10-20 Deps: TypeScript 7.0.2 in both packages (root TS 6.0.3 pin for Rspress docgen, `typescript-compiler` alias for the component sync check), plugin-babel 2.1.0, jest-dom 7.0.1, @types/node 26.6.5, rsbuild 2.2.14/rstest 0.12.4; icons devDependencies now share the tao-ui ranges; happy-dom stays 20.13.2 (21.x computed-style regression)
