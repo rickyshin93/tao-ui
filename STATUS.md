@@ -1,7 +1,7 @@
 # STATUS
 
 ## Doing
-- 2026-11-05 Native expansion of 37 Ant Design catalog entries and the bilingual website are implemented; component, snippet and local website checks passed. Real React 18/19 tarball compatibility, final release gates and independent review also passed; public repository, Pages and 0.0.42 publication are next. Scope and acceptance: `goals/2026-11-04-component-expansion.md`.
+- 2026-11-05 Native expansion of 37 catalog entries and the complete bilingual website passed local gates, real React 18/19 tarball checks and independent review. Repository is public; CI, Pages and live website interactions passed. Publishing and verifying npm 0.0.42 remains. Acceptance: `goals/2026-11-04-component-expansion.md`.
 - 2026-10-20 Approve the staged `@rockshin/tao-icons@0.0.1` on npmjs.com: the registry currently shows the public `0.0.0-stage` placeholder, and the real version needs maintainer 2FA approval (Staged Packages -> Approve)
 
 ## Next
@@ -48,4 +48,3 @@
 ## Known issues
 - Responsive controls: real iOS Safari/Android devices, software keyboards, safe areas and screen readers remain unverified; local Chrome emulation passed.
 - Select numeric popup widths retain the trigger's minimum width; the docs demonstrate a wider popup and explain this constraint.
-- GitHub Pages deployment is blocked while the repository is private on the current account plan; make it public or upgrade the plan before enabling Pages

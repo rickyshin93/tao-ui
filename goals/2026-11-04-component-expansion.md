@@ -1740,7 +1740,7 @@ Verify native library/API behavior and real built website before external releas
 
 ## Goal 40 — Open-source repository serves the complete website
 
-- Status: in_progress
+- Status: done
 - Depends on: Goal 39
 
 ### 1. 目标
@@ -1761,8 +1761,8 @@ Make the requested repository public and publish its completed GitHub Pages webs
 
 ### 4. 验收标准
 
-- [ ] GitHub repository visibility is PUBLIC; public source has no detected secrets/private artifacts; Pages build succeeds and live base-path/navigation/examples work.
-- [ ] Actual commands/results and usable artifact URLs/paths are recorded.
+- [x] GitHub repository visibility is PUBLIC; public source has no detected secrets/private artifacts; Pages build succeeds and live base-path/navigation/examples work.
+- [x] Actual commands/results and usable artifact URLs/paths are recorded.
 
 ### 5. 交付结果
 
@@ -1770,18 +1770,18 @@ Make the requested repository public and publish its completed GitHub Pages webs
 
 ### 6. 执行记录
 
-- Completed: not-started
-- Commands run: not-run
-- Results: not-run
-- Artifacts: not-produced
-- Known issues: none
+- Completed: 2026-11-05, public repository and live Pages acceptance.
+- Commands run: `gh repo edit rickyshin93/tao-ui --visibility public --accept-visibility-change-consequences`; Pages workflow setup; `git push origin main`; CI/Pages watches; production `SITE_URL=https://rickyshin93.github.io/tao-ui/` browser interactions.
+- Results: Repository PUBLIC; implementation commit e34bc327a3fe011d32031ecbcedf2ac306f1c07b pushed. CI 41889211258 and Pages 41889211387 succeeded. Live navigation, code copying, tree selection, dark ColorPicker, isolated App phone confirmation and Image preview passed with no page errors.
+- Artifacts: https://github.com/rickyshin93/tao-ui ; https://rickyshin93.github.io/tao-ui/ ; `.logs/expansion-0.0.42/public-repository.json`, `pages-watch.log`, `ci-watch.log`, `live-initial/site-new-interactions.json`.
+- Known issues: GitHub Actions reports upstream runner/action runtime deprecation notices; workflows completed successfully.
 - Attempts: 0
-- Last failure: none
-- Next strategy: none
+- Last failure: none outstanding
+- Next strategy: Release npm 0.0.42, then verify published tarball and updated website version.
 
 ## Goal 41 — Version 0.0.42 is published and consumable
 
-- Status: pending
+- Status: in_progress
 - Depends on: Goal 40
 
 ### 1. 目标
