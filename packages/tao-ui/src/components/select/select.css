@@ -331,6 +331,7 @@ button[data-tao-select-clear] {
 [data-tao-select-viewport] {
   padding: var(--tao-padding-xxs);
   max-height: 256px;
+  overflow-y: auto;
 }
 
 /* Group */

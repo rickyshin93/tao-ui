@@ -1,6 +1,7 @@
 # STATUS
 
 ## Doing
+- 2026-11-04 Fix Select option-list scrolling for `@rockshin/tao-ui@0.0.41`; local project gates and browser wheel/selection checks passed, npm publication pending.
 - 2026-10-20 Approve the staged `@rockshin/tao-icons@0.0.1` on npmjs.com: the registry currently shows the public `0.0.0-stage` placeholder, and the real version needs maintainer 2FA approval (Staged Packages -> Approve)
 
 ## Next

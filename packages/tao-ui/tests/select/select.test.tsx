@@ -13,6 +13,13 @@ test('desktop options include padding inside their popup width', () => {
   expect(rule).toContain('box-sizing: border-box;');
 });
 
+test('height-limited option lists allow vertical scrolling', () => {
+  const css = readFileSync('src/components/select/select.css', 'utf8');
+  const rule = css.match(/\[data-tao-select-viewport\] \{([^}]+)\}/)?.[1];
+
+  expect(rule).toContain('overflow-y: auto;');
+});
+
 test('renders with placeholder', () => {
   render(<Select options={[]} placeholder="Pick one" />);
   expect(screen.getByText('Pick one')).toBeTruthy();
