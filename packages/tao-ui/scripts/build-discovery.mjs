@@ -123,6 +123,17 @@ for (const path of paths) {
   const name = path.endsWith('/') || !path ? `${path}index` : path;
   const html = readFileSync(join(output, `${name}.html`), 'utf8');
   const markdown = readFileSync(join(output, `${name}.md`), 'utf8');
+  for (const [, href] of html.matchAll(/<a\b[^>]*href="([^"]+)"/g)) {
+    if (!href.startsWith(base)) continue;
+    const target = href.slice(base.length).split(/[?#]/)[0];
+    const file =
+      target.endsWith('/') || !target ? `${target}index.html` : target;
+    assert.ok(
+      existsSync(join(output, file)) ||
+        existsSync(join(output, `${file}.html`)),
+      `${path}: broken internal link ${href}`,
+    );
+  }
   assert.match(html, /<title>[^<]+<\/title>/, `${path}: title`);
   assert.match(
     html,

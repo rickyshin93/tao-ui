@@ -1,6 +1,7 @@
 # STATUS
 
 ## Doing
+- 2026-11-05 Corrected the Chinese Agent top-nav locale prefix and added built-page internal-link validation. Project gates, production-path docs build and local bilingual desktop/mobile navigation passed; website deployment verification pending.
 - 2026-10-20 Approve the staged `@rockshin/tao-icons@0.0.1` on npmjs.com: the registry currently shows the public `0.0.0-stage` placeholder, and the real version needs maintainer 2FA approval (Staged Packages -> Approve)
 
 ## Next
