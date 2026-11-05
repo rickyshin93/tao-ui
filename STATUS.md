@@ -1,7 +1,6 @@
 # STATUS
 
 ## Doing
-- 2026-11-05 Corrected the Chinese Agent top-nav locale prefix and added built-page internal-link validation. Project gates, production-path docs build and local bilingual desktop/mobile navigation passed; website deployment verification pending.
 - 2026-10-20 Approve the staged `@rockshin/tao-icons@0.0.1` on npmjs.com: the registry currently shows the public `0.0.0-stage` placeholder, and the real version needs maintainer 2FA approval (Staged Packages -> Approve)
 
 ## Next
@@ -14,6 +13,8 @@
 - none
 
 ## Done
+- 2026-11-05 Added the public GitHub About description and eight relevant discovery topics; readback confirmed the metadata and existing website link.
+- 2026-11-05 Fixed the Chinese Agent top-nav duplicate language prefix and deployed the website; added generated-page internal-link validation. Project/CI gates, production-path build and local/live bilingual desktop/mobile navigation passed. See `.logs/agent-nav-20261105/verification.md`.
 - 2026-11-05 Released `@rockshin/tao-ui@0.0.43` and deployed the bilingual website, including component fixes, redesigned docs and SEO/GEO/Agent discovery. Local/CI gates, deployed HTML/JSON/Markdown/browser checks and real npm React 18/19 consumers passed; WebMCP callbacks tested with mock registration because native browser support is unavailable. See `.logs/release-0.0.43/verification.md`. Icons unchanged.
 - 2026-11-05 Completed Alert alignment, shared docs device state, Tree/TreeSelect check styling and direct Form.Item spacing. Their earlier full-gate blockers are resolved by the current release verification; released in 0.0.43.
 - 2026-11-05 Aligned bilingual component references with the home specimen style: paper surfaces, cobalt accents, compact headings with contained anchors, and example/API hierarchy. Project gates, isolated docs build and local Chrome desktop/tablet/mobile/light/dark checks passed; title correction verified at 320–1440px. Live 4173 updated; released in 0.0.43. See `.logs/docs-reference-20261105/verification.md`.
