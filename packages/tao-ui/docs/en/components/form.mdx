@@ -353,7 +353,56 @@ export default function FormFormDynamicList() {
 
 </section>
 
+<section className="tao-example" id="form-example-scroll">
+
+### Scroll to a claim field
+
+Get the instance with `Form.useForm()`, a Form ref, or `Form.useFormInstance()`. Array paths and full `Form.List` paths such as `['claims', 0, 'email']` are supported.
+
+```tsx preview
+import { Button, Form, Input } from '@rockshin/tao-ui';
+
+export default function ScrollToClaimField() {
+  const [form] = Form.useForm();
+  return (
+    <div style={{ height: 320, display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <Button
+        style={{ flexShrink: 0 }}
+        onClick={() => form.scrollToField(['claimant', 'email'], {
+          behavior: 'smooth', block: 'center', focus: true,
+        })}
+      >
+        Reveal and focus email
+      </Button>
+      <Form form={form} style={{ minHeight: 0, flex: 1, overflowY: 'auto' }}>
+        <p>Scroll down, or use the button to reveal the field.</p>
+        <div aria-hidden="true" style={{ height: 360 }} />
+        <Form.Item name={['claimant', 'email']} label="Claimant email">
+          <Input placeholder="claim@example.com" />
+        </Form.Item>
+        <div aria-hidden="true" style={{ height: 160 }} />
+      </Form>
+    </div>
+  );
+}
+```
+
+</section>
+
 </div>
+
+Defaults to `scrollMode: 'if-needed'` and `block: 'nearest'`. Accepts `behavior`, `block`, `inline`, `boundary`, `scrollMode` and other scroll options; `focus: true` focuses the control after starting the scroll. Only mounted fields can be located; reveal conditional or unmounted tab content first. Custom controls must forward `ref` (a DOM node or an instance with `nativeElement`) or `id`.
+
+```tsx
+<Form
+  form={form}
+  onFinishFailed={({ errorFields }) => {
+    if (errorFields.length) {
+      form.scrollToField(errorFields[0].name, { focus: true });
+    }
+  }}
+/>
+```
 
 ## API
 

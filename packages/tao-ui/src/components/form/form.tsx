@@ -1,10 +1,7 @@
 import RcForm, {
-  FieldContext,
-  type FormInstance,
   FormProvider,
   List,
   type FormProps as RcFormProps,
-  useForm,
   useWatch,
 } from '@rc-component/form';
 import { forwardRef, type ReactNode, useContext, useMemo } from 'react';
@@ -16,6 +13,7 @@ import {
 } from '../../utils/semantic';
 import { FormLayoutContext } from './form-context';
 import { FormItem, type FormItemProps } from './form-item';
+import { type FormInstance, getFieldRegistry, useForm } from './use-form';
 import './form.css';
 import { interopDefault } from '../../utils/interop-default';
 
@@ -24,7 +22,8 @@ const RcFormComponent = /*#__PURE__*/ interopDefault(RcForm);
 export type FormSemanticPart = 'root';
 
 export interface FormProps<Values = Record<string, unknown>>
-  extends Omit<RcFormProps<Values>, 'component'> {
+  extends Omit<RcFormProps<Values>, 'component' | 'form'> {
+  form?: FormInstance<Values>;
   /** Label/control arrangement inherited by Form.Item. Defaults to 'vertical'. */
   layout?: 'vertical' | 'horizontal';
   /** Cascades a control size to everything inside the form. */
@@ -46,11 +45,20 @@ function FormInner<Values = Record<string, unknown>>(
     style,
     classNames,
     styles,
+    form,
     ...rcProps
   }: FormProps<Values>,
   ref: React.Ref<FormInstance<Values>>,
 ) {
-  const layoutValue = useMemo(() => ({ layout }), [layout]);
+  const [instance] = useForm(form);
+  const layoutValue = useMemo(
+    () => ({
+      layout,
+      form: instance as FormInstance,
+      fields: getFieldRegistry(instance),
+    }),
+    [layout, instance],
+  );
   return (
     <FormLayoutContext.Provider value={layoutValue}>
       {/* size/disabled ride the existing provider cascade — controls inside
@@ -62,6 +70,7 @@ function FormInner<Values = Record<string, unknown>>(
           className={cx(classNames?.root, className)}
           style={{ ...styles?.root, ...style }}
           {...rcProps}
+          form={instance}
         >
           {children}
         </RcFormComponent>
@@ -77,14 +86,12 @@ const ForwardedForm = forwardRef(FormInner) as <
 ) => React.ReactElement;
 
 /**
- * Returns the instance of the enclosing Form — the rc FieldContext holds the
- * InternalFormInstance (a superset of FormInstance), same source antd's
- * useFormInstance reads from.
+ * Returns the enhanced instance of the enclosing Form.
  */
 function useFormInstance<
   Values = Record<string, unknown>,
 >(): FormInstance<Values> {
-  return useContext(FieldContext) as unknown as FormInstance<Values>;
+  return useContext(FormLayoutContext).form as FormInstance<Values>;
 }
 
 export const Form = Object.assign(ForwardedForm, {

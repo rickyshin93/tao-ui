@@ -43,7 +43,7 @@ export default function App() {
 
 ### Accessibility
 
-Use `FormField` or `Form.Item` to label controls and associate help/validation messages. Input, Textarea, InputNumber, Select, Checkbox, Radio, Switch and the date pickers forward field ARIA attributes to their interactive elements; CheckboxGroup and RadioGroup expose group labels and validation messages. Placeholders are not a substitute for a label.
+Use `FormField` or `Form.Item` to label controls and associate help/validation messages. Input, Textarea, InputNumber, Select, Checkbox, Radio, Switch and the date pickers forward field ARIA attributes to their interactive elements; CheckboxGroup and RadioGroup expose group labels and validation messages. Placeholders are not a substitute for a label. For long forms, call `form.scrollToField(name, { focus: true })` using `Form.useForm()`, the Form ref or `Form.useFormInstance()`; nested and full `Form.List` paths are supported. Custom controls must forward `ref` or `id`, and the target field must be mounted.
 
 Radio maps `aria-required` to native `required`; an explicit `required` prop takes precedence. Group options retain their native disabled state, including explicit `disabled={false}` overrides.
 

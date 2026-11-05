@@ -9,7 +9,7 @@ export const formDoc = {
   exports: ['Form'],
   source: 'src/components/form/form.tsx',
   story: 'stories/form.stories.tsx',
-  tests: ['tests/form/form.test.tsx'],
+  tests: ['tests/form/form.test.tsx', 'tests/form/form-scroll.test.tsx'],
   semanticParts: ['root'],
   keywords: ['form', 'validation', 'rules', 'submit'],
   related: ['FormField', 'FormSection', 'FormActions', 'Input'],
@@ -20,6 +20,7 @@ export const formDoc = {
       'Declare validation as rules on Form.Item; the required mark is inferred from rules.',
       'Use dependencies for cross-field rules such as password confirmation.',
       'Use Form.useForm() for imperative control (setFieldsValue, resetFields, submit).',
+      'Call form.scrollToField(name, { focus: true }) to reveal a mounted field, including full Form.List paths; custom controls must forward ref or id.',
       'Set size or disabled on Form to cascade them to every control inside.',
     ],
     avoid: [

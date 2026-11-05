@@ -1,20 +1,17 @@
-import {
-  Field,
-  type FormInstance,
-  type Meta,
-  type NamePath,
-  type Rule,
-} from '@rc-component/form';
+import { Field, type Meta, type NamePath, type Rule } from '@rc-component/form';
 import {
   type CSSProperties,
   cloneElement,
   isValidElement,
+  type ReactElement,
   type ReactNode,
 } from 'react';
 import type { TaoStatus } from '../../provider/tao-provider';
 import type { SemanticClassNames, SemanticStyles } from '../../utils/semantic';
 import { FormFieldView } from '../form-field/form-field-view';
 import { useFormLayout } from './form-context';
+import { FieldControl } from './field-control';
+import type { FormInstance } from './use-form';
 
 export type FormItemSemanticPart = 'root' | 'label' | 'error' | 'description';
 
@@ -111,7 +108,7 @@ export function FormItem<Values = Record<string, unknown>>({
   styles,
   children,
 }: FormItemProps<Values>): ReactNode {
-  const { layout } = useFormLayout();
+  const { layout, form: formInstance } = useFormLayout();
   const requiredMark =
     required ??
     rules?.some(
@@ -175,9 +172,17 @@ export function FormItem<Values = Record<string, unknown>>({
     }
 
     if (noStyle) {
-      return isValidElement(content) && controlProps
-        ? cloneElement(content, controlProps)
-        : content;
+      const child =
+        isValidElement(content) && controlProps
+          ? cloneElement(content, controlProps)
+          : content;
+      return name != null &&
+        meta &&
+        isValidElement<Record<string, unknown>>(child) ? (
+        <FieldControl name={meta.name}>{child}</FieldControl>
+      ) : (
+        child
+      );
     }
 
     return (
@@ -191,6 +196,13 @@ export function FormItem<Values = Record<string, unknown>>({
         description={descriptionSlot}
         layout={layout}
         controlProps={controlProps}
+        renderControl={
+          name != null && meta
+            ? (child: ReactElement<Record<string, unknown>>) => (
+                <FieldControl name={meta.name}>{child}</FieldControl>
+              )
+            : undefined
+        }
         className={className}
         style={style}
         classNames={classNames}
@@ -222,10 +234,10 @@ export function FormItem<Values = Record<string, unknown>>({
       messageVariables={messageVariables}
       validateFirst={validateFirst}
     >
-      {(control, meta, form) => {
+      {(control, meta) => {
         const content =
           typeof children === 'function'
-            ? children(control, meta, form as FormInstance<Values>)
+            ? children(control, meta, formInstance as FormInstance<Values>)
             : children;
         // Only named fields bind value/trigger onto the control.
         return renderShell(content, meta, name != null ? control : null);

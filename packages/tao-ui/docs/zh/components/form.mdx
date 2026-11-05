@@ -350,7 +350,56 @@ export default function FormFormDynamicList() {
 
 </section>
 
+<section className="tao-example" id="form-example-scroll">
+
+### 滚动到理赔字段
+
+使用 `Form.useForm()`、Form 的 ref 或 `Form.useFormInstance()` 获取实例。支持数组路径和 `Form.List` 完整路径，例如 `['claims', 0, 'email']`。
+
+```tsx preview
+import { Button, Form, Input } from '@rockshin/tao-ui';
+
+export default function ScrollToClaimField() {
+  const [form] = Form.useForm();
+  return (
+    <div style={{ height: 320, display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <Button
+        style={{ flexShrink: 0 }}
+        onClick={() => form.scrollToField(['claimant', 'email'], {
+          behavior: 'smooth', block: 'center', focus: true,
+        })}
+      >
+        定位并聚焦邮箱
+      </Button>
+      <Form form={form} style={{ minHeight: 0, flex: 1, overflowY: 'auto' }}>
+        <p>向下滚动，或点击按钮定位字段。</p>
+        <div aria-hidden="true" style={{ height: 360 }} />
+        <Form.Item name={['claimant', 'email']} label="申请人邮箱">
+          <Input placeholder="claim@example.com" />
+        </Form.Item>
+        <div aria-hidden="true" style={{ height: 160 }} />
+      </Form>
+    </div>
+  );
+}
+```
+
+</section>
+
 </div>
+
+默认使用 `scrollMode: 'if-needed'` 和 `block: 'nearest'`。可传入 `behavior`、`block`、`inline`、`boundary`、`scrollMode` 等选项，`focus: true` 会在发起滚动后聚焦控件。只定位已挂载字段；条件渲染或未挂载的 Tab 内容需要先展开。自定义控件必须转发 `ref`（DOM 或带 `nativeElement` 的实例）或 `id`。
+
+```tsx
+<Form
+  form={form}
+  onFinishFailed={({ errorFields }) => {
+    if (errorFields.length) {
+      form.scrollToField(errorFields[0].name, { focus: true });
+    }
+  }}
+/>
+```
 
 ## API
 

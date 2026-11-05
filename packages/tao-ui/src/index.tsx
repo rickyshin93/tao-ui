@@ -11,7 +11,6 @@ import './theme/control.css';
 // Provider
 
 export type {
-  FormInstance,
   NamePath,
   Rule,
   RuleObject,
@@ -233,6 +232,8 @@ export {
 } from './components/float-button/float-button';
 export {
   Form,
+  type FormInstance,
+  type FormScrollOptions,
   type FormItemChildren,
   type FormItemProps,
   type FormItemSemanticPart,

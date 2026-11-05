@@ -4,6 +4,9 @@ import {
   Checkbox,
   DatePicker,
   Input,
+  Form,
+  type FormInstance,
+  type FormScrollOptions,
   InputNumber,
   type PickerRef,
   Radio,
@@ -23,6 +26,43 @@ import {
   zhCN,
   type TaoLocale,
 } from '../src';
+import type {
+  FormInstance as SubpathFormInstance,
+  FormScrollOptions as SubpathFormScrollOptions,
+} from '../src/entries/form';
+
+interface ClaimValues {
+  claimant: { email: string };
+  documents: { title: string }[];
+}
+const formRef = createRef<FormInstance<ClaimValues>>();
+<Form<ClaimValues> ref={formRef} />;
+const scrollOptions: FormScrollOptions = {
+  focus: true,
+  behavior: 'smooth',
+  block: 'center',
+  scrollMode: 'if-needed',
+  boundary: () => true,
+};
+formRef.current?.scrollToField(['claimant', 'email'], scrollOptions);
+formRef.current?.scrollToField(['documents', 0, 'title'], {
+  behavior: (actions) => {
+    void actions;
+  },
+});
+// @ts-expect-error unknown field names must not compile
+formRef.current?.scrollToField(['claimant', 'missing']);
+const subpathForm: SubpathFormInstance<ClaimValues> | null = formRef.current;
+const subpathOptions: SubpathFormScrollOptions = scrollOptions;
+subpathForm?.scrollToField(['claimant', 'email'], subpathOptions);
+
+// Existing callers may omit the value generic, as with rc-form's original hook.
+function useDefaultFormContract() {
+  const [form] = Form.useForm();
+  const email: string = form.getFieldsValue().claimant.email;
+  return email;
+}
+void useDefaultFormContract;
 
 const buttonRef = createRef<HTMLButtonElement>();
 const inputRef = createRef<HTMLInputElement>();

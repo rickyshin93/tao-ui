@@ -356,7 +356,7 @@ Collects and validates field values with an antd-aligned API (rules, dependencie
 - Exports: `Form`
 - Source: `src/components/form/form.tsx`
 - Storybook: `stories/form.stories.tsx`
-- Tests: `tests/form/form.test.tsx`
+- Tests: `tests/form/form.test.tsx`, `tests/form/form-scroll.test.tsx`
 - Semantic parts: `root`
 
 Use Form with Form.Item when fields need a value store, rule validation, or submit handling. Use the lighter FormField when you manage state yourself.

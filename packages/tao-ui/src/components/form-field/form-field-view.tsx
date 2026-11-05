@@ -2,6 +2,7 @@ import {
   type CSSProperties,
   cloneElement,
   isValidElement,
+  type ReactElement,
   type ReactNode,
   useId,
 } from 'react';
@@ -30,6 +31,8 @@ export interface FormFieldViewProps {
    * `value`/`onChange`/`status`). View-owned id/aria attributes win.
    */
   controlProps?: Record<string, unknown>;
+  /** Internal hook for bound forms to register the final control and its id. */
+  renderControl?: (control: ReactElement<Record<string, unknown>>) => ReactNode;
   children?: ReactNode;
   className?: string;
   style?: CSSProperties;
@@ -53,6 +56,7 @@ export function FormFieldView({
   description,
   layout = 'vertical',
   controlProps,
+  renderControl,
   children,
   className,
   style,
@@ -142,7 +146,9 @@ export function FormFieldView({
       )}
       <div data-tao-form-control="">
         <FieldLabelContext.Provider value={label}>
-          {control}
+          {renderControl && isValidElement<Record<string, unknown>>(control)
+            ? renderControl(control)
+            : control}
         </FieldLabelContext.Provider>
         {formItem ? <div data-tao-form-message="">{message}</div> : message}
       </div>

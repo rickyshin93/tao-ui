@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "packageName": "@rockshin/tao-ui",
-  "generatedAt": "2026-11-05T11:39:43.640Z",
+  "generatedAt": "2026-11-05T15:23:43.221Z",
   "components": [
     {
       "name": "affix",
@@ -1020,7 +1020,8 @@
       "source": "src/components/form/form.tsx",
       "story": "stories/form.stories.tsx",
       "tests": [
-        "tests/form/form.test.tsx"
+        "tests/form/form.test.tsx",
+        "tests/form/form-scroll.test.tsx"
       ],
       "semanticParts": [
         "root"
@@ -1043,6 +1044,7 @@
           "Declare validation as rules on Form.Item; the required mark is inferred from rules.",
           "Use dependencies for cross-field rules such as password confirmation.",
           "Use Form.useForm() for imperative control (setFieldsValue, resetFields, submit).",
+          "Call form.scrollToField(name, { focus: true }) to reveal a mounted field, including full Form.List paths; custom controls must forward ref or id.",
           "Set size or disabled on Form to cascade them to every control inside."
         ],
         "avoid": [

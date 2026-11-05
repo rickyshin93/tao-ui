@@ -1,6 +1,7 @@
 # STATUS
 
 ## Doing
+- 2026-11-05 Release `@rockshin/tao-ui@0.0.44` with Form.scrollToField; local checks passed, release/CI/npm verification in progress.
 - 2026-10-20 Approve the staged `@rockshin/tao-icons@0.0.1` on npmjs.com: the registry currently shows the public `0.0.0-stage` placeholder, and the real version needs maintainer 2FA approval (Staged Packages -> Approve)
 
 ## Next
@@ -13,6 +14,7 @@
 - none
 
 ## Done
+- 2026-11-05 Added Form.scrollToField with optional focus, nested/List/noStyle fields, per-form isolation and bilingual examples. React 18/19, package/docs gates and local Chrome desktop/mobile viewport checks passed; not published. See `.logs/form-scroll-20261105/verification.md`.
 - 2026-11-05 Added the public GitHub About description and eight relevant discovery topics; readback confirmed the metadata and existing website link.
 - 2026-11-05 Fixed the Chinese Agent top-nav duplicate language prefix and deployed the website; added generated-page internal-link validation. Project/CI gates, production-path build and local/live bilingual desktop/mobile navigation passed. See `.logs/agent-nav-20261105/verification.md`.
 - 2026-11-05 Released `@rockshin/tao-ui@0.0.43` and deployed the bilingual website, including component fixes, redesigned docs and SEO/GEO/Agent discovery. Local/CI gates, deployed HTML/JSON/Markdown/browser checks and real npm React 18/19 consumers passed; WebMCP callbacks tested with mock registration because native browser support is unavailable. See `.logs/release-0.0.43/verification.md`. Icons unchanged.
