@@ -1,7 +1,6 @@
 # STATUS
 
 ## Doing
-- 2026-11-06 Implemented RTL propagation, scrolling, keyboard/layout fixes and the React 18 Segmented crash fix. Review findings closed; local gates and React 18/19 desktop/mobile browser checks passed. Pending 0.0.45 release and registry verification. Evidence: `.logs/rtl-0.0.45/`.
 - 2026-10-20 Approve the staged `@rockshin/tao-icons@0.0.1` on npmjs.com: the registry currently shows the public `0.0.0-stage` placeholder, and the real version needs maintainer 2FA approval (Staged Packages -> Approve)
 
 ## Next
@@ -14,6 +13,7 @@
 - none
 
 ## Done
+- 2026-11-06 Released `@rockshin/tao-ui@0.0.45` with complete RTL direction/interaction fixes and the React 18 Segmented crash fix. Review, project gates, Release/CI/Pages and real npm React 18/19 consumer/browser checks passed; bilingual docs deployed. Icons unchanged. See `.logs/rtl-0.0.45/verification.md`.
 - 2026-11-05 Released `@rockshin/tao-ui@0.0.44` (Form.scrollToField, optional focus, nested/List/noStyle fields and bilingual examples) to npm latest and deployed docs. Release/CI/Pages and real npm React 18/19 consumer/browser checks passed. See `.logs/release-0.0.44/verification.md`.
 - 2026-11-05 Added the public GitHub About description and eight relevant discovery topics; readback confirmed the metadata and existing website link.
 - 2026-11-05 Fixed the Chinese Agent top-nav duplicate language prefix and deployed the website; added generated-page internal-link validation. Project/CI gates, production-path build and local/live bilingual desktop/mobile navigation passed. See `.logs/agent-nav-20261105/verification.md`.
