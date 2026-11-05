@@ -1,6 +1,7 @@
 # STATUS
 
 ## Doing
+- 2026-11-05 Completed 35 missing Chinese sidebar labels; all 74 entries, local desktop/mobile navigation and project gates passed. Pages update pending.
 - 2026-10-20 Approve the staged `@rockshin/tao-icons@0.0.1` on npmjs.com: the registry currently shows the public `0.0.0-stage` placeholder, and the real version needs maintainer 2FA approval (Staged Packages -> Approve)
 
 ## Next

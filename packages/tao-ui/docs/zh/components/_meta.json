@@ -35,17 +35,17 @@
   {
     "type": "file",
     "name": "form-layout",
-    "label": "FormLayout"
+    "label": "FormLayout 表单布局"
   },
   {
     "type": "file",
     "name": "splitter",
-    "label": "Splitter"
+    "label": "Splitter 分割面板"
   },
   {
     "type": "file",
     "name": "stack",
-    "label": "Stack"
+    "label": "Stack 堆叠布局"
   },
   {
     "type": "section-header",
@@ -59,32 +59,32 @@
   {
     "type": "file",
     "name": "breadcrumb",
-    "label": "Breadcrumb"
+    "label": "Breadcrumb 面包屑"
   },
   {
     "type": "file",
     "name": "context-menu",
-    "label": "ContextMenu"
+    "label": "ContextMenu 右键菜单"
   },
   {
     "type": "file",
     "name": "dropdown",
-    "label": "Dropdown"
+    "label": "Dropdown 下拉菜单"
   },
   {
     "type": "file",
     "name": "pagination",
-    "label": "Pagination"
+    "label": "Pagination 分页"
   },
   {
     "type": "file",
     "name": "steps",
-    "label": "Steps"
+    "label": "Steps 步骤条"
   },
   {
     "type": "file",
     "name": "tabs",
-    "label": "Tabs"
+    "label": "Tabs 标签页"
   },
   {
     "type": "section-header",
@@ -103,7 +103,7 @@
   {
     "type": "file",
     "name": "checkbox",
-    "label": "Checkbox"
+    "label": "Checkbox 多选框"
   },
   {
     "type": "file",
@@ -113,37 +113,37 @@
   {
     "type": "file",
     "name": "date-picker",
-    "label": "DatePicker"
+    "label": "DatePicker 日期选择器"
   },
   {
     "type": "file",
     "name": "form",
-    "label": "Form"
+    "label": "Form 表单"
   },
   {
     "type": "file",
     "name": "form-actions",
-    "label": "FormActions"
+    "label": "FormActions 表单操作"
   },
   {
     "type": "file",
     "name": "form-field",
-    "label": "FormField"
+    "label": "FormField 表单字段"
   },
   {
     "type": "file",
     "name": "form-section",
-    "label": "FormSection"
+    "label": "FormSection 表单分组"
   },
   {
     "type": "file",
     "name": "input",
-    "label": "Input"
+    "label": "Input 输入框"
   },
   {
     "type": "file",
     "name": "input-number",
-    "label": "InputNumber"
+    "label": "InputNumber 数字输入框"
   },
   {
     "type": "file",
@@ -153,12 +153,12 @@
   {
     "type": "file",
     "name": "radio",
-    "label": "Radio"
+    "label": "Radio 单选框"
   },
   {
     "type": "file",
     "name": "range-picker",
-    "label": "RangePicker"
+    "label": "RangePicker 日期范围选择器"
   },
   {
     "type": "file",
@@ -183,12 +183,12 @@
   {
     "type": "file",
     "name": "switch",
-    "label": "Switch"
+    "label": "Switch 开关"
   },
   {
     "type": "file",
     "name": "textarea",
-    "label": "Textarea"
+    "label": "Textarea 文本域"
   },
   {
     "type": "file",
@@ -242,7 +242,7 @@
   {
     "type": "file",
     "name": "collapsible",
-    "label": "Collapsible"
+    "label": "Collapsible 折叠面板"
   },
   {
     "type": "file",
@@ -277,7 +277,7 @@
   {
     "type": "file",
     "name": "popover",
-    "label": "Popover"
+    "label": "Popover 气泡卡片"
   },
   {
     "type": "file",
@@ -287,7 +287,7 @@
   {
     "type": "file",
     "name": "scroll-area",
-    "label": "ScrollArea"
+    "label": "ScrollArea 滚动区域"
   },
   {
     "type": "file",
@@ -297,12 +297,12 @@
   {
     "type": "file",
     "name": "table",
-    "label": "Table"
+    "label": "Table 表格"
   },
   {
     "type": "file",
     "name": "tag",
-    "label": "Tag"
+    "label": "Tag 标签"
   },
   {
     "type": "file",
@@ -312,7 +312,7 @@
   {
     "type": "file",
     "name": "tooltip",
-    "label": "Tooltip"
+    "label": "Tooltip 文字提示"
   },
   {
     "type": "file",
@@ -326,22 +326,22 @@
   {
     "type": "file",
     "name": "alert",
-    "label": "Alert"
+    "label": "Alert 警告提示"
   },
   {
     "type": "file",
     "name": "drawer",
-    "label": "Drawer"
+    "label": "Drawer 抽屉"
   },
   {
     "type": "file",
     "name": "modal",
-    "label": "Modal"
+    "label": "Modal 对话框"
   },
   {
     "type": "file",
     "name": "popconfirm",
-    "label": "Popconfirm"
+    "label": "Popconfirm 气泡确认框"
   },
   {
     "type": "file",
@@ -361,12 +361,12 @@
   {
     "type": "file",
     "name": "sonner",
-    "label": "Sonner"
+    "label": "Sonner 消息提示"
   },
   {
     "type": "file",
     "name": "spinner",
-    "label": "Spinner"
+    "label": "Spinner 加载指示器"
   },
   {
     "type": "file",
@@ -380,7 +380,7 @@
   {
     "type": "file",
     "name": "headless-input-number",
-    "label": "HeadlessInputNumber"
+    "label": "HeadlessInputNumber 无样式数字输入框"
   },
   {
     "type": "section-header",
@@ -394,7 +394,7 @@
   {
     "type": "file",
     "name": "tao-provider",
-    "label": "TaoProvider"
+    "label": "TaoProvider 全局配置"
   },
   {
     "type": "file",
