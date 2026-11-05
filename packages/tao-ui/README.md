@@ -4,6 +4,8 @@ A component library for React 18.2 and 19 with semantic DOM customization and OK
 
 Documentation: [English](https://rickyshin93.github.io/tao-ui/) · [简体中文](https://rickyshin93.github.io/tao-ui/zh/).
 
+Agent access: [guide](https://rickyshin93.github.io/tao-ui/guide/agents) · [JSON discovery index](https://rickyshin93.github.io/tao-ui/agent-manifest.json) · [Markdown index](https://rickyshin93.github.io/tao-ui/llms.txt). The website exposes versioned package facts and bilingual API/example links; the npm package exports `@rockshin/tao-ui/component-manifest.json` and `@rockshin/tao-ui/meta`.
+
 ## Features
 
 - **React 18.2 and 19** — supports React 18.2 as the minimum version and React 19, with React Compiler optimizations.
@@ -76,6 +78,8 @@ import { TaoProvider } from '@rockshin/tao-ui/provider';
 
 Entry names use kebab-case, such as `/input-number`, `/range-picker`, and `/form-layout`. Related exports share an entry: `CheckboxGroup` uses `/checkbox`, and `HeadlessInputNumber` uses `/number-input`.
 
+The `/input` entry includes `Input.Password`, `Input.Search`, `Input.TextArea`, and `Input.OTP`. Input and Textarea support `allowClear`, `showCount`, custom `count`, and `onPressEnter`; existing native DOM refs and standalone `Textarea` remain supported. See the [Input examples and API](docs/en/components/input.mdx).
+
 ### Dark mode
 
 Pure-CSS dark algorithm — no JS runtime. One prop flips every component, including portaled popups (Modal, Drawer, Select dropdowns):
@@ -118,11 +122,13 @@ import '@fontsource/geist-mono/400.css';
 | Layout | `Stack`, `FormLayout`, `Splitter`, `Divider`, `Masonry` |
 | Navigation | `Tabs`, `Pagination`, `Breadcrumb`, `Menu`, `Dropdown`, `ContextMenu`, `Affix` |
 | Data Entry | `Form`, `Input`, `Textarea`, `InputNumber`, `Select`, `Checkbox`, `Radio`, `Switch`, `DatePicker`, `RangePicker`, `FormField`, `FormSection`, `FormActions`, `AutoComplete`, `Cascader`, `ColorPicker`, `Mentions`, `Rate`, `Slider`, `TimePicker`, `Transfer`, `TreeSelect`, `Upload` |
-| Data Display | `Table`, `Tag`, `ScrollArea`, `Collapsible`, `Tooltip`, `Popover`, `Avatar`, `Badge`, `BorderBeam`, `Calendar`, `Card`, `Carousel`, `Descriptions`, `Empty`, `Image`, `List`, `Listy`, `QRCode`, `Segmented`, `Statistic`, `Timeline`, `Tour`, `Tree`, `Watermark` |
+| Data Display | `Table`, `Tag`, `ScrollArea`, `Collapse`, `Tooltip`, `Popover`, `Avatar`, `Badge`, `BorderBeam`, `Calendar`, `Card`, `Carousel`, `Descriptions`, `Empty`, `Image`, `List`, `Listy`, `QRCode`, `Segmented`, `Statistic`, `Timeline`, `Tour`, `Tree`, `Watermark` |
 | Feedback | `Modal`, `Drawer`, `Sonner`, `Spinner`, `Alert`, `Popconfirm`, `Progress`, `Result`, `Skeleton` |
 | Config | `TaoProvider`, `App`, `useTaoConfig`, `useTaoToken` |
 
 The 0.0.42 catalog adds 36 visual entries and the `GetProps`, `GetProp` and `GetRef` type utilities. New entries follow Ant Design 6.7.0 public APIs with tao-ui themes, Semantic DOM and component styles. Complex controls reuse low-level rc engines; `antd` is not a runtime dependency. Existing tao-ui APIs are unchanged. See the [compatibility scope](./ANTD-COMPATIBILITY.md) for the included APIs and boundaries.
+
+The current workspace replaces `Collapsible` with `Collapse` (subpath `@rockshin/tao-ui/collapse`). Pass `items` with `key`, `label` and `children` for built-in panels; use `accordion` for a single open panel and `activeKey` / `onChange` for controlled expansion. Update imports from the old name/subpath.
 
 Import types from the root or `@rockshin/tao-ui/util`. Compound APIs share their component entry, including `TimePicker.RangePicker`, `Tree.DirectoryTree`, `Image.PreviewGroup`, `Upload.Dragger`, `FloatButton.BackTop` and `App.useApp()`.
 

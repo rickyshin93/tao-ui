@@ -8,6 +8,7 @@ import {
   type Ref,
   useCallback,
   useContext,
+  useState,
 } from 'react';
 import { type TaoSize, useTaoConfig } from '../../provider/tao-provider';
 import {
@@ -166,6 +167,7 @@ export interface RadioGroupProps
 export function RadioGroup({
   options,
   value,
+  defaultValue,
   onChange,
   disabled,
   direction = 'horizontal',
@@ -181,17 +183,21 @@ export function RadioGroup({
 }: RadioGroupProps) {
   const ctx = useTaoConfig();
   const resolvedDisabled = disabled ?? ctx.disabled ?? false;
+  const [internalValue, setInternalValue] = useState(defaultValue);
+  const isControlled = value !== undefined;
+  const resolvedValue = isControlled ? value : internalValue;
 
   const handleChange = useCallback(
     (itemValue: string) => {
+      if (!isControlled) setInternalValue(itemValue);
       onChange?.(itemValue);
     },
-    [onChange],
+    [onChange, isControlled],
   );
 
   const groupCtxValue: RadioGroupContextValue = {
     name,
-    value,
+    value: resolvedValue,
     disabled: resolvedDisabled,
     onChange: handleChange,
   };

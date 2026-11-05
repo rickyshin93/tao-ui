@@ -853,10 +853,10 @@
 /* Notched separator between panels. */
 [data-tao-steps][data-tao-type="panel"] [data-tao-steps-panel-arrow] {
   position: absolute;
-  top: calc(var(--tao-steps-panel-line-width) * -1);
+  top: calc(var(--tao-steps-panel-line-width) / -2);
   inset-inline-start: 100%;
   z-index: 1;
-  height: calc(var(--tao-steps-panel-line-width) * 2 + 100%);
+  height: calc(var(--tao-steps-panel-line-width) + 100%);
   width: var(--tao-steps-panel-notch-width);
   overflow: visible;
   stroke-linecap: round;
@@ -891,6 +891,68 @@
 [data-tao-steps][data-tao-type="panel"][data-tao-size="small"] {
   --tao-steps-panel-padding: var(--tao-padding-xs);
   --tao-steps-panel-radius: var(--tao-radius-sm);
+}
+
+/* Paint each filled panel as one surface, including its arrow. Separate SVG
+   and CSS fills leave an antialiased seam at fractional layout coordinates. */
+[data-tao-steps][data-tao-type="panel"][data-tao-variant="filled"]
+  > [data-tao-step] {
+  background: none;
+  isolation: isolate;
+}
+
+[data-tao-steps][data-tao-type="panel"][data-tao-variant="filled"]
+  > [data-tao-step]::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset-block: calc(var(--tao-steps-panel-line-width) * -1);
+  inset-inline-start: 0;
+  inset-inline-end: calc(var(--tao-steps-panel-notch-width) * -1);
+  background: var(--tao-steps-panel-bg);
+  border-radius: inherit;
+  clip-path: polygon(
+    0 0,
+    calc(100% - var(--tao-steps-panel-notch-width)) 0,
+    100% 50%,
+    calc(100% - var(--tao-steps-panel-notch-width)) 100%,
+    0 100%
+  );
+  transition: background-color var(--tao-motion-duration-mid)
+    var(--tao-motion-ease-out);
+}
+
+:dir(rtl)
+  [data-tao-steps][data-tao-type="panel"][data-tao-variant="filled"]
+  > [data-tao-step]::before {
+  clip-path: polygon(
+    var(--tao-steps-panel-notch-width) 0,
+    100% 0,
+    100% 100%,
+    var(--tao-steps-panel-notch-width) 100%,
+    0 50%
+  );
+}
+
+[data-tao-steps][data-tao-type="panel"][data-tao-variant="filled"]
+  > [data-tao-step][data-tao-active]::before {
+  background: var(--tao-steps-panel-active-bg);
+}
+
+[data-tao-steps][data-tao-type="panel"][data-tao-variant="filled"]
+  > [data-tao-step]:first-child::before {
+  inset-inline-start: calc(var(--tao-steps-panel-line-width) * -1);
+}
+
+[data-tao-steps][data-tao-type="panel"][data-tao-variant="filled"]
+  > [data-tao-step]:last-child::before {
+  inset-inline-end: calc(var(--tao-steps-panel-line-width) * -1);
+  clip-path: none;
+}
+
+[data-tao-steps][data-tao-type="panel"][data-tao-variant="filled"]
+  [data-tao-steps-panel-arrow] {
+  display: none;
 }
 
 /* `filled` panels overlap so the notches interlock. */
@@ -1019,9 +1081,11 @@
   );
 
   position: absolute;
-  inset: calc(var(--tao-steps-progress-enhance) * -1);
+  top: 50%;
+  left: 50%;
   width: var(--tao-steps-progress-svg-size);
   height: var(--tao-steps-progress-svg-size);
+  transform: translate(-50%, -50%);
   pointer-events: none;
 }
 

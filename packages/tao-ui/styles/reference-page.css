@@ -1,0 +1,264 @@
+/* The home specimen paper, scoped to component references. Demo tokens stay local. */
+html:root:has(.tao-reference-heading) {
+  --reference-paper: oklch(0.985 0.002 250);
+  --reference-sheet: oklch(1 0 0);
+  --reference-ink: oklch(0.2 0.01 260);
+  --reference-muted: oklch(0.47 0.012 260);
+  --reference-line: oklch(0.9 0.004 260);
+  --reference-seed: oklch(0.5 0.19 258);
+  --rp-c-bg: var(--reference-paper);
+  --rp-c-bg-soft: var(--reference-sheet);
+  --rp-c-text-1: var(--reference-ink);
+  --rp-c-text-2: var(--reference-muted);
+  --rp-c-divider-light: var(--reference-line);
+  --rp-c-brand: var(--reference-seed);
+  --rp-c-brand-light: var(--reference-seed);
+  --rp-c-brand-dark: var(--reference-seed);
+  --rp-c-brand-tint: color-mix(in oklab, var(--reference-seed) 8%, transparent);
+  --rp-font-family-mono:
+    "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+html:root.rp-dark:has(.tao-reference-heading) {
+  --reference-paper: oklch(0.17 0.006 260);
+  --reference-sheet: oklch(0.2 0.007 260);
+  --reference-ink: oklch(0.95 0.004 260);
+  --reference-muted: oklch(0.72 0.01 260);
+  --reference-line: oklch(0.3 0.008 260);
+  --reference-seed: oklch(0.74 0.13 255);
+}
+
+body:has(.tao-reference-heading) {
+  background: var(--reference-paper);
+  scrollbar-color: var(--reference-line) var(--reference-paper);
+}
+
+.tao-reference-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 24px 16px;
+  padding-block: 8px 24px;
+  border-bottom: 1px solid var(--reference-line);
+}
+
+.rspress-doc .tao-reference-heading h1 {
+  flex: 1 1 340px;
+  min-width: 0;
+  margin: 0;
+  color: var(--reference-ink);
+  font-size: 32px;
+  font-weight: 500;
+  letter-spacing: -0.035em;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.rspress-doc .tao-reference-heading h1 .rp-header-anchor {
+  display: inline-block;
+  float: none;
+  margin-left: 8px;
+  font-size: 18px;
+  vertical-align: middle;
+}
+
+.tao-reference-heading .rp-llms-container {
+  margin: 0;
+}
+
+.tao-reference-heading .rp-llms-button {
+  background: var(--reference-sheet);
+  border-color: var(--reference-line);
+  color: var(--reference-muted);
+  font-size: 12px;
+}
+
+.tao-reference-context {
+  display: flex;
+  flex: 1 0 100%;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 24px;
+  font-size: 12px;
+}
+
+.tao-reference-category,
+.tao-reference-context nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+}
+
+.tao-reference-category {
+  color: var(--reference-muted);
+}
+
+.tao-reference-category code {
+  padding-inline-start: 16px;
+  border-inline-start: 1px solid var(--reference-line);
+  font-family: var(--rp-font-family-mono);
+  font-size: 11px;
+}
+
+.tao-reference-context a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  color: var(--reference-seed);
+  text-decoration: none;
+  text-underline-offset: 4px;
+}
+
+.tao-reference-context a:hover {
+  text-decoration: underline;
+}
+
+.tao-reference-context svg {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.rspress-doc:has(.tao-reference-heading) > p:first-of-type {
+  max-width: 70ch;
+  margin-block: 24px 36px;
+  color: var(--reference-muted);
+  font-size: 17px;
+  line-height: 1.8;
+}
+
+.rspress-doc:has(.tao-reference-heading) > h2 {
+  margin-block: 44px 24px;
+  padding: 0;
+  border: 0;
+  font-size: 26px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+
+.rspress-doc:has(.tao-reference-heading) > h2:first-of-type::before {
+  display: none;
+}
+
+.rspress-doc:has(.tao-reference-heading) .tao-demo-grid {
+  align-items: stretch;
+  gap: 24px;
+}
+
+.rspress-doc:has(.tao-reference-heading) .tao-example {
+  display: flex;
+  flex-direction: column;
+  background: var(--reference-sheet);
+  border-color: var(--reference-line);
+  border-radius: 16px;
+}
+
+.rspress-doc:has(.tao-reference-heading) .tao-example > h3 {
+  padding: 24px 24px 0;
+  font-size: 17px;
+}
+
+.rspress-doc:has(.tao-reference-heading) .tao-example > p {
+  padding-inline: 24px;
+  color: var(--reference-muted);
+}
+
+.rspress-doc:has(.tao-reference-heading) .tao-example > .tao-preview {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
+.rspress-doc:has(.tao-reference-heading) .tao-preview-stage {
+  flex: 1;
+  min-height: 168px;
+  padding: 32px 24px;
+}
+
+.rspress-doc:has(.tao-reference-heading) .tao-preview-toolbar {
+  padding: 8px 16px;
+  border-color: var(--reference-line);
+  border-radius: 0 0 16px 16px;
+  background: var(--reference-paper);
+}
+
+.rspress-doc:has(.tao-reference-heading)
+  .tao-preview:has([aria-expanded="true"])
+  .tao-preview-toolbar {
+  border-radius: 0;
+}
+
+.rspress-doc:has(.tao-reference-heading) .tao-preview-code {
+  border-radius: 0 0 16px 16px;
+}
+
+.rp-doc-layout__container:has(.tao-reference-heading)
+  .rp-sidebar-section-header {
+  color: var(--reference-muted);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.rp-doc-layout__container:has(.tao-reference-heading) .rp-sidebar-item--active {
+  background: var(--rp-c-brand-tint);
+  color: var(--reference-seed);
+}
+
+.rspress-doc:has(.tao-reference-heading) .rspress-plugin-api-docgen table {
+  margin: 0;
+  background: var(--reference-sheet);
+  font-size: 13px;
+}
+
+.rspress-doc:has(.tao-reference-heading) .rspress-plugin-api-docgen th {
+  background: var(--reference-paper);
+  font-weight: 500;
+}
+
+.tao-reference-heading a:focus-visible {
+  outline: 2px solid var(--reference-seed);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+.rspress-doc:has(.tao-reference-heading) ::selection {
+  background: var(--rp-c-brand-tint);
+}
+
+@media (max-width: 640px) {
+  .tao-reference-heading {
+    gap: 20px;
+    padding-block: 0 20px;
+  }
+
+  .rspress-doc .tao-reference-heading h1 {
+    flex-basis: 100%;
+    font-size: 28px;
+  }
+
+  .tao-reference-context a {
+    min-height: 44px;
+  }
+
+  .rspress-doc:has(.tao-reference-heading) > p:first-of-type {
+    font-size: 15px;
+  }
+
+  .rspress-doc:has(.tao-reference-heading) .tao-example > h3 {
+    padding: 20px 18px 0;
+  }
+
+  .rspress-doc:has(.tao-reference-heading) .tao-example > p {
+    padding-inline: 18px;
+  }
+
+  .rspress-doc:has(.tao-reference-heading) .tao-preview-stage {
+    padding: 28px 18px;
+  }
+}

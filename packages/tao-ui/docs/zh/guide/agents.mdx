@@ -1,0 +1,74 @@
+---
+title: 与 AI Agent 协作
+description: 通过 JSON、Markdown 和浏览器工具查找 tao-ui 组件导入路径、语义 DOM 契约、完整 API 表及可运行示例。
+---
+
+# 与 AI Agent 协作
+
+tao-ui 是 MIT 许可的 React 组件库，支持 React 与 React DOM 18.2、19，提供 Provider 默认配置、语义化 `classNames` / `styles` 和 OKLCH 种子主题。双语文档同时服务开发者和编程 Agent。
+
+## 按问题选择资料
+
+| 入口 | 用途 |
+| --- | --- |
+| [agent-manifest.json](https://rickyshin93.github.io/tao-ui/agent-manifest.json) | 官网对应包版本、peer 依赖、准确的组件导入路径和中英文 HTML / Markdown 地址 |
+| [component-manifest.json](https://rickyshin93.github.io/tao-ui/component-manifest.json) | 组件描述、使用建议、语义部件、关联组件和精选属性 |
+| [llms.txt](https://rickyshin93.github.io/tao-ui/zh/llms.txt) | 精简导航索引，按需读取相关页面 |
+| [llms-full.txt](https://rickyshin93.github.io/tao-ui/zh/llms-full.txt) | 确实需要批量上下文时读取完整中文文档 |
+| 安装包的 `.d.ts` 和组件页生成的 API 表 | 准确的属性类型、回调签名和重载 |
+
+`agent-manifest.json` 是本项目的发现格式，当前 `schemaVersion: 1`，并非 MCP 服务器或通用 Agent 协议。官网跟随当前发布版本；复制 API 前先核对安装包版本。元数据里的 `props` 是精选列表，可能不完整；完整类型以声明文件为准。
+
+## 生成组件的流程
+
+1. 读取项目安装的包版本和 peer 依赖要求。
+2. 在发现索引中定位组件，读取对应 Markdown 页面里的示例和 API 表。
+3. 使用记录的入口。`TaoProvider` 来自 `/provider`；`HeadlessInputNumber` 和 `useNumberInput` 来自 `/number-input`。
+4. 用 `TaoProvider` 包裹应用；通过已记录的语义部件与 `classNames` / `styles` 定制样式。
+5. 执行消费项目的类型检查，并操作相关交互；响应式控件还需检查窄屏。
+
+```tsx
+import { Button } from '@rockshin/tao-ui/button';
+import { TaoProvider } from '@rockshin/tao-ui/provider';
+
+export default function App() {
+  return (
+    <TaoProvider theme={{ mode: 'light' }}>
+      <Button onClick={() => console.log('Saved')}>保存</Button>
+    </TaoProvider>
+  );
+}
+```
+
+组件入口会加载自己的 CSS 和共享主题，无需额外导入 CSS。包根入口同样可用，会包含所有组件样式。React 是 peer 依赖；日期组件需要的 `dayjs` 会自动安装。
+
+Next.js App Router 的交互代码放在客户端组件中（`'use client'`）。组件用法以 tao-ui 的 API 文档和类型声明为准。例如，表单控件区分不传 `value` 和 `value={undefined}`，具体见[快速开始](./getting-started#控制字段值)。
+
+## 读取安装包契约
+
+```ts
+import { getComponentDoc } from '@rockshin/tao-ui/meta';
+
+const button = getComponentDoc('button');
+console.log(button?.semanticParts);
+```
+
+Node 工具可直接读取 JSON，无需加载 UI 代码：
+
+```js
+import { readFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
+
+const require = createRequire(import.meta.url);
+const file = require.resolve('@rockshin/tao-ui/component-manifest.json');
+const manifest = JSON.parse(readFileSync(file, 'utf8'));
+console.log(manifest.components.find((item) => item.name === 'button'));
+```
+
+安装包还包含 `llms.txt`。组件元数据中的源码、Story 和测试路径指向仓库，并不是网站路由，也不代表这些文件包含在 npm 包内。
+
+## 浏览器工具
+
+Rspress 通过实验性的 WebMCP 提供六个文档工具：`rspress_get_site_info`、`rspress_list_pages`、`rspress_get_page`、`rspress_get_current_page`、`rspress_search_docs` 和 `rspress_navigate`。使用它们需要浏览器在 HTTPS 或 localhost 下支持 `document.modelContext`；不支持的浏览器仍可读取上面的 JSON 和 Markdown。无需 API key 或独立 MCP 服务。
+
+这些工具用于读取和导航文档，不会执行你的应用，也不代表生成代码已通过测试。详情见 [Rspress WebMCP 文档](https://www.rspress.rs/guide/basic/webmcp)。

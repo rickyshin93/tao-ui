@@ -268,6 +268,7 @@ const TOKEN_TO_VAR_NUMBER: Record<string, string> = {
 };
 
 const DEFAULT_TOKEN_STYLE = {
+  '--tao-border-text-weight': '12%',
   '--tao-color-primary': 'oklch(0.205 0.01 70)',
   '--tao-color-success': 'oklch(0.555 0.14 155)',
   '--tao-color-warning': 'oklch(0.7 0.15 70)',

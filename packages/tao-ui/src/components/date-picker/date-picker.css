@@ -87,20 +87,27 @@ input[data-tao-picker-input]::placeholder {
   color: var(--tao-color-text-tertiary);
 }
 
-[data-tao-picker-icons][data-tao-clearable] [data-tao-picker-clear] {
+[data-tao-picker-icons][data-tao-clearable] [data-tao-picker-suffix] {
   display: none;
 }
 
-[data-tao-picker-trigger]:hover
-  [data-tao-picker-icons][data-tao-clearable]
-  [data-tao-picker-suffix] {
-  display: none;
-}
-
-[data-tao-picker-trigger]:hover
-  [data-tao-picker-icons][data-tao-clearable]
-  [data-tao-picker-clear] {
-  display: flex;
+@media (hover: hover) and (pointer: fine) {
+  [data-tao-picker-icons][data-tao-clearable] {
+    display: grid;
+  }
+  [data-tao-picker-icons][data-tao-clearable] > * {
+    grid-area: 1 / 1;
+  }
+  :is([data-tao-picker-trigger], [data-tao-range-trigger]):not(:hover)
+    [data-tao-picker-clear]:not(:focus-visible) {
+    opacity: 0;
+    pointer-events: none;
+  }
+  :is([data-tao-picker-trigger], [data-tao-range-trigger]):not(:hover)
+    [data-tao-picker-icons][data-tao-clearable]:not(:has(:focus-visible))
+    [data-tao-picker-suffix] {
+    display: flex;
+  }
 }
 
 [data-tao-picker-clear] {
@@ -597,26 +604,6 @@ button[data-tao-time-cell][data-tao-selected] {
   margin-block-start: var(--tao-padding-xs);
 }
 
-button[data-tao-preset-btn] {
-  border: var(--tao-line-width) solid var(--tao-color-border);
-  border-radius: var(--tao-radius-sm);
-  background: transparent;
-  font-family: var(--tao-font-family);
-  font-size: var(--tao-font-size-xs);
-  color: var(--tao-color-text-secondary);
-  cursor: pointer;
-  padding: 2px 8px;
-  margin: 0;
-  outline: none;
-  appearance: none;
-  transition:
-    border-color var(--tao-motion-duration-fast) ease-out,
-    color var(--tao-motion-duration-fast) ease-out;
-}
-button[data-tao-preset-btn]:hover {
-  border-color: var(--tao-primary);
-  color: var(--tao-primary);
-}
 
 /* ===========================
    Footer (showTime: Now + OK)
@@ -631,35 +618,6 @@ button[data-tao-preset-btn]:hover {
   margin-block-start: var(--tao-padding-xs);
 }
 
-button[data-tao-picker-footer-btn] {
-  border: var(--tao-line-width) solid var(--tao-color-border);
-  border-radius: var(--tao-radius-sm);
-  background: transparent;
-  font-family: var(--tao-font-family);
-  font-size: var(--tao-font-size-xs);
-  color: var(--tao-color-text-secondary);
-  cursor: pointer;
-  padding: 4px 12px;
-  margin: 0;
-  outline: none;
-  appearance: none;
-  transition:
-    background-color var(--tao-motion-duration-fast) ease-out,
-    border-color var(--tao-motion-duration-fast) ease-out,
-    color var(--tao-motion-duration-fast) ease-out;
-}
-button[data-tao-picker-footer-btn]:hover {
-  border-color: var(--tao-primary);
-  color: var(--tao-primary);
-}
-button[data-tao-picker-footer-btn][data-tao-primary] {
-  background: var(--tao-primary);
-  border-color: var(--tao-primary);
-  color: white;
-}
-button[data-tao-picker-footer-btn][data-tao-primary]:hover {
-  background: var(--tao-primary-hover);
-}
 
 /* ===========================
    RangePicker trigger

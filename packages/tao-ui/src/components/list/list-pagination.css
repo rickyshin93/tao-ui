@@ -50,7 +50,11 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
-[data-tao-list-pages] button {
+:is(
+  [data-tao-list-page-button],
+  [data-tao-list-pages] [class$="-quick-jumper-button"],
+  [data-tao-list-pages] [class$="-simple-pager"] > button
+) {
   font: inherit;
   color: inherit;
   background: transparent;
@@ -60,10 +64,16 @@
   padding: 0 8px;
   min-height: 28px;
 }
-[data-tao-list-pages] button:disabled {
+:is(
+  [data-tao-list-page-button],
+  [data-tao-list-pages] [class$="-quick-jumper-button"],
+  [data-tao-list-pages] [class$="-simple-pager"] > button
+):disabled {
   cursor: not-allowed;
 }
-[data-tao-list-pages] input {
+[data-tao-list-pages]
+  :is([class$="-quick-jumper"], [class$="-simple-pager"])
+  > input {
   width: 48px;
   min-width: 0;
   height: var(--tao-control-height);
@@ -77,7 +87,9 @@
   padding-inline: 4px;
   box-sizing: border-box;
 }
-[data-tao-list-pages] input:focus-visible {
+[data-tao-list-pages]
+  :is([class$="-quick-jumper"], [class$="-simple-pager"])
+  > input:focus-visible {
   outline: 2px solid var(--tao-color-primary);
   outline-offset: 2px;
 }
@@ -106,7 +118,9 @@
 [data-tao-list-pages][data-tao-size="small"] > ul {
   gap: 4px;
 }
-[data-tao-list-pages][data-tao-size="small"] input {
+[data-tao-list-pages][data-tao-size="small"]
+  :is([class$="-quick-jumper"], [class$="-simple-pager"])
+  > input {
   width: 32px;
   height: var(--tao-control-height-sm);
   margin-inline: 4px;

@@ -1,5 +1,12 @@
 # tao-ui 项目自我学习
 
+## [Rspress] 首页 mdx 正文不渲染，但 iframe 演示照样生成
+- **日期**: 2026-11-05
+- **错误假设**: 想在首页手机壳里展示真实移动端 Select/DatePicker 抽屉，只能复用组件页的 `_zh_components_select_N` 演示（编号随文档变化，脆弱），或想办法把抽屉 portal 进手机壳。
+- **真实行为**: `pageType: home` 的 HomeLayout 只渲染 hero/features，不渲染 mdx 正文；但 plugin-preview 的 remark 仍处理正文里的 ```tsx preview="iframe-follow"``` 代码块，生成 `/~demo/_zh_index_1.html`。抽屉 portal 到 document.body，只有独立 iframe 视口（<576px）才能真实呈现移动端形态。
+- **正确做法**: 在 `docs/{zh,en}/index.mdx` 正文放一个 iframe-follow 块，只 import `@home-phone-demo`（rspress.config.ts 的 iframeOptions.builderConfig alias 指向 `docs/_components/home-phone-demo.tsx`）；首页用自绘手机壳 iframe 指向该 demo id，用 postMessage 传 scene/seed/dark。
+- **适用场景**: 首页或任何不渲染正文的页面需要独立视口的真实组件演示。
+
 ## [Table CSS] 固定列阴影伪元素要盖住 cell 自身的 border-bottom
 - **日期**: 2026-10-15
 - **错误假设**: sticky cell 的阴影伪元素 `bottom: 0` 即可连续成一条竖向阴影。

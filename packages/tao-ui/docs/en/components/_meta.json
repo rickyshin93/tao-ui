@@ -241,8 +241,8 @@
   },
   {
     "type": "file",
-    "name": "collapsible",
-    "label": "Collapsible"
+    "name": "collapse",
+    "label": "Collapse"
   },
   {
     "type": "file",

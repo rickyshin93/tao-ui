@@ -1,4 +1,4 @@
-import { expect, rstest, test } from '@rstest/core';
+import { afterEach, expect, rstest, test } from '@rstest/core';
 import {
   act,
   fireEvent,
@@ -12,12 +12,64 @@ import {
   type CarouselRef,
 } from '../../src/components/carousel/carousel';
 import { TaoProvider, zhCN } from '../../src/provider/tao-provider';
+import { restoreViewport, setViewportWidth } from '../utils/mock-viewport';
+
+afterEach(restoreViewport);
 
 const slides = [
   <div key="a">First</div>,
   <div key="b">Second</div>,
   <div key="c">Third</div>,
 ];
+
+test.each([390, 480, 481])(
+  'applies responsive settings on initial mount at %ipx',
+  async (width) => {
+    setViewportWidth(width);
+    const { container } = render(
+      <Carousel
+        slidesToShow={2}
+        responsive={[{ breakpoint: 480, settings: { slidesToShow: 1 } }]}
+      >
+        {slides}
+      </Carousel>,
+    );
+    await waitFor(() =>
+      expect(
+        container.querySelectorAll('.slick-active[data-index]'),
+      ).toHaveLength(width <= 480 ? 1 : 2),
+    );
+  },
+);
+
+test('updates responsive settings and restores the slider after unslick', async () => {
+  setViewportWidth(390);
+  const ref = createRef<CarouselRef>();
+  const { container, rerender } = render(
+    <Carousel ref={ref} responsive={[{ breakpoint: 480, settings: 'unslick' }]}>
+      {slides}
+    </Carousel>,
+  );
+  await waitFor(() =>
+    expect(container.querySelector('.slick-slider')).toBeNull(),
+  );
+  expect(screen.getByText('First')).toBeVisible();
+  rerender(
+    <Carousel ref={ref} speed={0}>
+      {slides}
+    </Carousel>,
+  );
+  await waitFor(() =>
+    expect(container.querySelector('.slick-current')).not.toBeNull(),
+  );
+  act(() => ref.current!.next());
+  await waitFor(() =>
+    expect(container.querySelector('.slick-current')).toHaveAttribute(
+      'data-index',
+      '1',
+    ),
+  );
+});
 test('renders dots and native refs, then navigates with arrows and imperative methods', async () => {
   const ref = createRef<CarouselRef>();
   const afterChange = rstest.fn();

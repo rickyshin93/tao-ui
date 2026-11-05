@@ -16,6 +16,7 @@
   }
   [data-tao-carousel] .slick-list {
     position: relative;
+    isolation: isolate;
     display: block;
     overflow: hidden;
     margin: 0;

@@ -133,6 +133,77 @@ test('RadioGroup string options', () => {
   expect(screen.getByText('C')).toBeTruthy();
 });
 
+test('RadioGroup preserves default selection and updates native form data', async () => {
+  const changes: string[] = [];
+  const { container, rerender } = render(
+    <form>
+      <RadioGroup
+        name="plan"
+        options={['Free', 'Pro']}
+        defaultValue="Free"
+        onChange={(value) => changes.push(value)}
+      />
+    </form>,
+  );
+  expect(screen.getByRole('radio', { name: 'Free' })).toBeChecked();
+  await userEvent.click(screen.getByText('Pro'));
+  expect(screen.getByRole('radio', { name: 'Pro' })).toBeChecked();
+  expect(screen.getByRole('radio', { name: 'Free' })).not.toBeChecked();
+  expect(new FormData(container.querySelector('form')!).get('plan')).toBe(
+    'Pro',
+  );
+  expect(changes).toEqual(['Pro']);
+  rerender(
+    <form>
+      <RadioGroup name="plan" options={['Free', 'Pro']} defaultValue="Free" />
+    </form>,
+  );
+  expect(screen.getByRole('radio', { name: 'Pro' })).toBeChecked();
+});
+
+test('RadioGroup without a default value supports children and disabled options', async () => {
+  render(
+    <RadioGroup>
+      <Radio value="a">A</Radio>
+      <Radio value="b">B</Radio>
+      <Radio value="c" disabled>
+        C
+      </Radio>
+    </RadioGroup>,
+  );
+  expect(
+    screen
+      .getAllByRole('radio')
+      .every((radio) => !(radio as HTMLInputElement).checked),
+  ).toBe(true);
+  await userEvent.click(screen.getByText('A'));
+  expect(screen.getByRole('radio', { name: 'A' })).toBeChecked();
+  await userEvent.click(screen.getByText('B'));
+  expect(screen.getByRole('radio', { name: 'A' })).not.toBeChecked();
+  expect(screen.getByRole('radio', { name: 'B' })).toBeChecked();
+  await userEvent.click(screen.getByText('C'));
+  expect(screen.getByRole('radio', { name: 'B' })).toBeChecked();
+  expect(screen.getByRole('radio', { name: 'C' })).not.toBeChecked();
+});
+
+test('RadioGroup controlled value only changes when its owner updates it', async () => {
+  const changes: string[] = [];
+  const { rerender } = render(
+    <RadioGroup
+      options={['A', 'B']}
+      value="A"
+      defaultValue="B"
+      onChange={(value) => changes.push(value)}
+    />,
+  );
+  await userEvent.click(screen.getByText('B'));
+  expect(changes).toEqual(['B']);
+  expect(screen.getByRole('radio', { name: 'A' })).toBeChecked();
+  expect(screen.getByRole('radio', { name: 'B' })).not.toBeChecked();
+  rerender(<RadioGroup options={['A', 'B']} value="B" />);
+  expect(screen.getByRole('radio', { name: 'B' })).toBeChecked();
+});
+
 test('RadioGroup direction sets data-tao-direction', () => {
   const { container } = render(
     <RadioGroup options={['A']} direction="vertical" />,

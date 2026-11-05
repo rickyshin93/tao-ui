@@ -1,3 +1,20 @@
+/* Only direct items use the form's spacing; Stack/FormSection own their gap. */
+[data-tao-form] > [data-tao-form-item] {
+  margin-block-end: var(--tao-form-field-item-gap, var(--tao-padding-md));
+}
+
+[data-tao-form-message] {
+  min-block-size: 1lh;
+  margin-block-start: var(--tao-padding-xxs);
+  font-size: var(--tao-form-field-error-font-size, var(--tao-font-size-xs));
+  line-height: var(--tao-line-height-sm);
+}
+
+[data-tao-form-message] > [data-tao-form-error],
+[data-tao-form-message] > [data-tao-form-description] {
+  margin-block: 0;
+}
+
 /* ===========================
    Form — horizontal layout
    (activated per item via Form layout="horizontal" → data-tao-layout)

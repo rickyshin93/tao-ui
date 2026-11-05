@@ -24,6 +24,7 @@ import {
   useTaoConfig,
 } from '../../provider/tao-provider';
 import { useIsMobile } from '../../utils/breakpoint';
+import { useMobileTitle } from '../../utils/field-label';
 import {
   cx,
   type SemanticClassNames,
@@ -89,6 +90,8 @@ export interface RangePickerProps
   status?: TaoStatus;
   ref?: Ref<PickerRef>;
   mobile?: boolean;
+  /** Mobile drawer title. Defaults to the Form.Item/FormField label, then locale text. */
+  mobileTitle?: ReactNode;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
   className?: string;
@@ -132,6 +135,7 @@ export const RangePicker = forwardRef(function RangePicker(
   const [keyboardFocusRequested, setKeyboardFocusRequested] = useState(false);
   const returnFocusRef = useRef<HTMLInputElement | null>(null);
   const ctx = useTaoConfig();
+  const drawerTitle = useMobileTitle(props.mobileTitle, ctx.locale.dateRange);
   const placeholder = placeholderProp ?? [
     ctx.locale.startDate,
     ctx.locale.endDate,
@@ -804,7 +808,7 @@ export const RangePicker = forwardRef(function RangePicker(
           open={isOpen}
           onClose={() => setOpen(false)}
           placement="bottom"
-          title={ctx.locale.dateRange}
+          title={drawerTitle}
           height="85vh"
         >
           {panelContent}

@@ -231,25 +231,6 @@ export default function Example() {
 
 </section>
 
-<section className="tao-example" id="range-picker-mobile">
-
-### 移动端选择
-
-在手机预览中打开选择器，体验抽屉内的选择、确认和清空。
-
-```tsx preview="iframe-follow"
-import { RangePicker, TaoProvider, zhCN } from '@rockshin/tao-ui';
-export default function Example() {
-  return (
-    <TaoProvider locale={zhCN}>
-      <RangePicker allowClear />
-    </TaoProvider>
-  );
-}
-```
-
-</section>
-
 <section className="tao-example" id="range-picker-locale">
 
 ### 切换语言
@@ -392,6 +373,27 @@ export default function Example() {
 import { RangePicker } from '@rockshin/tao-ui';
 export default function Example() {
   return <RangePicker disabled={[true, false]} />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="range-picker-mobile">
+
+移动端抽屉标题按 `mobileTitle` → 最近的 `Form.Item` / `FormField` 的 label → 本地化默认文案取值。必填星号和帮助信息不会带入标题，placeholder 只用于输入提示。独立使用或搭配原生 HTML label 时，可显式设置 `mobileTitle="出发日期"`。
+
+### 移动端选择
+
+在手机预览中打开选择器，体验抽屉内的选择、确认和清空。
+
+```tsx preview="iframe-follow"
+import { RangePicker, TaoProvider, zhCN } from '@rockshin/tao-ui';
+export default function Example() {
+  return (
+    <TaoProvider locale={zhCN}>
+      <RangePicker allowClear />
+    </TaoProvider>
+  );
 }
 ```
 

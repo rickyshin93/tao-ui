@@ -182,10 +182,28 @@ button[data-tao-select-clear] {
   font: inherit;
 }
 
-/* Keep clear discoverable by keyboard and touch as well as pointer. */
+/* Touch keeps clear visible; fine pointers reveal it on hover or keyboard focus. */
 [data-tao-select-icons][data-tao-clearable]
 [data-tao-select-icon]:not([data-tao-select-loading-slot]) {
   display: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  [data-tao-select-icons][data-tao-clearable] {
+    display: grid;
+  }
+  [data-tao-select-icons][data-tao-clearable] > * {
+    grid-area: 1 / 1;
+  }
+  [data-tao-select]:not(:hover) [data-tao-select-clear]:not(:focus-visible) {
+    opacity: 0;
+    pointer-events: none;
+  }
+  [data-tao-select]:not(:hover)
+    [data-tao-select-icons][data-tao-clearable]:not(:has(:focus-visible))
+    [data-tao-select-icon] {
+    display: flex;
+  }
 }
 
 [data-tao-select-icon] {

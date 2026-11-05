@@ -15,6 +15,7 @@ import {
 import { flushSync } from 'react-dom';
 import { useTaoConfig } from '../../provider/tao-provider';
 import { cx } from '../../utils/semantic';
+import { Button } from '../button/button';
 import { Progress } from '../progress/progress';
 import type {
   DraggerProps,
@@ -399,26 +400,35 @@ const UploadRoot = forwardRef<UploadRef, UploadProps>((props, ref) => {
                     listType === 'picture-card' ||
                       listType === 'picture-circle',
                   ) && (
-                    <button
+                    <Button
+                      variant="ghost"
+                      size="small"
+                      disabled={false}
                       type="button"
                       aria-label={`${locale.previewFile} ${file.name}`}
                       onClick={actions.preview}
                     >
                       {renderOption(listConfig.previewIcon, file) ?? '↗'}
-                    </button>
+                    </Button>
                   )}
                   {visible(listConfig.showDownloadIcon, file, false) && (
-                    <button
+                    <Button
+                      variant="ghost"
+                      size="small"
+                      disabled={false}
                       type="button"
                       aria-label={`${locale.downloadFile} ${file.name}`}
                       onClick={actions.download}
                     >
                       {renderOption(listConfig.downloadIcon, file) ?? '↓'}
-                    </button>
+                    </Button>
                   )}
                   {visible(listConfig.showRemoveIcon, file, true) &&
                     !disabled && (
-                      <button
+                      <Button
+                        variant="ghost"
+                        size="small"
+                        disabled={false}
                         type="button"
                         aria-label={`${locale.removeFile} ${file.name}`}
                         onClick={actions.remove}
@@ -426,7 +436,7 @@ const UploadRoot = forwardRef<UploadRef, UploadProps>((props, ref) => {
                         {renderOption(listConfig.removeIcon, file) ?? (
                           <FileIcon remove />
                         )}
-                      </button>
+                      </Button>
                     )}
                 </span>
               </span>

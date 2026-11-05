@@ -3,6 +3,7 @@ import { version } from '../package.json';
 
 export * from '@rspress/core/theme-original';
 export { HomePage as HomeHero } from '../docs/_components/home-page';
+export { FallbackHeading } from './reference-heading';
 
 export function Layout() {
   return (

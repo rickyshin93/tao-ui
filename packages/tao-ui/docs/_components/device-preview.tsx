@@ -1,15 +1,22 @@
+import { Segmented, TaoProvider } from '@rockshin/tao-ui';
 import { useDark, useLang, withBase } from '@rspress/core/runtime';
 import { useEffect, useRef, useState } from 'react';
+import {
+  type PreviewDevice,
+  useDevicePreviewStore,
+} from './device-preview-store';
 
 export function DevicePreview({ demoId }: { demoId: string }) {
   const zh = useLang() === 'zh';
   const dark = useDark();
-  const [mobile, setMobile] = useState(true);
+  const device = useDevicePreviewStore((state) => state.device);
+  const setDevice = useDevicePreviewStore((state) => state.setDevice);
+  const mobile = device === 'phone';
   const [availableWidth, setAvailableWidth] = useState(0);
   const container = useRef<HTMLDivElement>(null);
   const iframe = useRef<HTMLIFrameElement>(null);
   const width = mobile ? 414 : 960;
-  const height = mobile ? 700 : 560;
+  const height = mobile ? 664 : 560;
   const scale = availableWidth ? Math.min(1, availableWidth / width) : 1;
   const src =
     import.meta.env.DEV && process.env.RSPRESS_IFRAME_DEV_PORT
@@ -26,7 +33,7 @@ export function DevicePreview({ demoId }: { demoId: string }) {
   useEffect(() => {
     const sendTheme = () =>
       iframe.current?.contentWindow?.postMessage(
-        { type: 'theme-change', dark },
+        { type: 'theme-change', dark, phone: mobile },
         '*',
       );
     const receiveReady = (event: MessageEvent) => {
@@ -39,7 +46,7 @@ export function DevicePreview({ demoId }: { demoId: string }) {
     window.addEventListener('message', receiveReady);
     sendTheme();
     return () => window.removeEventListener('message', receiveReady);
-  }, [dark]);
+  }, [dark, mobile]);
 
   return (
     <div className="tao-device-preview">
@@ -47,35 +54,27 @@ export function DevicePreview({ demoId }: { demoId: string }) {
         className="tao-device-toolbar"
         aria-label={zh ? '预览设备' : 'Preview device'}
       >
-        <div className="tao-device-options">
-          <button
-            type="button"
-            aria-pressed={!mobile}
-            onClick={() => setMobile(false)}
-          >
-            {zh ? '桌面' : 'Desktop'}
-          </button>
-          <button
-            type="button"
-            aria-pressed={mobile}
-            onClick={() => setMobile(true)}
-          >
-            {zh ? '手机' : 'Phone'}
-          </button>
-        </div>
+        <TaoProvider theme={{ mode: dark ? 'dark' : 'light' }}>
+          <Segmented<PreviewDevice>
+            aria-label={zh ? '预览设备' : 'Preview device'}
+            value={device}
+            onChange={setDevice}
+            options={[
+              { value: 'desktop', label: zh ? '桌面' : 'Desktop' },
+              { value: 'phone', label: zh ? '手机' : 'Phone' },
+            ]}
+          />
+        </TaoProvider>
         <span>{mobile ? '390 × 640' : '960 × 560'}</span>
       </fieldset>
       <div ref={container} className="tao-device-viewport">
         <div style={{ width: width * scale, height: height * scale }}>
           <div
             className={
-              mobile ? 'tao-device-frame tao-device-phone' : 'tao-device-frame'
+              mobile ? 'tao-device-frame tao-phone' : 'tao-device-frame'
             }
             style={{ width, height, transform: `scale(${scale})` }}
           >
-            {mobile && (
-              <div className="tao-device-speaker" aria-hidden="true" />
-            )}
             <iframe
               ref={iframe}
               src={src}
@@ -88,12 +87,11 @@ export function DevicePreview({ demoId }: { demoId: string }) {
               style={{ width: mobile ? 390 : 960, height: mobile ? 640 : 560 }}
               onLoad={() =>
                 iframe.current?.contentWindow?.postMessage(
-                  { type: 'theme-change', dark },
+                  { type: 'theme-change', dark, phone: mobile },
                   '*',
                 )
               }
             />
-            {mobile && <div className="tao-device-home" aria-hidden="true" />}
           </div>
         </div>
       </div>

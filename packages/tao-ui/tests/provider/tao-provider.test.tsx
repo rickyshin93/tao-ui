@@ -239,7 +239,9 @@ test('nested provider: child inherits parent when not specified', () => {
 
 test('nested provider with inherit=false resets parent theme seeds', () => {
   render(
-    <TaoProvider theme={{ token: { colorPrimary: 'red', fontSize: 18 } }}>
+    <TaoProvider
+      theme={{ mode: 'dark', token: { colorPrimary: 'red', fontSize: 18 } }}
+    >
       <TaoProvider theme={{ inherit: false }}>
         <span data-testid="child">x</span>
       </TaoProvider>
@@ -251,6 +253,9 @@ test('nested provider with inherit=false resets parent theme seeds', () => {
     'oklch(0.205 0.01 70)',
   );
   expect(childProvider.style.getPropertyValue('--tao-font-size')).toBe('14px');
+  expect(childProvider.style.getPropertyValue('--tao-border-text-weight')).toBe(
+    '12%',
+  );
 });
 
 // Bug A regression: Provider must not collapse children into one grid/flex item.

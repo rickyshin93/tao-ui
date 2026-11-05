@@ -1295,54 +1295,9 @@ export default function PopupContainer() {
 
 </div>
 
-## Mobile and forms
+## Forms and mobile
 
 <div className="tao-demo-grid">
-
-<section className="tao-example" id="select-mobile">
-
-### Mobile single and multiple selection
-
-Select follows the viewport by default; `mobile` forces the bottom drawer. Single selection commits immediately. Multiple selection commits with Done; closing discards the draft. Try the mobile interaction on desktop here.
-
-```tsx preview="iframe-follow"
-import { FormField, Select, Stack } from '@rockshin/tao-ui';
-import { useState } from 'react';
-
-const options = ['Design', 'Engineering', 'Research', 'Operations'].map(
-  (label) => ({ label, value: label.toLowerCase() }),
-);
-
-export default function MobileSelect() {
-  const [value, setValue] = useState<string[]>(['design']);
-  return (
-    <Stack>
-      <FormField label="Mobile single choice">
-        <Select
-          showSearch
-          options={options}
-          placeholder="Choose one team"
-        />
-      </FormField>
-      <FormField label="Mobile multiple choices">
-        <Select
-          mode="multiple"
-          showSearch
-          options={options}
-          value={value}
-          onChange={(next) => setValue(next as string[])}
-          placeholder="Choose several teams"
-        />
-      </FormField>
-      <output aria-live="polite">
-        Committed: {value.join(', ') || '(none)'}
-      </output>
-    </Stack>
-  );
-}
-```
-
-</section>
 
 <section className="tao-example" id="select-provider">
 
@@ -1420,6 +1375,53 @@ export default function SelectForm() {
         <output aria-live="polite">{result}</output>
       </Stack>
     </form>
+  );
+}
+```
+
+</section>
+
+Mobile drawer titles use `mobileTitle`, then the nearest `Form.Item` / `FormField` label, then localized default text. Required marks and help text are excluded; placeholders only describe the input. For standalone controls or native HTML labels, pass `mobileTitle="Departure date"` explicitly.
+
+<section className="tao-example" id="select-mobile">
+
+### Mobile single and multiple selection
+
+Select follows the viewport by default; `mobile` forces the bottom drawer. Single selection commits immediately. Multiple selection commits with Done; closing discards the draft. Try the mobile interaction on desktop here.
+
+```tsx preview="iframe-follow"
+import { FormField, Select, Stack } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+const options = ['Design', 'Engineering', 'Research', 'Operations'].map(
+  (label) => ({ label, value: label.toLowerCase() }),
+);
+
+export default function MobileSelect() {
+  const [value, setValue] = useState<string[]>(['design']);
+  return (
+    <Stack>
+      <FormField label="Mobile single choice">
+        <Select
+          showSearch
+          options={options}
+          placeholder="Choose one team"
+        />
+      </FormField>
+      <FormField label="Mobile multiple choices">
+        <Select
+          mode="multiple"
+          showSearch
+          options={options}
+          value={value}
+          onChange={(next) => setValue(next as string[])}
+          placeholder="Choose several teams"
+        />
+      </FormField>
+      <output aria-live="polite">
+        Committed: {value.join(', ') || '(none)'}
+      </output>
+    </Stack>
   );
 }
 ```

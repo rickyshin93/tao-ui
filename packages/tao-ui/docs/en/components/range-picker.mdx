@@ -231,25 +231,6 @@ export default function Example() {
 
 </section>
 
-<section className="tao-example" id="range-picker-mobile">
-
-### Mobile selection
-
-Open the picker in phone mode to try selection, confirmation, and clearing inside a drawer.
-
-```tsx preview="iframe-follow"
-import { RangePicker, TaoProvider, zhCN } from '@rockshin/tao-ui';
-export default function Example() {
-  return (
-    <TaoProvider locale={zhCN}>
-      <RangePicker allowClear />
-    </TaoProvider>
-  );
-}
-```
-
-</section>
-
 <section className="tao-example" id="range-picker-locale">
 
 ### Locale switching
@@ -392,6 +373,27 @@ A disabled tuple can lock only the start or end input.
 import { RangePicker } from '@rockshin/tao-ui';
 export default function Example() {
   return <RangePicker disabled={[true, false]} />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="range-picker-mobile">
+
+Mobile drawer titles use `mobileTitle`, then the nearest `Form.Item` / `FormField` label, then localized default text. Required marks and help text are excluded; placeholders only describe the input. For standalone controls or native HTML labels, pass `mobileTitle="Departure date"` explicitly.
+
+### Mobile selection
+
+Open the picker in phone mode to try selection, confirmation, and clearing inside a drawer.
+
+```tsx preview="iframe-follow"
+import { RangePicker, TaoProvider, zhCN } from '@rockshin/tao-ui';
+export default function Example() {
+  return (
+    <TaoProvider locale={zhCN}>
+      <RangePicker allowClear />
+    </TaoProvider>
+  );
 }
 ```
 

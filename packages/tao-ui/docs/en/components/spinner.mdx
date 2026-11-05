@@ -229,7 +229,12 @@ export default function Example() {
   const [loading, setLoading] = useState(false);
   return (
     <Stack direction="vertical">
-      <Switch aria-label="Loading" checked={loading} onChange={setLoading} />
+      <Switch
+        aria-label="Loading"
+        checked={loading}
+        onChange={setLoading}
+        style={{ alignSelf: 'flex-start' }}
+      />
       <Spinner spinning={loading} tip="Loading content">
         <div style={{ padding: 24 }}>Your workspace content stays here.</div>
       </Spinner>

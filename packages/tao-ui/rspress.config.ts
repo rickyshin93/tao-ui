@@ -15,6 +15,7 @@ export default defineConfig({
   globalStyles: path.join(__dirname, 'styles/rspress.css'),
   globalUIComponents: [
     path.join(__dirname, 'docs/_components/preview-interaction-guard.tsx'),
+    path.join(__dirname, 'docs/_components/discovery-head.tsx'),
   ],
   lang: 'en',
   locales: [
@@ -34,6 +35,7 @@ export default defineConfig({
     },
   ],
   llms: true,
+  webMcp: true,
   route: {
     exclude: ['superpowers/**/*'],
     localeRedirect: 'auto',
@@ -95,6 +97,10 @@ export default defineConfig({
           resolve: {
             alias: {
               '@rockshin/tao-ui': path.join(__dirname, 'src/index.tsx'),
+              '@home-phone-demo': path.join(
+                __dirname,
+                'docs/_components/home-phone-demo.tsx',
+              ),
             },
           },
         },

@@ -375,32 +375,45 @@ export const Select = forwardRef(function Select(
   ) : null;
 
   const trailingIcons = (
-    <span data-tao-select-icons="">
+    <span
+      data-tao-select-icons=""
+      data-tao-clearable={showClearBtn || undefined}
+    >
       {loading ? (
         <span data-tao-select-icon="" data-tao-select-loading-slot="">
           {loadingIcon ?? <LoadingIcon />}
         </span>
       ) : showClearBtn ? (
-        // biome-ignore lint/a11y/useSemanticElements: inside Radix button trigger; nesting a button here would be invalid HTML.
-        <span
-          data-tao-select-clear=""
-          className={cx(classNames?.clear)}
-          style={styles?.clear}
-          onPointerDown={(e) => e.stopPropagation()}
-          onClick={handleClear}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault();
-              e.stopPropagation();
-              clearValue();
-            }
-          }}
-          role="button"
-          tabIndex={0}
-          aria-label={ctx.locale.clear}
-        >
-          {clearIcon}
-        </span>
+        <>
+          {/* biome-ignore lint/a11y/useSemanticElements: inside Radix button trigger; nesting a button here would be invalid HTML. */}
+          <span
+            data-tao-select-clear=""
+            className={cx(classNames?.clear)}
+            style={styles?.clear}
+            onPointerDown={(e) => e.stopPropagation()}
+            onClick={handleClear}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                e.stopPropagation();
+                clearValue();
+              }
+            }}
+            role="button"
+            tabIndex={0}
+            aria-label={ctx.locale.clear}
+          >
+            {clearIcon}
+          </span>
+          <span
+            data-tao-select-icon=""
+            data-tao-custom-suffix={suffixIcon != null || undefined}
+            className={cx(classNames?.suffix)}
+            style={styles?.suffix}
+          >
+            {suffixIcon ?? <ChevronDownIcon />}
+          </span>
+        </>
       ) : (
         <span
           data-tao-select-icon=""
@@ -539,6 +552,7 @@ export const Select = forwardRef(function Select(
           {trailingIcons}
         </div>
         <MobileSelectDrawer
+          mobileTitle={props.mobileTitle}
           classNames={classNames}
           styles={styles}
           popupRender={popupRender}
@@ -951,6 +965,7 @@ export const Select = forwardRef(function Select(
       <RadixSelect.Trigger asChild>
         <div
           ref={triggerRef}
+          tabIndex={resolvedDisabled ? -1 : 0}
           id={id}
           {...ariaProps}
           data-tao-control=""

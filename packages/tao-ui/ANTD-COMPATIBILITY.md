@@ -8,7 +8,7 @@ Reference: https://ant.design/changelog/#670 and the official `6.7.0` source tag
 
 Included entries: Divider, Avatar, Badge, Card, Descriptions, Empty, Segmented, Statistic, Timeline, Progress, Result, Skeleton, List, Listy, Rate, Slider, Tree, TreeSelect, Cascader, Transfer, AutoComplete, Mentions, TimePicker, Calendar, ColorPicker, Upload, Image, Carousel, QRCode, Watermark, Tour, FloatButton, Affix, Masonry, BorderBeam, App and Util (GetProps/GetProp/GetRef type utilities).
 
-Excluded entries: Grid, Layout, Anchor, Menu and Typography. Existing analogous tao-ui components are not renamed. `List` remains included for compatibility despite its upstream deprecation.
+Excluded entries: Grid, Layout, Anchor, Menu and Typography. That expansion did not rename existing analogous tao-ui components. `List` remains included for compatibility despite its upstream deprecation.
 
 ## Contract
 
@@ -20,6 +20,14 @@ Excluded entries: Grid, Layout, Anchor, Menu and Typography. Existing analogous 
 - No placeholder implementations, ignored public props, fabricated success, or unconditional fallback results. Any demonstrated incompatibility must be fixed or explicitly remain an incomplete acceptance item.
 - Validate behavior through public interfaces: controlled updates, callbacks, keyboard interaction, empty/disabled/loading/error states, semantic styling, refs and nested theme behavior. Confirm CSS and layout in a real browser, not happy-dom.
 - Document supported behavior and runnable examples in both languages. API wording may be independently written from upstream facts; copied implementation must preserve the applicable MIT notice.
+
+## Collapse (current workspace)
+
+The owner requested replacing the bare Collapsible experience with Ant Design-style panels and renaming it to `Collapse` on 2026-11-05. The component and subpath are now `Collapse` and `@rockshin/tao-ui/collapse`; consumers must update imports from the old name.
+
+Supported item-panel APIs: `items`, `activeKey`, `defaultActiveKey`, `onChange`, `accordion`, `collapsible`, `bordered`, `ghost`, `size`, `expandIcon`, `expandIconPlacement`, `destroyOnHidden`; items provide `key`, `label`, `children`, `extra`, `showArrow`, `forceRender` and header/body semantic overrides. Numeric keys normalize to strings in callbacks. Styles use tao-ui tokens; `disabled` inherits from TaoProvider. Deprecated Ant Design aliases and the old `Collapse.Panel` API are not exposed.
+
+The existing single-disclosure composition is retained under `Collapse.Trigger` / `Collapse.Content` with `open` / `onOpenChange`; it is a separate mode from item panels. Content height changes immediately; only the chevron transform animates, following the repository motion contract.
 
 ## Delivery
 

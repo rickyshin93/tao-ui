@@ -5,11 +5,18 @@ import {
   isValidElement,
   useContext,
   useEffect,
+  useId,
   useRef,
   useState,
 } from 'react';
 import { TaoPortalScope, useTaoConfig } from '../../provider/tao-provider';
 import { cx } from '../../utils/semantic';
+import { Button } from '../button/button';
+import { Collapse } from '../collapse/collapse';
+import { BaseInput as Input } from '../input/base-input';
+import { Segmented } from '../segmented/segmented';
+import { Select } from '../select/select';
+import { Slider } from '../slider/slider';
 import { Color, type ColorFormatType, type ModeType } from './color';
 import type { ColorPickerProps } from './color-picker-types';
 import './color-picker.css';
@@ -56,6 +63,7 @@ function colorKeys() {
 }
 
 function PickerPanel() {
+  const fieldId = useId();
   const keyForColor = colorKeys();
   const panel = useContext(PanelContext);
   const {
@@ -93,9 +101,12 @@ function PickerPanel() {
     change: (value: number) => void,
     step = 1,
   ) => (
-    <label data-tao-color-field="">
+    <label data-tao-color-field="" htmlFor={`${fieldId}-${label}`}>
       <span>{label}</span>
-      <input
+      <Input
+        id={`${fieldId}-${label}`}
+        size="small"
+        disabled={false}
         type="number"
         aria-label={label}
         min={0}
@@ -115,14 +126,17 @@ function PickerPanel() {
   return (
     <div data-tao-color-picker-controls="">
       {modes.length > 1 && (
-        <select
+        <Segmented<ModeType>
           aria-label={chinese ? '颜色模式' : 'Color mode'}
+          size="small"
+          disabled={false}
           value={mode}
-          onChange={(event) => setMode(event.target.value as ModeType)}
-        >
-          <option value="single">{chinese ? '单色' : 'Single'}</option>
-          <option value="gradient">{chinese ? '渐变' : 'Gradient'}</option>
-        </select>
+          onChange={setMode}
+          options={[
+            { value: 'single', label: chinese ? '单色' : 'Single' },
+            { value: 'gradient', label: chinese ? '渐变' : 'Gradient' },
+          ]}
+        />
       )}
       {mode === 'gradient' && (
         <div data-tao-color-stops="">
@@ -141,7 +155,9 @@ function PickerPanel() {
                 style={{ background: stop.color.toCssString() }}
               />
             ))}
-            <button
+            <Button
+              variant="bare"
+              disabled={false}
               type="button"
               aria-label={chinese ? '添加色标' : 'Add color stop'}
               onClick={() => {
@@ -154,9 +170,11 @@ function PickerPanel() {
               }}
             >
               +
-            </button>
+            </Button>
             {stops.length > 2 && (
-              <button
+              <Button
+                variant="bare"
+                disabled={false}
                 type="button"
                 aria-label={chinese ? '删除色标' : 'Remove color stop'}
                 onClick={() => {
@@ -169,21 +187,22 @@ function PickerPanel() {
                 }}
               >
                 −
-              </button>
+              </Button>
             )}
           </div>
-          <label data-tao-color-stop-position="">
-            {chinese ? '位置' : 'Position'}
-            <input
-              type="range"
-              aria-label={chinese ? '色标位置' : 'Stop position'}
+          <div data-tao-color-stop-position="">
+            <span>{chinese ? '位置' : 'Position'}</span>
+            <Slider
+              ariaLabelForHandle={chinese ? '色标位置' : 'Stop position'}
+              disabled={false}
               min={0}
               max={100}
               value={stops[activeIndex].percent}
-              onChange={(event) => {
+              tooltip={{ open: false }}
+              onChange={(percent) => {
                 const moved = {
                   ...stops[activeIndex],
-                  percent: Number(event.target.value),
+                  percent,
                 };
                 const next = stops
                   .map((stop, index) => (index === activeIndex ? moved : stop))
@@ -191,11 +210,10 @@ function PickerPanel() {
                 panel.setActive(next.indexOf(moved));
                 panel.change(new Color(next), false);
               }}
-              onPointerUp={() => panel.complete(value)}
-              onKeyUp={() => panel.complete(value)}
+              onChangeComplete={() => panel.complete(value)}
             />
             <span>{stops[activeIndex].percent}%</span>
-          </label>
+          </div>
         </div>
       )}
       <RcColorPickerComponent
@@ -208,20 +226,26 @@ function PickerPanel() {
         }
       />
       <div data-tao-color-inputs="">
-        <select
+        <Select
           aria-label={chinese ? '颜色格式' : 'Color format'}
+          mobileTitle={chinese ? '颜色格式' : 'Color format'}
+          size="small"
+          style={{ width: '5.5em', flexShrink: 0 }}
+          styles={{
+            popup: { zIndex: 'calc(var(--tao-z-index-popup-base) + 60)' },
+          }}
           value={format}
-          disabled={props.disabledFormat}
-          onChange={(event) => setFormat(event.target.value as ColorFormatType)}
-        >
-          {(['hex', 'rgb', 'hsb'] as const).map((item) => (
-            <option key={item} value={item}>
-              {item.toUpperCase()}
-            </option>
-          ))}
-        </select>
+          disabled={props.disabledFormat ?? false}
+          onChange={(next) => setFormat(next as ColorFormatType)}
+          options={['hex', 'rgb', 'hsb'].map((item) => ({
+            value: item,
+            label: item.toUpperCase(),
+          }))}
+        />
         {format === 'hex' ? (
-          <input
+          <Input
+            size="small"
+            disabled={false}
             aria-label={chinese ? '十六进制颜色' : 'Hex color'}
             value={draft}
             aria-invalid={
@@ -272,9 +296,15 @@ function PickerPanel() {
           )}
       </div>
       {props.allowClear && (
-        <button type="button" data-tao-color-clear="" onClick={panel.clear}>
+        <Button
+          variant="ghost"
+          size="small"
+          disabled={false}
+          data-tao-color-clear=""
+          onClick={panel.clear}
+        >
           {chinese ? '清除颜色' : 'Clear color'}
-        </button>
+        </Button>
       )}
     </div>
   );
@@ -282,27 +312,37 @@ function PickerPanel() {
 function PresetsPanel() {
   const keyForColor = colorKeys();
   const { props, change, chinese } = useContext(PanelContext);
+  if (!props.presets?.length) return null;
   return (
     <div data-tao-color-presets="">
-      {props.presets?.map((preset, index) => (
-        <details key={preset.key ?? index} open={preset.defaultOpen ?? true}>
-          <summary>{preset.label}</summary>
-          <div>
-            {preset.colors.map((value) => {
-              const color = new Color(value);
-              return (
-                <button
-                  key={keyForColor(color.toCssString())}
-                  type="button"
-                  aria-label={`${chinese ? '预设' : 'Preset'} ${color.isGradient() ? color.toCssString() : color.toHexString()}`}
-                  style={{ background: color.toCssString() }}
-                  onClick={() => change(color)}
-                />
-              );
-            })}
-          </div>
-        </details>
-      ))}
+      <Collapse
+        ghost
+        disabled={false}
+        size="small"
+        defaultActiveKey={props.presets.flatMap((preset, index) =>
+          (preset.defaultOpen ?? true) ? [String(preset.key ?? index)] : [],
+        )}
+        items={props.presets.map((preset, index) => ({
+          key: String(preset.key ?? index),
+          label: preset.label,
+          children: (
+            <div data-tao-color-swatches="">
+              {preset.colors.map((value) => {
+                const color = new Color(value);
+                return (
+                  <button
+                    key={keyForColor(color.toCssString())}
+                    type="button"
+                    aria-label={`${chinese ? '预设' : 'Preset'} ${color.isGradient() ? color.toCssString() : color.toHexString()}`}
+                    style={{ background: color.toCssString() }}
+                    onClick={() => change(color)}
+                  />
+                );
+              })}
+            </div>
+          ),
+        }))}
+      />
     </div>
   );
 }

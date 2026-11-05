@@ -1295,54 +1295,9 @@ export default function PopupContainer() {
 
 </div>
 
-## 移动与表单
+## 表单与移动
 
 <div className="tao-demo-grid">
-
-<section className="tao-example" id="select-mobile">
-
-### 移动端单选与多选
-
-默认随视口切换，`mobile` 可强制打开底部抽屉。单选立即确认；多选在点击 Done 后提交，直接关闭会放弃本次草稿。切换预览设备可对比桌面弹层与手机抽屉。
-
-```tsx preview="iframe-follow"
-import { FormField, Select, Stack } from '@rockshin/tao-ui';
-import { useState } from 'react';
-
-const options = ['Design', 'Engineering', 'Research', 'Operations'].map(
-  (label) => ({ label, value: label.toLowerCase() }),
-);
-
-export default function MobileSelect() {
-  const [value, setValue] = useState<string[]>(['design']);
-  return (
-    <Stack>
-      <FormField label="Mobile single choice">
-        <Select
-          showSearch
-          options={options}
-          placeholder="Choose one team"
-        />
-      </FormField>
-      <FormField label="Mobile multiple choices">
-        <Select
-          mode="multiple"
-          showSearch
-          options={options}
-          value={value}
-          onChange={(next) => setValue(next as string[])}
-          placeholder="Choose several teams"
-        />
-      </FormField>
-      <output aria-live="polite">
-        Committed: {value.join(', ') || '(none)'}
-      </output>
-    </Stack>
-  );
-}
-```
-
-</section>
 
 <section className="tao-example" id="select-provider">
 
@@ -1420,6 +1375,53 @@ export default function SelectForm() {
         <output aria-live="polite">{result}</output>
       </Stack>
     </form>
+  );
+}
+```
+
+</section>
+
+移动端抽屉标题按 `mobileTitle` → 最近的 `Form.Item` / `FormField` 的 label → 本地化默认文案取值。必填星号和帮助信息不会带入标题，placeholder 只用于输入提示。独立使用或搭配原生 HTML label 时，可显式设置 `mobileTitle="出发日期"`。
+
+<section className="tao-example" id="select-mobile">
+
+### 移动端单选与多选
+
+默认随视口切换，`mobile` 可强制打开底部抽屉。单选立即确认；多选在点击 Done 后提交，直接关闭会放弃本次草稿。切换预览设备可对比桌面弹层与手机抽屉。
+
+```tsx preview="iframe-follow"
+import { FormField, Select, Stack } from '@rockshin/tao-ui';
+import { useState } from 'react';
+
+const options = ['Design', 'Engineering', 'Research', 'Operations'].map(
+  (label) => ({ label, value: label.toLowerCase() }),
+);
+
+export default function MobileSelect() {
+  const [value, setValue] = useState<string[]>(['design']);
+  return (
+    <Stack>
+      <FormField label="Mobile single choice">
+        <Select
+          showSearch
+          options={options}
+          placeholder="Choose one team"
+        />
+      </FormField>
+      <FormField label="Mobile multiple choices">
+        <Select
+          mode="multiple"
+          showSearch
+          options={options}
+          value={value}
+          onChange={(next) => setValue(next as string[])}
+          placeholder="Choose several teams"
+        />
+      </FormField>
+      <output aria-live="polite">
+        Committed: {value.join(', ') || '(none)'}
+      </output>
+    </Stack>
   );
 }
 ```

@@ -7,5 +7,6 @@ export {
   type AutoSizeOptions,
   Textarea,
   type TextareaProps,
+  type TextareaRef,
   type TextareaSemanticPart,
 } from '../components/textarea/textarea';

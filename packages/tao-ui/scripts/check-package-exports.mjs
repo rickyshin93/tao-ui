@@ -10,6 +10,25 @@ const packageJson = JSON.parse(
 );
 const buttonEntry = Bun.resolveSync(`${packageJson.name}/button`, root);
 const providerEntry = Bun.resolveSync(`${packageJson.name}/provider`, root);
+const manifestEntry = Bun.resolveSync(
+  `${packageJson.name}/component-manifest.json`,
+  root,
+);
+assert.equal(
+  JSON.parse(readFileSync(manifestEntry, 'utf8')).packageName,
+  packageJson.name,
+  'Public JSON metadata',
+);
+for (const component of JSON.parse(readFileSync(manifestEntry, 'utf8'))
+  .components) {
+  const entry =
+    { 'tao-provider': 'provider', 'headless-input-number': 'number-input' }[
+      component.name
+    ] ?? component.name;
+  const exports = await import(`${packageJson.name}/${entry}`);
+  for (const name of component.exports)
+    assert.ok(name in exports, `${entry}: documented export ${name}`);
+}
 
 for (const file of readdirSync(join(root, 'src/entries'))) {
   const name = file.replace(/\.tsx?$/, '');

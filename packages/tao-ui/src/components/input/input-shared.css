@@ -1,0 +1,77 @@
+[data-tao-input-action] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 0;
+  padding: var(--tao-padding-xxs);
+  background: transparent;
+  color: var(--tao-color-text-tertiary);
+  cursor: pointer;
+  border-radius: var(--tao-radius-sm);
+}
+[data-tao-input-action]:hover {
+  color: var(--tao-color-text);
+}
+[data-tao-input-action]:disabled {
+  color: var(--tao-color-text-disabled);
+  cursor: not-allowed;
+}
+[data-tao-input-action]:focus-visible {
+  outline: 2px solid var(--tao-primary);
+  outline-offset: -2px;
+}
+[data-tao-input-action] svg {
+  width: 16px;
+  height: 16px;
+}
+[data-tao-input-count] {
+  color: var(--tao-color-text-tertiary);
+  font-size: var(--tao-font-size-sm);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+[data-tao-input-count][data-tao-exceeded] {
+  color: var(--tao-error);
+}
+@media (hover: hover) and (pointer: fine) {
+  :is([data-tao-input], [data-tao-textarea]):not(:hover):not(:focus-within)
+    [data-tao-input-clear] {
+    opacity: 0;
+  }
+}
+:is(
+  [data-tao-input],
+  [data-tao-textarea]
+)[data-tao-control][data-tao-variant="underlined"] {
+  border: var(--tao-line-width) solid transparent;
+  border-block-end-color: var(--tao-color-border);
+  border-radius: 0;
+  background: transparent;
+}
+:is([data-tao-input], [data-tao-textarea])[data-tao-variant="underlined"]:not(
+  [data-disabled]
+):is(:hover, :focus-within) {
+  border-block-end-color: var(--tao-input-underline-status, var(--tao-primary));
+}
+:is(
+  [data-tao-input],
+  [data-tao-textarea]
+)[data-tao-variant="underlined"][data-tao-warning] {
+  --tao-input-underline-status: var(--tao-warning);
+  border-block-end-color: var(--tao-warning);
+}
+:is(
+  [data-tao-input],
+  [data-tao-textarea]
+)[data-tao-variant="underlined"][data-tao-error] {
+  --tao-input-underline-status: var(--tao-error);
+  border-block-end-color: var(--tao-error);
+}
+:is(
+  [data-tao-input],
+  [data-tao-textarea]
+)[data-tao-variant="underlined"][data-disabled] {
+  color: var(--tao-color-text-disabled);
+  cursor: not-allowed;
+}

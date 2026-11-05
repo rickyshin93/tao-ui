@@ -25,6 +25,21 @@ test('renders with placeholder', () => {
   expect(screen.getByText('Pick one')).toBeTruthy();
 });
 
+test('desktop trigger is keyboard focusable and disabled triggers leave the tab order', async () => {
+  const user = userEvent.setup();
+  render(
+    <>
+      <Select aria-label="Enabled" options={[{ label: 'One', value: '1' }]} />
+      <Select aria-label="Disabled" disabled options={[]} />
+      <button type="button">Next</button>
+    </>,
+  );
+  await user.tab();
+  expect(screen.getByRole('combobox', { name: 'Enabled' })).toHaveFocus();
+  await user.tab();
+  expect(screen.getByRole('button', { name: 'Next' })).toHaveFocus();
+});
+
 test.each([
   { name: 'desktop', mobile: false, showSearch: false },
   { name: 'searchable', mobile: false, showSearch: true },

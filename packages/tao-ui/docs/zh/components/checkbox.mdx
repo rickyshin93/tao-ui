@@ -76,7 +76,7 @@ function CheckboxStates() {
   const [mixed, setMixed] = useState(false);
 
   return (
-    <Stack direction="horizontal" gap="lg">
+    <Stack direction="horizontal" gap="lg" style={{ flexWrap: 'wrap' }}>
       <Checkbox
         checked={unchecked}
         onChange={(event) => setUnchecked(event.target.checked)}

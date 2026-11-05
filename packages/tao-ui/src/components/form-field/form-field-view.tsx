@@ -5,6 +5,7 @@ import {
   type ReactNode,
   useId,
 } from 'react';
+import { FieldLabelContext } from '../../utils/field-label';
 import {
   cx,
   type SemanticClassNames,
@@ -14,6 +15,8 @@ import {
 export type FormFieldLayout = 'vertical' | 'horizontal';
 
 export interface FormFieldViewProps {
+  /** Identifies Form.Item without changing standalone FormField spacing. */
+  formItem?: boolean;
   label?: ReactNode;
   htmlFor?: string;
   required?: boolean;
@@ -41,6 +44,7 @@ export interface FormFieldViewProps {
  * to the child control. Not part of the public API.
  */
 export function FormFieldView({
+  formItem,
   label,
   htmlFor,
   required,
@@ -90,11 +94,34 @@ export function FormFieldView({
       })
     : children;
 
+  const message = error ? (
+    <p
+      className={classNames?.error}
+      style={styles?.error}
+      data-tao-form-error=""
+      data-tao-status={warning ? 'warning' : undefined}
+      id={errorId}
+      role="alert"
+    >
+      {error}
+    </p>
+  ) : description ? (
+    <p
+      className={classNames?.description}
+      style={styles?.description}
+      data-tao-form-description=""
+      id={descriptionId}
+    >
+      {description}
+    </p>
+  ) : null;
+
   return (
     <div
       className={cx(classNames?.root, className)}
       style={{ ...styles?.root, ...style }}
       data-tao-form-field=""
+      data-tao-form-item={formItem ? '' : undefined}
       data-tao-layout={layout === 'horizontal' ? 'horizontal' : undefined}
     >
       {label != null && (
@@ -114,28 +141,10 @@ export function FormFieldView({
         </label>
       )}
       <div data-tao-form-control="">
-        {control}
-        {error ? (
-          <p
-            className={classNames?.error}
-            style={styles?.error}
-            data-tao-form-error=""
-            data-tao-status={warning ? 'warning' : undefined}
-            id={errorId}
-            role="alert"
-          >
-            {error}
-          </p>
-        ) : description ? (
-          <p
-            className={classNames?.description}
-            style={styles?.description}
-            data-tao-form-description=""
-            id={descriptionId}
-          >
-            {description}
-          </p>
-        ) : null}
+        <FieldLabelContext.Provider value={label}>
+          {control}
+        </FieldLabelContext.Provider>
+        {formItem ? <div data-tao-form-message="">{message}</div> : message}
       </div>
     </div>
   );

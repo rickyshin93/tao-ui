@@ -130,12 +130,15 @@ export {
   type CheckboxSemanticPart,
 } from './components/checkbox/checkbox';
 export {
-  Collapsible,
-  type CollapsibleContentProps,
-  type CollapsibleProps,
-  type CollapsibleSemanticPart,
-  type CollapsibleTriggerProps,
-} from './components/collapsible/collapsible';
+  Collapse,
+  type CollapseContentProps,
+  type CollapseExpandIconProps,
+  type CollapseItem,
+  type CollapseProps,
+  type CollapseSemanticPart,
+  type CollapseTriggerProps,
+  type CollapseTriggerType,
+} from './components/collapse/collapse';
 export type {
   Color,
   ColorFormatType,
@@ -270,6 +273,21 @@ export {
 export {
   Input,
   type InputProps,
+  type InputRef,
+  type InputFocusOptions,
+  type InputVariant,
+  type AllowClearConfig,
+  type CountConfig,
+  type CountInfo,
+  type PasswordProps,
+  type VisibilityToggle,
+  type SearchProps,
+  type SearchSemanticPart,
+  type OTPProps,
+  type OTPRef,
+  type OTPSemanticPart,
+  type TextAreaProps,
+  type TextAreaRef,
   type InputSemanticPart,
 } from './components/input/input';
 export {
@@ -544,6 +562,7 @@ export {
   type AutoSizeOptions,
   Textarea,
   type TextareaProps,
+  type TextareaRef,
   type TextareaSemanticPart,
 } from './components/textarea/textarea';
 export {

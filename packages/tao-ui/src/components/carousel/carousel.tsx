@@ -10,6 +10,7 @@ import {
   useEffect,
   useImperativeHandle,
   useRef,
+  useState,
 } from 'react';
 import { useTaoInternalConfig } from '../../provider/tao-provider';
 import { interopDefault } from '../../utils/interop-default';
@@ -21,6 +22,27 @@ import {
 import './carousel.css';
 
 const SlickCarouselComponent = /*#__PURE__*/ interopDefault(SlickCarousel);
+
+function useResponsiveSettings(responsive: Settings['responsive']) {
+  const [settings, setSettings] = useState<Settings | 'unslick'>();
+  useEffect(() => {
+    const queries = [...(responsive ?? [])]
+      .sort((a, b) => a.breakpoint - b.breakpoint)
+      .map(({ breakpoint, settings }) => ({
+        media: window.matchMedia(`(max-width: ${breakpoint}px)`),
+        settings,
+      }));
+    const update = () =>
+      setSettings(queries.find(({ media }) => media.matches)?.settings);
+    update();
+    for (const { media } of queries) media.addEventListener('change', update);
+    return () => {
+      for (const { media } of queries)
+        media.removeEventListener('change', update);
+    };
+  }, [responsive]);
+  return settings;
+}
 
 export type CarouselEffect = 'scrollx' | 'fade';
 export type DotPlacement = 'top' | 'bottom' | 'start' | 'end';
@@ -89,6 +111,9 @@ function Arrow({
 export const Carousel = forwardRef<CarouselRef, CarouselProps>(
   function Carousel(props, ref) {
     const { locale, tokenStyle } = useTaoInternalConfig();
+    const { responsive, ...baseProps } = props;
+    const responsiveSettings = useResponsiveSettings(responsive);
+    const unslick = responsiveSettings === 'unslick';
     const {
       dots = true,
       arrows = false,
@@ -115,7 +140,7 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
       styles,
       appendDots,
       ...rest
-    } = props;
+    } = { ...baseProps, ...(unslick ? {} : responsiveSettings) };
     const placement =
       dotPlacement ??
       (dotPosition === 'left'
@@ -147,15 +172,16 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
       [],
     );
     useEffect(() => {
-      if (count > 0)
+      if (count > 0 && !unslick)
         sliderRef.current!.slickGoTo(
           isRtl ? count - initialSlide - 1 : initialSlide,
           true,
         );
-    }, [count, initialSlide, isRtl]);
+    }, [count, initialSlide, isRtl, unslick]);
     useEffect(() => {
-      if (slickGoTo !== undefined) sliderRef.current!.slickGoTo(slickGoTo);
-    }, [slickGoTo]);
+      if (slickGoTo !== undefined && !unslick)
+        sliderRef.current!.slickGoTo(slickGoTo);
+    }, [slickGoTo, unslick]);
     return (
       <div
         ref={rootRef}
@@ -176,41 +202,45 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
           } as CSSProperties
         }
       >
-        <SlickCarouselComponent
-          {...rest}
-          ref={sliderRef}
-          initialSlide={initialSlide}
-          fade={effect === 'fade' || !!rest.fade}
-          dots={!!dots}
-          dotsClass={cx(
-            'slick-dots',
-            typeof dots === 'object' && dots.className,
-            classNames?.dots,
-          )}
-          appendDots={
-            appendDots ?? ((items) => <ul style={styles?.dots}>{items}</ul>)
-          }
-          arrows={arrows}
-          prevArrow={
-            prevArrow ?? (
-              <Arrow aria-label={isRtl ? locale.next : locale.previous} />
-            )
-          }
-          nextArrow={
-            nextArrow ?? (
-              <Arrow aria-label={isRtl ? locale.previous : locale.next} />
-            )
-          }
-          draggable={draggable}
-          vertical={isVertical}
-          verticalSwiping={isVertical}
-          rtl={isRtl}
-          autoplay={!!autoplay}
-          autoplaySpeed={autoplaySpeed}
-          waitForAnimate={waitForAnimate}
-        >
-          {children}
-        </SlickCarouselComponent>
+        {unslick ? (
+          <div className="regular slider">{children}</div>
+        ) : (
+          <SlickCarouselComponent
+            {...rest}
+            ref={sliderRef}
+            initialSlide={initialSlide}
+            fade={effect === 'fade' || !!rest.fade}
+            dots={!!dots}
+            dotsClass={cx(
+              'slick-dots',
+              typeof dots === 'object' && dots.className,
+              classNames?.dots,
+            )}
+            appendDots={
+              appendDots ?? ((items) => <ul style={styles?.dots}>{items}</ul>)
+            }
+            arrows={arrows}
+            prevArrow={
+              prevArrow ?? (
+                <Arrow aria-label={isRtl ? locale.next : locale.previous} />
+              )
+            }
+            nextArrow={
+              nextArrow ?? (
+                <Arrow aria-label={isRtl ? locale.previous : locale.next} />
+              )
+            }
+            draggable={draggable}
+            vertical={isVertical}
+            verticalSwiping={isVertical}
+            rtl={isRtl}
+            autoplay={!!autoplay}
+            autoplaySpeed={autoplaySpeed}
+            waitForAnimate={waitForAnimate}
+          >
+            {children}
+          </SlickCarouselComponent>
+        )}
       </div>
     );
   },

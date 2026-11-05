@@ -19,11 +19,14 @@ The package root remains available and includes all component styles.
 - Components expose semantic DOM customization through `classNames` and `styles` props.
 - Theme tokens are CSS custom properties prefixed with `--tao-*`; import `tokenVar(name)` and `taoTokenNames` from `@rockshin/tao-ui/tokens`.
 - Import `componentDocs` and `getComponentDoc(name)` from `@rockshin/tao-ui/meta` for machine-readable component metadata.
+- Resolve `@rockshin/tao-ui/component-manifest.json` for plain JSON without loading component code.
+- [Agent guide](https://rickyshin93.github.io/tao-ui/guide/agents.md): read contracts, choose imports, and verify generated code.
+- [Website discovery index](https://rickyshin93.github.io/tao-ui/agent-manifest.json): current website version and bilingual Markdown/API links. Match it to your installed version.
 
 ## Component Groups
 
 - Config: App, TaoProvider
-- Data Display: Avatar, Badge, Calendar, Card, Carousel, Collapsible, Descriptions, Empty, Image, List, Listy, Masonry, Popover, QRCode, ScrollArea, Statistic, Table, Tag, Timeline, Tooltip, Tree
+- Data Display: Avatar, Badge, Calendar, Card, Carousel, Collapse, Descriptions, Empty, Image, List, Listy, Masonry, Popover, QRCode, ScrollArea, Statistic, Table, Tag, Timeline, Tooltip, Tree
 - Data Entry: AutoComplete, Cascader, Checkbox, ColorPicker, DatePicker, Form, FormActions, FormField, FormSection, Input, InputNumber, Mentions, Radio, RangePicker, Rate, Segmented, Select, Slider, Switch, Textarea, TimePicker, Transfer, TreeSelect, Upload
 - Feedback: Alert, Drawer, Modal, Popconfirm, Progress, Result, Skeleton, Sonner, Spinner, Tour
 - General: BorderBeam, Button, FloatButton, Watermark
@@ -215,18 +218,18 @@ Selects one or more independent boolean options.
 
 Use Checkbox for independent choices, or CheckboxGroup when users can select multiple options from a set.
 
-### Collapsible
+### Collapse
 
-Shows and hides a region of content while keeping disclosure state accessible.
+Groups content into accessible item-based panels with built-in headers, expand icons and accordion behavior.
 
 - Category: Data Display
-- Exports: `Collapsible`
-- Source: `src/components/collapsible/collapsible.tsx`
-- Storybook: `stories/collapsible.stories.tsx`
-- Tests: `tests/collapsible/collapsible.test.tsx`
-- Semantic parts: `root`, `trigger`, `content`
+- Exports: `Collapse`
+- Source: `src/components/collapse/collapse.tsx`
+- Storybook: `stories/collapse.stories.tsx`
+- Tests: `tests/collapse/collapse.test.tsx`, `tests/collapse/panels.test.tsx`
+- Semantic parts: `root`, `item`, `header`, `trigger`, `title`, `icon`, `extra`, `content`, `body`
 
-Use Collapsible to hide secondary details while preserving a lightweight page layout.
+Pass items with key, label and children for ready-to-use panels; use accordion to allow one open panel and activeKey/onChange for controlled state.
 
 ### ColorPicker
 
@@ -437,14 +440,14 @@ Images with keyboard-accessible preview, grouping, transforms, fallbacks and upl
 
 ### Input
 
-Single-line text input for short freeform values.
+Text inputs with clearing, counting, password visibility, search, text areas and OTP.
 
 - Category: Data Entry
 - Exports: `Input`
 - Source: `src/components/input/input.tsx`
 - Storybook: `stories/input.stories.tsx`
-- Tests: `tests/input/input.test.tsx`
-- Semantic parts: `root`, `input`, `prefix`, `suffix`
+- Tests: `tests/input/input.test.tsx`, `tests/input/family.test.tsx`
+- Semantic parts: `root`, `input`, `prefix`, `suffix`, `clear`, `count`, `addonBefore`, `addonAfter`
 
 Use Input for short text values such as names, filters, search terms, and identifiers.
 
@@ -852,14 +855,14 @@ Wrap an app or subtree with TaoProvider to set size, disabled, variant, and them
 
 ### Textarea
 
-Multi-line text input with optional auto sizing.
+Multi-line text input with auto sizing, clearing and custom character counts; also available as Input.TextArea.
 
 - Category: Data Entry
 - Exports: `Textarea`
 - Source: `src/components/textarea/textarea.tsx`
 - Storybook: `stories/textarea.stories.tsx`
 - Tests: `tests/textarea/textarea.test.tsx`
-- Semantic parts: `root`, `textarea`
+- Semantic parts: `root`, `textarea`, `clear`, `count`
 
 Use Textarea for longer freeform content such as descriptions, notes, and comments.
 
@@ -982,7 +985,7 @@ Repeats a text or image watermark over content and inherited dialog panels.
 
 ## Notes For Code Generation
 
-- Prefer root imports from `@rockshin/tao-ui`.
+- Prefer component subpaths for smaller imports; the root entry remains supported.
 - Customize internals through semantic `classNames` and `styles`, not private class names.
 - Prefer provider-level defaults for app-wide size, disabled, variant, and theme choices.
 - Use `Modal.useModal()` inside React components so dialogs inherit the surrounding provider context.

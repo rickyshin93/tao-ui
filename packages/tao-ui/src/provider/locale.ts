@@ -2,6 +2,10 @@
 export interface TaoLocale {
   select: string;
   searchPlaceholder: string;
+  search?: string;
+  showPassword?: string;
+  hidePassword?: string;
+  otpLabel?: (index: number, length: number) => string;
   searchOptions: string;
   noResults: string;
   /** Empty-state text. Omitted custom locales use the built-in English text. */
@@ -13,6 +17,8 @@ export interface TaoLocale {
   close: string;
   remove: (label: string) => string;
   dateTime: string;
+  /** Date-only picker title. Omitted custom locales use the built-in English text. */
+  selectDate?: string;
   selectTime?: string;
   startTime?: string;
   endTime?: string;
@@ -56,6 +62,10 @@ export const enUS: TaoLocale = {
   locale: 'en_US',
   select: 'Select',
   searchPlaceholder: 'Search...',
+  search: 'Search',
+  showPassword: 'Show password',
+  hidePassword: 'Hide password',
+  otpLabel: (index, length) => `Character ${index} of ${length}`,
   searchOptions: 'Search options',
   noResults: 'No results',
   emptyDescription: 'No data',
@@ -64,6 +74,7 @@ export const enUS: TaoLocale = {
   close: 'Close',
   remove: (label) => `Remove ${label}`,
   dateTime: 'Date & Time',
+  selectDate: 'Select date',
   selectTime: 'Select time',
   startTime: 'Start time',
   endTime: 'End time',
@@ -111,6 +122,10 @@ export const zhCN: TaoLocale = {
   locale: 'zh_CN',
   select: '选择',
   searchPlaceholder: '搜索…',
+  search: '搜索',
+  showPassword: '显示密码',
+  hidePassword: '隐藏密码',
+  otpLabel: (index, length) => `第 ${index} 位，共 ${length} 位`,
   searchOptions: '搜索选项',
   noResults: '暂无结果',
   emptyDescription: '暂无数据',
@@ -119,6 +134,7 @@ export const zhCN: TaoLocale = {
   close: '关闭',
   remove: (label) => `移除${label}`,
   dateTime: '选择日期和时间',
+  selectDate: '选择日期',
   selectTime: '选择时间',
   startTime: '开始时间',
   endTime: '结束时间',

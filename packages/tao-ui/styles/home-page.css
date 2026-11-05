@@ -1,0 +1,1330 @@
+@import "@fontsource/geist-mono/400.css";
+
+/* Home-only visual system: a component specimen sheet.
+   Neutral proof paper and hairlines; the seed colour (--home-seed, set inline
+   from the live tester) is the only hue on the page. */
+html:root:has(.tao-home) {
+  --home-paper: oklch(0.985 0.002 250);
+  --home-sheet: oklch(1 0 0);
+  --home-ink: oklch(0.2 0.01 260);
+  --home-muted: oklch(0.47 0.012 260);
+  --home-line: oklch(0.9 0.004 260);
+  --home-line-strong: oklch(0.8 0.006 260);
+  --home-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --home-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --rp-c-bg: var(--home-paper);
+}
+
+html:root.rp-dark:has(.tao-home) {
+  --home-paper: oklch(0.17 0.006 260);
+  --home-sheet: oklch(0.2 0.007 260);
+  --home-ink: oklch(0.95 0.004 260);
+  --home-muted: oklch(0.72 0.01 260);
+  --home-line: oklch(0.3 0.008 260);
+  --home-line-strong: oklch(0.42 0.01 260);
+}
+
+body:has(.tao-home) {
+  background: var(--home-paper);
+  scrollbar-color: var(--home-line-strong) var(--home-paper);
+}
+body:has(.tao-home) .rp-home-background {
+  display: none;
+}
+body:has(.tao-home) .rp-home-footer__message {
+  color: var(--home-muted);
+}
+
+.tao-home {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 40px;
+  color: var(--home-ink);
+  font-feature-settings: "ss01", "tnum";
+}
+.tao-home ::selection {
+  background: color-mix(in oklab, var(--home-seed) 24%, transparent);
+}
+.tao-home h1,
+.tao-home h2,
+.tao-home h3,
+.tao-home p,
+.tao-home ul,
+.tao-home dl,
+.tao-home dd,
+.tao-home pre {
+  margin: 0;
+  padding: 0;
+}
+.tao-home a:focus-visible,
+.tao-home button:focus-visible,
+.tao-swatch input:focus-visible + span {
+  outline: 2px solid var(--home-seed);
+  outline-offset: 3px;
+}
+.tao-home h2 {
+  color: var(--home-ink);
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  text-wrap: balance;
+}
+.tao-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.tao-home-arrow {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 240ms var(--home-ease);
+}
+
+/* Hero ------------------------------------------------------------ */
+.tao-hero {
+  padding: clamp(40px, 6vh, 72px) 0 clamp(64px, 8vw, 104px);
+}
+.tao-hero-copy {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 400px);
+  align-items: end;
+  gap: 32px 64px;
+}
+.tao-hero h1,
+.tao-close-title {
+  font-size: clamp(44px, 6.4vw, 84px);
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  line-height: 1.04;
+}
+.tao-hero-line {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.08em;
+}
+.tao-hero-line > span {
+  display: inline-block;
+}
+.tao-hero-lede {
+  display: grid;
+}
+.tao-hero-lede > p {
+  color: var(--home-muted);
+  font-size: 17px;
+  line-height: 1.65;
+}
+.tao-home-title-accent {
+  color: var(--home-seed);
+  transition: color 900ms var(--home-ease);
+}
+.tao-home-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 24px;
+  margin-top: 28px;
+}
+.tao-home-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  color: var(--home-ink);
+  font-size: 15px;
+  font-weight: 500;
+  text-decoration: none;
+  transition:
+    background-color 240ms var(--home-ease),
+    color 240ms var(--home-ease);
+}
+.tao-home-link:hover .tao-home-arrow {
+  transform: translateX(3px);
+}
+.tao-home-link--brand {
+  padding: 0 18px 0 20px;
+  border-radius: 8px;
+  background: var(--home-ink);
+  color: var(--home-paper);
+}
+.tao-home-link--brand:hover {
+  background: var(--home-seed);
+  color: oklch(1 0 0);
+}
+html.rp-dark .tao-home-link--brand:hover {
+  color: oklch(0.17 0.006 260);
+}
+.tao-home-link--alt:hover {
+  color: var(--home-seed);
+}
+.tao-install {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 28px;
+  padding: 6px 0;
+  border-top: 1px solid var(--home-line);
+  border-bottom: 1px solid var(--home-line);
+}
+.tao-install code {
+  overflow-x: auto;
+  color: var(--home-ink);
+  font-family: var(--home-mono);
+  font-size: 13px;
+  white-space: nowrap;
+}
+.tao-install code span {
+  color: var(--home-muted);
+}
+/* Resizable hero stage ------------------------------------------ */
+.tao-resize {
+  margin-top: 44px;
+}
+.tao-resize-stage {
+  position: relative;
+}
+.tao-ruler {
+  display: block;
+  overflow: visible;
+}
+.tao-ruler line {
+  stroke: var(--home-line-strong);
+  stroke-width: 1;
+}
+.tao-ruler text {
+  fill: var(--home-muted);
+  font-family: var(--home-mono);
+  font-size: 10px;
+}
+.tao-breakpoint {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 0;
+  border-left: 1px dashed var(--home-line-strong);
+  pointer-events: none;
+  transition: border-color 400ms var(--home-ease);
+}
+.tao-breakpoint span {
+  position: absolute;
+  top: -2px;
+  left: 6px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: var(--home-paper);
+  color: var(--home-muted);
+  font-family: var(--home-mono);
+  font-size: 11px;
+  white-space: nowrap;
+  transition:
+    color 400ms var(--home-ease),
+    background-color 400ms var(--home-ease);
+}
+.tao-resize-stage[data-mobile] .tao-breakpoint {
+  border-color: var(--home-seed);
+}
+.tao-resize-stage[data-mobile] .tao-breakpoint span {
+  background: color-mix(in oklab, var(--home-seed) 14%, var(--home-paper));
+  color: var(--home-seed);
+}
+.tao-window-layer {
+  position: absolute;
+  left: 0;
+  z-index: 1;
+  transform-origin: 0 0;
+}
+.tao-window {
+  position: relative;
+  border: 1px solid var(--home-line-strong);
+  border-radius: 14px;
+  background: var(--home-sheet);
+  box-shadow:
+    0 1px 2px oklch(0 0 0 / 0.04),
+    0 48px 96px -48px oklch(0 0 0 / 0.28),
+    0 32px 64px -40px color-mix(in oklab, var(--home-seed) 40%, transparent);
+  transition: box-shadow 900ms var(--home-ease);
+}
+.tao-window-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 14px;
+  border-bottom: 1px solid var(--home-line);
+  font-size: 12px;
+}
+.tao-window-url {
+  overflow: hidden;
+  color: var(--home-muted);
+  font-family: var(--home-mono);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.tao-window-size {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+  color: var(--home-ink);
+  font-family: var(--home-mono);
+}
+.tao-window-size b {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--home-seed) 14%, var(--home-sheet));
+  color: var(--home-seed);
+  font-family: var(--rp-font-family-base);
+  font-weight: 500;
+}
+.tao-window iframe {
+  display: block;
+  width: 100%;
+  border: 0;
+  border-radius: 0 0 13px 13px;
+  background: var(--home-sheet);
+}
+.tao-window-handle {
+  position: absolute;
+  top: 0;
+  right: -18px;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 100%;
+  cursor: ew-resize;
+  touch-action: none;
+}
+.tao-window-handle i {
+  width: 6px;
+  height: 56px;
+  border-radius: 3px;
+  background: var(--home-line-strong);
+  transition:
+    background-color 240ms var(--home-ease),
+    transform 240ms var(--home-ease);
+}
+.tao-window-handle:hover i,
+.tao-window-handle:focus-visible i {
+  background: var(--home-seed);
+  transform: scaleY(1.3);
+}
+.tao-window-handle:focus-visible {
+  outline: none;
+}
+.tao-resize-caption {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 16px;
+  margin-top: 20px !important;
+  color: var(--home-muted);
+  font-size: 14px;
+}
+.tao-resize-caption button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--home-seed);
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+/* Marquee ---------------------------------------------------------- */
+.tao-marquee {
+  overflow: hidden;
+  border-top: 1px solid var(--home-line);
+  border-bottom: 1px solid var(--home-line);
+  mask-image: linear-gradient(
+    90deg,
+    transparent,
+    #000 8%,
+    #000 92%,
+    transparent
+  );
+}
+.tao-marquee ul {
+  display: flex;
+  width: max-content;
+  list-style: none;
+}
+.tao-marquee li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  padding: 20px 28px;
+  color: var(--home-ink);
+  font-size: 15px;
+  white-space: nowrap;
+}
+.tao-marquee svg {
+  width: 7px;
+  height: 7px;
+  fill: var(--home-seed);
+  transition: fill 900ms var(--home-ease);
+}
+
+/* Mobile story ----------------------------------------------------- */
+.tao-mobile {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 64px;
+  padding: clamp(96px, 12vw, 160px) 0 clamp(48px, 6vw, 80px);
+}
+.tao-mobile h2,
+.tao-section-head h2,
+.tao-bento h2 {
+  max-width: 15em;
+  font-size: clamp(32px, 4.4vw, 56px);
+}
+.tao-mobile-steps {
+  margin-top: 40px !important;
+  list-style: none;
+}
+.tao-mobile-step {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 64vh;
+  margin: 0;
+  border-top: 1px solid var(--home-line);
+}
+.tao-mobile-step button {
+  display: grid;
+  gap: 8px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--home-muted);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.tao-mobile-step-index {
+  font-family: var(--home-mono);
+  font-size: 12px;
+  transition: color 400ms var(--home-ease);
+}
+.tao-mobile-step-title {
+  font-size: clamp(24px, 2.6vw, 34px);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  transition: color 400ms var(--home-ease);
+}
+.tao-mobile-step[data-active] .tao-mobile-step-index {
+  color: var(--home-seed);
+}
+.tao-mobile-step[data-active] .tao-mobile-step-title {
+  color: var(--home-ink);
+}
+.tao-mobile-step p {
+  max-width: 32em;
+  margin-top: 14px !important;
+  color: var(--home-muted);
+  font-size: 16px;
+  line-height: 1.75;
+}
+.tao-mobile-active {
+  display: none;
+}
+.tao-mobile-stage {
+  position: sticky;
+  top: 88px;
+  display: grid;
+  place-items: center;
+  align-self: start;
+  min-height: calc(100svh - 120px);
+}
+.tao-mobile-viewport {
+  display: grid;
+  justify-items: center;
+  width: 100%;
+  perspective: 1400px;
+}
+.tao-phone {
+  position: relative;
+  padding: 12px;
+  border-radius: 56px;
+  background: oklch(0.17 0.005 260);
+  box-shadow:
+    inset 0 0 0 1.5px oklch(0.38 0.01 260),
+    0 60px 120px -48px oklch(0 0 0 / 0.5),
+    0 36px 72px -36px color-mix(in oklab, var(--home-seed) 50%, transparent);
+  transform-origin: top center;
+  transition: box-shadow 900ms var(--home-ease);
+}
+.tao-phone::before {
+  position: absolute;
+  top: 24px;
+  left: calc(50% - 56px);
+  z-index: 2;
+  width: 112px;
+  height: 32px;
+  border-radius: 20px;
+  background: oklch(0 0 0);
+  content: "";
+}
+.tao-phone iframe {
+  display: block;
+  border: 0;
+  border-radius: 44px;
+  background: var(--home-sheet);
+}
+.tao-mobile-caption {
+  margin-top: 20px !important;
+  color: var(--home-muted);
+  font-size: 13px;
+  text-align: center;
+}
+
+/* Theme ----------------------------------------------------------- */
+.tao-theme {
+  padding: clamp(96px, 12vw, 160px) 0 0;
+}
+.tao-section-head {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+  align-items: end;
+  gap: 24px 64px;
+  margin-bottom: 48px;
+}
+.tao-section-head p {
+  max-width: 52ch;
+  color: var(--home-muted);
+  font-size: 17px;
+  line-height: 1.75;
+}
+
+/* Specimen tester -------------------------------------------------- */
+.tao-tester {
+  display: grid;
+  grid-template-columns: 320px minmax(0, 1fr);
+  overflow: hidden;
+  border: 1px solid var(--tester-line);
+  border-radius: 16px;
+  background: var(--tao-color-bg-surface);
+  color: var(--tao-color-text-base);
+  --tester-line: color-mix(
+    in oklab,
+    var(--tao-color-text-base) 11%,
+    var(--tao-color-bg-surface)
+  );
+  --tester-muted: color-mix(
+    in oklab,
+    var(--tao-color-text-base) 62%,
+    var(--tao-color-bg-surface)
+  );
+  transition:
+    background-color 400ms var(--home-ease),
+    color 400ms var(--home-ease),
+    border-color 400ms var(--home-ease);
+}
+.tao-chip {
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--tester-line);
+}
+.tao-chip-field {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 240px;
+  padding: 18px 20px;
+  background: var(--tao-primary);
+  color: var(--tao-primary-fg);
+  font-size: 12px;
+  transition:
+    background-color 900ms var(--home-ease),
+    color 900ms var(--home-ease);
+}
+.tao-chip-field > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+.tao-chip-note {
+  min-height: 1.5em;
+  opacity: 0.85;
+}
+.tao-chip-field > div span:last-child {
+  font-family: var(--home-mono);
+  opacity: 0.8;
+}
+.tao-chip-card {
+  padding: 18px 20px 20px;
+}
+.tao-chip-name {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  font-size: 28px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+.tao-chip-name span {
+  color: var(--tester-muted);
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.tao-chip-value {
+  display: block;
+  margin-top: 4px;
+  color: var(--tester-muted);
+  font-family: var(--home-mono);
+  font-size: 12.5px;
+}
+.tao-chip-derived {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 6px;
+  margin-top: 18px !important;
+  list-style: none;
+}
+.tao-chip-derived li {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  color: var(--tester-muted);
+  font-family: var(--home-mono);
+  font-size: 10.5px;
+}
+.tao-chip-derived li span {
+  height: 28px;
+  border-radius: 4px;
+  box-shadow: inset 0 0 0 1px var(--tester-line);
+  transition: background-color 900ms var(--home-ease);
+}
+
+.tao-tester-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto 1fr auto;
+  min-width: 0;
+}
+.tao-axes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 24px;
+  padding: 14px 24px;
+  border-bottom: 1px solid var(--tester-line);
+}
+.tao-axis {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 36px;
+  font-size: 13px;
+}
+.tao-axis > span:first-child {
+  color: var(--tester-muted);
+}
+.tao-axis--radius [data-tao-slider],
+.tao-axis--radius .rc-slider {
+  width: 112px;
+}
+.tao-axis output {
+  min-width: 34px;
+  font-family: var(--home-mono);
+  font-size: 12px;
+}
+.tao-swatches {
+  display: flex;
+  gap: 8px;
+}
+.tao-swatch {
+  position: relative;
+  display: inline-grid;
+  cursor: pointer;
+}
+.tao-swatch input {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.tao-swatch > span:nth-of-type(1) {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px
+    color-mix(in oklab, var(--tao-color-text-base) 14%, transparent);
+  transition: transform 240ms var(--home-ease);
+}
+.tao-swatch:hover > span:nth-of-type(1) {
+  transform: scale(1.12);
+}
+.tao-swatch-ring {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1.5px var(--tao-color-text-base);
+  pointer-events: none;
+}
+
+.tao-specimens {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  background: var(--tester-line);
+}
+.tao-specimen {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-width: 0;
+  min-height: 164px;
+  padding: 16px 20px 22px;
+  background: var(--tao-color-bg-surface);
+  transition: background-color 400ms var(--home-ease);
+}
+.tao-specimen-caption {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 500;
+}
+.tao-specimen-caption span:last-child {
+  overflow: hidden;
+  color: var(--tester-muted);
+  font-family: var(--home-mono);
+  font-size: 11.5px;
+  font-weight: 400;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.tao-specimen-body {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  min-width: 0;
+}
+.tao-specimen-body > * {
+  min-width: 0;
+}
+.tao-specimen-body > [data-tao-slider],
+.tao-specimen-body > .rc-slider {
+  width: 100%;
+}
+.tao-specimen-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.tao-specimen-wrap {
+  flex-wrap: wrap;
+}
+.tao-specimen-label {
+  gap: 10px;
+  font-size: 14px;
+  cursor: pointer;
+}
+.tao-specimen-stack {
+  display: grid;
+  gap: 8px;
+}
+.tao-tester-code {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 12px 6px 24px;
+  border-top: 1px solid var(--tester-line);
+}
+.tao-tester-code pre {
+  flex: 1;
+  min-width: 0;
+  padding: 10px 0;
+  overflow-x: auto;
+  color: var(--tester-muted);
+  font-family: var(--home-mono);
+  font-size: 12px;
+  line-height: 1.6;
+  scrollbar-width: thin;
+}
+.tao-tester .tao-doc-action {
+  color: var(--tester-muted);
+}
+.tao-tester .tao-doc-action:hover {
+  background: color-mix(in oklab, var(--tao-color-text-base) 7%, transparent);
+  color: var(--tao-color-text-base);
+}
+
+/* Anatomy --------------------------------------------------------- */
+.tao-anatomy {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  align-items: start;
+  gap: 48px 64px;
+  padding: clamp(72px, 10vw, 128px) 0;
+}
+.tao-anatomy h2 {
+  font-size: clamp(30px, 3.6vw, 44px);
+}
+.tao-anatomy-copy > p {
+  margin-top: 16px;
+  color: var(--home-muted);
+  font-size: 16px;
+  line-height: 1.75;
+}
+.tao-parts {
+  display: grid;
+  margin-top: 32px;
+  border-top: 1px solid var(--home-line);
+}
+.tao-part {
+  position: relative;
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr);
+  align-items: baseline;
+  gap: 12px;
+  padding: 14px 12px;
+  border: 0;
+  border-bottom: 1px solid var(--home-line);
+  background: transparent;
+  color: var(--home-muted);
+  font: inherit;
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background-color 240ms var(--home-ease),
+    color 240ms var(--home-ease);
+}
+.tao-part code {
+  color: var(--home-ink);
+  font-family: var(--home-mono);
+  font-size: 13px;
+  transition: color 240ms var(--home-ease);
+}
+.tao-part > * {
+  position: relative;
+}
+.tao-part .tao-part-bg {
+  position: absolute;
+  inset: 0;
+  background: color-mix(in oklab, var(--home-seed) 8%, var(--home-paper));
+}
+.tao-part[aria-pressed="true"] {
+  color: var(--home-ink);
+}
+.tao-part[aria-pressed="true"] code {
+  color: var(--home-seed);
+}
+.tao-anatomy-proof {
+  overflow: hidden;
+  border: 1px solid var(--home-line);
+  border-radius: 16px;
+  background: var(--home-sheet);
+}
+.tao-anatomy-stage {
+  display: grid;
+  place-items: center;
+  min-height: 260px;
+  padding: 48px 32px;
+  background-image:
+    linear-gradient(
+      color-mix(in oklab, var(--home-line) 60%, transparent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      color-mix(in oklab, var(--home-line) 60%, transparent) 1px,
+      transparent 1px
+    );
+  background-position: center;
+  background-size: 24px 24px;
+}
+.tao-anatomy-stage [data-tao-input] {
+  background: var(--home-sheet);
+}
+.tao-anatomy-stage [data-tao-input].tao-anatomy-on {
+  outline: 1.5px dashed var(--home-seed);
+  outline-offset: 5px;
+}
+.tao-anatomy-stage [data-tao-input] .tao-anatomy-on {
+  border-radius: 3px;
+  background: color-mix(in oklab, var(--home-seed) 16%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--home-seed) 16%, transparent);
+  color: var(--home-ink);
+}
+.tao-anatomy-code {
+  padding: 20px 0;
+  overflow-x: auto;
+  border-top: 1px solid var(--home-line);
+  color: var(--home-muted);
+  font-family: var(--home-mono);
+  font-size: 13px;
+  line-height: 1.75;
+}
+.tao-anatomy-code span {
+  display: block;
+  padding: 0 24px;
+  white-space: pre;
+  transition:
+    background-color 240ms var(--home-ease),
+    color 240ms var(--home-ease);
+}
+.tao-anatomy-code span[data-active] {
+  background: color-mix(in oklab, var(--home-seed) 10%, var(--home-sheet));
+  color: var(--home-ink);
+}
+
+/* Bento ----------------------------------------------------------- */
+.tao-bento {
+  padding: clamp(96px, 12vw, 160px) 0;
+  border-top: 1px solid var(--home-line);
+}
+.tao-bento h2 {
+  margin-bottom: 48px;
+}
+.tao-bento-grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 16px;
+}
+.tao-tile {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 32px;
+  min-width: 0;
+  min-height: 340px;
+  padding: 28px;
+  overflow: hidden;
+  border: 1px solid var(--home-line);
+  border-radius: 20px;
+  background: var(--home-sheet);
+}
+.tao-tile--wide {
+  grid-column: span 7;
+}
+.tao-tile--narrow {
+  grid-column: span 5;
+}
+.tao-tile--half {
+  grid-column: span 6;
+}
+.tao-tile-demo {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  min-width: 0;
+}
+.tao-tile-copy h3 {
+  margin: 0;
+  color: var(--home-ink);
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+}
+.tao-tile-copy p {
+  max-width: 46ch;
+  margin-top: 8px !important;
+  color: var(--home-muted);
+  font-size: 15px;
+  line-height: 1.7;
+}
+.tao-mode-panel {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 20px;
+  border: 1px solid
+    color-mix(
+      in oklab,
+      var(--tao-color-text-base) 12%,
+      var(--tao-color-bg-surface)
+    );
+  border-radius: 14px;
+  background: var(--tao-color-bg-surface);
+  color: var(--tao-color-text-base);
+  transition:
+    background-color 500ms var(--home-ease),
+    border-color 500ms var(--home-ease),
+    color 500ms var(--home-ease);
+}
+.tao-tile-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+}
+.tao-tile-stack {
+  display: grid;
+  justify-items: start;
+  gap: 14px;
+}
+.tao-density-form {
+  display: grid;
+  justify-items: start;
+  gap: 10px;
+}
+.tao-density-form [data-tao-input] {
+  width: 240px;
+}
+.tao-import-code {
+  width: 100%;
+  padding: 18px 22px;
+  overflow-x: auto;
+  border: 1px solid var(--home-line);
+  border-radius: 14px;
+  background: var(--home-paper);
+  color: var(--home-muted);
+  font-family: var(--home-mono);
+  font-size: 13px;
+  line-height: 2;
+}
+.tao-import-code span {
+  display: block;
+  white-space: pre;
+}
+.tao-import-code i {
+  color: var(--home-seed);
+  font-style: normal;
+}
+.tao-import-code b {
+  color: var(--home-ink);
+  font-weight: 400;
+}
+.tao-keys-demo {
+  display: grid;
+  gap: 20px;
+}
+.tao-keys,
+.tao-keys-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.tao-keys kbd {
+  display: grid;
+  place-items: center;
+  min-width: 42px;
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid var(--home-line-strong);
+  border-bottom-width: 3px;
+  border-radius: 8px;
+  background: var(--home-paper);
+  color: var(--home-ink);
+  font-family: var(--home-mono);
+  font-size: 12px;
+}
+.tao-keys-list > span {
+  position: relative;
+  padding: 8px 14px;
+  border: 1px solid var(--home-line);
+  border-radius: 8px;
+  font-size: 14px;
+}
+.tao-keys-focus {
+  position: absolute;
+  inset: -4px;
+  border-radius: 11px;
+  box-shadow: 0 0 0 2px var(--home-seed);
+}
+.tao-versions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 24px;
+}
+.tao-versions span {
+  font-size: clamp(48px, 6vw, 80px);
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+.tao-versions span:nth-child(2) {
+  color: var(--home-seed);
+  transition: color 900ms var(--home-ease);
+}
+.tao-versions code {
+  padding: 4px 10px;
+  border: 1px solid var(--home-line);
+  border-radius: 999px;
+  color: var(--home-muted);
+  font-family: var(--home-mono);
+  font-size: 12px;
+}
+
+/* Component index ------------------------------------------------- */
+.tao-index {
+  padding: clamp(72px, 10vw, 128px) 0;
+  border-top: 1px solid var(--home-line);
+}
+.tao-index-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px 32px;
+  margin-bottom: 48px;
+}
+.tao-index-heading h2 {
+  font-size: clamp(30px, 3.6vw, 44px);
+}
+.tao-index-heading p {
+  color: var(--home-muted);
+  font-size: 15px;
+}
+.tao-index-groups {
+  column-gap: 40px;
+  column-width: 220px;
+}
+.tao-index-group {
+  margin-bottom: 36px;
+  break-inside: avoid;
+}
+.tao-index-group h3 {
+  display: flex;
+  justify-content: space-between;
+  margin: 0 0 6px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--home-line);
+  color: var(--home-muted);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+.tao-index-group h3 span {
+  font-family: var(--home-mono);
+  font-size: 12px;
+  font-weight: 400;
+}
+.tao-index-group ul {
+  list-style: none;
+}
+.tao-index-group li {
+  margin: 0;
+}
+.tao-index-group a {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 8px;
+  padding: 5px 0;
+  color: var(--home-ink);
+  text-decoration: none;
+}
+.tao-index-group a span:first-child {
+  font-size: 15px;
+  transition:
+    color 200ms var(--home-ease),
+    transform 240ms var(--home-ease);
+}
+.tao-index-group a span:last-child:not(:first-child) {
+  color: var(--home-muted);
+  font-size: 13px;
+}
+.tao-index-group a:hover span:first-child {
+  color: var(--home-seed);
+  transform: translateX(3px);
+}
+
+/* Close ----------------------------------------------------------- */
+.tao-close {
+  padding: clamp(80px, 12vw, 152px) 0 clamp(96px, 12vw, 160px);
+  border-top: 1px solid var(--home-line);
+}
+
+.tao-close-install {
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  max-width: 100%;
+  margin-top: 36px;
+  padding: 14px 14px 14px 24px;
+  border: 1px solid var(--home-line);
+  border-radius: 12px;
+  background: var(--home-sheet);
+}
+.tao-close-install code {
+  overflow-x: auto;
+  font-family: var(--home-mono);
+  font-size: clamp(15px, 2vw, 22px);
+  white-space: nowrap;
+}
+.tao-close-facts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px 40px;
+  margin: 56px 0 40px !important;
+  padding-top: 20px !important;
+  border-top: 1px solid var(--home-line);
+}
+.tao-close-facts dt {
+  color: var(--home-muted);
+  font-size: 13px;
+}
+.tao-close-facts dd {
+  margin-top: 6px !important;
+  font-size: 15px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+/* Responsive ------------------------------------------------------ */
+@media (max-width: 1180px) {
+  .tao-tester {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .tao-chip {
+    flex-direction: row;
+    border-right: 0;
+    border-bottom: 1px solid var(--tester-line);
+  }
+  .tao-chip-field {
+    flex: 0 0 38%;
+    min-height: 0;
+  }
+  .tao-chip-card {
+    flex: 1;
+  }
+}
+
+@media (max-width: 900px) {
+  .tao-hero-copy,
+  .tao-section-head,
+  .tao-anatomy,
+  .tao-mobile {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .tao-mobile {
+    gap: 32px;
+  }
+  .tao-mobile-steps {
+    display: flex;
+    gap: 8px;
+    margin-top: 28px !important;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .tao-mobile-step {
+    flex: none;
+    min-height: 0;
+    border: 0;
+  }
+  .tao-mobile-step button {
+    padding: 8px 14px;
+    border: 1px solid var(--home-line);
+    border-radius: 999px;
+  }
+  .tao-mobile-step[data-active] button {
+    border-color: var(--home-ink);
+  }
+  .tao-mobile-step-index,
+  .tao-mobile-step p {
+    display: none;
+  }
+  .tao-mobile-step-title {
+    font-size: 14px;
+    letter-spacing: 0;
+  }
+  .tao-mobile-active {
+    display: block;
+    margin-top: 16px !important;
+    color: var(--home-muted);
+    font-size: 15px;
+    line-height: 1.7;
+  }
+  .tao-mobile-stage {
+    position: static;
+    min-height: 0;
+  }
+  .tao-tile--wide,
+  .tao-tile--narrow,
+  .tao-tile--half {
+    grid-column: span 12;
+  }
+  .tao-tile {
+    min-height: 0;
+  }
+  .tao-specimens {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .tao-home {
+    padding: 0 16px;
+  }
+  .tao-hero {
+    padding: 48px 0 56px;
+  }
+  .tao-resize {
+    display: none;
+  }
+  .tao-tile {
+    padding: 20px;
+  }
+  .tao-chip {
+    flex-direction: column;
+  }
+  .tao-chip-field {
+    flex: none;
+    min-height: 120px;
+  }
+  .tao-axes {
+    gap: 12px 24px;
+    padding: 14px 16px;
+  }
+  .tao-specimen {
+    min-height: 140px;
+    padding: 14px 16px 18px;
+  }
+  .tao-tester-code {
+    padding-left: 16px;
+  }
+  .tao-section-head p {
+    font-size: 16px;
+  }
+  .tao-anatomy-stage {
+    min-height: 200px;
+    padding: 36px 16px;
+  }
+  .tao-close-facts {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .tao-index-groups {
+    column-gap: 20px;
+    column-width: 150px;
+  }
+}
+
+@media (max-width: 480px) {
+  .tao-specimens {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .tao-specimen {
+    min-height: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tao-home *,
+  .tao-tester,
+  .tao-tester * {
+    transition: none !important;
+  }
+}

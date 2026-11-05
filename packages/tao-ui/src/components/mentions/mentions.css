@@ -106,6 +106,12 @@
 [data-tao-mentions] [class*="-clear-icon"]:hover {
   color: var(--tao-color-text);
 }
+@media (hover: hover) and (pointer: fine) {
+  [data-tao-mentions]:not(:hover) [class*="-clear-icon"]:not(:focus-visible) {
+    opacity: 0;
+    pointer-events: none;
+  }
+}
 [data-tao-mentions] [class*="-clear-icon"]:focus-visible {
   outline: 2px solid var(--tao-primary);
   outline-offset: 1px;

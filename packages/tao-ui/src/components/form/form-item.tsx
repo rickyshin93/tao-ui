@@ -182,6 +182,7 @@ export function FormItem<Values = Record<string, unknown>>({
 
     return (
       <FormFieldView
+        formItem
         label={label}
         htmlFor={htmlFor}
         required={requiredMark}

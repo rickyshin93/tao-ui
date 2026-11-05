@@ -14,7 +14,7 @@ import { cardDoc } from './components/card.doc';
 import { carouselDoc } from './components/carousel.doc';
 import { cascaderDoc } from './components/cascader.doc';
 import { checkboxDoc } from './components/checkbox.doc';
-import { collapsibleDoc } from './components/collapsible.doc';
+import { collapseDoc } from './components/collapse.doc';
 import { colorPickerDoc } from './components/color-picker.doc';
 import { contextMenuDoc } from './components/context-menu.doc';
 import { datePickerDoc } from './components/date-picker.doc';
@@ -89,7 +89,7 @@ export const componentDocs = [
   carouselDoc,
   cascaderDoc,
   checkboxDoc,
-  collapsibleDoc,
+  collapseDoc,
   colorPickerDoc,
   contextMenuDoc,
   datePickerDoc,

@@ -4,12 +4,13 @@ export const textareaDoc = {
   name: 'textarea',
   displayName: 'Textarea',
   category: 'Data Entry',
-  description: 'Multi-line text input with optional auto sizing.',
+  description:
+    'Multi-line text input with auto sizing, clearing and custom character counts; also available as Input.TextArea.',
   exports: ['Textarea'],
   source: 'src/components/textarea/textarea.tsx',
   story: 'stories/textarea.stories.tsx',
   tests: ['tests/textarea/textarea.test.tsx'],
-  semanticParts: ['root', 'textarea'],
+  semanticParts: ['root', 'textarea', 'clear', 'count'],
   keywords: ['textarea', 'multiline', 'input'],
   related: ['Input', 'FormField'],
   usage: {

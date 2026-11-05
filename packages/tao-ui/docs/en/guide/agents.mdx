@@ -1,0 +1,74 @@
+---
+title: Working with AI agents
+description: Find tao-ui component imports, semantic DOM contracts, complete API tables and runnable examples through JSON, Markdown and browser tools.
+---
+
+# Working with AI agents
+
+tao-ui is an MIT React component library for React and React DOM 18.2 or 19. Components support provider defaults, semantic `classNames` and `styles`, and OKLCH seed themes. The same bilingual references serve people and coding agents.
+
+## Read the right source
+
+| Source | Use it for |
+| --- | --- |
+| [agent-manifest.json](https://rickyshin93.github.io/tao-ui/agent-manifest.json) | Website package version, peer dependencies, exact component import paths, and English/Chinese HTML and Markdown URLs |
+| [component-manifest.json](https://rickyshin93.github.io/tao-ui/component-manifest.json) | Component descriptions, usage guidance, semantic parts, related components and selected props |
+| [llms.txt](https://rickyshin93.github.io/tao-ui/llms.txt) | A small navigation index; fetch only relevant pages |
+| [llms-full.txt](https://rickyshin93.github.io/tao-ui/llms-full.txt) | All English documentation when bulk context is necessary |
+| Installed `.d.ts` and generated component API tables | Exact prop types, callback signatures and supported overloads |
+
+`agent-manifest.json` is this project's discovery format, with `schemaVersion: 1`; it is not an MCP server or a universal agent protocol. The website tracks the current release. Check its package version against your installed dependency before copying an API. The metadata's `props` list is curated and can be incomplete; use declarations for the full contract.
+
+## Generate a component safely
+
+1. Read the installed package version and peer requirements.
+2. Find the component in the discovery index, then fetch its Markdown page for examples and the API table.
+3. Follow the documented import path. `TaoProvider` uses `/provider`; `HeadlessInputNumber` and `useNumberInput` use `/number-input`.
+4. Wrap the application with `TaoProvider`; use `classNames` / `styles` with documented semantic parts for customization.
+5. Run the application's typecheck and exercise the relevant interaction. Check narrow viewports for responsive controls.
+
+```tsx
+import { Button } from '@rockshin/tao-ui/button';
+import { TaoProvider } from '@rockshin/tao-ui/provider';
+
+export default function App() {
+  return (
+    <TaoProvider theme={{ mode: 'light' }}>
+      <Button onClick={() => console.log('Saved')}>Save</Button>
+    </TaoProvider>
+  );
+}
+```
+
+Component entries include their CSS and shared theme styles. No separate CSS import is required. The package root is also supported and includes all component styles. React is a peer dependency; the date pickers' `dayjs` is installed automatically.
+
+For Next.js App Router, place interactive usage in a client component (`'use client'`). Use tao-ui's API documentation and type declarations as the component contract. For example, form controls distinguish an omitted `value` from `value={undefined}`; follow the [getting started guide](./getting-started#control-field-values).
+
+## Read installed metadata
+
+```ts
+import { getComponentDoc } from '@rockshin/tao-ui/meta';
+
+const button = getComponentDoc('button');
+console.log(button?.semanticParts);
+```
+
+Node tools can resolve plain JSON without importing UI code:
+
+```js
+import { readFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
+
+const require = createRequire(import.meta.url);
+const file = require.resolve('@rockshin/tao-ui/component-manifest.json');
+const manifest = JSON.parse(readFileSync(file, 'utf8'));
+console.log(manifest.components.find((item) => item.name === 'button'));
+```
+
+The installed package also includes `llms.txt`. Source/story/test paths inside component metadata refer to the repository; they are not HTTP routes or files promised inside the npm package.
+
+## Browser tools
+
+Rspress enables six documentation tools through experimental WebMCP: `rspress_get_site_info`, `rspress_list_pages`, `rspress_get_page`, `rspress_get_current_page`, `rspress_search_docs`, and `rspress_navigate`. They require a browser supporting `document.modelContext` on HTTPS or localhost. A browser without it can still read the JSON and Markdown URLs above. No API key or hosted MCP service is required.
+
+These tools read and navigate documentation; they do not execute your application or establish that generated code passes its tests. See the [Rspress WebMCP documentation](https://www.rspress.rs/guide/basic/webmcp).

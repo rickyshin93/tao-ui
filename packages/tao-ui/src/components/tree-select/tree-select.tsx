@@ -25,6 +25,7 @@ import { cx } from '../../utils/semantic';
 import { ChevronDownIcon, CloseIcon } from '../select/select-icons';
 import { Spinner } from '../spinner/spinner';
 import type { TreeProps } from '../tree/tree';
+import { TreeCheck } from '../tree/tree-check';
 import {
   type SelectEnginePart,
   SelectEnginePopup,
@@ -206,7 +207,7 @@ function InternalTreeSelect<
       classNames={classes}
       styles={semanticStyles}
       multiple={!!(treeCheckable || multiple)}
-      treeCheckable={treeCheckable ? <span data-tao-tree-check="" /> : false}
+      treeCheckable={treeCheckable ? <TreeCheck /> : false}
       treeLine={!!treeLine}
       treeIcon={treeIcon}
       showTreeIcon={!!treeIcon}

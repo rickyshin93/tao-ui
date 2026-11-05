@@ -260,49 +260,6 @@ export default function DatePickerDisabledDates() {
 
 </section>
 
-<section className="tao-example" id="date-picker-mobile-date-picker">
-
-### Mobile date drawer
-
-Use `mobile` to try the drawer on desktop and confirm the selected date.
-
-```tsx preview
-import { DatePicker, FormField, Stack } from '@rockshin/tao-ui';
-
-import type { Dayjs } from 'dayjs';
-
-import dayjs from 'dayjs';
-
-import { useState } from 'react';
-
-export default function DatePickerMobileDatePicker() {
-  function Demo() {
-    const [val, setVal] = useState<Dayjs | null>(null);
-    return (
-      <Stack gap="md" style={{ maxWidth: 300 }}>
-        <p style={{ color: 'var(--tao-color-text-secondary)', fontSize: 13 }}>
-          Using <code>mobile</code> prop to force Drawer mode.
-        </p>
-        <FormField label="Mobile DatePicker">
-          <DatePicker
-            value={val}
-            onChange={(d) => setVal(d)}
-            mobile
-            presets={[
-              { label: 'Today', value: dayjs() },
-              { label: 'Yesterday', value: dayjs().subtract(1, 'day') },
-            ]}
-          />
-        </FormField>
-      </Stack>
-    );
-  }
-  return <Demo />;
-}
-```
-
-</section>
-
 <section className="tao-example" id="date-picker-sizes">
 
 ### Sizes and variants
@@ -341,25 +298,6 @@ export default function Example() {
       <DatePicker status="warning" />
       <DatePicker disabled />
     </Stack>
-  );
-}
-```
-
-</section>
-
-<section className="tao-example" id="date-picker-mobile">
-
-### Mobile selection
-
-Open the picker in phone mode to try selection, confirmation, and clearing inside a drawer.
-
-```tsx preview="iframe-follow"
-import { DatePicker, TaoProvider, zhCN } from '@rockshin/tao-ui';
-export default function Example() {
-  return (
-    <TaoProvider locale={zhCN}>
-      <DatePicker allowClear />
-    </TaoProvider>
   );
 }
 ```
@@ -455,6 +393,70 @@ format changes display text while values remain Dayjs objects.
 import { DatePicker } from '@rockshin/tao-ui';
 export default function Example() {
   return <DatePicker format="DD/MM/YYYY" />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="date-picker-mobile-date-picker">
+
+### Mobile date drawer
+
+Use `mobile` to try the drawer on desktop and confirm the selected date.
+
+```tsx preview="iframe-follow"
+import { DatePicker, FormField, Stack } from '@rockshin/tao-ui';
+
+import type { Dayjs } from 'dayjs';
+
+import dayjs from 'dayjs';
+
+import { useState } from 'react';
+
+export default function DatePickerMobileDatePicker() {
+  function Demo() {
+    const [val, setVal] = useState<Dayjs | null>(null);
+    return (
+      <Stack gap="md" style={{ maxWidth: 300 }}>
+        <p style={{ color: 'var(--tao-color-text-secondary)', fontSize: 13 }}>
+          Using <code>mobile</code> prop to force Drawer mode.
+        </p>
+        <FormField label="Mobile DatePicker">
+          <DatePicker
+            value={val}
+            onChange={(d) => setVal(d)}
+            mobile
+            presets={[
+              { label: 'Today', value: dayjs() },
+              { label: 'Yesterday', value: dayjs().subtract(1, 'day') },
+            ]}
+          />
+        </FormField>
+      </Stack>
+    );
+  }
+  return <Demo />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="date-picker-mobile">
+
+Mobile drawer titles use `mobileTitle`, then the nearest `Form.Item` / `FormField` label, then localized default text. Required marks and help text are excluded; placeholders only describe the input. For standalone controls or native HTML labels, pass `mobileTitle="Departure date"` explicitly.
+
+### Mobile selection
+
+Open the picker in phone mode to try selection, confirmation, and clearing inside a drawer.
+
+```tsx preview="iframe-follow"
+import { DatePicker, TaoProvider, zhCN } from '@rockshin/tao-ui';
+export default function Example() {
+  return (
+    <TaoProvider locale={zhCN}>
+      <DatePicker allowClear />
+    </TaoProvider>
+  );
 }
 ```
 

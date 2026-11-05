@@ -9,12 +9,13 @@ import {
   type CSSProperties,
   forwardRef,
   type ReactNode,
-  useId,
   useImperativeHandle,
   useRef,
   useState,
 } from 'react';
 import { useTaoConfig } from '../../provider/tao-provider';
+import { Segmented } from '../segmented/segmented';
+import { Select } from '../select/select';
 import {
   cx,
   type SemanticClassNames,
@@ -84,7 +85,6 @@ export interface CalendarRef {
 
 export const Calendar = forwardRef<CalendarRef, CalendarProps>((props, ref) => {
   const config = useTaoConfig();
-  const modeName = useId();
   const root = useRef<HTMLDivElement>(null);
   useImperativeHandle(ref, () => ({
     get nativeElement() {
@@ -159,7 +159,7 @@ export const Calendar = forwardRef<CalendarRef, CalendarProps>((props, ref) => {
         : props.dateCellRender?.(date);
     return (
       <div
-        data-tao-calendar-cell=""
+        data-tao-calendar-item=""
         data-today={
           date.isSame(dayjs(), info.type === 'month' ? 'month' : 'day') ||
           undefined
@@ -197,70 +197,48 @@ export const Calendar = forwardRef<CalendarRef, CalendarProps>((props, ref) => {
         })
       ) : (
         <div
-          data-tao-calendar-header=""
+          data-tao-calendar-toolbar=""
           className={names?.header}
           style={styles?.header}
         >
-          <select
+          <Select
             aria-label={chinese ? '年' : 'Year'}
-            value={value.year()}
-            onChange={(event) =>
-              select(clamp(value.year(Number(event.target.value))), 'year')
-            }
-          >
-            {Array.from(
+            mobileTitle={chinese ? '年' : 'Year'}
+            size="medium"
+            style={{ width: 'auto', minWidth: '6em' }}
+            value={String(value.year())}
+            onChange={(year) => select(clamp(value.year(Number(year))), 'year')}
+            options={Array.from(
               { length: lastYear - firstYear + 1 },
-              (_, index) => firstYear + index,
-            ).map((year) => (
-              <option key={year} value={year}>
-                {year}
-                {chinese ? '年' : ''}
-              </option>
-            ))}
-          </select>
+              (_, index) => ({
+                value: String(firstYear + index),
+                label: `${firstYear + index}${chinese ? '年' : ''}`,
+              }),
+            )}
+          />
           {mode === 'month' && (
-            <select
+            <Select
               aria-label={chinese ? '月' : 'Month'}
-              value={value.month()}
-              onChange={(event) =>
-                select(value.month(Number(event.target.value)), 'month')
-              }
-            >
-              {months.map((month, index) =>
-                index >= minMonth && index <= maxMonth ? (
-                  <option key={month} value={index}>
-                    {month}
-                  </option>
-                ) : null,
-              )}
-            </select>
+              mobileTitle={chinese ? '月' : 'Month'}
+              size="medium"
+              style={{ width: 'auto', minWidth: '6em' }}
+              value={String(value.month())}
+              onChange={(month) => select(value.month(Number(month)), 'month')}
+              options={months
+                .map((month, index) => ({ label: month, value: String(index) }))
+                .slice(minMonth, maxMonth + 1)}
+            />
           )}
-          <div
-            data-tao-calendar-modes=""
-            role="radiogroup"
+          <Segmented<CalendarMode>
             aria-label={chinese ? '日历视图' : 'Calendar view'}
-          >
-            {(['month', 'year'] as const).map((type) => (
-              <label key={type} data-selected={mode === type || undefined}>
-                <input
-                  type="radio"
-                  name={modeName}
-                  value={type}
-                  checked={mode === type}
-                  onChange={() => changeMode(type)}
-                />
-                <span>
-                  {type === 'month'
-                    ? chinese
-                      ? '月'
-                      : 'Month'
-                    : chinese
-                      ? '年'
-                      : 'Year'}
-                </span>
-              </label>
-            ))}
-          </div>
+            size="medium"
+            value={mode}
+            onChange={changeMode}
+            options={[
+              { value: 'month', label: chinese ? '月' : 'Month' },
+              { value: 'year', label: chinese ? '年' : 'Year' },
+            ]}
+          />
         </div>
       )}
       <PickerPanel<Dayjs>

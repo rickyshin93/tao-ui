@@ -801,6 +801,8 @@ test('uncontrolled selection works without a change callback', () => {
   );
   const first = screen.getByRole('checkbox', { name: 'Select row 1' });
   const all = screen.getByRole('checkbox', { name: 'Select all rows' });
+  expect(first).toHaveAttribute('data-tao-checkbox-input');
+  expect(all).toHaveAttribute('data-tao-checkbox-input');
   fireEvent.click(first);
   expect(first).toBeChecked();
   expect(all).toBePartiallyChecked();
@@ -1333,6 +1335,11 @@ test('expandRowByClick toggles on row click but not on the selection checkbox', 
   );
 
   await user.click(screen.getByRole('checkbox', { name: 'Select row 1' }));
+  expect(screen.queryByText('Detail of Alice')).toBeNull();
+
+  await user.click(
+    screen.getByRole('checkbox', { name: 'Select row 1' }).closest('label')!,
+  );
   expect(screen.queryByText('Detail of Alice')).toBeNull();
 
   await user.click(screen.getByText('Alice'));

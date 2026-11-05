@@ -164,6 +164,8 @@ export interface SelectProps
   hideSelected?: boolean;
   /** Force mobile or desktop. Otherwise use viewport <576px; an open popup keeps its presentation until closed. */
   mobile?: boolean;
+  /** Mobile drawer title. Defaults to the Form.Item/FormField label, then locale text. */
+  mobileTitle?: ReactNode;
   /** CSS class on the root element. */
   className?: string;
   /** Inline styles on the root element. */

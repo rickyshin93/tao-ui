@@ -65,9 +65,10 @@ test('presets, format switching and clear preserve their public callback payload
     await screen.findByRole('button', { name: 'Preset #00ff00' }),
   );
   expect(values.at(-1)?.toHexString()).toBe('#00ff00');
-  fireEvent.change(screen.getByRole('combobox', { name: 'Color format' }), {
-    target: { value: 'rgb' },
-  });
+  const format = screen.getByRole('combobox', { name: 'Color format' });
+  expect(format).toHaveAttribute('data-tao-select');
+  fireEvent.keyDown(format, { key: 'ArrowDown' });
+  fireEvent.click(await screen.findByRole('option', { name: 'RGB' }));
   expect(formats).toEqual(['rgb']);
   fireEvent.change(screen.getByRole('spinbutton', { name: 'Red' }), {
     target: { value: '128' },
@@ -79,6 +80,7 @@ test('presets, format switching and clear preserve their public callback payload
 });
 test('gradient mode edits stops and disabledAlpha emits opaque colors', async () => {
   const values: Color[] = [];
+  const completed: Color[] = [];
   render(
     <ColorPicker
       open
@@ -86,12 +88,13 @@ test('gradient mode edits stops and disabledAlpha emits opaque colors', async ()
       defaultValue="#12345680"
       disabledAlpha
       onChange={(value) => values.push(value)}
+      onChangeComplete={(value) => completed.push(value)}
     />,
   );
-  fireEvent.change(
-    await screen.findByRole('combobox', { name: 'Color mode' }),
-    { target: { value: 'gradient' } },
-  );
+  expect(
+    await screen.findByRole('radiogroup', { name: 'Color mode' }),
+  ).toHaveAttribute('data-tao-segmented');
+  fireEvent.click(screen.getByRole('radio', { name: 'Gradient' }));
   expect(values.at(-1)?.isGradient()).toBe(true);
   fireEvent.click(screen.getByRole('button', { name: 'Add color stop' }));
   expect(values.at(-1)?.getColors()).toHaveLength(3);
@@ -101,15 +104,26 @@ test('gradient mode edits stops and disabledAlpha emits opaque colors', async ()
       ?.getColors()
       .map((stop) => stop.percent),
   ).toEqual([0, 50, 100]);
-  fireEvent.change(screen.getByRole('slider', { name: 'Stop position' }), {
-    target: { value: '75' },
+  fireEvent.keyDown(screen.getByRole('slider', { name: 'Stop position' }), {
+    key: 'ArrowRight',
+    keyCode: 39,
   });
   expect(
     values
       .at(-1)
       ?.getColors()
       .map((stop) => stop.percent),
-  ).toEqual([0, 75, 100]);
+  ).toEqual([0, 51, 100]);
+  fireEvent.keyUp(screen.getByRole('slider', { name: 'Stop position' }), {
+    key: 'ArrowRight',
+    keyCode: 39,
+  });
+  expect(
+    completed
+      .at(-1)
+      ?.getColors()
+      .map((stop) => stop.percent),
+  ).toEqual([0, 51, 100]);
   fireEvent.change(screen.getByRole('textbox', { name: 'Hex color' }), {
     target: { value: '#abcdef80' },
   });
@@ -126,9 +140,7 @@ test('controlled color changes synchronize the editor mode and preserve gradient
   const { rerender } = render(
     <ColorPicker open value="#1677ff" mode={['single', 'gradient']} />,
   );
-  expect(
-    await screen.findByRole('combobox', { name: 'Color mode' }),
-  ).toHaveValue('single');
+  expect(await screen.findByRole('radio', { name: 'Single' })).toBeChecked();
   rerender(
     <ColorPicker
       open
@@ -140,9 +152,7 @@ test('controlled color changes synchronize the editor mode and preserve gradient
       onChange={(value) => values.push(value)}
     />,
   );
-  expect(screen.getByRole('combobox', { name: 'Color mode' })).toHaveValue(
-    'gradient',
-  );
+  expect(screen.getByRole('radio', { name: 'Gradient' })).toBeChecked();
   expect(screen.getByRole('button', { name: 'Add color stop' })).toBeTruthy();
   fireEvent.change(screen.getByRole('textbox', { name: 'Hex color' }), {
     target: { value: '#00ff00' },
@@ -151,16 +161,14 @@ test('controlled color changes synchronize the editor mode and preserve gradient
   expect(values.at(-1)?.getColors()).toHaveLength(2);
   expect(values.at(-1)?.getColors()[1].color.toHexString()).toBe('#0000ff');
   rerender(<ColorPicker open value="#123456" mode={['single', 'gradient']} />);
-  expect(screen.getByRole('combobox', { name: 'Color mode' })).toHaveValue(
-    'single',
-  );
+  expect(screen.getByRole('radio', { name: 'Single' })).toBeChecked();
   expect(screen.queryByRole('button', { name: 'Add color stop' })).toBeNull();
 });
 test('changing the allowed modes selects an available editor', async () => {
   const { rerender } = render(
     <ColorPicker open defaultValue="#1677ff" mode={['single', 'gradient']} />,
   );
-  await screen.findByRole('combobox', { name: 'Color mode' });
+  await screen.findByRole('radiogroup', { name: 'Color mode' });
   rerender(<ColorPicker open defaultValue="#1677ff" mode={['gradient']} />);
   expect(screen.getByRole('button', { name: 'Add color stop' })).toBeTruthy();
   rerender(<ColorPicker open defaultValue="#1677ff" mode={[]} />);
@@ -211,4 +219,41 @@ test('provider disabled state prevents opening and invalid hex input never emits
     target: { value: 'invalid' },
   });
   expect(changes).toBe(0);
+});
+
+test('shared controls respect local enabled state and preset disclosure', async () => {
+  render(
+    <TaoProvider disabled>
+      <ColorPicker
+        disabled={false}
+        open
+        disabledFormat
+        allowClear
+        mode={['single', 'gradient']}
+        presets={[
+          {
+            key: 'brand',
+            label: 'Brand',
+            defaultOpen: false,
+            colors: ['#00ff00'],
+          },
+        ]}
+      />
+    </TaoProvider>,
+  );
+  const hex = await screen.findByRole('textbox', { name: 'Hex color' });
+  expect(hex).not.toBeDisabled();
+  expect(hex.closest('[data-tao-input]')).toBeTruthy();
+  expect(
+    screen.getByRole('combobox', { name: 'Color format' }),
+  ).toHaveAttribute('data-tao-disabled');
+  expect(screen.getByRole('radio', { name: 'Gradient' })).not.toBeDisabled();
+  expect(
+    screen.getByRole('button', { name: 'Clear color' }),
+  ).not.toBeDisabled();
+  expect(screen.queryByRole('button', { name: 'Preset #00ff00' })).toBeNull();
+  fireEvent.click(screen.getByRole('button', { name: 'Brand' }));
+  expect(screen.getByRole('button', { name: 'Preset #00ff00' })).toBeTruthy();
+  fireEvent.click(screen.getByRole('button', { name: 'Brand' }));
+  expect(screen.queryByRole('button', { name: 'Preset #00ff00' })).toBeNull();
 });

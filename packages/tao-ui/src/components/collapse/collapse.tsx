@@ -7,19 +7,69 @@ import {
   useContext,
   useState,
 } from 'react';
-import { useTaoConfig } from '../../provider/tao-provider';
+import { type TaoSize, useTaoConfig } from '../../provider/tao-provider';
 import {
   cx,
   type SemanticClassNames,
   type SemanticStyles,
 } from '../../utils/semantic';
-import './collapsible.css';
+import { CollapsePanels } from './collapse-panels';
+import './collapse.css';
 
 // ---- Types ----
 
-export type CollapsibleSemanticPart = 'root' | 'trigger' | 'content';
+export type CollapseSemanticPart =
+  | 'root'
+  | 'item'
+  | 'header'
+  | 'trigger'
+  | 'title'
+  | 'icon'
+  | 'extra'
+  | 'content'
+  | 'body';
 
-export interface CollapsibleProps {
+export type CollapseTriggerType = 'header' | 'icon' | 'disabled';
+
+export interface CollapseItem {
+  /** Unique panel key. Numeric keys are normalized to strings. */
+  key: string | number;
+  label: ReactNode;
+  children?: ReactNode;
+  extra?: ReactNode;
+  collapsible?: CollapseTriggerType;
+  showArrow?: boolean;
+  /** Mount the body even before opening; keeps it mounted when hidden. */
+  forceRender?: boolean;
+  className?: string;
+  style?: CSSProperties;
+  classNames?: SemanticClassNames<'header' | 'body'>;
+  styles?: SemanticStyles<'header' | 'body'>;
+}
+
+export interface CollapseExpandIconProps {
+  key: string | number;
+  isActive: boolean;
+  disabled: boolean;
+}
+
+export interface CollapseProps {
+  /** Complete panels with built-in headers, icons and content styling. */
+  items?: CollapseItem[];
+  activeKey?: string | number | (string | number)[];
+  defaultActiveKey?: string | number | (string | number)[];
+  /** Called with normalized string keys, including in accordion mode. */
+  onChange?: (activeKeys: string[]) => void;
+  /** Allow at most one active panel; clicking it again closes it. */
+  accordion?: boolean;
+  bordered?: boolean;
+  ghost?: boolean;
+  size?: TaoSize;
+  collapsible?: CollapseTriggerType;
+  expandIconPlacement?: 'start' | 'end';
+  expandIcon?: (props: CollapseExpandIconProps) => ReactNode;
+  /** Unmount closed bodies unless the item has forceRender. */
+  destroyOnHidden?: boolean;
   /** Controlled open state. */
   open?: boolean;
   /** Uncontrolled initial open state. Defaults to `false`. */
@@ -31,11 +81,11 @@ export interface CollapsibleProps {
   /** Merged into the root element. */
   className?: string;
   style?: CSSProperties;
-  classNames?: SemanticClassNames<CollapsibleSemanticPart>;
-  styles?: SemanticStyles<CollapsibleSemanticPart>;
+  classNames?: SemanticClassNames<CollapseSemanticPart>;
+  styles?: SemanticStyles<CollapseSemanticPart>;
 }
 
-export interface CollapsibleTriggerProps {
+export interface CollapseTriggerProps {
   children?: ReactNode;
   /** Render the child element as the trigger instead of a default button. */
   asChild?: boolean;
@@ -43,7 +93,7 @@ export interface CollapsibleTriggerProps {
   style?: CSSProperties;
 }
 
-export interface CollapsibleContentProps {
+export interface CollapseContentProps {
   children?: ReactNode;
   className?: string;
   style?: CSSProperties;
@@ -54,16 +104,24 @@ export interface CollapsibleContentProps {
 // classNames/styles live on the Root but apply to trigger/content too.
 // We thread them down via React context so the sub-components stay flat.
 
-interface CollapsibleCtx {
-  classNames?: SemanticClassNames<CollapsibleSemanticPart>;
-  styles?: SemanticStyles<CollapsibleSemanticPart>;
+interface CollapseCtx {
+  classNames?: SemanticClassNames<CollapseSemanticPart>;
+  styles?: SemanticStyles<CollapseSemanticPart>;
 }
 
-const Ctx = createContext<CollapsibleCtx>({});
+const Ctx = createContext<CollapseCtx>({});
 
 // ---- Component ----
 
-export function Collapsible(props: CollapsibleProps) {
+export function Collapse(props: CollapseProps) {
+  return props.items ? (
+    <CollapsePanels {...props} items={props.items} />
+  ) : (
+    <CollapseRoot {...props} />
+  );
+}
+
+function CollapseRoot(props: CollapseProps) {
   const {
     open,
     defaultOpen,
@@ -97,7 +155,7 @@ export function Collapsible(props: CollapsibleProps) {
         open={realOpen}
         onOpenChange={setOpen}
         disabled={resolvedDisabled}
-        data-tao-collapsible=""
+        data-tao-collapse=""
         className={cx(classNames?.root, className)}
         style={{ ...styles?.root, ...style }}
       >
@@ -107,13 +165,13 @@ export function Collapsible(props: CollapsibleProps) {
   );
 }
 
-function CollapsibleTrigger(props: CollapsibleTriggerProps) {
+function CollapseTrigger(props: CollapseTriggerProps) {
   const { children, asChild, className, style } = props;
   const { classNames, styles } = useContext(Ctx);
   return (
     <RC.Trigger
       asChild={asChild}
-      data-tao-collapsible-trigger=""
+      data-tao-collapse-trigger=""
       className={cx(classNames?.trigger, className)}
       style={{ ...styles?.trigger, ...style }}
     >
@@ -122,12 +180,12 @@ function CollapsibleTrigger(props: CollapsibleTriggerProps) {
   );
 }
 
-function CollapsibleContent(props: CollapsibleContentProps) {
+function CollapseContent(props: CollapseContentProps) {
   const { children, className, style } = props;
   const { classNames, styles } = useContext(Ctx);
   return (
     <RC.Content
-      data-tao-collapsible-content=""
+      data-tao-collapse-content=""
       className={cx(classNames?.content, className)}
       style={{ ...styles?.content, ...style }}
     >
@@ -136,5 +194,5 @@ function CollapsibleContent(props: CollapsibleContentProps) {
   );
 }
 
-Collapsible.Trigger = CollapsibleTrigger;
-Collapsible.Content = CollapsibleContent;
+Collapse.Trigger = CollapseTrigger;
+Collapse.Content = CollapseContent;

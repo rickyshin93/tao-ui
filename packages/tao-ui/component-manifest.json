@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "packageName": "@rockshin/tao-ui",
-  "generatedAt": "2026-11-04T16:10:01.752Z",
+  "generatedAt": "2026-11-05T11:39:43.640Z",
   "components": [
     {
       "name": "affix",
@@ -626,22 +626,29 @@
       ]
     },
     {
-      "name": "collapsible",
-      "displayName": "Collapsible",
+      "name": "collapse",
+      "displayName": "Collapse",
       "category": "Data Display",
-      "description": "Shows and hides a region of content while keeping disclosure state accessible.",
+      "description": "Groups content into accessible item-based panels with built-in headers, expand icons and accordion behavior.",
       "exports": [
-        "Collapsible"
+        "Collapse"
       ],
-      "source": "src/components/collapsible/collapsible.tsx",
-      "story": "stories/collapsible.stories.tsx",
+      "source": "src/components/collapse/collapse.tsx",
+      "story": "stories/collapse.stories.tsx",
       "tests": [
-        "tests/collapsible/collapsible.test.tsx"
+        "tests/collapse/collapse.test.tsx",
+        "tests/collapse/panels.test.tsx"
       ],
       "semanticParts": [
         "root",
+        "item",
+        "header",
         "trigger",
-        "content"
+        "title",
+        "icon",
+        "extra",
+        "content",
+        "body"
       ],
       "keywords": [
         "accordion",
@@ -653,10 +660,11 @@
         "Tabs"
       ],
       "usage": {
-        "description": "Use Collapsible to hide secondary details while preserving a lightweight page layout.",
+        "description": "Pass items with key, label and children for ready-to-use panels; use accordion to allow one open panel and activeKey/onChange for controlled state.",
         "bestPractices": [
           "Make the trigger label describe the hidden content.",
-          "Use controlled open state when it must coordinate with other UI."
+          "Use activeKey/onChange when expansion must coordinate with other UI.",
+          "Keep independent header actions in extra; reserve collapsible=\"icon\" for icon-only activation."
         ],
         "avoid": [
           "Do not hide required form inputs in a collapsed region without a clear cue."
@@ -1288,20 +1296,25 @@
       "name": "input",
       "displayName": "Input",
       "category": "Data Entry",
-      "description": "Single-line text input for short freeform values.",
+      "description": "Text inputs with clearing, counting, password visibility, search, text areas and OTP.",
       "exports": [
         "Input"
       ],
       "source": "src/components/input/input.tsx",
       "story": "stories/input.stories.tsx",
       "tests": [
-        "tests/input/input.test.tsx"
+        "tests/input/input.test.tsx",
+        "tests/input/family.test.tsx"
       ],
       "semanticParts": [
         "root",
         "input",
         "prefix",
-        "suffix"
+        "suffix",
+        "clear",
+        "count",
+        "addonBefore",
+        "addonAfter"
       ],
       "keywords": [
         "text field",
@@ -1316,7 +1329,9 @@
         "description": "Use Input for short text values such as names, filters, search terms, and identifiers.",
         "bestPractices": [
           "Pair with FormField for labels and validation.",
-          "Use type, inputMode, and autoComplete when applicable."
+          "Use type, inputMode, and autoComplete when applicable.",
+          "Use Input.Password, Input.Search, Input.TextArea and Input.OTP for specialized input.",
+          "Use count.max for a soft limit; add exceedFormatter for custom clipping."
         ]
       }
     },
@@ -2761,7 +2776,7 @@
       "name": "textarea",
       "displayName": "Textarea",
       "category": "Data Entry",
-      "description": "Multi-line text input with optional auto sizing.",
+      "description": "Multi-line text input with auto sizing, clearing and custom character counts; also available as Input.TextArea.",
       "exports": [
         "Textarea"
       ],
@@ -2772,7 +2787,9 @@
       ],
       "semanticParts": [
         "root",
-        "textarea"
+        "textarea",
+        "clear",
+        "count"
       ],
       "keywords": [
         "textarea",

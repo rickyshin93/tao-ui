@@ -1,0 +1,254 @@
+---
+title: Collapse
+description: 折叠面板，内置标题、展开图标与内容区域；支持独立展开和手风琴。
+---
+
+import Preview from '../../_components/demo-preview';
+
+折叠面板，内置标题、展开图标与内容区域；支持独立展开和手风琴。
+
+## 何时使用
+
+用于组织设置、说明和次要详情。需要只展开一个面板时设置 `accordion`；必填信息应有明确的展开提示。
+
+## 代码演示
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="collapse-basic">
+
+### 基础面板
+
+传入 `items` 即可使用完整面板。默认允许多个面板同时展开。
+
+```tsx preview
+import { Collapse } from '@rockshin/tao-ui';
+
+export default function Example() {
+  return <Collapse defaultActiveKey={'1'} items={[
+  { key: '1', label: '项目概览', children: '集中查看项目的目标、进度与最近变更。' },
+  { key: '2', label: '团队成员', children: '管理项目中的协作者及其访问权限。' },
+  { key: '3', label: '账单信息', children: '查看下次账单与付款方式。' },
+]} />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="collapse-accordion">
+
+### 手风琴
+
+一次只展开一个面板，再次点击当前面板可收起全部内容。
+
+```tsx preview
+import { Collapse } from '@rockshin/tao-ui';
+
+export default function Example() {
+  return <Collapse accordion defaultActiveKey={'1'} items={[
+  { key: '1', label: '项目概览', children: '集中查看项目的目标、进度与最近变更。' },
+  { key: '2', label: '团队成员', children: '管理项目中的协作者及其访问权限。' },
+  { key: '3', label: '账单信息', children: '查看下次账单与付款方式。' },
+]} />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="collapse-controlled">
+
+### 受控展开
+
+使用 `activeKey` 和 `onChange` 协调展开状态，回调始终返回字符串 key 数组。
+
+```tsx preview
+import { Button, Collapse, Stack } from '@rockshin/tao-ui';
+import { useState } from 'react';
+const items = [
+  { key: '1', label: '项目概览', children: '集中查看项目的目标、进度与最近变更。' },
+  { key: '2', label: '团队成员', children: '管理项目中的协作者及其访问权限。' },
+  { key: '3', label: '账单信息', children: '查看下次账单与付款方式。' },
+];
+export default function Example() {
+  const [activeKey, setActiveKey] = useState<string[]>(['1']);
+  return <Stack>
+    <Stack direction="row" gap="sm">
+      <Button onClick={() => setActiveKey(['1', '2', '3'])}>全部展开</Button>
+      <Button onClick={() => setActiveKey([])}>全部收起</Button>
+    </Stack>
+    <Collapse items={items} activeKey={activeKey} onChange={setActiveKey} />
+    <output aria-live="polite">已展开: {activeKey.join(', ') || '—'}</output>
+  </Stack>;
+}
+```
+
+</section>
+
+<section className="tao-example" id="collapse-sizes">
+
+### 三种尺寸
+
+支持 small、medium 和 large，也继承 TaoProvider 的 size。
+
+```tsx preview
+import { Collapse, Stack } from '@rockshin/tao-ui';
+export default function Example() {
+  return <Stack gap="lg">
+    {(['small', 'medium', 'large'] as const).map((size) => <Collapse key={size} size={size} defaultActiveKey="1" items={[{ key: '1', label: size, children: '集中查看项目的目标、进度与最近变更。' }]} />)}
+  </Stack>;
+}
+```
+
+</section>
+
+<section className="tao-example" id="collapse-appearance">
+
+### 无边框与透明背景
+
+`bordered={false}` 去掉外边框；`ghost` 同时去掉背景与分隔线。
+
+```tsx preview
+import { Collapse, Stack } from '@rockshin/tao-ui';
+const items = [
+  { key: '1', label: '项目概览', children: '集中查看项目的目标、进度与最近变更。' },
+  { key: '2', label: '团队成员', children: '管理项目中的协作者及其访问权限。' },
+  { key: '3', label: '账单信息', children: '查看下次账单与付款方式。' },
+];
+export default function Example() {
+  return <Stack gap="lg">
+    <Collapse bordered={false} defaultActiveKey="1" items={items} />
+    <Collapse ghost defaultActiveKey="1" items={items} />
+  </Stack>;
+}
+```
+
+</section>
+
+<section className="tao-example" id="collapse-triggers">
+
+### 触发方式与禁用
+
+可以点击整个标题行、仅点击图标，或禁用单个面板。隐藏箭头时仍可点击标题。
+
+```tsx preview
+import { Collapse } from '@rockshin/tao-ui';
+export default function Example() {
+  return <Collapse items={[
+    { key: 'header', label: '整行点击', children: '集中查看项目的目标、进度与最近变更。' },
+    { key: 'icon', label: '仅图标点击', collapsible: 'icon', children: '管理项目中的协作者及其访问权限。' },
+    { key: 'disabled', label: '暂不可用', collapsible: 'disabled', children: '查看下次账单与付款方式。' },
+    { key: 'no-arrow', label: '不显示箭头', showArrow: false, children: '集中查看项目的目标、进度与最近变更。' },
+  ]} />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="collapse-extra">
+
+### 额外操作与右侧图标
+
+`extra` 放置独立操作，点击它不会改变面板展开状态。
+
+```tsx preview
+import { Button, Collapse, Stack } from '@rockshin/tao-ui';
+import { useState } from 'react';
+export default function Example() {
+  const [count, setCount] = useState(0);
+  return <Stack>
+    <Collapse expandIconPlacement="end" items={[{
+      key: '1', label: '项目概览', children: '集中查看项目的目标、进度与最近变更。',
+      extra: <Button size="small" onClick={() => setCount((value) => value + 1)}>编辑</Button>,
+    }]} />
+    <output aria-live="polite">编辑次数: {count}</output>
+  </Stack>;
+}
+```
+
+</section>
+
+<section className="tao-example" id="collapse-nested">
+
+### 嵌套面板与自定义图标
+
+内外层独立管理状态；自定义图标根据 isActive 显示展开状态。
+
+```tsx preview
+import { Collapse } from '@rockshin/tao-ui';
+export default function Example() {
+  return <Collapse defaultActiveKey="outer" expandIcon={({ isActive }) => (
+    <svg aria-hidden="true" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+      <path d={isActive ? 'M3 8h10' : 'M3 8h10M8 3v10'} />
+    </svg>
+  )} items={[{
+    key: 'outer', label: '工作区设置', children: <Collapse size="small" items={[
+  { key: '1', label: '项目概览', children: '集中查看项目的目标、进度与最近变更。' },
+  { key: '2', label: '团队成员', children: '管理项目中的协作者及其访问权限。' },
+  { key: '3', label: '账单信息', children: '查看下次账单与付款方式。' },
+]} />,
+  }]} />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="collapse-lifecycle">
+
+### 内容保留与销毁
+
+默认首次展开才挂载内容，收起后保留输入。`destroyOnHidden` 可在收起时销毁内容；item 的 `forceRender` 会始终保留挂载。
+
+```tsx preview
+import { Button, Collapse, Input, Stack } from '@rockshin/tao-ui';
+import { useState } from 'react';
+export default function Example() {
+  const [destroy, setDestroy] = useState(false);
+  return <Stack>
+    <Button onClick={() => setDestroy((value) => !value)}>{destroy ? '收起时销毁' : '保留输入'}</Button>
+    <Collapse defaultActiveKey="1" destroyOnHidden={destroy} items={[{ key: '1', label: '备注', children: <Input aria-label='备注' placeholder='输入后收起再打开' /> }]} />
+  </Stack>;
+}
+```
+
+</section>
+
+<section className="tao-example" id="collapse-mobile">
+
+### 手机中的折叠面板
+
+长标题自然换行，图标和操作区保持可点击。手机与桌面选择使用全局预览状态。
+
+```tsx preview="iframe-follow"
+import { Collapse } from '@rockshin/tao-ui';
+export default function Example() {
+  return <Collapse defaultActiveKey="1" items={[
+    { key: '1', label: '一个较长的面板标题，用于检查手机视口中的换行与图标对齐', children: '集中查看项目的目标、进度与最近变更。' },
+    { key: '2', label: '团队成员', children: '管理项目中的协作者及其访问权限。' },
+  ]} />;
+}
+```
+
+</section>
+
+</div>
+
+## 迁移与组合式用法
+
+从旧版本迁移时，将 `Collapsible` / `@rockshin/tao-ui/collapsible` 改为 `Collapse` / `@rockshin/tao-ui/collapse`。推荐用 `items` 替代手写标题和内容；组合式 `Collapse.Trigger` / `Collapse.Content` 仍可用于自定义单区块，配合 `open` / `onOpenChange`。面板模式使用 `activeKey` / `onChange`，两种状态接口不要混用。
+
+## API
+
+<API moduleName="collapse" />
+
+### CollapseItem
+
+| 属性 | 说明 |
+| --- | --- |
+| `key` | 唯一的 string / number key；回调统一为字符串 |
+| `label / children` | 标题与内容 |
+| `extra` | 独立的标题操作区 |
+| `collapsible` | header / icon / disabled |
+| `showArrow` | 默认 true；不能同时设置 false 与 collapsible="icon" |
+| `forceRender` | 默认 false；预先挂载并保留内容 |
+| `className / style` | 面板容器样式 |
+| `classNames / styles` | header 与 body 的语义样式；覆盖组级同名值 |

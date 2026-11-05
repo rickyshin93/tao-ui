@@ -11,6 +11,10 @@ Collects and validates field values with an antd-aligned API (rules, dependencie
 
 Use Form with Form.Item when fields need a value store, rule validation, or submit handling. Use the lighter FormField when you manage state yourself.
 
+Direct Form.Item children have a default 20px bottom spacing, controlled by `--tao-form-field-item-gap` (falling back to `--tao-padding-md`). Stack and FormSection manage spacing for items placed inside them. `noStyle` adds neither a shell nor spacing, and standalone FormField layout is unchanged.
+
+Form.Item always reserves one line below the control for feedback. Single-line errors, warnings and help text can appear or disappear without moving subsequent fields or buttons. Longer messages wrap and expand the space naturally to avoid overlapping content.
+
 **Recommended**
 
 - Declare validation as rules on Form.Item; the required mark is inferred from rules.

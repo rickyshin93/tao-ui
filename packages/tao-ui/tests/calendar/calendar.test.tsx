@@ -29,7 +29,7 @@ test('date selection reports its source and controlled state follows the parent'
   );
 });
 
-test('mode and header navigation preserve callback sources and obey the valid range', () => {
+test('mode and header navigation preserve callback sources and obey the valid range', async () => {
   const sources: string[] = [];
   const panels: string[] = [];
   render(
@@ -42,13 +42,32 @@ test('mode and header navigation preserve callback sources and obey the valid ra
       }
     />,
   );
-  fireEvent.change(screen.getByRole('combobox', { name: 'Month' }), {
-    target: { value: '9' },
-  });
+  const month = screen.getByRole('combobox', { name: 'Month' });
+  expect(month).toHaveAttribute('data-tao-select');
+  fireEvent.keyDown(month, { key: 'ArrowDown' });
+  fireEvent.click(await screen.findByRole('option', { name: 'Oct' }));
   expect(sources).toEqual(['month']);
   expect(panels).toEqual(['2026-10:month']);
+  fireEvent.keyDown(screen.getByRole('combobox', { name: 'Year' }), {
+    key: 'ArrowDown',
+  });
+  expect(await screen.findAllByRole('option')).toHaveLength(2);
+  fireEvent.click(screen.getByRole('option', { name: '2027' }));
+  expect(sources).toEqual(['month', 'year']);
+  expect(panels).toEqual(['2026-10:month', '2027-08:month']);
+  fireEvent.keyDown(screen.getByRole('combobox', { name: 'Month' }), {
+    key: 'ArrowDown',
+  });
+  expect(await screen.findAllByRole('option')).toHaveLength(8);
+  expect(screen.queryByRole('option', { name: 'Sep' })).toBeNull();
+  fireEvent.click(screen.getByRole('option', { name: 'Jul' }));
   fireEvent.click(screen.getByRole('radio', { name: 'Year' }));
-  expect(panels).toEqual(['2026-10:month', '2026-10:year']);
+  expect(panels).toEqual([
+    '2026-10:month',
+    '2027-08:month',
+    '2027-07:month',
+    '2027-07:year',
+  ]);
   expect(screen.queryByRole('combobox', { name: 'Month' })).toBeNull();
 });
 
@@ -67,9 +86,32 @@ test('disabled dates cannot select; custom cells and semantic parts render', () 
   fireEvent.click(container.querySelector('[title="2026-11-05"]')!);
   expect(values).toEqual([]);
   expect(screen.getAllByText('Deployment')[0].className).toBe('event-slot');
-  expect(container.querySelector('[data-tao-calendar-header]')).toHaveStyle({
+  expect(container.querySelector('[data-tao-calendar-toolbar]')).toHaveStyle({
     padding: '7px',
   });
+});
+
+test('Segmented mode switching supports keyboard input and controlled mode', () => {
+  const panels: string[] = [];
+  const { rerender } = render(
+    <Calendar
+      value={dayjs('2026-11-04')}
+      mode="month"
+      onPanelChange={(_, mode) => panels.push(mode)}
+    />,
+  );
+  expect(
+    screen.getByRole('radiogroup', { name: 'Calendar view' }),
+  ).toHaveAttribute('data-tao-segmented');
+  fireEvent.keyDown(screen.getByRole('radio', { name: 'Month' }), {
+    key: 'ArrowRight',
+  });
+  expect(panels).toEqual(['year']);
+  expect(screen.getByRole('radio', { name: 'Month' })).toBeChecked();
+  expect(screen.getByRole('combobox', { name: 'Month' })).toBeTruthy();
+  rerender(<Calendar value={dayjs('2026-11-04')} mode="year" />);
+  expect(screen.getByRole('radio', { name: 'Year' })).toBeChecked();
+  expect(screen.queryByRole('combobox', { name: 'Month' })).toBeNull();
 });
 
 test('custom header sends customize events, ref exposes root, and full rendering replaces content', () => {

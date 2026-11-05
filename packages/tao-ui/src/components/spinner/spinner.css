@@ -59,7 +59,7 @@
 }
 
 [data-tao-spinner-container][data-tao-spinning] [data-tao-spinner-content] {
-  opacity: 0.5;
+  opacity: 0.15;
   pointer-events: none;
   user-select: none;
 }

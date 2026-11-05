@@ -1,0 +1,196 @@
+/* ===========================
+   Collapse
+   Inline expand/collapse panel (radix-collapsible wrapper).
+   No height animation by design — only opacity/transform allowed.
+   =========================== */
+
+[data-tao-collapse] {
+  font-family: var(--tao-font-family);
+  color: var(--tao-color-text);
+}
+
+/* Trigger — a clickable row. Reset native button defaults. */
+[data-tao-collapse-trigger] {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--tao-padding-xs);
+  appearance: none;
+  -webkit-appearance: none;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  border: none;
+  font: inherit;
+  color: inherit;
+  text-align: start;
+  cursor: pointer;
+  outline: none;
+  border-radius: var(--tao-radius-sm);
+  transition: color var(--tao-motion-duration-fast) var(--tao-motion-ease-out);
+}
+
+[data-tao-collapse-trigger]:focus-visible {
+  outline: var(--tao-line-width-focus, 2px) solid var(--tao-color-primary);
+  outline-offset: 2px;
+}
+
+[data-tao-collapse-trigger][data-disabled] {
+  color: var(--tao-color-text-disabled);
+  cursor: not-allowed;
+}
+
+/* Optional chevron inside a trigger: rotates on open. */
+[data-tao-collapse-chevron] {
+  display: inline-flex;
+  align-items: center;
+  color: var(--tao-color-text-tertiary);
+  transition: transform var(--tao-motion-duration-fast)
+    var(--tao-motion-ease-out);
+}
+
+[data-tao-collapse-trigger][data-state="open"] [data-tao-collapse-chevron] {
+  transform: rotate(180deg);
+}
+
+/* Content — base typography. */
+[data-tao-collapse-content] {
+  color: var(--tao-color-text-secondary);
+}
+
+/* Item-based panels: ready-to-use headers and bodies. */
+[data-tao-collapse-panels] {
+  --tao-collapse-header-block: var(--tao-padding-sm);
+  --tao-collapse-header-inline: var(--tao-padding);
+  --tao-collapse-body-padding: var(--tao-padding);
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+  border: 1px solid var(--tao-color-border);
+  border-radius: var(--tao-radius);
+  background: var(--tao-color-fill-quaternary);
+  font: var(--tao-font-size) / var(--tao-line-height) var(--tao-font-family);
+}
+[data-tao-collapse-panels][data-tao-size="small"] {
+  --tao-collapse-header-block: var(--tao-padding-xs);
+  --tao-collapse-header-inline: var(--tao-padding-sm);
+  --tao-collapse-body-padding: var(--tao-padding-sm);
+}
+[data-tao-collapse-panels][data-tao-size="large"] {
+  --tao-collapse-header-block: var(--tao-padding);
+  --tao-collapse-header-inline: var(--tao-padding-lg);
+  --tao-collapse-body-padding: var(--tao-padding-lg);
+  font-size: var(--tao-font-size-lg);
+}
+[data-tao-collapse-item] + [data-tao-collapse-item] {
+  border-top: 1px solid var(--tao-color-border);
+}
+[data-tao-collapse-header] {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+[data-tao-collapse-panel-trigger] {
+  display: flex;
+  flex: 1;
+  align-self: stretch;
+  min-width: 0;
+  gap: var(--tao-padding-sm);
+  padding: var(--tao-collapse-header-block) var(--tao-collapse-header-inline);
+  border-radius: 0;
+  line-height: inherit;
+  transition: background-color var(--tao-motion-duration-fast)
+    var(--tao-motion-ease-out);
+}
+[data-tao-collapse-panel-trigger]:not(:disabled):hover {
+  background: var(--tao-color-fill-quaternary);
+}
+[data-tao-collapse-panel-trigger]:focus-visible {
+  outline-offset: -3px;
+}
+[data-tao-collapse-title] {
+  flex: 1;
+  min-width: 0;
+  text-align: start;
+  overflow-wrap: anywhere;
+}
+[data-tao-collapse-icon] {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+}
+[data-tao-collapse-arrow] {
+  transition: transform var(--tao-motion-duration-fast)
+    var(--tao-motion-ease-out);
+}
+[data-tao-collapse-panel-trigger][data-state="open"] [data-tao-collapse-arrow] {
+  transform: rotate(90deg);
+}
+[data-tao-collapse-header][data-tao-icon-placement="end"]
+  > [data-tao-collapse-panel-trigger]
+  > [data-tao-collapse-icon] {
+  order: 1;
+}
+[data-tao-collapse-extra] {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  padding-inline-end: var(--tao-collapse-header-inline);
+}
+[data-tao-collapse-header][data-tao-trigger-mode="icon"]
+  > [data-tao-collapse-panel-trigger] {
+  flex: none;
+  padding-inline-end: var(--tao-padding-sm);
+}
+[data-tao-collapse-header][data-tao-trigger-mode="icon"]
+  > [data-tao-collapse-title] {
+  padding-block: var(--tao-collapse-header-block);
+  padding-inline-end: var(--tao-collapse-header-inline);
+}
+[data-tao-collapse-header][data-tao-trigger-mode="icon"][data-tao-icon-placement="end"]
+  > [data-tao-collapse-panel-trigger] {
+  order: 2;
+  padding-inline: var(--tao-padding-sm) var(--tao-collapse-header-inline);
+}
+[data-tao-collapse-header][data-tao-trigger-mode="icon"][data-tao-icon-placement="end"]
+  > [data-tao-collapse-title] {
+  padding-inline: var(--tao-collapse-header-inline) var(--tao-padding-sm);
+}
+[data-tao-collapse-panel-content] {
+  border-top: 1px solid var(--tao-color-border-secondary);
+  background: var(--tao-color-bg-container);
+  color: var(--tao-color-text);
+}
+[data-tao-collapse-panel-content][hidden] {
+  display: none;
+}
+[data-tao-collapse-body] {
+  padding: var(--tao-collapse-body-padding);
+  overflow-wrap: anywhere;
+}
+[data-tao-collapse-panels][data-tao-bordered="false"],
+[data-tao-collapse-panels][data-tao-ghost] {
+  border: 0;
+}
+[data-tao-collapse-panels][data-tao-bordered="false"]
+  > [data-tao-collapse-item]
+  > [data-tao-collapse-panel-content] {
+  border-top: 0;
+  background: transparent;
+}
+[data-tao-collapse-panels][data-tao-ghost] {
+  background: transparent;
+}
+[data-tao-collapse-panels][data-tao-ghost] > [data-tao-collapse-item],
+[data-tao-collapse-panels][data-tao-ghost]
+  > [data-tao-collapse-item]
+  > [data-tao-collapse-panel-content] {
+  border: 0;
+  background: transparent;
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-tao-collapse-arrow] {
+    transition: none;
+  }
+}

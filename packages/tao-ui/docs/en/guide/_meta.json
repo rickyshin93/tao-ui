@@ -3,5 +3,10 @@
     "type": "file",
     "name": "getting-started",
     "label": "Getting Started"
+  },
+  {
+    "type": "file",
+    "name": "agents",
+    "label": "AI agents"
   }
 ]

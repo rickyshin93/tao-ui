@@ -1,11 +1,11 @@
 ---
 title: Input
-description: 输入单行文本，并支持前后缀、状态、尺寸与视觉变体。页面涵盖适用场景、设计建议、多组可运行示例、交互状态与完整 API 参考。
+description: Input 输入家族支持清空、计数、密码显隐、搜索、多行输入和验证码，提供双语示例、键盘交互与完整 API 说明。
 ---
 
 import Preview from '../../_components/demo-preview';
 
-输入单行文本，并支持前后缀、状态、尺寸与视觉变体。
+输入家族包含 Input、Input.Password、Input.Search、Input.TextArea 和 Input.OTP。
 
 ## 何时使用
 
@@ -60,6 +60,7 @@ function InputVariants() {
       <Input variant="outlined" placeholder="Outlined" />
       <Input variant="filled" placeholder="Filled" />
       <Input variant="borderless" placeholder="Borderless" />
+      <Input variant="underlined" placeholder="Underlined" />
     </Stack>
   );
 }
@@ -122,26 +123,20 @@ export default function Example() {
 
 <section className="tao-example" id="input-controlled">
 
-### 受控值与清空
+### 清空与计数
 
-通过 value 和 onChange 与外部状态同步，重置按钮更新同一状态。
+清空会触发 onChange 与 onClear，受控值由业务状态决定。
 
 ```tsx preview
 import { useState } from 'react';
-import { Input, Button, Stack } from '@rockshin/tao-ui';
+import { Input, Stack } from '@rockshin/tao-ui';
 export default function Example() {
   const [value, setValue] = useState('tao-ui');
-  return (
-    <Stack direction="vertical">
-      <Input
-        aria-label="Project name"
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
-      />
-      <Button onClick={() => setValue('')}>Clear</Button>
-      <output>{value || 'Empty'}</output>
-    </Stack>
-  );
+  return <Stack direction="vertical">
+    <Input aria-label="Project name" value={value} onChange={(e) => setValue(e.target.value)} allowClear showCount maxLength={24} />
+    <Input aria-label="Read-only name" value="Read-only" readOnly allowClear />
+    <output>{value || 'Empty'}</output>
+  </Stack>;
 }
 ```
 
@@ -180,28 +175,20 @@ export default function Example() {
 
 <section className="tao-example" id="input-password">
 
-### 显示密码
+### 密码输入框
 
-切换原生 type，按钮提供明确名称并避免提交表单。
+内置显示/隐藏按钮支持键盘、禁用态与受控 visibilityToggle。
 
 ```tsx preview
 import { useState } from 'react';
 import { Input, Button, Stack } from '@rockshin/tao-ui';
 export default function Example() {
   const [visible, setVisible] = useState(false);
-  return (
-    <Stack direction="vertical">
-      <Input
-        aria-label="Password"
-        type={visible ? 'text' : 'password'}
-        defaultValue="example-password"
-        autoComplete="new-password"
-      />
-      <Button aria-pressed={visible} onClick={() => setVisible(!visible)}>
-        {visible ? 'Hide password' : 'Show password'}
-      </Button>
-    </Stack>
-  );
+  return <Stack direction="vertical">
+    <Input.Password aria-label="Password" defaultValue="example-password" autoComplete="new-password" allowClear />
+    <Input.Password aria-label="Controlled password" defaultValue="controlled" visibilityToggle={{ visible, onVisibleChange: setVisible }} />
+    <Button onClick={() => setVisible(!visible)}>{visible ? 'Hide' : 'Show'}</Button>
+  </Stack>;
 }
 ```
 
@@ -209,37 +196,20 @@ export default function Example() {
 
 <section className="tao-example" id="input-search-submit">
 
-### 回车搜索
+### 搜索输入框
 
-通过原生表单处理回车和按钮提交，结果在页面内显示。
+按钮、回车与清空触发 onSearch；source 区分 input / clear。中文输入法确认时不搜索，loading 期间不重复触发。
 
 ```tsx preview
 import { useState } from 'react';
-import { Input, Button, Stack } from '@rockshin/tao-ui';
+import { Input, Stack } from '@rockshin/tao-ui';
 export default function Example() {
-  const [query, setQuery] = useState('');
-  return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        setQuery(String(new FormData(e.currentTarget).get('query')));
-      }}
-    >
-      <Stack direction="vertical">
-        <Input
-          name="query"
-          type="search"
-          aria-label="Search components"
-          placeholder="Search components"
-          required
-        />
-        <Button type="submit">Search</Button>
-        <output aria-live="polite">
-          {query ? `Searching for: ${query}` : 'Enter a component name'}
-        </output>
-      </Stack>
-    </form>
-  );
+  const [result, setResult] = useState('No search yet');
+  return <Stack direction="vertical">
+    <Input.Search aria-label="Search components" placeholder="Search components" allowClear enterButton="Search" onSearch={(value, _, info) => setResult(`${info?.source}: ${value || '(empty)'}`)} />
+    <Input.Search aria-label="Loading search" value="Loading" loading readOnly />
+    <output aria-live="polite">{result}</output>
+  </Stack>;
 }
 ```
 
@@ -282,32 +252,90 @@ export default function Example() {
 
 <section className="tao-example" id="input-focus-ref">
 
-### 命令式聚焦
+### 光标定位
 
-ref 指向原生输入框，可在完成其他操作后恢复焦点。
+ref 继续指向原生输入框，InputRef 另外声明 input、nativeElement 与扩展 focus 选项。
 
 ```tsx preview
 import { useRef } from 'react';
-import { Input, Button, Stack } from '@rockshin/tao-ui';
+import { Input, type InputRef, Button, Stack } from '@rockshin/tao-ui';
 export default function Example() {
-  const ref = useRef<HTMLInputElement>(null);
-  return (
-    <Stack direction="vertical">
-      <Input
-        ref={ref}
-        aria-label="Focus target"
-        defaultValue="Select this text"
-      />
-      <Button
-        onClick={() => {
-          ref.current?.focus();
-          ref.current?.select();
-        }}
-      >
-        Focus and select
-      </Button>
+  const ref = useRef<InputRef>(null);
+  return <Stack direction="vertical">
+    <Input ref={ref} aria-label="Focus target" defaultValue="Select this text" />
+    <Stack wrap>
+      {(['start', 'end', 'all'] as const).map((cursor) => <Button key={cursor} onClick={() => ref.current?.focus({ cursor, preventScroll: true })}>{cursor}</Button>)}
     </Stack>
-  );
+  </Stack>;
+}
+```
+
+</section>
+
+<section className="tao-example" id="input-advanced-count">
+
+### 自定义计数
+
+count.max 默认只标记超限；通过 strategy 与 exceedFormatter 按 Unicode 码点计数和截断。原生 maxLength 按 UTF-16 计数，两者分别配置。
+
+```tsx preview
+import { Input, Stack } from '@rockshin/tao-ui';
+export default function Example() {
+  return <Stack direction="vertical">
+    <Input aria-label="Soft limit" defaultValue="More than five" count={{ max: 5, show: true }} />
+    <Input aria-label="Emoji counter" defaultValue="😊😊" count={{ max: 5, show: true, strategy: (value) => Array.from(value).length, exceedFormatter: (value, { max }) => Array.from(value).slice(0, max).join('') }} />
+  </Stack>;
+}
+```
+
+</section>
+
+<section className="tao-example" id="input-textarea">
+
+### 多行输入
+
+Input.TextArea 与独立 Textarea 是同一组件，支持自动高度、清空、计数和回车事件。
+
+```tsx preview
+import { Input } from '@rockshin/tao-ui';
+export default function Example() {
+  return <Input.TextArea aria-label="Description" placeholder="Write a description" autoSize={{ minRows: 2, maxRows: 5 }} allowClear showCount maxLength={120} />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="input-otp">
+
+### 验证码
+
+输入自动前进，支持整串粘贴、左右方向键、退格、格式化与掩码。onInput 返回包含空位的数组，onChange 仅在填满时触发。
+
+```tsx preview
+import { useState } from 'react';
+import { Input, Stack } from '@rockshin/tao-ui';
+export default function Example() {
+  const [complete, setComplete] = useState('');
+  return <Stack direction="vertical">
+    <Input.OTP aria-label="Verification code" length={6} autoComplete="one-time-code" formatter={(value) => value.toUpperCase()} separator={(index) => index === 2 ? '-' : null} onChange={setComplete} />
+    <Input.OTP aria-label="Masked code" length={4} mask defaultValue="1234" />
+    <output aria-live="polite">{complete || 'Enter all characters'}</output>
+  </Stack>;
+}
+```
+
+</section>
+
+<section className="tao-example" id="input-addons">
+
+### 前后附加内容
+
+addonBefore / addonAfter 显示附加标签；prefix / suffix 位于输入区域内。
+
+```tsx preview
+import { Input } from '@rockshin/tao-ui';
+export default function Example() {
+  return <Input aria-label="Website address" addonBefore="https://" addonAfter=".com" defaultValue="example" allowClear />;
 }
 ```
 
@@ -317,4 +345,69 @@ export default function Example() {
 
 ## API
 
-<API moduleName="input" />
+### Input / Input.TextArea
+
+其余属性透传到原生 input / textarea。`Input.TextArea` 不支持 prefix、suffix 或 addon；独立 `Textarea` 用法保持兼容。
+
+| Prop | Type | Default |
+| --- | --- | --- |
+| value / defaultValue | Native input value / textarea value | — |
+| onChange | `(event) => void` | — |
+| allowClear | `boolean` or `{ clearIcon?, disabled?, tabIndex? }` | `false` |
+| onClear | `() => void` | — |
+| showCount | `boolean` or `{ formatter: ({ value, count, maxLength }) => ReactNode }` | `false` |
+| count | `{ max?, strategy?: (value) => number, show?: boolean or formatter, exceedFormatter?: (value, { max }) => string }` | — |
+| onPressEnter | `(event: KeyboardEvent) => void` | — |
+| size | `'small'`, `'medium'`, `'large'` | TaoProvider |
+| variant | `'outlined'`, `'filled'`, `'borderless'`, `'underlined'` | TaoProvider |
+| status / error | `'error'` or `'warning'` / `boolean` | — |
+| disabled / readOnly | `boolean` | TaoProvider / `false` |
+| prefix / suffix | `ReactNode` (Input only) | — |
+| addonBefore / addonAfter | `ReactNode` (Input only) | — |
+| autoSize | `boolean` or `{ minRows?, maxRows? }` (TextArea only) | `false` |
+| classNames / styles | Semantic part map or `({ props }) => map` | — |
+
+计数超限不会自动截断；设置 `count.exceedFormatter` 才截断，中文输入法组合结束后执行。`count.show` 优先于 `showCount`。Input Semantic DOM：`root / input / prefix / suffix / clear / count / addonBefore / addonAfter`；TextArea：`root / textarea / clear / count`。
+
+### Input.Password
+
+继承 Input 属性。
+
+| Prop | Type | Default |
+| --- | --- | --- |
+| visibilityToggle | `boolean` or `{ visible?, onVisibleChange?, tabIndex? }` | `true` |
+| iconRender | `(visible: boolean) => ReactNode` | Eye icon |
+
+### Input.Search
+
+继承 Input 属性。搜索按钮默认不提交外层表单；onSearch 的 source 为 input 或 clear。
+
+| Prop | Type | Default |
+| --- | --- | --- |
+| enterButton | `ReactNode` (boolean, label, native button or Button) | `false` |
+| searchIcon | `ReactNode` | Search icon |
+| loading | `boolean` | `false` |
+| onSearch | `(value, event?, info?: { source: 'input' or 'clear' }) => void` | — |
+| classNames / styles | Input parts plus `button` | — |
+
+### Input.OTP
+
+| Prop | Type | Default |
+| --- | --- | --- |
+| length | Positive integer | `6` |
+| value / defaultValue | `string` | — |
+| formatter | `(value: string) => string` | — |
+| onInput | `(value: string[]) => void` | — |
+| onChange | `(value: string) => void` (complete values) | — |
+| mask | `boolean` or `string` | `false` |
+| separator | `ReactNode` or `(index: number) => ReactNode` | — |
+| type / inputMode / autoComplete | Native input attributes | `text` / — / — |
+| autoFocus / disabled | `boolean` | `false` / TaoProvider |
+| size / variant / status | Same as Input | TaoProvider / TaoProvider / — |
+| classNames / styles | `root / input / separator` map or `({ props }) => map` | — |
+
+### Ref
+
+Input、Password、Search 的 ref 保留原生 HTMLInputElement，TextArea 保留 HTMLTextAreaElement。使用导出的 `InputRef` / `TextAreaRef` 类型可访问 `focus({ preventScroll, cursor: 'start' | 'end' | 'all' })`、`blur()`、`nativeElement` 及 `input` / `textArea`。不支持选区的原生输入类型仅聚焦。OTP 使用 `OTPRef`：`focus()`、`blur()`、`nativeElement`。
+
+API 参考本地 Ant Design 6.7.0，保留 tao-ui 的原生 ref、主题与 Semantic DOM 契约；不承诺直接替换 antd。`bordered`、`prefixCls`、antd 全局组件配置不在支持范围。`underlined` 当前通过 Input 家族的本地 variant 设置。

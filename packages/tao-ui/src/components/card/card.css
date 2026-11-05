@@ -93,7 +93,7 @@
     border-inline-start: var(--tao-line-width) solid
       var(--tao-color-border-secondary);
   }
-  [data-tao-card-actions] button {
+  [data-tao-card-actions] > li > button:not([data-tao-button]) {
     font: inherit;
   }
   [data-tao-card][data-tao-has-grid] > [data-tao-card-body] {

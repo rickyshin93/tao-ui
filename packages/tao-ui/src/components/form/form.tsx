@@ -57,6 +57,7 @@ function FormInner<Values = Record<string, unknown>>(
           Form.Items pick them up without per-item plumbing. */}
       <TaoProvider size={size} disabled={disabled}>
         <RcFormComponent<Values>
+          data-tao-form=""
           ref={ref}
           className={cx(classNames?.root, className)}
           style={{ ...styles?.root, ...style }}

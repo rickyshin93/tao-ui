@@ -1,0 +1,254 @@
+---
+title: Collapse
+description: Item-based panels with built-in headers, expand icons and content regions; supports independent panels and accordions.
+---
+
+import Preview from '../../_components/demo-preview';
+
+Item-based panels with built-in headers, expand icons and content regions; supports independent panels and accordions.
+
+## When to use
+
+Group settings, explanations and secondary details. Use `accordion` to keep one panel open at a time. Make required information easy to discover.
+
+## Examples
+
+<div className="tao-demo-grid">
+
+<section className="tao-example" id="collapse-basic">
+
+### Basic panels
+
+Pass `items` for complete panels. Multiple panels can be expanded by default.
+
+```tsx preview
+import { Collapse } from '@rockshin/tao-ui';
+
+export default function Example() {
+  return <Collapse defaultActiveKey={'1'} items={[
+  { key: '1', label: 'Project overview', children: 'Keep project goals, progress and recent changes together.' },
+  { key: '2', label: 'Team members', children: 'Manage collaborators and their access to this project.' },
+  { key: '3', label: 'Billing details', children: 'Review your next invoice and payment method.' },
+]} />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="collapse-accordion">
+
+### Accordion
+
+Open one panel at a time. Clicking the active panel again closes it.
+
+```tsx preview
+import { Collapse } from '@rockshin/tao-ui';
+
+export default function Example() {
+  return <Collapse accordion defaultActiveKey={'1'} items={[
+  { key: '1', label: 'Project overview', children: 'Keep project goals, progress and recent changes together.' },
+  { key: '2', label: 'Team members', children: 'Manage collaborators and their access to this project.' },
+  { key: '3', label: 'Billing details', children: 'Review your next invoice and payment method.' },
+]} />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="collapse-controlled">
+
+### Controlled expansion
+
+Coordinate expansion through `activeKey` and `onChange`. Callbacks always receive an array of string keys.
+
+```tsx preview
+import { Button, Collapse, Stack } from '@rockshin/tao-ui';
+import { useState } from 'react';
+const items = [
+  { key: '1', label: 'Project overview', children: 'Keep project goals, progress and recent changes together.' },
+  { key: '2', label: 'Team members', children: 'Manage collaborators and their access to this project.' },
+  { key: '3', label: 'Billing details', children: 'Review your next invoice and payment method.' },
+];
+export default function Example() {
+  const [activeKey, setActiveKey] = useState<string[]>(['1']);
+  return <Stack>
+    <Stack direction="row" gap="sm">
+      <Button onClick={() => setActiveKey(['1', '2', '3'])}>Expand all</Button>
+      <Button onClick={() => setActiveKey([])}>Collapse all</Button>
+    </Stack>
+    <Collapse items={items} activeKey={activeKey} onChange={setActiveKey} />
+    <output aria-live="polite">Expanded: {activeKey.join(', ') || '—'}</output>
+  </Stack>;
+}
+```
+
+</section>
+
+<section className="tao-example" id="collapse-sizes">
+
+### Three sizes
+
+Choose small, medium or large; size also inherits from TaoProvider.
+
+```tsx preview
+import { Collapse, Stack } from '@rockshin/tao-ui';
+export default function Example() {
+  return <Stack gap="lg">
+    {(['small', 'medium', 'large'] as const).map((size) => <Collapse key={size} size={size} defaultActiveKey="1" items={[{ key: '1', label: size, children: 'Keep project goals, progress and recent changes together.' }]} />)}
+  </Stack>;
+}
+```
+
+</section>
+
+<section className="tao-example" id="collapse-appearance">
+
+### Borderless and ghost
+
+`bordered={false}` removes the outer border; `ghost` also removes the background and separators.
+
+```tsx preview
+import { Collapse, Stack } from '@rockshin/tao-ui';
+const items = [
+  { key: '1', label: 'Project overview', children: 'Keep project goals, progress and recent changes together.' },
+  { key: '2', label: 'Team members', children: 'Manage collaborators and their access to this project.' },
+  { key: '3', label: 'Billing details', children: 'Review your next invoice and payment method.' },
+];
+export default function Example() {
+  return <Stack gap="lg">
+    <Collapse bordered={false} defaultActiveKey="1" items={items} />
+    <Collapse ghost defaultActiveKey="1" items={items} />
+  </Stack>;
+}
+```
+
+</section>
+
+<section className="tao-example" id="collapse-triggers">
+
+### Trigger modes and disabled panels
+
+Toggle with the whole header, only the icon, or disable a panel. Arrow-free headers remain clickable.
+
+```tsx preview
+import { Collapse } from '@rockshin/tao-ui';
+export default function Example() {
+  return <Collapse items={[
+    { key: 'header', label: 'Whole header', children: 'Keep project goals, progress and recent changes together.' },
+    { key: 'icon', label: 'Icon only', collapsible: 'icon', children: 'Manage collaborators and their access to this project.' },
+    { key: 'disabled', label: 'Unavailable', collapsible: 'disabled', children: 'Review your next invoice and payment method.' },
+    { key: 'no-arrow', label: 'No arrow', showArrow: false, children: 'Keep project goals, progress and recent changes together.' },
+  ]} />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="collapse-extra">
+
+### Extra actions and end icon
+
+Put independent actions in `extra`. Clicking them does not toggle the panel.
+
+```tsx preview
+import { Button, Collapse, Stack } from '@rockshin/tao-ui';
+import { useState } from 'react';
+export default function Example() {
+  const [count, setCount] = useState(0);
+  return <Stack>
+    <Collapse expandIconPlacement="end" items={[{
+      key: '1', label: 'Project overview', children: 'Keep project goals, progress and recent changes together.',
+      extra: <Button size="small" onClick={() => setCount((value) => value + 1)}>Edit</Button>,
+    }]} />
+    <output aria-live="polite">Edit count: {count}</output>
+  </Stack>;
+}
+```
+
+</section>
+
+<section className="tao-example" id="collapse-nested">
+
+### Nested panels and custom icons
+
+Nested groups keep independent state. Custom icons receive isActive.
+
+```tsx preview
+import { Collapse } from '@rockshin/tao-ui';
+export default function Example() {
+  return <Collapse defaultActiveKey="outer" expandIcon={({ isActive }) => (
+    <svg aria-hidden="true" viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+      <path d={isActive ? 'M3 8h10' : 'M3 8h10M8 3v10'} />
+    </svg>
+  )} items={[{
+    key: 'outer', label: 'Workspace settings', children: <Collapse size="small" items={[
+  { key: '1', label: 'Project overview', children: 'Keep project goals, progress and recent changes together.' },
+  { key: '2', label: 'Team members', children: 'Manage collaborators and their access to this project.' },
+  { key: '3', label: 'Billing details', children: 'Review your next invoice and payment method.' },
+]} />,
+  }]} />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="collapse-lifecycle">
+
+### Retain or destroy content
+
+Bodies mount on first expansion and retain inputs when closed. `destroyOnHidden` unmounts closed bodies; an item with `forceRender` stays mounted.
+
+```tsx preview
+import { Button, Collapse, Input, Stack } from '@rockshin/tao-ui';
+import { useState } from 'react';
+export default function Example() {
+  const [destroy, setDestroy] = useState(false);
+  return <Stack>
+    <Button onClick={() => setDestroy((value) => !value)}>{destroy ? 'Destroy on close' : 'Keep input'}</Button>
+    <Collapse defaultActiveKey="1" destroyOnHidden={destroy} items={[{ key: '1', label: 'Notes', children: <Input aria-label='Notes' placeholder='Type, close, then reopen' /> }]} />
+  </Stack>;
+}
+```
+
+</section>
+
+<section className="tao-example" id="collapse-mobile">
+
+### Panels on a phone
+
+Long titles wrap while icons and extra actions stay usable. Phone and desktop selection follows the shared preview state.
+
+```tsx preview="iframe-follow"
+import { Collapse } from '@rockshin/tao-ui';
+export default function Example() {
+  return <Collapse defaultActiveKey="1" items={[
+    { key: '1', label: 'A longer panel title to check wrapping and icon alignment in a phone viewport', children: 'Keep project goals, progress and recent changes together.' },
+    { key: '2', label: 'Team members', children: 'Manage collaborators and their access to this project.' },
+  ]} />;
+}
+```
+
+</section>
+
+</div>
+
+## Migration and composition
+
+Rename `Collapsible` / `@rockshin/tao-ui/collapsible` to `Collapse` / `@rockshin/tao-ui/collapse`. Prefer `items` over hand-built headers and bodies. `Collapse.Trigger` / `Collapse.Content` remain available for custom single disclosures with `open` / `onOpenChange`; item panels use `activeKey` / `onChange`. Do not mix the two state APIs.
+
+## API
+
+<API moduleName="collapse" />
+
+### CollapseItem
+
+| Property | Description |
+| --- | --- |
+| `key` | Unique string / number key; callbacks normalize it to a string |
+| `label / children` | Header label and panel body |
+| `extra` | Independent header actions |
+| `collapsible` | header / icon / disabled |
+| `showArrow` | Defaults to true; false cannot be combined with collapsible="icon" |
+| `forceRender` | Defaults to false; mount early and keep the body mounted |
+| `className / style` | Item container styling |
+| `classNames / styles` | Semantic header/body styles; item styles override group values |

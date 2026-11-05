@@ -1,6 +1,6 @@
 ---
 title: Textarea
-description: 输入多行文本，并支持状态、尺寸、变体与自动高度。页面涵盖适用场景、设计建议、多组可运行示例、交互状态与完整 API 参考。
+description: 多行输入框支持自动高度、清空、自定义计数与回车事件，并兼容 Input.TextArea 用法。
 ---
 
 import Preview from '../../_components/demo-preview';
@@ -239,6 +239,10 @@ export default function Example() {
 </section>
 
 </div>
+
+## 清空与计数
+
+`Textarea` 与 `Input.TextArea` 是同一组件，支持 `allowClear`、`onClear`、`showCount`、`count`、`onPressEnter` 和 `variant="underlined"`。[查看完整输入家族示例与 API](./input)。
 
 ## API
 

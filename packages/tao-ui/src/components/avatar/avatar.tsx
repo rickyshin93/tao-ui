@@ -162,7 +162,7 @@ const AvatarRoot = forwardRef<HTMLSpanElement, AvatarProps>((props, ref) => {
             : dimensions
           : undefined
       }
-      data-tao-image={hasImage || undefined}
+      data-tao-avatar-image={hasImage || undefined}
       data-tao-icon={hasIcon || undefined}
       className={cx(prefixCls, classNames?.root, className, rootClassName)}
       style={{ ...dimensionsStyle, ...styles?.root, ...style }}

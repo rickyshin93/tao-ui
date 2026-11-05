@@ -38,6 +38,7 @@
     --tao-color-error: oklch(0.57 0.19 25);
     --tao-color-bg-base: oklch(0.985 0.004 70);
     --tao-color-text-base: oklch(0.155 0.01 70);
+    --tao-border-text-weight: 12%;
 
     /* Surface seed — bg-container/elevated 的基准。亮色默认纯白（popover 融入白底
        宿主）；dark scope 覆盖此 seed 为深灰。必须独立成 seed：派生规则会在嵌套
@@ -232,10 +233,10 @@
     /* ===========================
        DERIVED: Border (2 levels)
        =========================== */
-    /* shadcn 边框比 antd 更浅（12% vs 原 18%），配合更粗的 focus ring 依旧清晰 */
+    /* 权重由明暗 seed 决定；嵌套 provider 用当前 seed 重算，分隔线独立保持弱层级。 */
     --tao-color-border: color-mix(
       in oklch,
-      var(--tao-color-text-base) 12%,
+      var(--tao-color-text-base) var(--tao-border-text-weight),
       var(--tao-color-bg-base)
     );
     /* 半透明而非不透明 mix：叠在任何底色上都不产生色阶断层；
@@ -459,7 +460,7 @@
        - primary hover/active：浅色主色在暗背景上需要反向操作
          （hover 向 white mix = 更亮，active 回收向 bg-base mix）
        - error outline：alpha 提高以在暗底保持可见
-       - fill/border 梯度：text-base 已翻转为浅色，mix 公式不变自动生效
+       - border 权重：提高控件轮廓对比度；fill/secondary 分隔线保持原梯度
 
      启用方式（等价于 DESIGN.md 的 algorithm: 'dark'）：
        <TaoProvider theme={{ mode: 'dark' }}>          // React 推荐
@@ -470,6 +471,7 @@
     --tao-color-bg-base: oklch(0.165 0.005 70);
     --tao-color-text-base: oklch(0.922 0.005 70);
     --tao-color-bg-surface: oklch(0.21 0.005 70);
+    --tao-border-text-weight: 36%;
     /* 近黑主色在暗底上不可见 → 翻成近白（shadcn dark 同款反转）；
        primary-fg 仍引用 bg-base，自动变成深色文字压浅按钮 */
     --tao-color-primary: oklch(0.922 0.005 70);

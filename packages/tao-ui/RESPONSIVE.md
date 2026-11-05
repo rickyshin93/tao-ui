@@ -12,6 +12,10 @@
 
 ## Layout and touch
 
+Select, DatePicker and RangePicker share mobile drawer title resolution: `mobileTitle` → nearest `Form.Item`/`FormField` label → localized component text. Labels flow through wrappers and update with the field; generated required marks and help text are excluded. `mobileTitle` accepts React content and also works without a form. Placeholders remain input hints and no longer name drawers. Fields built with native labels should pass `mobileTitle` explicitly. Desktop popup behavior is unchanged.
+
+Select, TreeSelect, Cascader, AutoComplete, DatePicker, RangePicker, TimePicker (including TimePicker.RangePicker) and Mentions reveal their field clear action on hover for fine pointers. Keyboard focus on the clear action also reveals it; touch devices without hover keep it visible. Individual tag removal actions remain visible.
+
 RangePicker constrains its two-panel surface to the viewport. Pagination wraps its controls when space is limited. Multi-select triggers grow with their tags unless responsive folding is enabled.
 
 On a coarse primary pointer, Button, form controls, Checkbox/Radio labels, pagination and Select clear/tag actions target 44px. Switch retains its compact visual track and reserves space for a 44px hit area. Fine-pointer sizes and compact density remain unchanged. This rule covers these basic controls, not every dense calendar/table cell or arbitrary custom renderer.

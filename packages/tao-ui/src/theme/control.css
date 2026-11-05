@@ -41,15 +41,15 @@
   border: var(--tao-line-width) solid var(--tao-color-border);
 }
 
-/* Outlined: hover — shadcn 风格保持边框不动，只有 focus 才响应 */
+/* Outlined: hover — 比静止边框增强 8 个百分点；focus 使用主题色。 */
 [data-tao-control][data-tao-variant="outlined"]:hover:not([data-disabled]):not(
-  :focus-within
-):not([data-state="open"]) {
+  :has(input:disabled)
+):not(:focus-within):not([data-state="open"]) {
   border-color: var(
     --tao-input-hover-border-color,
     color-mix(
       in oklch,
-      var(--tao-color-text-base) 20%,
+      var(--tao-color-text-base) calc(var(--tao-border-text-weight) + 8%),
       var(--tao-color-bg-base)
     )
   );

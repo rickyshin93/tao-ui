@@ -1,6 +1,8 @@
 import { type ReactNode, useCallback, useMemo, useRef } from 'react';
 import { useTaoConfig } from '../../provider/tao-provider';
+import { Button } from '../button/button';
 import { Drawer } from '../drawer/drawer';
+import { useMobileTitle } from '../../utils/field-label';
 import { SearchIcon } from './select-icons';
 import {
   countLeafOptions,
@@ -296,14 +298,14 @@ function MobileSelectContentInner({
       </div>
       {multiple && (
         <div data-tao-sheet-footer="">
-          <button
-            type="button"
+          <Button
+            size="large"
             data-tao-sheet-done=""
             disabled={disabled || (maxCount != null && draft.length > maxCount)}
             onClick={handleDone}
           >
             {locale.done}
-          </button>
+          </Button>
         </div>
       )}
     </>
@@ -314,10 +316,12 @@ export { MobileSelectContentInner as MobileSelectContent };
 
 export interface MobileSelectDrawerProps extends MobileSelectContentProps {
   open: boolean;
+  mobileTitle?: ReactNode;
 }
 
 export function MobileSelectDrawer({
   open,
+  mobileTitle,
   onClose,
   placeholder,
   classNames,
@@ -326,6 +330,7 @@ export function MobileSelectDrawer({
   ...rest
 }: MobileSelectDrawerProps) {
   const { locale } = useTaoConfig();
+  const title = useMobileTitle(mobileTitle, locale.select);
   const content = (
     <MobileSelectContentInner
       onClose={onClose}
@@ -340,7 +345,7 @@ export function MobileSelectDrawer({
       open={open}
       onClose={onClose}
       placement="bottom"
-      title={placeholder ?? locale.select}
+      title={title}
       height="70vh"
       classNames={{ root: classNames?.popup }}
       styles={{ root: styles?.popup }}

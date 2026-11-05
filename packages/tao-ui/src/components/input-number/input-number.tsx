@@ -16,7 +16,10 @@ import type {
 } from '../../provider/tao-provider';
 import { mergeRefs } from '../../utils/refs';
 import type { SemanticClassNames, SemanticStyles } from '../../utils/semantic';
-import { Input, type InputSemanticPart } from '../input/input';
+import {
+  BaseInput as Input,
+  type InputSemanticPart,
+} from '../input/base-input';
 
 // InputNumber — the batteries-included numeric field (antd naming). It composes
 // the headless number logic (useNumberInput: formatting, thousands grouping,
@@ -27,7 +30,10 @@ import { Input, type InputSemanticPart } from '../input/input';
 // Reach for the lower layers when you need full control of the markup:
 //   • <HeadlessInputNumber> — same logic, unstyled span (bring your own box)
 //   • useNumberInput() — the raw hook, wire it into any element yourself
-export type InputNumberSemanticPart = InputSemanticPart;
+export type InputNumberSemanticPart = Extract<
+  InputSemanticPart,
+  'root' | 'input' | 'prefix' | 'suffix'
+>;
 
 export interface InputNumberProps
   extends UseNumberInputOptions,

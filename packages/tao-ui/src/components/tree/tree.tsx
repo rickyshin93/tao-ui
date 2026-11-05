@@ -28,6 +28,7 @@ import {
   type SemanticStyles,
 } from '../../utils/semantic';
 import { Spinner } from '../spinner/spinner';
+import { TreeCheck } from './tree-check';
 import './tree.css';
 import { interopDefault } from '../../utils/interop-default';
 
@@ -259,7 +260,7 @@ const TreeBase = forwardRef<RcTree, TreeProps>((props, ref) => {
         selectable={selectable}
         itemHeight={itemHeight}
         filterTreeNode={filterTreeNode}
-        checkable={checkable && <span data-tao-tree-check="" />}
+        checkable={checkable && <TreeCheck />}
         switcherIcon={renderSwitcher}
         draggable={dragConfig}
         classNames={classes}

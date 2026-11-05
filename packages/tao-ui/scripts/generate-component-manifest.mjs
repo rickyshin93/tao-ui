@@ -56,6 +56,9 @@ function renderLlmsTxt() {
     '- Components expose semantic DOM customization through `classNames` and `styles` props.',
     '- Theme tokens are CSS custom properties prefixed with `--tao-*`; import `tokenVar(name)` and `taoTokenNames` from `@rockshin/tao-ui/tokens`.',
     '- Import `componentDocs` and `getComponentDoc(name)` from `@rockshin/tao-ui/meta` for machine-readable component metadata.',
+    '- Resolve `@rockshin/tao-ui/component-manifest.json` for plain JSON without loading component code.',
+    '- [Agent guide](https://rickyshin93.github.io/tao-ui/guide/agents.md): read contracts, choose imports, and verify generated code.',
+    '- [Website discovery index](https://rickyshin93.github.io/tao-ui/agent-manifest.json): current website version and bilingual Markdown/API links. Match it to your installed version.',
     '',
     '## Component Groups',
     '',
@@ -100,7 +103,7 @@ function renderLlmsTxt() {
   lines.push(
     '## Notes For Code Generation',
     '',
-    '- Prefer root imports from `@rockshin/tao-ui`.',
+    '- Prefer component subpaths for smaller imports; the root entry remains supported.',
     '- Customize internals through semantic `classNames` and `styles`, not private class names.',
     '- Prefer provider-level defaults for app-wide size, disabled, variant, and theme choices.',
     '- Use `Modal.useModal()` inside React components so dialogs inherit the surrounding provider context.',

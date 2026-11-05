@@ -354,11 +354,6 @@
   width: 48px;
 }
 
-[data-tao-table-checkbox] {
-  cursor: pointer;
-  accent-color: var(--tao-primary);
-}
-
 /* ===========================
    Fixed columns (sticky)
    =========================== */

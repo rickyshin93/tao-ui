@@ -241,8 +241,8 @@
   },
   {
     "type": "file",
-    "name": "collapsible",
-    "label": "Collapsible 折叠面板"
+    "name": "collapse",
+    "label": "Collapse 折叠面板"
   },
   {
     "type": "file",

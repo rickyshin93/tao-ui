@@ -1,4 +1,5 @@
 export type TaoTokenName =
+  | '--tao-border-text-weight'
   | '--tao-box-shadow'
   | '--tao-box-shadow-secondary'
   | '--tao-box-shadow-tertiary'
@@ -140,6 +141,7 @@ export function tokenVar(name: TaoTokenName | (string & {})): string {
 }
 
 export const taoTokenNames = [
+  '--tao-border-text-weight',
   '--tao-box-shadow',
   '--tao-box-shadow-secondary',
   '--tao-box-shadow-tertiary',

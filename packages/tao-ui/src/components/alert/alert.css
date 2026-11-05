@@ -25,6 +25,7 @@
    =========================== */
 [data-tao-alert-icon] {
   display: inline-flex;
+  align-self: center;
   align-items: center;
   justify-content: center;
   flex: 0 0 auto;

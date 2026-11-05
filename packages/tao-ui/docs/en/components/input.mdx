@@ -1,6 +1,6 @@
 ---
 title: Input
-description: "Single-line text input for short freeform values. Includes usage guidance, a runnable example, and the complete API reference."
+description: Input family with clearing, counting, password visibility, search, text areas and one-time codes. Includes runnable examples, keyboard behavior and API reference.
 ---
 
 import Preview from '../../_components/demo-preview';
@@ -60,6 +60,7 @@ function InputVariants() {
       <Input variant="outlined" placeholder="Outlined" />
       <Input variant="filled" placeholder="Filled" />
       <Input variant="borderless" placeholder="Borderless" />
+      <Input variant="underlined" placeholder="Underlined" />
     </Stack>
   );
 }
@@ -122,26 +123,20 @@ export default function Example() {
 
 <section className="tao-example" id="input-controlled">
 
-### Controlled value and reset
+### Clear and count
 
-Keep value and onChange in application state; reset updates the same state.
+Clearing calls onChange and onClear. Controlled values remain owned by your state.
 
 ```tsx preview
 import { useState } from 'react';
-import { Input, Button, Stack } from '@rockshin/tao-ui';
+import { Input, Stack } from '@rockshin/tao-ui';
 export default function Example() {
   const [value, setValue] = useState('tao-ui');
-  return (
-    <Stack direction="vertical">
-      <Input
-        aria-label="Project name"
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
-      />
-      <Button onClick={() => setValue('')}>Clear</Button>
-      <output>{value || 'Empty'}</output>
-    </Stack>
-  );
+  return <Stack direction="vertical">
+    <Input aria-label="Project name" value={value} onChange={(e) => setValue(e.target.value)} allowClear showCount maxLength={24} />
+    <Input aria-label="Read-only name" value="Read-only" readOnly allowClear />
+    <output>{value || 'Empty'}</output>
+  </Stack>;
 }
 ```
 
@@ -180,28 +175,20 @@ export default function Example() {
 
 <section className="tao-example" id="input-password">
 
-### Password visibility
+### Password input
 
-Toggle the native type with a named button that does not submit the form.
+The visibility button supports keyboard access, disabled state, and controlled visibilityToggle.
 
 ```tsx preview
 import { useState } from 'react';
 import { Input, Button, Stack } from '@rockshin/tao-ui';
 export default function Example() {
   const [visible, setVisible] = useState(false);
-  return (
-    <Stack direction="vertical">
-      <Input
-        aria-label="Password"
-        type={visible ? 'text' : 'password'}
-        defaultValue="example-password"
-        autoComplete="new-password"
-      />
-      <Button aria-pressed={visible} onClick={() => setVisible(!visible)}>
-        {visible ? 'Hide password' : 'Show password'}
-      </Button>
-    </Stack>
-  );
+  return <Stack direction="vertical">
+    <Input.Password aria-label="Password" defaultValue="example-password" autoComplete="new-password" allowClear />
+    <Input.Password aria-label="Controlled password" defaultValue="controlled" visibilityToggle={{ visible, onVisibleChange: setVisible }} />
+    <Button onClick={() => setVisible(!visible)}>{visible ? 'Hide' : 'Show'}</Button>
+  </Stack>;
 }
 ```
 
@@ -209,37 +196,20 @@ export default function Example() {
 
 <section className="tao-example" id="input-search-submit">
 
-### Search on submit
+### Search input
 
-Use a native form for Enter and button submission, with results shown inline.
+Button clicks, Enter and clearing call onSearch with source input or clear. IME confirmation and loading do not submit a search.
 
 ```tsx preview
 import { useState } from 'react';
-import { Input, Button, Stack } from '@rockshin/tao-ui';
+import { Input, Stack } from '@rockshin/tao-ui';
 export default function Example() {
-  const [query, setQuery] = useState('');
-  return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        setQuery(String(new FormData(e.currentTarget).get('query')));
-      }}
-    >
-      <Stack direction="vertical">
-        <Input
-          name="query"
-          type="search"
-          aria-label="Search components"
-          placeholder="Search components"
-          required
-        />
-        <Button type="submit">Search</Button>
-        <output aria-live="polite">
-          {query ? `Searching for: ${query}` : 'Enter a component name'}
-        </output>
-      </Stack>
-    </form>
-  );
+  const [result, setResult] = useState('No search yet');
+  return <Stack direction="vertical">
+    <Input.Search aria-label="Search components" placeholder="Search components" allowClear enterButton="Search" onSearch={(value, _, info) => setResult(`${info?.source}: ${value || '(empty)'}`)} />
+    <Input.Search aria-label="Loading search" value="Loading" loading readOnly />
+    <output aria-live="polite">{result}</output>
+  </Stack>;
 }
 ```
 
@@ -282,32 +252,90 @@ export default function Example() {
 
 <section className="tao-example" id="input-focus-ref">
 
-### Focus with a ref
+### Cursor placement
 
-The ref points to the native input for restoring focus after another action.
+The ref remains the native input. InputRef also exposes input, nativeElement and extended focus options.
 
 ```tsx preview
 import { useRef } from 'react';
-import { Input, Button, Stack } from '@rockshin/tao-ui';
+import { Input, type InputRef, Button, Stack } from '@rockshin/tao-ui';
 export default function Example() {
-  const ref = useRef<HTMLInputElement>(null);
-  return (
-    <Stack direction="vertical">
-      <Input
-        ref={ref}
-        aria-label="Focus target"
-        defaultValue="Select this text"
-      />
-      <Button
-        onClick={() => {
-          ref.current?.focus();
-          ref.current?.select();
-        }}
-      >
-        Focus and select
-      </Button>
+  const ref = useRef<InputRef>(null);
+  return <Stack direction="vertical">
+    <Input ref={ref} aria-label="Focus target" defaultValue="Select this text" />
+    <Stack wrap>
+      {(['start', 'end', 'all'] as const).map((cursor) => <Button key={cursor} onClick={() => ref.current?.focus({ cursor, preventScroll: true })}>{cursor}</Button>)}
     </Stack>
-  );
+  </Stack>;
+}
+```
+
+</section>
+
+<section className="tao-example" id="input-advanced-count">
+
+### Custom counting
+
+count.max warns by default. strategy and exceedFormatter can count and clip Unicode code points. Native maxLength counts UTF-16 code units independently.
+
+```tsx preview
+import { Input, Stack } from '@rockshin/tao-ui';
+export default function Example() {
+  return <Stack direction="vertical">
+    <Input aria-label="Soft limit" defaultValue="More than five" count={{ max: 5, show: true }} />
+    <Input aria-label="Emoji counter" defaultValue="😊😊" count={{ max: 5, show: true, strategy: (value) => Array.from(value).length, exceedFormatter: (value, { max }) => Array.from(value).slice(0, max).join('') }} />
+  </Stack>;
+}
+```
+
+</section>
+
+<section className="tao-example" id="input-textarea">
+
+### Text area
+
+Input.TextArea is the same component as standalone Textarea, with auto sizing, clearing, counting and Enter events.
+
+```tsx preview
+import { Input } from '@rockshin/tao-ui';
+export default function Example() {
+  return <Input.TextArea aria-label="Description" placeholder="Write a description" autoSize={{ minRows: 2, maxRows: 5 }} allowClear showCount maxLength={120} />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="input-otp">
+
+### One-time code
+
+Supports automatic advance, pasting, arrow keys, Backspace, formatting and masking. onInput returns an array including empty slots; onChange fires only when complete.
+
+```tsx preview
+import { useState } from 'react';
+import { Input, Stack } from '@rockshin/tao-ui';
+export default function Example() {
+  const [complete, setComplete] = useState('');
+  return <Stack direction="vertical">
+    <Input.OTP aria-label="Verification code" length={6} autoComplete="one-time-code" formatter={(value) => value.toUpperCase()} separator={(index) => index === 2 ? '-' : null} onChange={setComplete} />
+    <Input.OTP aria-label="Masked code" length={4} mask defaultValue="1234" />
+    <output aria-live="polite">{complete || 'Enter all characters'}</output>
+  </Stack>;
+}
+```
+
+</section>
+
+<section className="tao-example" id="input-addons">
+
+### Attached content
+
+addonBefore / addonAfter attach labels; prefix / suffix sit inside the input area.
+
+```tsx preview
+import { Input } from '@rockshin/tao-ui';
+export default function Example() {
+  return <Input aria-label="Website address" addonBefore="https://" addonAfter=".com" defaultValue="example" allowClear />;
 }
 ```
 
@@ -317,4 +345,69 @@ export default function Example() {
 
 ## API
 
-<API moduleName="input" />
+### Input / Input.TextArea
+
+Other props pass through to the native input / textarea. Input.TextArea does not accept prefix, suffix or addons; standalone Textarea remains compatible.
+
+| Prop | Type | Default |
+| --- | --- | --- |
+| value / defaultValue | Native input value / textarea value | — |
+| onChange | `(event) => void` | — |
+| allowClear | `boolean` or `{ clearIcon?, disabled?, tabIndex? }` | `false` |
+| onClear | `() => void` | — |
+| showCount | `boolean` or `{ formatter: ({ value, count, maxLength }) => ReactNode }` | `false` |
+| count | `{ max?, strategy?: (value) => number, show?: boolean or formatter, exceedFormatter?: (value, { max }) => string }` | — |
+| onPressEnter | `(event: KeyboardEvent) => void` | — |
+| size | `'small'`, `'medium'`, `'large'` | TaoProvider |
+| variant | `'outlined'`, `'filled'`, `'borderless'`, `'underlined'` | TaoProvider |
+| status / error | `'error'` or `'warning'` / `boolean` | — |
+| disabled / readOnly | `boolean` | TaoProvider / `false` |
+| prefix / suffix | `ReactNode` (Input only) | — |
+| addonBefore / addonAfter | `ReactNode` (Input only) | — |
+| autoSize | `boolean` or `{ minRows?, maxRows? }` (TextArea only) | `false` |
+| classNames / styles | Semantic part map or `({ props }) => map` | — |
+
+A count limit does not clip unless count.exceedFormatter is set. Clipping waits for IME composition to finish. count.show takes precedence over showCount. Input semantic parts: root / input / prefix / suffix / clear / count / addonBefore / addonAfter. TextArea: root / textarea / clear / count.
+
+### Input.Password
+
+Inherits Input props.
+
+| Prop | Type | Default |
+| --- | --- | --- |
+| visibilityToggle | `boolean` or `{ visible?, onVisibleChange?, tabIndex? }` | `true` |
+| iconRender | `(visible: boolean) => ReactNode` | Eye icon |
+
+### Input.Search
+
+Inherits Input props. The search button does not submit a surrounding form; onSearch reports source input or clear.
+
+| Prop | Type | Default |
+| --- | --- | --- |
+| enterButton | `ReactNode` (boolean, label, native button or Button) | `false` |
+| searchIcon | `ReactNode` | Search icon |
+| loading | `boolean` | `false` |
+| onSearch | `(value, event?, info?: { source: 'input' or 'clear' }) => void` | — |
+| classNames / styles | Input parts plus `button` | — |
+
+### Input.OTP
+
+| Prop | Type | Default |
+| --- | --- | --- |
+| length | Positive integer | `6` |
+| value / defaultValue | `string` | — |
+| formatter | `(value: string) => string` | — |
+| onInput | `(value: string[]) => void` | — |
+| onChange | `(value: string) => void` (complete values) | — |
+| mask | `boolean` or `string` | `false` |
+| separator | `ReactNode` or `(index: number) => ReactNode` | — |
+| type / inputMode / autoComplete | Native input attributes | `text` / — / — |
+| autoFocus / disabled | `boolean` | `false` / TaoProvider |
+| size / variant / status | Same as Input | TaoProvider / TaoProvider / — |
+| classNames / styles | `root / input / separator` map or `({ props }) => map` | — |
+
+### Ref
+
+Input, Password and Search refs remain HTMLInputElement; TextArea remains HTMLTextAreaElement. Exported InputRef / TextAreaRef types add `focus({ preventScroll, cursor: 'start' | 'end' | 'all' })`, blur(), nativeElement and input / textArea. Native types without selection support only receive focus. OTPRef exposes focus(), blur() and nativeElement.
+
+The API follows local Ant Design 6.7.0 while retaining tao-ui native refs, theming and semantic DOM contracts; it is not a drop-in antd replacement. Deprecated bordered, prefixCls and antd component-global configuration are not supported. Set underlined through the local Input-family variant prop.

@@ -108,6 +108,12 @@
 [data-tao-select-engine] [class$="-clear"]:hover {
   color: var(--tao-color-text);
 }
+@media (hover: hover) and (pointer: fine) {
+  [data-tao-select-engine]:not(:hover) [class$="-clear"]:not(:focus-visible) {
+    opacity: 0;
+    pointer-events: none;
+  }
+}
 [data-tao-select-engine] [class$="-clear"]:focus-visible {
   outline: 2px solid var(--tao-primary);
   outline-offset: 2px;

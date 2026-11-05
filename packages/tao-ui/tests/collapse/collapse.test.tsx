@@ -1,7 +1,7 @@
 import { beforeAll, expect, test } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { Collapsible } from '../../src/components/collapsible/collapsible';
+import { Collapse } from '../../src/components/collapse/collapse';
 import { TaoProvider } from '../../src/provider/tao-provider';
 
 // Radix relies on a few DOM APIs jsdom doesn't implement.
@@ -11,12 +11,12 @@ beforeAll(() => {
   }
 });
 
-function Basic(props: React.ComponentProps<typeof Collapsible>) {
+function Basic(props: React.ComponentProps<typeof Collapse>) {
   return (
-    <Collapsible {...props}>
-      <Collapsible.Trigger>Toggle</Collapsible.Trigger>
-      <Collapsible.Content>Panel body</Collapsible.Content>
-    </Collapsible>
+    <Collapse {...props}>
+      <Collapse.Trigger>Toggle</Collapse.Trigger>
+      <Collapse.Content>Panel body</Collapse.Content>
+    </Collapse>
   );
 }
 
@@ -74,15 +74,15 @@ test('inherits disabled from TaoProvider', async () => {
 
 test('semantic classNames/styles apply to parts', () => {
   render(
-    <Collapsible
+    <Collapse
       defaultOpen
       className="my-root"
       classNames={{ trigger: 'my-trigger', content: 'my-content' }}
       styles={{ trigger: { color: 'rgb(1, 2, 3)' } }}
     >
-      <Collapsible.Trigger>Toggle</Collapsible.Trigger>
-      <Collapsible.Content>Panel body</Collapsible.Content>
-    </Collapsible>,
+      <Collapse.Trigger>Toggle</Collapse.Trigger>
+      <Collapse.Content>Panel body</Collapse.Content>
+    </Collapse>,
   );
   expect(document.querySelector('.my-root')).toBeTruthy();
   const trigger = document.querySelector('.my-trigger') as HTMLElement;

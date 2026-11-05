@@ -215,8 +215,9 @@ interface TaoSeedToken {
   --tao-color-bg-container:      var(--tao-color-bg-surface);
   --tao-color-bg-elevated:       color-mix(in oklch, var(--tao-color-bg-surface) 94%, white);
 
-  /* 边框 2 级（shadcn 式浅边框 12%；secondary 用半透明，跨底色无断层） */
-  --tao-color-border:            color-mix(in oklch, var(--tao-color-text-base) 12%, var(--tao-color-bg-base));
+  /* 边框 2 级：border-text-weight 种子浅色 12%、深色 36%；控件 hover 加 8 个百分点。
+     secondary 保持 5% 半透明，跨底色无断层，弱于控件轮廓。 */
+  --tao-color-border:            color-mix(in oklch, var(--tao-color-text-base) var(--tao-border-text-weight), var(--tao-color-bg-base));
   --tao-color-border-secondary:  color-mix(in oklch, var(--tao-color-text-base) 5%, transparent);
 }
 ```
@@ -555,7 +556,7 @@ tao-ui 支持 3 种 variant：
 ### 3.5 主题模式（已实现：dark）
 
 明暗模式不是硬编码另一套 token，而是**纯 CSS 算法**：`[data-tao-theme="dark"]`
-scope 只覆盖 4 个 seed（bg-base/text-base/bg-surface/primary）+ 少数「翻转方向
+scope 覆盖颜色 seed（bg-base/text-base/bg-surface/primary）和边框混色权重 + 少数「翻转方向
 不同」的 derived token（shadows、primary hover/active、mask），其余派生全部由
 `color-mix` 公式自动适配。零 JS runtime。
 
@@ -580,6 +581,7 @@ Dark scope 覆盖值（theme.css）：
   --tao-color-bg-base:    oklch(0.165 0.005 70);
   --tao-color-text-base:  oklch(0.922 0.005 70);
   --tao-color-bg-surface: oklch(0.21  0.005 70);
+  --tao-border-text-weight: 36%; /* 浅色默认 12%；嵌套 provider 继承并重算边框 */
   --tao-color-primary:    oklch(0.922 0.005 70);  /* 近黑主色翻为近白 */
   /* + shadows 加深、mask 加深、focus outline α 提高、
      primary hover/active 改向深色 mix */
@@ -1057,7 +1059,7 @@ API:
 
 状态:
   default:    border=color-border, bg=transparent
-  hover:      border 加深一档 (text-base 20%)
+  hover:      border 增强一档 (text-base 浅色 20% / 深色 44%)
   focus:      border=primary + 3px ring (control-outline)
   error:      border=error, ring=color-error-outline
   disabled:   bg=color-bg-disabled, fg=color-text-disabled
@@ -1165,15 +1167,17 @@ src/
 
 ## 16. 文档站（精简组件参考）
 
-> 适用于中英文首页和全部组件参考页。站点样式由 `styles/rspress.css` 管理，
+> 适用于中英文首页和全部组件参考页。首页样式由 `styles/home-page.css` 管理，组件参考样式由 `styles/rspress.css` 管理，
 > `theme/index.tsx` 使用原生 Layout 插槽和 HomeHero 扩展，不影响组件库 token。
 > 对应场景说明：`.impeccable/surfaces/docs-index-mdx.md`。
 
+组件参考视觉层位于 `styles/reference-page.css`，由 `styles/rspress.css` 引入。组件页使用 32px 标题（≤640px 时 28px）、26px 分区标题、15/17px 引言、17px 示例标题、13px 示例说明及 API、11/12px 包名与工具栏；示例圆角 16px。沿用首页视觉语言，但不沿用首页大标题尺度；标题锚点放在文字后方的正常行内流中，不侵入侧栏。这是文档站阅读尺度，不更改组件库字号与圆角 token。
+
 - **目标**：让访问者完成安装、查组件、试效果、复制代码和查 API；参考 antd 的交互组织，保留 tao-ui 视觉。
-- **首页**：简短介绍、安装命令和操作入口，搭配可编辑并有提交反馈的真实组件表单。下方直达 Button 和 Select 文档。
-- **组件页**：分类导航、示例卡片、页内目录和生成 API。按真实能力拆分独立示例，说明关键参数并维护可操作状态；代码就地展开和复制。常规示例桌面双列、手机单列；表格、复杂表单与布局示例使用通栏。
-- **配色与字体**：沿用 teal 品牌和中性表面；Geist Sans 与系统 CJK 字体；正文层级、边框和背景使用 Rspress 变量。深色模式同时应用到站点与真实示例。
-- **站点尺度**：首页标题 36–54px，分区标题 20–24px，正文 14–17px；代码和辅助信息 11–13px，手机版本标记 10px。控件圆角 5–8px，示例容器 12–16px。这些尺度仅属于站点，不覆盖库组件样式。
+- **首页**：组件样本册的 landing 版，动效用 Motion。首屏左侧大标题（逐行遮罩上移）、右侧简介与安装；其下是「拖动断点」舞台：带刻度的标尺与 576px 断点虚线，一个独立 iframe 视口的真实应用窗口在 780↔390px 间自动伸缩，越过断点时同一个 Select / DatePicker 从桌面下拉切换为底部抽屉；访客可拖动窗口右缘或用方向键调整（role=slider），一经操作即停止自动演示并提供「重新演示」，<640px 隐藏舞台。其下亮点跑马灯。组件索引之后、安装收尾之前安排移动端叙事：左侧 4 步（单选抽屉 / 多选草稿 / DatePicker 抽屉 / 44px 触控），右侧 sticky 手机壳内嵌独立 390px iframe（首页 mdx 中的 iframe-follow 演示 `_zh_index_1` / `_en_index_1`），滚动到哪一步就打开对应真实抽屉，访客可直接操作；≤900px 步骤变为胶囊切换。跑马灯后先展示种子色样本台（色卡、圆角、尺寸、明暗四轴驱动 8 格真实组件，视口内自动轮播，任何交互即停）、Input 语义部件解剖、6 格亮点 bento（深色穿透浮层、locale、紧凑密度、按组件引入、键盘可达、React 18.2/19 类型）、侧栏生成的组件索引与安装收尾。种子色同时染标题、浮动卡阴影、手机与全部示例；减少动态时关闭轮播、自动伸缩与跑马灯。
+- **组件页**：延续首页样本册的中性纸面、Geist 字体、细线与钴蓝种子色。大标题配分类、包名和示例/API 锚点；示例说明、白色演示台和代码工具栏分层，示例仍使用组件自身 token。分类导航、页内目录和生成 API 保留原生交互。桌面和通用能力优先，移动端专属示例放在演示区末尾；设备模式沿用共享预览状态。代码就地展开和复制。常规示例桌面双列、手机单列；表格、复杂表单与布局示例使用通栏。
+- **配色与字体**：首页是中性校样纸面（浅 `oklch(0.985 0.002 250)` / 深 `oklch(0.17 0.006 260)`）加细线，唯一的色相来自当前种子色：钴蓝、朱砂、青碧、赭石、苔绿、墨六档，各有浅/深两值，明确不使用紫色。种子色同时染色卡、标题第二行与全部示例组件。组件参考页沿用同一纸面与首页默认钴蓝（浅 `oklch(0.5 0.19 258)` / 深 `oklch(0.74 0.13 255)`），以阅读为主，不自动轮播色彩。字体为自托管 Geist Sans / Geist Mono 与系统 CJK 字体；Mono 只用于代码、token 值与规格注释。
+- **站点尺度**：首页标题 44–96px、分区标题 30–56px、正文 15–18px；代码和规格注释 10.5–13px。样本台与解剖面板 16px 圆角，内部用 1px 细线分格而非卡片。样本台桌面为色卡列 + 四列样本格，≤1180px 色卡转为横条，≤900px 两列，≤480px 单列；首页使用正常文档滚动。这些尺度仅属于站点，示例组件通过 TaoProvider 公开 token 定制。
 - **交互与适配**：保留原生搜索、语言切换、导航抽屉和锚点恢复；代码及 API 宽表格局部横滚。复制失败明确提示，展开按钮保留键盘操作和状态语义。
 - **设备演示**：移动场景和通知示例使用独立 iframe；手机视口 390 × 640，桌面视口 960 × 560，外壳按可用宽度缩放但不改变内部视口。设备切换保留示例状态，深色模式跟随站点；手机壳不模拟操作系统、软键盘或触摸硬件。
-- **范围**：全部组件文档继续本地预览与验收，部署单独安排。
+- **范围**：本次样本册首页重设计仅更新本地预览；官网部署单独安排。

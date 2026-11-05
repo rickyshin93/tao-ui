@@ -10,18 +10,30 @@ import {
 import {
   type TaoSize,
   type TaoStatus,
-  type TaoVariant,
   useTaoConfig,
 } from '../../provider/tao-provider';
-import { mergeRefs } from '../../utils/refs';
 import {
   cx,
   type SemanticClassNames,
   type SemanticStyles,
 } from '../../utils/semantic';
+import {
+  InputClear,
+  type InputFocusOptions,
+  type InputSemanticValue,
+  type InputVariant,
+  type TextControlProps,
+  useTextControl,
+  useTextControlRef,
+} from '../input/input-shared';
 import './textarea.css';
 
-export type TextareaSemanticPart = 'root' | 'textarea';
+export type TextareaSemanticPart = 'root' | 'textarea' | 'clear' | 'count';
+export type TextareaRef = HTMLTextAreaElement & {
+  textArea: HTMLTextAreaElement;
+  nativeElement: HTMLDivElement;
+  focus: (options?: InputFocusOptions) => void;
+};
 
 export interface AutoSizeOptions {
   minRows?: number;
@@ -29,20 +41,30 @@ export interface AutoSizeOptions {
 }
 
 export interface TextareaProps
-  extends Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, 'size'> {
+  extends Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, 'size'>,
+    TextControlProps<HTMLTextAreaElement> {
   size?: TaoSize;
-  variant?: TaoVariant;
+  variant?: InputVariant;
   error?: boolean;
   status?: TaoStatus;
   ref?: Ref<HTMLTextAreaElement>;
   /** Auto-grow height to fit content. `true` grows freely; pass min/max rows to clamp. */
   autoSize?: boolean | AutoSizeOptions;
-  classNames?: SemanticClassNames<TextareaSemanticPart>;
-  styles?: SemanticStyles<TextareaSemanticPart>;
+  classNames?: InputSemanticValue<
+    SemanticClassNames<TextareaSemanticPart>,
+    TextareaProps
+  >;
+  styles?: InputSemanticValue<
+    SemanticStyles<TextareaSemanticPart>,
+    TextareaProps
+  >;
 }
 
 export const Textarea = forwardRef(function Textarea(
-  {
+  props: TextareaProps,
+  ref: ForwardedRef<HTMLTextAreaElement>,
+) {
+  const {
     size,
     variant,
     error,
@@ -51,18 +73,35 @@ export const Textarea = forwardRef(function Textarea(
     autoSize,
     className,
     style,
-    classNames,
-    styles,
+    classNames: customClassNames,
+    styles: customStyles,
+    allowClear,
+    onClear,
+    count,
+    showCount,
+    onPressEnter,
+    onKeyDown,
+    onCompositionStart,
+    onCompositionEnd,
+    value,
+    defaultValue,
     onChange,
     ...rest
-  }: TextareaProps,
-  ref: ForwardedRef<HTMLTextAreaElement>,
-) {
+  } = props;
+  const classNames =
+    typeof customClassNames === 'function'
+      ? customClassNames({ props })
+      : customClassNames;
+  const styles =
+    typeof customStyles === 'function' ? customStyles({ props }) : customStyles;
   const ctx = useTaoConfig();
   const resolvedSize = size ?? ctx.size;
   const resolvedVariant = variant ?? ctx.variant;
   const resolvedDisabled = disabled ?? ctx.disabled;
   const innerRef = useRef<HTMLTextAreaElement>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const field = useTextControl(props, innerRef);
+  useTextControlRef(ref, innerRef, rootRef);
 
   const resize = useCallback(() => {
     const el = innerRef.current;
@@ -92,7 +131,7 @@ export const Textarea = forwardRef(function Textarea(
   // biome-ignore lint/correctness/useExhaustiveDependencies: re-measure on value change
   useLayoutEffect(() => {
     resize();
-  }, [resize, rest.value, rest.defaultValue]);
+  }, [resize, field.value]);
 
   useLayoutEffect(() => {
     const el = innerRef.current;
@@ -114,6 +153,7 @@ export const Textarea = forwardRef(function Textarea(
 
   return (
     <div
+      ref={rootRef}
       className={cx(classNames?.root, className)}
       style={{ ...styles?.root, ...style }}
       data-tao-control=""
@@ -126,8 +166,8 @@ export const Textarea = forwardRef(function Textarea(
     >
       <textarea
         {...rest}
-        value={'value' in rest ? (rest.value ?? '') : undefined}
-        ref={mergeRefs(innerRef, ref)}
+        value={field.value}
+        ref={innerRef}
         className={classNames?.textarea}
         style={styles?.textarea}
         disabled={resolvedDisabled}
@@ -135,9 +175,51 @@ export const Textarea = forwardRef(function Textarea(
         data-tao-autosize={autoSize ? '' : undefined}
         onChange={(e) => {
           if (autoSize) resize();
-          onChange?.(e);
+          field.change(e);
+        }}
+        onKeyDown={(event) => {
+          onKeyDown?.(event);
+          if (
+            event.key === 'Enter' &&
+            !event.defaultPrevented &&
+            !field.composing.current &&
+            !event.nativeEvent.isComposing &&
+            event.keyCode !== 229
+          )
+            onPressEnter?.(event);
+        }}
+        onCompositionStart={(event) => {
+          field.composing.current = true;
+          onCompositionStart?.(event);
+        }}
+        onCompositionEnd={(event) => {
+          field.composing.current = false;
+          if (
+            field.normalize(event.currentTarget.value) !==
+            event.currentTarget.value
+          )
+            field.change({ ...event, target: event.currentTarget });
+          onCompositionEnd?.(event);
         }}
       />
+      {allowClear && field.value && !resolvedDisabled && !rest.readOnly && (
+        <InputClear
+          config={allowClear}
+          onClick={field.clear}
+          className={classNames?.clear}
+          style={styles?.clear}
+        />
+      )}
+      {field.counter != null && (
+        <span
+          data-tao-input-count=""
+          data-tao-exceeded={field.exceeded || undefined}
+          className={classNames?.count}
+          style={styles?.count}
+        >
+          {field.counter}
+        </span>
+      )}
     </div>
   );
 });

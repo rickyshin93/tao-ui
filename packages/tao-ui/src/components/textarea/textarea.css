@@ -106,3 +106,19 @@
     cursor: not-allowed;
   }
 }
+[data-tao-textarea] {
+  position: relative;
+}
+[data-tao-textarea] > [data-tao-input-clear] {
+  position: absolute;
+  inset-block-start: var(--tao-padding-xxs);
+  inset-inline-end: var(--tao-padding-xxs);
+}
+:where([data-tao-textarea]:has([data-tao-input-clear]) textarea) {
+  padding-inline-end: var(--tao-control-height);
+}
+[data-tao-textarea] > [data-tao-input-count] {
+  display: block;
+  text-align: end;
+  padding: 0 var(--tao-padding-xs) var(--tao-padding-xxs);
+}

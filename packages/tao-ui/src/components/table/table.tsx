@@ -11,7 +11,9 @@ import {
 import { useTaoConfig } from '../../provider/tao-provider';
 import { useBreakpoint } from '../../utils/breakpoint';
 import { cx } from '../../utils/semantic';
+import { Checkbox } from '../checkbox/checkbox';
 import { Pagination } from '../pagination/pagination';
+import { Radio } from '../radio/radio';
 import { TableFilterDropdown } from './table-filter';
 import { ExpandIcon, SortIcon, TableLoadingSpinner } from './table-icons';
 import {
@@ -438,16 +440,12 @@ export function Table<T extends TableRecord = Record<string, unknown>>({
                       }}
                     >
                       {selectionType === 'checkbox' && (
-                        <input
-                          type="checkbox"
+                        <Checkbox
                           aria-label="Select all rows"
                           checked={isAllSelected}
                           disabled={selectablePageKeys.length === 0}
-                          ref={(el) => {
-                            if (el) el.indeterminate = isIndeterminate;
-                          }}
+                          indeterminate={isIndeterminate}
                           onChange={(e) => handleSelectAll(e.target.checked)}
-                          data-tao-table-checkbox=""
                         />
                       )}
                     </th>
@@ -564,14 +562,18 @@ export function Table<T extends TableRecord = Record<string, unknown>>({
                       {...rowProps}
                       data-tao-table-row=""
                       data-tao-selected={isSelected || undefined}
-                      onClick={
-                        rowExpandable && expandable?.expandRowByClick
-                          ? (e) => {
-                              rowProps.onClick?.(e);
-                              toggleExpand(record, key);
-                            }
-                          : rowProps.onClick
-                      }
+                      onClick={(event) => {
+                        const selectionCell = (event.target as Element).closest(
+                          '[data-tao-table-selection-cell]',
+                        );
+                        if (selectionCell && event.target !== selectionCell) {
+                          event.stopPropagation();
+                          return;
+                        }
+                        rowProps.onClick?.(event);
+                        if (rowExpandable && expandable?.expandRowByClick)
+                          toggleExpand(record, key);
+                      }}
                       className={cx(
                         resolvedClassNames['body.row'],
                         resolveRowClassName(rowClassName, record, rowIdx),
@@ -616,19 +618,21 @@ export function Table<T extends TableRecord = Record<string, unknown>>({
                             ...resolvedStyles['selection.cell'],
                           }}
                         >
-                          <input
-                            type={
-                              selectionType === 'radio' ? 'radio' : 'checkbox'
-                            }
-                            checked={isSelected}
-                            aria-label={`Select row ${String(key)}`}
-                            disabled={checkboxProps?.disabled}
-                            onChange={() => handleSelectRow(key)}
-                            // Ticking a box must not trigger row clicks
-                            // (e.g. expandRowByClick), same as antd.
-                            onClick={(e) => e.stopPropagation()}
-                            data-tao-table-checkbox=""
-                          />
+                          {selectionType === 'radio' ? (
+                            <Radio
+                              checked={isSelected}
+                              aria-label={`Select row ${String(key)}`}
+                              disabled={checkboxProps?.disabled ?? false}
+                              onChange={() => handleSelectRow(key)}
+                            />
+                          ) : (
+                            <Checkbox
+                              checked={isSelected}
+                              aria-label={`Select row ${String(key)}`}
+                              disabled={checkboxProps?.disabled ?? false}
+                              onChange={() => handleSelectRow(key)}
+                            />
+                          )}
                         </td>
                       )}
                       {columns.map((col, colIdx) => {

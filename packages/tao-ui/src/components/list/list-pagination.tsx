@@ -118,6 +118,7 @@ export function ListPaginationControl(props: ListPagination) {
           itemRender ??
           ((page, type) => (
             <button
+              data-tao-list-page-button=""
               type="button"
               aria-label={
                 type === 'page'

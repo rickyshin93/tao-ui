@@ -260,49 +260,6 @@ export default function DatePickerDisabledDates() {
 
 </section>
 
-<section className="tao-example" id="date-picker-mobile-date-picker">
-
-### 手机日期抽屉
-
-通过 `mobile` 在桌面也能试用抽屉，确认操作完成后提交选中日期。
-
-```tsx preview
-import { DatePicker, FormField, Stack } from '@rockshin/tao-ui';
-
-import type { Dayjs } from 'dayjs';
-
-import dayjs from 'dayjs';
-
-import { useState } from 'react';
-
-export default function DatePickerMobileDatePicker() {
-  function Demo() {
-    const [val, setVal] = useState<Dayjs | null>(null);
-    return (
-      <Stack gap="md" style={{ maxWidth: 300 }}>
-        <p style={{ color: 'var(--tao-color-text-secondary)', fontSize: 13 }}>
-          Using <code>mobile</code> prop to force Drawer mode.
-        </p>
-        <FormField label="Mobile DatePicker">
-          <DatePicker
-            value={val}
-            onChange={(d) => setVal(d)}
-            mobile
-            presets={[
-              { label: 'Today', value: dayjs() },
-              { label: 'Yesterday', value: dayjs().subtract(1, 'day') },
-            ]}
-          />
-        </FormField>
-      </Stack>
-    );
-  }
-  return <Demo />;
-}
-```
-
-</section>
-
 <section className="tao-example" id="date-picker-sizes">
 
 ### 尺寸与外观
@@ -341,25 +298,6 @@ export default function Example() {
       <DatePicker status="warning" />
       <DatePicker disabled />
     </Stack>
-  );
-}
-```
-
-</section>
-
-<section className="tao-example" id="date-picker-mobile">
-
-### 移动端选择
-
-在手机预览中打开选择器，体验抽屉内的选择、确认和清空。
-
-```tsx preview="iframe-follow"
-import { DatePicker, TaoProvider, zhCN } from '@rockshin/tao-ui';
-export default function Example() {
-  return (
-    <TaoProvider locale={zhCN}>
-      <DatePicker allowClear />
-    </TaoProvider>
   );
 }
 ```
@@ -455,6 +393,70 @@ format 控制显示文本，值仍是 Dayjs；不要将显示格式误认为存�
 import { DatePicker } from '@rockshin/tao-ui';
 export default function Example() {
   return <DatePicker format="DD/MM/YYYY" />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="date-picker-mobile-date-picker">
+
+### 手机日期抽屉
+
+通过 `mobile` 在桌面也能试用抽屉，确认操作完成后提交选中日期。
+
+```tsx preview="iframe-follow"
+import { DatePicker, FormField, Stack } from '@rockshin/tao-ui';
+
+import type { Dayjs } from 'dayjs';
+
+import dayjs from 'dayjs';
+
+import { useState } from 'react';
+
+export default function DatePickerMobileDatePicker() {
+  function Demo() {
+    const [val, setVal] = useState<Dayjs | null>(null);
+    return (
+      <Stack gap="md" style={{ maxWidth: 300 }}>
+        <p style={{ color: 'var(--tao-color-text-secondary)', fontSize: 13 }}>
+          Using <code>mobile</code> prop to force Drawer mode.
+        </p>
+        <FormField label="Mobile DatePicker">
+          <DatePicker
+            value={val}
+            onChange={(d) => setVal(d)}
+            mobile
+            presets={[
+              { label: 'Today', value: dayjs() },
+              { label: 'Yesterday', value: dayjs().subtract(1, 'day') },
+            ]}
+          />
+        </FormField>
+      </Stack>
+    );
+  }
+  return <Demo />;
+}
+```
+
+</section>
+
+<section className="tao-example" id="date-picker-mobile">
+
+移动端抽屉标题按 `mobileTitle` → 最近的 `Form.Item` / `FormField` 的 label → 本地化默认文案取值。必填星号和帮助信息不会带入标题，placeholder 只用于输入提示。独立使用或搭配原生 HTML label 时，可显式设置 `mobileTitle="出发日期"`。
+
+### 移动端选择
+
+在手机预览中打开选择器，体验抽屉内的选择、确认和清空。
+
+```tsx preview="iframe-follow"
+import { DatePicker, TaoProvider, zhCN } from '@rockshin/tao-ui';
+export default function Example() {
+  return (
+    <TaoProvider locale={zhCN}>
+      <DatePicker allowClear />
+    </TaoProvider>
+  );
 }
 ```
 

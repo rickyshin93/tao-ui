@@ -25,6 +25,8 @@ import {
   useTaoConfig,
 } from '../../provider/tao-provider';
 import { useIsMobile } from '../../utils/breakpoint';
+import { useMobileTitle } from '../../utils/field-label';
+import { Button } from '../button/button';
 import {
   cx,
   type SemanticClassNames,
@@ -89,6 +91,8 @@ export interface DatePickerProps
   status?: TaoStatus;
   ref?: Ref<PickerRef>;
   mobile?: boolean;
+  /** Mobile drawer title. Defaults to the Form.Item/FormField label, then locale text. */
+  mobileTitle?: ReactNode;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
   className?: string;
@@ -158,7 +162,10 @@ export const DatePicker = forwardRef(function DatePicker(
 
   const fmt = formatProp ?? getDefaultFormat(picker, showTime);
   const defaultPlaceholder = placeholder ?? fmt;
-  const drawerTitle = showTime ? ctx.locale.dateTime : defaultPlaceholder;
+  const drawerTitle = useMobileTitle(
+    props.mobileTitle,
+    showTime ? ctx.locale.dateTime : ctx.locale.selectDate,
+  );
 
   const isDateBlocked = useCallback(
     (date: Dayjs) => {
@@ -437,21 +444,24 @@ export const DatePicker = forwardRef(function DatePicker(
           className={classNames?.footer}
           style={styles?.footer}
         >
-          <button
-            type="button"
+          <Button
+            variant="secondary"
+            size="small"
+            disabled={false}
             data-tao-picker-footer-btn=""
             onClick={handleNow}
           >
             {ctx.locale.now}
-          </button>
-          <button
-            type="button"
+          </Button>
+          <Button
+            size="small"
+            disabled={false}
             data-tao-picker-footer-btn=""
             data-tao-primary=""
             onClick={handleOk}
           >
             {ctx.locale.ok}
-          </button>
+          </Button>
         </div>
       )}
     </div>
@@ -632,7 +642,10 @@ export const DatePicker = forwardRef(function DatePicker(
           <Popover.Content
             id={popupId}
             ref={popupRef}
-            aria-label={props['aria-label'] ?? drawerTitle}
+            aria-label={
+              props['aria-label'] ??
+              (showTime ? ctx.locale.dateTime : defaultPlaceholder)
+            }
             data-tao-picker-dropdown=""
             sideOffset={4}
             align="start"

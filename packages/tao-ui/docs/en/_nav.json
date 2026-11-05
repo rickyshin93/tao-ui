@@ -8,5 +8,9 @@
     "text": "Components",
     "link": "/components/button",
     "activeMatch": "/components/"
+  },
+  {
+    "text": "AI agents",
+    "link": "/guide/agents"
   }
 ]

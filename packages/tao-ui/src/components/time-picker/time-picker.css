@@ -73,6 +73,12 @@
     outline: var(--tao-ring-width) solid var(--tao-control-outline);
     border-radius: var(--tao-radius-sm);
   }
+  @media (hover: hover) and (pointer: fine) {
+    [data-tao-time-picker]:not(:hover) [class*="-clear"]:not(:focus-visible) {
+      opacity: 0;
+      pointer-events: none;
+    }
+  }
   [data-tao-time-picker] [class*="-range-separator"] {
     display: inline-flex;
     padding-inline: var(--tao-padding-xxs);
