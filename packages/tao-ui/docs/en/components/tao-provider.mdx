@@ -840,6 +840,30 @@ export default function ProviderCompactDensity() {
 
 </section>
 
+
+<section className="tao-example" id="tao-provider-rtl">
+
+### Right-to-left layouts
+
+Set `direction="rtl"` on TaoProvider or use HTML `dir="rtl"` on a surrounding element. Components inherit the local direction, and popups keep the direction of their trigger even when rendered into a portal. An explicit component `direction` prop or nested provider can override it; Carousel uses `rtl`. Locale and direction are independent. Explicit popup placements such as `bottomLeft` retain their physical meaning.
+
+```tsx preview
+import { Select, Stack, TaoProvider } from '@rockshin/tao-ui';
+
+export default function DirectionExample() {
+  return (
+    <TaoProvider direction="rtl">
+      <Stack gap="md">
+        <Select defaultValue="ar" options={[{ value: 'ar', label: 'العربية' }, { value: 'en', label: 'English' }]} />
+        <Select direction="ltr" defaultValue="en" options={[{ value: 'en', label: 'English override' }]} />
+      </Stack>
+    </TaoProvider>
+  );
+}
+```
+
+</section>
+
 </div>
 
 ## API

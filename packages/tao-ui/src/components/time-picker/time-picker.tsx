@@ -9,6 +9,12 @@ import type { Locale, RangePickerRef } from '@rc-component/picker/interface';
 import enLocale from '@rc-component/picker/locale/en_US';
 import zhLocale from '@rc-component/picker/locale/zh_CN';
 import type { Dayjs } from 'dayjs';
+import { useMemo } from 'react';
+import {
+  type TaoDirection,
+  useTaoDirection,
+} from '../../provider/tao-provider';
+import { mergeRefs } from '../../utils/refs';
 import 'dayjs/locale/zh-cn';
 import {
   type ButtonHTMLAttributes,
@@ -195,10 +201,11 @@ function useAppearance(
 
 function scopedPanel(
   panel: ReactNode,
-  render?: (panel: ReactNode) => ReactNode,
+  render: ((panel: ReactNode) => ReactNode) | undefined,
+  direction: TaoDirection,
 ) {
   return (
-    <TaoPortalScope asChild>
+    <TaoPortalScope asChild direction={direction}>
       <div data-tao-time-popup="">{render ? render(panel) : panel}</div>
     </TaoPortalScope>
   );
@@ -207,6 +214,11 @@ function scopedPanel(
 const SingleTimePicker = forwardRef<TimePickerRef, TimePickerProps>(
   (props, ref) => {
     const rootRef = useRef<HTMLDivElement>(null);
+    const [direction, directionRef] = useTaoDirection(props.direction);
+    const mergedRootRef = useMemo(
+      () => mergeRefs(rootRef, directionRef),
+      [directionRef],
+    );
     const pickerRef = useRef<PickerRef>(null);
     useImperativeHandle(ref, () => ({
       get nativeElement() {
@@ -274,7 +286,8 @@ const SingleTimePicker = forwardRef<TimePickerRef, TimePickerProps>(
           };
     return (
       <div
-        ref={rootRef}
+        ref={mergedRootRef}
+        dir={direction}
         data-tao-time-picker=""
         data-tao-control=""
         data-tao-size={appearance.size}
@@ -288,6 +301,7 @@ const SingleTimePicker = forwardRef<TimePickerRef, TimePickerProps>(
         <RcPicker<Dayjs>
           {...rest}
           ref={pickerRef}
+          direction={direction}
           picker="time"
           generateConfig={dayjsConfig}
           locale={appearance.locale}
@@ -319,7 +333,7 @@ const SingleTimePicker = forwardRef<TimePickerRef, TimePickerProps>(
             okButton: components?.button ?? ConfirmButton,
             ...components,
           }}
-          panelRender={(panel) => scopedPanel(panel, panelRender)}
+          panelRender={(panel) => scopedPanel(panel, panelRender, direction)}
           renderExtraFooter={renderExtraFooter ?? addon}
           onChange={(date, text) =>
             onChange?.(date as Dayjs | null, text as string)
@@ -341,6 +355,11 @@ export const TimeRangePicker = forwardRef<
   TimeRangePickerProps
 >((props, ref) => {
   const rootRef = useRef<HTMLDivElement>(null);
+  const [direction, directionRef] = useTaoDirection(props.direction);
+  const mergedRootRef = useMemo(
+    () => mergeRefs(rootRef, directionRef),
+    [directionRef],
+  );
   const pickerRef = useRef<RangePickerRef>(null);
   useImperativeHandle(ref, () => ({
     get nativeElement() {
@@ -399,7 +418,8 @@ export const TimeRangePicker = forwardRef<
         };
   return (
     <div
-      ref={rootRef}
+      ref={mergedRootRef}
+      dir={direction}
       data-tao-time-picker="range"
       data-tao-control=""
       data-tao-size={appearance.size}
@@ -413,6 +433,7 @@ export const TimeRangePicker = forwardRef<
       <RcRangePicker<Dayjs>
         {...rest}
         ref={pickerRef}
+        direction={direction}
         picker="time"
         generateConfig={dayjsConfig}
         locale={appearance.locale}
@@ -444,7 +465,7 @@ export const TimeRangePicker = forwardRef<
           okButton: components?.button ?? ConfirmButton,
           ...components,
         }}
-        panelRender={(panel) => scopedPanel(panel, panelRender)}
+        panelRender={(panel) => scopedPanel(panel, panelRender, direction)}
       />
     </div>
   );

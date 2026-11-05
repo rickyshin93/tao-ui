@@ -9,7 +9,11 @@ import {
   useRef,
   useState,
 } from 'react';
-import { TaoPortalScope, useTaoConfig } from '../../provider/tao-provider';
+import {
+  TaoPortalScope,
+  TaoProvider,
+  useTaoConfig,
+} from '../../provider/tao-provider';
 import { DialogContent } from '../../utils/dialog-content';
 import { preventParentOutsideDismiss } from '../../utils/portal';
 import {
@@ -48,6 +52,7 @@ export interface DrawerProps
     AriaAttributes,
     'aria-label' | 'aria-labelledby' | 'aria-describedby'
   > {
+  direction?: 'ltr' | 'rtl';
   open: boolean;
   onClose?: () => void;
   title?: ReactNode;
@@ -87,6 +92,7 @@ export interface DrawerProps
 }
 
 export function Drawer({
+  direction,
   open,
   onClose,
   title,
@@ -197,119 +203,121 @@ export function Drawer({
   const showHeader = title != null || extra != null || closable;
 
   return (
-    <Dialog.Root
-      open={open}
-      onOpenChange={(v) => {
-        if (!v) onClose?.();
-      }}
-    >
-      <Dialog.Portal forceMount={forceMount}>
-        <TaoPortalScope>
-          {mask && (!keepAlive || open) && (
-            <Dialog.Overlay
-              forceMount={forceMount}
-              data-tao-drawer-overlay=""
-              className={cx(classNames?.overlay)}
-              style={stylesProp?.overlay}
-              onClick={maskClosable ? onClose : undefined}
-            />
-          )}
-          <DialogContent
-            open={open}
-            keepAlive={keepAlive}
-            contentRef={panelRef}
-            forceMount={forceMount}
-            data-tao-drawer=""
-            data-tao-placement={placement}
-            style={contentStyle}
-            className={cx(classNames?.root)}
-            aria-label={ariaLabel}
-            {...(ariaLabel || ariaLabelledBy
-              ? { 'aria-labelledby': ariaLabelledBy }
-              : {})}
-            aria-describedby={ariaDescribedBy}
-            onEscapeKeyDown={(e) => {
-              if (!keyboard) e.preventDefault();
-            }}
-            onPointerDownOutside={preventParentOutsideDismiss}
-            onInteractOutside={preventParentOutsideDismiss}
-          >
-            {isResizable && (
-              <div
-                data-tao-drawer-dragger=""
-                data-tao-placement={placement}
-                className={cx(classNames?.dragger)}
-                style={stylesProp?.dragger}
-                onPointerDown={onDraggerPointerDown}
-                onPointerMove={onDraggerPointerMove}
-                onPointerUp={onDraggerPointerUp}
+    <TaoProvider direction={direction}>
+      <Dialog.Root
+        open={open}
+        onOpenChange={(v) => {
+          if (!v) onClose?.();
+        }}
+      >
+        <Dialog.Portal forceMount={forceMount}>
+          <TaoPortalScope direction={direction}>
+            {mask && (!keepAlive || open) && (
+              <Dialog.Overlay
+                forceMount={forceMount}
+                data-tao-drawer-overlay=""
+                className={cx(classNames?.overlay)}
+                style={stylesProp?.overlay}
+                onClick={maskClosable ? onClose : undefined}
               />
             )}
-            {showHeader && (
-              <div
-                data-tao-drawer-header=""
-                className={cx(classNames?.header)}
-                style={stylesProp?.header}
-              >
-                {title != null ? (
-                  <Dialog.Title
-                    data-tao-drawer-title=""
-                    className={cx(classNames?.title)}
-                    style={stylesProp?.title}
-                  >
-                    {title}
-                  </Dialog.Title>
-                ) : (
-                  <Dialog.Title
-                    data-tao-drawer-title=""
-                    style={{ display: 'none' }}
-                  />
-                )}
-                <div data-tao-drawer-actions="">
-                  {extra != null && (
-                    <div
-                      data-tao-drawer-extra=""
-                      className={cx(classNames?.extra)}
-                      style={stylesProp?.extra}
-                    >
-                      {extra}
-                    </div>
-                  )}
-                  {closable && (
-                    <button
-                      type="button"
-                      data-tao-drawer-close=""
-                      className={cx(classNames?.close)}
-                      style={stylesProp?.close}
-                      onClick={onClose}
-                      aria-label={locale.close}
-                    >
-                      {closeIcon ?? <CloseIcon />}
-                    </button>
-                  )}
-                </div>
-              </div>
-            )}
-            <div
-              data-tao-drawer-body=""
-              className={cx(classNames?.body)}
-              style={stylesProp?.body}
+            <DialogContent
+              open={open}
+              keepAlive={keepAlive}
+              contentRef={panelRef}
+              forceMount={forceMount}
+              data-tao-drawer=""
+              data-tao-placement={placement}
+              style={contentStyle}
+              className={cx(classNames?.root)}
+              aria-label={ariaLabel}
+              {...(ariaLabel || ariaLabelledBy
+                ? { 'aria-labelledby': ariaLabelledBy }
+                : {})}
+              aria-describedby={ariaDescribedBy}
+              onEscapeKeyDown={(e) => {
+                if (!keyboard) e.preventDefault();
+              }}
+              onPointerDownOutside={preventParentOutsideDismiss}
+              onInteractOutside={preventParentOutsideDismiss}
             >
-              {children}
-            </div>
-            {footer != null && (
+              {isResizable && (
+                <div
+                  data-tao-drawer-dragger=""
+                  data-tao-placement={placement}
+                  className={cx(classNames?.dragger)}
+                  style={stylesProp?.dragger}
+                  onPointerDown={onDraggerPointerDown}
+                  onPointerMove={onDraggerPointerMove}
+                  onPointerUp={onDraggerPointerUp}
+                />
+              )}
+              {showHeader && (
+                <div
+                  data-tao-drawer-header=""
+                  className={cx(classNames?.header)}
+                  style={stylesProp?.header}
+                >
+                  {title != null ? (
+                    <Dialog.Title
+                      data-tao-drawer-title=""
+                      className={cx(classNames?.title)}
+                      style={stylesProp?.title}
+                    >
+                      {title}
+                    </Dialog.Title>
+                  ) : (
+                    <Dialog.Title
+                      data-tao-drawer-title=""
+                      style={{ display: 'none' }}
+                    />
+                  )}
+                  <div data-tao-drawer-actions="">
+                    {extra != null && (
+                      <div
+                        data-tao-drawer-extra=""
+                        className={cx(classNames?.extra)}
+                        style={stylesProp?.extra}
+                      >
+                        {extra}
+                      </div>
+                    )}
+                    {closable && (
+                      <button
+                        type="button"
+                        data-tao-drawer-close=""
+                        className={cx(classNames?.close)}
+                        style={stylesProp?.close}
+                        onClick={onClose}
+                        aria-label={locale.close}
+                      >
+                        {closeIcon ?? <CloseIcon />}
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
               <div
-                data-tao-drawer-footer=""
-                className={cx(classNames?.footer)}
-                style={stylesProp?.footer}
+                data-tao-drawer-body=""
+                className={cx(classNames?.body)}
+                style={stylesProp?.body}
               >
-                {footer}
+                {children}
               </div>
-            )}
-          </DialogContent>
-        </TaoPortalScope>
-      </Dialog.Portal>
-    </Dialog.Root>
+              {footer != null && (
+                <div
+                  data-tao-drawer-footer=""
+                  className={cx(classNames?.footer)}
+                  style={stylesProp?.footer}
+                >
+                  {footer}
+                </div>
+              )}
+            </DialogContent>
+          </TaoPortalScope>
+        </Dialog.Portal>
+      </Dialog.Root>
+    </TaoProvider>
   );
 }
 

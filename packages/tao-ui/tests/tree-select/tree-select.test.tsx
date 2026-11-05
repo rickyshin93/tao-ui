@@ -313,3 +313,51 @@ test('maps the public middle size alias to the shared medium control', () => {
     'medium',
   );
 });
+
+test.each(['ltr', 'rtl'] as const)(
+  'tree select horizontal keys follow %s while preserving input and root events',
+  async (direction) => {
+    const inputKeys: string[] = [];
+    const rootKeys: string[] = [];
+    const bubbled: string[] = [];
+    render(
+      <fieldset onKeyDown={(event) => bubbled.push(event.key)}>
+        <TreeSelect
+          direction={direction}
+          defaultOpen
+          showSearch
+          treeData={[
+            {
+              value: 'parent',
+              title: 'Parent',
+              children: [{ value: 'child', title: 'Child' }],
+            },
+          ]}
+          popupRender={(menu) => <div data-testid="custom-popup">{menu}</div>}
+          onInputKeyDown={(event) => inputKeys.push(event.key)}
+          onKeyDown={(event) => rootKeys.push(event.key)}
+        />
+      </fieldset>,
+    );
+    const input = screen.getByRole('combobox');
+    fireEvent.focus(input);
+    fireEvent.keyDown(input, { key: 'ArrowDown', keyCode: 40, which: 40 });
+    const expand = direction === 'rtl' ? 'ArrowLeft' : 'ArrowRight';
+    const collapse = direction === 'rtl' ? 'ArrowRight' : 'ArrowLeft';
+    fireEvent.keyDown(input, {
+      key: expand,
+      keyCode: direction === 'rtl' ? 37 : 39,
+      which: direction === 'rtl' ? 37 : 39,
+    });
+    await waitFor(() => expect(screen.getByText('Child')).toBeVisible());
+    fireEvent.keyDown(input, {
+      key: collapse,
+      keyCode: direction === 'rtl' ? 39 : 37,
+      which: direction === 'rtl' ? 39 : 37,
+    });
+    await waitFor(() => expect(screen.queryByText('Child')).toBeNull());
+    expect(inputKeys).toEqual(['ArrowDown', expand, collapse]);
+    expect(rootKeys).toEqual(inputKeys);
+    expect(bubbled).toEqual(inputKeys);
+  },
+);

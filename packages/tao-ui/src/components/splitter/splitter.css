@@ -164,7 +164,7 @@
 
 /* Rotate icons for orientation + direction */
 [data-tao-splitter-collapse][data-tao-orientation="horizontal"]
-  svg[data-tao-collapse-direction="end"] {
+svg[data-tao-collapse-direction="end"] {
   transform: rotate(180deg);
 }
 
@@ -175,4 +175,9 @@
 [data-tao-splitter-collapse][data-tao-orientation="vertical"]
   svg[data-tao-collapse-direction="end"] {
   transform: rotate(-90deg);
+}
+
+[data-tao-splitter]:dir(rtl)
+  [data-tao-splitter-collapse][data-tao-orientation="horizontal"] {
+  transform: scaleX(-1);
 }

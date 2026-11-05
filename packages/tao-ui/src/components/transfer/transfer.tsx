@@ -3,11 +3,13 @@ import {
   type ReactElement,
   type Ref,
   useImperativeHandle,
+  useMemo,
   useRef,
   useState,
 } from 'react';
-import { useTaoConfig } from '../../provider/tao-provider';
+import { useTaoConfig, useTaoDirection } from '../../provider/tao-provider';
 import { cx } from '../../utils/semantic';
+import { mergeRefs } from '../../utils/refs';
 import { TransferList } from './transfer-list';
 import { TransferOperation, TransferSearch } from './transfer-parts';
 import type {
@@ -87,6 +89,15 @@ function TransferRoot<T extends TransferItem>(
   const semanticStyles =
     typeof styles === 'function' ? styles({ props: mergedProps }) : styles;
   const root = useRef<HTMLDivElement>(null);
+  const [direction, directionRef] = useTaoDirection(
+    rest.dir === 'auto' || rest.dir === 'rtl' || rest.dir === 'ltr'
+      ? rest.dir
+      : undefined,
+  );
+  const mergedRootRef = useMemo(
+    () => mergeRefs(root, directionRef),
+    [directionRef],
+  );
   useImperativeHandle(ref, () => ({ nativeElement: root.current! }));
   const [internalSelected, setSelected] = useState<TransferKey[]>([]);
   const selected = selectedKeys ?? internalSelected;
@@ -215,7 +226,8 @@ function TransferRoot<T extends TransferItem>(
   return (
     <div
       {...rest}
-      ref={root}
+      ref={mergedRootRef}
+      dir={rest.dir === 'auto' ? 'auto' : direction}
       data-tao-transfer=""
       data-tao-disabled={resolvedDisabled ? '' : undefined}
       data-tao-status={status}
@@ -233,7 +245,7 @@ function TransferRoot<T extends TransferItem>(
         )}
         disabled={resolvedDisabled}
         oneWay={oneWay}
-        direction={rest.dir === 'rtl' ? 'rtl' : 'ltr'}
+        direction={direction}
         className={classes?.actions}
         style={{ ...operationStyle, ...semanticStyles?.actions }}
       />

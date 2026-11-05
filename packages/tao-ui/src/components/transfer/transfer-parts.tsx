@@ -114,9 +114,25 @@ export function TransferOperation({
         onClick={handler}
         aria-label={label}
         icon={
-          <span aria-hidden="true">
-            {right !== (direction === 'rtl') ? '›' : '‹'}
-          </span>
+          <svg
+            aria-hidden="true"
+            width="16"
+            height="16"
+            viewBox="0 0 16 16"
+            fill="none"
+          >
+            <path
+              d={
+                right !== (direction === 'rtl')
+                  ? 'm6 4 4 4-4 4'
+                  : 'm10 4-4 4 4 4'
+              }
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
         }
       >
         {content}

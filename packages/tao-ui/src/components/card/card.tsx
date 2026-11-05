@@ -293,7 +293,9 @@ const CardRoot = forwardRef<HTMLDivElement, CardProps>((props, ref) => {
           {tabList && (
             <CardTabs
               size={size === 'small' ? 'small' : 'large'}
-              direction={rest.dir === 'rtl' ? 'rtl' : 'ltr'}
+              direction={
+                rest.dir === 'rtl' || rest.dir === 'ltr' ? rest.dir : undefined
+              }
               {...tabProps}
               {...(activeTabKey !== undefined
                 ? { activeKey: activeTabKey }

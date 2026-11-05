@@ -11,8 +11,9 @@ import {
   type Ref,
   useCallback,
   useEffect,
-  useImperativeHandle,
   useId,
+  useImperativeHandle,
+  useMemo,
   useRef,
   useState,
 } from 'react';
@@ -22,9 +23,11 @@ import {
   type TaoStatus,
   type TaoVariant,
   useTaoConfig,
+  useTaoDirection,
 } from '../../provider/tao-provider';
 import { useIsMobile } from '../../utils/breakpoint';
 import { useMobileTitle } from '../../utils/field-label';
+import { mergeRefs } from '../../utils/refs';
 import {
   cx,
   type SemanticClassNames,
@@ -70,6 +73,7 @@ export interface RangePickerProps
     | 'aria-invalid'
     | 'aria-required'
   > {
+  direction?: 'ltr' | 'rtl';
   id?: string;
   value?: RangeValue;
   defaultValue?: [Dayjs | null, Dayjs | null];
@@ -150,6 +154,11 @@ export const RangePicker = forwardRef(function RangePicker(
   const autoMobile = useIsMobile();
   const isMobile = mobile ?? autoMobile;
   const mobileTriggerRef = useRef<HTMLButtonElement>(null);
+  const [direction, directionRef] = useTaoDirection(props.direction);
+  const mergedMobileRef = useMemo(
+    () => mergeRefs(mobileTriggerRef, directionRef),
+    [directionRef],
+  );
   const startInputRef = useRef<HTMLInputElement>(null);
   const endInputRef = useRef<HTMLInputElement>(null);
 
@@ -609,7 +618,8 @@ export const RangePicker = forwardRef(function RangePicker(
 
   const mobileTrigger = (
     <button
-      ref={mobileTriggerRef}
+      ref={mergedMobileRef}
+      dir={direction}
       id={props.id}
       {...controlAria}
       type="button"
@@ -662,6 +672,8 @@ export const RangePicker = forwardRef(function RangePicker(
     // biome-ignore lint/a11y/noStaticElementInteractions: the input surface forwards pointer activation; the inputs handle keyboard interaction.
     // biome-ignore lint/a11y/useKeyWithClickEvents: the inputs handle keyboard interaction.
     <div
+      ref={directionRef}
+      dir={direction}
       data-tao-control=""
       data-tao-range-trigger=""
       onClick={() => !resolvedDisabled && setOpen(!isOpen)}
@@ -805,6 +817,7 @@ export const RangePicker = forwardRef(function RangePicker(
       <>
         {mobileTrigger}
         <Drawer
+          direction={direction}
           open={isOpen}
           onClose={() => setOpen(false)}
           placement="bottom"
@@ -821,7 +834,7 @@ export const RangePicker = forwardRef(function RangePicker(
     <Popover.Root open={isOpen} onOpenChange={setOpen}>
       <Popover.Anchor asChild>{desktopTrigger}</Popover.Anchor>
       <Popover.Portal>
-        <TaoPortalScope asChild>
+        <TaoPortalScope asChild direction={direction}>
           <Popover.Content
             id={popupId}
             ref={popupRef}

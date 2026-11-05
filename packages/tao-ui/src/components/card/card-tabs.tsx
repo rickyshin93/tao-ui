@@ -10,7 +10,7 @@ import type {
   MouseEvent,
   ReactNode,
 } from 'react';
-import { TaoPortalScope } from '../../provider/tao-provider';
+import { TaoPortalScope, useTaoDirection } from '../../provider/tao-provider';
 import { interopDefault } from '../../utils/interop-default';
 import { cx } from '../../utils/semantic';
 
@@ -113,12 +113,13 @@ export function CardTabs(props: CardTabsProps) {
     prefixCls,
     className,
     style,
-    direction = 'ltr',
+    direction: directionProp,
     animated,
     indicator,
     popupClassName,
     ...rest
   } = props;
+  const [direction, directionRef] = useTaoDirection(directionProp);
   const classes =
     typeof classNames === 'function'
       ? classNames({ props: { ...props, size, type } })
@@ -163,51 +164,53 @@ export function CardTabs(props: CardTabsProps) {
       }
     : motion;
   return (
-    <RcTabsComponent
-      {...rest}
-      prefixCls="tao-card-tabs"
-      data-tao-card-tabs=""
-      data-tao-tab-type={type}
-      data-tao-size={size === 'middle' ? 'medium' : size}
-      data-tao-centered={centered || undefined}
-      className={cx(prefixCls, rootClass, className, rootClassName)}
-      style={{ ...rootStyle, ...style }}
-      direction={direction}
-      tabPosition={position}
-      destroyOnHidden={destroyOnHidden ?? destroyInactiveTabPane}
-      items={items?.map(
-        ({ destroyInactiveTabPane: legacyDestroy, ...item }) => ({
-          ...item,
-          destroyOnHidden: item.destroyOnHidden ?? legacyDestroy,
-        }),
-      )}
-      animated={animation}
-      indicator={{ size: indicatorSize, ...indicator }}
-      classNames={partClasses}
-      styles={{ ...partStyles, popup: popupStyles?.root }}
-      popupClassName={cx(popupClasses?.root, popupClassName)}
-      more={{
-        icon: moreIcon ?? <TabIcon type="more" />,
-        ...moreProps,
-        open: moreProps.open ?? visible,
-        onOpenChange: moreProps.onOpenChange ?? onVisibleChange,
-        popupRender: (menu, info) => (
-          <TaoPortalScope asChild>
-            {moreProps.popupRender ? moreProps.popupRender(menu, info) : menu}
-          </TaoPortalScope>
-        ),
-      }}
-      editable={
-        type === 'editable-card'
-          ? {
-              showAdd: !hideAdd,
-              addIcon: addIcon ?? <TabIcon type="add" />,
-              removeIcon: removeIcon ?? <TabIcon type="remove" />,
-              onEdit: (action, info) =>
-                onEdit?.(action === 'add' ? info.event : info.key!, action),
-            }
-          : undefined
-      }
-    />
+    <div ref={directionRef} dir={direction} style={{ display: 'contents' }}>
+      <RcTabsComponent
+        {...rest}
+        prefixCls="tao-card-tabs"
+        data-tao-card-tabs=""
+        data-tao-tab-type={type}
+        data-tao-size={size === 'middle' ? 'medium' : size}
+        data-tao-centered={centered || undefined}
+        className={cx(prefixCls, rootClass, className, rootClassName)}
+        style={{ ...rootStyle, ...style }}
+        direction={direction}
+        tabPosition={position}
+        destroyOnHidden={destroyOnHidden ?? destroyInactiveTabPane}
+        items={items?.map(
+          ({ destroyInactiveTabPane: legacyDestroy, ...item }) => ({
+            ...item,
+            destroyOnHidden: item.destroyOnHidden ?? legacyDestroy,
+          }),
+        )}
+        animated={animation}
+        indicator={{ size: indicatorSize, ...indicator }}
+        classNames={partClasses}
+        styles={{ ...partStyles, popup: popupStyles?.root }}
+        popupClassName={cx(popupClasses?.root, popupClassName)}
+        more={{
+          icon: moreIcon ?? <TabIcon type="more" />,
+          ...moreProps,
+          open: moreProps.open ?? visible,
+          onOpenChange: moreProps.onOpenChange ?? onVisibleChange,
+          popupRender: (menu, info) => (
+            <TaoPortalScope asChild direction={direction}>
+              {moreProps.popupRender ? moreProps.popupRender(menu, info) : menu}
+            </TaoPortalScope>
+          ),
+        }}
+        editable={
+          type === 'editable-card'
+            ? {
+                showAdd: !hideAdd,
+                addIcon: addIcon ?? <TabIcon type="add" />,
+                removeIcon: removeIcon ?? <TabIcon type="remove" />,
+                onEdit: (action, info) =>
+                  onEdit?.(action === 'add' ? info.event : info.key!, action),
+              }
+            : undefined
+        }
+      />
+    </div>
   );
 }

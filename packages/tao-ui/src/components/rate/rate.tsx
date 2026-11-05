@@ -10,7 +10,11 @@ import {
   type HTMLAttributes,
   type ReactElement,
 } from 'react';
-import { type TaoSize, useTaoConfig } from '../../provider/tao-provider';
+import {
+  type TaoSize,
+  useTaoConfig,
+  useTaoDirection,
+} from '../../provider/tao-provider';
 import {
   cx,
   type SemanticClassNames,
@@ -61,63 +65,74 @@ export const Rate = forwardRef<RateRef, RateProps>(
       readOnly = false,
       character = Star,
       characterRender,
+      direction: directionProp,
       ...rest
     },
     ref,
   ) => {
+    const [direction, directionRef] = useTaoDirection(
+      directionProp === undefined
+        ? undefined
+        : directionProp === 'rtl'
+          ? 'rtl'
+          : 'ltr',
+    );
     const config = useTaoConfig();
     const resolvedDisabled = disabled ?? config.disabled;
     return (
-      <RcRateComponent
-        {...rest}
-        ref={ref}
-        {...{ role: 'radiogroup' }}
-        data-tao-rate=""
-        data-tao-size={size === 'middle' ? 'medium' : (size ?? config.size)}
-        data-tao-disabled={resolvedDisabled ? '' : undefined}
-        data-tao-readonly={readOnly ? '' : undefined}
-        aria-readonly={readOnly || undefined}
-        aria-disabled={resolvedDisabled || undefined}
-        prefixCls={prefixCls}
-        disabled={resolvedDisabled || readOnly}
-        character={character}
-        className={cx(classNames?.root, rootClassName, className)}
-        style={{ ...styles?.root, ...style }}
-        characterRender={(node, info) => {
-          const index = info.index ?? 0;
-          const half =
-            !!info.allowHalf &&
-            (info.value ?? 0) > index &&
-            (info.value ?? 0) < index + 1;
-          const child = cloneElement(
-            node as ReactElement<HTMLAttributes<HTMLLIElement>>,
-            {
-              ...{
-                'data-tao-rate-item': '',
-                'data-tao-half': half ? '' : undefined,
-                'data-tao-full':
-                  (info.value ?? 0) >= index + 1 ? '' : undefined,
+      <span ref={directionRef} dir={direction} style={{ display: 'contents' }}>
+        <RcRateComponent
+          {...rest}
+          direction={direction}
+          ref={ref}
+          {...{ role: 'radiogroup' }}
+          data-tao-rate=""
+          data-tao-size={size === 'middle' ? 'medium' : (size ?? config.size)}
+          data-tao-disabled={resolvedDisabled ? '' : undefined}
+          data-tao-readonly={readOnly ? '' : undefined}
+          aria-readonly={readOnly || undefined}
+          aria-disabled={resolvedDisabled || undefined}
+          prefixCls={prefixCls}
+          disabled={resolvedDisabled || readOnly}
+          character={character}
+          className={cx(classNames?.root, rootClassName, className)}
+          style={{ ...styles?.root, ...style }}
+          characterRender={(node, info) => {
+            const index = info.index ?? 0;
+            const half =
+              !!info.allowHalf &&
+              (info.value ?? 0) > index &&
+              (info.value ?? 0) < index + 1;
+            const child = cloneElement(
+              node as ReactElement<HTMLAttributes<HTMLLIElement>>,
+              {
+                ...{
+                  'data-tao-rate-item': '',
+                  'data-tao-half': half ? '' : undefined,
+                  'data-tao-full':
+                    (info.value ?? 0) >= index + 1 ? '' : undefined,
+                },
+                className: cx(
+                  (node.props as HTMLAttributes<HTMLLIElement>).className,
+                  classNames?.item,
+                ),
+                style: styles?.item,
               },
-              className: cx(
-                (node.props as HTMLAttributes<HTMLLIElement>).className,
-                classNames?.item,
-              ),
-              style: styles?.item,
-            },
-          );
-          const rendered = characterRender
-            ? characterRender(child, info)
-            : child;
-          const tip = tooltips?.[index];
-          return tip ? (
-            <Tooltip {...(typeof tip === 'string' ? { title: tip } : tip)}>
-              {rendered}
-            </Tooltip>
-          ) : (
-            rendered
-          );
-        }}
-      />
+            );
+            const rendered = characterRender
+              ? characterRender(child, info)
+              : child;
+            const tip = tooltips?.[index];
+            return tip ? (
+              <Tooltip {...(typeof tip === 'string' ? { title: tip } : tip)}>
+                {rendered}
+              </Tooltip>
+            ) : (
+              rendered
+            );
+          }}
+        />
+      </span>
     );
   },
 );

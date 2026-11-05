@@ -289,3 +289,17 @@ test('custom scrollbarSize via CSS variable', () => {
   const area = container.querySelector('[data-tao-scroll-area]') as HTMLElement;
   expect(area.style.getPropertyValue('--tao-scrollbar-size')).toBe('10px');
 });
+
+test('RTL horizontal offsets, track clicks and drags share physical coordinates', () => {
+  const { viewport, thumb, track } = renderScrollableArea('x');
+  viewport.style.direction = 'rtl';
+  viewport.scrollLeft = -450;
+  fireEvent.scroll(viewport);
+  expect(thumb.style.left).toBe('50%');
+  fireEvent.click(track, { clientX: 20 });
+  expect(viewport.scrollLeft).toBe(-675);
+  fireEvent.pointerDown(thumb, { pointerId: 1, clientX: 0 });
+  fireEvent.pointerMove(document, { pointerId: 1, clientX: 10 });
+  fireEvent.pointerUp(document, { pointerId: 1 });
+  expect(viewport.scrollLeft).toBe(-525);
+});

@@ -86,3 +86,37 @@ test('inherits disabled and size, forwards the element and exposes icon semantic
   expect(ref.current).toHaveAttribute('data-tao-size', 'large');
   expect(screen.getByText('≡').parentElement).toHaveStyle({ color: 'red' });
 });
+
+test('keyboard changes remeasure the selected item without a React 18 layout update loop', () => {
+  const measure = rstest
+    .spyOn(HTMLElement.prototype, 'getBoundingClientRect')
+    .mockImplementation(function (this: HTMLElement) {
+      const label = this.textContent;
+      const x = this.hasAttribute('data-tao-segmented-item')
+        ? label === 'A'
+          ? 0
+          : label === 'B'
+            ? 40
+            : 80
+        : 0;
+      return new DOMRect(
+        x,
+        0,
+        this.hasAttribute('data-tao-segmented-item') ? 40 : 120,
+        32,
+      );
+    });
+  try {
+    render(<Segmented options={['A', 'B', 'C']} defaultValue="B" />);
+    screen.getByRole('radio', { name: 'B' }).focus();
+    fireEvent.keyDown(screen.getByRole('radio', { name: 'B' }), {
+      key: 'ArrowRight',
+    });
+    expect(screen.getByRole('radio', { name: 'C' })).toBeChecked();
+    expect(document.querySelector('[data-tao-segmented-thumb]')).toHaveStyle({
+      transform: 'translate(80px, 0px)',
+    });
+  } finally {
+    measure.mockRestore();
+  }
+});

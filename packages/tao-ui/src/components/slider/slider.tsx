@@ -12,7 +12,11 @@ import {
   useRef,
   useState,
 } from 'react';
-import { TaoPortalScope, useTaoConfig } from '../../provider/tao-provider';
+import {
+  TaoPortalScope,
+  useTaoConfig,
+  useTaoDirection,
+} from '../../provider/tao-provider';
 import {
   cx,
   type SemanticClassNames,
@@ -194,7 +198,7 @@ function SliderTip({
               : undefined
           }
         >
-          <TaoPortalScope>
+          <TaoPortalScope direction={direction}>
             <TooltipPrimitive.Content
               data-tao-tooltip-content=""
               side={side}
@@ -242,13 +246,14 @@ export const Slider = forwardRef<SliderRef, SliderProps>((props, ref) => {
     style,
     orientation,
     vertical = false,
-    direction = 'ltr',
+    direction: directionProp,
     disabled,
     tooltip = {},
     handleRender,
     reverse,
     ...rest
   } = props;
+  const [direction, directionRef] = useTaoDirection(directionProp);
   const config = useTaoConfig();
   const resolvedDisabled = disabled ?? config.disabled;
   const resolvedVertical = orientation ? orientation === 'vertical' : vertical;
@@ -268,6 +273,7 @@ export const Slider = forwardRef<SliderRef, SliderProps>((props, ref) => {
     : resolvedDisabled;
   return (
     <div
+      ref={directionRef}
       data-tao-slider=""
       data-tao-vertical={resolvedVertical ? '' : undefined}
       data-tao-disabled={allDisabled ? '' : undefined}

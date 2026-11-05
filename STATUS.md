@@ -1,6 +1,7 @@
 # STATUS
 
 ## Doing
+- 2026-11-06 Implemented RTL propagation, scrolling, keyboard/layout fixes and the React 18 Segmented crash fix. Review findings closed; local gates and React 18/19 desktop/mobile browser checks passed. Pending 0.0.45 release and registry verification. Evidence: `.logs/rtl-0.0.45/`.
 - 2026-10-20 Approve the staged `@rockshin/tao-icons@0.0.1` on npmjs.com: the registry currently shows the public `0.0.0-stage` placeholder, and the real version needs maintainer 2FA approval (Staged Packages -> Approve)
 
 ## Next

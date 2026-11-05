@@ -17,7 +17,7 @@ import {
   useRef,
 } from 'react';
 import { RemoveScroll } from 'react-remove-scroll';
-import { TaoPortalScope } from '../../provider/tao-provider';
+import { TaoPortalScope, TaoProvider } from '../../provider/tao-provider';
 import {
   resolveResponsiveValue,
   type TaoBreakpointMap,
@@ -64,6 +64,7 @@ export interface ModalProps
     AriaAttributes,
     'aria-label' | 'aria-labelledby' | 'aria-describedby'
   > {
+  direction?: 'ltr' | 'rtl';
   open: boolean;
   onClose?: () => void;
   title?: ReactNode;
@@ -133,6 +134,7 @@ export interface ModalProps
 }
 
 export function Modal({
+  direction,
   open,
   onClose,
   title,
@@ -460,21 +462,23 @@ export function Modal({
       );
   }
   return (
-    <Dialog.Root
-      open={open}
-      modal={!customInteraction}
-      onOpenChange={(value) => {
-        if (!value) onClose?.();
-      }}
-    >
-      {getContainer === false ? (
-        layer
-      ) : (
-        <Dialog.Portal forceMount={forceMount} container={container}>
-          {layer}
-        </Dialog.Portal>
-      )}
-    </Dialog.Root>
+    <TaoProvider direction={direction}>
+      <Dialog.Root
+        open={open}
+        modal={!customInteraction}
+        onOpenChange={(value) => {
+          if (!value) onClose?.();
+        }}
+      >
+        {getContainer === false ? (
+          layer
+        ) : (
+          <Dialog.Portal forceMount={forceMount} container={container}>
+            {layer}
+          </Dialog.Portal>
+        )}
+      </Dialog.Root>
+    </TaoProvider>
   );
 }
 

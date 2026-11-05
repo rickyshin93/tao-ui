@@ -13,12 +13,15 @@ import {
   type ReactNode,
   type Ref,
   type RefAttributes,
+  useMemo,
 } from 'react';
 import {
   type TaoSize,
   type TaoStatus,
+  useTaoDirection,
   useTaoInternalConfig,
 } from '../../provider/tao-provider';
+import { mergeRefs } from '../../utils/refs';
 import { cx } from '../../utils/semantic';
 import { ChevronDownIcon, CloseIcon } from '../select/select-icons';
 import { Spinner } from '../spinner/spinner';
@@ -152,11 +155,21 @@ function InternalCascader<
   const semanticStyles =
     typeof styles === 'function' ? styles({ props: resolvedProps }) : styles;
   const renderPopup = popupRender ?? dropdownRender;
+  const [direction, directionRef] = useTaoDirection(props.direction);
+  const mergedRef = useMemo(
+    () =>
+      mergeRefs<CascaderRef>(ref, (node) =>
+        directionRef(node?.nativeElement ?? null),
+      ),
+    [ref, directionRef],
+  );
 
   return (
     <RcCascaderComponent<OptionType, ValueField, Multiple>
       {...rest}
-      ref={ref}
+      ref={mergedRef}
+      direction={direction}
+      {...{ dir: direction }}
       prefixCls={prefixCls}
       popupPrefixCls="tao-cascader"
       data-tao-cascader=""
@@ -206,7 +219,7 @@ function InternalCascader<
         ...semanticStyles?.popup?.root,
       }}
       popupRender={(menu) => (
-        <SelectEnginePopup size={size}>
+        <SelectEnginePopup direction={direction} size={size}>
           <div data-tao-cascader-popup="">
             {renderPopup ? renderPopup(menu) : menu}
           </div>
@@ -272,16 +285,19 @@ export function CascaderPanel<
     loadingIcon = <Spinner size="small" />,
     ...rest
   } = props;
+  const [direction, directionRef] = useTaoDirection(props.direction);
   return (
     <div
+      ref={directionRef}
       data-tao-cascader-panel=""
       data-tao-cascader-popup=""
       className={cx(className, rootClassName)}
       style={style}
-      dir={props.direction}
+      dir={direction}
     >
       <RcPanel<OptionType, ValueField, Multiple>
         {...rest}
+        direction={direction}
         prefixCls={prefixCls}
         checkable={multiple}
         disabled={disabled}

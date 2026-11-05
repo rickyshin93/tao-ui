@@ -69,7 +69,13 @@ export interface BreadcrumbProps {
 
 function ChevronIcon() {
   return (
-    <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" focusable="false">
+    <svg
+      data-tao-breadcrumb-chevron=""
+      viewBox="0 0 16 16"
+      fill="none"
+      aria-hidden="true"
+      focusable="false"
+    >
       <path
         d="M6 4l4 4-4 4"
         stroke="currentColor"

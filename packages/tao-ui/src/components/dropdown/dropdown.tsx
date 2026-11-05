@@ -10,6 +10,7 @@ import {
   TaoPortalScope,
   type TaoSize,
   useTaoConfig,
+  useTaoDirection,
 } from '../../provider/tao-provider';
 import { asTriggerChild } from '../../utils/overlay';
 import {
@@ -50,6 +51,7 @@ export type DropdownPlacement =
 export type DropdownTrigger = 'click' | 'hover' | 'contextMenu';
 
 export interface DropdownProps {
+  direction?: 'ltr' | 'rtl';
   menu: MenuProps;
   /** Trigger element (a single React element). */
   children: ReactNode;
@@ -133,11 +135,12 @@ function EllipsisIcon() {
 // ---- Component ----
 
 export function Dropdown(props: DropdownProps) {
+  const [direction, directionRef] = useTaoDirection(props.direction, 'self');
   const {
     menu,
     children,
     trigger = ['click'],
-    placement = 'bottomLeft',
+    placement,
     open,
     defaultOpen,
     onOpenChange,
@@ -186,6 +189,7 @@ export function Dropdown(props: DropdownProps) {
   if (isContext) {
     return (
       <ContextMenu
+        direction={props.direction}
         menu={menu}
         open={open}
         onOpenChange={onOpenChange}
@@ -200,14 +204,28 @@ export function Dropdown(props: DropdownProps) {
     );
   }
 
-  const { side, align } = parsePlacement(placement);
+  const { side, align: physicalAlign } = parsePlacement(
+    placement ?? (direction === 'rtl' ? 'bottomRight' : 'bottomLeft'),
+  );
+  const align =
+    direction === 'rtl' && physicalAlign !== 'center'
+      ? physicalAlign === 'start'
+        ? 'end'
+        : 'start'
+      : physicalAlign;
   const hoverProps = hoverMode
     ? { onPointerEnter: openOnHover, onPointerLeave: closeOnHover }
     : undefined;
 
   return (
-    <RD.Root open={realOpen} onOpenChange={setOpen} modal={false}>
+    <RD.Root
+      dir={direction}
+      open={realOpen}
+      onOpenChange={setOpen}
+      modal={false}
+    >
       <RD.Trigger
+        ref={directionRef}
         asChild
         disabled={resolvedDisabled}
         data-tao-dropdown-trigger=""
@@ -216,7 +234,7 @@ export function Dropdown(props: DropdownProps) {
         {triggerChild}
       </RD.Trigger>
       <RD.Portal>
-        <TaoPortalScope asChild>
+        <TaoPortalScope asChild direction={direction}>
           <RD.Content
             data-tao-menu-content=""
             data-tao-dropdown=""
@@ -228,7 +246,11 @@ export function Dropdown(props: DropdownProps) {
             sideOffset={4}
             {...hoverProps}
           >
-            {arrow && <RD.Arrow asChild><span data-tao-dropdown-arrow="" /></RD.Arrow>}
+            {arrow && (
+              <RD.Arrow asChild>
+                <span data-tao-dropdown-arrow="" />
+              </RD.Arrow>
+            )}
             {content}
           </RD.Content>
         </TaoPortalScope>

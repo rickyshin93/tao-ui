@@ -1,8 +1,8 @@
 import { type ReactNode, useCallback, useMemo, useRef } from 'react';
 import { useTaoConfig } from '../../provider/tao-provider';
+import { useMobileTitle } from '../../utils/field-label';
 import { Button } from '../button/button';
 import { Drawer } from '../drawer/drawer';
-import { useMobileTitle } from '../../utils/field-label';
 import { SearchIcon } from './select-icons';
 import {
   countLeafOptions,
@@ -315,11 +315,13 @@ function MobileSelectContentInner({
 export { MobileSelectContentInner as MobileSelectContent };
 
 export interface MobileSelectDrawerProps extends MobileSelectContentProps {
+  direction?: 'ltr' | 'rtl';
   open: boolean;
   mobileTitle?: ReactNode;
 }
 
 export function MobileSelectDrawer({
+  direction,
   open,
   mobileTitle,
   onClose,
@@ -342,6 +344,7 @@ export function MobileSelectDrawer({
   );
   return (
     <Drawer
+      direction={direction}
       open={open}
       onClose={onClose}
       placement="bottom"

@@ -10,6 +10,7 @@ export {
   type InputComponentToken,
   type TaoComponentTokenMap,
   type TaoConfig,
+  type TaoDirection,
   type TaoLocale,
   TaoProvider,
   type TaoProviderProps,

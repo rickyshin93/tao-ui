@@ -52,7 +52,7 @@ function renderLlmsTxt() {
     '',
     '## Core Concepts',
     '',
-    '- `TaoProvider` supplies size, disabled, variant, portal scope, and theme seed token defaults.',
+    '- `TaoProvider` supplies size, disabled, variant, direction, portal scope, and theme seed token defaults.',
     '- Components expose semantic DOM customization through `classNames` and `styles` props.',
     '- Theme tokens are CSS custom properties prefixed with `--tao-*`; import `tokenVar(name)` and `taoTokenNames` from `@rockshin/tao-ui/tokens`.',
     '- Import `componentDocs` and `getComponentDoc(name)` from `@rockshin/tao-ui/meta` for machine-readable component metadata.',

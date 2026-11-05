@@ -14,7 +14,7 @@ export const taoProviderDoc = {
   related: ['Button', 'Input', 'tokenVar'],
   usage: {
     description:
-      'Wrap an app or subtree with TaoProvider to set size, disabled, variant, and theme defaults.',
+      'Wrap an app or subtree with TaoProvider to set size, disabled, variant, direction, and theme defaults.',
     bestPractices: [
       'Prefer provider-level defaults for app-wide decisions.',
       'Use nested providers for scoped theme overrides.',
@@ -24,6 +24,12 @@ export const taoProviderDoc = {
     ],
   },
   props: [
+    {
+      name: 'direction',
+      type: "'ltr' | 'rtl'",
+      description:
+        'Text and interaction direction. Inherits the surrounding DOM when omitted; nested providers and component props can override it. Portals retain their source direction.',
+    },
     {
       name: 'size',
       type: 'TaoSize',

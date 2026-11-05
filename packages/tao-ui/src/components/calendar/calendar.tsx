@@ -10,10 +10,11 @@ import {
   forwardRef,
   type ReactNode,
   useImperativeHandle,
+  useMemo,
   useRef,
   useState,
 } from 'react';
-import { useTaoConfig } from '../../provider/tao-provider';
+import { useTaoConfig, useTaoDirection } from '../../provider/tao-provider';
 import { Segmented } from '../segmented/segmented';
 import { Select } from '../select/select';
 import {
@@ -21,6 +22,7 @@ import {
   type SemanticClassNames,
   type SemanticStyles,
 } from '../../utils/semantic';
+import { mergeRefs } from '../../utils/refs';
 import './calendar.css';
 
 export type CalendarMode = 'year' | 'month';
@@ -42,6 +44,7 @@ export type HeaderRender<DateType> = (config: {
 }) => ReactNode;
 type SemanticValue<Value, Props> = Value | ((info: { props: Props }) => Value);
 export interface CalendarProps<DateType = Dayjs> {
+  direction?: 'ltr' | 'rtl';
   prefixCls?: string;
   className?: string;
   rootClassName?: string;
@@ -86,6 +89,11 @@ export interface CalendarRef {
 export const Calendar = forwardRef<CalendarRef, CalendarProps>((props, ref) => {
   const config = useTaoConfig();
   const root = useRef<HTMLDivElement>(null);
+  const [direction, directionRef] = useTaoDirection(props.direction);
+  const mergedRootRef = useMemo(
+    () => mergeRefs(root, directionRef),
+    [directionRef],
+  );
   useImperativeHandle(ref, () => ({
     get nativeElement() {
       return root.current as HTMLDivElement;
@@ -182,7 +190,8 @@ export const Calendar = forwardRef<CalendarRef, CalendarProps>((props, ref) => {
   };
   return (
     <div
-      ref={root}
+      ref={mergedRootRef}
+      dir={direction}
       data-tao-calendar=""
       data-fullscreen={fullscreen}
       className={cx(names?.root, props.className, props.rootClassName)}
@@ -242,6 +251,7 @@ export const Calendar = forwardRef<CalendarRef, CalendarProps>((props, ref) => {
         </div>
       )}
       <PickerPanel<Dayjs>
+        direction={direction}
         prefixCls={props.prefixCls ?? 'tao-calendar-panel'}
         generateConfig={dayjsConfig}
         locale={locale}

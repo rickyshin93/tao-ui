@@ -119,8 +119,9 @@ export function CalendarGrid({
 
   const handleKeyDown = (event: KeyboardEvent, date: Dayjs) => {
     let next: Dayjs | undefined;
-    if (event.key === 'ArrowLeft') next = date.subtract(1, 'day');
-    else if (event.key === 'ArrowRight') next = date.add(1, 'day');
+    const rtl = getComputedStyle(event.currentTarget).direction === 'rtl';
+    if (event.key === 'ArrowLeft') next = date.add(rtl ? 1 : -1, 'day');
+    else if (event.key === 'ArrowRight') next = date.add(rtl ? -1 : 1, 'day');
     else if (event.key === 'ArrowUp') next = date.subtract(7, 'day');
     else if (event.key === 'ArrowDown') next = date.add(7, 'day');
     else if (event.key === 'Home')

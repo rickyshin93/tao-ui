@@ -8,8 +8,9 @@ import {
   useRef,
   useState,
 } from 'react';
-import { useTaoConfig } from '../../provider/tao-provider';
+import { useTaoConfig, useTaoDirection } from '../../provider/tao-provider';
 import { useBreakpoint } from '../../utils/breakpoint';
+import { getScrollLeft } from '../../utils/scroll-left';
 import { cx } from '../../utils/semantic';
 import { Checkbox } from '../checkbox/checkbox';
 import { Pagination } from '../pagination/pagination';
@@ -253,6 +254,7 @@ export function Table<T extends TableRecord = Record<string, unknown>>({
 
   // ---- Scroll + sticky columns ----
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [direction, directionRef] = useTaoDirection(undefined, 'self');
   // Expanded content is pinned to the visible width while scrolling sideways.
   const [viewportWidth, setViewportWidth] = useState<number>();
   const [scrollState, setScrollState] = useState<
@@ -262,15 +264,16 @@ export function Table<T extends TableRecord = Record<string, unknown>>({
   const handleScroll = useCallback(() => {
     const el = scrollRef.current;
     if (!el) return;
-    const { scrollLeft, scrollWidth, clientWidth } = el;
+    const { scrollWidth, clientWidth } = el;
+    const scrollLeft = getScrollLeft(el);
     const atLeft = scrollLeft <= 1;
     const atRight = scrollLeft + clientWidth >= scrollWidth - 1;
     setViewportWidth(clientWidth);
     if (atLeft && atRight) setScrollState('both');
-    else if (atLeft) setScrollState('left');
-    else if (atRight) setScrollState('right');
+    else if (atLeft) setScrollState(direction === 'rtl' ? 'right' : 'left');
+    else if (atRight) setScrollState(direction === 'rtl' ? 'left' : 'right');
     else setScrollState('middle');
-  }, []);
+  }, [direction]);
 
   // Container width / column widths change without a scroll event.
   useEffect(() => {
@@ -322,7 +325,9 @@ export function Table<T extends TableRecord = Record<string, unknown>>({
     let leftOffset = 0;
     for (const col of allColumns) {
       if (col.fixed === 'left') {
-        positions[col._key] = { left: leftOffset };
+        positions[col._key] = {
+          [direction === 'rtl' ? 'right' : 'left']: leftOffset,
+        };
         leftOffset += typeof col.width === 'number' ? col.width : 0;
       }
     }
@@ -332,13 +337,15 @@ export function Table<T extends TableRecord = Record<string, unknown>>({
     for (let i = allColumns.length - 1; i >= 0; i--) {
       const col = allColumns[i];
       if (col.fixed === 'right') {
-        positions[col._key] = { right: rightOffset };
+        positions[col._key] = {
+          [direction === 'rtl' ? 'left' : 'right']: rightOffset,
+        };
         rightOffset += typeof col.width === 'number' ? col.width : 0;
       }
     }
 
     return positions;
-  }, [allColumns, scroll?.x]);
+  }, [allColumns, scroll?.x, direction]);
 
   const summaryColumns = useMemo<TableSummaryColumn[]>(
     () =>
@@ -369,7 +376,9 @@ export function Table<T extends TableRecord = Record<string, unknown>>({
 
   return (
     <div
+      ref={directionRef}
       data-tao-table-wrapper=""
+      data-tao-direction={direction}
       data-tao-size={resolvedSize}
       data-tao-variant={resolvedVariant}
       data-tao-header-bg={headerBackground ? undefined : 'off'}

@@ -67,6 +67,12 @@ import { TaoProvider, zhCN } from '@rockshin/tao-ui/provider';
 
 Select and calendar text defaults to English (`enUS`). Override individual keys with `locale={{ ...zhCN, done: '确认' }}`. Nested providers inherit omitted keys, including in portals. This does not change date value formats or Day.js global locale. See [responsive behavior and customization](./RESPONSIVE.md) for scope and verification boundaries.
 
+### Right-to-left layouts
+
+Set `<TaoProvider direction="rtl">` for an application or section. Components also inherit HTML `dir="rtl"` from their surrounding DOM. Explicit component `direction` props override inheritance; Carousel uses its existing `rtl` prop. Popups retain the direction of their trigger, including mobile Select and date-picker drawers. Nested `direction="ltr"` scopes can display Latin content inside an RTL application.
+
+Directional keys, horizontal scrolling, splitters, ratings and fixed table columns follow the rendered direction. Explicit popup placements such as `bottomLeft` remain physical left/right positions. Locale and text direction are independent settings.
+
 ### Component imports
 
 Use component entries to include only their styles and shared theme styles. No separate CSS import is needed. The root entry remains available and includes all component styles.
