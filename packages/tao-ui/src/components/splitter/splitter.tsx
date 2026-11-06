@@ -13,6 +13,7 @@ import {
   type SemanticStyles,
 } from '../../utils/semantic';
 import './splitter.css';
+import { useTaoConfig } from '../../provider/tao-provider';
 
 // ---- Types ----
 
@@ -174,6 +175,7 @@ export function Splitter({
   styles,
   children,
 }: SplitterProps) {
+  const { locale } = useTaoConfig();
   const containerRef = useRef<HTMLDivElement>(null);
 
   const { panels, panelChildren } = useMemo(() => {
@@ -270,13 +272,18 @@ export function Splitter({
       dragCleanup.current?.();
       const pos = isHorizontal ? e.clientX : e.clientY;
       const pointerId = e.pointerId;
+      const sign =
+        isHorizontal &&
+        getComputedStyle(containerRef.current!).direction === 'rtl'
+          ? -1
+          : 1;
       const startSizes = [...sizes];
       let currentSizes = startSizes;
       onResizeStart?.(sizes);
 
       const handleMove = (ev: PointerEvent) => {
         if (ev.pointerId !== pointerId) return;
-        const delta = (isHorizontal ? ev.clientX : ev.clientY) - pos;
+        const delta = ((isHorizontal ? ev.clientX : ev.clientY) - pos) * sign;
 
         const next = resizePanels(index, delta, startSizes);
         currentSizes = next;
@@ -307,8 +314,17 @@ export function Splitter({
 
   const handleDraggerKeyDown = useCallback(
     (index: number, event: React.KeyboardEvent<HTMLDivElement>) => {
-      const growKey = isHorizontal ? 'ArrowRight' : 'ArrowDown';
-      const shrinkKey = isHorizontal ? 'ArrowLeft' : 'ArrowUp';
+      const rtl = getComputedStyle(event.currentTarget).direction === 'rtl';
+      const growKey = isHorizontal
+        ? rtl
+          ? 'ArrowLeft'
+          : 'ArrowRight'
+        : 'ArrowDown';
+      const shrinkKey = isHorizontal
+        ? rtl
+          ? 'ArrowRight'
+          : 'ArrowLeft'
+        : 'ArrowUp';
       if (event.key !== growKey && event.key !== shrinkKey) return;
       event.preventDefault();
       const delta = event.key === growKey ? 10 : -10;
@@ -432,7 +448,7 @@ export function Splitter({
                 data-tao-splitter-dragger=""
                 data-tao-orientation={orientation}
                 role="separator"
-                aria-label={`Resize panels ${i + 1} and ${i + 2}`}
+                aria-label={locale.messages.resizePanels(i + 1, i + 2)}
                 aria-orientation={isHorizontal ? 'vertical' : 'horizontal'}
                 aria-valuemin={Math.round(valueMin)}
                 aria-valuemax={Math.round(valueMax)}
@@ -460,7 +476,7 @@ export function Splitter({
                           data-tao-splitter-collapse=""
                           data-tao-collapse-direction="start"
                           data-tao-orientation={orientation}
-                          aria-label="Collapse panel"
+                          aria-label={locale.messages.collapsePanel}
                           onClick={() => handleCollapse(i, 'start')}
                         >
                           <CollapseIcon
@@ -475,7 +491,7 @@ export function Splitter({
                           data-tao-splitter-collapse=""
                           data-tao-collapse-direction="end"
                           data-tao-orientation={orientation}
-                          aria-label="Collapse panel"
+                          aria-label={locale.messages.collapsePanel}
                           onClick={() => handleCollapse(i, 'end')}
                         >
                           <CollapseIcon

@@ -176,3 +176,7 @@
     min-height: 44px;
   }
 }
+
+[data-tao-pagination]:dir(rtl) [data-tao-pagination-btn] > svg {
+  transform: scaleX(-1);
+}

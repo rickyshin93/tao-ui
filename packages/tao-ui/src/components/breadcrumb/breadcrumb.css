@@ -142,3 +142,7 @@ button[data-tao-breadcrumb-ellipsis]:hover {
 [data-tao-breadcrumb][data-tao-size="large"] [data-tao-breadcrumb-list] {
   font-size: var(--tao-font-size-base);
 }
+
+[data-tao-breadcrumb-chevron]:dir(rtl) {
+  transform: scaleX(-1);
+}

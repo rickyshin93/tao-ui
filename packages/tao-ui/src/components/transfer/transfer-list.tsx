@@ -1,4 +1,5 @@
 import { type MouseEvent, useState } from 'react';
+import { useTaoConfig } from '../../provider/tao-provider';
 import { Checkbox } from '../checkbox/checkbox';
 import { Dropdown } from '../dropdown/dropdown';
 import { Empty } from '../empty/empty';
@@ -14,6 +15,7 @@ import type {
 export function TransferList<T extends TransferItem>(
   props: TransferListProps<T>,
 ) {
+  const { locale } = useTaoConfig();
   const {
     prefixCls,
     style,
@@ -44,13 +46,14 @@ export function TransferList<T extends TransferItem>(
     searchPlaceholder,
     itemUnit,
     itemsUnit,
-    remove = 'Remove',
-    selectAll = 'Select all',
-    deselectAll = 'Deselect all',
-    selectCurrent = 'Select current page',
-    selectInvert = 'Invert current selection',
-    removeAll = 'Remove all',
-    removeCurrent = 'Remove current page',
+    itemCount,
+    remove = locale.remove('').trim(),
+    selectAll = locale.messages.selectAll,
+    deselectAll = locale.messages.deselectAll,
+    selectCurrent = locale.messages.selectCurrent,
+    selectInvert = locale.messages.invertCurrent,
+    removeAll = locale.messages.removeAll,
+    removeCurrent = locale.messages.removeCurrent,
   } = props;
   const searchOptions = typeof showSearch === 'object' ? showSearch : {};
   const [search, setSearch] = useState(searchOptions.defaultValue ?? '');
@@ -109,7 +112,7 @@ export function TransferList<T extends TransferItem>(
     typeof selectAllLabel === 'function'
       ? selectAllLabel({ selectedCount, totalCount: filteredItems.length })
       : (selectAllLabel ??
-        `${selectedCount ? `${selectedCount}/` : ''}${filteredItems.length} ${filteredItems.length === 1 ? itemUnit : itemsUnit}`);
+        `${selectedCount ? `${new Intl.NumberFormat(locale.numberLocale).format(selectedCount)}/` : ''}${itemCount ? itemCount(filteredItems.length) : `${filteredItems.length} ${filteredItems.length === 1 ? itemUnit : itemsUnit}`}`);
   const clear = () => {
     setSearch('');
     setPage(1);
@@ -125,8 +128,8 @@ export function TransferList<T extends TransferItem>(
     typeof titleText === 'string' && titleText
       ? titleText
       : direction === 'left'
-        ? 'Source'
-        : 'Target';
+        ? locale.messages.source
+        : locale.messages.target;
   const semantic = (
     part: Exclude<TransferSemanticPart, 'root' | 'actions'>,
   ) => ({ className: classNames?.[part], style: styles?.[part] });
@@ -202,7 +205,7 @@ export function TransferList<T extends TransferItem>(
               <button
                 data-tao-transfer-selection=""
                 type="button"
-                aria-label={`Selection actions ${sectionName}`}
+                aria-label={`${locale.messages.selectionActions} ${sectionName}`}
                 disabled={disabled || !enabled.length}
               >
                 {selectionsIcon ?? '⌄'}

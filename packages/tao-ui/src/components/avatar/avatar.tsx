@@ -217,6 +217,7 @@ function flattenChildren(children: ReactNode): ReactNode[] {
 const AvatarGroup = forwardRef<AvatarGroupRef, AvatarGroupProps>(
   (props, ref) => {
     const parent = useContext(GroupContext);
+    const { locale } = useTaoConfig();
     const {
       prefixCls,
       rootClassName,
@@ -270,7 +271,7 @@ const AvatarGroup = forwardRef<AvatarGroupRef, AvatarGroupProps>(
               <button
                 type="button"
                 data-tao-avatar-overflow=""
-                aria-label={`${hidden.length} more users`}
+                aria-label={locale.messages.moreUsers(hidden.length)}
                 className={classNames?.overflow}
                 style={styles?.overflow}
               >

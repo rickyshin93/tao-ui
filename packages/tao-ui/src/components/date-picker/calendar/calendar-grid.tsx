@@ -50,7 +50,13 @@ export function CalendarGrid({
   cellStyle,
 }: CalendarGridProps) {
   const { locale } = useTaoConfig();
-  const weeks = getCalendarWeeks(viewDate);
+  const weekStartsOn = locale.weekStartsOn ?? 1;
+  const weekdayOffset = (weekStartsOn + 6) % 7;
+  const weekdays = [
+    ...locale.weekdays.slice(weekdayOffset),
+    ...locale.weekdays.slice(0, weekdayOffset),
+  ];
+  const weeks = getCalendarWeeks(viewDate, weekStartsOn);
   const today = dayjs();
   const currentMonth = viewDate.month();
   const isRangeMode = rangeStart !== undefined; // distinguish from single picker
@@ -119,14 +125,15 @@ export function CalendarGrid({
 
   const handleKeyDown = (event: KeyboardEvent, date: Dayjs) => {
     let next: Dayjs | undefined;
-    if (event.key === 'ArrowLeft') next = date.subtract(1, 'day');
-    else if (event.key === 'ArrowRight') next = date.add(1, 'day');
+    const rtl = getComputedStyle(event.currentTarget).direction === 'rtl';
+    if (event.key === 'ArrowLeft') next = date.add(rtl ? 1 : -1, 'day');
+    else if (event.key === 'ArrowRight') next = date.add(rtl ? -1 : 1, 'day');
     else if (event.key === 'ArrowUp') next = date.subtract(7, 'day');
     else if (event.key === 'ArrowDown') next = date.add(7, 'day');
     else if (event.key === 'Home')
-      next = date.subtract((date.day() + 6) % 7, 'day');
+      next = date.subtract((date.day() - weekStartsOn + 7) % 7, 'day');
     else if (event.key === 'End')
-      next = date.add(6 - ((date.day() + 6) % 7), 'day');
+      next = date.add(6 - ((date.day() - weekStartsOn + 7) % 7), 'day');
     else if (event.key === 'PageUp') next = date.subtract(1, 'month');
     else if (event.key === 'PageDown') next = date.add(1, 'month');
     if (!next) return;
@@ -175,7 +182,7 @@ export function CalendarGrid({
     >
       <thead>
         <tr>
-          {locale.weekdays.map((d) => (
+          {weekdays.map((d) => (
             <th key={d} data-tao-calendar-weekday="">
               {d}
             </th>

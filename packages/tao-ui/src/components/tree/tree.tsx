@@ -21,7 +21,7 @@ import {
   useRef,
   useState,
 } from 'react';
-import { useTaoConfig } from '../../provider/tao-provider';
+import { useTaoConfig, useTaoDirection } from '../../provider/tao-provider';
 import {
   cx,
   type SemanticClassNames,
@@ -29,10 +29,20 @@ import {
 } from '../../utils/semantic';
 import { Spinner } from '../spinner/spinner';
 import { TreeCheck } from './tree-check';
+import { originalTreeKeyboardEvent, treeKeyboardEvent } from './tree-keyboard';
 import './tree.css';
 import { interopDefault } from '../../utils/interop-default';
 
 const RcTreeComponent = /*#__PURE__*/ interopDefault(RcTree);
+
+class DirectionalRcTree extends RcTreeComponent {
+  constructor(props: RcTreeProps) {
+    super(props);
+    const onKeyDown = this.onKeyDown;
+    this.onKeyDown = (event) =>
+      onKeyDown(treeKeyboardEvent(event, this.props.direction));
+  }
+}
 
 export type {
   BasicDataNode,
@@ -154,9 +164,11 @@ const TreeBase = forwardRef<RcTree, TreeProps>((props, ref) => {
     filterTreeNode = filterAntTreeNode,
     itemHeight = 32,
     dropIndicatorRender,
-    direction,
+    direction: directionProp,
+    onKeyDown,
     ...rest
   } = props;
+  const [direction, directionRef] = useTaoDirection(directionProp);
   const mergedProps = {
     ...props,
     disabled,
@@ -239,6 +251,7 @@ const TreeBase = forwardRef<RcTree, TreeProps>((props, ref) => {
 
   return (
     <div
+      ref={directionRef}
       data-tao-tree=""
       data-tao-block={blockNode || undefined}
       data-tao-show-line={Boolean(showLine) || undefined}
@@ -249,11 +262,12 @@ const TreeBase = forwardRef<RcTree, TreeProps>((props, ref) => {
       className={cx(className, rootClassName, classes?.root)}
       style={{ ...rootStyle, ...semanticStyles?.root }}
     >
-      <RcTreeComponent
+      <DirectionalRcTree
         {...rest}
         ref={ref}
         prefixCls={prefixCls}
         direction={direction}
+        onKeyDown={(event) => onKeyDown?.(originalTreeKeyboardEvent(event))}
         showLine={Boolean(showLine)}
         showIcon={showIcon}
         disabled={disabled}

@@ -7,6 +7,8 @@ import {
   useRef,
   useState,
 } from 'react';
+import { useTaoConfig, useTaoDirection } from '../../provider/tao-provider';
+import { getScrollLeft, setScrollLeft } from '../../utils/scroll-left';
 import {
   cx,
   type SemanticClassNames,
@@ -87,19 +89,19 @@ export function ScrollArea({
     atRight: true,
   });
 
+  const [textDirection, directionRef] = useTaoDirection(undefined, 'self');
+  const { locale } = useTaoConfig();
   const updateScrollState = useCallback(() => {
     const el = viewportRef.current;
     if (!el) return;
 
-    const {
-      scrollTop,
-      scrollLeft,
-      scrollHeight,
-      scrollWidth,
-      clientHeight,
-      clientWidth,
-    } = el;
+    const { scrollTop, scrollHeight, scrollWidth, clientHeight, clientWidth } =
+      el;
 
+    const scrollLeft = getScrollLeft(
+      el,
+      getComputedStyle(el).direction || textDirection,
+    );
     const hasV = scrollHeight > clientHeight + 1;
     const hasH = scrollWidth > clientWidth + 1;
 
@@ -119,7 +121,7 @@ export function ScrollArea({
       atLeft: scrollLeft <= 1,
       atRight: scrollLeft + clientWidth >= scrollWidth - 1,
     });
-  }, []);
+  }, [textDirection]);
 
   // Observe content size changes
   useEffect(() => {
@@ -174,7 +176,7 @@ export function ScrollArea({
       const track = thumb.parentElement;
       if (!track) return;
       const pos = axis === 'y' ? e.clientY : e.clientX;
-      const scroll = axis === 'y' ? el.scrollTop : el.scrollLeft;
+      const scroll = axis === 'y' ? el.scrollTop : getScrollLeft(el);
       const pointerId = e.pointerId;
 
       const handleMove = (ev: PointerEvent) => {
@@ -198,7 +200,7 @@ export function ScrollArea({
         );
 
         if (axis === 'y') vp.scrollTop = nextScroll;
-        else vp.scrollLeft = nextScroll;
+        else setScrollLeft(vp, nextScroll);
       };
 
       const cleanup = () => {
@@ -237,7 +239,7 @@ export function ScrollArea({
       if (axis === 'y') {
         el.scrollTop = clickPos * (el.scrollHeight - el.clientHeight);
       } else {
-        el.scrollLeft = clickPos * (el.scrollWidth - el.clientWidth);
+        setScrollLeft(el, clickPos * (el.scrollWidth - el.clientWidth));
       }
     },
     [],
@@ -265,6 +267,7 @@ export function ScrollArea({
 
   return (
     <div
+      ref={directionRef}
       data-tao-scroll-area=""
       data-tao-scroll-type={type}
       data-tao-has-v={scrollState.hasVertical || undefined}
@@ -314,7 +317,7 @@ export function ScrollArea({
           type="button"
           data-tao-scrollbar=""
           data-tao-orientation="vertical"
-          aria-label="Scroll vertically"
+          aria-label={locale.messages.scrollVertically}
           className={cx(classNames?.scrollbar)}
           style={styles?.scrollbar}
           onClick={(e) => handleTrackClick('y', e)}
@@ -340,7 +343,7 @@ export function ScrollArea({
           type="button"
           data-tao-scrollbar=""
           data-tao-orientation="horizontal"
-          aria-label="Scroll horizontally"
+          aria-label={locale.messages.scrollHorizontally}
           className={cx(classNames?.scrollbar)}
           style={styles?.scrollbar}
           onClick={(e) => handleTrackClick('x', e)}

@@ -493,3 +493,40 @@ test('failed asynchronous loading clears its loading state without onLoad succes
   expect(loadData).toHaveBeenCalledTimes(1);
   expect(onLoad).not.toHaveBeenCalled();
 });
+
+test.each(['ltr', 'rtl'] as const)(
+  'tree horizontal keys follow %s direction without changing public events',
+  (direction) => {
+    const keys: string[] = [];
+    const bubbled: string[] = [];
+    const ref = createRef<TreeRef>();
+    render(
+      <fieldset onKeyDown={(event) => bubbled.push(event.key)}>
+        <Tree
+          ref={ref}
+          direction={direction}
+          treeData={nodes}
+          onKeyDown={(event) => keys.push(event.key)}
+        />
+      </fieldset>,
+    );
+    const tree = screen.getByRole('tree');
+    fireEvent.focus(tree);
+    fireEvent.keyDown(tree, { key: 'ArrowDown', keyCode: 40 });
+    const expand = direction === 'rtl' ? 'ArrowLeft' : 'ArrowRight';
+    const collapse = direction === 'rtl' ? 'ArrowRight' : 'ArrowLeft';
+    fireEvent.keyDown(tree, {
+      key: expand,
+      keyCode: direction === 'rtl' ? 37 : 39,
+    });
+    expect(screen.getByText('Draft')).toBeVisible();
+    fireEvent.keyDown(tree, {
+      key: collapse,
+      keyCode: direction === 'rtl' ? 39 : 37,
+    });
+    expect(screen.queryByText('Draft')).toBeNull();
+    expect(keys).toEqual(['ArrowDown', expand, collapse]);
+    expect(bubbled).toEqual(keys);
+    expect(typeof ref.current?.scrollTo).toBe('function');
+  },
+);

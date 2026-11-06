@@ -11,7 +11,7 @@ import {
   useMemo,
   useRef,
 } from 'react';
-import { TaoPortalScope } from '../../provider/tao-provider';
+import { TaoPortalScope, useTaoDirection } from '../../provider/tao-provider';
 import { asTriggerChild, useControlledOpen } from '../../utils/overlay';
 import {
   cx,
@@ -50,6 +50,7 @@ export interface PopoverProps
     AriaAttributes,
     'aria-label' | 'aria-labelledby' | 'aria-describedby'
   > {
+  direction?: 'ltr' | 'rtl';
   /** Header content of the popup. */
   title?: PopoverRender;
   /** Body content of the popup. */
@@ -107,6 +108,7 @@ function isRenderable(node: ReactNode) {
 }
 
 export function Popover({
+  direction: directionProp,
   title,
   content,
   trigger = 'hover',
@@ -128,6 +130,7 @@ export function Popover({
   'aria-labelledby': ariaLabelledBy,
   'aria-describedby': ariaDescribedBy,
 }: PopoverProps) {
+  const [direction, directionRef] = useTaoDirection(directionProp, 'self');
   const titleId = useId();
   const triggers = useMemo(
     () => new Set(Array.isArray(trigger) ? trigger : [trigger]),
@@ -161,9 +164,13 @@ export function Popover({
   );
   const popupRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLElement | null>(null);
-  const setTriggerRef = useCallback((node: HTMLElement | null) => {
-    triggerRef.current = node;
-  }, []);
+  const setTriggerRef = useCallback(
+    (node: HTMLElement | null) => {
+      triggerRef.current = node;
+      directionRef(node);
+    },
+    [directionRef],
+  );
   const containsFocusTarget = useCallback(
     (target: EventTarget | null) =>
       target instanceof Node &&
@@ -241,7 +248,7 @@ export function Popover({
         {asTriggerChild(children)}
       </TriggerPrimitive>
       <RadixPopover.Portal forceMount={shouldDestroy ? undefined : true}>
-        <TaoPortalScope asChild>
+        <TaoPortalScope asChild direction={direction}>
           <RadixPopover.Content
             ref={popupRef}
             aria-label={ariaLabel}
@@ -256,6 +263,16 @@ export function Popover({
             className={cx(classNames?.root, className)}
             style={{ ...styles?.root, ...style }}
             {...placementProps}
+            align={
+              direction === 'rtl' &&
+              (placementProps.side === 'top' ||
+                placementProps.side === 'bottom') &&
+              placementProps.align !== 'center'
+                ? placementProps.align === 'start'
+                  ? 'end'
+                  : 'start'
+                : placementProps.align
+            }
             sideOffset={4}
             forceMount={shouldDestroy ? undefined : true}
             onOpenAutoFocus={(event) => event.preventDefault()}

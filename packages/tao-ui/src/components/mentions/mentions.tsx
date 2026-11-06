@@ -11,6 +11,7 @@ import {
   TaoPortalScope,
   type TaoSize,
   type TaoStatus,
+  useTaoDirection,
   useTaoInternalConfig,
 } from '../../provider/tao-provider';
 import {
@@ -119,8 +120,10 @@ const MentionsComponent = forwardRef<MentionsRef, MentionsProps>(
         label: <Spinner size="small" />,
       },
     ];
+    const [direction, directionRef] = useTaoDirection(props.direction);
     return (
       <div
+        ref={directionRef}
         data-tao-mentions=""
         data-tao-control=""
         data-tao-size={size}
@@ -128,12 +131,13 @@ const MentionsComponent = forwardRef<MentionsRef, MentionsProps>(
         data-disabled={disabled || undefined}
         data-tao-error={status === 'error' || undefined}
         data-tao-warning={status === 'warning' || undefined}
-        dir={props.direction}
+        dir={direction}
         className={cx(className, rootClassName, classes?.root)}
         style={{ ...semanticStyles?.root, ...style }}
       >
         <RcMentionsComponent
           {...rest}
+          direction={direction}
           ref={ref}
           prefixCls={prefixCls}
           disabled={disabled}
@@ -159,7 +163,7 @@ const MentionsComponent = forwardRef<MentionsRef, MentionsProps>(
             },
           }}
           popupRender={(menu) => (
-            <TaoPortalScope asChild>
+            <TaoPortalScope asChild direction={direction}>
               <div data-tao-mentions-popup="" data-tao-size={size}>
                 {popupRender ? popupRender(menu) : menu}
               </div>

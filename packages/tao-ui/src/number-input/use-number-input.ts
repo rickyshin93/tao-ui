@@ -9,6 +9,7 @@ import {
   useRef,
   useState,
 } from 'react';
+import { useTaoConfig } from '../provider/tao-provider';
 import {
   countAnchored,
   findCursorAt,
@@ -16,8 +17,9 @@ import {
   reposition,
 } from './cursor';
 import { format, padOnBlur, parse, truncateDecimals } from './format';
+import { resolveNumberFormat } from './locale';
 import { fromPercent, toPercent } from './percentage';
-import type { FormatOptions, PadDecimalsOnBlur } from './types';
+import type { PadDecimalsOnBlur } from './types';
 import {
   clampToRange,
   isValidCanonical,
@@ -25,6 +27,8 @@ import {
 } from './validate';
 
 export interface UseNumberInputOptions {
+  /** BCP 47 locale. Defaults to the provider's number locale. */
+  locale?: string;
   value?: string;
   defaultValue?: string;
   onChange?: (value: string) => void;
@@ -61,8 +65,9 @@ export function useNumberInput(
     defaultValue,
     onChange,
     onBlur,
-    decimalSeparator = '.',
-    thousandsSeparator = ',',
+    locale: localeProp,
+    decimalSeparator,
+    thousandsSeparator: thousandsSeparatorProp,
     decimalPlaces = 2,
     padDecimalsOnBlur: padMode = 'never',
     isPercentage = false,
@@ -71,10 +76,17 @@ export function useNumberInput(
     max,
   } = opts;
 
-  const fmtOpts = useMemo<FormatOptions>(
-    () => ({ decimalSeparator, thousandsSeparator }),
-    [decimalSeparator, thousandsSeparator],
+  const config = useTaoConfig();
+  const locale = localeProp ?? config.locale.numberLocale;
+  const fmtOpts = useMemo(
+    () =>
+      resolveNumberFormat(locale, {
+        decimalSeparator,
+        thousandsSeparator: thousandsSeparatorProp,
+      }),
+    [locale, decimalSeparator, thousandsSeparatorProp],
   );
+  const thousandsSeparator = fmtOpts.thousandsSeparator;
 
   const canonicalToDisplay = (actual: string): string => {
     const canonical = isPercentage ? toPercent(actual) : actual;

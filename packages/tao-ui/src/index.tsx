@@ -722,6 +722,7 @@ export {
   type InputComponentToken,
   type TaoComponentTokenMap,
   type TaoConfig,
+  type TaoDirection,
   type TaoLocale,
   TaoProvider,
   type TaoProviderProps,
@@ -735,6 +736,25 @@ export {
   useTaoToken,
   zhCN,
 } from './provider/tao-provider';
+export {
+  arEG,
+  deDE,
+  esES,
+  frFR,
+  hiIN,
+  idID,
+  itIT,
+  jaJP,
+  koKR,
+  ptBR,
+  ruRU,
+  thTH,
+  trTR,
+  viVN,
+  zhTW,
+  type BuiltinTaoLocale,
+  type TaoMessages,
+} from './locales';
 // Theme token utilities
 export { type TaoTokenName, taoTokenNames, tokenVar } from './theme/tokens';
 // Responsive utilities

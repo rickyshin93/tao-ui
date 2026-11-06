@@ -15,7 +15,7 @@ The package root remains available and includes all component styles.
 
 ## Core Concepts
 
-- `TaoProvider` supplies size, disabled, variant, portal scope, and theme seed token defaults.
+- `TaoProvider` supplies size, disabled, variant, direction, portal scope, and theme seed token defaults.
 - Components expose semantic DOM customization through `classNames` and `styles` props.
 - Theme tokens are CSS custom properties prefixed with `--tao-*`; import `tokenVar(name)` and `taoTokenNames` from `@rockshin/tao-ui/tokens`.
 - Import `componentDocs` and `getComponentDoc(name)` from `@rockshin/tao-ui/meta` for machine-readable component metadata.
@@ -843,7 +843,7 @@ Use Tag for lightweight metadata or status markers. Use CheckableTag for compact
 
 ### TaoProvider
 
-Provides global component defaults, portal scoping, and theme seed token overrides.
+Provides global component defaults, 17 locales with date and number regional settings, portal scoping, and theme seed token overrides.
 
 - Category: Config
 - Exports: `TaoProvider`
@@ -851,7 +851,7 @@ Provides global component defaults, portal scoping, and theme seed token overrid
 - Storybook: `stories/provider.stories.tsx`
 - Tests: `tests/provider/tao-provider.test.tsx`
 
-Wrap an app or subtree with TaoProvider to set size, disabled, variant, and theme defaults.
+Wrap an app or subtree with TaoProvider to set size, disabled, variant, direction, and theme defaults.
 
 ### Textarea
 

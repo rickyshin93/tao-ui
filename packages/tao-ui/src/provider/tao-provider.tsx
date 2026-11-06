@@ -4,12 +4,16 @@ import {
   createContext,
   type ReactNode,
   useContext,
+  useLayoutEffect,
   useMemo,
   useRef,
+  useState,
 } from 'react';
 import { type TaoTokenName, taoTokenVars } from '../theme/tokens';
 import { enUS, type TaoLocale } from './locale';
-export { enUS, zhCN, type TaoLocale } from './locale';
+import { mergeLocale, type ResolvedTaoLocale } from './merge-locale';
+
+export { enUS, type TaoLocale, zhCN } from './locale';
 
 // ---- Seed Token ----
 
@@ -121,8 +125,10 @@ export interface TaoThemeConfig {
 export type TaoSize = 'small' | 'medium' | 'large';
 export type TaoVariant = 'outlined' | 'filled' | 'borderless';
 export type TaoStatus = 'error' | 'warning';
+export type TaoDirection = 'ltr' | 'rtl';
 
 export interface TaoConfig {
+  direction?: TaoDirection;
   locale: TaoLocale;
   size: TaoSize;
   disabled: boolean;
@@ -134,6 +140,7 @@ export interface TaoConfig {
 }
 
 interface TaoConfigContextValue extends TaoConfig {
+  locale: ResolvedTaoLocale;
   /**
    * Merged CSS custom-property overrides from this provider and all ancestors.
    * Carried through context so portaled layers (Modal/Drawer/Select dropdown…)
@@ -152,18 +159,69 @@ const TaoConfigContext = createContext<TaoConfigContextValue>({
   locale: enUS,
 });
 
-export function useTaoConfig(): TaoConfig {
-  const { size, disabled, variant, mode, compact, locale } =
+export function useTaoConfig(): TaoConfig & { locale: ResolvedTaoLocale } {
+  const { size, disabled, variant, mode, compact, locale, direction } =
     useContext(TaoConfigContext);
   return useMemo(
-    () => ({ size, disabled, variant, mode, compact, locale }),
-    [size, disabled, variant, mode, compact, locale],
+    () => ({ size, disabled, variant, mode, compact, locale, direction }),
+    [size, disabled, variant, mode, compact, locale, direction],
   );
 }
 
 /** Internal component access for token propagation through third-party portals. */
 export function useTaoInternalConfig(): TaoConfigContextValue {
   return useContext(TaoConfigContext);
+}
+
+/** Resolve DOM inheritance at a component's source, before it creates portals. */
+export function useTaoDirection(
+  explicit?: TaoDirection | 'auto',
+  source: 'parent' | 'self' = 'parent',
+) {
+  const { direction: contextDirection } = useContext(TaoConfigContext);
+  const [element, setElement] = useState<HTMLElement | null>(null);
+  const [inherited, setInherited] = useState<TaoDirection>();
+  useLayoutEffect(() => {
+    if ((explicit && explicit !== 'auto') || !element) return;
+    // Components writing their resolved dir read the parent to avoid feedback.
+    // External triggers and dir="auto" must resolve from their own DOM instead.
+    const target =
+      source === 'self' || explicit === 'auto'
+        ? element
+        : element.parentElement;
+    if (!target) return;
+    const update = () => {
+      const value =
+        getComputedStyle(target).direction ||
+        target.closest('[dir]')?.getAttribute('dir') ||
+        contextDirection;
+      setInherited(value === 'rtl' ? 'rtl' : 'ltr');
+      for (
+        let ancestor: HTMLElement | null = target;
+        ancestor;
+        ancestor = ancestor.parentElement
+      ) {
+        const auto = ancestor.dir === 'auto';
+        observer.observe(ancestor, {
+          attributes: true,
+          attributeFilter: ['dir', 'style', 'class'],
+          childList: auto,
+          characterData: auto,
+          subtree: auto,
+        });
+      }
+    };
+    const observer = new MutationObserver(update);
+    update();
+    return () => observer.disconnect();
+  }, [element, explicit, contextDirection, source]);
+  return [
+    (explicit === 'auto' ? undefined : explicit) ??
+      inherited ??
+      contextDirection ??
+      'ltr',
+    setElement,
+  ] as const;
 }
 
 /**
@@ -198,42 +256,58 @@ export function TaoPortalScope({
   children,
   style,
   asChild,
+  direction: directionProp,
 }: {
   children: ReactNode;
   style?: CSSProperties;
   asChild?: boolean;
+  direction?: TaoDirection;
 }) {
-  const { tokenStyle, mode, compact } = useTaoInternalConfig();
+  const config = useTaoInternalConfig();
+  const { tokenStyle, mode, compact } = config;
+  const direction = directionProp ?? config.direction;
+  const portalConfig = useMemo(
+    () => ({ ...config, direction }),
+    [config, direction],
+  );
   const themeAttr = mode === 'light' ? undefined : { 'data-tao-theme': mode };
   const densityAttr = compact ? { 'data-tao-density': 'compact' } : undefined;
   if (asChild) {
     return (
-      <Slot
-        data-tao-provider=""
-        {...themeAttr}
-        {...densityAttr}
-        style={{ ...tokenStyle, ...style }}
-      >
-        {children}
-      </Slot>
+      <TaoConfigContext.Provider value={portalConfig}>
+        <Slot
+          dir={direction}
+          data-tao-provider=""
+          {...themeAttr}
+          {...densityAttr}
+          style={{ ...tokenStyle, ...style }}
+        >
+          {children}
+        </Slot>
+      </TaoConfigContext.Provider>
     );
   }
   return (
-    <div
-      data-tao-provider=""
-      {...themeAttr}
-      {...densityAttr}
-      style={{ display: 'contents', ...tokenStyle, ...style }}
-    >
-      {children}
-    </div>
+    <TaoConfigContext.Provider value={portalConfig}>
+      <div
+        dir={direction}
+        data-tao-provider=""
+        {...themeAttr}
+        {...densityAttr}
+        style={{ display: 'contents', ...tokenStyle, ...style }}
+      >
+        {children}
+      </div>
+    </TaoConfigContext.Provider>
   );
 }
 
 // ---- Provider ----
 
 export interface TaoProviderProps {
-  /** Select and calendar text; missing keys inherit from the parent (English at the root). */
+  /** Text and interaction direction. Defaults to the surrounding DOM direction. */
+  direction?: TaoDirection;
+  /** Component text and regional settings; omitted keys inherit from the parent. */
   locale?: Partial<TaoLocale>;
   children: ReactNode;
   theme?: TaoThemeConfig;
@@ -302,7 +376,10 @@ function useStableThemeKey(
   token: Partial<TaoSeedToken> | undefined,
   components: TaoComponentTokenMap | undefined,
 ): string {
-  const key = JSON.stringify({ token: token ?? null, components: components ?? null });
+  const key = JSON.stringify({
+    token: token ?? null,
+    components: components ?? null,
+  });
   const ref = useRef(key);
   if (ref.current !== key) ref.current = key;
   return ref.current;
@@ -319,6 +396,7 @@ function kebabCase(key: string): string {
 const UNITLESS_COMPONENT_TOKEN_KEYS = new Set(['fontWeight']);
 
 export function TaoProvider({
+  direction: directionProp,
   locale: localeProp,
   theme,
   size,
@@ -326,12 +404,10 @@ export function TaoProvider({
   variant,
   children,
 }: TaoProviderProps) {
+  const [direction, directionRef] = useTaoDirection(directionProp);
   const parentConfig = useContext(TaoConfigContext);
   const locale = useMemo(
-    () =>
-      localeProp
-        ? { ...parentConfig.locale, ...localeProp }
-        : parentConfig.locale,
+    () => mergeLocale(parentConfig.locale, localeProp),
     [parentConfig.locale, localeProp],
   );
   const inherit = theme?.inherit ?? true;
@@ -372,7 +448,9 @@ export function TaoProvider({
 
     // Component tokens → `--tao-button-border-radius` style overrides
     if (parsedTheme.components) {
-      for (const [component, tokens] of Object.entries(parsedTheme.components)) {
+      for (const [component, tokens] of Object.entries(
+        parsedTheme.components,
+      )) {
         if (!tokens) continue;
         for (const [key, value] of Object.entries(tokens)) {
           if (value == null) continue;
@@ -422,6 +500,7 @@ export function TaoProvider({
 
   const config = useMemo<TaoConfigContextValue>(
     () => ({
+      direction,
       size: size ?? (inherit ? parentSize : 'medium'),
       disabled: disabled ?? (inherit ? parentDisabled : false),
       variant: variant ?? (inherit ? parentVariant : 'outlined'),
@@ -431,6 +510,7 @@ export function TaoProvider({
       locale,
     }),
     [
+      direction,
       size,
       disabled,
       variant,
@@ -448,6 +528,8 @@ export function TaoProvider({
   return (
     <TaoConfigContext.Provider value={config}>
       <div
+        ref={directionRef}
+        dir={directionProp}
         style={divStyle}
         data-tao-provider=""
         data-tao-theme={mode === 'light' ? undefined : mode}

@@ -67,6 +67,7 @@ export interface SelectProps
     | 'aria-invalid'
     | 'aria-required'
   > {
+  direction?: 'ltr' | 'rtl';
   /** Available options; nested options form groups. */
   options: SelectOption[];
   /** Controlled selection. Use an array for multiple or tags mode. */

@@ -14,6 +14,7 @@ import { Button, type ButtonProps } from '../button/button';
 import { Popover, type PopoverPlacement } from '../popover/popover';
 import { StatusIcon } from '../status-icon/status-icon';
 import './popconfirm.css';
+import { useTaoConfig } from '../../provider/tao-provider';
 
 // ---- Types ----
 
@@ -66,8 +67,8 @@ export function Popconfirm({
   description,
   onConfirm,
   onCancel,
-  okText = 'OK',
-  cancelText = 'Cancel',
+  okText,
+  cancelText,
   okButtonProps,
   cancelButtonProps,
   icon,
@@ -82,6 +83,7 @@ export function Popconfirm({
   styles,
   children,
 }: PopconfirmProps) {
+  const { locale } = useTaoConfig();
   const titleId = useId();
   const descriptionId = useId();
   // antd semantics: a disabled Popconfirm never opens on click,
@@ -155,7 +157,7 @@ export function Popconfirm({
           onClick={handleCancel}
           {...cancelButtonProps}
         >
-          {cancelText}
+          {cancelText === undefined ? locale.cancel : cancelText}
         </Button>
         <Button
           variant="primary"
@@ -163,7 +165,7 @@ export function Popconfirm({
           onClick={handleConfirm}
           {...okButtonProps}
         >
-          {okText}
+          {okText === undefined ? locale.ok : okText}
         </Button>
       </div>
     </div>

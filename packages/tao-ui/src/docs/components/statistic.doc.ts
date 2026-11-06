@@ -8,6 +8,14 @@ export const statisticDoc = {
   source: 'src/components/statistic/statistic.tsx',
   story: 'stories/statistic.stories.tsx',
   tests: ['tests/statistic/statistic.test.tsx'],
+  props: [
+    {
+      name: 'locale',
+      type: 'string',
+      description:
+        'BCP 47 numeric locale. Inherits TaoProvider numberLocale. Explicit separators and formatter take precedence; string precision and truncation semantics are preserved.',
+    },
+  ],
   semanticParts: [
     'root',
     'header',

@@ -2,7 +2,41 @@ import { afterEach, describe, expect, test } from '@rstest/core';
 import { act, render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { Sonner, toast } from '../../src/components/sonner';
-import { TaoProvider } from '../../src/provider/tao-provider';
+import { TaoProvider, zhCN } from '../../src/provider/tao-provider';
+
+test('static toasts use their mounted Sonner provider and update language in place', async () => {
+  const { rerender } = render(
+    <TaoProvider locale={zhCN}>
+      <Sonner closeButton />
+    </TaoProvider>,
+  );
+  const id = toast.success({ title: 'Caller title', duration: 0 });
+  expect(
+    await screen.findByRole('status', { name: '成功通知' }),
+  ).toHaveTextContent('Caller title');
+  expect(screen.getByRole('button', { name: '关闭通知' })).toBeInTheDocument();
+  rerender(
+    <TaoProvider
+      locale={{
+        ...zhCN,
+        messages: {
+          ...zhCN.messages,
+          successNotification: 'Succès',
+          closeNotification: 'Fermer notification',
+        },
+      }}
+    >
+      <Sonner closeButton />
+    </TaoProvider>,
+  );
+  expect(screen.getByRole('status', { name: 'Succès' })).toHaveTextContent(
+    'Caller title',
+  );
+  expect(
+    screen.getByRole('button', { name: 'Fermer notification' }),
+  ).toBeInTheDocument();
+  toast.dismiss(id);
+});
 
 test('renders toast title and description', async () => {
   render(<Sonner />);
@@ -178,89 +212,92 @@ describe('promise toast lifecycle', () => {
     { rejects: true, withMessage: true },
     { rejects: false, withMessage: false },
     { rejects: true, withMessage: false },
-  ])('preserves newer toast: rejects=$rejects, withMessage=$withMessage', async ({
-    rejects,
-    withMessage,
-  }) => {
-    render(<Sonner />);
-    const failure = new Error('Old task failed');
-    let settle!: () => void;
-    const task = new Promise<string>((resolve, reject) => {
-      settle = () => (rejects ? reject(failure) : resolve('old result'));
-    });
-    let result!: Promise<string>;
-    act(() => {
-      result = toast.promise(task, {
-        loading: { id: 'replaced-promise', title: 'Old task loading' },
-        success: withMessage ? 'Old task succeeded' : undefined,
-        error: withMessage ? 'Old task failed' : undefined,
+  ])(
+    'preserves newer toast: rejects=$rejects, withMessage=$withMessage',
+    async ({ rejects, withMessage }) => {
+      render(<Sonner />);
+      const failure = new Error('Old task failed');
+      let settle!: () => void;
+      const task = new Promise<string>((resolve, reject) => {
+        settle = () => (rejects ? reject(failure) : resolve('old result'));
       });
-      toast.success({
-        id: 'replaced-promise',
-        title: 'New task succeeded',
-        duration: 0,
+      let result!: Promise<string>;
+      act(() => {
+        result = toast.promise(task, {
+          loading: { id: 'replaced-promise', title: 'Old task loading' },
+          success: withMessage ? 'Old task succeeded' : undefined,
+          error: withMessage ? 'Old task failed' : undefined,
+        });
+        toast.success({
+          id: 'replaced-promise',
+          title: 'New task succeeded',
+          duration: 0,
+        });
       });
-    });
 
-    await act(async () => {
-      settle();
-      if (rejects) await expect(result).rejects.toBe(failure);
-      else await expect(result).resolves.toBe('old result');
-    });
+      await act(async () => {
+        settle();
+        if (rejects) await expect(result).rejects.toBe(failure);
+        else await expect(result).resolves.toBe('old result');
+      });
 
-    expect(
-      screen.getByText('New task succeeded').closest('[data-tao-sonner-toast]'),
-    ).toHaveAttribute('data-tao-removing', 'false');
-    expect(screen.queryByText('Old task succeeded')).toBeNull();
-    expect(screen.queryByText('Old task failed')).toBeNull();
-  });
+      expect(
+        screen
+          .getByText('New task succeeded')
+          .closest('[data-tao-sonner-toast]'),
+      ).toHaveAttribute('data-tao-removing', 'false');
+      expect(screen.queryByText('Old task succeeded')).toBeNull();
+      expect(screen.queryByText('Old task failed')).toBeNull();
+    },
+  );
 
   test.each([
     { rejects: false, removed: false },
     { rejects: true, removed: false },
     { rejects: false, removed: true },
     { rejects: true, removed: true },
-  ])('keeps dismissed toast closed: rejects=$rejects, removed=$removed', async ({
-    rejects,
-    removed,
-  }) => {
-    render(<Sonner />);
-    const failure = new Error('Dismissed task failed');
-    let settle!: () => void;
-    const task = new Promise<string>((resolve, reject) => {
-      settle = () => (rejects ? reject(failure) : resolve('dismissed result'));
-    });
-    let result!: Promise<string>;
-    act(() => {
-      result = toast.promise(task, {
-        loading: { id: 'dismissed-promise', title: 'Dismissed task loading' },
-        success: 'Dismissed task succeeded',
-        error: 'Dismissed task failed',
+  ])(
+    'keeps dismissed toast closed: rejects=$rejects, removed=$removed',
+    async ({ rejects, removed }) => {
+      render(<Sonner />);
+      const failure = new Error('Dismissed task failed');
+      let settle!: () => void;
+      const task = new Promise<string>((resolve, reject) => {
+        settle = () =>
+          rejects ? reject(failure) : resolve('dismissed result');
       });
-      toast.dismiss('dismissed-promise');
-    });
+      let result!: Promise<string>;
+      act(() => {
+        result = toast.promise(task, {
+          loading: { id: 'dismissed-promise', title: 'Dismissed task loading' },
+          success: 'Dismissed task succeeded',
+          error: 'Dismissed task failed',
+        });
+        toast.dismiss('dismissed-promise');
+      });
 
-    if (removed) {
-      await waitFor(() =>
-        expect(screen.queryByText('Dismissed task loading')).toBeNull(),
-      );
-    } else {
-      expect(
-        screen
-          .getByText('Dismissed task loading')
-          .closest('[data-tao-sonner-toast]'),
-      ).toHaveAttribute('data-tao-removing', 'true');
-    }
+      if (removed) {
+        await waitFor(() =>
+          expect(screen.queryByText('Dismissed task loading')).toBeNull(),
+        );
+      } else {
+        expect(
+          screen
+            .getByText('Dismissed task loading')
+            .closest('[data-tao-sonner-toast]'),
+        ).toHaveAttribute('data-tao-removing', 'true');
+      }
 
-    await act(async () => {
-      settle();
-      if (rejects) await expect(result).rejects.toBe(failure);
-      else await expect(result).resolves.toBe('dismissed result');
-    });
+      await act(async () => {
+        settle();
+        if (rejects) await expect(result).rejects.toBe(failure);
+        else await expect(result).resolves.toBe('dismissed result');
+      });
 
-    expect(screen.queryByText('Dismissed task succeeded')).toBeNull();
-    expect(screen.queryByText('Dismissed task failed')).toBeNull();
-  });
+      expect(screen.queryByText('Dismissed task succeeded')).toBeNull();
+      expect(screen.queryByText('Dismissed task failed')).toBeNull();
+    },
+  );
 });
 
 test('inherits provider token styles through portal scope', async () => {

@@ -1,7 +1,6 @@
 import * as Popover from '@radix-ui/react-popover';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
-import customParseFormat from 'dayjs/plugin/customParseFormat';
 import {
   type AriaAttributes,
   type CSSProperties,
@@ -11,8 +10,9 @@ import {
   type Ref,
   useCallback,
   useEffect,
-  useImperativeHandle,
   useId,
+  useImperativeHandle,
+  useMemo,
   useRef,
   useState,
 } from 'react';
@@ -22,9 +22,11 @@ import {
   type TaoStatus,
   type TaoVariant,
   useTaoConfig,
+  useTaoDirection,
 } from '../../provider/tao-provider';
 import { useIsMobile } from '../../utils/breakpoint';
 import { useMobileTitle } from '../../utils/field-label';
+import { mergeRefs } from '../../utils/refs';
 import {
   cx,
   type SemanticClassNames,
@@ -34,13 +36,12 @@ import { Drawer } from '../drawer/drawer';
 import { CalendarGrid } from './calendar/calendar-grid';
 import './date-picker.css';
 import { Presets } from './presets';
+import { formatPickerDate, parsePickerDate } from './date-localization';
 import {
   getDefaultFormat,
   type PickerRef,
   type RangePresetItem,
 } from './types';
-
-dayjs.extend(customParseFormat);
 
 type RangeValue = [Dayjs | null, Dayjs | null] | null;
 type RangeInteraction =
@@ -70,6 +71,7 @@ export interface RangePickerProps
     | 'aria-invalid'
     | 'aria-required'
   > {
+  direction?: 'ltr' | 'rtl';
   id?: string;
   value?: RangeValue;
   defaultValue?: [Dayjs | null, Dayjs | null];
@@ -150,6 +152,11 @@ export const RangePicker = forwardRef(function RangePicker(
   const autoMobile = useIsMobile();
   const isMobile = mobile ?? autoMobile;
   const mobileTriggerRef = useRef<HTMLButtonElement>(null);
+  const [direction, directionRef] = useTaoDirection(props.direction);
+  const mergedMobileRef = useMemo(
+    () => mergeRefs(mobileTriggerRef, directionRef),
+    [directionRef],
+  );
   const startInputRef = useRef<HTMLInputElement>(null);
   const endInputRef = useRef<HTMLInputElement>(null);
 
@@ -176,6 +183,13 @@ export const RangePicker = forwardRef(function RangePicker(
   );
 
   const fmt = formatProp ?? getDefaultFormat(picker, showTime);
+  const dayjsLocale = ctx.locale.dayjsLocale;
+  const numberLocale = ctx.locale.numberLocale;
+  const formatValue = useCallback(
+    (date: Dayjs | null | undefined) =>
+      formatPickerDate(date, fmt, dayjsLocale),
+    [fmt, dayjsLocale],
+  );
   const isDateBlocked = useCallback(
     (date: Dayjs) =>
       !date.isValid() ||
@@ -198,7 +212,7 @@ export const RangePicker = forwardRef(function RangePicker(
         return false;
       const nextValue: RangeValue = start || end ? [start, end] : null;
       if (!isValueControlled) setInternalValue(nextValue);
-      onChange?.(nextValue, [start?.format(fmt) ?? '', end?.format(fmt) ?? '']);
+      onChange?.(nextValue, [formatValue(start), formatValue(end)]);
       return true;
     },
     [
@@ -208,7 +222,7 @@ export const RangePicker = forwardRef(function RangePicker(
       endDisabled,
       resolvedDisabled,
       resolvedValue,
-      fmt,
+      formatValue,
     ],
   );
 
@@ -343,8 +357,8 @@ export const RangePicker = forwardRef(function RangePicker(
     [emitChange, setOpen, isDateBlocked, startDisabled, endDisabled],
   );
 
-  const displayStart = rangeStart ? rangeStart.format(fmt) : '';
-  const displayEnd = rangeEnd ? rangeEnd.format(fmt) : '';
+  const displayStart = formatValue(rangeStart);
+  const displayEnd = formatValue(rangeEnd);
   const [inputStart, setInputStart] = useState(displayStart);
   const [inputEnd, setInputEnd] = useState(displayEnd);
 
@@ -356,7 +370,9 @@ export const RangePicker = forwardRef(function RangePicker(
       if (position === 'start' ? startDisabled : endDisabled) return;
       const text = (position === 'start' ? inputStart : inputEnd).trim();
       const currentValue = position === 'start' ? displayStart : displayEnd;
-      const parsed = text ? dayjs(text, fmt, true) : null;
+      const parsed = text
+        ? parsePickerDate(text, fmt, dayjsLocale, numberLocale)
+        : null;
       const isBlocked =
         parsed != null &&
         (isDateBlocked(parsed) ||
@@ -376,8 +392,8 @@ export const RangePicker = forwardRef(function RangePicker(
       const nextStart = position === 'start' ? parsed : rangeStart;
       const nextEnd = position === 'end' ? parsed : rangeEnd;
       const nextStrings: [string, string] = [
-        nextStart?.format(fmt) ?? '',
-        nextEnd?.format(fmt) ?? '',
+        formatValue(nextStart),
+        formatValue(nextEnd),
       ];
       if (nextStrings[0] !== displayStart || nextStrings[1] !== displayEnd) {
         emitChange(nextStart || nextEnd ? [nextStart, nextEnd] : null);
@@ -397,6 +413,9 @@ export const RangePicker = forwardRef(function RangePicker(
       displayStart,
       emitChange,
       fmt,
+      dayjsLocale,
+      numberLocale,
+      formatValue,
       inputEnd,
       inputStart,
       isValueControlled,
@@ -609,7 +628,8 @@ export const RangePicker = forwardRef(function RangePicker(
 
   const mobileTrigger = (
     <button
-      ref={mobileTriggerRef}
+      ref={mergedMobileRef}
+      dir={direction}
       id={props.id}
       {...controlAria}
       type="button"
@@ -662,6 +682,8 @@ export const RangePicker = forwardRef(function RangePicker(
     // biome-ignore lint/a11y/noStaticElementInteractions: the input surface forwards pointer activation; the inputs handle keyboard interaction.
     // biome-ignore lint/a11y/useKeyWithClickEvents: the inputs handle keyboard interaction.
     <div
+      ref={directionRef}
+      dir={direction}
       data-tao-control=""
       data-tao-range-trigger=""
       onClick={() => !resolvedDisabled && setOpen(!isOpen)}
@@ -805,6 +827,7 @@ export const RangePicker = forwardRef(function RangePicker(
       <>
         {mobileTrigger}
         <Drawer
+          direction={direction}
           open={isOpen}
           onClose={() => setOpen(false)}
           placement="bottom"
@@ -821,7 +844,7 @@ export const RangePicker = forwardRef(function RangePicker(
     <Popover.Root open={isOpen} onOpenChange={setOpen}>
       <Popover.Anchor asChild>{desktopTrigger}</Popover.Anchor>
       <Popover.Portal>
-        <TaoPortalScope asChild>
+        <TaoPortalScope asChild direction={direction}>
           <Popover.Content
             id={popupId}
             ref={popupRef}

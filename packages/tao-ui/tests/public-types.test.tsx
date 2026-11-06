@@ -127,3 +127,12 @@ const customLocale: Partial<TaoLocale> = { ...zhCN, done: 'Confirm' };
 <TaoProvider locale={customLocale}>
   <Select options={[]} mode="tags" maxTagCount="responsive" />
 </TaoProvider>;
+
+<TaoProvider
+  locale={{
+    messages: { loading: 'Loading records' },
+    form: { string: { min: 'Too short' } },
+  }}
+>
+  <InputNumber locale="fr-FR" value="1234567.89" />
+</TaoProvider>;

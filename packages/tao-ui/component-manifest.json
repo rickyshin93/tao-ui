@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "packageName": "@rockshin/tao-ui",
-  "generatedAt": "2026-11-05T15:23:43.221Z",
+  "generatedAt": "2026-11-06T01:19:33.184Z",
   "components": [
     {
       "name": "affix",
@@ -1249,6 +1249,13 @@
       "related": [
         "InputNumber"
       ],
+      "props": [
+        {
+          "name": "locale",
+          "type": "string",
+          "description": "BCP 47 numeric locale, also accepted by useNumberInput. Inherits TaoProvider numberLocale; explicit separators win. Canonical values and callbacks remain exact ASCII strings."
+        }
+      ],
       "usage": {
         "description": "Use the headless API when tao-ui styling is not appropriate but number formatting behavior should stay consistent.",
         "bestPractices": [
@@ -1364,6 +1371,13 @@
       "related": [
         "HeadlessInputNumber",
         "Input"
+      ],
+      "props": [
+        {
+          "name": "locale",
+          "type": "string",
+          "description": "BCP 47 numeric locale. Inherits TaoProvider numberLocale; explicit decimalSeparator/thousandsSeparator override regional symbols. Callbacks keep exact canonical ASCII strings."
+        }
       ],
       "usage": {
         "description": "Use InputNumber for numeric values that need min, max, step, precision, or formatted display.",
@@ -2473,6 +2487,13 @@
       "tests": [
         "tests/statistic/statistic.test.tsx"
       ],
+      "props": [
+        {
+          "name": "locale",
+          "type": "string",
+          "description": "BCP 47 numeric locale. Inherits TaoProvider numberLocale. Explicit separators and formatter take precedence; string precision and truncation semantics are preserved."
+        }
+      ],
       "semanticParts": [
         "root",
         "header",
@@ -2710,7 +2731,7 @@
       "name": "tao-provider",
       "displayName": "TaoProvider",
       "category": "Config",
-      "description": "Provides global component defaults, portal scoping, and theme seed token overrides.",
+      "description": "Provides global component defaults, 17 locales with date and number regional settings, portal scoping, and theme seed token overrides.",
       "exports": [
         "TaoProvider"
       ],
@@ -2724,7 +2745,9 @@
         "theme",
         "tokens",
         "size",
-        "disabled"
+        "disabled",
+        "locale",
+        "internationalization"
       ],
       "related": [
         "Button",
@@ -2732,7 +2755,7 @@
         "tokenVar"
       ],
       "usage": {
-        "description": "Wrap an app or subtree with TaoProvider to set size, disabled, variant, and theme defaults.",
+        "description": "Wrap an app or subtree with TaoProvider to set size, disabled, variant, direction, and theme defaults.",
         "bestPractices": [
           "Prefer provider-level defaults for app-wide decisions.",
           "Use nested providers for scoped theme overrides."
@@ -2742,6 +2765,17 @@
         ]
       },
       "props": [
+        {
+          "name": "locale",
+          "type": "Partial<TaoLocale>",
+          "defaultValue": "enUS",
+          "description": "Component text, accessible names, form validation and regional date/number settings. Missing keys inherit from the parent; explicit component overrides win. Direction is independent."
+        },
+        {
+          "name": "direction",
+          "type": "'ltr' | 'rtl'",
+          "description": "Text and interaction direction. Inherits the surrounding DOM when omitted; nested providers and component props can override it. Portals retain their source direction."
+        },
         {
           "name": "size",
           "type": "TaoSize",

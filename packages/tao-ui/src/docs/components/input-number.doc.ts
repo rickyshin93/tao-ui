@@ -13,6 +13,14 @@ export const inputNumberDoc = {
   semanticParts: ['root', 'input', 'prefix', 'suffix'],
   keywords: ['number', 'numeric', 'stepper'],
   related: ['HeadlessInputNumber', 'Input'],
+  props: [
+    {
+      name: 'locale',
+      type: 'string',
+      description:
+        'BCP 47 numeric locale. Inherits TaoProvider numberLocale; explicit decimalSeparator/thousandsSeparator override regional symbols. Callbacks keep exact canonical ASCII strings.',
+    },
+  ],
   usage: {
     description:
       'Use InputNumber for numeric values that need min, max, step, precision, or formatted display.',

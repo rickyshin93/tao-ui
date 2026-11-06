@@ -171,11 +171,11 @@ export function HomeBento({
         <Tile
           className="tao-tile--narrow"
           index={1}
-          title={zh ? '中英文，一行切换' : 'Two languages, one prop'}
+          title={zh ? '17 种语言，一处配置' : '17 languages, one prop'}
           body={
             zh
-              ? 'locale 驱动内置按钮、占位与日历标签；嵌套 Provider 只覆盖你给出的键，日期格式与 Day.js 全局不受影响。'
-              : 'locale drives built-in buttons, placeholders and calendar labels. Nested providers override only the keys you pass.'
+              ? 'locale 驱动内置文案、日历与数字格式；嵌套 Provider 只覆盖你给出的键，日期默认格式与 Day.js 全局语言保持不变。'
+              : 'locale drives built-in text, calendars and number formats. Nested providers override only the keys you pass; default date formats and the global Day.js locale stay unchanged.'
           }
         >
           <TaoProvider locale={chinese ? zhCN : enUS} theme={siteTheme}>

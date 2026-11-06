@@ -131,10 +131,17 @@ export function Tabs({
       const idx = enabledItems.findIndex((item) => item.key === focusedKey);
       let next: TabItem | undefined;
 
-      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+      const rtl = getComputedStyle(e.currentTarget).direction === 'rtl';
+      if (
+        e.key === (rtl ? 'ArrowLeft' : 'ArrowRight') ||
+        e.key === 'ArrowDown'
+      ) {
         e.preventDefault();
         next = enabledItems[(idx + 1) % enabledItems.length];
-      } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+      } else if (
+        e.key === (rtl ? 'ArrowRight' : 'ArrowLeft') ||
+        e.key === 'ArrowUp'
+      ) {
         e.preventDefault();
         next =
           enabledItems[(idx - 1 + enabledItems.length) % enabledItems.length];

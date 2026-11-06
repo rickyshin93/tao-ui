@@ -1,4 +1,5 @@
 import type { MouseEvent } from 'react';
+import { useTaoConfig } from '../../provider/tao-provider';
 import type { SortOrder } from './table-types';
 
 export function SortIcon({ order }: { order: SortOrder }) {
@@ -109,13 +110,16 @@ export function ExpandIcon({
   expanded: boolean;
   onClick: (event: MouseEvent<HTMLButtonElement>) => void;
 }) {
+  const { locale } = useTaoConfig();
   return (
     <button
       type="button"
       data-tao-table-expand-icon=""
       data-tao-expanded={expanded || undefined}
       aria-expanded={expanded}
-      aria-label={expanded ? 'Collapse row' : 'Expand row'}
+      aria-label={
+        expanded ? locale.messages.collapseRow : locale.messages.expandRow
+      }
       onClick={onClick}
     />
   );

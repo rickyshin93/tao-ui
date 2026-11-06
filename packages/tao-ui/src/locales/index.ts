@@ -1,0 +1,18 @@
+export { enUS } from './en-US';
+export { zhCN } from './zh-CN';
+export { frFR } from './fr-FR';
+export { deDE } from './de-DE';
+export { esES } from './es-ES';
+export { itIT } from './it-IT';
+export { ptBR } from './pt-BR';
+export { zhTW } from './zh-TW';
+export { jaJP } from './ja-JP';
+export { koKR } from './ko-KR';
+export { ruRU } from './ru-RU';
+export { arEG } from './ar-EG';
+export { hiIN } from './hi-IN';
+export { trTR } from './tr-TR';
+export { idID } from './id-ID';
+export { thTH } from './th-TH';
+export { viVN } from './vi-VN';
+export type { BuiltinTaoLocale, TaoLocale, TaoMessages } from './types';

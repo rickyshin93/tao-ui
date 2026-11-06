@@ -10,6 +10,7 @@ import {
   type SemanticStyles,
 } from '../../utils/semantic';
 import './tag.css';
+import { useTaoConfig } from '../../provider/tao-provider';
 
 // ---- Types ----
 
@@ -87,6 +88,7 @@ export function Tag({
   classNames,
   styles,
 }: TagProps) {
+  const { locale } = useTaoConfig();
   const isPreset = [
     'default',
     'primary',
@@ -155,7 +157,7 @@ export function Tag({
         <button
           type="button"
           data-tao-tag-close=""
-          aria-label="Close"
+          aria-label={locale.close}
           disabled={disabled}
           onClick={handleClose}
           className={cx(classNames?.close)}

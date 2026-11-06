@@ -454,3 +454,23 @@ test('fully controlled sizes remain parent-owned even when they cannot fill or f
   rerender(view(50, 80));
   expect(panelSizes()).toEqual([50, 80]);
 });
+
+test('RTL horizontal drag and arrow keys move the separator in the requested direction', () => {
+  const onResize = rstest.fn();
+  render(
+    <Splitter
+      onResize={onResize}
+      styles={{ root: { direction: 'rtl' }, dragger: { direction: 'rtl' } }}
+    >
+      <Panel>A</Panel>
+      <Panel>B</Panel>
+    </Splitter>,
+  );
+  const separator = screen.getByRole('separator');
+  fireEvent.pointerDown(separator, { pointerId: 1, clientX: 100 });
+  fireEvent.pointerMove(document, { pointerId: 1, clientX: 130 });
+  fireEvent.pointerUp(document, { pointerId: 1 });
+  expect(onResize).toHaveBeenLastCalledWith([269.5, 329.5]);
+  fireEvent.keyDown(separator, { key: 'ArrowRight' });
+  expect(onResize).toHaveBeenLastCalledWith([259.5, 339.5]);
+});

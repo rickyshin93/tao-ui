@@ -1,5 +1,5 @@
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
-import { TaoPortalScope } from '../../provider/tao-provider';
+import { TaoPortalScope, useTaoConfig } from '../../provider/tao-provider';
 import { CheckIcon, FilterIcon } from './table-icons';
 import type { TableFilterItem } from './table-types';
 
@@ -12,6 +12,7 @@ export function TableFilterDropdown({
   activeValues: string[];
   onSelect: (values: string[]) => void;
 }) {
+  const { locale } = useTaoConfig();
   const toggle = (value: string) => {
     onSelect(
       activeValues.includes(value)
@@ -26,7 +27,7 @@ export function TableFilterDropdown({
         <button
           type="button"
           data-tao-table-filter-trigger=""
-          aria-label="Filter"
+          aria-label={locale.messages.filter}
         >
           <FilterIcon active={activeValues.length > 0} />
         </button>
@@ -66,7 +67,7 @@ export function TableFilterDropdown({
                 data-tao-table-filter-reset=""
                 onSelect={() => onSelect([])}
               >
-                Reset
+                {locale.messages.filterReset}
               </DropdownMenu.Item>
             )}
           </DropdownMenu.Content>

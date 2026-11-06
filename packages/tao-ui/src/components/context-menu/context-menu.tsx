@@ -1,6 +1,10 @@
 import * as RC from '@radix-ui/react-context-menu';
 import type { CSSProperties, ReactNode } from 'react';
-import { TaoPortalScope, useTaoConfig } from '../../provider/tao-provider';
+import {
+  TaoPortalScope,
+  useTaoConfig,
+  useTaoDirection,
+} from '../../provider/tao-provider';
 import {
   cx,
   type SemanticClassNames,
@@ -17,6 +21,7 @@ import './context-menu.css';
 export type ContextMenuSemanticPart = MenuSemanticPart;
 
 export interface ContextMenuProps {
+  direction?: 'ltr' | 'rtl';
   menu: MenuProps;
   /** Element whose right-click (long-press on touch) opens the menu. */
   children: ReactNode;
@@ -46,6 +51,7 @@ const CM: MenuPrimitives = {
 };
 
 export function ContextMenu({
+  direction: directionProp,
   menu,
   children,
   open,
@@ -56,18 +62,23 @@ export function ContextMenu({
   classNames,
   styles,
 }: ContextMenuProps) {
+  const [direction, directionRef] = useTaoDirection(directionProp, 'self');
   const { size, disabled: ctxDisabled } = useTaoConfig();
   const resolvedDisabled = disabled ?? ctxDisabled;
 
   const content = useMenuController(menu, CM, { classNames, styles });
 
   return (
-    <RC.Root open={open} onOpenChange={onOpenChange}>
-      <RC.Trigger disabled={resolvedDisabled} data-tao-context-menu-trigger="">
+    <RC.Root dir={direction} open={open} onOpenChange={onOpenChange}>
+      <RC.Trigger
+        ref={directionRef}
+        disabled={resolvedDisabled}
+        data-tao-context-menu-trigger=""
+      >
         {children}
       </RC.Trigger>
       <RC.Portal>
-        <TaoPortalScope asChild>
+        <TaoPortalScope asChild direction={direction}>
           <RC.Content
             data-tao-menu-content=""
             data-tao-context-menu=""

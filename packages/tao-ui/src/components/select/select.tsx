@@ -12,7 +12,12 @@ import {
   useRef,
   useState,
 } from 'react';
-import { TaoPortalScope, useTaoConfig } from '../../provider/tao-provider';
+import {
+  TaoPortalScope,
+  useTaoConfig,
+  useTaoDirection,
+} from '../../provider/tao-provider';
+import { mergeRefs } from '../../utils/refs';
 import { cx } from '../../utils/semantic';
 import { MobileSelectDrawer } from './mobile-select';
 import {
@@ -83,7 +88,7 @@ export const Select = forwardRef(function Select(
     open: openProp,
     defaultOpen,
     onOpenChange,
-    placement = 'bottomLeft',
+    placement,
     popupMatchSelectWidth = true,
     listHeight = 256,
     getPopupContainer,
@@ -130,6 +135,11 @@ export const Select = forwardRef(function Select(
     (requestedOpen ? mobilePresentation : requestedMobile) ?? false;
 
   const triggerRef = useRef<HTMLDivElement>(null);
+  const [direction, directionRef] = useTaoDirection(props.direction);
+  const mergedTriggerRef = useMemo(
+    () => mergeRefs(triggerRef, directionRef),
+    [directionRef],
+  );
   const inputRef = useRef<HTMLInputElement>(null);
   const searchListboxId = useId();
 
@@ -470,9 +480,10 @@ export const Select = forwardRef(function Select(
       <>
         {/* biome-ignore lint/a11y/useSemanticElements: this custom trigger contains removable tags, so it cannot be a native button. */}
         <div
-          ref={triggerRef}
+          ref={mergedTriggerRef}
           id={id}
           data-tao-control=""
+          dir={direction}
           data-tao-select=""
           data-tao-multiple={isMultiple || undefined}
           data-tao-size={resolvedSize}
@@ -552,6 +563,7 @@ export const Select = forwardRef(function Select(
           {trailingIcons}
         </div>
         <MobileSelectDrawer
+          direction={direction}
           mobileTitle={props.mobileTitle}
           classNames={classNames}
           styles={styles}
@@ -584,7 +596,16 @@ export const Select = forwardRef(function Select(
   }
 
   // ---- Desktop: Radix Select ----
-  const { side, align } = PLACEMENT_MAP[placement];
+  const { side, align: physicalAlign } =
+    PLACEMENT_MAP[
+      placement ?? (direction === 'rtl' ? 'bottomRight' : 'bottomLeft')
+    ];
+  const align =
+    direction === 'rtl'
+      ? physicalAlign === 'start'
+        ? 'end'
+        : 'start'
+      : physicalAlign;
 
   const contentStyle: CSSProperties = { ...styles?.popup };
   if (typeof popupMatchSelectWidth === 'number') {
@@ -844,9 +865,10 @@ export const Select = forwardRef(function Select(
       <Popover.Root open={open} onOpenChange={handleOpenChange}>
         <Popover.Trigger asChild>
           <div
-            ref={triggerRef}
+            ref={mergedTriggerRef}
             role="presentation"
             data-tao-control=""
+            dir={direction}
             data-tao-select=""
             data-tao-inline-search=""
             data-tao-multiple={isMultiple || undefined}
@@ -924,7 +946,7 @@ export const Select = forwardRef(function Select(
         )}
 
         <Popover.Portal container={container}>
-          <TaoPortalScope asChild>
+          <TaoPortalScope asChild direction={direction}>
             <Popover.Content
               data-tao-select-content=""
               data-tao-size={resolvedSize}
@@ -955,6 +977,7 @@ export const Select = forwardRef(function Select(
 
   return (
     <RadixSelect.Root
+      dir={direction}
       value={radixValue}
       onValueChange={handleValueChange}
       disabled={resolvedDisabled}
@@ -964,11 +987,12 @@ export const Select = forwardRef(function Select(
     >
       <RadixSelect.Trigger asChild>
         <div
-          ref={triggerRef}
+          ref={mergedTriggerRef}
           tabIndex={resolvedDisabled ? -1 : 0}
           id={id}
           {...ariaProps}
           data-tao-control=""
+          dir={direction}
           data-tao-select=""
           data-tao-size={resolvedSize}
           data-tao-variant={resolvedVariant}
@@ -1036,7 +1060,7 @@ export const Select = forwardRef(function Select(
       </RadixSelect.Trigger>
 
       <RadixSelect.Portal container={container}>
-        <TaoPortalScope asChild>
+        <TaoPortalScope asChild direction={direction}>
           <RadixSelect.Content
             data-tao-select-content=""
             data-tao-size={resolvedSize}

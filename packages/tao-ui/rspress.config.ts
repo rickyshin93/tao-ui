@@ -10,6 +10,7 @@ export default defineConfig({
   base: process.env.RSPRESS_BASE ?? '/',
   siteOrigin: process.env.RSPRESS_SITE_ORIGIN ?? '',
   title: 'tao-ui',
+  icon: '/brand/tao-mark.svg',
   description:
     'React 18.2 and 19 components with machine-readable metadata, semantic DOM contracts, and predictable theming.',
   globalStyles: path.join(__dirname, 'styles/rspress.css'),

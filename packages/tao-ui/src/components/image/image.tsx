@@ -4,8 +4,11 @@ import type {
   PreviewGroupProps as RcPreviewGroupProps,
 } from '@rc-component/image/es/PreviewGroup';
 import {
+  Children,
   type CSSProperties,
+  cloneElement,
   isValidElement,
+  type ReactElement,
   type ReactNode,
   useEffect,
   useRef,
@@ -192,6 +195,50 @@ function usePreviewOptions(
     flipY: <ImageControlIcon name="flipY" />,
     ...raw.icons,
   };
+  const actionLabels: Record<string, string> = {
+    prev: locale.previous,
+    next: locale.next,
+    flipY: locale.messages.flipY,
+    flipX: locale.messages.flipX,
+    rotateLeft: locale.messages.rotateLeft,
+    rotateRight: locale.messages.rotateRight,
+    zoomOut: locale.messages.zoomOut,
+    zoomIn: locale.messages.zoomIn,
+  };
+  const localizeAction = (node: ReactNode): ReactNode => {
+    if (!isValidElement<{ 'aria-label'?: string }>(node)) return node;
+    const label = actionLabels[node.props['aria-label'] ?? ''];
+    return label === undefined
+      ? node
+      : cloneElement(node, { 'aria-label': label });
+  };
+  const renderActions = raw.actionsRender ?? toolbarRender;
+  const actionsRender: NonNullable<RcGroupPreviewConfig['actionsRender']> = (
+    original,
+    info,
+  ) => {
+    const actions = original as ReactElement<{ children: ReactNode }>;
+    const localized = cloneElement(
+      actions,
+      undefined,
+      Children.map(actions.props.children, localizeAction),
+    );
+    return renderActions
+      ? renderActions(localized, {
+          ...info,
+          icons: {
+            prevIcon: localizeAction(info.icons.prevIcon),
+            nextIcon: localizeAction(info.icons.nextIcon),
+            flipYIcon: localizeAction(info.icons.flipYIcon),
+            flipXIcon: localizeAction(info.icons.flipXIcon),
+            rotateLeftIcon: localizeAction(info.icons.rotateLeftIcon),
+            rotateRightIcon: localizeAction(info.icons.rotateRightIcon),
+            zoomOutIcon: localizeAction(info.icons.zoomOutIcon),
+            zoomInIcon: localizeAction(info.icons.zoomInIcon),
+          },
+        })
+      : localized;
+  };
   return {
     disabled: preview === false,
     raw,
@@ -205,7 +252,7 @@ function usePreviewOptions(
       icons,
       motionName: 'tao-image-preview-fade',
       maskClosable: maskConfig?.closable ?? true,
-      actionsRender: raw.actionsRender ?? toolbarRender,
+      actionsRender,
       ...(isValidElement(mask) ? { cover: mask } : {}),
     },
   };
@@ -226,7 +273,7 @@ function ImageProgress({
       : props.classNames;
   const styles =
     typeof props.styles === 'function' ? props.styles({ props }) : props.styles;
-  const { tokenStyle } = useTaoInternalConfig();
+  const { tokenStyle, locale } = useTaoInternalConfig();
   const cn = classes?.placeholder?.progress;
   const st = styles?.placeholder?.progress;
   const hasPercent =
@@ -234,15 +281,22 @@ function ImageProgress({
   const percent = hasPercent
     ? Math.max(0, Math.min(100, Math.round(progress.percent!)))
     : 0;
+  const percentText = new Intl.NumberFormat(locale.numberLocale ?? 'en-US', {
+    style: 'percent',
+  }).format(percent / 100);
   const progressAria = hasPercent
     ? {
         role: 'progressbar' as const,
         'aria-valuemin': 0,
         'aria-valuemax': 100,
         'aria-valuenow': percent,
-        'aria-label': `${percent}%`,
+        'aria-label': props['aria-label'] ?? percentText,
       }
-    : { role: 'status' as const, 'aria-label': 'Loading', 'aria-busy': true };
+    : {
+        role: 'status' as const,
+        'aria-label': props['aria-label'] ?? locale.messages.loading,
+        'aria-busy': true,
+      };
   const bar = hasPercent ? (
     <div data-tao-image-progress-rail="" className={cn?.rail} style={st?.rail}>
       <span style={{ transform: `scaleX(${percent / 100})` }} />
@@ -281,7 +335,7 @@ function ImageProgress({
               {bar}
               {hasPercent && (
                 <span className={cn?.indicator} style={st?.indicator}>
-                  {percent}%
+                  {percentText}
                 </span>
               )}
             </>

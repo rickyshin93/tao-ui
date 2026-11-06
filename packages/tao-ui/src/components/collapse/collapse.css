@@ -194,3 +194,11 @@
     transition: none;
   }
 }
+
+[data-tao-collapse-panel-trigger]:dir(rtl) [data-tao-collapse-arrow] {
+  transform: scaleX(-1);
+}
+[data-tao-collapse-panel-trigger][data-state="open"]:dir(rtl)
+  [data-tao-collapse-arrow] {
+  transform: rotate(90deg);
+}

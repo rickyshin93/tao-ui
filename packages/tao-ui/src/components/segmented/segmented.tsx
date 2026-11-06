@@ -6,16 +6,18 @@ import {
   useId,
   useImperativeHandle,
   useLayoutEffect,
+  useMemo,
   useRef,
   useState,
 } from 'react';
-import { useTaoConfig } from '../../provider/tao-provider';
+import { useTaoConfig, useTaoDirection } from '../../provider/tao-provider';
 import {
   cx,
   type SemanticClassNames,
   type SemanticStyles,
 } from '../../utils/semantic';
 import { Tooltip, type TooltipProps } from '../tooltip/tooltip';
+import { mergeRefs } from '../../utils/refs';
 import './segmented.css';
 export type SegmentedValue = string | number;
 export type SegmentedSemanticPart = 'root' | 'item' | 'label' | 'icon';
@@ -89,10 +91,14 @@ function SegmentedInner<ValueType>(
     onKeyDown,
     ...rest
   } = props;
-  const resolved = options.map((option) =>
-    typeof option === 'object' && option !== null
-      ? (option as SegmentedLabeledOption<ValueType>)
-      : { value: option as ValueType, label: String(option) },
+  const resolved = useMemo(
+    () =>
+      options.map((option) =>
+        typeof option === 'object' && option !== null
+          ? (option as SegmentedLabeledOption<ValueType>)
+          : { value: option as ValueType, label: String(option) },
+      ),
+    [options],
   );
   const [internal, setInternal] = useState(defaultValue ?? resolved[0]?.value);
   const selected = value !== undefined ? value : internal;
@@ -112,6 +118,16 @@ function SegmentedInner<ValueType>(
   const slots =
     typeof styles === 'function' ? styles({ props: merged }) : styles;
   const root = useRef<HTMLDivElement>(null);
+  const [resolvedDirection, directionRef] = useTaoDirection(
+    direction ??
+      (props.dir === 'auto' || props.dir === 'ltr' || props.dir === 'rtl'
+        ? props.dir
+        : undefined),
+  );
+  const mergedRootRef = useMemo(
+    () => mergeRefs(root, directionRef),
+    [directionRef],
+  );
   useImperativeHandle(ref, () => root.current!);
   const [thumb, setThumb] = useState<{
     x: number;
@@ -122,9 +138,11 @@ function SegmentedInner<ValueType>(
   } | null>(null);
   useLayoutEffect(() => {
     const container = root.current!;
-    const item = container.querySelector<HTMLElement>(
-      '[data-tao-segmented-item][data-tao-checked]',
+    const items = container.querySelectorAll<HTMLElement>(
+      '[data-tao-segmented-item]',
     );
+    const item =
+      items[resolved.findIndex((option) => option.value === selected)];
     if (!item) {
       setThumb(null);
       return;
@@ -151,9 +169,17 @@ function SegmentedInner<ValueType>(
     measure();
     const observer = new ResizeObserver(measure);
     observer.observe(container);
-    observer.observe(item);
-    return () => observer.disconnect();
-  });
+    for (const element of items) observer.observe(element);
+    const attributes = new MutationObserver(measure);
+    attributes.observe(container, {
+      attributes: true,
+      attributeFilter: ['dir', 'style', 'class'],
+    });
+    return () => {
+      observer.disconnect();
+      attributes.disconnect();
+    };
+  }, [resolved, selected]);
   function select(next: ValueType) {
     if (next === selected) return;
     if (value === undefined) setInternal(next);
@@ -162,10 +188,10 @@ function SegmentedInner<ValueType>(
   return (
     <div
       {...rest}
-      ref={root}
+      ref={mergedRootRef}
       role="radiogroup"
       aria-orientation={axis}
-      dir={direction ?? props.dir}
+      dir={direction ?? (props.dir === 'auto' ? 'auto' : resolvedDirection)}
       data-tao-segmented=""
       data-tao-has-thumb={thumb !== null || undefined}
       data-tao-disabled={disabled || undefined}

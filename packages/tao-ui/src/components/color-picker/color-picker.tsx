@@ -48,7 +48,6 @@ interface PanelState {
   change: (value: Color, complete?: boolean) => void;
   complete: (value: Color) => void;
   clear: () => void;
-  chinese: boolean;
 }
 const PanelContext = createContext<PanelState>(null!);
 const clamp = (value: number, max: number) => Math.max(0, Math.min(max, value));
@@ -64,19 +63,13 @@ function colorKeys() {
 
 function PickerPanel() {
   const fieldId = useId();
+  const {
+    locale: { messages },
+  } = useTaoConfig();
   const keyForColor = colorKeys();
   const panel = useContext(PanelContext);
-  const {
-    value,
-    active,
-    props,
-    mode,
-    modes,
-    setMode,
-    format,
-    setFormat,
-    chinese,
-  } = panel;
+  const { value, active, props, mode, modes, setMode, format, setFormat } =
+    panel;
   const stops = value.getColors(),
     activeIndex = Math.min(active, stops.length - 1);
   const selected = mode === 'gradient' ? stops[activeIndex].color : value;
@@ -95,16 +88,17 @@ function PickerPanel() {
   const changeSelected = (next: Color, complete = true) =>
     panel.change(replace(next), complete);
   const numberInput = (
+    channel: string,
     label: string,
     number: number,
     max: number,
     change: (value: number) => void,
     step = 1,
   ) => (
-    <label data-tao-color-field="" htmlFor={`${fieldId}-${label}`}>
+    <label data-tao-color-field="" htmlFor={`${fieldId}-${channel}`}>
       <span>{label}</span>
       <Input
-        id={`${fieldId}-${label}`}
+        id={`${fieldId}-${channel}`}
         size="small"
         disabled={false}
         type="number"
@@ -127,14 +121,14 @@ function PickerPanel() {
     <div data-tao-color-picker-controls="">
       {modes.length > 1 && (
         <Segmented<ModeType>
-          aria-label={chinese ? '颜色模式' : 'Color mode'}
+          aria-label={messages.colorMode}
           size="small"
           disabled={false}
           value={mode}
           onChange={setMode}
           options={[
-            { value: 'single', label: chinese ? '单色' : 'Single' },
-            { value: 'gradient', label: chinese ? '渐变' : 'Gradient' },
+            { value: 'single', label: messages.colorSingle },
+            { value: 'gradient', label: messages.colorGradient },
           ]}
         />
       )}
@@ -149,7 +143,7 @@ function PickerPanel() {
               <button
                 key={keyForColor(`${stop.percent}:${stop.color.toCssString()}`)}
                 type="button"
-                aria-label={`${chinese ? '色标' : 'Color stop'} ${index + 1}`}
+                aria-label={`${messages.colorStop} ${index + 1}`}
                 aria-pressed={index === activeIndex}
                 onClick={() => panel.setActive(index)}
                 style={{ background: stop.color.toCssString() }}
@@ -159,7 +153,7 @@ function PickerPanel() {
               variant="bare"
               disabled={false}
               type="button"
-              aria-label={chinese ? '添加色标' : 'Add color stop'}
+              aria-label={messages.addColorStop}
               onClick={() => {
                 const added = { color: selected, percent: 50 };
                 const next = [...stops, added].sort(
@@ -176,7 +170,7 @@ function PickerPanel() {
                 variant="bare"
                 disabled={false}
                 type="button"
-                aria-label={chinese ? '删除色标' : 'Remove color stop'}
+                aria-label={messages.removeColorStop}
                 onClick={() => {
                   panel.setActive(Math.max(0, activeIndex - 1));
                   panel.change(
@@ -191,9 +185,9 @@ function PickerPanel() {
             )}
           </div>
           <div data-tao-color-stop-position="">
-            <span>{chinese ? '位置' : 'Position'}</span>
+            <span>{messages.colorPosition}</span>
             <Slider
-              ariaLabelForHandle={chinese ? '色标位置' : 'Stop position'}
+              ariaLabelForHandle={messages.colorStopPosition}
               disabled={false}
               min={0}
               max={100}
@@ -227,8 +221,8 @@ function PickerPanel() {
       />
       <div data-tao-color-inputs="">
         <Select
-          aria-label={chinese ? '颜色格式' : 'Color format'}
-          mobileTitle={chinese ? '颜色格式' : 'Color format'}
+          aria-label={messages.colorFormat}
+          mobileTitle={messages.colorFormat}
           size="small"
           style={{ width: '5.5em', flexShrink: 0 }}
           styles={{
@@ -246,7 +240,7 @@ function PickerPanel() {
           <Input
             size="small"
             disabled={false}
-            aria-label={chinese ? '十六进制颜色' : 'Hex color'}
+            aria-label={messages.colorHex}
             value={draft}
             aria-invalid={
               !/^#?(?:[\da-f]{3}|[\da-f]{4}|[\da-f]{6}|[\da-f]{8})$/i.test(
@@ -267,32 +261,48 @@ function PickerPanel() {
           />
         ) : format === 'rgb' ? (
           <>
-            {numberInput('Red', rgb.r, 255, (r) =>
+            {numberInput('red', messages.colorRed, rgb.r, 255, (r) =>
               changeSelected(new Color({ ...rgb, r })),
             )}
-            {numberInput('Green', rgb.g, 255, (g) =>
+            {numberInput('green', messages.colorGreen, rgb.g, 255, (g) =>
               changeSelected(new Color({ ...rgb, g })),
             )}
-            {numberInput('Blue', rgb.b, 255, (b) =>
+            {numberInput('blue', messages.colorBlue, rgb.b, 255, (b) =>
               changeSelected(new Color({ ...rgb, b })),
             )}
           </>
         ) : (
           <>
-            {numberInput('Hue', Math.round(hsb.h), 360, (h) =>
-              changeSelected(new Color({ ...hsb, h })),
+            {numberInput(
+              'hue',
+              messages.colorHue,
+              Math.round(hsb.h),
+              360,
+              (h) => changeSelected(new Color({ ...hsb, h })),
             )}
-            {numberInput('Saturation', Math.round(hsb.s * 100), 100, (s) =>
-              changeSelected(new Color({ ...hsb, s: s / 100 })),
+            {numberInput(
+              'saturation',
+              messages.colorSaturation,
+              Math.round(hsb.s * 100),
+              100,
+              (s) => changeSelected(new Color({ ...hsb, s: s / 100 })),
             )}
-            {numberInput('Brightness', Math.round(hsb.b * 100), 100, (b) =>
-              changeSelected(new Color({ ...hsb, b: b / 100 })),
+            {numberInput(
+              'brightness',
+              messages.colorBrightness,
+              Math.round(hsb.b * 100),
+              100,
+              (b) => changeSelected(new Color({ ...hsb, b: b / 100 })),
             )}
           </>
         )}
         {!props.disabledAlpha &&
-          numberInput('Alpha', Math.round(rgb.a * 100), 100, (alpha) =>
-            changeSelected(new Color({ ...rgb, a: alpha / 100 })),
+          numberInput(
+            'alpha',
+            messages.colorAlpha,
+            Math.round(rgb.a * 100),
+            100,
+            (alpha) => changeSelected(new Color({ ...rgb, a: alpha / 100 })),
           )}
       </div>
       {props.allowClear && (
@@ -303,7 +313,7 @@ function PickerPanel() {
           data-tao-color-clear=""
           onClick={panel.clear}
         >
-          {chinese ? '清除颜色' : 'Clear color'}
+          {messages.clearColor}
         </Button>
       )}
     </div>
@@ -311,7 +321,10 @@ function PickerPanel() {
 }
 function PresetsPanel() {
   const keyForColor = colorKeys();
-  const { props, change, chinese } = useContext(PanelContext);
+  const { props, change } = useContext(PanelContext);
+  const {
+    locale: { messages },
+  } = useTaoConfig();
   if (!props.presets?.length) return null;
   return (
     <div data-tao-color-presets="">
@@ -333,7 +346,7 @@ function PresetsPanel() {
                   <button
                     key={keyForColor(color.toCssString())}
                     type="button"
-                    aria-label={`${chinese ? '预设' : 'Preset'} ${color.isGradient() ? color.toCssString() : color.toHexString()}`}
+                    aria-label={`${messages.colorPreset} ${color.isGradient() ? color.toCssString() : color.toHexString()}`}
                     style={{ background: color.toCssString() }}
                     onClick={() => change(color)}
                   />
@@ -417,7 +430,7 @@ export function ColorPicker(props: ColorPickerProps) {
       : props.classNames;
   const styles =
     typeof props.styles === 'function' ? props.styles({ props }) : props.styles;
-  const chinese = config.locale.locale === 'zh_CN';
+  const { messages } = config.locale;
   const normalize = (next: Color) =>
     props.disabledAlpha && !next.cleared ? opaque(next) : next;
   const complete = (next: Color) => props.onChangeComplete?.(normalize(next));
@@ -474,7 +487,6 @@ export function ColorPicker(props: ColorPickerProps) {
       change(new Color(null));
       props.onClear?.();
     },
-    chinese,
   };
   const basicPanel = (
     <>
@@ -502,13 +514,9 @@ export function ColorPicker(props: ColorPickerProps) {
     typeof props.showText === 'function'
       ? props.showText(value)
       : value.cleared
-        ? chinese
-          ? '透明'
-          : 'Transparent'
+        ? messages.colorTransparent
         : value.isGradient()
-          ? chinese
-            ? '渐变'
-            : 'Gradient'
+          ? messages.colorGradient
           : format === 'rgb'
             ? value.toRgbString()
             : format === 'hsb'
@@ -521,7 +529,7 @@ export function ColorPicker(props: ColorPickerProps) {
     <button
       type="button"
       disabled={disabled}
-      aria-label={`${chinese ? '选择颜色' : 'Choose color'} ${value.toHexString()}`}
+      aria-label={`${messages.chooseColor} ${value.toHexString()}`}
     >
       <span data-tao-color-body="" className={names?.body} style={styles?.body}>
         <span
@@ -587,7 +595,7 @@ export function ColorPicker(props: ColorPickerProps) {
           <TaoPortalScope asChild>
             <Popover.Content
               data-tao-color-popup=""
-              aria-label={chinese ? '颜色选择器' : 'Color picker'}
+              aria-label={messages.colorPicker}
               side={side}
               align={align}
               sideOffset={6}

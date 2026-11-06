@@ -2,6 +2,18 @@ import { expect, test } from '@rstest/core';
 import * as metadataExports from '../src/docs';
 import * as publicExports from '../src/index';
 import * as tokenExports from '../src/theme/tokens';
+import * as localeExports from '../src/locales';
+import * as providerExports from '../src/entries/provider';
+
+test('all built-in locale packs are available from the root and provider entries', () => {
+  expect(Object.keys(localeExports)).toHaveLength(17);
+  const rootPacks = new Map(Object.entries(publicExports));
+  const providerPacks = new Map(Object.entries(providerExports));
+  for (const [name, locale] of Object.entries(localeExports)) {
+    expect(rootPacks.get(name)).toBe(locale);
+    expect(providerPacks.get(name)).toBe(locale);
+  }
+});
 
 test('package root excludes internal and metadata seams', () => {
   expect('TaoPortalScope' in publicExports).toBe(false);

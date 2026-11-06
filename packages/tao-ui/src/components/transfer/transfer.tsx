@@ -3,11 +3,13 @@ import {
   type ReactElement,
   type Ref,
   useImperativeHandle,
+  useMemo,
   useRef,
   useState,
 } from 'react';
-import { useTaoConfig } from '../../provider/tao-provider';
+import { useTaoConfig, useTaoDirection } from '../../provider/tao-provider';
 import { cx } from '../../utils/semantic';
+import { mergeRefs } from '../../utils/refs';
 import { TransferList } from './transfer-list';
 import { TransferOperation, TransferSearch } from './transfer-parts';
 import type {
@@ -64,19 +66,22 @@ function TransferRoot<T extends TransferItem>(
   } = props;
   const config = useTaoConfig();
   const resolvedDisabled = disabled ?? config.disabled;
-  const chinese = config.locale.locale?.startsWith('zh');
   const text: TransferLocale = {
-    titles: chinese ? ['源列表', '目标列表'] : ['Source', 'Target'],
+    titles: [config.locale.messages.source, config.locale.messages.target],
     searchPlaceholder: config.locale.searchPlaceholder,
-    itemUnit: chinese ? '项' : 'item',
-    itemsUnit: chinese ? '项' : 'items',
-    remove: chinese ? '移除' : 'Remove',
-    selectAll: chinese ? '全选' : 'Select all',
-    deselectAll: chinese ? '取消全选' : 'Deselect all',
-    selectCurrent: chinese ? '选择当前页' : 'Select current page',
-    selectInvert: chinese ? '反选当前页' : 'Invert current selection',
-    removeAll: chinese ? '移除全部' : 'Remove all',
-    removeCurrent: chinese ? '移除当前页' : 'Remove current page',
+    itemUnit: config.locale.messages.itemUnit,
+    itemsUnit: config.locale.messages.itemsUnit,
+    itemCount:
+      locale?.itemUnit !== undefined || locale?.itemsUnit !== undefined
+        ? undefined
+        : config.locale.messages.itemCount,
+    remove: config.locale.remove('').trim(),
+    selectAll: config.locale.messages.selectAll,
+    deselectAll: config.locale.messages.deselectAll,
+    selectCurrent: config.locale.messages.selectCurrent,
+    selectInvert: config.locale.messages.invertCurrent,
+    removeAll: config.locale.messages.removeAll,
+    removeCurrent: config.locale.messages.removeCurrent,
     ...locale,
   };
   const mergedProps = { ...props, disabled: resolvedDisabled };
@@ -87,6 +92,15 @@ function TransferRoot<T extends TransferItem>(
   const semanticStyles =
     typeof styles === 'function' ? styles({ props: mergedProps }) : styles;
   const root = useRef<HTMLDivElement>(null);
+  const [direction, directionRef] = useTaoDirection(
+    rest.dir === 'auto' || rest.dir === 'rtl' || rest.dir === 'ltr'
+      ? rest.dir
+      : undefined,
+  );
+  const mergedRootRef = useMemo(
+    () => mergeRefs(root, directionRef),
+    [directionRef],
+  );
   useImperativeHandle(ref, () => ({ nativeElement: root.current! }));
   const [internalSelected, setSelected] = useState<TransferKey[]>([]);
   const selected = selectedKeys ?? internalSelected;
@@ -215,7 +229,8 @@ function TransferRoot<T extends TransferItem>(
   return (
     <div
       {...rest}
-      ref={root}
+      ref={mergedRootRef}
+      dir={rest.dir === 'auto' ? 'auto' : direction}
       data-tao-transfer=""
       data-tao-disabled={resolvedDisabled ? '' : undefined}
       data-tao-status={status}
@@ -233,7 +248,7 @@ function TransferRoot<T extends TransferItem>(
         )}
         disabled={resolvedDisabled}
         oneWay={oneWay}
-        direction={rest.dir === 'rtl' ? 'rtl' : 'ltr'}
+        direction={direction}
         className={classes?.actions}
         style={{ ...operationStyle, ...semanticStyles?.actions }}
       />

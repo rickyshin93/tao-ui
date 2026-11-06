@@ -170,7 +170,7 @@ export function Pagination({
       data-tao-pagination=""
       data-tao-size={resolvedSize}
       data-tao-disabled={resolvedDisabled || undefined}
-      aria-label="Pagination"
+      aria-label={ctx.locale.messages.pagination}
       className={cx(classNames?.root, className)}
       style={styles?.root}
     >
@@ -188,7 +188,7 @@ export function Pagination({
         type="button"
         data-tao-pagination-btn=""
         disabled={resolvedDisabled || current <= 1}
-        aria-label="Previous page"
+        aria-label={ctx.locale.messages.previousPage}
         onClick={() => goTo(current - 1)}
         className={classNames?.item}
         style={styles?.item}
@@ -211,7 +211,7 @@ export function Pagination({
             data-tao-pagination-btn=""
             data-tao-active={item === current || undefined}
             disabled={resolvedDisabled}
-            aria-label={`Page ${item}`}
+            aria-label={ctx.locale.messages.page(item)}
             aria-current={item === current ? 'page' : undefined}
             onClick={() => goTo(item)}
             className={classNames?.item}
@@ -226,7 +226,7 @@ export function Pagination({
         type="button"
         data-tao-pagination-btn=""
         disabled={resolvedDisabled || current >= totalPages}
-        aria-label="Next page"
+        aria-label={ctx.locale.messages.nextPage}
         onClick={() => goTo(current + 1)}
         className={classNames?.item}
         style={styles?.item}

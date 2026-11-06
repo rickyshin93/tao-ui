@@ -39,12 +39,14 @@ export function selectAllowClear(
 }
 
 export function SelectEnginePopup({
+  direction,
   children,
   tree,
   treeLine,
   size,
   style,
 }: {
+  direction?: 'ltr' | 'rtl';
   children: ReactNode;
   tree?: boolean;
   treeLine?: boolean;
@@ -52,7 +54,7 @@ export function SelectEnginePopup({
   style?: CSSProperties;
 }) {
   return (
-    <TaoPortalScope asChild>
+    <TaoPortalScope asChild direction={direction}>
       <div
         data-tao-select-engine-popup=""
         data-tao-size={size}

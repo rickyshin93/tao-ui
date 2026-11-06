@@ -1,3 +1,4 @@
+import { treeKeyboardPopup } from '../tree/tree-keyboard';
 import type { BaseSelectRef } from '@rc-component/select';
 import RcTreeSelect, {
   type TreeSelectProps as RcTreeSelectProps,
@@ -14,13 +15,16 @@ import {
   type ReactNode,
   type Ref,
   type RefAttributes,
+  useMemo,
   useRef,
 } from 'react';
 import {
   type TaoSize,
   type TaoStatus,
+  useTaoDirection,
   useTaoInternalConfig,
 } from '../../provider/tao-provider';
+import { mergeRefs } from '../../utils/refs';
 import { cx } from '../../utils/semantic';
 import { ChevronDownIcon, CloseIcon } from '../select/select-icons';
 import { Spinner } from '../spinner/spinner';
@@ -182,6 +186,14 @@ function InternalTreeSelect<
   const semanticStyles =
     typeof styles === 'function' ? styles({ props: resolvedProps }) : styles;
   const renderPopup = popupRender ?? dropdownRender;
+  const [direction, directionRef] = useTaoDirection(props.direction);
+  const mergedRef = useMemo(
+    () =>
+      mergeRefs<TreeSelectRef>(ref, (node) =>
+        directionRef(node?.nativeElement ?? null),
+      ),
+    [ref, directionRef],
+  );
   const selectionLimit =
     props.showCheckedStrategy === SHOW_PARENT ||
     (props.showCheckedStrategy === SHOW_ALL && !props.treeCheckStrictly)
@@ -191,7 +203,9 @@ function InternalTreeSelect<
   return (
     <RcTreeSelectComponent<ValueType, OptionType>
       {...rest}
-      ref={ref}
+      ref={mergedRef}
+      direction={direction}
+      {...{ dir: direction }}
       prefixCls={prefixCls}
       data-tao-tree-select=""
       data-tao-select-engine=""
@@ -282,8 +296,15 @@ function InternalTreeSelect<
         ...semanticStyles?.popup?.root,
       }}
       popupRender={(menu) => (
-        <SelectEnginePopup tree treeLine={!!treeLine} size={size}>
-          {renderPopup ? renderPopup(menu) : menu}
+        <SelectEnginePopup
+          direction={direction}
+          tree
+          treeLine={!!treeLine}
+          size={size}
+        >
+          {renderPopup
+            ? renderPopup(treeKeyboardPopup(menu, direction))
+            : treeKeyboardPopup(menu, direction)}
         </SelectEnginePopup>
       )}
       onPopupVisibleChange={

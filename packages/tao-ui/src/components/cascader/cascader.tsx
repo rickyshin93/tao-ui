@@ -14,6 +14,7 @@ import {
   type ReactNode,
   type Ref,
   type RefAttributes,
+  useMemo,
   useRef,
   useState,
 } from 'react';
@@ -21,8 +22,10 @@ import { createPortal } from 'react-dom';
 import {
   type TaoSize,
   type TaoStatus,
+  useTaoDirection,
   useTaoInternalConfig,
 } from '../../provider/tao-provider';
+import { mergeRefs } from '../../utils/refs';
 import { cx } from '../../utils/semantic';
 import { ChevronDownIcon, CloseIcon } from '../select/select-icons';
 import { Spinner } from '../spinner/spinner';
@@ -38,7 +41,6 @@ import './cascader.css';
 import { useBreakpoint } from '../../utils/breakpoint';
 import { useMobileTitle } from '../../utils/field-label';
 import { interopDefault } from '../../utils/interop-default';
-import { mergeRefs } from '../../utils/refs';
 import { Button } from '../button/button';
 import { Drawer } from '../drawer/drawer';
 
@@ -196,6 +198,14 @@ function InternalCascader<
   const isMobile = (open ? mobilePresentation : requestedMobile) ?? false;
   const title = useMobileTitle(mobileTitle, config.locale.select);
   const triggerRef = useRef<CascaderRef>(null);
+  const [direction, directionRef] = useTaoDirection(props.direction);
+  const mergedRef = useMemo(
+    () =>
+      mergeRefs<CascaderRef>(triggerRef, ref, (node) =>
+        directionRef(node?.nativeElement ?? null),
+      ),
+    [ref, directionRef],
+  );
   type ChangeArgs = Parameters<NonNullable<typeof onChange>>;
   const [internalValue, setInternalValue] = useState(defaultValue);
   const value = valueProp !== undefined ? valueProp : internalValue;
@@ -267,7 +277,9 @@ function InternalCascader<
     <>
       <RcCascaderComponent<OptionType, ValueField, Multiple>
         {...rest}
-        ref={mergeRefs(triggerRef, ref)}
+        ref={mergedRef}
+        direction={direction}
+        {...{ dir: direction }}
         open={open}
         value={(isMobile && open && multiple && draft ? draft[0] : value) ?? []}
         onChange={changeValue}
@@ -346,7 +358,7 @@ function InternalCascader<
             );
           }
           return (
-            <SelectEnginePopup size={size}>
+            <SelectEnginePopup direction={direction} size={size}>
               <div data-tao-cascader-popup="">
                 {renderPopup ? renderPopup(menu) : menu}
               </div>
@@ -399,6 +411,7 @@ function InternalCascader<
           )}
           <fieldset
             data-tao-cascader-mobile-container=""
+            dir={direction}
             ref={setMobileContainer}
             aria-label={config.locale.select}
             tabIndex={showSearch ? -1 : 0}
@@ -462,16 +475,19 @@ export function CascaderPanel<
     loadingIcon = <Spinner size="small" />,
     ...rest
   } = props;
+  const [direction, directionRef] = useTaoDirection(props.direction);
   return (
     <div
+      ref={directionRef}
       data-tao-cascader-panel=""
       data-tao-cascader-popup=""
       className={cx(className, rootClassName)}
       style={style}
-      dir={props.direction}
+      dir={direction}
     >
       <RcPanel<OptionType, ValueField, Multiple>
         {...rest}
+        direction={direction}
         prefixCls={prefixCls}
         checkable={multiple}
         disabled={disabled}

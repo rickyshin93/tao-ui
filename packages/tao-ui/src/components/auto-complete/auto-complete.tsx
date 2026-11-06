@@ -16,12 +16,15 @@ import {
   type ReactNode,
   type Ref,
   type RefAttributes,
+  useMemo,
 } from 'react';
 import {
   type TaoSize,
   type TaoStatus,
+  useTaoDirection,
   useTaoInternalConfig,
 } from '../../provider/tao-provider';
+import { mergeRefs } from '../../utils/refs';
 import { cx } from '../../utils/semantic';
 import {
   SelectEnginePopup,
@@ -180,11 +183,21 @@ function InternalAutoComplete<
   const semanticStyles =
     typeof styles === 'function' ? styles({ props: resolvedProps }) : styles;
   const renderPopup = popupRender ?? dropdownRender;
+  const [direction, directionRef] = useTaoDirection(props.direction);
+  const mergedRef = useMemo(
+    () =>
+      mergeRefs<AutoCompleteRef>(ref, (node) =>
+        directionRef(node?.nativeElement ?? null),
+      ),
+    [ref, directionRef],
+  );
 
   return (
     <RcSelectComponent<ValueType, OptionType>
       {...rest}
-      ref={ref}
+      ref={mergedRef}
+      direction={direction}
+      {...{ dir: direction }}
       prefixCls={prefixCls}
       mode="combobox"
       data-tao-auto-complete=""
@@ -230,7 +243,7 @@ function InternalAutoComplete<
         ...semanticStyles?.popup?.root,
       }}
       popupRender={(menu) => (
-        <SelectEnginePopup size={size}>
+        <SelectEnginePopup direction={direction} size={size}>
           {renderPopup ? renderPopup(menu) : menu}
         </SelectEnginePopup>
       )}

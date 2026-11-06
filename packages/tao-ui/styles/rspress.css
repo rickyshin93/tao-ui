@@ -47,6 +47,86 @@ html.rp-dark {
   font-variant-numeric: tabular-nums;
 }
 
+.tao-brand {
+  flex-shrink: 0;
+  color: oklch(0.22 0.015 255);
+}
+
+.tao-brand svg {
+  display: block;
+  width: auto;
+  height: 28px;
+  aspect-ratio: 578 / 134;
+  overflow: visible;
+  fill: currentColor;
+}
+
+.tao-brand-mark {
+  fill: #0055ff;
+}
+
+.tao-brand-stem {
+  transform-origin: 69px 40px;
+}
+
+html.rp-dark .tao-brand {
+  color: oklch(0.97 0.008 255);
+}
+
+.tao-brand:focus-visible {
+  outline: 2px solid var(--rp-c-brand);
+  outline-offset: 6px;
+  border-radius: 2px;
+}
+
+@keyframes tao-brand-stem {
+  0%,
+  100% {
+    transform: none;
+  }
+  35%,
+  55% {
+    transform: translate(-10px, 8px) scaleY(0.67);
+  }
+}
+
+@keyframes tao-brand-foot {
+  0%,
+  100% {
+    transform: none;
+  }
+  35%,
+  55% {
+    transform: translate(39px, -40px);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .tao-brand:focus-visible .tao-brand-stem {
+    animation: tao-brand-stem 1.1s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .tao-brand:focus-visible .tao-brand-foot {
+    animation: tao-brand-foot 1.1s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  @media (hover: hover) {
+    .tao-brand:hover .tao-brand-stem {
+      animation: tao-brand-stem 1.1s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .tao-brand:hover .tao-brand-foot {
+      animation: tao-brand-foot 1.1s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+  }
+}
+
+@media (max-width: 640px) {
+  .tao-brand svg {
+    height: 24px;
+  }
+}
+
 .tao-doc-action svg {
   width: 18px;
   height: 18px;

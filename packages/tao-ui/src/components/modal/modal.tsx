@@ -17,7 +17,11 @@ import {
   useRef,
 } from 'react';
 import { RemoveScroll } from 'react-remove-scroll';
-import { TaoPortalScope } from '../../provider/tao-provider';
+import {
+  TaoPortalScope,
+  TaoProvider,
+  useTaoConfig,
+} from '../../provider/tao-provider';
 import {
   resolveResponsiveValue,
   type TaoBreakpointMap,
@@ -64,6 +68,7 @@ export interface ModalProps
     AriaAttributes,
     'aria-label' | 'aria-labelledby' | 'aria-describedby'
   > {
+  direction?: 'ltr' | 'rtl';
   open: boolean;
   onClose?: () => void;
   title?: ReactNode;
@@ -133,13 +138,14 @@ export interface ModalProps
 }
 
 export function Modal({
+  direction,
   open,
   onClose,
   title,
   footer,
   onOk,
-  okText = 'OK',
-  cancelText = 'Cancel',
+  okText,
+  cancelText,
   confirmLoading,
   okButtonProps,
   cancelButtonProps,
@@ -169,6 +175,7 @@ export function Modal({
   'aria-labelledby': ariaLabelledBy,
   'aria-describedby': ariaDescribedBy,
 }: ModalProps) {
+  const { locale } = useTaoConfig();
   const watermarkRef = useWatermarkPanelRef();
   const contentRef = useRef<HTMLDivElement | null>(null);
   const { nodes: focusBranches, registry: focusRegistry } =
@@ -208,7 +215,7 @@ export function Modal({
       data-tao-modal-action="cancel"
       {...cancelButtonProps}
     >
-      {cancelText}
+      {cancelText === undefined ? locale.cancel : cancelText}
     </Button>
   );
   const OkBtn: FC = () => (
@@ -219,7 +226,7 @@ export function Modal({
       data-tao-modal-action="ok"
       {...okButtonProps}
     >
-      {okText}
+      {okText === undefined ? locale.ok : okText}
     </Button>
   );
 
@@ -303,7 +310,7 @@ export function Modal({
                 onClose?.();
               }}
               disabled={closeConfig?.disabled}
-              aria-label={closeConfig?.['aria-label'] ?? 'Close'}
+              aria-label={closeConfig?.['aria-label'] ?? locale.close}
             >
               {mergedCloseIcon ?? <CloseIcon />}
             </button>
@@ -460,21 +467,23 @@ export function Modal({
       );
   }
   return (
-    <Dialog.Root
-      open={open}
-      modal={!customInteraction}
-      onOpenChange={(value) => {
-        if (!value) onClose?.();
-      }}
-    >
-      {getContainer === false ? (
-        layer
-      ) : (
-        <Dialog.Portal forceMount={forceMount} container={container}>
-          {layer}
-        </Dialog.Portal>
-      )}
-    </Dialog.Root>
+    <TaoProvider direction={direction}>
+      <Dialog.Root
+        open={open}
+        modal={!customInteraction}
+        onOpenChange={(value) => {
+          if (!value) onClose?.();
+        }}
+      >
+        {getContainer === false ? (
+          layer
+        ) : (
+          <Dialog.Portal forceMount={forceMount} container={container}>
+            {layer}
+          </Dialog.Portal>
+        )}
+      </Dialog.Root>
+    </TaoProvider>
   );
 }
 

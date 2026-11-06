@@ -11,6 +11,46 @@ const packageJson = JSON.parse(
 const buttonEntry = Bun.resolveSync(`${packageJson.name}/button`, root);
 const providerEntry = Bun.resolveSync(`${packageJson.name}/provider`, root);
 const formEntry = Bun.resolveSync(`${packageJson.name}/form`, root);
+for (const locale of [
+  'en-US',
+  'zh-CN',
+  'zh-TW',
+  'ja-JP',
+  'ko-KR',
+  'fr-FR',
+  'de-DE',
+  'es-ES',
+  'it-IT',
+  'pt-BR',
+  'ru-RU',
+  'ar-EG',
+  'hi-IN',
+  'tr-TR',
+  'id-ID',
+  'th-TH',
+  'vi-VN',
+]) {
+  const entry = Bun.resolveSync(`${packageJson.name}/locale/${locale}`, root);
+  assert.ok(
+    entry.startsWith(join(root, 'dist/locales/')),
+    `${locale}: built locale entry`,
+  );
+  assert.ok(
+    existsSync(entry.replace(/\.js$/, '.d.ts')),
+    `${locale}: public locale types`,
+  );
+  const dictionary = await import(entry);
+  assert.equal(
+    dictionary.default.numberLocale,
+    locale,
+    `${locale}: regional identifier`,
+  );
+  assert.equal(
+    typeof dictionary.default.messages.itemCount,
+    'function',
+    `${locale}: localized counts`,
+  );
+}
 const manifestEntry = Bun.resolveSync(
   `${packageJson.name}/component-manifest.json`,
   root,

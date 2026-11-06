@@ -69,7 +69,13 @@ export interface BreadcrumbProps {
 
 function ChevronIcon() {
   return (
-    <svg viewBox="0 0 16 16" fill="none" aria-hidden="true" focusable="false">
+    <svg
+      data-tao-breadcrumb-chevron=""
+      viewBox="0 0 16 16"
+      fill="none"
+      aria-hidden="true"
+      focusable="false"
+    >
       <path
         d="M6 4l4 4-4 4"
         stroke="currentColor"
@@ -113,7 +119,7 @@ export function Breadcrumb({
   classNames,
   styles,
 }: BreadcrumbProps) {
-  const { size, disabled: ctxDisabled } = useTaoConfig();
+  const { size, disabled: ctxDisabled, locale } = useTaoConfig();
 
   const collapsed =
     maxItems != null && maxItems >= 1 && items.length > maxItems;
@@ -193,7 +199,7 @@ export function Breadcrumb({
     <nav
       data-tao-breadcrumb=""
       data-tao-size={size}
-      aria-label="breadcrumb"
+      aria-label={locale.messages.breadcrumb}
       className={cx(classNames?.root, className)}
       style={{ ...styles?.root, ...style }}
     >
@@ -237,7 +243,7 @@ export function Breadcrumb({
                     <button
                       type="button"
                       data-tao-breadcrumb-ellipsis=""
-                      aria-label="Show more"
+                      aria-label={locale.messages.showMore}
                       className={cx(classNames?.ellipsis)}
                       style={styles?.ellipsis}
                     >

@@ -1,7 +1,6 @@
 import * as Popover from '@radix-ui/react-popover';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
-import customParseFormat from 'dayjs/plugin/customParseFormat';
 import {
   type AriaAttributes,
   type CSSProperties,
@@ -11,8 +10,8 @@ import {
   type Ref,
   useCallback,
   useEffect,
-  useImperativeHandle,
   useId,
+  useImperativeHandle,
   useMemo,
   useRef,
   useState,
@@ -23,15 +22,17 @@ import {
   type TaoStatus,
   type TaoVariant,
   useTaoConfig,
+  useTaoDirection,
 } from '../../provider/tao-provider';
 import { useIsMobile } from '../../utils/breakpoint';
 import { useMobileTitle } from '../../utils/field-label';
-import { Button } from '../button/button';
+import { mergeRefs } from '../../utils/refs';
 import {
   cx,
   type SemanticClassNames,
   type SemanticStyles,
 } from '../../utils/semantic';
+import { Button } from '../button/button';
 import { Drawer } from '../drawer/drawer';
 import { CalendarGrid } from './calendar/calendar-grid';
 import { CalendarHeader } from './calendar/calendar-header';
@@ -40,6 +41,7 @@ import { TimePanel } from './calendar/time-panel';
 import { YearGrid } from './calendar/year-grid';
 import './date-picker.css';
 import { Presets } from './presets';
+import { formatPickerDate, parsePickerDate } from './date-localization';
 import {
   getDefaultFormat,
   type PanelMode,
@@ -47,8 +49,6 @@ import {
   type PresetItem,
   type TimeConfig,
 } from './types';
-
-dayjs.extend(customParseFormat);
 
 export type { PickerRef } from './types';
 
@@ -70,6 +70,7 @@ export interface DatePickerProps
     | 'aria-invalid'
     | 'aria-required'
   > {
+  direction?: 'ltr' | 'rtl';
   id?: string;
   value?: Dayjs | null;
   defaultValue?: Dayjs | null;
@@ -142,6 +143,11 @@ export const DatePicker = forwardRef(function DatePicker(
   const autoMobile = useIsMobile();
   const isMobile = mobile ?? autoMobile;
   const mobileTriggerRef = useRef<HTMLButtonElement>(null);
+  const [direction, directionRef] = useTaoDirection(props.direction);
+  const mergedMobileRef = useMemo(
+    () => mergeRefs(mobileTriggerRef, directionRef),
+    [directionRef],
+  );
   const inputRef = useRef<HTMLInputElement>(null);
 
   useImperativeHandle(
@@ -161,6 +167,13 @@ export const DatePicker = forwardRef(function DatePicker(
   );
 
   const fmt = formatProp ?? getDefaultFormat(picker, showTime);
+  const dayjsLocale = ctx.locale.dayjsLocale;
+  const numberLocale = ctx.locale.numberLocale;
+  const formatValue = useCallback(
+    (date: Dayjs | null | undefined) =>
+      formatPickerDate(date, fmt, dayjsLocale),
+    [fmt, dayjsLocale],
+  );
   const defaultPlaceholder = placeholder ?? fmt;
   const drawerTitle = useMobileTitle(
     props.mobileTitle,
@@ -194,7 +207,7 @@ export const DatePicker = forwardRef(function DatePicker(
   );
 
   const [internalOpen, setInternalOpen] = useState(false);
-  const displayValue = resolvedValue ? resolvedValue.format(fmt) : '';
+  const displayValue = formatValue(resolvedValue);
   const [inputValue, setInputValue] = useState(displayValue);
   const isOpen = controlledOpen ?? internalOpen;
   const setOpen = useCallback(
@@ -248,49 +261,49 @@ export const DatePicker = forwardRef(function DatePicker(
           .second(resolvedValue.second());
       }
       if (!showTime) {
-        emitChange(result, result.format(fmt));
+        emitChange(result, formatValue(result));
         setOpen(false);
       } else {
-        emitChange(result, result.format(fmt));
+        emitChange(result, formatValue(result));
         // Keep open for time selection
       }
     },
-    [emitChange, fmt, showTime, resolvedValue, setOpen],
+    [emitChange, formatValue, showTime, resolvedValue, setOpen],
   );
 
   const handleMonthSelect = useCallback(
     (date: Dayjs) => {
       if (picker === 'month') {
-        emitChange(date, date.format(fmt));
+        emitChange(date, formatValue(date));
         setOpen(false);
       } else {
         setViewDate(date);
         setPanelMode('date');
       }
     },
-    [picker, emitChange, fmt, setOpen],
+    [picker, emitChange, formatValue, setOpen],
   );
 
   const handleYearSelect = useCallback(
     (date: Dayjs) => {
       if (picker === 'year') {
-        emitChange(date, date.format(fmt));
+        emitChange(date, formatValue(date));
         setOpen(false);
       } else {
         setViewDate(date);
         setPanelMode(picker === 'month' ? 'month' : 'date');
       }
     },
-    [picker, emitChange, fmt, setOpen],
+    [picker, emitChange, formatValue, setOpen],
   );
 
   const handleTimeChange = useCallback(
     (h: number, m: number, s: number) => {
       const base = resolvedValue ?? dayjs();
       const result = base.hour(h).minute(m).second(s);
-      emitChange(result, result.format(fmt));
+      emitChange(result, formatValue(result));
     },
-    [resolvedValue, emitChange, fmt],
+    [resolvedValue, emitChange, formatValue],
   );
 
   const handleClear = useCallback(
@@ -305,10 +318,10 @@ export const DatePicker = forwardRef(function DatePicker(
     (val: unknown) => {
       const d = val as Dayjs;
       if (isDateBlocked(d)) return;
-      emitChange(d, d.format(fmt));
+      emitChange(d, formatValue(d));
       setOpen(false);
     },
-    [emitChange, fmt, setOpen, isDateBlocked],
+    [emitChange, formatValue, setOpen, isDateBlocked],
   );
 
   const handleOk = useCallback(() => {
@@ -317,11 +330,11 @@ export const DatePicker = forwardRef(function DatePicker(
 
   const handleNow = useCallback(() => {
     const now = dayjs();
-    emitChange(now, now.format(fmt));
+    emitChange(now, formatValue(now));
     setViewDate(now);
     setPanelMode('date');
     setTimeScrollKey((k) => k + 1);
-  }, [emitChange, fmt]);
+  }, [emitChange, formatValue]);
 
   const showClearBtn = allowClear && resolvedValue && !resolvedDisabled;
 
@@ -334,13 +347,13 @@ export const DatePicker = forwardRef(function DatePicker(
       return;
     }
 
-    const parsed = dayjs(text, fmt, true);
+    const parsed = parsePickerDate(text, fmt, dayjsLocale, numberLocale);
     if (isDateBlocked(parsed)) {
       setInputValue(displayValue);
       return;
     }
 
-    const formatted = parsed.format(fmt);
+    const formatted = formatValue(parsed);
     setInputValue(isValueControlled ? displayValue : formatted);
     setViewDate(parsed);
     if (formatted !== displayValue) emitChange(parsed, formatted);
@@ -348,6 +361,9 @@ export const DatePicker = forwardRef(function DatePicker(
   }, [
     displayValue,
     fmt,
+    dayjsLocale,
+    numberLocale,
+    formatValue,
     inputValue,
     isValueControlled,
     isDateBlocked,
@@ -532,7 +548,8 @@ export const DatePicker = forwardRef(function DatePicker(
 
   const mobileTrigger = (
     <button
-      ref={mobileTriggerRef}
+      ref={mergedMobileRef}
+      dir={direction}
       id={props.id}
       {...controlAria}
       type="button"
@@ -564,6 +581,8 @@ export const DatePicker = forwardRef(function DatePicker(
     // biome-ignore lint/a11y/noStaticElementInteractions: the input surface forwards pointer activation; the inputs handle keyboard interaction.
     // biome-ignore lint/a11y/useKeyWithClickEvents: the inputs handle keyboard interaction.
     <div
+      ref={directionRef}
+      dir={direction}
       data-tao-control=""
       data-tao-picker-trigger=""
       onClick={() => !resolvedDisabled && setOpen(!isOpen)}
@@ -622,6 +641,7 @@ export const DatePicker = forwardRef(function DatePicker(
       <>
         {mobileTrigger}
         <Drawer
+          direction={direction}
           open={isOpen}
           onClose={() => setOpen(false)}
           placement="bottom"
@@ -638,7 +658,7 @@ export const DatePicker = forwardRef(function DatePicker(
     <Popover.Root open={isOpen} onOpenChange={setOpen}>
       <Popover.Anchor asChild>{desktopTrigger}</Popover.Anchor>
       <Popover.Portal>
-        <TaoPortalScope asChild>
+        <TaoPortalScope asChild direction={direction}>
           <Popover.Content
             id={popupId}
             ref={popupRef}

@@ -814,3 +814,7 @@ input[data-tao-range-input]::placeholder {
     font-size: var(--tao-font-size-base);
   }
 }
+
+[data-tao-calendar-nav-btn]:dir(rtl) > svg {
+  transform: scaleX(-1);
+}

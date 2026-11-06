@@ -9,11 +9,16 @@ import {
   type ReactNode,
   useEffect,
   useImperativeHandle,
+  useMemo,
   useRef,
   useState,
 } from 'react';
-import { useTaoInternalConfig } from '../../provider/tao-provider';
+import {
+  useTaoDirection,
+  useTaoInternalConfig,
+} from '../../provider/tao-provider';
 import { interopDefault } from '../../utils/interop-default';
+import { mergeRefs } from '../../utils/refs';
 import {
   cx,
   type SemanticClassNames,
@@ -131,7 +136,7 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
       autoplay = false,
       autoplaySpeed = 3000,
       initialSlide = 0,
-      rtl = false,
+      rtl,
       children,
       effect = 'scrollx',
       slickGoTo,
@@ -151,9 +156,16 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
       'bottom';
     const isVertical =
       vertical ?? (placement === 'start' || placement === 'end');
-    const isRtl = rtl && !isVertical;
+    const [direction, directionRef] = useTaoDirection(
+      rtl === undefined ? undefined : rtl ? 'rtl' : 'ltr',
+    );
+    const isRtl = direction === 'rtl' && !isVertical;
     const sliderRef = useRef<SlickCarousel>(null);
     const rootRef = useRef<HTMLDivElement>(null);
+    const mergedRootRef = useMemo(
+      () => mergeRefs(rootRef, directionRef),
+      [directionRef],
+    );
     const count = Children.count(children);
     useImperativeHandle(
       ref,
@@ -184,7 +196,8 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
     }, [slickGoTo, unslick]);
     return (
       <div
-        ref={rootRef}
+        ref={mergedRootRef}
+        dir={direction}
         data-tao-carousel=""
         data-dot-placement={placement}
         data-vertical={isVertical || undefined}

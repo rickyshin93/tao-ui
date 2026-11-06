@@ -2,6 +2,8 @@
    Table Wrapper
    =========================== */
 [data-tao-table-wrapper] {
+  --tao-table-header-left-align: flex-start;
+  --tao-table-header-right-align: flex-end;
   font-family: var(--tao-font-family);
   color: var(--tao-color-text);
   position: relative;
@@ -137,7 +139,7 @@
     var(--tao-table-cell-padding-inline);
   font-size: var(--tao-table-cell-font-size);
   line-height: var(--tao-table-cell-line-height);
-  text-align: left;
+  text-align: start;
   border-bottom: var(--tao-line-width) solid var(--tao-table-border-color);
   background: var(--tao-table-cell-bg);
   transition: background-color var(--tao-motion-duration-fast)
@@ -145,6 +147,9 @@
 }
 
 /* Alignment */
+[data-tao-table-cell][data-tao-align="left"] {
+  text-align: left;
+}
 [data-tao-table-cell][data-tao-align="center"] {
   text-align: center;
 }
@@ -190,8 +195,12 @@
   justify-content: center;
 }
 
+[data-tao-table-cell][data-tao-align="left"] [data-tao-table-header-content] {
+  justify-content: var(--tao-table-header-left-align);
+}
+
 [data-tao-table-cell][data-tao-align="right"] [data-tao-table-header-content] {
-  justify-content: flex-end;
+  justify-content: var(--tao-table-header-right-align);
 }
 
 [data-tao-table-header-title] {
@@ -383,17 +392,18 @@
 
 /* Shadow indicators */
 [data-tao-table-wrapper][data-tao-scroll-state="middle"]
-  [data-tao-fixed="left"]::after,
+[data-tao-fixed="left"]::after,
 [data-tao-table-wrapper][data-tao-scroll-state="right"]
   [data-tao-fixed="left"]::after {
   content: "";
   position: absolute;
   top: 0;
-  right: -30px;
+  inset-inline-end: -30px;
   /* Cover the cell's own border-bottom, else the shadow breaks at each row. */
   bottom: calc(var(--tao-line-width) * -1);
   width: 30px;
-  box-shadow: inset 12px 0 12px -8px var(--tao-table-fixed-shadow-color);
+  box-shadow: inset var(--tao-table-shadow-x, 12px) 0 12px -8px
+    var(--tao-table-fixed-shadow-color);
   transition: box-shadow var(--tao-motion-duration-slow)
     var(--tao-motion-ease-out);
   pointer-events: none;
@@ -406,11 +416,12 @@
   content: "";
   position: absolute;
   top: 0;
-  left: -30px;
+  inset-inline-start: -30px;
   /* Cover the cell's own border-bottom, else the shadow breaks at each row. */
   bottom: calc(var(--tao-line-width) * -1);
   width: 30px;
-  box-shadow: inset -12px 0 12px -8px var(--tao-table-fixed-shadow-color);
+  box-shadow: inset calc(-1 * var(--tao-table-shadow-x, 12px)) 0 12px -8px
+    var(--tao-table-fixed-shadow-color);
   transition: box-shadow var(--tao-motion-duration-slow)
     var(--tao-motion-ease-out);
   pointer-events: none;
@@ -466,7 +477,7 @@
 }
 
 [data-tao-table-expand-icon]::after {
-  left: 7px;
+  inset-inline-start: 7px;
   inset-block: 3px;
   width: 1px;
 }
@@ -494,7 +505,7 @@
    width itself comes from the scroll container, see viewportWidth). */
 [data-tao-scroll-state] [data-tao-table-expanded-content] {
   position: sticky;
-  left: 0;
+  inset-inline-start: 0;
   overflow: hidden;
 }
 
@@ -599,13 +610,13 @@
 }
 
 [data-tao-table-wrapper][data-tao-bordered] [data-tao-table-cell] {
-  border-right: var(--tao-line-width) solid var(--tao-table-border-color);
+  border-inline-end: var(--tao-line-width) solid var(--tao-table-border-color);
 }
 
 [data-tao-table-wrapper][data-tao-bordered]
   tr
   > [data-tao-table-cell]:last-child {
-  border-right: none;
+  border-inline-end: none;
 }
 
 /* The frame lives on the <table>, and with separate borders it no longer merges
@@ -662,7 +673,7 @@
 
 [data-tao-table-wrapper][data-tao-variant="modern"][data-tao-bordered]
   [data-tao-table-cell] {
-  border-right: none;
+  border-inline-end: none;
 }
 
 [data-tao-table-wrapper][data-tao-variant="modern"]
@@ -700,4 +711,10 @@
   display: flex;
   justify-content: flex-end;
   padding-top: var(--tao-padding);
+}
+
+[data-tao-table-wrapper][data-tao-direction="rtl"] {
+  --tao-table-header-left-align: flex-end;
+  --tao-table-header-right-align: flex-start;
+  --tao-table-shadow-x: -12px;
 }

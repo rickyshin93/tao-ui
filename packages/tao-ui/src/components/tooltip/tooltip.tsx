@@ -6,7 +6,7 @@ import {
   useEffect,
   useRef,
 } from 'react';
-import { TaoPortalScope } from '../../provider/tao-provider';
+import { TaoPortalScope, useTaoDirection } from '../../provider/tao-provider';
 import { asTriggerChild, useControlledOpen } from '../../utils/overlay';
 import {
   cx,
@@ -22,6 +22,7 @@ export type TooltipSemanticPart = 'content' | 'arrow';
 export type TooltipPlacement = 'top' | 'bottom' | 'left' | 'right';
 
 export interface TooltipProps {
+  direction?: 'ltr' | 'rtl';
   /** Tooltip content. Renders nothing (and disables the tooltip) when null/undefined/''. */
   title?: ReactNode;
   /** Popup side relative to the trigger. Defaults to 'top'. */
@@ -52,6 +53,7 @@ export interface TooltipProps {
 // ---- Tooltip ----
 
 export function Tooltip({
+  direction: directionProp,
   title,
   placement = 'top',
   arrow = true,
@@ -67,6 +69,7 @@ export function Tooltip({
   styles,
   children,
 }: TooltipProps) {
+  const [direction, directionRef] = useTaoDirection(directionProp, 'self');
   const [realOpen, setOpen] = useControlledOpen({
     open,
     defaultOpen,
@@ -136,6 +139,7 @@ export function Tooltip({
     <RadixTooltip.Provider delayDuration={mouseEnterDelay * 1000}>
       <RadixTooltip.Root open={realOpen} onOpenChange={handleOpenChange}>
         <RadixTooltip.Trigger
+          ref={directionRef}
           asChild
           {...hoverProps}
           onBlur={() => {
@@ -145,7 +149,7 @@ export function Tooltip({
           {asTriggerChild(children)}
         </RadixTooltip.Trigger>
         <RadixTooltip.Portal>
-          <TaoPortalScope>
+          <TaoPortalScope direction={direction}>
             <RadixTooltip.Content
               data-tao-tooltip-content=""
               className={cx(classNames?.content, className)}

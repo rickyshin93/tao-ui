@@ -15,6 +15,8 @@
 
 ## Done
 - 2026-11-06 Fixed Form subpath error/required styles and compacted feedback spacing; fields without validation/messages no longer reserve an empty line. Required gates and local Chrome desktop/mobile/RTL/dark/horizontal consumer checks passed; not published. See `.logs/form-feedback-20261106/verification.md`.
+- 2026-11-06 Released `@rockshin/tao-ui@0.0.46`: 17 locale packs, localized dates/numbers and component messages, plus vector logo and bilingual website update. Project/CI/release/Pages gates, live browser checks and fresh-cache npm React 18/19 consumer checks passed.
+- 2026-11-06 Released `@rockshin/tao-ui@0.0.45` with complete RTL direction/interaction fixes and the React 18 Segmented crash fix. Review, project gates, Release/CI/Pages and real npm React 18/19 consumer/browser checks passed; bilingual docs deployed. Icons unchanged. See `.logs/rtl-0.0.45/verification.md`.
 - 2026-11-05 Released `@rockshin/tao-ui@0.0.44` (Form.scrollToField, optional focus, nested/List/noStyle fields and bilingual examples) to npm latest and deployed docs. Release/CI/Pages and real npm React 18/19 consumer/browser checks passed. See `.logs/release-0.0.44/verification.md`.
 - 2026-11-05 Aligned Cascader with Select: hover clear/suffix switching and mobile bottom Drawer with search, single commit, multiple Done/cancel and keyboard navigation. React 18/19, package/docs gates and local Chrome touch/docs previews passed; not published. See `.logs/cascader-mobile-20261105/verification.md`.
 - 2026-11-05 Centered Cascader expansion arrows in popup and inline panel rows. Required package gates and local Chrome desktop/390px LTR/RTL alignment and selection checks passed; not published. See `.logs/cascader-alignment-20261105/verification.md`.

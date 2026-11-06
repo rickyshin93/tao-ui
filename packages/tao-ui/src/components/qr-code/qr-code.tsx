@@ -158,7 +158,7 @@ export const QRCode = forwardRef<QRCodeRef, QRCodeProps>(
             {statusRender ? (
               statusRender({ status, locale, onRefresh })
             ) : status === 'loading' ? (
-              <Spinner aria-label="Loading QR Code" />
+              <Spinner aria-label={config.locale.messages.loadingQrCode} />
             ) : (
               <>
                 <span>

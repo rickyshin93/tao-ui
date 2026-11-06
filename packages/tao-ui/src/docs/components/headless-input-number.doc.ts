@@ -17,6 +17,14 @@ export const headlessInputNumberDoc = {
   ],
   keywords: ['headless', 'number', 'formatting', 'validation'],
   related: ['InputNumber'],
+  props: [
+    {
+      name: 'locale',
+      type: 'string',
+      description:
+        'BCP 47 numeric locale, also accepted by useNumberInput. Inherits TaoProvider numberLocale; explicit separators win. Canonical values and callbacks remain exact ASCII strings.',
+    },
+  ],
   usage: {
     description:
       'Use the headless API when tao-ui styling is not appropriate but number formatting behavior should stay consistent.',
