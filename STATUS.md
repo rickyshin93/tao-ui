@@ -13,6 +13,7 @@
 - none
 
 ## Done
+- 2026-11-06 Compacted Form feedback to 24px at 12–14px message sizes (18px line + 2px top + 4px trailing), retaining reserved single-line feedback. Required gates and local desktop/mobile/RTL/horizontal browser checks passed; not published. See `.logs/form-24px-20261106/verification.md`.
 - 2026-11-06 Released `@rockshin/tao-ui@0.0.47`: Form feedback colors/compact spacing, Cascader mobile improvements and docs styling, integrated with RTL/locales from 0.0.45–46. Project gates, Release/CI/Pages, npm tarball integrity and local ai-portal acceptance passed. See `.logs/release-0.0.47/verification.md`.
 - 2026-11-06 Fixed Form subpath error/required styles and compacted feedback spacing; fields without validation/messages no longer reserve an empty line. Required gates and local Chrome desktop/mobile/RTL/dark/horizontal consumer checks passed; released in 0.0.47. See `.logs/form-feedback-20261106/verification.md`.
 - 2026-11-06 Released `@rockshin/tao-ui@0.0.46`: 17 locale packs, localized dates/numbers and component messages, plus vector logo and bilingual website update. Project/CI/release/Pages gates, live browser checks and fresh-cache npm React 18/19 consumer checks passed.

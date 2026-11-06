@@ -5,19 +5,20 @@
 
 /* The feedback line already separates controls; keep its trailing gap compact. */
 [data-tao-form] > [data-tao-form-item][data-tao-form-feedback] {
-  margin-block-end: var(--tao-form-field-item-gap, var(--tao-padding-xs));
+  margin-block-end: var(--tao-form-field-item-gap, var(--tao-size-unit));
 }
 
 [data-tao-form-message] {
   min-block-size: 1lh;
   margin-block-start: var(--tao-padding-xxs);
   font-size: var(--tao-form-field-error-font-size, var(--tao-font-size-xs));
-  line-height: var(--tao-line-height-sm);
+  line-height: max(18px, 1.25em);
 }
 
 [data-tao-form-message] > [data-tao-form-error],
 [data-tao-form-message] > [data-tao-form-description] {
   margin-block: 0;
+  line-height: inherit;
 }
 
 /* ===========================

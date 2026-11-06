@@ -11,7 +11,9 @@ Collects and validates field values with an antd-aligned API (rules, dependencie
 
 Use Form with Form.Item when fields need a value store, rule validation, or submit handling. Use the lighter FormField when you manage state yourself.
 
-Direct Form.Item children have 8px bottom spacing when a feedback row is present (`--tao-padding-xs`), or 20px otherwise (`--tao-padding-md`). `--tao-form-field-item-gap` overrides either default. Stack and FormSection manage spacing for items placed inside them. `noStyle` adds neither a shell nor spacing, and standalone FormField layout is unchanged.
+Direct Form.Item children have 4px bottom spacing when a feedback row is present (`--tao-size-unit`), or 20px otherwise (`--tao-padding-md`). `--tao-form-field-item-gap` overrides either default. Stack and FormSection manage spacing for items placed inside them. `noStyle` adds neither a shell nor spacing, and standalone FormField layout is unchanged.
+
+At the default 12–14px message sizes, the reserved line is 18px high; with its 2px top margin and 4px trailing gap, feedback occupies 24px. Larger custom message text can increase the line height.
 
 Form.Item reserves one feedback line when it has validation rules or an explicit `help`, `extra` or `validateStatus`. Single-line validation messages can appear or disappear without moving subsequent fields or buttons. Longer messages wrap and expand the space naturally to avoid overlapping content. Fields without validation or feedback do not reserve an empty row. Use `help=""` to keep the row when controlling messages manually.
 

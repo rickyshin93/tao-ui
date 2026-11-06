@@ -17,13 +17,13 @@ beforeAll(() => {
     .join('\n');
   document.head.append(stylesheet);
   document.documentElement.style.setProperty('--tao-padding-md', '20px');
-  document.documentElement.style.setProperty('--tao-padding-xs', '8px');
+  document.documentElement.style.setProperty('--tao-size-unit', '4px');
   document.documentElement.style.setProperty('--tao-padding', '16px');
 });
 afterAll(() => {
   stylesheet.remove();
   document.documentElement.style.removeProperty('--tao-padding-md');
-  document.documentElement.style.removeProperty('--tao-padding-xs');
+  document.documentElement.style.removeProperty('--tao-size-unit');
   document.documentElement.style.removeProperty('--tao-padding');
 });
 
@@ -50,11 +50,11 @@ test('validation feedback uses compact spacing before and after validation', asy
   const slot = item.querySelector('[data-tao-form-message]');
   expect(slot).not.toBeNull();
   expect(slot?.textContent).toBe('');
-  expect(fieldMargin(/^Email/)).toBe('8px');
+  expect(fieldMargin(/^Email/)).toBe('4px');
   fireEvent.submit(screen.getByRole('button').closest('form')!);
   expect(await screen.findByText('Required')).toBeTruthy();
   expect(item.querySelector('[data-tao-form-message]')).toBe(slot);
-  expect(fieldMargin(/^Email/)).toBe('8px');
+  expect(fieldMargin(/^Email/)).toBe('4px');
 });
 
 test('fields without validation or messages do not reserve feedback space', () => {
@@ -129,7 +129,7 @@ test('server errors can create and clear feedback without validation rules', asy
   expect(await screen.findByRole('alert')).toHaveTextContent(
     'Account unavailable',
   );
-  expect(fieldMargin('Account')).toBe('8px');
+  expect(fieldMargin('Account')).toBe('4px');
   fireEvent.click(screen.getByText('Clear error'));
   await waitFor(() => expect(screen.queryByRole('alert')).toBeNull());
   expect(container.querySelector('[data-tao-form-message]')).toBeNull();
