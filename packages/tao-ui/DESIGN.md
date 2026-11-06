@@ -86,6 +86,12 @@ components:
 
 ## Overview
 
+### Website brand mark
+
+The website uses the approved blue block-T symbol with the lowercase `tao-ui` wordmark. Canonical vector artwork lives in [tao-ui.svg](docs/public/brand/tao-ui.svg); the wordmark is outlined from the supplied artwork and needs no font. [tao-ui-dark.svg](docs/public/brand/tao-ui-dark.svg) uses a light wordmark, and [tao-mark.svg](docs/public/brand/tao-mark.svg) is the standalone favicon/avatar symbol. Transparent backgrounds and the original proportions are preserved.
+
+Navigation renders the same SVG geometry through `theme/brand-logo.tsx`, with a localized home-link name and theme-aware wordmark. The four blocks remain still by default, regroup once on hover or keyboard focus, and stay still under reduced motion. This identity does not change component theme tokens or the homepage seed palette.
+
 **约束即自由**。tao-ui 通过严格的 token 系统消除视觉决策，让 AI（和人类）只需选择"用哪个组件"，而非"用什么颜色/间距/圆角"。
 
 核心原则：

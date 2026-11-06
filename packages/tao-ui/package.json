@@ -42,6 +42,10 @@
       "types": "./dist/theme/tokens.d.ts",
       "import": "./dist/theme/tokens.js"
     },
+    "./locale/*": {
+      "types": "./dist/locales/*.d.ts",
+      "import": "./dist/locales/*.js"
+    },
     "./*": {
       "types": "./dist/entries/*.d.ts",
       "import": "./dist/entries/*.js"

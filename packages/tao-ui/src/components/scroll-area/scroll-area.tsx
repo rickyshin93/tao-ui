@@ -7,7 +7,7 @@ import {
   useRef,
   useState,
 } from 'react';
-import { useTaoDirection } from '../../provider/tao-provider';
+import { useTaoConfig, useTaoDirection } from '../../provider/tao-provider';
 import { getScrollLeft, setScrollLeft } from '../../utils/scroll-left';
 import {
   cx,
@@ -90,6 +90,7 @@ export function ScrollArea({
   });
 
   const [textDirection, directionRef] = useTaoDirection(undefined, 'self');
+  const { locale } = useTaoConfig();
   const updateScrollState = useCallback(() => {
     const el = viewportRef.current;
     if (!el) return;
@@ -316,7 +317,7 @@ export function ScrollArea({
           type="button"
           data-tao-scrollbar=""
           data-tao-orientation="vertical"
-          aria-label="Scroll vertically"
+          aria-label={locale.messages.scrollVertically}
           className={cx(classNames?.scrollbar)}
           style={styles?.scrollbar}
           onClick={(e) => handleTrackClick('y', e)}
@@ -342,7 +343,7 @@ export function ScrollArea({
           type="button"
           data-tao-scrollbar=""
           data-tao-orientation="horizontal"
-          aria-label="Scroll horizontally"
+          aria-label={locale.messages.scrollHorizontally}
           className={cx(classNames?.scrollbar)}
           style={styles?.scrollbar}
           onClick={(e) => handleTrackClick('x', e)}

@@ -7,6 +7,7 @@ import {
   useState,
   useSyncExternalStore,
 } from 'react';
+import type { TaoMessages } from '../../locales/types';
 import { TaoPortalScope, useTaoConfig } from '../../provider/tao-provider';
 import {
   cx,
@@ -250,20 +251,20 @@ function resolveDataType(type: SonnerType, richColors: boolean) {
   return type;
 }
 
-function getAriaLabel(type: SonnerType) {
+function getAriaLabel(type: SonnerType, messages: TaoMessages) {
   switch (type) {
     case 'success':
-      return 'Success notification';
+      return messages.successNotification;
     case 'error':
-      return 'Error notification';
+      return messages.errorNotification;
     case 'warning':
-      return 'Warning notification';
+      return messages.warningNotification;
     case 'info':
-      return 'Info notification';
+      return messages.infoNotification;
     case 'loading':
-      return 'Loading notification';
+      return messages.loadingNotification;
     default:
-      return 'Notification';
+      return messages.notification;
   }
 }
 
@@ -297,7 +298,6 @@ export function Sonner({
   classNames,
   styles,
 }: SonnerProps) {
-  useTaoConfig();
   const snapshot = useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
   const [heights, setHeights] = useState<Map<string, number>>(() => new Map());
 
@@ -390,6 +390,9 @@ function ToastView({
   classNames,
   styles,
 }: ToastViewProps) {
+  const {
+    locale: { messages },
+  } = useTaoConfig();
   const [mounted, setMounted] = useState(false);
   const [offsetBeforeRemove, setOffsetBeforeRemove] = useState(0);
   const ref = useRef<HTMLDivElement>(null);
@@ -444,7 +447,7 @@ function ToastView({
       className={cx(classNames?.toast)}
       role="status"
       aria-live="polite"
-      aria-label={getAriaLabel(toast.type)}
+      aria-label={getAriaLabel(toast.type, messages)}
       data-tao-sonner-toast=""
       data-tao-type={resolveDataType(toast.type, richColors)}
       data-tao-mounted={mounted}
@@ -529,7 +532,7 @@ function ToastView({
               {showClose ? (
                 <button
                   type="button"
-                  aria-label="Close notification"
+                  aria-label={messages.closeNotification}
                   className={cx(classNames?.close)}
                   style={styles?.close}
                   data-tao-sonner-close=""

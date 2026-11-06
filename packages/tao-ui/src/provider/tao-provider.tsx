@@ -11,6 +11,7 @@ import {
 } from 'react';
 import { type TaoTokenName, taoTokenVars } from '../theme/tokens';
 import { enUS, type TaoLocale } from './locale';
+import { mergeLocale, type ResolvedTaoLocale } from './merge-locale';
 
 export { enUS, type TaoLocale, zhCN } from './locale';
 
@@ -139,6 +140,7 @@ export interface TaoConfig {
 }
 
 interface TaoConfigContextValue extends TaoConfig {
+  locale: ResolvedTaoLocale;
   /**
    * Merged CSS custom-property overrides from this provider and all ancestors.
    * Carried through context so portaled layers (Modal/Drawer/Select dropdown…)
@@ -157,7 +159,7 @@ const TaoConfigContext = createContext<TaoConfigContextValue>({
   locale: enUS,
 });
 
-export function useTaoConfig(): TaoConfig {
+export function useTaoConfig(): TaoConfig & { locale: ResolvedTaoLocale } {
   const { size, disabled, variant, mode, compact, locale, direction } =
     useContext(TaoConfigContext);
   return useMemo(
@@ -305,7 +307,7 @@ export function TaoPortalScope({
 export interface TaoProviderProps {
   /** Text and interaction direction. Defaults to the surrounding DOM direction. */
   direction?: TaoDirection;
-  /** Select and calendar text; missing keys inherit from the parent (English at the root). */
+  /** Component text and regional settings; omitted keys inherit from the parent. */
   locale?: Partial<TaoLocale>;
   children: ReactNode;
   theme?: TaoThemeConfig;
@@ -405,10 +407,7 @@ export function TaoProvider({
   const [direction, directionRef] = useTaoDirection(directionProp);
   const parentConfig = useContext(TaoConfigContext);
   const locale = useMemo(
-    () =>
-      localeProp
-        ? { ...parentConfig.locale, ...localeProp }
-        : parentConfig.locale,
+    () => mergeLocale(parentConfig.locale, localeProp),
     [parentConfig.locale, localeProp],
   );
   const inherit = theme?.inherit ?? true;

@@ -2,7 +2,63 @@ import { expect, test } from '@rstest/core';
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import { Color } from '../../src/components/color-picker/color';
 import { ColorPicker } from '../../src/components/color-picker/color-picker';
-import { TaoProvider } from '../../src/provider/tao-provider';
+import { TaoProvider, zhCN } from '../../src/provider/tao-provider';
+
+test('provider messages localize color channels, mode, presets and live portal labels', async () => {
+  const { rerender } = render(
+    <TaoProvider locale={zhCN}>
+      <ColorPicker
+        open
+        defaultFormat="rgb"
+        defaultValue="#123456"
+        mode={['single', 'gradient']}
+        allowClear
+        presets={[{ label: 'Brand', colors: ['#ffffff'] }]}
+      />
+    </TaoProvider>,
+  );
+  expect(
+    await screen.findByRole('spinbutton', { name: '红色' }),
+  ).toBeInTheDocument();
+  expect(screen.getByRole('spinbutton', { name: '绿色' })).toBeInTheDocument();
+  expect(screen.getByRole('spinbutton', { name: '蓝色' })).toBeInTheDocument();
+  expect(
+    screen.getByRole('spinbutton', { name: '透明度' }),
+  ).toBeInTheDocument();
+  expect(
+    screen.getByRole('combobox', { name: '颜色格式' }),
+  ).toBeInTheDocument();
+  expect(
+    screen.getByRole('button', { name: '预设 #ffffff' }),
+  ).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: '清除颜色' })).toBeInTheDocument();
+  rerender(
+    <TaoProvider
+      locale={{
+        ...zhCN,
+        messages: {
+          ...zhCN.messages,
+          colorRed: 'Rouge',
+          colorFormat: 'Format couleur',
+        },
+      }}
+    >
+      <ColorPicker
+        open
+        defaultFormat="rgb"
+        defaultValue="#123456"
+        mode={['single', 'gradient']}
+        allowClear
+        presets={[{ label: 'Brand', colors: ['#ffffff'] }]}
+      />
+    </TaoProvider>,
+  );
+  expect(screen.getByRole('spinbutton', { name: 'Rouge' })).toHaveValue(18);
+  expect(
+    screen.getByRole('combobox', { name: 'Format couleur' }),
+  ).toBeInTheDocument();
+  expect(screen.getByText('Brand')).toBeInTheDocument();
+});
 
 test('color values convert between RGB/HSB/hex, clone and compare gradients', () => {
   const color = new Color('#ff000080');

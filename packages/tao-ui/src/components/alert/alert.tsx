@@ -11,6 +11,7 @@ import {
   type SemanticStyles,
 } from '../../utils/semantic';
 import { StatusIcon } from '../status-icon/status-icon';
+import { useTaoConfig } from '../../provider/tao-provider';
 import './alert.css';
 
 // ---- Types ----
@@ -79,6 +80,7 @@ export function Alert({
   classNames,
   styles,
 }: AlertProps) {
+  const { locale } = useTaoConfig();
   const [visible, setVisible] = useState(true);
 
   const handleClose = useCallback(
@@ -145,7 +147,7 @@ export function Alert({
         <button
           type="button"
           data-tao-alert-close=""
-          aria-label="Close"
+          aria-label={locale.close}
           onClick={handleClose}
           className={cx(classNames?.close)}
           style={styles?.close}

@@ -2,9 +2,7 @@ import { PickerPanel } from '@rc-component/picker';
 import dayjsConfig from '@rc-component/picker/generate/dayjs';
 import type { CellRenderInfo, Locale } from '@rc-component/picker/interface';
 import enLocale from '@rc-component/picker/locale/en_US';
-import zhLocale from '@rc-component/picker/locale/zh_CN';
 import dayjs, { type Dayjs } from 'dayjs';
-import 'dayjs/locale/zh-cn';
 import {
   type CSSProperties,
   forwardRef,
@@ -110,8 +108,31 @@ export const Calendar = forwardRef<CalendarRef, CalendarProps>((props, ref) => {
       : props.classNames;
   const styles =
     typeof props.styles === 'function' ? props.styles({ props }) : props.styles;
-  const chinese = config.locale.locale === 'zh_CN';
-  const locale = { ...(chinese ? zhLocale : enLocale), ...props.locale?.lang };
+  const locale = {
+    ...(config.locale.pickerLocale ?? enLocale),
+    ...props.locale?.lang,
+  };
+  const weekStartsOn = props.locale?.lang.locale
+    ? dayjsConfig.locale.getWeekFirstDay(locale.locale)
+    : (config.locale.weekStartsOn ??
+      dayjsConfig.locale.getWeekFirstDay(locale.locale));
+  const generateConfig = useMemo(
+    () => ({
+      ...dayjsConfig,
+      locale: {
+        ...dayjsConfig.locale,
+        getWeekFirstDay: () => weekStartsOn,
+        getWeekFirstDate: (_locale: string, date: Dayjs) =>
+          date.subtract((date.day() - weekStartsOn + 7) % 7, 'day'),
+      },
+    }),
+    [weekStartsOn],
+  );
+  const calendarYear =
+    props.locale?.lang.year ?? config.locale.messages.calendarYear;
+  const calendarMonth =
+    props.locale?.lang.month ?? config.locale.messages.calendarMonth;
+  const { calendarView } = config.locale.messages;
   const months =
     locale.shortMonths ??
     dayjsConfig.locale.getShortMonths?.(locale.locale) ??
@@ -211,8 +232,8 @@ export const Calendar = forwardRef<CalendarRef, CalendarProps>((props, ref) => {
           style={styles?.header}
         >
           <Select
-            aria-label={chinese ? '年' : 'Year'}
-            mobileTitle={chinese ? '年' : 'Year'}
+            aria-label={calendarYear}
+            mobileTitle={calendarYear}
             size="medium"
             style={{ width: 'auto', minWidth: '6em' }}
             value={String(value.year())}
@@ -221,14 +242,18 @@ export const Calendar = forwardRef<CalendarRef, CalendarProps>((props, ref) => {
               { length: lastYear - firstYear + 1 },
               (_, index) => ({
                 value: String(firstYear + index),
-                label: `${firstYear + index}${chinese ? '年' : ''}`,
+                label: dayjsConfig.locale.format(
+                  locale.locale,
+                  value.year(firstYear + index),
+                  locale.yearFormat ?? 'YYYY',
+                ),
               }),
             )}
           />
           {mode === 'month' && (
             <Select
-              aria-label={chinese ? '月' : 'Month'}
-              mobileTitle={chinese ? '月' : 'Month'}
+              aria-label={calendarMonth}
+              mobileTitle={calendarMonth}
               size="medium"
               style={{ width: 'auto', minWidth: '6em' }}
               value={String(value.month())}
@@ -239,13 +264,13 @@ export const Calendar = forwardRef<CalendarRef, CalendarProps>((props, ref) => {
             />
           )}
           <Segmented<CalendarMode>
-            aria-label={chinese ? '日历视图' : 'Calendar view'}
+            aria-label={calendarView}
             size="medium"
             value={mode}
             onChange={changeMode}
             options={[
-              { value: 'month', label: chinese ? '月' : 'Month' },
-              { value: 'year', label: chinese ? '年' : 'Year' },
+              { value: 'month', label: calendarMonth },
+              { value: 'year', label: calendarYear },
             ]}
           />
         </div>
@@ -253,7 +278,7 @@ export const Calendar = forwardRef<CalendarRef, CalendarProps>((props, ref) => {
       <PickerPanel<Dayjs>
         direction={direction}
         prefixCls={props.prefixCls ?? 'tao-calendar-panel'}
-        generateConfig={dayjsConfig}
+        generateConfig={generateConfig}
         locale={locale}
         value={value}
         mode={mode === 'year' ? 'month' : 'date'}

@@ -84,7 +84,7 @@ export function Table<T extends TableRecord = Record<string, unknown>>({
   size,
   variant,
   headerBackground = true,
-  emptyText = 'No Data',
+  emptyText: emptyTextProp,
   bordered = false,
   className,
   style,
@@ -96,6 +96,10 @@ export function Table<T extends TableRecord = Record<string, unknown>>({
   onHeaderRow,
 }: TableProps<T>) {
   const ctx = useTaoConfig();
+  const emptyText =
+    emptyTextProp === undefined
+      ? ctx.locale.messages.tableEmpty
+      : emptyTextProp;
   const resolvedSize = size ?? ctx.size;
   const screens = useBreakpoint();
   // Columns with a `responsive` list render only when one of its breakpoints
@@ -450,7 +454,7 @@ export function Table<T extends TableRecord = Record<string, unknown>>({
                     >
                       {selectionType === 'checkbox' && (
                         <Checkbox
-                          aria-label="Select all rows"
+                          aria-label={ctx.locale.messages.selectAllRows}
                           checked={isAllSelected}
                           disabled={selectablePageKeys.length === 0}
                           indeterminate={isIndeterminate}
@@ -630,14 +634,18 @@ export function Table<T extends TableRecord = Record<string, unknown>>({
                           {selectionType === 'radio' ? (
                             <Radio
                               checked={isSelected}
-                              aria-label={`Select row ${String(key)}`}
+                              aria-label={ctx.locale.messages.selectRow(
+                                String(key),
+                              )}
                               disabled={checkboxProps?.disabled ?? false}
                               onChange={() => handleSelectRow(key)}
                             />
                           ) : (
                             <Checkbox
                               checked={isSelected}
-                              aria-label={`Select row ${String(key)}`}
+                              aria-label={ctx.locale.messages.selectRow(
+                                String(key),
+                              )}
                               disabled={checkboxProps?.disabled ?? false}
                               onChange={() => handleSelectRow(key)}
                             />

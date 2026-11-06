@@ -187,6 +187,10 @@ export default function Example() {
 
 </div>
 
+## Regional formatting
+
+Regional grouping, decimal symbols and digits inherit `TaoProvider.locale.numberLocale`; set `locale="fr-FR"` on this component to override it. Explicit separators and custom formatters take precedence. Numeric input keeps canonical ASCII strings and precision while displaying localized digits.
+
 ## API
 
 <API moduleName="statistic" />

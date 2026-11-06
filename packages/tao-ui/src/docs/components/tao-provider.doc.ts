@@ -5,12 +5,20 @@ export const taoProviderDoc = {
   displayName: 'TaoProvider',
   category: 'Config',
   description:
-    'Provides global component defaults, portal scoping, and theme seed token overrides.',
+    'Provides global component defaults, 17 locales with date and number regional settings, portal scoping, and theme seed token overrides.',
   exports: ['TaoProvider'],
   source: 'src/provider/tao-provider.tsx',
   story: 'stories/provider.stories.tsx',
   tests: ['tests/provider/tao-provider.test.tsx'],
-  keywords: ['provider', 'theme', 'tokens', 'size', 'disabled'],
+  keywords: [
+    'provider',
+    'theme',
+    'tokens',
+    'size',
+    'disabled',
+    'locale',
+    'internationalization',
+  ],
   related: ['Button', 'Input', 'tokenVar'],
   usage: {
     description:
@@ -24,6 +32,13 @@ export const taoProviderDoc = {
     ],
   },
   props: [
+    {
+      name: 'locale',
+      type: 'Partial<TaoLocale>',
+      defaultValue: 'enUS',
+      description:
+        'Component text, accessible names, form validation and regional date/number settings. Missing keys inherit from the parent; explicit component overrides win. Direction is independent.',
+    },
     {
       name: 'direction',
       type: "'ltr' | 'rtl'",

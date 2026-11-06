@@ -49,9 +49,7 @@ export function TransferSearch({
             data-tao-transfer-clear=""
             type="button"
             disabled={disabled}
-            aria-label={
-              locale.locale?.startsWith('zh') ? '清空搜索' : 'Clear search'
-            }
+            aria-label={locale.messages.clearSearch}
             onClick={handleClear}
           >
             ×
@@ -100,13 +98,9 @@ export function TransferOperation({
         },
       });
     }
-    const label = locale.locale?.startsWith('zh')
-      ? right
-        ? '移至目标'
-        : '移至源列表'
-      : right
-        ? 'Move to target'
-        : 'Move to source';
+    const label = right
+      ? locale.messages.moveToTarget
+      : locale.messages.moveToSource;
     return (
       <Button
         size="small"

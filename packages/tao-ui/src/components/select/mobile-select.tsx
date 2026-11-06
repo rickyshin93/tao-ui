@@ -47,7 +47,7 @@ function MobileSelectContentInner({
   searchValue: search,
   onSearch,
   filterOption,
-  notFoundContent = 'No results',
+  notFoundContent: notFoundContentProp,
   optionRender,
   onClose,
   multiple,
@@ -60,6 +60,8 @@ function MobileSelectContentInner({
   styles,
 }: MobileSelectContentProps) {
   const { locale } = useTaoConfig();
+  const notFoundContent =
+    notFoundContentProp === undefined ? locale.noResults : notFoundContentProp;
   const valueArray = useMemo<string[]>(() => {
     if (multiple) return (value as string[]) ?? [];
     return value ? [value as string] : [];

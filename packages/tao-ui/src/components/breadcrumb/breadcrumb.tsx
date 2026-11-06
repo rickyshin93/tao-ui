@@ -119,7 +119,7 @@ export function Breadcrumb({
   classNames,
   styles,
 }: BreadcrumbProps) {
-  const { size, disabled: ctxDisabled } = useTaoConfig();
+  const { size, disabled: ctxDisabled, locale } = useTaoConfig();
 
   const collapsed =
     maxItems != null && maxItems >= 1 && items.length > maxItems;
@@ -199,7 +199,7 @@ export function Breadcrumb({
     <nav
       data-tao-breadcrumb=""
       data-tao-size={size}
-      aria-label="breadcrumb"
+      aria-label={locale.messages.breadcrumb}
       className={cx(classNames?.root, className)}
       style={{ ...styles?.root, ...style }}
     >
@@ -243,7 +243,7 @@ export function Breadcrumb({
                     <button
                       type="button"
                       data-tao-breadcrumb-ellipsis=""
-                      aria-label="Show more"
+                      aria-label={locale.messages.showMore}
                       className={cx(classNames?.ellipsis)}
                       style={styles?.ellipsis}
                     >

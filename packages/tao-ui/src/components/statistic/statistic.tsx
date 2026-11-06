@@ -6,9 +6,17 @@ import {
   useEffect,
   useImperativeHandle,
   useLayoutEffect,
+  useMemo,
   useRef,
   useState,
 } from 'react';
+import {
+  groupInteger,
+  localizeDigits,
+  type NumberFormatOptions,
+  resolveNumberFormat,
+} from '../../number-input/locale';
+import { useTaoConfig } from '../../provider/tao-provider';
 import {
   cx,
   type SemanticClassNames,
@@ -26,6 +34,8 @@ export type StatisticSemanticPart =
   | 'prefix'
   | 'suffix';
 export interface StatisticFormatConfig {
+  /** BCP 47 locale. Defaults to the provider's number locale. */
+  locale?: string;
   formatter?:
     | false
     | 'number'
@@ -68,8 +78,7 @@ const plainNumber = new Intl.NumberFormat('en-US', {
 function formattedNumber(
   value: StatisticValue,
   precision: number | undefined,
-  group: string,
-  separator: string,
+  options: NumberFormatOptions,
 ): ReactNode {
   const text =
     typeof value === 'number' && String(value).includes('e')
@@ -77,7 +86,10 @@ function formattedNumber(
       : String(value);
   const match = /^(-?)(\d*)(?:\.(\d+))?$/.exec(text);
   if (!match || text === '-') return text;
-  const integer = (match[2] || '0').replace(/\B(?=(\d{3})+(?!\d))/g, group);
+  const integer = localizeDigits(
+    groupInteger(match[2] || '0', options),
+    options,
+  );
   const fraction =
     precision === undefined
       ? (match[3] ?? '')
@@ -87,13 +99,13 @@ function formattedNumber(
   return (
     <>
       <span data-tao-statistic-integer="">
-        {match[1]}
+        {match[1] ? (options.minusSign ?? '-') : ''}
         {integer}
       </span>
       {fraction && (
         <span data-tao-statistic-decimal="">
-          {separator}
-          {fraction}
+          {options.decimalSeparator}
+          {localizeDigits(fraction, options)}
         </span>
       )}
     </>
@@ -113,8 +125,9 @@ const StatisticRoot = forwardRef<StatisticRef, StatisticProps>((props, ref) => {
     suffix,
     loading = false,
     formatter,
-    decimalSeparator = '.',
-    groupSeparator = ',',
+    locale: localeProp,
+    decimalSeparator,
+    groupSeparator,
     precision,
     classNames,
     styles,
@@ -122,7 +135,23 @@ const StatisticRoot = forwardRef<StatisticRef, StatisticProps>((props, ref) => {
     style,
     ...rest
   } = props;
-  const merged = { ...props, value, loading, decimalSeparator, groupSeparator };
+  const config = useTaoConfig();
+  const locale = localeProp ?? config.locale.numberLocale;
+  const numberFormat = useMemo(
+    () =>
+      resolveNumberFormat(locale, {
+        decimalSeparator,
+        thousandsSeparator: groupSeparator,
+      }),
+    [locale, decimalSeparator, groupSeparator],
+  );
+  const merged = {
+    ...props,
+    value,
+    loading,
+    decimalSeparator: numberFormat.decimalSeparator,
+    groupSeparator: numberFormat.thousandsSeparator,
+  };
   const classes =
     typeof classNames === 'function'
       ? classNames({ props: merged })
@@ -139,7 +168,7 @@ const StatisticRoot = forwardRef<StatisticRef, StatisticProps>((props, ref) => {
     >
       {typeof formatter === 'function'
         ? formatter(value)
-        : formattedNumber(value, precision, groupSeparator, decimalSeparator)}
+        : formattedNumber(value, precision, numberFormat)}
     </span>
   );
   return (

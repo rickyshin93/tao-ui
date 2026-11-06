@@ -71,7 +71,6 @@ export function ListPaginationControl(props: ListPagination) {
     typeof classNames === 'function' ? classNames({ props }) : classNames;
   const semanticStyles =
     typeof styles === 'function' ? styles({ props }) : styles;
-  const chinese = contextLocale.locale?.startsWith('zh');
   const CustomSelect = components?.sizeChanger ?? selectComponentClass;
   const selectProps: Partial<SelectProps> =
     typeof showSizeChanger === 'object' ? showSizeChanger : {};
@@ -93,13 +92,17 @@ export function ListPaginationControl(props: ListPagination) {
         prefixCls={prefixCls}
         disabled={props.disabled ?? disabled}
         locale={{
-          items_per_page: chinese ? '条/页' : '/ page',
-          jump_to: chinese ? '跳至' : 'Go to',
-          jump_to_confirm: chinese ? '确定' : 'Go',
-          page: chinese ? '页' : 'page',
-          prev_page: contextLocale.previous,
-          next_page: contextLocale.next,
-          page_size: chinese ? '每页条数' : 'Page size',
+          items_per_page: contextLocale.messages.itemsPerPage,
+          jump_to: contextLocale.messages.jumpTo,
+          jump_to_confirm: contextLocale.messages.jumpToConfirm,
+          page: contextLocale.messages.pageUnit,
+          prev_page: contextLocale.messages.previousPage,
+          next_page: contextLocale.messages.nextPage,
+          page_size: contextLocale.messages.pageSize,
+          prev_5: contextLocale.messages.previousPages,
+          next_5: contextLocale.messages.nextPages,
+          prev_3: contextLocale.messages.previousPages,
+          next_3: contextLocale.messages.nextPages,
           ...locale,
         }}
         className={cx(classes?.root, rootClassName, className)}
@@ -122,14 +125,14 @@ export function ListPaginationControl(props: ListPagination) {
               type="button"
               aria-label={
                 type === 'page'
-                  ? `Page ${page}`
+                  ? contextLocale.messages.page(page)
                   : type === 'prev'
                     ? contextLocale.previous
                     : type === 'next'
                       ? contextLocale.next
                       : type === 'jump-prev'
-                        ? 'Previous pages'
-                        : 'Next pages'
+                        ? contextLocale.messages.previousPages
+                        : contextLocale.messages.nextPages
               }
               aria-current={
                 type === 'page' && page === current ? 'page' : undefined

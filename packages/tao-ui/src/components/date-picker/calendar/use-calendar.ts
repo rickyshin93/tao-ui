@@ -3,14 +3,11 @@ import dayjs from 'dayjs';
 
 /**
  * Generate 6×7 matrix of days for a calendar month view.
- * Weeks start on Monday. Includes fill days from prev/next month.
+ * Includes fill days from prev/next month; legacy callers start on Monday.
  */
-export function getCalendarWeeks(viewDate: Dayjs): Dayjs[][] {
+export function getCalendarWeeks(viewDate: Dayjs, weekStartsOn = 1): Dayjs[][] {
   const startOfMonth = viewDate.startOf('month');
-  // dayjs .day(): 0=Sun,1=Mon...6=Sat. We want Monday=0.
-  const dayOfWeek = startOfMonth.day();
-  // Offset: Monday-based. Sunday(0)→6, Monday(1)→0, Tuesday(2)→1, ...
-  const offset = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+  const offset = (startOfMonth.day() - weekStartsOn + 7) % 7;
   const start = startOfMonth.subtract(offset, 'day');
 
   return Array.from({ length: 6 }, (_, week) =>

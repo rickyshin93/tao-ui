@@ -843,7 +843,7 @@ Use Tag for lightweight metadata or status markers. Use CheckableTag for compact
 
 ### TaoProvider
 
-Provides global component defaults, portal scoping, and theme seed token overrides.
+Provides global component defaults, 17 locales with date and number regional settings, portal scoping, and theme seed token overrides.
 
 - Category: Config
 - Exports: `TaoProvider`

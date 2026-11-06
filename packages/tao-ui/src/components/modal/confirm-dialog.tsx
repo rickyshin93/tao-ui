@@ -7,6 +7,7 @@ import {
 import { Button, type ButtonProps } from '../button/button';
 import { StatusIcon } from '../status-icon/status-icon';
 import { Modal, type ModalSemanticPart } from './modal';
+import { useTaoConfig } from '../../provider/tao-provider';
 
 export type ConfirmType = 'info' | 'success' | 'error' | 'warning' | 'confirm';
 
@@ -73,6 +74,7 @@ export function ConfirmDialog({
   classNames,
   styles,
 }: ConfirmDialogProps) {
+  const { locale } = useTaoConfig();
   const [loading, setLoading] = useState(false);
   const [cancelLoading, setCancelLoading] = useState(false);
   const cancelPending = useRef(false);
@@ -115,7 +117,8 @@ export function ConfirmDialog({
     }
   };
 
-  const iconNode = icon === null ? null : (icon ?? <StatusIconFor type={type} />);
+  const iconNode =
+    icon === null ? null : (icon ?? <StatusIconFor type={type} />);
 
   const mergedClassNames = className
     ? { ...classNames, root: cx(classNames?.root, className) }
@@ -143,7 +146,7 @@ export function ConfirmDialog({
               onClick={handleCancel}
               {...cancelButtonProps}
             >
-              {cancelText ?? 'Cancel'}
+              {cancelText ?? locale.cancel}
             </Button>
           )}
           <Button
@@ -153,7 +156,7 @@ export function ConfirmDialog({
             {...okButtonProps}
             disabled={cancelLoading || okButtonProps?.disabled}
           >
-            {okText ?? 'OK'}
+            {okText ?? locale.ok}
           </Button>
         </>
       }
@@ -177,10 +180,5 @@ export function ConfirmDialog({
 
 function StatusIconFor({ type }: { type: ConfirmType }) {
   // 'confirm' uses the warning triangle; the rest map 1:1 onto the shared set.
-  return (
-    <StatusIcon
-      type={type === 'confirm' ? 'warning' : type}
-      size={22}
-    />
-  );
+  return <StatusIcon type={type === 'confirm' ? 'warning' : type} size={22} />;
 }

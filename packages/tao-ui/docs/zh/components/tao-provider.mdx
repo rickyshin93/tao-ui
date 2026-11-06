@@ -865,6 +865,63 @@ export default function DirectionExample() {
 
 </section>
 
+<section className="tao-example" id="tao-provider-locales">
+
+### 17 种语言与地区格式
+
+切换语言可更新组件默认文案、日期与数字格式。日期默认仍使用原有 ISO 格式；此例用 `format="L"` 显式选择地区格式。数字输入回调始终返回规范 ASCII 十进制字符串。调用方提供的业务标签由应用自行翻译。
+
+```tsx preview
+import { useState } from 'react';
+import dayjs from 'dayjs';
+import {
+  DatePicker, Empty, InputNumber, Pagination, Select, Stack, Statistic, TaoProvider, Upload,
+  enUS, zhCN, zhTW, jaJP, koKR, frFR, deDE, esES, itIT, ptBR, ruRU, arEG, hiIN, trTR, idID, thTH, viVN,
+} from '@rockshin/tao-ui';
+
+const languages = [
+  { value: 'enUS', label: 'English', locale: enUS },
+  { value: 'zhCN', label: '简体中文', locale: zhCN },
+  { value: 'zhTW', label: '繁體中文', locale: zhTW },
+  { value: 'jaJP', label: '日本語', locale: jaJP },
+  { value: 'koKR', label: '한국어', locale: koKR },
+  { value: 'frFR', label: 'Français', locale: frFR },
+  { value: 'deDE', label: 'Deutsch', locale: deDE },
+  { value: 'esES', label: 'Español', locale: esES },
+  { value: 'itIT', label: 'Italiano', locale: itIT },
+  { value: 'ptBR', label: 'Português (Brasil)', locale: ptBR },
+  { value: 'ruRU', label: 'Русский', locale: ruRU },
+  { value: 'arEG', label: 'العربية', locale: arEG },
+  { value: 'hiIN', label: 'हिन्दी', locale: hiIN },
+  { value: 'trTR', label: 'Türkçe', locale: trTR },
+  { value: 'idID', label: 'Bahasa Indonesia', locale: idID },
+  { value: 'thTH', label: 'ไทย', locale: thTH },
+  { value: 'viVN', label: 'Tiếng Việt', locale: viVN },
+];
+
+export default function LocaleExample() {
+  const [language, setLanguage] = useState('frFR');
+  const selected = languages.find((item) => item.value === language)!;
+  return (
+    <Stack gap="md">
+      <Select aria-label="Language" value={language} options={languages} onChange={(value) => setLanguage(String(value))} />
+      <TaoProvider locale={selected.locale} direction={language === 'arEG' ? 'rtl' : 'ltr'}>
+        <Stack gap="md">
+          <DatePicker defaultValue={dayjs('2026-11-12')} format="L" />
+          <InputNumber aria-label="Amount" defaultValue="1234567.89" />
+          <Statistic value="1234567.89" />
+          <Upload />
+          <Pagination total={100} defaultCurrent={2} />
+          <Empty />
+        </Stack>
+      </TaoProvider>
+    </Stack>
+  );
+}
+```
+
+</section>
+
 </div>
 
 ## API

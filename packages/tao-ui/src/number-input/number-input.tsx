@@ -20,6 +20,7 @@ export interface HeadlessInputNumberProps
 }
 
 const HOOK_KEYS = [
+  'locale',
   'value',
   'defaultValue',
   'onChange',

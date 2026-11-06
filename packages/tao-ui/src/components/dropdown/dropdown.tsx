@@ -270,7 +270,7 @@ function DropdownButton({
   menu,
   ...dropdownRest
 }: DropdownButtonProps) {
-  const { size: ctxSize } = useTaoConfig();
+  const { size: ctxSize, locale } = useTaoConfig();
   const resolvedSize = size ?? ctxSize;
   return (
     <span data-tao-dropdown-button-group="">
@@ -286,7 +286,7 @@ function DropdownButton({
         <Button
           variant={variant}
           size={resolvedSize}
-          aria-label="More"
+          aria-label={locale.messages.more}
           data-tao-dropdown-button-trigger=""
         >
           {icon ?? <EllipsisIcon />}

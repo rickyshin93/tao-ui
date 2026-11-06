@@ -13,6 +13,7 @@ import {
   type SemanticStyles,
 } from '../../utils/semantic';
 import './splitter.css';
+import { useTaoConfig } from '../../provider/tao-provider';
 
 // ---- Types ----
 
@@ -174,6 +175,7 @@ export function Splitter({
   styles,
   children,
 }: SplitterProps) {
+  const { locale } = useTaoConfig();
   const containerRef = useRef<HTMLDivElement>(null);
 
   const { panels, panelChildren } = useMemo(() => {
@@ -446,7 +448,7 @@ export function Splitter({
                 data-tao-splitter-dragger=""
                 data-tao-orientation={orientation}
                 role="separator"
-                aria-label={`Resize panels ${i + 1} and ${i + 2}`}
+                aria-label={locale.messages.resizePanels(i + 1, i + 2)}
                 aria-orientation={isHorizontal ? 'vertical' : 'horizontal'}
                 aria-valuemin={Math.round(valueMin)}
                 aria-valuemax={Math.round(valueMax)}
@@ -474,7 +476,7 @@ export function Splitter({
                           data-tao-splitter-collapse=""
                           data-tao-collapse-direction="start"
                           data-tao-orientation={orientation}
-                          aria-label="Collapse panel"
+                          aria-label={locale.messages.collapsePanel}
                           onClick={() => handleCollapse(i, 'start')}
                         >
                           <CollapseIcon
@@ -489,7 +491,7 @@ export function Splitter({
                           data-tao-splitter-collapse=""
                           data-tao-collapse-direction="end"
                           data-tao-orientation={orientation}
-                          aria-label="Collapse panel"
+                          aria-label={locale.messages.collapsePanel}
                           onClick={() => handleCollapse(i, 'end')}
                         >
                           <CollapseIcon

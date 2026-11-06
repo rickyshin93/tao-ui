@@ -1,9 +1,14 @@
-import type { FormatOptions, PadDecimalsOnBlur } from './types';
+import {
+  groupInteger,
+  localizeDigits,
+  type NumberFormatOptions,
+  normalizeDigits,
+} from './locale';
+import type { PadDecimalsOnBlur } from './types';
 
-const THOUSAND_SEP_REGEX = /\B(?=(\d{3})+(?!\d))/g;
-
-export function format(canonical: string, opts: FormatOptions): string {
-  if (canonical === '' || canonical === '-') return canonical;
+export function format(canonical: string, opts: NumberFormatOptions): string {
+  if (canonical === '') return canonical;
+  if (canonical === '-') return opts.minusSign ?? '-';
 
   const negative = canonical.startsWith('-');
   const abs = negative ? canonical.slice(1) : canonical;
@@ -11,30 +16,41 @@ export function format(canonical: string, opts: FormatOptions): string {
   const intPart = dotIndex === -1 ? abs : abs.slice(0, dotIndex);
   const fracPart = dotIndex === -1 ? '' : abs.slice(dotIndex + 1);
 
-  const groupedInt = opts.thousandsSeparator
-    ? intPart.replace(THOUSAND_SEP_REGEX, opts.thousandsSeparator)
-    : intPart;
+  const groupedInt = groupInteger(intPart, opts);
 
   let result = groupedInt;
   if (dotIndex !== -1) {
     result += opts.decimalSeparator + fracPart;
   }
 
-  return (negative ? '-' : '') + result;
+  return (
+    (negative ? (opts.minusSign ?? '-') : '') + localizeDigits(result, opts)
+  );
 }
 
-export function parse(display: string, opts: FormatOptions): string {
+export function parse(display: string, opts: NumberFormatOptions): string {
   if (!display) return '';
 
-  const negative = display.startsWith('-');
-  const body = negative ? display.slice(1) : display;
+  const text = normalizeDigits(display, opts).replace(
+    /[\u061c\u200e\u200f\u202a-\u202e\u2066-\u2069]/g,
+    '',
+  );
+  const negative =
+    text.startsWith('-') || text.startsWith(opts.minusSign ?? '-');
+  const body = negative ? text.slice(1) : text;
 
   let cleaned = '';
   let seenDecimal = false;
   for (const ch of body) {
     if (ch >= '0' && ch <= '9') {
       cleaned += ch;
-    } else if (ch === opts.decimalSeparator && !seenDecimal) {
+    } else if (
+      !seenDecimal &&
+      (ch === opts.decimalSeparator ||
+        (opts.allowAsciiDecimal &&
+          ch === '.' &&
+          opts.thousandsSeparator !== '.'))
+    ) {
       cleaned += '.';
       seenDecimal = true;
     }

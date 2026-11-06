@@ -1,7 +1,6 @@
 import * as Popover from '@radix-ui/react-popover';
 import type { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
-import customParseFormat from 'dayjs/plugin/customParseFormat';
 import {
   type AriaAttributes,
   type CSSProperties,
@@ -37,13 +36,12 @@ import { Drawer } from '../drawer/drawer';
 import { CalendarGrid } from './calendar/calendar-grid';
 import './date-picker.css';
 import { Presets } from './presets';
+import { formatPickerDate, parsePickerDate } from './date-localization';
 import {
   getDefaultFormat,
   type PickerRef,
   type RangePresetItem,
 } from './types';
-
-dayjs.extend(customParseFormat);
 
 type RangeValue = [Dayjs | null, Dayjs | null] | null;
 type RangeInteraction =
@@ -185,6 +183,13 @@ export const RangePicker = forwardRef(function RangePicker(
   );
 
   const fmt = formatProp ?? getDefaultFormat(picker, showTime);
+  const dayjsLocale = ctx.locale.dayjsLocale;
+  const numberLocale = ctx.locale.numberLocale;
+  const formatValue = useCallback(
+    (date: Dayjs | null | undefined) =>
+      formatPickerDate(date, fmt, dayjsLocale),
+    [fmt, dayjsLocale],
+  );
   const isDateBlocked = useCallback(
     (date: Dayjs) =>
       !date.isValid() ||
@@ -207,7 +212,7 @@ export const RangePicker = forwardRef(function RangePicker(
         return false;
       const nextValue: RangeValue = start || end ? [start, end] : null;
       if (!isValueControlled) setInternalValue(nextValue);
-      onChange?.(nextValue, [start?.format(fmt) ?? '', end?.format(fmt) ?? '']);
+      onChange?.(nextValue, [formatValue(start), formatValue(end)]);
       return true;
     },
     [
@@ -217,7 +222,7 @@ export const RangePicker = forwardRef(function RangePicker(
       endDisabled,
       resolvedDisabled,
       resolvedValue,
-      fmt,
+      formatValue,
     ],
   );
 
@@ -352,8 +357,8 @@ export const RangePicker = forwardRef(function RangePicker(
     [emitChange, setOpen, isDateBlocked, startDisabled, endDisabled],
   );
 
-  const displayStart = rangeStart ? rangeStart.format(fmt) : '';
-  const displayEnd = rangeEnd ? rangeEnd.format(fmt) : '';
+  const displayStart = formatValue(rangeStart);
+  const displayEnd = formatValue(rangeEnd);
   const [inputStart, setInputStart] = useState(displayStart);
   const [inputEnd, setInputEnd] = useState(displayEnd);
 
@@ -365,7 +370,9 @@ export const RangePicker = forwardRef(function RangePicker(
       if (position === 'start' ? startDisabled : endDisabled) return;
       const text = (position === 'start' ? inputStart : inputEnd).trim();
       const currentValue = position === 'start' ? displayStart : displayEnd;
-      const parsed = text ? dayjs(text, fmt, true) : null;
+      const parsed = text
+        ? parsePickerDate(text, fmt, dayjsLocale, numberLocale)
+        : null;
       const isBlocked =
         parsed != null &&
         (isDateBlocked(parsed) ||
@@ -385,8 +392,8 @@ export const RangePicker = forwardRef(function RangePicker(
       const nextStart = position === 'start' ? parsed : rangeStart;
       const nextEnd = position === 'end' ? parsed : rangeEnd;
       const nextStrings: [string, string] = [
-        nextStart?.format(fmt) ?? '',
-        nextEnd?.format(fmt) ?? '',
+        formatValue(nextStart),
+        formatValue(nextEnd),
       ];
       if (nextStrings[0] !== displayStart || nextStrings[1] !== displayEnd) {
         emitChange(nextStart || nextEnd ? [nextStart, nextEnd] : null);
@@ -406,6 +413,9 @@ export const RangePicker = forwardRef(function RangePicker(
       displayStart,
       emitChange,
       fmt,
+      dayjsLocale,
+      numberLocale,
+      formatValue,
       inputEnd,
       inputStart,
       isValueControlled,

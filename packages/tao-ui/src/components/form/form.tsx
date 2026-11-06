@@ -5,7 +5,13 @@ import RcForm, {
   useWatch,
 } from '@rc-component/form';
 import { forwardRef, type ReactNode, useContext, useMemo } from 'react';
-import { TaoProvider, type TaoSize } from '../../provider/tao-provider';
+import RcFormContext from '@rc-component/form/es/FormContext';
+import {
+  TaoProvider,
+  type TaoSize,
+  useTaoConfig,
+} from '../../provider/tao-provider';
+import { mergeValidateMessages } from '../../provider/merge-locale';
 import {
   cx,
   type SemanticClassNames,
@@ -50,6 +56,8 @@ function FormInner<Values = Record<string, unknown>>(
   }: FormProps<Values>,
   ref: React.Ref<FormInstance<Values>>,
 ) {
+  const { locale } = useTaoConfig();
+  const formContext = useContext(interopDefault(RcFormContext));
   const [instance] = useForm(form);
   const layoutValue = useMemo(
     () => ({
@@ -70,6 +78,10 @@ function FormInner<Values = Record<string, unknown>>(
           className={cx(classNames?.root, className)}
           style={{ ...styles?.root, ...style }}
           {...rcProps}
+          validateMessages={mergeValidateMessages(
+            mergeValidateMessages(locale.form, formContext.validateMessages),
+            rcProps.validateMessages,
+          )}
           form={instance}
         >
           {children}

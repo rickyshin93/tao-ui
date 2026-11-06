@@ -325,7 +325,7 @@ const FloatButtonGroup = forwardRef<FloatButtonGroupRef, FloatButtonGroupProps>(
       <div
         ref={root}
         role="toolbar"
-        aria-label="Floating actions"
+        aria-label={config.locale.messages.floatingActions}
         data-tao-float-button-group=""
         data-tao-shape={shape}
         data-tao-placement={placement}
@@ -435,6 +435,7 @@ function scrollElement(target: HTMLElement | Window | Document): HTMLElement {
 }
 const BackTop = forwardRef<FloatButtonRef, FloatButtonBackTopProps>(
   (props, ref) => {
+    const { locale } = useTaoConfig();
     const {
       visibilityHeight = 400,
       target = defaultTarget,
@@ -503,7 +504,7 @@ const BackTop = forwardRef<FloatButtonRef, FloatButtonBackTopProps>(
         {...rest}
         ref={node}
         icon={icon}
-        aria-label={rest['aria-label'] ?? 'Back to top'}
+        aria-label={rest['aria-label'] ?? locale.messages.backToTop}
         onClick={click}
         style={
           {

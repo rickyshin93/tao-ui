@@ -76,7 +76,10 @@ export function Spinner({
       role="status"
       aria-live="polite"
       aria-label={
-        ariaLabel ?? (tip == null && !ariaLabelledBy ? 'Loading' : undefined)
+        ariaLabel ??
+        (tip == null && !ariaLabelledBy
+          ? ctx.locale.messages.loading
+          : undefined)
       }
       aria-labelledby={ariaLabelledBy}
     >

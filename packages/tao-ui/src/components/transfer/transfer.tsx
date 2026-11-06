@@ -66,19 +66,22 @@ function TransferRoot<T extends TransferItem>(
   } = props;
   const config = useTaoConfig();
   const resolvedDisabled = disabled ?? config.disabled;
-  const chinese = config.locale.locale?.startsWith('zh');
   const text: TransferLocale = {
-    titles: chinese ? ['源列表', '目标列表'] : ['Source', 'Target'],
+    titles: [config.locale.messages.source, config.locale.messages.target],
     searchPlaceholder: config.locale.searchPlaceholder,
-    itemUnit: chinese ? '项' : 'item',
-    itemsUnit: chinese ? '项' : 'items',
-    remove: chinese ? '移除' : 'Remove',
-    selectAll: chinese ? '全选' : 'Select all',
-    deselectAll: chinese ? '取消全选' : 'Deselect all',
-    selectCurrent: chinese ? '选择当前页' : 'Select current page',
-    selectInvert: chinese ? '反选当前页' : 'Invert current selection',
-    removeAll: chinese ? '移除全部' : 'Remove all',
-    removeCurrent: chinese ? '移除当前页' : 'Remove current page',
+    itemUnit: config.locale.messages.itemUnit,
+    itemsUnit: config.locale.messages.itemsUnit,
+    itemCount:
+      locale?.itemUnit !== undefined || locale?.itemsUnit !== undefined
+        ? undefined
+        : config.locale.messages.itemCount,
+    remove: config.locale.remove('').trim(),
+    selectAll: config.locale.messages.selectAll,
+    deselectAll: config.locale.messages.deselectAll,
+    selectCurrent: config.locale.messages.selectCurrent,
+    selectInvert: config.locale.messages.invertCurrent,
+    removeAll: config.locale.messages.removeAll,
+    removeCurrent: config.locale.messages.removeCurrent,
     ...locale,
   };
   const mergedProps = { ...props, disabled: resolvedDisabled };

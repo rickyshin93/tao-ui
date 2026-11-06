@@ -17,7 +17,11 @@ import {
   useRef,
 } from 'react';
 import { RemoveScroll } from 'react-remove-scroll';
-import { TaoPortalScope, TaoProvider } from '../../provider/tao-provider';
+import {
+  TaoPortalScope,
+  TaoProvider,
+  useTaoConfig,
+} from '../../provider/tao-provider';
 import {
   resolveResponsiveValue,
   type TaoBreakpointMap,
@@ -140,8 +144,8 @@ export function Modal({
   title,
   footer,
   onOk,
-  okText = 'OK',
-  cancelText = 'Cancel',
+  okText,
+  cancelText,
   confirmLoading,
   okButtonProps,
   cancelButtonProps,
@@ -171,6 +175,7 @@ export function Modal({
   'aria-labelledby': ariaLabelledBy,
   'aria-describedby': ariaDescribedBy,
 }: ModalProps) {
+  const { locale } = useTaoConfig();
   const watermarkRef = useWatermarkPanelRef();
   const contentRef = useRef<HTMLDivElement | null>(null);
   const { nodes: focusBranches, registry: focusRegistry } =
@@ -210,7 +215,7 @@ export function Modal({
       data-tao-modal-action="cancel"
       {...cancelButtonProps}
     >
-      {cancelText}
+      {cancelText === undefined ? locale.cancel : cancelText}
     </Button>
   );
   const OkBtn: FC = () => (
@@ -221,7 +226,7 @@ export function Modal({
       data-tao-modal-action="ok"
       {...okButtonProps}
     >
-      {okText}
+      {okText === undefined ? locale.ok : okText}
     </Button>
   );
 
@@ -305,7 +310,7 @@ export function Modal({
                 onClose?.();
               }}
               disabled={closeConfig?.disabled}
-              aria-label={closeConfig?.['aria-label'] ?? 'Close'}
+              aria-label={closeConfig?.['aria-label'] ?? locale.close}
             >
               {mergedCloseIcon ?? <CloseIcon />}
             </button>

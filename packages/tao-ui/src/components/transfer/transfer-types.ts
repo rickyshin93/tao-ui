@@ -66,6 +66,7 @@ export interface TransferLocale {
   searchPlaceholder: string;
   itemUnit: string;
   itemsUnit: string;
+  itemCount?: (count: number) => string;
   remove?: string;
   selectAll?: string;
   deselectAll?: string;

@@ -7,7 +7,6 @@ import RcPicker, {
 import dayjsConfig from '@rc-component/picker/generate/dayjs';
 import type { Locale, RangePickerRef } from '@rc-component/picker/interface';
 import enLocale from '@rc-component/picker/locale/en_US';
-import zhLocale from '@rc-component/picker/locale/zh_CN';
 import type { Dayjs } from 'dayjs';
 import { useMemo } from 'react';
 import {
@@ -15,7 +14,10 @@ import {
   useTaoDirection,
 } from '../../provider/tao-provider';
 import { mergeRefs } from '../../utils/refs';
-import 'dayjs/locale/zh-cn';
+import {
+  normalizeDigits,
+  resolveNumberFormat,
+} from '../../number-input/locale';
 import {
   type ButtonHTMLAttributes,
   type CSSProperties,
@@ -31,6 +33,7 @@ import {
 } from '../../provider/tao-provider';
 import { cx } from '../../utils/semantic';
 import { Button } from '../button/button';
+import { parsePickerDate } from '../date-picker/date-localization';
 import './time-picker.css';
 
 export type TimePickerSemanticPart =
@@ -156,13 +159,46 @@ function useAppearance(
 ) {
   const config = useTaoConfig();
   const { tokenStyle } = useTaoInternalConfig();
-  const baseLocale = config.locale.locale === 'zh_CN' ? zhLocale : enLocale;
+  const baseLocale = config.locale.pickerLocale ?? enLocale;
+  const numberLocale = props.locale?.lang.locale
+    ? props.locale.lang.locale.replaceAll('_', '-')
+    : config.locale.numberLocale;
+  const dayjsLocale = config.locale.dayjsLocale;
+  const generateConfig = useMemo(() => {
+    const numberFormat = resolveNumberFormat(numberLocale);
+    return {
+      ...dayjsConfig,
+      locale: {
+        ...dayjsConfig.locale,
+        parse: (locale: string, text: string, formats: string[]) => {
+          if (locale === baseLocale.locale && dayjsLocale) {
+            for (const format of formats) {
+              const parsed = parsePickerDate(
+                text,
+                format,
+                dayjsLocale,
+                numberLocale,
+              );
+              if (parsed.isValid()) return parsed;
+            }
+            return null;
+          }
+          return dayjsConfig.locale.parse(
+            locale,
+            normalizeDigits(text, numberFormat),
+            formats,
+          );
+        },
+      },
+    };
+  }, [numberLocale, dayjsLocale, baseLocale.locale]);
   const popup =
     typeof classNames?.popup === 'string'
       ? { root: classNames.popup }
       : classNames?.popup;
   return {
     config,
+    generateConfig,
     locale: {
       ...baseLocale,
       now: config.locale.now,
@@ -303,7 +339,7 @@ const SingleTimePicker = forwardRef<TimePickerRef, TimePickerProps>(
           ref={pickerRef}
           direction={direction}
           picker="time"
-          generateConfig={dayjsConfig}
+          generateConfig={appearance.generateConfig}
           locale={appearance.locale}
           defaultValue={defaultValue ?? undefined}
           disabled={disabled}
@@ -435,7 +471,7 @@ export const TimeRangePicker = forwardRef<
         ref={pickerRef}
         direction={direction}
         picker="time"
-        generateConfig={dayjsConfig}
+        generateConfig={appearance.generateConfig}
         locale={appearance.locale}
         disabled={disabled}
         placeholder={

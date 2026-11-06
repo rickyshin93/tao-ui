@@ -22,11 +22,11 @@ On a coarse primary pointer, Button, form controls, Checkbox/Radio labels, pagin
 
 ## Language
 
-`TaoProvider` accepts `locale?: Partial<TaoLocale>`. The root uses `enUS`; nested providers merge overrides with their parent's dictionary. `zhCN`, `enUS` and `TaoLocale` are exported from the root and `/provider` entries.
+`TaoProvider` accepts `locale?: Partial<TaoLocale>`. The root uses `enUS`; nested providers merge overrides with their parent's dictionary, including individual `messages` keys and form validation groups. All 17 built-in packs are exported from the root and `/provider`, with independent `/locale/fr-FR`-style imports. See [Internationalization](./INTERNATIONALIZATION.md) for the complete contract.
 
-The dictionary currently covers Select search/empty/confirmation/removal text, Drawer close labels, and DatePicker/RangePicker navigation, calendar month/weekday labels and time controls. Other component copy and caller-supplied option/preset labels are unchanged. Explicit component text such as `placeholder` and `notFoundContent` takes precedence.
+The dictionary supplies component defaults, accessible names, empty states, upload actions, date/time controls and default form validation errors. Caller-supplied labels, business content and explicit component text such as `placeholder` and `notFoundContent` take precedence. Static Modal methods created outside the tree retain root defaults; use `Modal.useModal()` and render its holder inside the provider for contextual language.
 
-`months` has 12 January-first entries and `weekdays` has seven Monday-first entries. `monthTitle` and `calendarTitle` receive a **zero-based** month and the year. Date values, serialization formats and the calendar's Monday-first week order do not change; Day.js global locale is untouched.
+`months` has 12 January-first entries and `weekdays` has seven Monday-first entries. `weekStartsOn` selects the displayed first day consistently across Calendar and DatePicker. `monthTitle` and `calendarTitle` receive a **zero-based** month and the year. Date values and default ISO formats remain unchanged; explicit localized tokens such as `format="L"` select a regional format. Named months use the provider's Day.js locale without mutating the value or global locale. Numbers follow `numberLocale` while numeric input callbacks retain canonical ASCII decimal strings.
 
 ```tsx
 import { TaoProvider, zhCN } from '@rockshin/tao-ui/provider';

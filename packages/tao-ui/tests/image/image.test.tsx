@@ -1,10 +1,109 @@
 import { expect, rstest, test } from '@rstest/core';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { Image } from '../../src/components/image/image';
-import { TaoProvider } from '../../src/provider/tao-provider';
+import { TaoProvider, zhCN } from '../../src/provider/tao-provider';
 
 const source =
   'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="120" height="80"/>';
+
+test('localizes actual image action buttons before custom toolbar composition', async () => {
+  const onTransform = rstest.fn();
+  render(
+    <TaoProvider locale={zhCN}>
+      <Image
+        src={source}
+        alt="Photo"
+        preview={{
+          open: true,
+          onTransform,
+          actionsRender: (original, info) => (
+            <>
+              {original}
+              <div data-testid="custom-action">
+                {info.icons.rotateRightIcon}
+              </div>
+              <button type="button" onClick={info.actions.onReset}>
+                Owner reset
+              </button>
+            </>
+          ),
+        }}
+      />
+    </TaoProvider>,
+  );
+  expect(await screen.findByRole('button', { name: '放大' })).toHaveAttribute(
+    'aria-label',
+    '放大',
+  );
+  expect(screen.getByRole('button', { name: '缩小' })).toBeDisabled();
+  expect(screen.queryByRole('button', { name: 'zoomIn' })).toBeNull();
+  fireEvent.click(screen.getByRole('button', { name: '放大' }));
+  await waitFor(() =>
+    expect(onTransform.mock.calls.at(-1)?.[0]).toMatchObject({
+      action: 'zoomIn',
+    }),
+  );
+  const custom = screen.getByTestId('custom-action').querySelector('button')!;
+  expect(custom).toHaveAttribute('aria-label', '向右旋转');
+  fireEvent.click(custom);
+  await waitFor(() =>
+    expect(onTransform.mock.calls.at(-1)?.[0]).toMatchObject({
+      action: 'rotateRight',
+    }),
+  );
+  expect(
+    screen.getByRole('button', { name: 'Owner reset' }),
+  ).toBeInTheDocument();
+});
+
+test('loading labels and legacy toolbar callbacks inherit provider overrides', async () => {
+  const toolbar = rstest.fn((node) => node);
+  render(
+    <TaoProvider
+      locale={{ messages: { loading: 'Chargement', zoomIn: 'Agrandir' } }}
+    >
+      <Image placeholder={{ progress: true }} />
+      <Image
+        src={source}
+        alt="Legacy"
+        preview={{ open: true, toolbarRender: toolbar }}
+      />
+    </TaoProvider>,
+  );
+  expect(
+    screen.getByRole('status', { name: 'Chargement' }),
+  ).toBeInTheDocument();
+  expect(
+    await screen.findByRole('button', { name: 'Agrandir' }),
+  ).toBeInTheDocument();
+  expect(toolbar).toHaveBeenCalled();
+});
+
+test('progress localizes displayed percentages while keeping numeric values and caller labels', () => {
+  const { rerender } = render(
+    <TaoProvider locale={{ numberLocale: 'ar-EG' }}>
+      <Image placeholder={{ progress: { percent: 50 } }} />
+    </TaoProvider>,
+  );
+  const progress = screen.getByRole('progressbar');
+  const label = new Intl.NumberFormat('ar-EG', { style: 'percent' }).format(
+    0.5,
+  );
+  expect(progress).toHaveAccessibleName(label);
+  expect(progress).toHaveTextContent(label);
+  expect(progress).toHaveAttribute('aria-valuenow', '50');
+  rerender(
+    <TaoProvider locale={{ numberLocale: 'ar-EG' }}>
+      <Image
+        aria-label="Owner progress"
+        placeholder={{ progress: { percent: 50 } }}
+      />
+    </TaoProvider>,
+  );
+  expect(
+    screen.getByRole('progressbar', { name: 'Owner progress' }),
+  ).toHaveAttribute('aria-valuenow', '50');
+});
 
 test('opens a labeled preview with Enter and forwards transform and close events', async () => {
   const onOpenChange = rstest.fn();
@@ -21,14 +120,14 @@ test('opens a labeled preview with Enter and forwards transform and close events
   });
   const dialog = await screen.findByRole('dialog', { name: 'Mountains' });
   expect(onOpenChange).toHaveBeenCalledWith(true);
-  fireEvent.click(screen.getByRole('button', { name: 'zoomIn' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Zoom in' }));
   await waitFor(() =>
     expect(onTransform.mock.calls.at(-1)?.[0]).toMatchObject({
       action: 'zoomIn',
       transform: { scale: 1.5 },
     }),
   );
-  fireEvent.click(screen.getByRole('button', { name: 'rotateRight' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Rotate right' }));
   await waitFor(() =>
     expect(onTransform.mock.calls.at(-1)?.[0]).toMatchObject({
       action: 'rotateRight',

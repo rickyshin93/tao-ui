@@ -45,12 +45,11 @@ function toFile(file: BaseRcFile): UploadFile {
     percent: 0,
   };
 }
-function readPreview(file: File | Blob) {
+function readPreview(file: File | Blob, failureMessage: string) {
   return new Promise<string>((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => resolve(String(reader.result));
-    reader.onerror = () =>
-      reject(reader.error ?? new Error('Unable to read file preview'));
+    reader.onerror = () => reject(reader.error ?? new Error(failureMessage));
     reader.readAsDataURL(file);
   });
 }
@@ -61,26 +60,40 @@ function FilePreview({
   file: UploadFile;
   previewFile?: UploadProps['previewFile'];
 }) {
+  const { locale } = useTaoConfig();
   const [preview, setPreview] = useState<string>();
   const [error, setError] = useState<string>();
   useEffect(() => {
     if (file.thumbUrl || file.url || !file.originFileObj) return;
     let active = true;
-    Promise.resolve((previewFile ?? readPreview)(file.originFileObj)).then(
+    Promise.resolve(
+      previewFile
+        ? previewFile(file.originFileObj)
+        : readPreview(file.originFileObj, locale.messages.readFileError),
+    ).then(
       (value) => {
         if (active) setPreview(value);
       },
       (reason) => {
         if (active)
           setError(
-            reason instanceof Error ? reason.message : 'Preview unavailable',
+            reason instanceof Error
+              ? reason.message
+              : locale.messages.previewUnavailable,
           );
       },
     );
     return () => {
       active = false;
     };
-  }, [file.originFileObj, file.thumbUrl, file.url, previewFile]);
+  }, [
+    file.originFileObj,
+    file.thumbUrl,
+    file.url,
+    previewFile,
+    locale.messages.readFileError,
+    locale.messages.previewUnavailable,
+  ]);
   const src = file.thumbUrl ?? file.url ?? preview;
   return error ? (
     <span role="status">{error}</span>
@@ -133,12 +146,11 @@ const UploadRoot = forwardRef<UploadRef, UploadProps>((props, ref) => {
     typeof props.styles === 'function'
       ? props.styles({ props: { ...props, listType, type, disabled } })
       : props.styles;
-  const chinese = config.locale.locale === 'zh_CN';
   const locale = {
-    removeFile: chinese ? '删除文件' : 'Remove file',
-    previewFile: chinese ? '预览文件' : 'Preview file',
-    downloadFile: chinese ? '下载文件' : 'Download file',
-    uploadError: chinese ? '上传失败' : 'Upload failed',
+    removeFile: config.locale.messages.removeFile,
+    previewFile: config.locale.messages.previewFile,
+    downloadFile: config.locale.messages.downloadFile,
+    uploadError: config.locale.messages.uploadError,
     ...props.locale,
   };
   const current = () => propsRef.current.fileList ?? filesRef.current;
@@ -225,7 +237,9 @@ const UploadRoot = forwardRef<UploadRef, UploadProps>((props, ref) => {
       setRemoveError(undefined);
     } catch (error) {
       setRemoveError(
-        error instanceof Error ? error.message : 'Unable to remove file',
+        error instanceof Error
+          ? error.message
+          : config.locale.messages.removeFileError,
       );
     }
   };
@@ -313,12 +327,8 @@ const UploadRoot = forwardRef<UploadRef, UploadProps>((props, ref) => {
         >
           {props.children ??
             (type === 'drag'
-              ? chinese
-                ? '点击或拖动文件到此区域上传'
-                : 'Click or drop files here to upload'
-              : chinese
-                ? '上传文件'
-                : 'Upload files')}
+              ? config.locale.messages.uploadDrop
+              : config.locale.messages.uploadFile)}
         </RcUploaderComponent>
       </span>
       {props.showUploadList !== false && (

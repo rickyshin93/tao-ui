@@ -65,7 +65,9 @@ import { TaoProvider, zhCN } from '@rockshin/tao-ui/provider';
 </TaoProvider>
 ```
 
-Select and calendar text defaults to English (`enUS`). Override individual keys with `locale={{ ...zhCN, done: '确认' }}`. Nested providers inherit omitted keys, including in portals. This does not change date value formats or Day.js global locale. See [responsive behavior and customization](./RESPONSIVE.md) for scope and verification boundaries.
+TaoProvider supplies component text, accessible names, form validation messages and date/number regional settings. Built-in packs cover English, Simplified/Traditional Chinese, Japanese, Korean, French, German, Spanish, Italian, Brazilian Portuguese, Russian, Arabic (Egypt), Hindi, Turkish, Indonesian, Thai and Vietnamese. Packs are exported from the root and `/provider`, or independently as `import frFR from '@rockshin/tao-ui/locale/fr-FR'`.
+
+Override individual keys with `locale={{ ...zhCN, done: '确认' }}` or `locale={{ messages: { loading: '处理中' } }}`. Nested providers inherit omitted text, including in portals. Date values and default ISO formats remain compatible; explicit `format="L"` requests a regional date format. Named months and week starts follow the locale without changing Day.js global locale. InputNumber and Statistic inherit regional digits/grouping; explicit `locale` or separator props take precedence, and numeric input still emits exact ASCII decimal strings. See the [internationalization contract](./INTERNATIONALIZATION.md) for all packs, precedence and verification boundaries.
 
 ### Right-to-left layouts
 
