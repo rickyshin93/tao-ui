@@ -10,6 +10,13 @@
 - `classNames` / `styles` apply to trigger/tag parts and mobile popup, search, group, item and empty parts. On mobile, `popup` styles the Drawer root, and `popupRender` wraps its content. `optionRender`, `labelRender` and `tagRender` work in both surfaces.
 - `placement`, `popupMatchSelectWidth`, `listHeight` and `getPopupContainer` configure desktop popups. Mobile uses the bottom Drawer and its viewport-based height. `hideSelected` remains a desktop list option. Native `name` serialization is supported for desktop single-select; serialize application values explicitly for multiple/mobile selection.
 
+## Cascader
+
+- Like Select, Cascader uses a bottom Drawer below 576px; `mobile` overrides automatic detection and `mobileTitle` overrides the field-label/localized title. The active surface stays fixed until closed.
+- Single leaf selection commits immediately. Multiple selection uses a draft: Done commits it, while closing the drawer cancels it. Search, custom field names, disabled options and lazy loading retain the Cascader engine's behavior.
+- Hierarchy columns stay inside the drawer, with touch-sized rows and horizontal scrolling when the full path exceeds the available width. `Cascader.Panel` remains inline.
+- Desktop clear actions replace the suffix on hover or keyboard focus. Touch keeps the clear action visible in the suffix position, matching Select.
+
 ## Layout and touch
 
 Select, DatePicker and RangePicker share mobile drawer title resolution: `mobileTitle` → nearest `Form.Item`/`FormField` label → localized component text. Labels flow through wrappers and update with the field; generated required marks and help text are excluded. `mobileTitle` accepts React content and also works without a form. Placeholders remain input hints and no longer name drawers. Fields built with native labels should pass `mobileTitle` explicitly. Desktop popup behavior is unchanged.

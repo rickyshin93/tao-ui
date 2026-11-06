@@ -10,6 +10,7 @@ const packageJson = JSON.parse(
 );
 const buttonEntry = Bun.resolveSync(`${packageJson.name}/button`, root);
 const providerEntry = Bun.resolveSync(`${packageJson.name}/provider`, root);
+const formEntry = Bun.resolveSync(`${packageJson.name}/form`, root);
 const manifestEntry = Bun.resolveSync(
   `${packageJson.name}/component-manifest.json`,
   root,
@@ -68,6 +69,17 @@ async function bundleCss(entrypoints) {
 
 const buttonCss = await bundleCss([buttonEntry]);
 const providerCss = await bundleCss([providerEntry]);
+const formCss = await bundleCss([formEntry]);
+assert.match(
+  formCss,
+  /\[data-tao-form-error\]\{[^}]*color:var\(--tao-form-field-error-color,var\(--tao-error\)\)/,
+  'Form subpath includes shared error colors',
+);
+assert.match(
+  formCss,
+  /\[data-tao-required\]\{[^}]*color:var\(--tao-form-field-label-required-mark-color,var\(--tao-error\)\)/,
+  'Form subpath includes required mark colors',
+);
 const rootCss = await bundleCss([join(root, packageJson.exports['.'].import)]);
 assert.ok(
   buttonCss.includes('--tao-color-primary'),

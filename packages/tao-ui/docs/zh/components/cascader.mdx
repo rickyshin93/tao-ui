@@ -11,6 +11,8 @@ import Preview from '../../_components/demo-preview';
 
 尺寸支持 `small`、`medium`、`large`；兼容别名 `middle` 与 `medium` 使用相同尺寸。
 
+窄于 576px 时自动使用底部抽屉；可用 `mobile` 强制选择展示方式，`mobileTitle` 指定抽屉标题。手机端单选即时提交，多选点击 Done 后提交，关闭则取消本次修改。桌面端 hover 时清除按钮替换箭头，触屏始终显示清除按钮。
+
 ## 示例
 
 <div className="tao-demo-grid">
@@ -425,9 +427,9 @@ export default function LocationPanel() {
 
 <section className="tao-example" id="cascader-mobile">
 
-### 窄屏级联列
+### 手机底部抽屉
 
-在手机模式下展开三级选项。弹层限制在视口内，级联列可以横向滚动。
+在手机模式下通过底部抽屉选择三级路径，级联列超出可用宽度时可以横向滚动。
 
 ```tsx preview="iframe-follow"
 import { Cascader } from '@rockshin/tao-ui';
@@ -469,6 +471,7 @@ export default function MobileLocation() {
       <h3>Delivery location</h3>
       <Cascader
         aria-label="Delivery location"
+        mobileTitle="Delivery location"
         size="middle"
         options={options}
         showSearch

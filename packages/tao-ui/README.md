@@ -55,7 +55,7 @@ Automated regression checks cover DOM semantics and keyboard interactions in Rea
 
 ### Responsive controls and language
 
-Select, DatePicker and RangePicker adapt to the viewport. Select keeps its current editing surface while open, supports `maxTagCount="responsive"`, and shares selection limits, controlled search and tag creation across desktop and mobile. Coarse pointers receive larger targets for basic controls.
+Select, Cascader, DatePicker and RangePicker adapt to the viewport. Select keeps its current editing surface while open, supports `maxTagCount="responsive"`, and shares selection limits, controlled search and tag creation across desktop and mobile. Cascader uses a bottom drawer on phones, with immediate single selection and Done/cancel for multiple selection. Coarse pointers receive larger targets for basic controls.
 
 ```tsx
 import { TaoProvider, zhCN } from '@rockshin/tao-ui/provider';
@@ -134,7 +134,7 @@ Import types from the root or `@rockshin/tao-ui/util`. Compound APIs share their
 
 Responsive helpers: `useBreakpoint`, `useIsMobile`, plus breakpoint-map props on
 `Stack` (`direction`/`gap`/`align`), `Modal` (`width`), and `Table` (column
-`responsive`). `Select` / `DatePicker` / `RangePicker` render as bottom drawers
+`responsive`). `Select` / `Cascader` / `DatePicker` / `RangePicker` render as bottom drawers
 on phones automatically.
 
 Headless utilities: `useNumberInput` / `NumberInput`, and the `cx` semantic-class helper.

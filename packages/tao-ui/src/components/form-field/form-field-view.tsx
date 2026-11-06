@@ -12,12 +12,15 @@ import {
   type SemanticClassNames,
   type SemanticStyles,
 } from '../../utils/semantic';
+import './form.css';
 
 export type FormFieldLayout = 'vertical' | 'horizontal';
 
 export interface FormFieldViewProps {
   /** Identifies Form.Item without changing standalone FormField spacing. */
   formItem?: boolean;
+  /** Keep one feedback line for validation or explicitly controlled messages. */
+  reserveMessage?: boolean;
   label?: ReactNode;
   htmlFor?: string;
   required?: boolean;
@@ -48,6 +51,7 @@ export interface FormFieldViewProps {
  */
 export function FormFieldView({
   formItem,
+  reserveMessage,
   label,
   htmlFor,
   required,
@@ -119,6 +123,7 @@ export function FormFieldView({
       {description}
     </p>
   ) : null;
+  const hasMessage = formItem && (reserveMessage || message !== null);
 
   return (
     <div
@@ -126,6 +131,7 @@ export function FormFieldView({
       style={{ ...styles?.root, ...style }}
       data-tao-form-field=""
       data-tao-form-item={formItem ? '' : undefined}
+      data-tao-form-feedback={hasMessage ? '' : undefined}
       data-tao-layout={layout === 'horizontal' ? 'horizontal' : undefined}
     >
       {label != null && (
@@ -150,7 +156,7 @@ export function FormFieldView({
             ? renderControl(control)
             : control}
         </FieldLabelContext.Provider>
-        {formItem ? <div data-tao-form-message="">{message}</div> : message}
+        {hasMessage ? <div data-tao-form-message="">{message}</div> : message}
       </div>
     </div>
   );

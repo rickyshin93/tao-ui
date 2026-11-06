@@ -6,12 +6,6 @@
 @import "./reference-page.css";
 
 html:root {
-  --rp-c-brand: oklch(0.48 0.07 210);
-  --rp-c-brand-light: oklch(0.62 0.065 210);
-  --rp-c-brand-lighter: oklch(0.88 0.03 210);
-  --rp-c-brand-dark: oklch(0.4 0.065 210);
-  --rp-c-brand-darker: oklch(0.32 0.055 210);
-  --rp-c-brand-tint: oklch(0.48 0.07 210 / 0.12);
   --rp-home-hero-title-color: var(--rp-c-brand-darker);
   --rp-home-hero-title-bg: var(--rp-c-brand-dark);
   --rp-home-background-bg: oklch(0.975 0.008 210);
@@ -26,12 +20,6 @@ html:root {
 }
 
 html.rp-dark {
-  --rp-c-brand: oklch(0.72 0.065 205);
-  --rp-c-brand-light: oklch(0.8 0.05 205);
-  --rp-c-brand-lighter: oklch(0.9 0.025 205);
-  --rp-c-brand-dark: oklch(0.64 0.065 205);
-  --rp-c-brand-darker: oklch(0.5 0.055 205);
-  --rp-c-brand-tint: oklch(0.72 0.065 205 / 0.14);
   --rp-home-hero-title-color: var(--rp-c-brand-light);
   --rp-home-hero-title-bg: var(--rp-c-brand-darker);
   --rp-home-background-bg: oklch(0.19 0.012 220);
@@ -70,11 +58,11 @@ html.rp-dark {
 }
 
 .tao-demo-grid {
+  counter-reset: tao-example;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  align-items: start;
-  gap: 24px;
-  margin: 24px 0 40px;
+  column-gap: 32px;
+  margin: 28px 0 8px;
 }
 
 .tao-demo-grid-wide {
@@ -122,32 +110,70 @@ html.rp-dark {
 }
 .tao-example {
   min-width: 0;
-  border: 1px solid var(--rp-c-divider-light);
-  border-radius: 12px;
-  background: var(--rp-c-bg);
+  grid-row: span 3;
+}
+/* Title, copy and card share rows across a pair so card tops line up; each card
+   keeps its natural height instead of stretching next to a taller neighbour. */
+.tao-example:not(:has(.tao-device-preview)) {
+  display: grid;
+  grid-template-rows: subgrid;
+}
+.tao-example > h3 {
+  grid-row: 1;
+}
+.tao-example > p {
+  grid-row: 2;
+}
+.tao-example > .tao-preview {
+  grid-row: 3;
+  align-self: start;
+}
+.tao-example > :last-child {
+  margin-bottom: 48px;
+}
+.rp-doc .tao-example > p + h3 {
+  margin-top: 20px;
 }
 .rp-doc .tao-example > h3 {
   margin: 0;
-  padding: 20px 22px 0;
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.rp-doc .tao-example > h3::before {
+  counter-increment: tao-example;
+  content: counter(tao-example, decimal-leading-zero);
+  margin-inline-end: 12px;
+  color: var(--rp-c-brand);
+  font-family: var(--rp-font-family-mono);
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0;
+  vertical-align: 2px;
 }
 .rp-doc .tao-example > p {
   margin: 8px 0 0;
-  padding: 0 22px;
   color: var(--rp-c-text-2);
-  font-size: 13px;
-  line-height: 1.7;
+  font-size: 14px;
+  line-height: 1.75;
 }
+/* Copy sits in the document flow; the card frames only the live specimen. */
 .tao-preview {
   min-width: 0;
+  margin-top: 16px;
+  border: 1px solid var(--rp-c-divider-light);
+  border-radius: 12px;
+  background: var(--rp-c-bg-soft);
 }
 .tao-preview-stage {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   align-items: center;
-  min-height: 160px;
-  padding: 28px 22px;
+  min-height: 120px;
+  padding: 32px 28px;
+  border-radius: 12px 12px 0 0;
+  /* Specimen paper: a faint seed wash. */
+  background-color: color-mix(in oklab, var(--rp-c-brand) 5%, var(--rp-c-bg-soft));
 }
 .tao-preview-stage > * {
   min-width: 0;
@@ -158,8 +184,13 @@ html.rp-dark {
   justify-content: flex-end;
   flex-wrap: wrap;
   gap: 8px;
-  padding: 9px 14px;
+  padding: 6px 12px;
   border-top: 1px solid var(--rp-c-divider-light);
+  border-radius: 0 0 12px 12px;
+  background: var(--rp-c-bg);
+}
+.tao-preview:has([aria-expanded="true"]) .tao-preview-toolbar {
+  border-radius: 0;
 }
 .tao-preview-language {
   margin-right: auto;
@@ -240,7 +271,7 @@ html.rp-dark {
 
 @media (max-width: 960px) {
   .tao-demo-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 

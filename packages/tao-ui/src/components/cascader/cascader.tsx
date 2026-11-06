@@ -10,10 +10,14 @@ import {
   type CSSProperties,
   forwardRef,
   type ReactElement,
+  type KeyboardEvent as ReactKeyboardEvent,
   type ReactNode,
   type Ref,
   type RefAttributes,
+  useRef,
+  useState,
 } from 'react';
+import { createPortal } from 'react-dom';
 import {
   type TaoSize,
   type TaoStatus,
@@ -31,9 +35,21 @@ import {
 } from '../tree-select/select-engine';
 import '../tree-select/select-engine.css';
 import './cascader.css';
+import { useBreakpoint } from '../../utils/breakpoint';
+import { useMobileTitle } from '../../utils/field-label';
 import { interopDefault } from '../../utils/interop-default';
+import { mergeRefs } from '../../utils/refs';
+import { Button } from '../button/button';
+import { Drawer } from '../drawer/drawer';
 
 const RcCascaderComponent = /*#__PURE__*/ interopDefault(RcCascader);
+const NAVIGATION_KEYS: Record<string, number> = {
+  ArrowLeft: 37,
+  ArrowUp: 38,
+  ArrowRight: 39,
+  ArrowDown: 40,
+  Enter: 13,
+};
 
 export type { BaseOptionType, DefaultOptionType } from '@rc-component/cascader';
 export type CascaderRef = RcCascaderRef;
@@ -57,6 +73,10 @@ export interface CascaderProps<
     'checkable' | 'classNames' | 'styles' | 'popupRender'
   > {
   multiple?: Multiple;
+  /** Use a bottom drawer. Automatically enabled below 576px. */
+  mobile?: boolean;
+  /** Drawer title; defaults to the field label, then localized selection text. */
+  mobileTitle?: ReactNode;
   size?: TaoSize | 'middle';
   variant?: SelectEngineVariant;
   status?: TaoStatus;
@@ -120,6 +140,16 @@ function InternalCascader<
     classNames,
     styles,
     multiple,
+    mobile,
+    mobileTitle,
+    open: openProp,
+    defaultOpen = false,
+    value: valueProp,
+    defaultValue,
+    onChange,
+    showSearch,
+    searchValue: searchValueProp,
+    onSearch,
     suffix,
     suffixIcon,
     showArrow = true,
@@ -152,71 +182,231 @@ function InternalCascader<
   const semanticStyles =
     typeof styles === 'function' ? styles({ props: resolvedProps }) : styles;
   const renderPopup = popupRender ?? dropdownRender;
+  const screens = useBreakpoint();
+  const requestedMobile = mobile ?? screens.xs;
+  const [internalOpen, setInternalOpen] = useState(defaultOpen);
+  const open = openProp ?? internalOpen;
+  const [mobilePresentation, setMobilePresentation] = useState(requestedMobile);
+  if (
+    (!open || mobilePresentation === undefined) &&
+    mobilePresentation !== requestedMobile
+  ) {
+    setMobilePresentation(requestedMobile);
+  }
+  const isMobile = (open ? mobilePresentation : requestedMobile) ?? false;
+  const title = useMobileTitle(mobileTitle, config.locale.select);
+  const triggerRef = useRef<CascaderRef>(null);
+  type ChangeArgs = Parameters<NonNullable<typeof onChange>>;
+  const [internalValue, setInternalValue] = useState(defaultValue);
+  const value = valueProp !== undefined ? valueProp : internalValue;
+  const [draft, setDraft] = useState<ChangeArgs>();
+  const [previousOpen, setPreviousOpen] = useState(open);
+  if (previousOpen !== open) {
+    setPreviousOpen(open);
+    setDraft(undefined);
+  }
+  const [mobileContainer, setMobileContainer] =
+    useState<HTMLFieldSetElement | null>(null);
+  const [internalSearch, setInternalSearch] = useState('');
+  const searchConfig = typeof showSearch === 'object' ? showSearch : {};
+  const searchValue =
+    searchConfig.searchValue ?? searchValueProp ?? internalSearch;
+  const changeSearch = (next: string) => {
+    setInternalSearch(next);
+    (searchConfig.onSearch ?? onSearch)?.(next);
+  };
+  const changeOpen = (next: boolean) => {
+    setInternalOpen(next);
+    setDraft(undefined);
+    if (!next && isMobile) {
+      if (searchValue) changeSearch('');
+      triggerRef.current?.focus();
+    }
+    (onOpenChange ?? onPopupVisibleChange ?? onDropdownVisibleChange)?.(next);
+  };
+  const commit = (...args: ChangeArgs) => {
+    setInternalValue(args[0]);
+    onChange?.(...args);
+  };
+  const changeValue = (...args: ChangeArgs) => {
+    if (isMobile && open && multiple) {
+      setDraft(args);
+      return;
+    }
+    commit(...args);
+    if (isMobile && open) {
+      const selected = args[1] as OptionType[];
+      const last = selected?.at(-1);
+      const children = last?.[props.fieldNames?.children ?? 'children'];
+      if (!last || (last.isLeaf ?? !children?.length)) changeOpen(false);
+    }
+  };
+  const navigateMobile = (event: ReactKeyboardEvent<HTMLElement>) => {
+    if (event.nativeEvent.isComposing || event.keyCode === 229) return;
+    if (
+      searchValue &&
+      (event.key === 'ArrowLeft' || event.key === 'ArrowRight')
+    )
+      return;
+    const keyCode = NAVIGATION_KEYS[event.key];
+    if (!keyCode) return;
+    event.preventDefault();
+    // Keep the engine's path navigation and disabled-option handling while
+    // keyboard focus stays inside the drawer.
+    triggerRef.current?.nativeElement.querySelector('input')?.dispatchEvent(
+      new KeyboardEvent('keydown', {
+        key: event.key,
+        keyCode,
+        which: keyCode,
+        bubbles: true,
+      }),
+    );
+  };
 
   return (
-    <RcCascaderComponent<OptionType, ValueField, Multiple>
-      {...rest}
-      ref={ref}
-      prefixCls={prefixCls}
-      popupPrefixCls="tao-cascader"
-      data-tao-cascader=""
-      data-tao-select-engine=""
-      data-tao-control=""
-      data-tao-size={size}
-      data-tao-variant={variant}
-      data-disabled={disabled || undefined}
-      data-tao-error={status === 'error' || undefined}
-      data-tao-warning={status === 'warning' || undefined}
-      disabled={disabled}
-      className={cx(className, rootClassName, classes?.root)}
-      style={{ ...semanticStyles?.root, ...style }}
-      classNames={classes}
-      styles={semanticStyles}
-      checkable={multiple}
-      expandIcon={expandIcon}
-      loadingIcon={loadingIcon}
-      suffix={
-        suffix !== undefined ? (
-          suffix
-        ) : suffixIcon !== undefined ? (
-          suffixIcon
-        ) : showArrow ? (
-          <ChevronDownIcon />
-        ) : null
-      }
-      allowClear={selectAllowClear(allowClear, clearIcon, config.locale.clear)}
-      removeIcon={removeIcon}
-      notFoundContent={notFoundContent}
-      popupAlign={{
-        overflow: { adjustX: true, adjustY: true, shiftX: 8 },
-        ...props.popupAlign,
-      }}
-      popupClassName={cx(
-        popupClassName ?? dropdownClassName,
-        rootClassName,
-        classes?.popup?.root,
+    <>
+      <RcCascaderComponent<OptionType, ValueField, Multiple>
+        {...rest}
+        ref={mergeRefs(triggerRef, ref)}
+        open={open}
+        value={(isMobile && open && multiple && draft ? draft[0] : value) ?? []}
+        onChange={changeValue}
+        showSearch={
+          isMobile && showSearch
+            ? { ...searchConfig, searchValue, onSearch: changeSearch }
+            : showSearch
+        }
+        searchValue={isMobile ? searchValue : searchValueProp}
+        onSearch={isMobile ? changeSearch : onSearch}
+        expandTrigger={isMobile ? 'click' : props.expandTrigger}
+        prefixCls={prefixCls}
+        popupPrefixCls="tao-cascader"
+        data-tao-cascader=""
+        data-tao-select-engine=""
+        data-tao-control=""
+        data-tao-size={size}
+        data-tao-variant={variant}
+        data-disabled={disabled || undefined}
+        data-tao-error={status === 'error' || undefined}
+        data-tao-warning={status === 'warning' || undefined}
+        disabled={disabled}
+        className={cx(className, rootClassName, classes?.root)}
+        style={{ ...semanticStyles?.root, ...style }}
+        classNames={classes}
+        styles={semanticStyles}
+        checkable={multiple}
+        expandIcon={expandIcon}
+        loadingIcon={loadingIcon}
+        suffix={
+          suffix !== undefined ? (
+            suffix
+          ) : suffixIcon !== undefined ? (
+            suffixIcon
+          ) : showArrow ? (
+            <ChevronDownIcon />
+          ) : null
+        }
+        allowClear={selectAllowClear(
+          allowClear,
+          clearIcon,
+          config.locale.clear,
+        )}
+        removeIcon={removeIcon}
+        notFoundContent={notFoundContent}
+        popupAlign={{
+          overflow: { adjustX: true, adjustY: true, shiftX: 8 },
+          ...props.popupAlign,
+        }}
+        popupClassName={cx(
+          popupClassName ?? dropdownClassName,
+          rootClassName,
+          classes?.popup?.root,
+        )}
+        popupStyle={{
+          ...config.tokenStyle,
+          position: 'absolute',
+          maxWidth: 'calc(100vw - 16px)',
+          zIndex: 'var(--tao-z-index-popup)' as CSSProperties['zIndex'],
+          ...dropdownStyle,
+          ...popupStyle,
+          ...semanticStyles?.popup?.root,
+          ...(isMobile ? { display: 'contents' } : {}),
+        }}
+        popupRender={(menu) => {
+          if (isMobile) {
+            return mobileContainer ? (
+              createPortal(
+                <div data-tao-cascader-popup="" data-tao-cascader-mobile="">
+                  {renderPopup ? renderPopup(menu) : menu}
+                </div>,
+                mobileContainer,
+              )
+            ) : (
+              <></>
+            );
+          }
+          return (
+            <SelectEnginePopup size={size}>
+              <div data-tao-cascader-popup="">
+                {renderPopup ? renderPopup(menu) : menu}
+              </div>
+            </SelectEnginePopup>
+          );
+        }}
+        popupMenuColumnStyle={popupMenuColumnStyle ?? dropdownMenuColumnStyle}
+        onPopupVisibleChange={(next) => {
+          // The portaled Drawer owns mobile dismissal; rc's outside-click handler
+          // cannot distinguish its content from elements outside the anchored popup.
+          if (!isMobile || next) changeOpen(next);
+        }}
+      />
+      {isMobile && (
+        <Drawer
+          open={open && !disabled}
+          onClose={() => changeOpen(false)}
+          placement="bottom"
+          title={title}
+          height="70vh"
+          classNames={{ root: classes?.popup?.root }}
+          styles={{ root: semanticStyles?.popup?.root }}
+          footer={
+            multiple ? (
+              <Button
+                size="large"
+                style={{ width: '100%' }}
+                disabled={disabled}
+                onClick={() => {
+                  if (draft) commit(...draft);
+                  changeOpen(false);
+                }}
+              >
+                {config.locale.done}
+              </Button>
+            ) : undefined
+          }
+        >
+          {showSearch && (
+            <input
+              data-tao-cascader-search=""
+              type="search"
+              aria-label={config.locale.searchOptions}
+              placeholder={config.locale.searchPlaceholder}
+              value={searchValue}
+              disabled={disabled}
+              onChange={(event) => changeSearch(event.target.value)}
+              onKeyDown={navigateMobile}
+            />
+          )}
+          <fieldset
+            data-tao-cascader-mobile-container=""
+            ref={setMobileContainer}
+            aria-label={config.locale.select}
+            tabIndex={showSearch ? -1 : 0}
+            onKeyDown={navigateMobile}
+          />
+        </Drawer>
       )}
-      popupStyle={{
-        ...config.tokenStyle,
-        position: 'absolute',
-        maxWidth: 'calc(100vw - 16px)',
-        zIndex: 'var(--tao-z-index-popup)' as CSSProperties['zIndex'],
-        ...dropdownStyle,
-        ...popupStyle,
-        ...semanticStyles?.popup?.root,
-      }}
-      popupRender={(menu) => (
-        <SelectEnginePopup size={size}>
-          <div data-tao-cascader-popup="">
-            {renderPopup ? renderPopup(menu) : menu}
-          </div>
-        </SelectEnginePopup>
-      )}
-      popupMenuColumnStyle={popupMenuColumnStyle ?? dropdownMenuColumnStyle}
-      onPopupVisibleChange={
-        onOpenChange ?? onPopupVisibleChange ?? onDropdownVisibleChange
-      }
-    />
+    </>
   );
 }
 

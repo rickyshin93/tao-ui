@@ -1,11 +1,14 @@
-/* The home specimen paper, scoped to component references. Demo tokens stay local. */
-html:root:has(.tao-reference-heading) {
+/* The home specimen paper for every docs page. The seed colour marks where you
+   are and what is live (navigation, example numbers, preview paper); inline code
+   stays neutral so prose is not broken into coloured fragments. */
+html:root {
   --reference-paper: oklch(0.985 0.002 250);
   --reference-sheet: oklch(1 0 0);
   --reference-ink: oklch(0.2 0.01 260);
   --reference-muted: oklch(0.47 0.012 260);
   --reference-line: oklch(0.9 0.004 260);
-  --reference-seed: oklch(0.5 0.19 258);
+  /* Jade: hue 170 keeps it clear of the 155 success green. */
+  --reference-seed: oklch(0.56 0.12 170);
   --rp-c-bg: var(--reference-paper);
   --rp-c-bg-soft: var(--reference-sheet);
   --rp-c-text-1: var(--reference-ink);
@@ -15,20 +18,23 @@ html:root:has(.tao-reference-heading) {
   --rp-c-brand-light: var(--reference-seed);
   --rp-c-brand-dark: var(--reference-seed);
   --rp-c-brand-tint: color-mix(in oklab, var(--reference-seed) 8%, transparent);
+  --rp-c-text-code: var(--reference-ink);
+  --rp-c-text-code-bg: color-mix(in oklab, var(--reference-ink) 5%, transparent);
+  --rp-c-text-code-border: transparent;
   --rp-font-family-mono:
     "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
-html:root.rp-dark:has(.tao-reference-heading) {
+html:root.rp-dark {
   --reference-paper: oklch(0.17 0.006 260);
   --reference-sheet: oklch(0.2 0.007 260);
   --reference-ink: oklch(0.95 0.004 260);
   --reference-muted: oklch(0.72 0.01 260);
   --reference-line: oklch(0.3 0.008 260);
-  --reference-seed: oklch(0.74 0.13 255);
+  --reference-seed: oklch(0.8 0.11 170);
 }
 
-body:has(.tao-reference-heading) {
+body {
   background: var(--reference-paper);
   scrollbar-color: var(--reference-line) var(--reference-paper);
 }
@@ -133,7 +139,7 @@ body:has(.tao-reference-heading) {
   line-height: 1.8;
 }
 
-.rspress-doc:has(.tao-reference-heading) > h2 {
+.rspress-doc > h2 {
   margin-block: 44px 24px;
   padding: 0;
   border: 0;
@@ -142,72 +148,30 @@ body:has(.tao-reference-heading) {
   letter-spacing: -0.02em;
 }
 
-.rspress-doc:has(.tao-reference-heading) > h2:first-of-type::before {
+.rspress-doc > h2:first-of-type::before {
   display: none;
 }
 
-.rspress-doc:has(.tao-reference-heading) .tao-demo-grid {
-  align-items: stretch;
-  gap: 24px;
-}
-
-.rspress-doc:has(.tao-reference-heading) .tao-example {
-  display: flex;
-  flex-direction: column;
-  background: var(--reference-sheet);
-  border-color: var(--reference-line);
-  border-radius: 16px;
-}
-
-.rspress-doc:has(.tao-reference-heading) .tao-example > h3 {
-  padding: 24px 24px 0;
-  font-size: 17px;
-}
-
-.rspress-doc:has(.tao-reference-heading) .tao-example > p {
-  padding-inline: 24px;
-  color: var(--reference-muted);
-}
-
-.rspress-doc:has(.tao-reference-heading) .tao-example > .tao-preview {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-}
-
-.rspress-doc:has(.tao-reference-heading) .tao-preview-stage {
-  flex: 1;
-  min-height: 168px;
-  padding: 32px 24px;
-}
-
-.rspress-doc:has(.tao-reference-heading) .tao-preview-toolbar {
-  padding: 8px 16px;
-  border-color: var(--reference-line);
-  border-radius: 0 0 16px 16px;
-  background: var(--reference-paper);
-}
-
-.rspress-doc:has(.tao-reference-heading)
-  .tao-preview:has([aria-expanded="true"])
-  .tao-preview-toolbar {
-  border-radius: 0;
-}
-
-.rspress-doc:has(.tao-reference-heading) .tao-preview-code {
-  border-radius: 0 0 16px 16px;
-}
-
-.rp-doc-layout__container:has(.tao-reference-heading)
-  .rp-sidebar-section-header {
+html .rp-sidebar-section-header {
   color: var(--reference-muted);
   font-size: 12px;
   font-weight: 500;
 }
 
-.rp-doc-layout__container:has(.tao-reference-heading) .rp-sidebar-item--active {
-  background: var(--rp-c-brand-tint);
+html .rp-sidebar-item--active,
+html .rp-sidebar-item--active:hover {
+  background: color-mix(in oklab, var(--reference-seed) 10%, var(--reference-paper));
   color: var(--reference-seed);
+  font-weight: 500;
+}
+
+html .rp-toc-item--active .rp-toc-item__text,
+html .rp-nav-menu__item--active .rp-nav-menu__item__container {
+  color: var(--reference-seed);
+}
+
+html .rp-toc-item--active::before {
+  background-color: var(--reference-seed);
 }
 
 .rspress-doc:has(.tao-reference-heading) .rspress-plugin-api-docgen table {
@@ -250,15 +214,5 @@ body:has(.tao-reference-heading) {
     font-size: 15px;
   }
 
-  .rspress-doc:has(.tao-reference-heading) .tao-example > h3 {
-    padding: 20px 18px 0;
-  }
 
-  .rspress-doc:has(.tao-reference-heading) .tao-example > p {
-    padding-inline: 18px;
-  }
-
-  .rspress-doc:has(.tao-reference-heading) .tao-preview-stage {
-    padding: 28px 18px;
-  }
 }

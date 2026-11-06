@@ -11,6 +11,8 @@ Each example can be copied and run independently. Use the device control on fram
 
 Sizes are `small`, `medium` and `large`; the compatible `middle` alias uses the same dimensions as `medium`.
 
+Below 576px, Cascader automatically uses a bottom drawer. Use `mobile` to override the surface and `mobileTitle` to name the drawer. Mobile single selection commits immediately; multiple selection commits on Done and cancels on dismissal. On desktop, the clear action replaces the arrow on hover; touch keeps clear visible.
+
 ## Examples
 
 <div className="tao-demo-grid">
@@ -425,9 +427,9 @@ export default function LocationPanel() {
 
 <section className="tao-example" id="cascader-mobile">
 
-### Narrow popup columns
+### Mobile bottom drawer
 
-Open all three levels in phone mode. The popup is constrained to the viewport and its columns scroll horizontally.
+Choose a three-level path in a bottom drawer on phones. The columns scroll horizontally when the path exceeds the available width.
 
 ```tsx preview="iframe-follow"
 import { Cascader } from '@rockshin/tao-ui';
@@ -469,6 +471,7 @@ export default function MobileLocation() {
       <h3>Delivery location</h3>
       <Cascader
         aria-label="Delivery location"
+        mobileTitle="Delivery location"
         size="middle"
         options={options}
         showSearch

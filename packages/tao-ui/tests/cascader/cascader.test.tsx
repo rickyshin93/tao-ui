@@ -5,6 +5,7 @@ import {
   render,
   screen,
   waitFor,
+  within,
 } from '@testing-library/react';
 import { createRef, useState } from 'react';
 import {
@@ -12,6 +13,7 @@ import {
   type CascaderRef,
 } from '../../src/components/cascader/cascader';
 import { TaoProvider } from '../../src/provider/tao-provider';
+import { FieldLabelContext } from '../../src/utils/field-label';
 
 const options = [
   {
@@ -24,6 +26,183 @@ const options = [
   },
   { value: 'locked', label: 'Locked', disabled: true },
 ];
+
+test('mobile single selection opens a named drawer and commits a leaf', async () => {
+  const onChange = rstest.fn();
+  const onOpenChange = rstest.fn();
+  render(
+    <Cascader
+      mobile
+      mobileTitle="Delivery location"
+      options={options}
+      defaultOpen
+      onChange={onChange}
+      onOpenChange={onOpenChange}
+    />,
+  );
+  const dialog = await screen.findByRole('dialog', {
+    name: 'Delivery location',
+  });
+  fireEvent.click(within(dialog).getByText('China'));
+  expect(onChange).not.toHaveBeenCalled();
+  fireEvent.click(within(dialog).getByText('Shanghai'));
+  expect(onChange).toHaveBeenCalledWith(
+    ['cn', 'sh'],
+    [options[0], options[0].children![0]],
+  );
+  await waitFor(() =>
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument(),
+  );
+  expect(onOpenChange).toHaveBeenCalledWith(false);
+  expect(screen.getByTitle('China / Shanghai')).toBeInTheDocument();
+});
+
+test('mobile multiple selection commits on Done and discards a cancelled draft', async () => {
+  const onChange = rstest.fn();
+  render(
+    <Cascader
+      mobile
+      multiple
+      defaultOpen
+      options={options}
+      onChange={onChange}
+    />,
+  );
+  let dialog = await screen.findByRole('dialog');
+  fireEvent.click(
+    within(dialog)
+      .getByText('China')
+      .parentElement!.querySelector('[class*="-checkbox"]')!,
+  );
+  expect(onChange).not.toHaveBeenCalled();
+  fireEvent.click(within(dialog).getByRole('button', { name: 'Close' }));
+  await waitFor(() =>
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument(),
+  );
+  expect(screen.queryByTitle('China')).not.toBeInTheDocument();
+  fireEvent.mouseDown(document.querySelector('[data-tao-cascader]')!);
+  dialog = await screen.findByRole('dialog');
+  expect(
+    within(dialog)
+      .getByText('China')
+      .parentElement!.querySelector('[class*="-checkbox-checked"]'),
+  ).toBeNull();
+  fireEvent.click(
+    within(dialog)
+      .getByText('China')
+      .parentElement!.querySelector('[class*="-checkbox"]')!,
+  );
+  fireEvent.click(within(dialog).getByRole('button', { name: 'Done' }));
+  expect(onChange).toHaveBeenCalledTimes(1);
+  expect(onChange.mock.calls[0][0]).toEqual([['cn']]);
+  await waitFor(() =>
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument(),
+  );
+  expect(screen.getByTitle('China')).toBeInTheDocument();
+});
+
+test('mobile drawer search uses the cascader path search', async () => {
+  const onChange = rstest.fn();
+  const onSearch = rstest.fn();
+  render(
+    <Cascader
+      mobile
+      defaultOpen
+      showSearch
+      options={options}
+      onChange={onChange}
+      onSearch={onSearch}
+    />,
+  );
+  const dialog = await screen.findByRole('dialog');
+  fireEvent.change(within(dialog).getByRole('searchbox'), {
+    target: { value: 'Shanghai' },
+  });
+  expect(onSearch).toHaveBeenCalledWith('Shanghai');
+  fireEvent.click(await within(dialog).findByText('China / Shanghai'));
+  expect(onChange.mock.calls[0][0]).toEqual(['cn', 'sh']);
+  await waitFor(() =>
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument(),
+  );
+});
+
+test('external mobile close discards the draft before a controlled reopening', async () => {
+  const onChange = rstest.fn();
+  const props = { mobile: true, multiple: true as const, options, onChange };
+  const { rerender } = render(<Cascader {...props} open />);
+  const dialog = await screen.findByRole('dialog');
+  fireEvent.click(
+    within(dialog)
+      .getByText('China')
+      .parentElement!.querySelector('[class*="-checkbox"]')!,
+  );
+  rerender(<Cascader {...props} open={false} />);
+  await waitFor(() =>
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument(),
+  );
+  rerender(<Cascader {...props} open />);
+  const reopened = await screen.findByRole('dialog');
+  expect(reopened.querySelector('[class*="-checkbox-checked"]')).toBeNull();
+  expect(onChange).not.toHaveBeenCalled();
+});
+
+test('mobile title inherits the field label and custom option fields retain selection', async () => {
+  const onChange = rstest.fn();
+  const data = [{ id: 1, text: 'Parent', nodes: [{ id: 2, text: 'Child' }] }];
+  render(
+    <FieldLabelContext.Provider value="Destination">
+      <Cascader
+        mobile
+        defaultOpen
+        options={data}
+        fieldNames={{ value: 'id', label: 'text', children: 'nodes' }}
+        onChange={onChange}
+      />
+    </FieldLabelContext.Provider>,
+  );
+  const dialog = await screen.findByRole('dialog', { name: 'Destination' });
+  fireEvent.click(within(dialog).getByText('Parent'));
+  fireEvent.click(within(dialog).getByText('Child'));
+  expect(onChange.mock.calls[0][0]).toEqual([1, 2]);
+  await waitFor(() =>
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument(),
+  );
+});
+
+test('disabled mobile cascader does not open a drawer', () => {
+  render(<Cascader mobile disabled defaultOpen options={options} />);
+  expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+});
+
+test.each([false, true])(
+  'mobile keyboard navigation works with search=%s',
+  async (showSearch) => {
+    const onChange = rstest.fn();
+    render(
+      <Cascader
+        mobile
+        defaultOpen
+        showSearch={showSearch}
+        options={options}
+        onChange={onChange}
+      />,
+    );
+    const dialog = await screen.findByRole('dialog');
+    const focusTarget = within(dialog).getByRole(
+      showSearch ? 'searchbox' : 'group',
+    );
+    focusTarget.focus();
+    fireEvent.keyDown(focusTarget, { key: 'ArrowDown' });
+    fireEvent.keyDown(focusTarget, { key: 'ArrowRight' });
+    fireEvent.keyDown(focusTarget, { key: 'Enter', isComposing: true });
+    expect(onChange).not.toHaveBeenCalled();
+    fireEvent.keyDown(focusTarget, { key: 'Enter' });
+    expect(onChange.mock.calls[0][0]).toEqual(['cn', 'sh']);
+    await waitFor(() =>
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument(),
+    );
+  },
+);
 
 test('opens cascaded columns and emits complete paths and selected option objects', async () => {
   const onChange = rstest.fn();
@@ -147,42 +326,46 @@ test('controlled clear emits an empty value without overriding the supplied valu
   expect(screen.getByTitle('China / Shanghai')).toBeInTheDocument();
 });
 
-test('loads lazy children and shows loading state until new options arrive', async () => {
-  const loadData = rstest.fn();
-  function Lazy() {
-    const [data, setData] = useState([
-      {
-        value: 'cn',
-        label: 'China',
-        isLeaf: false,
-        children: [] as { value: string; label: string }[],
-      },
+test.each([false, true])(
+  'loads lazy children with mobile=%s',
+  async (mobile) => {
+    const loadData = rstest.fn();
+    function Lazy() {
+      const [data, setData] = useState([
+        {
+          value: 'cn',
+          label: 'China',
+          isLeaf: false,
+          children: [] as { value: string; label: string }[],
+        },
+      ]);
+      return (
+        <Cascader
+          mobile={mobile}
+          options={data}
+          defaultOpen
+          loadData={(path) => {
+            loadData(path);
+            setData([
+              {
+                value: 'cn',
+                label: 'China',
+                isLeaf: false,
+                children: [{ value: 'sh', label: 'Shanghai' }],
+              },
+            ]);
+          }}
+        />
+      );
+    }
+    render(<Lazy />);
+    fireEvent.click(await screen.findByText('China'));
+    expect(await screen.findByText('Shanghai')).toBeInTheDocument();
+    expect(loadData.mock.calls[0][0]).toEqual([
+      expect.objectContaining({ value: 'cn' }),
     ]);
-    return (
-      <Cascader
-        options={data}
-        defaultOpen
-        loadData={(path) => {
-          loadData(path);
-          setData([
-            {
-              value: 'cn',
-              label: 'China',
-              isLeaf: false,
-              children: [{ value: 'sh', label: 'Shanghai' }],
-            },
-          ]);
-        }}
-      />
-    );
-  }
-  render(<Lazy />);
-  fireEvent.click(await screen.findByText('China'));
-  expect(await screen.findByText('Shanghai')).toBeInTheDocument();
-  expect(loadData.mock.calls[0][0]).toEqual([
-    expect.objectContaining({ value: 'cn' }),
-  ]);
-});
+  },
+);
 
 test('Panel supports multiple values and provider disabled state', () => {
   const onChange = rstest.fn();

@@ -1,3 +1,35 @@
+[data-tao-cascader] [class$="-clear"] {
+  width: 16px;
+  height: 16px;
+  background: transparent;
+}
+[data-tao-cascader]:has(> [class*="-suffix"]) > [class$="-clear"] {
+  position: absolute;
+  inset-inline-end: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+[data-tao-cascader]:has(> [class$="-clear"]) > [class*="-suffix"] {
+  visibility: hidden;
+}
+@media (hover: hover) and (pointer: fine) {
+  [data-tao-cascader]:not(:hover):not(:has([class$="-clear"]:focus-visible))
+    > [class*="-suffix"] {
+    visibility: visible;
+  }
+}
+@media (pointer: coarse) {
+  [data-tao-cascader]:has(> [class*="-suffix"]):has(> [class$="-clear"]) {
+    padding-inline-end: 52px;
+  }
+  [data-tao-cascader] > [class$="-clear"] {
+    width: 44px;
+    height: 44px;
+  }
+  [data-tao-cascader]:has(> [class$="-clear"]) > [class*="-suffix"] {
+    display: none;
+  }
+}
 [data-tao-cascader-popup] {
   color: var(--tao-color-text);
   font:
@@ -59,10 +91,62 @@
   min-width: 0;
   white-space: nowrap;
 }
+[data-tao-cascader-popup] [class$="-menu-item-expand-icon"] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 [data-tao-cascader-expand] {
   display: inline-flex;
   align-items: center;
   transform: rotate(-90deg);
+}
+[data-tao-drawer]:has([data-tao-cascader-mobile]) [data-tao-drawer-body] {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: 0;
+  overflow: hidden;
+}
+[data-tao-cascader-mobile] {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+}
+[data-tao-cascader-mobile-container] {
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  display: flex;
+  overflow: hidden;
+}
+[data-tao-cascader-mobile] [class$="-menus"] {
+  flex: 1;
+  min-height: 0;
+}
+[data-tao-cascader-mobile] [class$="-menu"] {
+  height: auto;
+  max-width: none;
+  overscroll-behavior: contain;
+}
+[data-tao-cascader-mobile] li[class*="-menu-item"] {
+  min-height: 44px;
+}
+[data-tao-cascader-search] {
+  flex: none;
+  min-height: 44px;
+  width: 100%;
+  padding: var(--tao-padding-xs) var(--tao-padding);
+  border: 0;
+  border-block-end: var(--tao-line-width) solid
+    var(--tao-color-border-secondary);
+  background: transparent;
+  color: var(--tao-color-text);
+  font: inherit;
+  font-size: 16px;
 }
 [data-tao-cascader-popup]:dir(rtl) [data-tao-cascader-expand] {
   transform: rotate(90deg);

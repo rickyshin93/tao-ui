@@ -188,6 +188,12 @@ export function FormItem<Values = Record<string, unknown>>({
     return (
       <FormFieldView
         formItem
+        reserveMessage={
+          Boolean(rules?.length) ||
+          help != null ||
+          extra != null ||
+          validateStatus != null
+        }
         label={label}
         htmlFor={htmlFor}
         required={requiredMark}

@@ -11,9 +11,9 @@ import Preview from '../../_components/demo-preview';
 
 多个字段需要统一的数据收集、校验和提交生命周期时使用 Form。
 
-Form 的直接子级 Form.Item 默认保留 20px 底部间距，跟随 `--tao-form-field-item-gap`（回退到 `--tao-padding-md`）。放入 Stack 或 FormSection 后由容器管理间距；`noStyle` 不产生外壳或间距，独立 FormField 的布局不变。
+Form 的直接子级 Form.Item 在有提示行时默认保留 8px 底部间距（`--tao-padding-xs`），其余字段为 20px（`--tao-padding-md`）；`--tao-form-field-item-gap` 可覆盖两者。放入 Stack 或 FormSection 后由容器管理间距；`noStyle` 不产生外壳或间距，独立 FormField 的布局不变。
 
-Form.Item 在控件下方始终预留一行提示空间。单行错误、警告或帮助文字出现和消失时，不会挤动后续字段或按钮；长文案换行时允许自然撑高，避免遮挡内容。
+Form.Item 配有校验规则，或显式设置 `help`、`extra`、`validateStatus` 时，在控件下方预留一行提示空间。单行校验消息出现和消失时不会挤动后续字段或按钮；长文案换行时允许自然撑高，避免遮挡内容。没有校验或提示的字段不预留空行。手动控制提示时，可用 `help=""` 保留空提示行。
 
 **推荐**
 

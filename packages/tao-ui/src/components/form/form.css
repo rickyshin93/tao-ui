@@ -3,6 +3,11 @@
   margin-block-end: var(--tao-form-field-item-gap, var(--tao-padding-md));
 }
 
+/* The feedback line already separates controls; keep its trailing gap compact. */
+[data-tao-form] > [data-tao-form-item][data-tao-form-feedback] {
+  margin-block-end: var(--tao-form-field-item-gap, var(--tao-padding-xs));
+}
+
 [data-tao-form-message] {
   min-block-size: 1lh;
   margin-block-start: var(--tao-padding-xxs);

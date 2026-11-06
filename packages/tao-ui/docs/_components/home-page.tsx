@@ -42,6 +42,13 @@ const ease = [0.16, 1, 0.3, 1] as const;
 
 const seeds = [
   {
+    id: 'jade',
+    zh: '玉绿',
+    en: 'Jade',
+    light: 'oklch(0.56 0.12 170)',
+    dark: 'oklch(0.8 0.11 170)',
+  },
+  {
     id: 'cobalt',
     zh: '钴蓝',
     en: 'Cobalt',
@@ -54,13 +61,6 @@ const seeds = [
     en: 'Vermilion',
     light: 'oklch(0.55 0.19 32)',
     dark: 'oklch(0.74 0.14 34)',
-  },
-  {
-    id: 'teal',
-    zh: '青碧',
-    en: 'Teal',
-    light: 'oklch(0.5 0.09 195)',
-    dark: 'oklch(0.78 0.1 192)',
   },
   {
     id: 'ochre',

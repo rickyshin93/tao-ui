@@ -1,7 +1,6 @@
 import type { CSSProperties, ReactNode } from 'react';
 import type { SemanticClassNames, SemanticStyles } from '../../utils/semantic';
 import { FormFieldView } from './form-field-view';
-import './form.css';
 
 export type FormFieldSemanticPart = 'root' | 'label' | 'error' | 'description';
 
