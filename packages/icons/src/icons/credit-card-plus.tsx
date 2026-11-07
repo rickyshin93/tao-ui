@@ -11,7 +11,7 @@ export const CreditCardPlusIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, Icon
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="M12.6 20H4.7q-1.6 0-1.6-1.6V5.6Q3.1 4 4.7 4h14.6q1.6 0 1.6 1.6v7.1M3.3 8.5h17.4M6.5 15h3.2"/><path d="M15.5 18h5M18 15.5v5"/>
+        <path d="M11.4 19.3H4.8q-1.6 0-1.6-1.6V6.5q0-1.6 1.6-1.6h14.4q1.6 0 1.6 1.6v5.1M3.2 9.6h17.6"/><path d="M14.8 17.6h6.4M18 14.4v6.4"/>
         {children}
       </svg>
     );

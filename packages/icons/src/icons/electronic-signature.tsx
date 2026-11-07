@@ -11,7 +11,7 @@ export const ElectronicSignatureIcon = /* @__PURE__ */ forwardRef<SVGSVGElement,
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="m9 16 1-5 8-8 3 3-8 8-4 2ZM3 21q3-5 5-1t5 0h8"/>
+        <path d="m7.1 13.9 1-4.2 6.6-6.6q.75-.75 1.5 0l2.05 2.05q.75.75 0 1.5l-6.6 6.6Zm6.5-9.2 3.2 3.2M3.5 20q2.6-3.7 4.4-1.1 1.35 1.9 3.1 0h7.2"/>
         {children}
       </svg>
     );

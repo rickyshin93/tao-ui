@@ -11,7 +11,7 @@ export const DatabaseArrowUpIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, Ico
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="M19 7c0 2-3.1 3.5-7 3.5S5 9 5 7s3.1-3.5 7-3.5 7 1.5 7 3.5ZM5 7v10c0 2 3.1 3.5 7 3.5M19 7v4M5 12c0 2 3.1 3.5 7 3.5M16 21v-7m-3 3 3-3 3 3"/>
+        <ellipse cx="10" cy="5.5" rx="6.4" ry="2.8"/><path d="M3.6 5.5v11.7c0 2 3.3 3.3 7.8 3.3m5-15v5.8M3.6 11.4q3.8 3.8 9.6 2.2"/><path d="M18 20.6v-6.7m-2.7 2.7 2.7-2.7 2.7 2.7"/>
         {children}
       </svg>
     );

@@ -11,7 +11,7 @@ export const ShieldEllipsisIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, Icon
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="M12 3.1 19.2 5.8v5.1c0 4.65-2.9 7.9-7.2 10-4.3-2.1-7.2-5.35-7.2-10V5.8Z"/><circle cx="9.083" cy="12.5" r="0.625" fill="currentColor" stroke="none"/><circle cx="12" cy="12.5" r="0.625" fill="currentColor" stroke="none"/><circle cx="14.917" cy="12.5" r="0.625" fill="currentColor" stroke="none"/>
+        <path d="M12 3.1 19.2 5.8v5.1c0 4.65-2.9 7.9-7.2 10-4.3-2.1-7.2-5.35-7.2-10V5.8Z"/><path d="M8.475 12.3h0.45"/><path d="M11.775 12.3h0.45"/><path d="M15.075 12.3h0.45"/>
         {children}
       </svg>
     );

@@ -11,7 +11,7 @@ export const VideoCallIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <rect x="3.1" y="6.3" width="12.2" height="11.4" rx="1.8"/><path d="m15.5 9.5 5.4-2.8v10.6l-5.4-2.8"/>
+        <path d="M5.1 6h9.3q1.6 0 1.6 1.6v1.6l4.5-2.6v9.8L16 14v1.2q0 1.6-1.6 1.6H8L4 20v-3.6q-.5-.5-.5-1.2V7.6Q3.5 6 5.1 6ZM7 11.4h5.6"/>
         {children}
       </svg>
     );

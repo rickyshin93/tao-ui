@@ -11,7 +11,7 @@ export const ShipWheelIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <circle cx="12" cy="12" r="6"/><path d="M12 2v7m0 6v7M2 12h7m6 0h7M5 5l4.8 4.8m4.4 4.4L19 19M5 19l4.8-4.8m4.4-4.4L19 5"/>
+        <circle cx="12" cy="12" r="6.35"/><path d="M12 3.2v5.5m0 6.6v5.5M3.2 12h5.5m6.6 0h5.5m-15.1-6.3 4 4m4.6 4.6 4 4m-12.6 0 4-4m4.6-4.6 4-4"/>
         {children}
       </svg>
     );

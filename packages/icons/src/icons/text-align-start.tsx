@@ -11,7 +11,7 @@ export const TextAlignStartIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, Icon
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="M4.2 5.4h15.6M4.2 9.8H14M4.2 14.2h15.6M4.2 18.6H14"/>
+        <path d="M4 5v14M8 6h11m-11 4h7m-7 4h11m-11 4h7"/>
         {children}
       </svg>
     );

@@ -11,7 +11,7 @@ export const MapPinPenIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="M12.8 20 12 21C9.7 18 5 13.2 5 8.8a7 7 0 0 1 14 0q0 1.4-.6 3"/><circle cx="12" cy="8.8" r="2.2"/><path d="M15 21l1-3 5-5M15 21l3-1 5-5"/>
+        <path d="M11.8 20C8.1 16.2 5 12.5 5 8.9a6.7 6.7 0 0 1 13.4 0q0 1-.35 2.3"/><circle cx="11.7" cy="8.9" r="2.1"/><path d="m15 20.4.6-3.2 4.2-4.2 2 2-4.2 4.2Z"/>
         {children}
       </svg>
     );

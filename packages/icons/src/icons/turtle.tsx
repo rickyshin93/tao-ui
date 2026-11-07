@@ -11,7 +11,7 @@ export const TurtleIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="M4 16a8 8 0 0 1 16 0ZM20 12h1a2 2 0 0 1 0 4h-1M6 16l-2 4M17 16l2 4M4 16H2M8 9l4 3 4-3M12 12v4"/>
+        <path d="M4.8 15.4a6.9 6.9 0 0 1 13.8 0ZM18.4 12h.8a1.7 1.7 0 0 1 0 3.4h-.6M7 15.4l-1.7 3.1m11-3.1 1.7 3.1M4.8 15.4H3.1m5.2-5 3.4 2.4 3.4-2.4"/>
         {children}
       </svg>
     );

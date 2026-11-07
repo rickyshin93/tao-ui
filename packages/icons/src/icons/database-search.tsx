@@ -11,7 +11,7 @@ export const DatabaseSearchIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, Icon
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <ellipse cx="11" cy="5.2" rx="7.3" ry="2.6"/><path d="M3.7 5.2v12.6c0 2.1 5.2 3.5 9 2.3M18.3 5.2v7M3.8 11.5c2.5 2.2 8 3 13 .5"/><circle cx="17.4" cy="17.4" r="2.4"/><path d="M19.2 19.2l2.2 2.2"/>
+        <ellipse cx="10" cy="5.5" rx="6.4" ry="2.8"/><path d="M3.6 5.5v11.7c0 2 3.3 3.3 7.8 3.3m5-15v5.8M3.6 11.4q3.8 3.8 9.6 2.2"/><circle cx="17.5" cy="16.6" r="2.35"/><path d="m19.2 18.3 1.9 1.9"/>
         {children}
       </svg>
     );

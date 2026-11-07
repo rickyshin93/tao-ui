@@ -11,7 +11,7 @@ export const GavelIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="m5 3 8 8-4 4-8-8ZM11 13l8 7M3 21h9"/>
+        <path d="m6.5 3.6 7.2 7.2-3.7 3.7-7.2-7.2Zm5.3 9.1 7.9 7.1M3.5 20.6h7.8"/>
         {children}
       </svg>
     );

@@ -11,7 +11,7 @@ export const OriginalUserMinusIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, I
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <circle cx="10" cy="6.7" r="3.2"/><path d="M3.4 20v-2.2c0-3 2.3-5 6.6-5 2 0 3.6.4 4.8 1.3"/><path d="M16 18h5"/>
+        <circle cx="8.7" cy="7" r="3.25"/><path d="M3.5 20v-2q0-4.1 5.2-4.1 2.1 0 3.3.65"/><path d="M14.8 17.6h6.4"/>
         {children}
       </svg>
     );

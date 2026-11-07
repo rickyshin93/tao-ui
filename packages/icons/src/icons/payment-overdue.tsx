@@ -11,7 +11,7 @@ export const PaymentOverdueIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, Icon
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l4 2.5"/>
+        <path d="M9 19H5.2q-1.7 0-1.7-1.7V7.5q0-1.7 1.7-1.7h13.6q1.7 0 1.7 1.7v2.7M3.5 10h9.2"/><circle cx="16.7" cy="16.6" r="4.2"/><path d="M16.7 14.2v2.6l1.4.9"/>
         {children}
       </svg>
     );

@@ -11,7 +11,7 @@ export const ClaimReopenIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconPro
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="M3 10V9q0-1 1-1h4l3 3h8q2 0 2 2v6q0 2-2 2H5q-2 0-2-2Z"/><path d="M21 8V7.5q0-3-3-3h-6m3.5-3.5-3.5 3.5 3.5 3.5"/>
+        <path d="M3.5 10.5v-1h4.2l3.4 3h7.4q2 0 2 2v3.9q0 2-2 2h-13q-2 0-2-2Zm17-1.4V8q0-2.5-2.5-2.5h-5.5m2.7-2.7-2.7 2.7 2.7 2.7"/>
         {children}
       </svg>
     );

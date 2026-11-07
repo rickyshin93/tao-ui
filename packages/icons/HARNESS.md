@@ -14,7 +14,7 @@ bun run check:extended
 
 根目录 `bun install` 使用唯一的 `bun.lockb`，不要执行 `npm install` / `npm ci`。全量检查需要 npm 官方 registry 的网络访问；消费项目中的 React、类型、Next 及其传递依赖由 `tests/fixtures/*/package-lock.json` 冻结，先 `npm ci` 再安装本次 tgz，不把可变 tgz hash 写入依赖基线。需要完全离线时先准备这些 registry 依赖的 npm 缓存。新机器第一次安装/构建 Next 比快测慢。
 
-V13 使用独立的 geometry-v13.json 校验快照。旧版 554 个图标的 canonical 和 manifest 保存在测试 fixture 内，旧版的冻结 SHA-256 及导入器复现检查继续有效。
+V13 使用独立的 geometry-v13.json 校验快照。几何修订使用 geometry-refinement.1.json 记录变更 SVG 的哈希，其余图标继续使用冻结的 V13 哈希。旧版 554 个图标的 canonical 和 manifest 保存在测试 fixture 内，旧版的冻结 SHA-256 及导入器复现检查继续有效。
 
 ## 测试分层
 

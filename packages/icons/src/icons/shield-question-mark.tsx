@@ -11,7 +11,7 @@ export const ShieldQuestionMarkIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, 
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="M12 3.1 19.2 5.8v5.1c0 4.65-2.9 7.9-7.2 10-4.3-2.1-7.2-5.35-7.2-10V5.8Z"/><path d="M 9.917,10.833 C 9.917,8.75 14.083,8.75 14.083,10.833 C 14.083,12.083 12,12.083 12,13.333"/><circle cx="12" cy="15" r="0.458" fill="currentColor" stroke="none"/>
+        <path d="M12 3.1 19.2 5.8v5.1c0 4.65-2.9 7.9-7.2 10-4.3-2.1-7.2-5.35-7.2-10V5.8Z"/><path d="M 9.917,10.833 C 9.917,8.75 14.083,8.75 14.083,10.833 C 14.083,12.083 12,12.083 12,13.333"/><path d="M11.875 15.4h0.25"/>
         {children}
       </svg>
     );

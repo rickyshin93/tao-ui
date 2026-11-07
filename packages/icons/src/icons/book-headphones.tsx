@@ -11,7 +11,7 @@ export const BookHeadphonesIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, Icon
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="M5 18.5V5.5Q5 3.5 7 3.5H20V20.5H7Q5 20.5 5 18.5Q5 16.5 7 16.5H20M8.5 11V10a4 4 0 0 1 8 0v1"/><path d="M8.5 11v2M16.5 11v2" strokeWidth="2.8"/>
+        <path d="M5 18.5V5.5Q5 3.5 7 3.5H20V20.5H7Q5 20.5 5 18.5Q5 16.5 7 16.5H20M8.5 11V10a4 4 0 0 1 8 0v1"/><path d="M8.5 11v2M16.5 11v2"/>
         {children}
       </svg>
     );

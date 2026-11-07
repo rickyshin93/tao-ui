@@ -11,7 +11,7 @@ export const CableIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <rect x="3" y="4" width="6" height="6" rx="1.2"/><rect x="15" y="4" width="6" height="6" rx="1.2"/><path d="M6 10v7a6 6 0 0 0 12 0v-7M6 2v2m12-2v2"/>
+        <rect x="3.4" y="5.3" width="5.8" height="5.3" rx="1.2"/><rect x="14.8" y="5.3" width="5.8" height="5.3" rx="1.2"/><path d="M6.3 10.6V15a5.7 5.7 0 0 0 11.4 0v-4.4M6.3 3.2v2.1m11.4-2.1v2.1"/>
         {children}
       </svg>
     );

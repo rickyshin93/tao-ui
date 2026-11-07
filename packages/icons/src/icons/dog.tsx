@@ -11,7 +11,7 @@ export const DogIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="M7 7 4 4c-5 2-2 11 2 9M17 7l3-3c5 2 2 11-2 9M6 9c0-6 12-6 12 0v6c0 8-12 8-12 0ZM10 15l2 2 2-2M12 17v3"/><circle cx="9" cy="11" r="0.85" fill="currentColor" stroke="none"/><circle cx="15" cy="11" r="0.85" fill="currentColor" stroke="none"/>
+        <path d="M7 7.3 4.9 4.6C2 5 2.5 10.8 5.8 12M17 7.3l2.1-2.7c2.9.4 2.4 6.2-.9 7.4M6.3 10c0-5.8 11.4-5.8 11.4 0v4.7c0 7.5-11.4 7.5-11.4 0ZM10.4 15l1.6 1.5 1.6-1.5"/><path d="M9.05 11.5h0.3"/><path d="M14.65 11.5h0.3"/>
         {children}
       </svg>
     );

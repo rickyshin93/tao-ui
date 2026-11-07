@@ -11,7 +11,7 @@ export const KeyboardMusicIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconP
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <rect x="3" y="3" width="18" height="18" rx="1.8"/><path d="M9 11v10M15 11v10"/><rect x="7.5" y="3" width="3" height="8" rx=".6" fill="currentColor" stroke="none"/><rect x="13.5" y="3" width="3" height="8" rx=".6" fill="currentColor" stroke="none"/>
+        <rect x="3.6" y="4.6" width="16.8" height="14.8" rx="1.8"/><path d="M9.2 12.2v7.2m5.6-7.2v7.2"/><rect x="8.1" y="4.6" width="2.2" height="6.7" rx=".6" fill="currentColor" stroke="none"/><rect x="13.7" y="4.6" width="2.2" height="6.7" rx=".6" fill="currentColor" stroke="none"/>
         {children}
       </svg>
     );

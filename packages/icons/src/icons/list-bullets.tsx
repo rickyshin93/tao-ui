@@ -11,7 +11,7 @@ export const ListBulletsIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconPro
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <circle cx="4.8" cy="6" r="1.2" fill="currentColor" stroke="none"/><circle cx="4.8" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="4.8" cy="18" r="1.2" fill="currentColor" stroke="none"/><path d="M10 6h10M10 12h7M10 18h10"/>
+        <circle cx="5" cy="6" r="1.2" fill="currentColor" stroke="none"/><circle cx="5" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="5" cy="18" r="1.2" fill="currentColor" stroke="none"/><path d="M10.4 6h10M10.4 12h10M10.4 18h10"/>
         {children}
       </svg>
     );

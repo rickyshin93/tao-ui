@@ -11,7 +11,7 @@ export const GlobeLockIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="M20.5 10a8.7 8.7 0 1 0-10 10.5M3.5 9h16M3.5 15h8M12 3.3c-4 5-4 12 0 17.4M12 3.3q3 4 3 8"/><rect x="15.083" y="17.167" width="5.833" height="4.583" rx="0.833"/><path d="M 16.333,17.167 L 16.333,15.917 A 1.667,1.667 0 0,1 19.667,15.917 L 19.667,17.167"/>
+        <path d="M20.4 10.2a8.7 8.7 0 1 0-10.3 10.3M3.4 11.8h13.2m-4.8-8.5c-4.7 4.4-5.5 12-.1 17.3m.1-17.3q3.4 2.9 3.9 6.5"/><rect x="14.4" y="16.7" width="6.8" height="5.2" rx="1.05"/><path d="M15.9 16.7v-1.6a1.9 1.9 0 0 1 3.8 0v1.6"/>
         {children}
       </svg>
     );

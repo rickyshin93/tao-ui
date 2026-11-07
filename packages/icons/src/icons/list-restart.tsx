@@ -11,7 +11,7 @@ export const ListRestartIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconPro
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="M3 5h18M3 12h7M3 19h5"/><path strokeWidth="1.5" d="M14 17.939A4.2 4.2 0 1 0 16 10.921L13 14M13 10v4h4"/>
+        <path d="M3 5h18M3 12h7M3 19h5"/><path d="M14 17.939A4.2 4.2 0 1 0 16 10.921L13 14M13 10v4h4"/>
         {children}
       </svg>
     );

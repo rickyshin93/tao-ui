@@ -11,7 +11,7 @@ export const GlobeCheckIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProp
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="M20.5 10a8.7 8.7 0 1 0-10 10.5M3.5 9h16M3.5 15h8M12 3.3c-4 5-4 12 0 17.4M12 3.3q3 4 3 8"/><path d="M 15.083,18 L 16.958,20.083 L 20.917,15.917"/>
+        <path d="M20.4 10.2a8.7 8.7 0 1 0-10.3 10.3M3.4 11.8h13.2m-4.8-8.5c-4.7 4.4-5.5 12-.1 17.3m.1-17.3q3.4 2.9 3.9 6.5"/><path d="m14.8 17.6 2.1 2.2 3.9-4.5"/>
         {children}
       </svg>
     );

@@ -6,7 +6,14 @@ import { JSDOM } from 'jsdom';
 
 const root = new URL('../', import.meta.url);
 const read = file => readFile(new URL(file, root), 'utf8');
-const golden = JSON.parse(await read('tests/fixtures/geometry-v13.json'));
+const v13 = JSON.parse(await read('tests/fixtures/geometry-v13.json'));
+const refinement = JSON.parse(await read('tests/fixtures/geometry-refinement.1.json'));
+assert.equal(refinement.baseVersion, v13.version);
+const golden = {
+  ...v13,
+  ...refinement,
+  svgSha256: { ...v13.svgSha256, ...refinement.svgSha256 },
+};
 const legacyText = await read('tests/fixtures/v0.0.1-icons.json');
 const legacy = JSON.parse(legacyText);
 const legacyManifest = JSON.parse(await read('tests/fixtures/v0.0.1-manifest.json'));
@@ -34,6 +41,10 @@ test('current canonical and all SVG byte hashes match provenance-separated golde
   assert.equal(new Set(manifest.icons.map(i => i.component)).size, golden.iconCount);
   assert.deepEqual(new Set(manifest.icons.map(i => i.name)), new Set(Object.keys(canonical.icons)));
   assert.deepEqual(new Set((await readdir(new URL('svg/', root))).map(x => x.replace(/\.svg$/, ''))), new Set(Object.keys(canonical.icons)));
+  for (const [name, hash] of Object.entries(refinement.svgSha256)) {
+    assert.ok(v13.svgSha256[name], name);
+    assert.notEqual(hash, v13.svgSha256[name], name);
+  }
   for (const { name, component, sha256: expected } of manifest.icons) {
     const svg = await read(`svg/${name}.svg`);
     assert.equal(sha256(svg), golden.svgSha256[name], `${name}: recorded SVG bytes changed`);
@@ -53,6 +64,7 @@ test('SVG schema stays self-contained, safe, 24px/1.8px rounded stroke', async (
     for (const child of element.children) {
       assert.ok(primitives[child.tagName], `${name}: unsupported SVG primitive ${child.tagName}`);
       assert.equal(child.children.length, 0, `${name}: nested content is not approved`);
+      assert.equal(child.hasAttribute('stroke-width'), false, name + ': strokes must inherit the icon width');
       for (const attribute of child.attributes) {
         assert.ok(primitives[child.tagName].includes(attribute.name), `${name}: unapproved attribute ${attribute.name}`);
         assert.ok(!/url\(|https?:|javascript:/i.test(attribute.value), `${name}: external or scripted attribute`);
@@ -67,6 +79,28 @@ test('SVG schema stays self-contained, safe, 24px/1.8px rounded stroke', async (
   }
 });
 
+
+test('catalog aliases share geometry with a canonical entry and keep their public names', () => {
+  const normalize = body => body.replace(/\s+(?=\/>)/g, '').replace(/\s+/g, ' ');
+  const aliases = manifest.catalogAliases;
+  assert.equal(aliases.alarm, 'alarm-clock');
+  assert.equal(aliases['alarm-off'], 'alarm-clock-off');
+  for (const [alias, target] of Object.entries(aliases)) {
+    assert.ok(canonical.icons[alias] && canonical.icons[target], alias);
+    assert.ok(!Object.hasOwn(aliases, target), target + ': aliases must resolve directly');
+    assert.equal(normalize(canonical.icons[alias]), normalize(canonical.icons[target]), alias);
+  }
+  const visibleGeometry = new Map();
+  for (const [name, body] of Object.entries(canonical.icons)) {
+    if (Object.hasOwn(aliases, name)) continue;
+    const geometry = normalize(body);
+    assert.ok(!visibleGeometry.has(geometry), `${name} duplicates ${visibleGeometry.get(geometry)} in the catalog`);
+    visibleGeometry.set(geometry, name);
+  }
+  for (const [a, b] of [['car-front', 'insurance-auto'], ['cross', 'insurance-health'], ['filter', 'funnel'], ['video', 'video-call']]) {
+    assert.notEqual(normalize(canonical.icons[a]), normalize(canonical.icons[b]), a + ' / ' + b);
+  }
+});
 
 test('V13 retains all 554 package names and their migration targets', () => {
   assert.equal(sha256(legacyText), legacyGolden.canonicalSha256);

@@ -11,7 +11,7 @@ export const SpeechIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <circle cx="7" cy="6" r="3"/><path d="M2 21v-5q0-4 5-4t5 4v5M16 6q3 3 0 6M20 3q6 6 0 12"/>
+        <circle cx="7.4" cy="6.7" r="3.05"/><path d="M3.2 20.5v-2.2a4.2 4.2 0 0 1 8.4 0v2.2m4-13.5a4.5 4.5 0 0 1 0 6.4m3.1-8.7a7.7 7.7 0 0 1 0 11"/>
         {children}
       </svg>
     );

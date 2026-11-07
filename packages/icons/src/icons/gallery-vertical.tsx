@@ -11,7 +11,7 @@ export const GalleryVerticalIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, Ico
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <rect x="5" y="6.5" width="14" height="11" rx="1.5"/><path d="M6 3.5h12M6 20.5h12"/>
+        <rect x="5" y="7.9" width="14" height="8.2" rx="1.5"/><path d="M6.4 3.5h11.2m-11.2 17h11.2"/>
         {children}
       </svg>
     );

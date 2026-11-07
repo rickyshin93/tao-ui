@@ -11,7 +11,7 @@ export const CoinsuranceShareIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, Ic
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <circle cx="12" cy="12" r="8.5"/><path d="M12 3.5V12l7.4 4.2"/>
+        <path d="M10.7 4a8.2 8.2 0 1 0 9.3 9.3h-9.3Z M14 3.8v6.3h6.3A7.2 7.2 0 0 0 14 3.8Z"/>
         {children}
       </svg>
     );

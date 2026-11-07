@@ -11,7 +11,7 @@ export const DiscAlbumIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <rect x="3.2" y="3.2" width="17.6" height="17.6" rx="1.7"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="1.5"/>
+        <rect x="3.5" y="3.5" width="17" height="17" rx="1.8"/><circle cx="12" cy="12" r="5.55"/><path d="M11.625 12h0.75"/>
         {children}
       </svg>
     );

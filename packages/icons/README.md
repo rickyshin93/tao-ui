@@ -9,7 +9,7 @@ V13 素材采用 MIT 许可，见 [ARTWORK-LICENSE](./ARTWORK-LICENSE)。npm 发
 ## 安装
 
 ```sh
-npm install @rockshin/tao-icons@0.1.0
+npm install @rockshin/tao-icons@0.1.1
 ```
 
 在已有 React 18.2+ 或 React 19 项目里安装。React 是 peer dependency（`^18.2.0 || ^19.0.0`），不包含在图标 bundle 里。此版本输出 **ESM + TypeScript 声明**，不提供 CommonJS 入口。monorepo 内使用时可以直接通过 workspace 引用，无需安装 tgz。
@@ -165,7 +165,7 @@ Rslib 的职责是将 TSX 编译成独立 ESM 模块、生成声明和管理 Rea
 
 1. 包名已确定为 `@rockshin/tao-icons`（scope `@rockshin`），发布前确认账号拥有权与公开范围
 2. 核对代码的 LICENSE 与素材的 ARTWORK-LICENSE，确认公开分发授权
-3. 确认发布版本（当前 `0.1.0`），同步包名示例与测试，再运行 `bun run release:check`
+3. 确认发布版本（当前 `0.1.1`），同步包名示例与测试，再运行 `bun run release:check`
 4. `bun install && bun run check:extended`，检查 `npm pack --dry-run` 与实际 tgz 安装
 5. 在明确批准发布后，创建 GitHub Release `icons-v<version>` 触发 `release-icons.yml`；新包首次发布会进入 npm staged publishing，需维护者用 2FA 在 Staged Packages 批准，之后可在 npmjs 配置 trusted publisher 供后续版本使用
 

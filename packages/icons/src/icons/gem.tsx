@@ -11,7 +11,7 @@ export const GemIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="M7 3.5h10l5 6L12 21 2 9.5ZM2 9.5h20M7 3.5l-1 6L12 21l6-11.5-1-6M6 9.5h12"/>
+        <path d="M6.9 4.6h10.2l4.3 5.2L12 20.5 2.6 9.8ZM2.8 9.8h18.4M9.7 4.6 8.8 9.8 12 20.5 15.2 9.8 14.3 4.6"/>
         {children}
       </svg>
     );

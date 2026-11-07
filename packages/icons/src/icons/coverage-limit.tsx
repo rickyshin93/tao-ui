@@ -11,7 +11,7 @@ export const CoverageLimitIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconP
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="M3 11a9 8 0 0 1 18 0ZM12 15v6M8 15h8"/>
+        <path d="M4 10.4a8 6.3 0 0 1 16 0ZM12 10.4v6.2m-5.5 3.5h11"/>
         {children}
       </svg>
     );

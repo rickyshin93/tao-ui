@@ -11,7 +11,7 @@ export const TablePropertiesIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, Ico
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <rect x="3" y="3" width="18" height="18" rx="1.5"/><path d="M3 9h18M9 9v12M12 13h5M12 17h5"/>
+        <rect x="3.6" y="3.6" width="16.8" height="16.8" rx="1.8"/><path d="M3.6 9.2h16.8m-11 0v11.2m3.6-7h3.8m-3.8 3.8h3.8"/>
         {children}
       </svg>
     );

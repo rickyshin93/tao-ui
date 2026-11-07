@@ -11,7 +11,7 @@ export const PricingAdjustmentIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, I
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <circle cx="10" cy="12" r="6"/><path d="M18 4v5M15.5 6.5h5M17 19h4"/>
+        <path d="M4.2 5.5h6.3q.65 0 1.1.45l4.6 4.6q.8.8 0 1.6l-5.5 5.5q-.8.8-1.6 0L3.95 12.5q-.45-.45-.45-1.1V6.2q0-.7.7-.7Z"/><path d="M7 8.7h.01"/><path d="M19.5 5.5v5m-2.5-2.5h5m-5 8h5"/>
         {children}
       </svg>
     );

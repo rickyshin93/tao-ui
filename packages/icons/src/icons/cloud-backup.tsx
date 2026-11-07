@@ -11,7 +11,7 @@ export const CloudBackupIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconPro
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="M10 15H6a4 4 0 0 1-1-7 6 6 0 0 1 11-1 4 4 0 0 1 4 5"/><path d="M14 16.5h4q4 0 4 3t-4 3h-1M17 13.5l-3 3 3 3"/>
+        <path d="M10 15.5H6.3a3.9 3.9 0 0 1-.8-7.7 5.9 5.9 0 0 1 10.9-1.1 3.9 3.9 0 0 1 3.9 4.8m-6.3 5h4.1a2.25 2.25 0 1 1 0 4.5h-1.2m-.5-7.1-2.4 2.6 2.4 2.6"/>
         {children}
       </svg>
     );

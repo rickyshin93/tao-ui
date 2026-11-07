@@ -11,7 +11,7 @@ export const MapPinHouseIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconPro
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="M12.8 20 12 21C9.7 18 5 13.2 5 8.8a7 7 0 0 1 14 0q0 1.4-.6 3"/><circle cx="12" cy="8.8" r="2.2"/><path d="m14 17 4-3 4 3M15 17v4M21 17v4M15 21h6"/>
+        <path d="M11.8 20C8.1 16.2 5 12.5 5 8.9a6.7 6.7 0 0 1 13.4 0q0 1-.35 2.3"/><circle cx="11.7" cy="8.9" r="2.1"/><path d="m13.5 16.9 4.3-3.7 4.3 3.7m-7.3-.7v4.5h6v-4.5"/>
         {children}
       </svg>
     );

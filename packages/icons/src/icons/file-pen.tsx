@@ -11,7 +11,7 @@ export const FilePenIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="M14 3H6q-2 0-2 2v14q0 2 2 2h12q2 0 2-2V9Z"/><path d="m8 15 6-6 3 3-6 6H8Z"/>
+        <path d="M14 3.5H6q-1.8 0-1.8 1.8v13.4q0 1.8 1.8 1.8h4.1m3.9-17 5.8 5.8v1.1m-5.8-6.9V8q0 1.3 1.3 1.3h4.5m-6.4 10.9.8-3.3 4.7-4.7 2.4 2.4-4.7 4.7Z"/>
         {children}
       </svg>
     );

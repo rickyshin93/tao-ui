@@ -11,7 +11,7 @@ export const UnlockIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <rect x="5.4" y="10.1" width="13.2" height="10.5" rx="1.8"/><path d="M8 9.9V7.3q0-4 4-4 3.7 0 4 3.5M12 14.1v2.7"/>
+        <rect x="5.4" y="10.1" width="13.2" height="10.5" rx="1.8"/><path d="M8 10.1V7.6a4 4 0 0 1 7.6-1.8M12 14.1v2.7"/>
         {children}
       </svg>
     );

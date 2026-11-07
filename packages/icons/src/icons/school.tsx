@@ -11,7 +11,7 @@ export const SchoolIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="M3 21V10h5V7l4-4 4 4v3h5v11ZM8 21V10M16 21V10M10 21v-6h4v6M12 3V2M5 13v1M19 13v1"/><circle cx="12" cy="9" r="0.8" fill="currentColor" stroke="none"/>
+        <path d="M3.5 20.5V11h4.8V7.2L12 3.5l3.7 3.7V11h4.8v9.5ZM10 20.5V15h4v5.5"/><path d="M11.85 9.6h0.3"/>
         {children}
       </svg>
     );

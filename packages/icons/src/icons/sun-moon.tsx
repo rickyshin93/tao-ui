@@ -11,7 +11,7 @@ export const SunMoonIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="M15 5a7.5 7.5 0 1 0 6 12A8 8 0 0 1 15 5"/><circle cx="5.5" cy="6" r="2"/><path d="M5.5 1.5v1M1 6h1M2 2.5l.7.7"/>
+        <path d="M14.1 5.6a7.55 7.55 0 1 0 6.5 10.5 7.55 7.55 0 0 1-6.5-10.5"/><circle cx="6.5" cy="6.7" r="1.65"/><path d="M6.5 3.2v.7M3.1 6.7h.65M4 4.2l.55.55"/>
         {children}
       </svg>
     );

@@ -11,7 +11,7 @@ export const RiskQuestionnaireIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, I
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="M4 7a4 4 0 0 1 8 0c0 3-4 3-4 6M8 18v1M17 6h4M17 13h4M17 20h4"/>
+        <path d="M8.5 5H6.4q-1.9 0-1.9 1.9v12.2q0 1.9 1.9 1.9h11.2q1.9 0 1.9-1.9V6.9Q19.5 5 17.6 5h-2.1"/><rect x="8.5" y="2.8" width="7" height="4.1" rx="1.3"/><path d="M9.9 11.6a2.1 2.1 0 0 1 4.2 0c0 1.6-2.1 1.8-2.1 3.1"/><path d="M12 17.8h.01"/>
         {children}
       </svg>
     );

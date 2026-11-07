@@ -1,6 +1,6 @@
 {
   "name": "@rockshin/tao-icons",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "2165 rounded 24px line icons for React, with per-icon entry points and accessible defaults.",
   "keywords": [
     "react",

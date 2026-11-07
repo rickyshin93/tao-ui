@@ -11,7 +11,7 @@ export const PlayingCardsFanIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, Ico
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="M6 8H3v13h10M7 5H5v13h11M10 3l11 3-4 14-11-3ZM12 9l2 3-3 1-1-3Z"/>
+        <path d="M6.5 6.8H3.2v13.7h10.3m-5.1-17 12.4 3.3-3.8 13.3-12.2-3.3Z"/><path d="m13.7 9.5 1.6 3.1-2.9 1.5-1.5-2.8Z"/>
         {children}
       </svg>
     );

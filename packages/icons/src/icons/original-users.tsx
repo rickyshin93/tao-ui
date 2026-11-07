@@ -11,7 +11,7 @@ export const OriginalUsersIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconP
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <circle cx="8.7" cy="7.8" r="3.5"/><path d="M2.9 20v-1.1c0-3 2.1-4.6 5.8-4.6s5.8 1.6 5.8 4.6V20M16 4.7c2.2.1 3.5 1.3 3.5 3.4S18.2 11.4 16 11.5M17.6 14.7c2.3.5 3.5 1.9 3.5 4.2V20"/>
+        <circle cx="8.5" cy="6.5" r="3.2"/><path d="M2.8 21v-3q0-4 4-4h3.4q4 0 4 4v3M16 3.5c5 0 5 6 0 6M17 14q4 0 4 4v3"/>
         {children}
       </svg>
     );

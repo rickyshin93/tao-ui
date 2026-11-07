@@ -11,7 +11,7 @@ export const OctagonAlertIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconPr
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="M8 3h8l5 5v8l-5 5H8l-5-5V8Z"/><path d="M 12,8.792 L 12,12.458"/><circle cx="12" cy="14.75" r="0.55" fill="currentColor" stroke="none"/>
+        <path d="M8 3.5h8l4.5 4.5v8L16 20.5H8L3.5 16V8Z M12 7.9v4.7"/><path d="M11.8 16.3h0.4"/>
         {children}
       </svg>
     );

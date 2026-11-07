@@ -11,7 +11,7 @@ export const SquareDivideIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconPr
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <rect x="3.4" y="3.4" width="17.2" height="17.2" rx="2"/><path d="M8 12h8"/><circle cx="12" cy="8" r="0.8" fill="currentColor" stroke="none"/><circle cx="12" cy="16" r="0.8" fill="currentColor" stroke="none"/>
+        <rect x="3.4" y="3.4" width="17.2" height="17.2" rx="2"/><path d="M7.6 12h8.8"/><path d="M11.725 7.9h0.55"/><path d="M11.725 16.1h0.55"/>
         {children}
       </svg>
     );

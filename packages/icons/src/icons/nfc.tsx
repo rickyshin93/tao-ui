@@ -11,7 +11,7 @@ export const NfcIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="M7 7a7 7 0 0 0 0 10M17 7a7 7 0 0 1 0 10M5 3a13 13 0 0 0 0 18M19 3a13 13 0 0 1 0 18M10 9v6l4-6v6"/>
+        <path d="M7.4 7.3a6.6 6.6 0 0 0 0 9.4m9.2-9.4a6.6 6.6 0 0 1 0 9.4M5.7 3.6a11.4 11.4 0 0 0 0 16.8M18.3 3.6a11.4 11.4 0 0 1 0 16.8M10 14.8V9.2l4 5.6V9.2"/>
         {children}
       </svg>
     );

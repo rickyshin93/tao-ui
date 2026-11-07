@@ -11,7 +11,7 @@ export const CircleFadingPlayIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, Ic
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="M4.4 15.8A8.5 8.5 0 1 0 8.2 4.4M4 9v.1M5.6 5.8v.1M3.5 12.3v.1"/><path d="m9 7 7 5-7 5Z"/>
+        <path d="M7.7 4.6a8.55 8.55 0 1 1-2.8 12.9M4.65 7.25l-.22.35m-1.2 3.3-.05.4m.48 3.15.14.38M10 8l5.5 4-5.5 4Z"/>
         {children}
       </svg>
     );

@@ -11,7 +11,7 @@ export const DocumentScanIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconPr
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="M3.5 7.5V4.7q0-1.2 1.2-1.2h2.8m9 0h2.8q1.2 0 1.2 1.2v2.8m0 9v2.8q0 1.2-1.2 1.2h-2.8m-9 0H4.7q-1.2 0-1.2-1.2v-2.8M8 9.5h8M8 14.5h6"/>
+        <path d="M4 8V5q0-1 1-1h3m8 0h3q1 0 1 1v3m0 8v3q0 1-1 1h-3m-8 0H5q-1 0-1-1v-3M9 8h4l2 2v6H9Z"/>
         {children}
       </svg>
     );

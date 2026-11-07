@@ -11,7 +11,7 @@ export const EarthLockIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="M21 11a9 9 0 1 0-10 10M5 6q3-1 5 1l-1 4-5 1"/><rect x="14" y="16" width="8" height="6" rx="1.5"/><path d="M16 16v-2a2 2 0 0 1 4 0v2"/>
+        <path d="M20.2 10.4a8.5 8.5 0 1 0-10 10m-5.2-14 3.9 1.4.2 3.2-4.5 1.5"/><rect x="14.299999999999999" y="16.7" width="6.8" height="5.2" rx="1.05"/><path d="M15.799999999999999 16.7v-1.6a1.9 1.9 0 0 1 3.8 0v1.6"/>
         {children}
       </svg>
     );

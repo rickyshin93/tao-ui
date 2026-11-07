@@ -11,7 +11,7 @@ export const CalendarCogIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconPro
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="M12 20.8H5.5q-1.8 0-1.8-1.8V6.8Q3.7 5 5.5 5h13q1.8 0 1.8 1.8V11M8 3.2v4M16 3.2v4M3.7 9.6h16.6"/><path d="M 16.3,14.056 L 19.02,14.056 L 19.428,15.416 L 20.788,16.232 L 20.38,17.66 L 20.788,19.088 L 19.428,19.904 L 19.02,21.264 L 16.3,21.264 L 15.892,19.904 L 14.532,19.088 L 14.94,17.66 L 14.532,16.232 L 15.892,15.416 L 16.3,14.056"/>
+        <path d="M10.2 20.3H5.2q-1.6 0-1.6-1.6V6.6Q3.6 5 5.2 5h13.6q1.6 0 1.6 1.6V9m-16.8.4H17M8 3v4m8-4v4"/><circle cx="17.2" cy="16.5" r="2.8"/><path d="M17.2 12v1.7m0 5.6v1.7m-4.5-4.5h1.7m5.6 0h1.7"/>
         {children}
       </svg>
     );

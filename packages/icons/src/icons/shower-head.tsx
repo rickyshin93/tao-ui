@@ -11,7 +11,7 @@ export const ShowerHeadIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProp
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="M3 21V6a5 5 0 0 1 10 0M8 11a5 5 0 0 1 10 0ZM9 15v1M13 15v1M17 15v1M9 20v1M13 20v1M17 20v1"/>
+        <path d="M3.4 19.8V7.8a4.7 4.7 0 0 1 9.4 0M8 12.6a4.8 4.8 0 0 1 9.6 0Zm1 3.7v.7m3.8-.7v.7m3.8-.7v.7m-7.6 3.2v.5m3.8-.5v.5m3.8-.5v.5"/>
         {children}
       </svg>
     );

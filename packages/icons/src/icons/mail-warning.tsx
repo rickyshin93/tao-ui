@@ -11,7 +11,7 @@ export const MailWarningIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconPro
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="M12 19H5q-1.8 0-1.8-1.8V6.8Q3.2 5 5 5h14q1.8 0 1.8 1.8v5M3.6 6l7.4 6q1 .8 2 0l7.4-6"/><path d="M 17.5,14.875 L 17.5,17.875"/><circle cx="17.5" cy="19.75" r="0.45" fill="currentColor" stroke="none"/>
+        <path d="M12 19H5q-1.8 0-1.8-1.8V6.8Q3.2 5 5 5h14q1.8 0 1.8 1.8v5M3.6 6l7.4 6q1 .8 2 0l7.4-6"/><path d="M 17.5,14.875 L 17.5,17.875"/><path d="M17.375 20.15h0.25"/>
         {children}
       </svg>
     );

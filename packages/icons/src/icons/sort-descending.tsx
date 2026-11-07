@@ -11,7 +11,7 @@ export const SortDescendingIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, Icon
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="M6.2 4.6v14.8M3.3 16.55l2.5 2.5q.4.4.8 0l2.5-2.5M12 5.8h8M12 12h5.6M12 18.2h3.2"/>
+        <path d="M6.2 4.5V20m-3-3 3 3 3-3m3.4-10.5H21m-8.4 5.5h5.35m-5.35 5.5h2.7"/>
         {children}
       </svg>
     );

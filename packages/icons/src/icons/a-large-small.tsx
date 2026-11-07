@@ -11,7 +11,7 @@ export const ALargeSmallIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconPro
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="m2.5 19 5-14 5 14M4.2 14h6.6M15 19l3-8 3 8M16 16.5h4"/>
+        <path d="m3 18.5 4.25-13 4.25 13M4.4 14h5.7m4.1 4.5 3.3-8.3 3.3 8.3m-5.6-2.6h4.6"/>
         {children}
       </svg>
     );

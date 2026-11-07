@@ -11,7 +11,7 @@ export const DatabaseBackupIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, Icon
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <ellipse cx="10" cy="5" rx="6.6" ry="2.5"/><path d="M3.4 5v12c0 2.5 6 3.7 9 2.5M16.6 5v6M3.5 10.5c3 2.7 8 2.7 12 0"/><path d="M14 16.5h4q4 0 4 3t-4 3h-1M17 13.5l-3 3 3 3"/>
+        <ellipse cx="10" cy="5.5" rx="6.4" ry="2.8"/><path d="M3.6 5.5v11.7c0 2 3.3 3.3 7.8 3.3m5-15v5.8M3.6 11.4q3.8 3.8 9.6 2.2"/><path d="M14.8 16.8h3.7a2.4 2.4 0 1 1 0 4.8h-1.2m-.1-7.2-2.4 2.4 2.4 2.4"/>
         {children}
       </svg>
     );

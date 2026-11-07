@@ -11,7 +11,7 @@ export const CalendarClockIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconP
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="M9 21H5q-1.5 0-1.5-1.5v-13Q3.5 5 5 5h14q1.5 0 1.5 1.5V9M3.5 9.5H17M8 3v4M16 3v4"/><circle cx="16.5" cy="16.5" r="5"/><path d="M16.5 13.5v3l2 1"/>
+        <path d="M8.6 20.3H5.2q-1.6 0-1.6-1.6V6.6Q3.6 5 5.2 5h13.6q1.6 0 1.6 1.6V9M3.6 9.4h12.8M8 3v4m8-4v4"/><circle cx="16.2" cy="16.5" r="4.55"/><path d="M16.2 13.9v2.7l1.6 1"/>
         {children}
       </svg>
     );

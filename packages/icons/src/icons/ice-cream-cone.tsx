@@ -11,7 +11,7 @@ export const IceCreamConeIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconPr
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="m6 12 6 10 6-10ZM6 12c-5 0-4-7 0-7 1-5 11-5 12 0 4 0 5 7 0 7ZM9 17l5-4"/>
+        <path d="m6.4 11.8 5.6 8.8 5.6-8.8ZM6.4 11.8a3.3 3.3 0 0 1-.5-6.5 6.9 6.9 0 0 1 12.2 0 3.3 3.3 0 0 1-.5 6.5M9 16.2l4.9-3.1"/>
         {children}
       </svg>
     );

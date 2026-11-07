@@ -11,7 +11,7 @@ export const Grid3x2Icon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <rect x="3.5" y="3.5" width="17" height="17" rx="1.4"/><path d="M9.166666666666668 3.5v17"/><path d="M14.833333333333334 3.5v17"/><path d="M3.5 12.0h17"/>
+        <rect x="4.2" y="4.5" width="15.6" height="15" rx="1.75"/><path d="M9.4 4.5v15m5.2-15v15M4.2 12h15.6"/>
         {children}
       </svg>
     );

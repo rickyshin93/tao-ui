@@ -11,7 +11,7 @@ export const ClipboardPenIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconPr
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="M8 4H5q-2 0-2 2v12q0 2 2 2h5M16 4h3q2 0 2 2v4"/><rect x="8" y="2.5" width="8" height="4" rx="1.2"/><path d="m13 18 6-6 3 3-6 6h-3Z"/>
+        <path d="M8.4 4.6H5.6Q4 4.6 4 6.2v12.6q0 1.6 1.6 1.6h4.1m5.9-15.8h2.8q1.6 0 1.6 1.6v3.4m-7.2 10.6.8-3.3 4.7-4.7 2.4 2.4-4.7 4.7Z"/><rect x="8.4" y="2.9" width="7.2" height="3.9" rx="1.25"/>
         {children}
       </svg>
     );

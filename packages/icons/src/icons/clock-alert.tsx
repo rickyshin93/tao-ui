@@ -11,7 +11,7 @@ export const ClockAlertIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProp
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="M20.2 10a8.5 8.5 0 1 0-9.5 10.5"/><path d="M11.8 6v6l3 1.5"/><path d="M 18,15.083 L 18,18.417"/><circle cx="18" cy="20.5" r="0.5" fill="currentColor" stroke="none"/>
+        <path d="M20.2 10a8.5 8.5 0 1 0-9.5 10.5"/><path d="M11.8 6v6l3 1.5"/><path d="M 18,15.083 L 18,18.417"/><path d="M17.875 20.9h0.25"/>
         {children}
       </svg>
     );

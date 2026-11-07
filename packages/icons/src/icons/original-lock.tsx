@@ -11,7 +11,7 @@ export const OriginalLockIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconPr
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <rect x="5.4" y="10.1" width="13.2" height="10.5" rx="1.8"/><path d="M8 9.9V7.3q0-4 4-4t4 4v2.6M12 14.1v2.7"/>
+        <rect x="4.5" y="10" width="15" height="11" rx="1.8"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/><circle cx="12" cy="14.5" r="1.5"/><path d="M12 16v2"/>
         {children}
       </svg>
     );

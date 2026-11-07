@@ -11,7 +11,7 @@ export const SunSnowIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="M8 5a7 7 0 1 0 0 14M3 3l1 1M2 12H1.5M3 21l1-1M16 4v16M11 7l10 10M11 17 21 7"/>
+        <path d="M8.2 6.6a5.4 5.4 0 0 0 0 10.8M5.3 3.6l1.1 1.3M3.8 12H3m2.3 8.4 1.1-1.3M15.8 4.2v15.6m-4.8-11.4 9.6 7.2m-9.6 0 9.6-7.2"/>
         {children}
       </svg>
     );

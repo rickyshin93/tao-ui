@@ -11,7 +11,7 @@ export const ToolCaseIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <rect x="3" y="7" width="18" height="14" rx="2"/><path d="M8 7V3h8v4M3 12h18M7 10v5M17 10v5M9 18h6"/>
+        <rect x="3" y="7" width="18" height="14" rx="1.8"/><path d="M8 7V3h8v4M3 13h18M8 11v4M16 11v4"/>
         {children}
       </svg>
     );

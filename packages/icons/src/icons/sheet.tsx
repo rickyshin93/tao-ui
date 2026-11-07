@@ -11,7 +11,7 @@ export const SheetIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <rect x="3.5" y="3.5" width="17" height="17" rx="1.5"/><path d="M3.5 9h17M3.5 14.5h17M9 3.5v17"/>
+        <rect x="3.4" y="3.4" width="17.2" height="17.2" rx="1.8"/><path d="M3.4 9h17.2m-17.2 5.8h17.2M10 9v11.6"/>
         {children}
       </svg>
     );

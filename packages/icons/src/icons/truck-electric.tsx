@@ -11,7 +11,7 @@ export const TruckElectricIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconP
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="M3 5h12v13H3ZM15 10h4l3 5v3h-7M15 15h7"/><circle cx="6" cy="19" r="2"/><circle cx="18" cy="19" r="2"/><path d="m10 8-3 4h3l-2 3"/>
+        <path d="M3.4 16.9V5.9h10.9v11m0-7.3h3.3l3.3 4.2v3.1H20m-3.6 0H9.3m-5.9 0h2.3m8.6-3.1h6.4m-10.6-6-2.8 3.8h2.8l-1.9 2.8"/><circle cx="7.5" cy="17.6" r="2"/><circle cx="18.1" cy="17.6" r="2"/>
         {children}
       </svg>
     );

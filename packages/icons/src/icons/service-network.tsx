@@ -11,7 +11,7 @@ export const ServiceNetworkIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, Icon
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="m10 4-2 3 3 3 3-2a4.5 4.5 0 0 1-5.8 5.8l-4.4 4.4a1.6 1.6 0 0 1-2.3-2.3l4.3-4.4A4.5 4.5 0 0 1 10 4M17 11v3h3M17 14v5"/><circle cx="21" cy="14" r="1.5"/><circle cx="17" cy="20.5" r="1.5"/>
+        <path d="m9.7 4.3-2 2.5 2.9 2.8 2.7-1.8a4.4 4.4 0 0 1-5.4 5.7l-3.3 3.4a1.6 1.6 0 0 1-2.2-2.2l3.4-3.5A4.4 4.4 0 0 1 9.7 4.3m7.1 7.4v3h2.1m-2.1 0v3.9"/><circle cx="20.4" cy="14.7" r="1.4"/><circle cx="16.8" cy="20" r="1.4"/>
         {children}
       </svg>
     );

@@ -11,7 +11,7 @@ export const SquareStopIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProp
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <rect x="3.4" y="3.4" width="17.2" height="17.2" rx="2"/><rect x="8.2" y="8.2" width="7.6" height="7.6" rx="0.5"/>
+        <rect x="3.4" y="3.4" width="17.2" height="17.2" rx="2"/><rect x="9.4" y="9.4" width="5.2" height="5.2" rx="1" fill="currentColor" stroke="none"/>
         {children}
       </svg>
     );

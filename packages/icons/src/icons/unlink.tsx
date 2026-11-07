@@ -11,7 +11,7 @@ export const UnlinkIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="m11 6.8 1.9-1.9c1.8-1.8 4.4-1.8 6.2 0s1.8 4.4 0 6.2L17.2 13M13 17.2l-1.9 1.9c-1.8 1.8-4.4 1.8-6.2 0s-1.8-4.4 0-6.2L6.8 11M4.6 4.6l2.7 2.7m9.4 9.4 2.7 2.7"/>
+        <path d="m10.8 6.8 2.1-2.1a4.25 4.25 0 0 1 6 6l-2.1 2.1m-3.6 4.4-2.1 2.1a4.25 4.25 0 0 1-6-6l2.1-2.1M5 5l2.3 2.3m9.4 9.4L19 19"/>
         {children}
       </svg>
     );

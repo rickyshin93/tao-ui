@@ -11,7 +11,7 @@ export const SatelliteIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="m9 10 5-5 5 5-5 5ZM7 11 3 7l4-4 4 4M13 17l4 4 4-4-4-4M9 15l-3 3M3 13a8 8 0 0 1 8 8M3 17a4 4 0 0 1 4 4"/>
+        <path d="m9.2 9.8 4.8-4.8 4.8 4.8-4.8 4.8ZM7.1 11.7l-3.4-3.4 3.6-3.6 3.4 3.4m5.2 5.2 3.4 3.4-3.6 3.6-3.4-3.4M11.6 12.2l-3.4 3.4M3.3 14.8a5.9 5.9 0 0 1 5.9 5.9"/>
         {children}
       </svg>
     );

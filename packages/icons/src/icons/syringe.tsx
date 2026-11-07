@@ -11,7 +11,7 @@ export const SyringeIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="m8 5 11 11-5 5L3 10ZM6 7l2 2M9 10l2 2M14 3l7 7M17.5 6.5 15 9M5 19l-3 3"/>
+        <path d="m13.5 6.4 4.1 4.1-8.2 8.2-4.1-4.1Zm2.05 2.05L19 5m-2.1-2.1 4.2 4.2M7.35 16.65 3.4 20.6m6.9-11 1.6 1.6"/>
         {children}
       </svg>
     );

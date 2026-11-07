@@ -11,7 +11,7 @@ export const OriginalContainerIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, I
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <rect x="2.5" y="6" width="19" height="13" rx="1.8"/><path d="M7 10v5M12 10v5M17 10v5M6 3v3M18 3v3"/>
+        <path d="m3 7 14-3 4 3v12l-14 2-4-3ZM3 7l4 3 14-3M7 10v11M11 11v6M16 10v6"/>
         {children}
       </svg>
     );

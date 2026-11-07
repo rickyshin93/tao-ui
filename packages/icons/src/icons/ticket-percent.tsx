@@ -11,7 +11,7 @@ export const TicketPercentIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconP
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="M4.7 5.3h14.6q1.5 0 1.5 1.5v2.5q-2.7.1-2.7 2.7t2.7 2.7v2.5q0 1.5-1.5 1.5H4.7q-1.5 0-1.5-1.5v-2.5q2.7-.1 2.7-2.7t-2.7-2.7V6.8q0-1.5 1.5-1.5Z"/><path d="m10 15 4-6" /><circle cx="10" cy="9.5" r="0.85" fill="currentColor" stroke="none" /><circle cx="14" cy="14.5" r="0.85" fill="currentColor" stroke="none" />
+        <path d="M4.7 5.3h14.6q1.5 0 1.5 1.5v2.5q-2.7.1-2.7 2.7t2.7 2.7v2.5q0 1.5-1.5 1.5H4.7q-1.5 0-1.5-1.5v-2.5q2.7-.1 2.7-2.7t-2.7-2.7V6.8q0-1.5 1.5-1.5Z"/><path d="m9.4 14.6 5.2-5.2"/><path d="M8.825 9.15h0.65"/><path d="M14.525 14.85h0.65"/>
         {children}
       </svg>
     );

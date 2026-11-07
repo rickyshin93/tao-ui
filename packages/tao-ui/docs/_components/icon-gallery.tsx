@@ -23,10 +23,32 @@ const categoryByName = new Map(
     names.map((name) => [name, id] as const),
   ),
 );
-const catalog = manifest.icons.map((icon) => ({
-  ...icon,
-  galleryCategory: categoryByName.get(icon.name) ?? icon.category,
-}));
+categoryByName.set('car-front', 'transport-travel');
+categoryByName.set('cross', 'health-medicine');
+
+const aliases: Readonly<Record<string, string>> = manifest.catalogAliases;
+const aliasesByIcon = new Map<string, string[]>();
+for (const icon of manifest.icons) {
+  const target = aliases[icon.name];
+  if (!target) continue;
+  const terms = aliasesByIcon.get(target) ?? [];
+  terms.push(icon.name, icon.component, icon.label, icon.labelZh, ...icon.tags);
+  aliasesByIcon.set(target, terms);
+}
+const catalog = manifest.icons
+  .filter((icon) => !Object.hasOwn(aliases, icon.name))
+  .map((icon) => ({
+    ...icon,
+    galleryCategory: categoryByName.get(icon.name) ?? icon.category,
+    searchTerms: [
+      icon.name,
+      icon.component,
+      icon.label,
+      icon.labelZh,
+      ...icon.tags,
+      ...(aliasesByIcon.get(icon.name) ?? []),
+    ].map((term) => term.toLowerCase()),
+  }));
 const categories = new Map(
   [...manifest.categories, ...galleryCategories.groups].map((group) => [
     group.id,
@@ -62,9 +84,7 @@ export function IconGallery({ locale }: { locale: Locale }) {
   const results = catalog.filter(
     (icon) =>
       (category === 'all' || icon.galleryCategory === category) &&
-      [icon.name, icon.component, icon.label, icon.labelZh, ...icon.tags].some(
-        (value) => value.toLowerCase().includes(search),
-      ),
+      icon.searchTerms.some((term) => term.includes(search)),
   );
 
   const visibleIcons = results.slice((page - 1) * pageSize, page * pageSize);
@@ -109,7 +129,7 @@ export function IconGallery({ locale }: { locale: Locale }) {
                   : `Copy ${icon.component} import`
               }
             >
-              <Icon size={26} />
+              <Icon size={24} />
               <span>{icon.name}</span>
             </button>
           );
@@ -167,8 +187,8 @@ export function IconGallery({ locale }: { locale: Locale }) {
       <div className="icon-gallery-meta">
         <span>
           {zh
-            ? `${results.length} / ${manifest.count} 个图标`
-            : `${results.length} / ${manifest.count} icons`}
+            ? `${results.length} / ${catalog.length} 个图标`
+            : `${results.length} / ${catalog.length} icons`}
         </span>
         <span role="status" aria-live="polite">
           {notice}

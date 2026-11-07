@@ -11,7 +11,7 @@ export const TicketsPlaneIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconPr
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="M3 9V5h18v4a3 3 0 0 0 0 6v4H3v-4a3 3 0 0 0 0-6ZM7 2H2v13M12 8v9M8 13l4-2 4 2M10 17l2-1 2 1"/>
+        <path d="M7.9 3.5H3.4v8.2m4-4.6h12.9v3.1q-2.5 0-2.5 2.6t2.5 2.6v4.5H7.4v-4.5q2.5 0 2.5-2.6t-2.5-2.6Zm6.4 3.2v6.2m-2.7-2.8 2.7-1.7 2.7 1.7"/>
         {children}
       </svg>
     );

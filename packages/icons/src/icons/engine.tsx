@@ -11,7 +11,7 @@ export const EngineIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="M6 9V6h8v3h3l3 3v5q0 2-2 2h-3v2H8v-3H5q-2 0-2-2v-5q0-2 2-2ZM9 3h4M1 11v5"/>
+        <path d="M6.4 9V6.8h7.8V9h3l3.5 3.3v4.5q0 1.5-1.5 1.5h-3.7v2.2H8v-2.2H5.8q-1.2 0-1.2-1.2V9Zm3.2-5.5h4M3.1 11v5"/>
         {children}
       </svg>
     );

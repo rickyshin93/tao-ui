@@ -11,7 +11,7 @@ export const SearchAlertIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconPro
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <circle cx="10.6" cy="10.6" r="7"/><path d="m16 16 4.5 4.5"/><path d="M 10.6,7.9 L 10.6,11.38"/><circle cx="10.6" cy="13.36" r="0.51" fill="currentColor" stroke="none"/>
+        <circle cx="10.6" cy="10.6" r="7"/><path d="m16 16 4.5 4.5"/><path d="M 10.6,7.9 L 10.6,11.38"/><path d="M10.475 13.76h0.25"/>
         {children}
       </svg>
     );

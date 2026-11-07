@@ -11,7 +11,7 @@ export const VectorPolygonIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconP
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="M7 4.5l8-1M19.5 7l1 9M17 20.2l-9 .6M3.75 17l-.5-8"/><circle cx="3" cy="5" r="1.6"/><circle cx="19" cy="3" r="1.6"/><circle cx="21" cy="20" r="1.6"/><circle cx="4" cy="21" r="1.6"/>
+        <path d="m6.6 5.7 9.2-1.2m3.4 3.1 1 8.6m-3.3 3.5-9.4.5M4.4 17 4 8.6"/><circle cx="3.9" cy="5.8" r="1.35"/><circle cx="18.3" cy="4.1" r="1.35"/><circle cx="20.2" cy="18.9" r="1.35"/><circle cx="4.8" cy="20.1" r="1.35"/>
         {children}
       </svg>
     );

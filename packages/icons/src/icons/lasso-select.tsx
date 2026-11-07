@@ -11,7 +11,7 @@ export const LassoSelectIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconPro
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="M8 17C-2 17 0 4 10 4q10 0 11 6M5 17q-4 1-2 4 2 3 5 0M13 12l8 5-4 1-2 4Z"/>
+        <path d="M8.1 16.2c-7.6 0-6.4-12.3 2.2-12.3q8.1 0 9.6 5.1M6.2 16.3c-4.1 0-3.5 5.6.3 3.8m6.6-8 7.8 4.9-4.2 1.1-1.6 3.1Z"/>
         {children}
       </svg>
     );

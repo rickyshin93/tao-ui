@@ -11,7 +11,7 @@ export const CircleStopIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProp
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <circle cx="12" cy="12" r="8.5"/><rect x="8.2" y="8.2" width="7.6" height="7.6" rx="0.5"/>
+        <circle cx="12" cy="12" r="8.5"/><rect x="8.9" y="8.9" width="6.2" height="6.2" rx="1"/>
         {children}
       </svg>
     );

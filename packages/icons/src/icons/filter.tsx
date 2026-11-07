@@ -11,7 +11,7 @@ export const FilterIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="M4.1 4.2h15.8q.6 0 .6.6v1.35q0 .35-.25.6l-6.05 6.2v6.1l-4.4 1.4v-7.5l-6.05-6.2q-.25-.25-.25-.6V4.8q0-.6.6-.6Z"/>
+        <path d="M3.6 5.7h16.8M3.6 11.5h5.2m4 0h7.6M3.6 17.3h9.6"/><circle cx="10.8" cy="11.5" r="2"/>
         {children}
       </svg>
     );

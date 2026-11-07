@@ -11,7 +11,7 @@ export const MapPinPlusIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProp
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="M13.8 19.2 12 21C9.7 18 5 13.2 5 8.8a7 7 0 0 1 14 0q0 1.4-.6 3"/><circle cx="12" cy="8.8" r="2.2"/><path d="M16.275 18.5h4.25M18.4 16.375v4.25"/>
+        <path d="M11.8 20C8.1 16.2 5 12.5 5 8.9a6.7 6.7 0 0 1 13.4 0q0 1-.35 2.3"/><circle cx="11.7" cy="8.9" r="2.1"/><path d="M14.8 17.6h6.4M18 14.4v6.4"/>
         {children}
       </svg>
     );

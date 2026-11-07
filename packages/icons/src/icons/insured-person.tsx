@@ -11,7 +11,7 @@ export const InsuredPersonIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconP
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="M3 7a9 4 0 0 1 18 0M7 21q0-6 5-6t5 6"/><circle cx="12" cy="10" r="2.6"/>
+        <path d="M4.1 7.5a8 4.5 0 0 1 15.8 0H4.1M7.7 21q.6-3.8 4.3-3.8t4.3 3.8"/><circle cx="12" cy="12.3" r="1.9"/>
         {children}
       </svg>
     );

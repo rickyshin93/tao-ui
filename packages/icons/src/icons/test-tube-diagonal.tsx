@@ -11,7 +11,7 @@ export const TestTubeDiagonalIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, Ic
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="m13 2 9 9M14 3 3 14c-5 5 2 12 7 7L21 10M8 10l6 6"/>
+        <path d="m12.5 3.3 8.2 8.2m-7.5-7.4-9 9q-2.9 2.9 0 5.8t5.8 0l9.3-9M8.2 9.2l6.6 6.6"/>
         {children}
       </svg>
     );

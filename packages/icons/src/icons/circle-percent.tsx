@@ -11,7 +11,7 @@ export const CirclePercentIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconP
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <circle cx="12" cy="12" r="8.5"/><path d="M8.5 15.5l7-7"/><circle cx="8.5" cy="8.5" r="0.8" fill="currentColor" stroke="none"/><circle cx="15.5" cy="15.5" r="0.8" fill="currentColor" stroke="none"/>
+        <circle cx="12" cy="12" r="8.5"/><path d="m8.6 15.4 6.8-6.8"/><path d="M8.025 8.35h0.65"/><path d="M15.325 15.65h0.65"/>
         {children}
       </svg>
     );

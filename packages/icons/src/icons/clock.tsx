@@ -11,7 +11,7 @@ export const ClockIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <circle cx="12" cy="12" r="8.7"/><path d="M12 6.85v5.45l3.65 2.15"/>
+        <circle cx="12" cy="12" r="8.5"/><path d="M8.4 8.8 12 12l4.2-2.2"/>
         {children}
       </svg>
     );

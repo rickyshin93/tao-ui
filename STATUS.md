@@ -1,7 +1,7 @@
 # STATUS
 
 ## Doing
-- 2026-11-07 Published tao-icons 0.1.0 with 2,165 MIT-licensed icons. The grouped bilingual catalog and six React examples are ready for GitHub Pages deployment.
+- 2026-11-07 Artwork review complete for tao-icons 0.1.1, including the revised gem facets. Release and Pages verification pending.
 
 ## Next
 
@@ -12,6 +12,7 @@
 - none
 
 ## Done
+- 2026-11-07 Published tao-icons 0.1.0 (2,165 MIT-licensed icons) and deployed the bilingual catalog with 39 groups and six React examples. npm archive, Pages and local browser checks passed.
 - 2026-11-06 Released `@rockshin/tao-ui@0.0.48`: 24px Form feedback spacing with stable single-line validation and unchanged font size. Project gates, Release/CI/Pages, npm integrity and local ai-portal desktop/mobile/RTL acceptance passed; generated release outputs cleaned. See `.logs/release-0.0.48/verification.md`.
 - 2026-11-06 Released `@rockshin/tao-ui@0.0.47`: Form feedback colors/compact spacing, Cascader mobile improvements and docs styling, integrated with RTL/locales from 0.0.45–46. Project gates, Release/CI/Pages, npm tarball integrity and local ai-portal acceptance passed. See `.logs/release-0.0.47/verification.md`.
 - 2026-11-06 Fixed Form subpath error/required styles and compacted feedback spacing; fields without validation/messages no longer reserve an empty line. Required gates and local Chrome desktop/mobile/RTL/dark/horizontal consumer checks passed; released in 0.0.47. See `.logs/form-feedback-20261106/verification.md`.

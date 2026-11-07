@@ -11,7 +11,7 @@ export const UsersRoundCollaborationIcon = /* @__PURE__ */ forwardRef<SVGSVGElem
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <circle cx="6" cy="6" r="2.7"/><path d="M1.8 12.5c.5-5 7.9-5 8.4 0"/><circle cx="18" cy="16.2" r="2.7"/><path d="M13.8 22c.5-5 7.9-5 8.4 0M13 4h5v6M15 7l3 3 3-3M11 20H6v-6M3 17l3-3 3 3"/>
+        <circle cx="6.7" cy="6.8" r="2.4"/><circle cx="17.3" cy="15.8" r="2.4"/><path d="M3.2 13v-.4q0-2.2 3.5-2.2t3.5 2.2v.4m3.6 8.2v-.4q0-2.2 3.5-2.2t3.5 2.2v.4M13 4.7h4.3V9m-2.1-2.1 2.1 2.1 2.1-2.1M11 19.3H6.7V15m-2.1 2.1L6.7 15l2.1 2.1"/>
         {children}
       </svg>
     );

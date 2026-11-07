@@ -11,7 +11,7 @@ export const RadioIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="M7 7a7 7 0 0 0 0 10M17 7a7 7 0 0 1 0 10M5 4a11 11 0 0 0 0 16M19 4a11 11 0 0 1 0 16"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/>
+        <path d="M7.8 7.7a6 6 0 0 0 0 8.6m8.4-8.6a6 6 0 0 1 0 8.6M5.3 5.1a9.6 9.6 0 0 0 0 13.8m13.4-13.8a9.6 9.6 0 0 1 0 13.8"/><path d="M11.7 12h0.6"/>
         {children}
       </svg>
     );

@@ -11,7 +11,7 @@ export const PencilLineIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProp
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="M 3.2,12.8 L 12.8,3.2 Q 13.6,2.4 14.4,3.2 L 16,4.8 Q 16.8,5.6 16,6.4 L 6.4,16 L 2.4,16.8 L 3.2,12.8 M 11.2,4.8 L 14.4,8 M 3.2,12.8 L 6.4,16"/><path d="M10 21h11"/>
+        <path d="m3.6 15.6.8-4.15 7.65-7.65q1-1 2 0l2.15 2.15q1 1 0 2l-7.65 7.65-4.95.8Zm7.05-10.4 4.1 4.1M8.5 20.1h12"/>
         {children}
       </svg>
     );

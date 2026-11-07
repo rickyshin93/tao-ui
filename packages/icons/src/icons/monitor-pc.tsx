@@ -11,7 +11,7 @@ export const MonitorPcIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <rect x="2.8" y="4.5" width="12.5" height="11" rx="1.5"/><path d="M9 15.5v4M5 19.5h8"/><rect x="17.2" y="3.5" width="4.2" height="17" rx="1"/><path d="M18.8 7h1M18.8 10h1"/>
+        <rect x="3.1" y="5.2" width="10.7" height="10.6" rx="1.6"/><path d="M8.45 15.8v3.6m-3.1 0h6.2"/><rect x="17.5" y="4.2" width="3.6" height="15.8" rx="1.1"/>
         {children}
       </svg>
     );

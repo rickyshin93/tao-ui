@@ -11,7 +11,7 @@ export const DatabaseZapIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconPro
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <ellipse cx="10" cy="5" rx="7" ry="2.5"/><path d="M3 5v13q0 3 8 3M17 5v5M3 11q4 3 10 1M18 12l-5 6h5l-1 4 5-7h-5Z"/>
+        <ellipse cx="10" cy="5.5" rx="6.4" ry="2.8"/><path d="M3.6 5.5v11.7c0 2 3.3 3.3 7.8 3.3m5-15v5.8M3.6 11.4q3.8 3.8 9.6 2.2"/><path d="m18.6 13.6-3.3 4.2h3l-.8 3.4 3.6-4.8h-3Z"/>
         {children}
       </svg>
     );

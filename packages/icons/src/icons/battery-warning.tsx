@@ -11,7 +11,7 @@ export const BatteryWarningIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, Icon
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="M8 6H5q-2 0-2 2v8q0 2 2 2h3m7-12h2q2 0 2 2v8q0 2-2 2h-2M22 10v4M11.5 7v6"/><circle cx="11.5" cy="17" r="0.7" fill="currentColor" stroke="none"/>
+        <path d="M8 6H5q-2 0-2 2v8q0 2 2 2h3m7-12h2q2 0 2 2v8q0 2-2 2h-2M22 10v4M11.5 7v6"/><path d="M11.375 17.4h0.25"/>
         {children}
       </svg>
     );

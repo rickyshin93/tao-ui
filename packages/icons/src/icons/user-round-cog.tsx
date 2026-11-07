@@ -11,7 +11,7 @@ export const UserRoundCogIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconPr
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <circle cx="9" cy="6" r="3"/><path d="M3 21a6 6 0 0 1 7-5.8"/><path d="M16 12h3l.5 2 2 1v3l-2 1-.5 2h-3l-.5-2-2-1v-3l2-1Z"/><circle cx="17.5" cy="16.5" r="1.1" fill="currentColor" stroke="none"/>
+        <circle cx="8.7" cy="7" r="3.25"/><path d="M3.5 20q.25-5.9 5.2-5.9 1.9 0 3.15.9"/><circle cx="17.2" cy="16.5" r="2.8"/><path d="M17.2 12v1.7m0 5.6v1.7m-4.5-4.5h1.7m5.6 0h1.7"/>
         {children}
       </svg>
     );

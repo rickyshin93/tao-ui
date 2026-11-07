@@ -11,7 +11,7 @@ export const MapMinusIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="M13 19.6 9 17.5l-5.5 2.4V5.2L9 2.8l6 2.7 5.5-2.4v9M9 3v14.5M15 5.5V13"/><path d="M15.5 18.5h5"/>
+        <path d="M12.3 19.1 9 17.5l-5.4 2.3V5.5L9 3.1l6 2.6 5.4-2.4v8.6M9 3.3v14.2m6-11.8v5.9"/><path d="M14.8 17.6h6.4"/>
         {children}
       </svg>
     );

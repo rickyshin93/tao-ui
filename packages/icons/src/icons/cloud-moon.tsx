@@ -11,7 +11,7 @@ export const CloudMoonIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="M6 18a4 4 0 0 1-1-7 5 5 0 0 1 9-1 4 4 0 0 1 4 8Z"/><path d="M17 3a5 5 0 0 0 4 6M17 3a6 6 0 0 0-1 5"/>
+        <path d="M6.5 17.5a3.6 3.6 0 0 1-.4-7.2 4.7 4.7 0 0 1 8.9-.9 4.1 4.1 0 0 1 1.3 8.1Z"/><path d="M16 7.1A4.4 4.4 0 0 1 18 2.9a3.9 3.9 0 0 0 3.6 5.6 4.4 4.4 0 0 1-2.9 1.4"/>
         {children}
       </svg>
     );

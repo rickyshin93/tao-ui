@@ -11,7 +11,7 @@ export const OriginalContactIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, Ico
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <rect x="4" y="3" width="16" height="18" rx="1.8"/><circle cx="12" cy="9" r="2.5"/><path d="M8 17c0-2.2 1.4-3.5 4-3.5s4 1.3 4 3.5M2.5 7H5M2.5 12H5M2.5 17H5"/>
+        <rect x="4" y="3" width="16" height="18" rx="1.7"/><circle cx="12" cy="9" r="2.6"/><path d="M7.8 17c.3-4 8.1-4 8.4 0M2 7h3M2 12h3M2 17h3"/>
         {children}
       </svg>
     );

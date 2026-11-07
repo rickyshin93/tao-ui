@@ -11,7 +11,7 @@ export const WashingMachineIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, Icon
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <rect x="3" y="3" width="18" height="18" rx="1.5"/><path d="M3 7h18M6 5h1"/><circle cx="12" cy="14" r="4"/><path d="M9 15q3-2 6 0"/>
+        <rect x="3.8" y="3.4" width="16.4" height="17.2" rx="1.8"/><path d="M3.8 8.1h16.4"/><path d="M7.05 5.7h0.3"/><circle cx="12" cy="14.4" r="3.6"/>
         {children}
       </svg>
     );

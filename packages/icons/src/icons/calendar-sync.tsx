@@ -11,7 +11,7 @@ export const CalendarSyncIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconPr
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="M9.7 20.8H5.5q-1.8 0-1.8-1.8V6.8Q3.7 5 5.5 5h13q1.8 0 1.8 1.8V8M8 3.2v4M16 3.2v4M3.7 9.6h14.4"/><path d="M13.436 14.3a4 4 0 0 1 6.928 0M17.639 15.292l2.725-.992.504-2.856M20.364 18.3a4 4 0 0 1-6.928 0M16.161 17.308l-2.725.992-.504 2.856" strokeWidth="1.5"/>
+        <path d="M9.7 20.8H5.5q-1.8 0-1.8-1.8V6.8Q3.7 5 5.5 5h13q1.8 0 1.8 1.8V8M8 3.2v4M16 3.2v4M3.7 9.6h14.4"/><path d="M13.436 14.3a4 4 0 0 1 6.928 0M17.639 15.292l2.725-.992.504-2.856M20.364 18.3a4 4 0 0 1-6.928 0M16.161 17.308l-2.725.992-.504 2.856"/>
         {children}
       </svg>
     );

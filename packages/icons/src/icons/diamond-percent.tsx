@@ -11,7 +11,7 @@ export const DiamondPercentIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, Icon
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="M12 3 21 12 12 21 3 12ZM9 15l6-6"/><circle cx="9" cy="9" r="0.8" fill="currentColor" stroke="none"/><circle cx="15" cy="15" r="0.8" fill="currentColor" stroke="none"/>
+        <path d="m12 3.3 8.7 8.7-8.7 8.7L3.3 12Z"/><path d="m9.45 14.55 5.1-5.1"/><path d="M8.875 9.2h0.65"/><path d="M14.475 14.8h0.65"/>
         {children}
       </svg>
     );

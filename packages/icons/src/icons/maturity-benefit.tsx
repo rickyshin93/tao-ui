@@ -11,7 +11,7 @@ export const MaturityBenefitIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, Ico
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="M15 11a6.5 6.5 0 1 0-4 4M8.5 5v4h3M4 20h16m-3-3 3 3-3 3"/>
+        <path d="M15 10.9A6.2 6.2 0 1 0 11 15M8.6 5.8v3.8h2.9M4 18.7h15.8m-2.8-2.8 2.8 2.8-2.8 2.8"/>
         {children}
       </svg>
     );

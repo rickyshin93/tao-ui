@@ -11,7 +11,7 @@ export const CandyOffIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="M11 7h3a4 4 0 0 1 4 4v2M13 17h-3a4 4 0 0 1-4-4v-2M1 8l2 4-2 4M23 8l-2 4 2 4M3 3l18 18"/>
+        <path d="m3.5 3.5 17 17M10 7.2h3.4q3.6 0 3.6 3.6v1.8m-.3-3.6 3.9-1.8v7.4m-17.2-4v6.2L7.2 15m-.2-3v1.2q0 3.6 3.6 3.6h2"/>
         {children}
       </svg>
     );

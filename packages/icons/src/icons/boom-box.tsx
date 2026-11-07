@@ -11,7 +11,7 @@ export const BoomBoxIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <rect x="3" y="7" width="18" height="14" rx="1.8"/><path d="M7 7V3h10v4"/><circle cx="8" cy="14" r="2.3"/><circle cx="16" cy="14" r="2.3"/>
+        <rect x="3.6" y="7.9" width="16.8" height="12.3" rx="1.8"/><path d="M8 7.9V4h8v3.9"/><circle cx="8.2" cy="14" r="2"/><circle cx="15.8" cy="14" r="2"/>
         {children}
       </svg>
     );

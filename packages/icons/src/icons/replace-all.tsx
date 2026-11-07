@@ -11,7 +11,7 @@ export const ReplaceAllIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProp
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <rect x="7.5" y="3.9" width="5.4" height="5.4" rx="0.9"/><path d="M 3.9,5.7 L 3.9,12.9 L 10.2,12.9"/><rect x="14.7" y="14.7" width="5.4" height="5.4" rx="0.9"/><path d="M 11.1,16.5 L 11.1,21.9 M 16.5,4.8 L 19.2,4.8 L 19.2,10.2 M 16.5,7.5 L 19.2,10.2 L 21.9,7.5 M 4.8,16.5 L 4.8,19.2 L 7.5,19.2"/>
+        <rect x="3.4" y="4" width="5.5" height="5.5" rx="1"/><rect x="3.4" y="14.5" width="5.5" height="5.5" rx="1"/><rect x="15.5" y="8.7" width="5.5" height="6.6" rx="1"/><path d="m10.9 8.9 2.45 3.1-2.45 3.1"/>
         {children}
       </svg>
     );

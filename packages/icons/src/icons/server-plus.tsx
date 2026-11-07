@@ -11,7 +11,7 @@ export const ServerPlusIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProp
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <rect x="3.5" y="3.5" width="17" height="6" rx="1.4"/><path d="M12 20.5H5q-1.5 0-1.5-1.5v-4q0-1.5 1.5-1.5h7M7 6.5h.1M7 17h.1M12 6.5h5"/><path d="M15.5 17.5h5M18 15v5"/>
+        <rect x="3.5" y="4" width="17" height="5.8" rx="1.4"/><path d="M10.8 20H5q-1.5 0-1.5-1.5v-3q0-1.5 1.5-1.5h5.8"/><path d="M6.85 6.9h0.3"/><path d="M6.85 17h0.3"/><path d="M14.8 17.6h6.4M18 14.4v6.4"/>
         {children}
       </svg>
     );

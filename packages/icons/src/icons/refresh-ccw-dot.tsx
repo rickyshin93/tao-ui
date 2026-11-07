@@ -11,7 +11,7 @@ export const RefreshCcwDotIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconP
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="M4 10a8.5 8.5 0 0 1 14-6M4 5v5h5M20 14a8.5 8.5 0 0 1-14 6M20 19v-5h-5"/><circle cx="12" cy="12" r="1.2" fill="currentColor" stroke="none"/>
+        <path d="M4 10a8.5 8.5 0 0 1 14-6M4 5v5h5M20 14a8.5 8.5 0 0 1-14 6M20 19v-5h-5"/><path d="M11.625 12h0.75"/>
         {children}
       </svg>
     );

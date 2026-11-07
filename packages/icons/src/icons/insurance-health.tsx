@@ -11,7 +11,7 @@ export const InsuranceHealthIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, Ico
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="M9 3h6v6h6v6h-6v6H9v-6H3V9h6Z"/>
+        <path d="M12 3.1 19.2 5.8v5.1c0 4.65-2.9 7.9-7.2 10-4.3-2.1-7.2-5.35-7.2-10V5.8Z"/><path d="M7.7 12.1h2.15l1.45-3 1.75 4.5 1.1-1.5h2.15"/>
         {children}
       </svg>
     );

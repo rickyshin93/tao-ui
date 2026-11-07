@@ -11,7 +11,7 @@ export const Printer3dIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="M3 21V3h18v18M3 7h18M10 7v3l2 2 2-2V7M7 21v-4l5-3 5 3v4M5 21h14"/>
+        <path d="M3.5 20.4V3.6h17v16.8M3.5 8.6h17M12 8.6v2.5m-4.3 9.3v-4.1l4.3-2.6 4.3 2.6v4.1m-8.6 0h8.6"/>
         {children}
       </svg>
     );

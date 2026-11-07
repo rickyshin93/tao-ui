@@ -11,7 +11,7 @@ export const CarFrontIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="M4 11 6 5h12l2 6M3 11h18v7H3ZM6 18v2M18 18v2"/><path d="M7.5 14h1M15.5 14h1"/>
+        <path d="m5.4 10.4 1.8-4.6q.3-.8 1.2-.8h7.2q.9 0 1.2.8l1.8 4.6M6 17.6v2m12-2v2M7.2 14h1.4m6.8 0h1.4"/><rect x="3.6" y="10.4" width="16.8" height="7.2" rx="1.5"/>
         {children}
       </svg>
     );

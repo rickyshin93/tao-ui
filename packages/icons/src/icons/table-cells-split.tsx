@@ -11,7 +11,7 @@ export const TableCellsSplitIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, Ico
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <rect x="3" y="3" width="18" height="18" rx="1.6"/><path d="M3 7h18M3 17h18M12 3v4M12 17v4"/><path d="M10 12H6m2-2-2 2 2 2M14 12h4m-2-2 2 2-2 2"/>
+        <rect x="3.3" y="4" width="17.4" height="16" rx="1.7"/><path d="M3.3 8.4h17.4M12 4v16m-4.1-8.4-2 2.6 2 2.6m8.2-5.2 2 2.6-2 2.6"/>
         {children}
       </svg>
     );

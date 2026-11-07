@@ -1,6 +1,6 @@
 {
   "name": "Rounded essentials",
-  "version": "svg-v13-complete",
+  "version": "svg-v13-refinement.1",
   "count": 2165,
   "viewBox": "0 0 24 24",
   "strokeWidth": 1.8,
@@ -255,7 +255,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "963decf6384d496e35e0dd313ecb7b7a7e0d06263dde3cd0b3ae561296a8ff79",
+      "sha256": "fe1e55a69afde8bb842bd8690723a5f6c7ff013bed17f6ecf05af6e69d61d743",
       "component": "ALargeSmallIcon",
       "symbol": "rounded-a-large-small"
     },
@@ -3297,7 +3297,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "84ec063391cd0b9d0881c4af88054bf1073d7803d145ef4d269694e1f3b70ab4",
+      "sha256": "8eec6657d65356abcaa579ab58a10380cf747552e8381d7d1fabacb360d43c34",
       "component": "BadgeIcon",
       "symbol": "rounded-badge"
     },
@@ -3320,7 +3320,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "853615dd8bfffd5c2b047a24b9f122f29f49f5872f7f91474998283793aa29fb",
+      "sha256": "d7e33879c4c6eb67dc17fa1bff78d5d372ce81babc5e8ed2fdd4477e39e31158",
       "component": "BadgeAlertIcon",
       "symbol": "rounded-badge-alert"
     },
@@ -3354,7 +3354,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "04ae916da3bf696add6626fd93b5c01ac5126a5b5543bc940c1ab3de0c1d82bc",
+      "sha256": "54dbd2f3fc949ef8e154d3782b2bb5d6559895ceab5fb6bcad164d28a94af960",
       "component": "BadgeCentIcon",
       "symbol": "rounded-badge-cent"
     },
@@ -3374,7 +3374,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "66f1def68368ab8acc3f33fd1fbf14a639097fec48570ef4d1c9fd824e2ee24c",
+      "sha256": "b0fedb32c80507807111320a9b7e790671bebf9adca4e85590184150445e1f7a",
       "component": "BadgeCheckIcon",
       "symbol": "rounded-badge-check"
     },
@@ -3405,7 +3405,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "aa2513131b7763d1a2a5cc56fc989582ffccfb1f576c410cd0dedf02671833e9",
+      "sha256": "b2833da43387405d161db976f27093cec48c39056cf2b5349c7e2c126f7690b3",
       "component": "BadgeDollarSignIcon",
       "symbol": "rounded-badge-dollar-sign"
     },
@@ -3435,7 +3435,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "737934a3ad24c57918ce350a8cbd1dacd96f6445c742244901a6efa90614d3e6",
+      "sha256": "cf700708c13481c850dfcbdd20e445e6512a9912cf0a076c2aa892818936d023",
       "component": "BadgeEuroIcon",
       "symbol": "rounded-badge-euro"
     },
@@ -3466,7 +3466,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "e08f981abdcec60b061a3ff4bce91756f5879a3a78e53bfd00c40d958ccada40",
+      "sha256": "ce29a79cbfe5f85e7b1258f250f7be25fe0aae4c1d6fa2e038b5525a2384f322",
       "component": "BadgeIndianRupeeIcon",
       "symbol": "rounded-badge-indian-rupee"
     },
@@ -3486,7 +3486,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "b8318ca934652ce4ae801d1ba2e8be8fec861d609f7d89bc5185bf39962bd9ba",
+      "sha256": "9598d66d3120ced544734ccab7bf492f808631398bdbddcc553e910d610c2c9e",
       "component": "BadgeInfoIcon",
       "symbol": "rounded-badge-info"
     },
@@ -3517,7 +3517,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "b1743752425b58e398a20953b3b147b3e8a00d12e8e8eae43bd506ffa75410fb",
+      "sha256": "7df1b8d461fcf0d841b28b6ad10e354483566b121e370569a1ad5f72bf39b656",
       "component": "BadgeJapaneseYenIcon",
       "symbol": "rounded-badge-japanese-yen"
     },
@@ -3539,7 +3539,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "68b30645cc465fbb660f60f3d29a55c1bf5f5bfc5150e6cbc29579345d2ca6da",
+      "sha256": "60863c6ae65261cb54f67250210fdc69780138d706c5a5de2420a50fb1274bed",
       "component": "BadgeMinusIcon",
       "symbol": "rounded-badge-minus"
     },
@@ -3564,7 +3564,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "cfd81f86b8dedbb63fbd17e5cd2ad283167d14792f5d582755ad658ef6ebcddb",
+      "sha256": "ecb709c58d39e53a92acaf8dcb734c2f8b53985b15b4764736285b7f93a441c7",
       "component": "BadgePercentIcon",
       "symbol": "rounded-badge-percent"
     },
@@ -3586,7 +3586,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "f8454070e7db4d8e08b0b9a78929830b93210f6ae5655e4e44f072c035f333b8",
+      "sha256": "7de253befe83404687dbbfbdd252f479432712ab0bf302caab8f7f288464d558",
       "component": "BadgePlusIcon",
       "symbol": "rounded-badge-plus"
     },
@@ -3618,7 +3618,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "505789606b6f0ef5d7d728f132eb38bcc6824f3149bcd21a78f6c3bf8fff7c92",
+      "sha256": "efda46e9d5f41c21e273e360128453a96b661bc439b25480017ceb0b3b015e36",
       "component": "BadgePoundSterlingIcon",
       "symbol": "rounded-badge-pound-sterling"
     },
@@ -3638,7 +3638,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "ca4112a2f5691680e3c2bef7856030a1230560ca06e6850ec084e5a48884c7c8",
+      "sha256": "de187a428bc0c01ef17234cd06e870c2df26c95df8f26f6c9a3048b2b0d03ce8",
       "component": "BadgeQuestionMarkIcon",
       "symbol": "rounded-badge-question-mark"
     },
@@ -3669,7 +3669,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "0565eb365086aabcbe5bb63958a8a1745d65a43a6466f5a97f2bfbcd69213c04",
+      "sha256": "f461b000924e6b28410cf19ffe840a37c68994d803c0a025d55d06079b483390",
       "component": "BadgeRussianRubleIcon",
       "symbol": "rounded-badge-russian-ruble"
     },
@@ -3700,7 +3700,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "108d00295f5ebb726f94710dc9dc0f048b7fbcd632a5d6771a9f084154e7b479",
+      "sha256": "13113c738fb0299f15e8ee5cd738384c7686e1dcd454ff3fe3f3b791d0904bc0",
       "component": "BadgeSwissFrancIcon",
       "symbol": "rounded-badge-swiss-franc"
     },
@@ -3731,7 +3731,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "81dcaf6841bbcddee880aa277c371db6f175f2946719f4444cc0fdcd50ddd24f",
+      "sha256": "156988f863ff1e7ffd98bd509d401d333e1dbc1470a0ebb5c6723d3055c625af",
       "component": "BadgeTurkishLiraIcon",
       "symbol": "rounded-badge-turkish-lira"
     },
@@ -3753,7 +3753,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "aa9e4d87b97966a969ccf43f15fe47c89b04ac468966ec35d08e4592aa0b1ae5",
+      "sha256": "7c119b06fc15e9c70167f85d91f0ec12cb9be30247d917e571a395befff7cb91",
       "component": "BadgeXIcon",
       "symbol": "rounded-badge-x"
     },
@@ -4323,7 +4323,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "596541359c5015c4c59a9a49b3eff3ab7e230ed285e536fa91f86c9e9fb1d5b9",
+      "sha256": "09ca5fde0e8e4de5560e1a61ac6e925bf89b111102e321b31a32ff6c3c4d27d9",
       "component": "BatteryWarningIcon",
       "symbol": "rounded-battery-warning"
     },
@@ -5559,7 +5559,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "07830f18c9fbdc9568361293abaf70fff3494a779094e632c22af17c4c53bc8d",
+      "sha256": "a51cceaebf5e729211e4edcd56c49b8be60a2d4520c90e24a749da0fbe20f394",
       "component": "BoneFractureIcon",
       "symbol": "rounded-bone-fracture"
     },
@@ -5988,7 +5988,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "19d03ea488c018b3cdf5d7416b5faea7f82e1f6b7b46707ad86ede4ee13418a4",
+      "sha256": "ddec08b7913a1f4f36d910eda48d1c362458ed5a4d1c780e64873d17d05b8ab0",
       "component": "BookHeadphonesIcon",
       "symbol": "rounded-book-headphones"
     },
@@ -6723,7 +6723,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "c26823c2b1be953d11cc9edf2cc0b4bf583b76a9321a9f276e4298026df23ae1",
+      "sha256": "62df4aa1f6c0bac034614fc7d2e799e4bfe3b7479ada1144acc4a4225954177e",
       "component": "BoomBoxIcon",
       "symbol": "rounded-boom-box"
     },
@@ -6894,7 +6894,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "d7a69fde9d8a68d86288a12d554f98860f0b0a683014be5519adc451c4a59ed6",
+      "sha256": "ee1df337aecad3d2693ce985fea6267de2eb0fc73a2efc21b2dd16fbe74139ee",
       "component": "BoxesIcon",
       "symbol": "rounded-boxes"
     },
@@ -7470,7 +7470,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "9f52662e878909c4cfb5cca4bcc0a5bc7af12dcfde0e8f7fc1344230f17f935e",
+      "sha256": "be9f3a0cc22e8568ad0943f2fffedc1f0ba5b692847ad483a21b2c3f12ed45dd",
       "component": "BroomSparklesIcon",
       "symbol": "rounded-broom-sparkles"
     },
@@ -7696,7 +7696,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "2e8dca9a8a88b8405f076cee6ef05e7367fae967ded05c9b55d04e1f5a858885",
+      "sha256": "0cc4cbade1209912a51975dfbdec179e535386cdd7ab41623a7ab640f5d396be",
       "component": "BuildingComplexIcon",
       "symbol": "rounded-building-complex"
     },
@@ -7819,7 +7819,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "5febc29fc5c19031979a413063eee4e373972f0e362a66073977877f3f87bdc4",
+      "sha256": "f9be2a27619682459c60269c75bd5c1210efbfe2d485a22a2dd13413a6dcb8fb",
       "component": "CableIcon",
       "symbol": "rounded-cable"
     },
@@ -7919,7 +7919,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "5c6a61b5f3a7540525dff479a4421d4697b98d4584b35996998d476f7711d4d8",
+      "sha256": "eb972700936b5fc7d4b0e34b019f3165f963c6a05f88eac1640c976c80e04885",
       "component": "CalculatorIcon",
       "symbol": "rounded-calculator"
     },
@@ -8157,7 +8157,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "863a6461dfcc65dc09d8d62aa720edecec41e95507bea467a5625a0e2f013fad",
+      "sha256": "689a984bc563be0b67f4ef4bf3239e0b4a9ea8759967552c07bd14050090854a",
       "component": "CalendarClockIcon",
       "symbol": "rounded-calendar-clock"
     },
@@ -8182,7 +8182,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "4ec9c0ee608c13d26037792d2b1eae8da0337eb4ee4839068f5fa8c4f12518a1",
+      "sha256": "d6b7a0e36e1202f356131fecb5bce9c87136d765bc18770f81bed50d15948103",
       "component": "CalendarCogIcon",
       "symbol": "rounded-calendar-cog"
     },
@@ -8203,7 +8203,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "bdfd4a52580ef3bdccb6fc8aa4880a44b8339aa46f36e5faa9429d0f49705d59",
+      "sha256": "b46689f2e6348dea8e9bb65d7425e1e218502b5b07b98318107b90e9942640b9",
       "component": "CalendarDaysIcon",
       "symbol": "rounded-calendar-days"
     },
@@ -8454,7 +8454,7 @@
         "V13"
       ],
       "lucideCanonical": true,
-      "sha256": "093f250105fbc856584bcf301dcd01afd8d1abb54fc0c50cd171013d34129dd9",
+      "sha256": "07152743ef0f9be330ce2f76880fa723ce4aa4e1c5be598f7396255271d52b72",
       "component": "CalendarSyncIcon",
       "symbol": "rounded-calendar-sync"
     },
@@ -8635,7 +8635,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "a400635e6e93a726dca78c9860b4e633625b11c79f6904214ec5ac02b1761c76",
+      "sha256": "ab43786572fbf337efcd119ae38847a770a5ad69f6147505b62e280c04892b38",
       "component": "CandyIcon",
       "symbol": "rounded-candy"
     },
@@ -8680,7 +8680,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "8f3c8eb3ca691dc37f6e03fe0fcb675e965425c07facae7bd04832639ffe4058",
+      "sha256": "b5774584962421bdc43dfe1fd230e0a92b0a7a6ce966a89edb98fa6e335479fa",
       "component": "CandyOffIcon",
       "symbol": "rounded-candy-off"
     },
@@ -8700,7 +8700,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "718736db4adfb2eaf64aee172af3dde0432c2ef858bcd9fb9e27970bab77e1f8",
+      "sha256": "e515f9494516e858264344f780b35b126f7af60e1fe4b4270b63b29149bce442",
       "component": "CannabisIcon",
       "symbol": "rounded-cannabis"
     },
@@ -8720,7 +8720,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "85f32061cf48560eda4aa5fef723da3c13c0d94dd08823401470e1f4bf96506a",
+      "sha256": "7e88fbcd448791e64be64f372c15625430736a0d13358372a5b9323f0479e8db",
       "component": "CannabisOffIcon",
       "symbol": "rounded-cannabis-off"
     },
@@ -8838,7 +8838,7 @@
         "V4"
       ],
       "lucideCanonical": true,
-      "sha256": "44ee8702ca7e0e4104d491763fe8e1d8c5d7a92caa707c7367ab5ac75191f175",
+      "sha256": "694cd87d09e86bfc8bd68454e34b31affce9c4cdd648baea4e40357fbc3fe22c",
       "component": "CarFrontIcon",
       "symbol": "rounded-car-front"
     },
@@ -9156,7 +9156,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "a85da835a735b01859c37286348d2d6be7fef1aa13be0c1f4c041da889364297",
+      "sha256": "a5e6b9bfaa4634a8a4effc9951a0780735817d9fc95a38d6ca0f629e08f8d8c8",
       "component": "CastleIcon",
       "symbol": "rounded-castle"
     },
@@ -11366,7 +11366,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "f62daf76e187f5bc4e7900e21251b5425cc102d215f361a93f1371fe231443b4",
+      "sha256": "1200e84e644a0b1c1b39e6449bacaad09d5f68af5cb0ebe8d62390e2cb3917da",
       "component": "CircleFadingPlayIcon",
       "symbol": "rounded-circle-fading-play"
     },
@@ -11558,7 +11558,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "0a81e8d7289832a949bdaec21a55dc1cca3bfd8583e107c52c1237d9409c94bd",
+      "sha256": "53e9d354863f2644c5dba8a574a433df31affaf17d6ec93c30323b7573745257",
       "component": "CirclePercentIcon",
       "symbol": "rounded-circle-percent"
     },
@@ -11867,7 +11867,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "3afbcf7150b17baddd824e1348580dd55321a9501be30698be056aebfb443743",
+      "sha256": "518842f29b5bc08ee2ada5bcd16bda0c773c558dd566861cf84f7cb2794167d3",
       "component": "CircleStopIcon",
       "symbol": "rounded-circle-stop"
     },
@@ -12190,7 +12190,7 @@
         "V8"
       ],
       "lucideCanonical": false,
-      "sha256": "9bf640d61ca7e9206e02c44f1850fd618feaacca2d883785b9246db3bfba48cb",
+      "sha256": "1d10831f13a4f3bded87723eb6118377decffacf94a1947834c2e4c784a17baa",
       "component": "ClaimReopenIcon",
       "symbol": "rounded-claim-reopen"
     },
@@ -12531,7 +12531,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "36c4dea62df20e38124860ce63b3f358adc63bcf21e9d8a88f2561cfb8dd195f",
+      "sha256": "0466f37bce49ded7eb545b8a8a17841e6630fd29ef1b50d84d1523814e59be41",
       "component": "ClipboardPenIcon",
       "symbol": "rounded-clipboard-pen"
     },
@@ -12637,7 +12637,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "6709435bdfa0929b7fdcbccdf1363827507d2e7d133b3a8993b825ab9cd0e78a",
+      "sha256": "3b6457b691a1bb937911beb018864aafe286ea16309385f143748a6194df4ce8",
       "component": "ClockIcon",
       "symbol": "rounded-clock"
     },
@@ -12901,7 +12901,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "b3dc5c1bdabbee5e889ff3e34137c00b6e76932eb9690b47a6529cec066cde71",
+      "sha256": "8a10d0355168f742a42d067dcbd12aadf53530936ee02258153c7cfd4926ff75",
       "component": "ClockAlertIcon",
       "symbol": "rounded-clock-alert"
     },
@@ -13157,7 +13157,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "58f232f57b770af26f331cf24a03de03c074caaefaee6c159abcc6032f54c64f",
+      "sha256": "081e628263e9706cda4030a7220a6874acb6c1242904117ad61fb3c37c55a115",
       "component": "CloudAlertIcon",
       "symbol": "rounded-cloud-alert"
     },
@@ -13193,7 +13193,7 @@
         "V9"
       ],
       "lucideCanonical": true,
-      "sha256": "71e883071785566d684dcf0811c7e63db0d77430c7cd019e4671941c70fa21ab",
+      "sha256": "5d5e7ec08c162dbc021dd654f764b52b3d7d1256f75ed3a27163cb65264aa0f9",
       "component": "CloudBackupIcon",
       "symbol": "rounded-cloud-backup"
     },
@@ -13350,7 +13350,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "e60f02e98589eb38c1036ca879acf2daaa3a4ccce48dea9a0f360b010a2ab91c",
+      "sha256": "b993e63d03e28e36b8bdcc2fd49aff40fea90c1702437a16558ff1c804f3f737",
       "component": "CloudMoonIcon",
       "symbol": "rounded-cloud-moon"
     },
@@ -13372,7 +13372,7 @@
         "V4"
       ],
       "lucideCanonical": true,
-      "sha256": "5b88114245cffa2cc1a06d081c7598abd91b0d1459daab9e0d530e5819e45be0",
+      "sha256": "a75c8f74977aed845e69804a4835973135e365e2e8e54bf3f269b6d96a756baf",
       "component": "CloudMoonRainIcon",
       "symbol": "rounded-cloud-moon-rain"
     },
@@ -13521,7 +13521,7 @@
         "V13"
       ],
       "lucideCanonical": true,
-      "sha256": "58e77c99caffe33e5905f0052145cde7dd64d66d7e43ffa4c1c51dd39b05976d",
+      "sha256": "aeeed67b15a9aae067267d79b4c2e66d5b3cb007abe9e88d8a91e7e50a04d4a9",
       "component": "CloudSyncIcon",
       "symbol": "rounded-cloud-sync"
     },
@@ -13758,7 +13758,7 @@
         "V3"
       ],
       "lucideCanonical": false,
-      "sha256": "e3f724badbabea6a3d8c8469438af5a3dffe0117c9049f40721264c76fba14d5",
+      "sha256": "baa7d7657d41c0e2e66924ac1ea4e321d141a69947bb7e313259b0ec38e2cc31",
       "component": "CoinsuranceShareIcon",
       "symbol": "rounded-coinsurance-share"
     },
@@ -14097,7 +14097,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "2b0dacad7a136062e67f13bd1079b1384cafca3200e12611d02e5c78978d5f7d",
+      "sha256": "54e7e4c5bd29dc3903df00942cec0896f3199b719c5aa88709eb4b6e62c52d63",
       "component": "ComponentIcon",
       "symbol": "rounded-component"
     },
@@ -14759,7 +14759,7 @@
         "V3"
       ],
       "lucideCanonical": false,
-      "sha256": "5faac6ad658f50121eeccbf2d525d120d746a5e41f7b2292b899ba04914c77e5",
+      "sha256": "c92044a72df3a7c8777c4cb87cb05ec853a8097d83911d1de31c7d83697192f7",
       "component": "CoverageLimitIcon",
       "symbol": "rounded-coverage-limit"
     },
@@ -14919,7 +14919,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "b3057d5893475f1413dfd2e0406c7c0a95bc1a1f4c8dd1188ed9f0c4fcca0193",
+      "sha256": "02b2226d8886ecc931076ca2754c276217d5376eaf609d0ffeed457f953a1915",
       "component": "CreditCardCheckIcon",
       "symbol": "rounded-credit-card-check"
     },
@@ -14956,7 +14956,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "dacfe9a2f409eb26a1b8fcae9adbdeecfa98bec7f84366d6f3c8882e48d9719f",
+      "sha256": "b5d2831e02040e1251025d9e3bc1dfa3e715b0266ab039c6b2c8789f6e831beb",
       "component": "CreditCardMinusIcon",
       "symbol": "rounded-credit-card-minus"
     },
@@ -14992,7 +14992,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "751742e43edec22a678db0e87e150a090d30c1bc76bd4d04fd887ae424f99f35",
+      "sha256": "a629024601ea5687084237c74517cbe02ef33e7c11ba69e570ecbe78fc2a9cac",
       "component": "CreditCardPlusIcon",
       "symbol": "rounded-credit-card-plus"
     },
@@ -15064,7 +15064,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "e11a91a61b010e4c8f14b66eeb3e397ac965931754dfee0d21ab3ca4fde30755",
+      "sha256": "e58662966ab1836f60bf6b2898865e0e2d3433d52537198e6a6595ed326b0621",
       "component": "CreditCardXIcon",
       "symbol": "rounded-credit-card-x"
     },
@@ -15446,7 +15446,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "0bc4e985bf34af8da4b59fcb9729ea0c12702c7fffc1bb04e8ad3fa69a8d9552",
+      "sha256": "30d11fa40a8bfad2b56d65c5c851c571996cde7903cb7952da779a2654c6c749",
       "component": "DatabaseArrowDownIcon",
       "symbol": "rounded-database-arrow-down"
     },
@@ -15472,7 +15472,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "ad20e3561da6a8f7591ff20c4ec988b1c38843c1a55d8899512948e6c1ffff48",
+      "sha256": "4e86c6ca3374feadad552a88143d81d4916542d511699dade6768eaed00a3f97",
       "component": "DatabaseArrowUpIcon",
       "symbol": "rounded-database-arrow-up"
     },
@@ -15499,7 +15499,7 @@
         "V9"
       ],
       "lucideCanonical": true,
-      "sha256": "dca751e64f4107cfda0fe6b9cb158690bf9b7f239d97c8f5ef126bbf0616729d",
+      "sha256": "aa171f8d39e2ee809e33de23353cb5004abf384c14b918a33f8ee1cb42f86f8c",
       "component": "DatabaseBackupIcon",
       "symbol": "rounded-database-backup"
     },
@@ -15526,7 +15526,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "e1137e100c818d09505f35adba4b111566ddaf228ad974345e3035f58986f54a",
+      "sha256": "f762886b752df4a1d75a2b0ce362152347490e5b873f87588f2b8d20af9bc6c5",
       "component": "DatabaseCheckIcon",
       "symbol": "rounded-database-check"
     },
@@ -15551,7 +15551,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "bfbcd312f904d8fcdc6b736669804e69e9af4ca2b43be7aef1a009b9b648cde4",
+      "sha256": "1fba1a0c12b1541c5fe455635c119a590c65b490f830bf102c1b4f20ad53a91c",
       "component": "DatabaseMinusIcon",
       "symbol": "rounded-database-minus"
     },
@@ -15578,7 +15578,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "e34d967a4e05f99d8699b229457ac0fbd44c448080ccc803642f7576a5c556c2",
+      "sha256": "1d64649e82263561c308aa48dd28691e7f03531c54a3ebdd769322f57609242a",
       "component": "DatabasePlusIcon",
       "symbol": "rounded-database-plus"
     },
@@ -15602,7 +15602,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "9c81ccc7da9d6985395efaa373b0d56968085a86fdc800ec996dac9d8bf09624",
+      "sha256": "f0de3f7ea2ca8bd10aeb2a04225c74b37de88725b46434f436752c44a7326d5a",
       "component": "DatabaseSearchIcon",
       "symbol": "rounded-database-search"
     },
@@ -15632,7 +15632,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "a2d724ed8de78306124a3dfe39753311713a72d65fa36e81d77b0675d0d39b41",
+      "sha256": "8c413e29b6b963102ead04e64adbde8780255d128a5dad316f512ae0b4ed1c60",
       "component": "DatabaseXIcon",
       "symbol": "rounded-database-x"
     },
@@ -15656,7 +15656,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "c61b41aa61780d6f97d73f3e5377766713a214bc54aaaf05ab52574450911ecb",
+      "sha256": "6c06c5e54bc683d54a1e7f3ed39d3f3b673a81c6b54bbf1cd64b32a78cbdf000",
       "component": "DatabaseZapIcon",
       "symbol": "rounded-database-zap"
     },
@@ -15875,7 +15875,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "298e2592709aea67cfa0b6c77ac367398df6f5daf056ae28d5e66780d6281c03",
+      "sha256": "fb03a28ef51b9608b2c3275ada39636e911f5d654a429e1f2caa304afdfd8596",
       "component": "DiamondPercentIcon",
       "symbol": "rounded-diamond-percent"
     },
@@ -15933,7 +15933,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "66f634d06029a8ae1f0ff6ba1fb595941782a9d0890f1ba7a156c20920f02ffc",
+      "sha256": "cc9bece20ed057b0c910a176329b7f53bcc2c39adde5828cd7442c916857b259",
       "component": "Dice1Icon",
       "symbol": "rounded-dice-1"
     },
@@ -15956,7 +15956,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "50cd87aca76bc33dcae06d16853a73d48f98a7b534089173568ca5248cbaecb0",
+      "sha256": "31c95df45e2150731413c2cbd90f3023b8f8ca39447a2a57d9e2bdf30a783fbb",
       "component": "Dice2Icon",
       "symbol": "rounded-dice-2"
     },
@@ -15979,7 +15979,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "9c56662c27437a25262196d16fcbee649c21439e2c3ea1a550d888e156d148d3",
+      "sha256": "8a314377e3cd7cbad46588bb907ddd45b7b100201eaab1d987d5bbf60d72b3b7",
       "component": "Dice3Icon",
       "symbol": "rounded-dice-3"
     },
@@ -16002,7 +16002,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "44a60b928d1a2178d71a9f0044c05f7f636c355a9fdafe86383628a82d49283e",
+      "sha256": "0a3adc149f48970f73b2a1e2498c9a2828415151ad455010adee63b104a870b3",
       "component": "Dice4Icon",
       "symbol": "rounded-dice-4"
     },
@@ -16025,7 +16025,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "167636c5c58505555a51139170f713110e624513c24af29cc32da6949a14a7f4",
+      "sha256": "36d97775fd337ecc8d8b7289b78ee813604222dbd167deab773732367b6e436e",
       "component": "Dice5Icon",
       "symbol": "rounded-dice-5"
     },
@@ -16048,7 +16048,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "ca9dcf25a7398ab989846891331a592118bb8b425f274722c278dcd49e0adb84",
+      "sha256": "11a44ac08a4502750b5c8e34479bf57cd70749b6c7145401ee48abe6af927488",
       "component": "Dice6Icon",
       "symbol": "rounded-dice-6"
     },
@@ -16220,7 +16220,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "fd1a1a1b27e0d71a5026a8681e40af276ca8f2a765e8eef884bd62e24eb3c6f2",
+      "sha256": "afdc531f9c419cc194e7862bbf46dd282e08192f1275a2c4e089a629411cc221",
       "component": "DiscAlbumIcon",
       "symbol": "rounded-disc-album"
     },
@@ -16377,7 +16377,7 @@
         "V3"
       ],
       "lucideCanonical": false,
-      "sha256": "c97eb1532eeb6bff12e669db7d9d5a35ebab47ab167d406d99ae17cc3370fef9",
+      "sha256": "c7c01d1ee77796deb0610ed5b829b3db0ea957c64a0a12182460f0af58018be2",
       "component": "DocumentScanIcon",
       "symbol": "rounded-document-scan"
     },
@@ -16399,7 +16399,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "6fb320f3cbdef007b05cc0bd211888b0b7b36b1c845d9be4fd9782e9ed9596e0",
+      "sha256": "35040681db1fdd3b7e758237aa10a19bfcf8b59afcd1ddb77f58cc1366e32659",
       "component": "DogIcon",
       "symbol": "rounded-dog"
     },
@@ -17047,7 +17047,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "311dd65643a6bba977518ca2600ec4f203c9c429458e49749d563508008b1a64",
+      "sha256": "3118a61c3d4e52ca78725ca000906057a8ce39ee4cc178d2adcca469ef934aac",
       "component": "EarthLockIcon",
       "symbol": "rounded-earth-lock"
     },
@@ -17271,7 +17271,7 @@
         "V3"
       ],
       "lucideCanonical": false,
-      "sha256": "d5b6a2981dba79794157b16b5e72e8ed4ce8952adca79e1ee73fa073a36b3d41",
+      "sha256": "612aec5d23bae13f78d9462ee7617e8a82159ff02233c9280a33d6353668f872",
       "component": "ElectronicSignatureIcon",
       "symbol": "rounded-electronic-signature"
     },
@@ -17386,7 +17386,7 @@
         "V4"
       ],
       "lucideCanonical": false,
-      "sha256": "dfb82e14044ea8422d196a78d81bd9d93a2f525d136fcdae5eec1f2965d1aed2",
+      "sha256": "c92a400c8207751116fb8d8bd66cd271c7b270d846801a859bb7f9d79e93b2f4",
       "component": "EmbeddedInsuranceIcon",
       "symbol": "rounded-embedded-insurance"
     },
@@ -17416,7 +17416,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "dc137860d55f6aeaecaaf20dfa0c6f8da14dbab7237535c2b0d145c3a4ec61d0",
+      "sha256": "0010c423f5bad6cdc92fda4a1dd2e95d55ebec035803902b4da9773a40be8006",
       "component": "EngineIcon",
       "symbol": "rounded-engine"
     },
@@ -18624,7 +18624,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "92370936e53cc5167a1317be369278b2e087ac4c6c48b442440f01ed9d95f60a",
+      "sha256": "7c2047066afca6336fe28f0800ba16ddd3ad1e80cb9afaae4559f54fc1c9999d",
       "component": "FileDownIcon",
       "symbol": "rounded-file-down"
     },
@@ -18644,7 +18644,7 @@
         "V3"
       ],
       "lucideCanonical": false,
-      "sha256": "92370936e53cc5167a1317be369278b2e087ac4c6c48b442440f01ed9d95f60a",
+      "sha256": "7c2047066afca6336fe28f0800ba16ddd3ad1e80cb9afaae4559f54fc1c9999d",
       "component": "FileDownloadIcon",
       "symbol": "rounded-file-download"
     },
@@ -18894,7 +18894,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "1bb0c6b68233d41e949a8ec2b683aee5f749fd5b3c58185a633a23e6e82a312c",
+      "sha256": "661c2011f50ea444c18fcf843a8e917e83504a8cf1f706ab4e6f8914a65d292d",
       "component": "FilePenIcon",
       "symbol": "rounded-file-pen"
     },
@@ -19125,7 +19125,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "9541f517d2723fbff8027bb3e506466d592915136a338801952bf3af188fba6a",
+      "sha256": "32600f7638424f700eb66b5696b540f35f4b7a59ee5276c993d858fc7bfc3973",
       "component": "FileSpreadsheetIcon",
       "symbol": "rounded-file-spreadsheet"
     },
@@ -19273,7 +19273,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "f775a7c8502625720e8d31434e512cdd0d8958aba86e40f9b814f53d61f654c7",
+      "sha256": "36edfe12bd0a8c80d5eaa744ee7dcb3831331071589fd3c4e5d88de37051bb43",
       "component": "FileUpIcon",
       "symbol": "rounded-file-up"
     },
@@ -19293,7 +19293,7 @@
         "V3"
       ],
       "lucideCanonical": false,
-      "sha256": "f775a7c8502625720e8d31434e512cdd0d8958aba86e40f9b814f53d61f654c7",
+      "sha256": "36edfe12bd0a8c80d5eaa744ee7dcb3831331071589fd3c4e5d88de37051bb43",
       "component": "FileUploadIcon",
       "symbol": "rounded-file-upload"
     },
@@ -19485,7 +19485,7 @@
         "V3"
       ],
       "lucideCanonical": false,
-      "sha256": "989505fee27eae16c57a90754ba4e47069fe130d49ed1d13b5a11d7ec6f6d23c",
+      "sha256": "3fe12be6dac057d1f46ecf8c130cfe812b3936566bbcd910a146d667e2b5e6b9",
       "component": "FilterIcon",
       "symbol": "rounded-filter"
     },
@@ -20754,7 +20754,7 @@
         "V13"
       ],
       "lucideCanonical": true,
-      "sha256": "c63477a03f86f38a59548a148bf59b0ebd4c63ecb86d93e4e5890944c21112b4",
+      "sha256": "65518644b181544aeebfea4f0616b9d8575c9f08a13851c0847c7741f3f97293",
       "component": "FolderSyncIcon",
       "symbol": "rounded-folder-sync"
     },
@@ -21310,7 +21310,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "204c2851c1b42cb392edf85ccaafdfe808bb8cf28b00cc0a133bf60458e28b8f",
+      "sha256": "7c4c447cb362dbe842bee4c1eb09c382f49d38b70668f849659f14eaa262f90a",
       "component": "GalleryVerticalIcon",
       "symbol": "rounded-gallery-vertical"
     },
@@ -21338,7 +21338,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "3a071872c1225dd7af68472c25ca42ab2efb51857be7ac802f0f3dca1fe6f930",
+      "sha256": "709c3c2744b2479895c94345ccc4c5fc689ec85625ebcb6f9046337b19130b88",
       "component": "GalleryVerticalEndIcon",
       "symbol": "rounded-gallery-vertical-end"
     },
@@ -21509,7 +21509,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "087dfde9e5507fabfb0819392215100f13dfdd4117b9653c756100b75ff77f7e",
+      "sha256": "3f5f16036bf244ef08e65c70c0a7fdd72a51912988994f27642f9b6378b2934b",
       "component": "GavelIcon",
       "symbol": "rounded-gavel"
     },
@@ -21539,7 +21539,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "d68f954cef5259a1221f0d563b7aa75252fe38c966c421957532624b17c3eaef",
+      "sha256": "f81c8aa38f22e1fe1051b88927aca2e40f9959795b24e6411d235e2d2c02a1e7",
       "component": "GemIcon",
       "symbol": "rounded-gem"
     },
@@ -22194,7 +22194,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "3bbc49cc3f06ba6bdfe2923ef299cac4bdf705c7d93eec1d4e4bb938e5d9ec40",
+      "sha256": "a5656e4172d87794210f6c83ce8af397cf9b7025b18cab22f66df361fd7ba4f5",
       "component": "GlobeCheckIcon",
       "symbol": "rounded-globe-check"
     },
@@ -22224,7 +22224,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "aed2b44d4716990f840bef6e5e0b5d24fc70df00389a240f06650935c769a82f",
+      "sha256": "05f5ef77a0cfab5d0e57f5075fd163278a1b7af8d5d34d278ba22fa5dc8a6edb",
       "component": "GlobeCodeIcon",
       "symbol": "rounded-globe-code"
     },
@@ -22251,7 +22251,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "a4c7d1c1fa32d294eae6d00afcf03f9fedc9bd1ee7459d8c1fc472537637c8a9",
+      "sha256": "8a7d7fb14125f19046d07409e51284b3768862299b958142ff079a4d243f4189",
       "component": "GlobeLockIcon",
       "symbol": "rounded-globe-lock"
     },
@@ -22288,7 +22288,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "5da145abdddaf7b91c51b2037aee385adc51a719515899b80cc78267e08f6cc6",
+      "sha256": "9cf2e919ca63d3dec9f68af9400ea010b49d08b77c92ef4093f53354fe1a6fd5",
       "component": "GlobeOffIcon",
       "symbol": "rounded-globe-off"
     },
@@ -22315,7 +22315,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "65372c42b05741c3b4984c1de34ebb94eeb6d65ae3f7fc7ca5005e2a9e18e3c5",
+      "sha256": "d3c8bfc55093f68e005937cd94dac982fa83a911fc4b139bf676cd1b5f25e6f5",
       "component": "GlobeXIcon",
       "symbol": "rounded-globe-x"
     },
@@ -22668,7 +22668,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "0454beef9b0c838361e5b5b880f6b8222c61cd103c522bdf639855fc035ecfa9",
+      "sha256": "7b74b3cebebd3e425dd269e20b9baf8f20d093f0b29d421ac20f5d0c9eceab26",
       "component": "Grid3x2Icon",
       "symbol": "rounded-grid-3x2"
     },
@@ -22688,7 +22688,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "a65dec53d9ba68390ea1a0bca0ec146fb15a11745cc74a9b969cc030004c51e9",
+      "sha256": "aead1477d35126f2192f84d116a2896b4771e7ee1726eaca3bb648f7e7b3dda1",
       "component": "Grid3x3Icon",
       "symbol": "rounded-grid-3x3"
     },
@@ -24463,7 +24463,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "286fa3b90b2c677d89fda62ded27e20bf54439b4df3d9170192b0f8f6a77fd90",
+      "sha256": "a704dc4d0719ada6ac75b5cddb9f61f1df55d3081ef8e517225a537410b174cd",
       "component": "IceCreamConeIcon",
       "symbol": "rounded-ice-cream-cone"
     },
@@ -24899,7 +24899,7 @@
         "V3"
       ],
       "lucideCanonical": false,
-      "sha256": "4123cdc44ac9cfac13c8132f6c9c307f97434c8fa98482c1ef4168939dc2d175",
+      "sha256": "c42f444e23d7942f07924a99004146e2eadaaeb1489b1feca2f78acbf7c2db37",
       "component": "InsuranceAccidentIcon",
       "symbol": "rounded-insurance-accident"
     },
@@ -24920,7 +24920,7 @@
         "V3"
       ],
       "lucideCanonical": false,
-      "sha256": "18c9c721d9432f0ec8c387d5d29adbf2aefe2fe5d6098decc9e0e6f61624ddc1",
+      "sha256": "680c0953cf7573c5c5e6a79a2118c7262dae2039933a22522cd443dea914836d",
       "component": "InsuranceAgentIcon",
       "symbol": "rounded-insurance-agent"
     },
@@ -24963,7 +24963,7 @@
         "V4"
       ],
       "lucideCanonical": false,
-      "sha256": "44ee8702ca7e0e4104d491763fe8e1d8c5d7a92caa707c7367ab5ac75191f175",
+      "sha256": "ca63d2600ebce100e361b43ae4384fc90905e6a602f4285c3932bc62f9ea76ea",
       "component": "InsuranceAutoIcon",
       "symbol": "rounded-insurance-auto"
     },
@@ -25068,7 +25068,7 @@
         "V3"
       ],
       "lucideCanonical": false,
-      "sha256": "d8c20a0391ec2e4550ea641cfb155d682c4991457f734286751fcd561a46db03",
+      "sha256": "e043e4bea0d3a2a863189e80508a49604b5aa69712f921f9ebee160ff2045d1b",
       "component": "InsuranceEngineeringIcon",
       "symbol": "rounded-insurance-engineering"
     },
@@ -25089,7 +25089,7 @@
         "V3"
       ],
       "lucideCanonical": false,
-      "sha256": "37a38a6ab811598b4277bf9cc209545fab0db1b75b0bee91eb23f3ba7f6ddf4b",
+      "sha256": "5056c0ece06369bbda20ceacd3d5b09fa1a0e11c09562c40b90aaf296cc0a454",
       "component": "InsuranceHealthIcon",
       "symbol": "rounded-insurance-health"
     },
@@ -25153,7 +25153,7 @@
         "V3"
       ],
       "lucideCanonical": false,
-      "sha256": "94934c4176b8a38c31c1148ecc261b8da12a273d5ab4eb19a31ee7d5e47284e9",
+      "sha256": "d6d6c0857fc47e9f9b04f3f09e59212f1998d936c15118645dea002220cb4c8f",
       "component": "InsuranceLifeIcon",
       "symbol": "rounded-insurance-life"
     },
@@ -25195,7 +25195,7 @@
         "V3"
       ],
       "lucideCanonical": false,
-      "sha256": "8a518daa1c063e4c12b9dea513f975978f0368d5762815fec95fad372424c4ee",
+      "sha256": "d5bf389057bd7d1950c4d80cefa569180faa30113eaaff12260c361abe9bf165",
       "component": "InsuranceNeedsIcon",
       "symbol": "rounded-insurance-needs"
     },
@@ -25363,7 +25363,7 @@
         "V3"
       ],
       "lucideCanonical": false,
-      "sha256": "7defac02d137aade767025038d16158c63e7ce620fb0f489fe2f708cf08c6b04",
+      "sha256": "215c10daaaba3abed4b08512d4d0a1b7dd4d68deef22d487c82a16dcd2903a91",
       "component": "InsuredPersonIcon",
       "symbol": "rounded-insured-person"
     },
@@ -25696,7 +25696,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "1d1359890fcd558389e2bf3f29e70f81cd75d4ea621f324161960001be51d818",
+      "sha256": "d303276a8fa3eaaa90bfe819d43722ddeec832bd1321bbd11cbed9d63ec7e952",
       "component": "KeyboardMusicIcon",
       "symbol": "rounded-keyboard-music"
     },
@@ -26073,7 +26073,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "6b64b4673cf4ef6ad6ae1a63901a6788c337e627710417135e9756c1ce3472ef",
+      "sha256": "6928d7c4c2674e86f9e08dd242711e426f452af4aa1c2c47b0b209e0b95e28d5",
       "component": "LassoSelectIcon",
       "symbol": "rounded-lasso-select"
     },
@@ -27312,7 +27312,7 @@
         "V3"
       ],
       "lucideCanonical": false,
-      "sha256": "5c3db86e8369f91ac4ba70e105d601eb34a831158182f13931e5c5181c0f6feb",
+      "sha256": "63c0bb2725e732139a14bf39958e5011550f2ba3f99a617a4bc0025936ab970b",
       "component": "ListBulletsIcon",
       "symbol": "rounded-list-bullets"
     },
@@ -27689,7 +27689,7 @@
         "V13"
       ],
       "lucideCanonical": true,
-      "sha256": "7294ceaa8f8348a116cee605c606e5542746cd6c4ec2a20fead0a755322395d3",
+      "sha256": "97ddda8015ee7cbc75b54d0293bec2845d9db2c5405d97e5b26c5ba864127a21",
       "component": "ListRestartIcon",
       "symbol": "rounded-list-restart"
     },
@@ -28057,7 +28057,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "f2ef9f8c1924be576660d5e58dbef9c1c536eaeb87425820675b0f8b357fdf10",
+      "sha256": "a8b4be985e74326b3efc0256058ab9301d5b5752f631e0ea89f5292e87154977",
       "component": "LockKeyholeOpenIcon",
       "symbol": "rounded-lock-keyhole-open"
     },
@@ -28075,7 +28075,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "caf85d0aa31a4e80c0fcb5851dd73f97c26d59b91e8bfb65b6505a48b09d9f91",
+      "sha256": "ae593ebf3293d29c4d365f68482ec962f69d75beac20d17d213a3e95059c7211",
       "component": "LockOpenIcon",
       "symbol": "rounded-lock-open"
     },
@@ -28493,7 +28493,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "f3f53e6710d103fd5127bd2d2a15558fa112326528492e469eef3b096914592f",
+      "sha256": "ea167479546f1b76ced035c1439c9a6a931e72cfa1b379f77f6a43bbc7f12b4a",
       "component": "MailQuestionMarkIcon",
       "symbol": "rounded-mail-question-mark"
     },
@@ -28535,7 +28535,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "26109c64982b87f5e7d595a08a823d05c9869ed8f5a9535b929847ecbc4b32a6",
+      "sha256": "81d993b7a8f1aec061b43f61f9452b16ba9ed090755a60daf252b2e36f78ce66",
       "component": "MailWarningIcon",
       "symbol": "rounded-mail-warning"
     },
@@ -28646,7 +28646,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "e0929d157ef1ad8bd39fbacf2304152361dc17468ae2dec35ff809fc6d12c690",
+      "sha256": "befe0e9fcb6fb5ebae9d7584c1d8baecd2eedbfed4f7a0359391bb66e12e3955",
       "component": "MapMinusIcon",
       "symbol": "rounded-map-minus"
     },
@@ -28693,7 +28693,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "fddf30a3748f9f4cfeb26024e1934fee6711d11ac26d142b08387fe7d0dd7e4a",
+      "sha256": "d88b40960ee4ba881ac01404acd4b7924cb9bfa2d2e1e802a79227babd7d0178",
       "component": "MapPinCheckIcon",
       "symbol": "rounded-map-pin-check"
     },
@@ -28754,7 +28754,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "2d2660050079441f0cde5293f4de74b34824c9762127b495f852d8d767681d97",
+      "sha256": "5f961bc35b85e7017b362ca75ea2f0e1b98fc7c18e278d4dd234159df8025346",
       "component": "MapPinHouseIcon",
       "symbol": "rounded-map-pin-house"
     },
@@ -28778,7 +28778,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "fadf2365fdd35d7a539d426a1da0715d1bf353f5586bd6d83cf114ff986220e4",
+      "sha256": "9def1e717c4a1cb878cea58f08f653eaa96a9ad15075fcf786a7a9cad6042006",
       "component": "MapPinMinusIcon",
       "symbol": "rounded-map-pin-minus"
     },
@@ -28844,7 +28844,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "9eb4bc99e6cacb0d3a6c6bc0599d1a737bf2e2dc47591b0288a0aee2d6f057a9",
+      "sha256": "1a5a7dadee1a6fffca67b46e6d61e49122828b43ee3f965c2d9f829617e774a0",
       "component": "MapPinPenIcon",
       "symbol": "rounded-map-pin-pen"
     },
@@ -28868,7 +28868,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "096ac6f04e5a9acb571231030139828273aad73ba766a42791fce99584fbae36",
+      "sha256": "751f12ff8d96d7deb352822f26957aa003089434035432ee83e4cbd32ab33d5b",
       "component": "MapPinPlusIcon",
       "symbol": "rounded-map-pin-plus"
     },
@@ -28915,7 +28915,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "a80b668fb0258a474d2bd119494b6859f52d2c65c7551f0fdc9dd04f0532fcc5",
+      "sha256": "e7286c1f6e7d88d18fd3d7c1ead06ec5572dff741b6fd012c850a779da603fec",
       "component": "MapPinSearchIcon",
       "symbol": "rounded-map-pin-search"
     },
@@ -28939,7 +28939,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "49cfa9b386a38c5ea414a201bcb1cda352de7e0262a630ea4a02ed1baaa6b3d4",
+      "sha256": "24c4309ffffd57d9f33148e88977bd425cf4238ebdf85e8f1afe761be15ad135",
       "component": "MapPinXIcon",
       "symbol": "rounded-map-pin-x"
     },
@@ -29007,7 +29007,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "0d77f954d4da59375fe18c2e757a5cb873b6ffa6afc129bc55bffb1f9ecb1331",
+      "sha256": "6044f99688ecbdbe4735dd8e1ec0c763a53814a499a0d75d64ebe9baf5da43e5",
       "component": "MapPlusIcon",
       "symbol": "rounded-map-plus"
     },
@@ -29100,7 +29100,7 @@
         "V5"
       ],
       "lucideCanonical": false,
-      "sha256": "74edaf1b809bf6dab8caccf44c9c1b762e4ced2047fd9a6e31364f0a88630cf8",
+      "sha256": "c01646c6c7ade17283d38bef550f86d4edc079eba9720ed6f68ac53b8da46699",
       "component": "MaturityBenefitIcon",
       "symbol": "rounded-maturity-benefit"
     },
@@ -31141,7 +31141,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "1a4152145c2e256cce782ef93904c7d638068f7aa99e6a55b351422105264bce",
+      "sha256": "5bf9aaa020ae42eda5c43a2307df5552535435adc68a4fc028f476cb95671ee9",
       "component": "MonitorPcIcon",
       "symbol": "rounded-monitor-pc"
     },
@@ -31233,7 +31233,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "084a3fe9a546c51943fa9c32d49c8eb114aa832538997b74ddd6301fb6f709f0",
+      "sha256": "8634d21c16caabb90bbcc0760418c89cdc4ae0356a5a2647bf6430f34c6cfb3a",
       "component": "MonitorSpeakerIcon",
       "symbol": "rounded-monitor-speaker"
     },
@@ -32309,7 +32309,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "c1636ea62c0a838acf608180a57254bd40ded2ef9e354e256f61b5e2ab79d4bb",
+      "sha256": "ff2351d75654b1b7e25aa4baf298e8cb40162fb626385ed71399ef1a3a1d1fe0",
       "component": "NfcIcon",
       "symbol": "rounded-nfc"
     },
@@ -32655,7 +32655,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "b69d436259fdca5971acf635becf20c27cb9c71b82af7f94b0e1e49efa7b220e",
+      "sha256": "e34480cda8326b426e44c1544e2a4061aeff5589c9a2c2f3cc6369997cad7635",
       "component": "OctagonAlertIcon",
       "symbol": "rounded-octagon-alert"
     },
@@ -33086,7 +33086,7 @@
         "V3"
       ],
       "lucideCanonical": false,
-      "sha256": "7caa160a05c8b4564ccdd59a25652847f013b7fa185a8861a12b9f193613f37e",
+      "sha256": "0685f7ab0cd152679bb4f4267ffaa191ff7fd84ee2dec62ebc37ee37ff2207cb",
       "component": "OriginalContactIcon",
       "symbol": "rounded-original-contact"
     },
@@ -33106,7 +33106,7 @@
         "V3"
       ],
       "lucideCanonical": false,
-      "sha256": "3d4cc15e1a8d4384828d3b9a3c353935a5ba946a7bbaec4cf784b6c25c7d7429",
+      "sha256": "bf4882e7dae1123b4f1159f6dcd0fe498cedcb5b8734e371d05e50ab08309e8e",
       "component": "OriginalContainerIcon",
       "symbol": "rounded-original-container"
     },
@@ -33127,7 +33127,7 @@
         "V9"
       ],
       "lucideCanonical": false,
-      "sha256": "8417ea49f889fd7e15031194c6b070f706ece472aa52e239337437d2f6acf34f",
+      "sha256": "aa171f8d39e2ee809e33de23353cb5004abf384c14b918a33f8ee1cb42f86f8c",
       "component": "OriginalDatabaseBackupIcon",
       "symbol": "rounded-original-database-backup"
     },
@@ -33210,7 +33210,7 @@
         "V3"
       ],
       "lucideCanonical": false,
-      "sha256": "8dea06d6f1d84a417c9711189f5cbb9be010e9e0b572f044fdc09f5b93c3dd9d",
+      "sha256": "a9385aeb40b227bbac29cf635d3373dc0dfa75ab7a77ed8b4716398f8db3b14c",
       "component": "OriginalLockIcon",
       "symbol": "rounded-original-lock"
     },
@@ -33395,7 +33395,7 @@
         "V3"
       ],
       "lucideCanonical": false,
-      "sha256": "0f7ace0333ae78ffe1d75dd78339f9437b2527fa3ab2fcd37a7d3d50a6f1632a",
+      "sha256": "1f92da9b629c8a76235ee3a05173322361b2dce6f189f81e42e46cb3c9af39df",
       "component": "OriginalUserIcon",
       "symbol": "rounded-original-user"
     },
@@ -33416,7 +33416,7 @@
         "V3"
       ],
       "lucideCanonical": false,
-      "sha256": "928cf322b969b3cd5ec98a25d6ce2ac5df41465a8dd9366b1d39f1b791c13390",
+      "sha256": "ea0dab9eb6448ebe888c840aa99d33ea9696b28b902cd4c3170fae0f8bfdc9d5",
       "component": "OriginalUserCheckIcon",
       "symbol": "rounded-original-user-check"
     },
@@ -33436,7 +33436,7 @@
         "V3"
       ],
       "lucideCanonical": false,
-      "sha256": "8c2fe8319af311ca265f7a88174dd5628e522860bcd1a4d16503e8f9c9ebfb2a",
+      "sha256": "9e0db5323745ad95066c21fa2d8efaeb72cbfa8b989400cbac8df02dead47498",
       "component": "OriginalUserMinusIcon",
       "symbol": "rounded-original-user-minus"
     },
@@ -33457,7 +33457,7 @@
         "V3"
       ],
       "lucideCanonical": false,
-      "sha256": "a29fdbe402fedfa083f0d45d2ce42d4ee2c05bac7a0b5506066021aaa116bb15",
+      "sha256": "c8a1fe176b951572498458b7ed95146e77a047a01eba9085af67368c1a86815d",
       "component": "OriginalUserPlusIcon",
       "symbol": "rounded-original-user-plus"
     },
@@ -33477,7 +33477,7 @@
         "V3"
       ],
       "lucideCanonical": false,
-      "sha256": "ea51f29ba6edd76296da86f84ce707c9b7c02ad75da618d8abb2339c03afb4a2",
+      "sha256": "b4995adddbcfeeb042b8856ea37381a9879e139f18db721f79c0e1f8705c099e",
       "component": "OriginalUserSearchIcon",
       "symbol": "rounded-original-user-search"
     },
@@ -33497,7 +33497,7 @@
         "V3"
       ],
       "lucideCanonical": false,
-      "sha256": "2aaa6118cf744e70e2c4c2b6e024c62016e55eaa8aad207701840ef61b1f8430",
+      "sha256": "8524f1c2915d1bea0c9f7366d3f2029a5849466dfb5e06a80671c1c232c185c0",
       "component": "OriginalUserXIcon",
       "symbol": "rounded-original-user-x"
     },
@@ -33518,7 +33518,7 @@
         "V3"
       ],
       "lucideCanonical": false,
-      "sha256": "ed6bfd7f6152ceeb30910bfbc49c2bb097073b8749e16c7a678ad3446efd89c0",
+      "sha256": "fc659a268edb359d1a20813f67c04d19a139752a84ec99491e4e2a07b1447ac1",
       "component": "OriginalUsersIcon",
       "symbol": "rounded-original-users"
     },
@@ -34792,7 +34792,7 @@
         "V3"
       ],
       "lucideCanonical": false,
-      "sha256": "62a86f79a76c4e926e86957966a8d0bbceb77a3ec1a99b00eb0442a5e7bcaa07",
+      "sha256": "2ad17d9780ac2396a1494b2589cd8f2b339c6c858d0195da5fe3dc7d98097548",
       "component": "PaymentOverdueIcon",
       "symbol": "rounded-payment-overdue"
     },
@@ -35005,7 +35005,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "52114c36211524188f21b8a06e33cf29d957614de7a3e5a1b1cea345a916a05a",
+      "sha256": "dcff9b520048bce35b94cb947853a11aa781d450d760b9fb847c9bd674b21112",
       "component": "PencilLineIcon",
       "symbol": "rounded-pencil-line"
     },
@@ -35084,7 +35084,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "d95dc02209b3a76cb39237363e65d39e99a2fa5cecdc80ad9f617c07fefc2ff7",
+      "sha256": "10813460ec158438f3da17f352c292d3d03e1537000df87b19dc411abb8d1a30",
       "component": "PencilRulerIcon",
       "symbol": "rounded-pencil-ruler"
     },
@@ -36066,7 +36066,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "259139528d9b14b1508b6b4d2e384530a4244c97dbead999c5338e455b35d35f",
+      "sha256": "8d512601584801ee74edd405a631a32231921775594835b351c49bcff4a63d2d",
       "component": "PlayingCardsFanIcon",
       "symbol": "rounded-playing-cards-fan"
     },
@@ -36572,7 +36572,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "1f52b4fc98cbc694306574bdd7907e09afe2073fe0e965908b0194bedd413a38",
+      "sha256": "b42646092e854cf6780b0bde1c6b0d7dbea916a5391b3ea707ff29026f304e21",
       "component": "PopcornIcon",
       "symbol": "rounded-popcorn"
     },
@@ -36655,7 +36655,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "e228e7d41845218dee91e435958e7e15f82c78f066f52df22f8564733b1f04da",
+      "sha256": "9912d30ef7fffd7b7d9cccdc7e70b89f1aa0561abd2dfe10689022b7bd90bebd",
       "component": "PowerOffIcon",
       "symbol": "rounded-power-off"
     },
@@ -36833,7 +36833,7 @@
         "V3"
       ],
       "lucideCanonical": false,
-      "sha256": "a1ba30efa0561d6b20f6da3417b50f1d306e7de92ca06068d68c55e91de1adcf",
+      "sha256": "f56df79290ec197a53e1200fd4db661c2ab239783caece5f9566d1ae58548614",
       "component": "PricingAdjustmentIcon",
       "symbol": "rounded-pricing-adjustment"
     },
@@ -36890,7 +36890,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "db41ab9682f771b890ed76ab1974f5b58b0e10d824a1e35028283e97f2830775",
+      "sha256": "bb848385e0389ffb0053eba4de01e35e6948edadbd8a621a8d7e8f1ec216790b",
       "component": "Printer3dIcon",
       "symbol": "rounded-printer-3d"
     },
@@ -37352,7 +37352,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "327af835a70bca02aba9f9e74e04a59807b7d82817d387a8cbc5caca2eff182f",
+      "sha256": "f6e0ab7047733b87969c5562adc4b88902e2cabbd4579791840ec53d300ce4cb",
       "component": "RadiationIcon",
       "symbol": "rounded-radiation"
     },
@@ -37398,7 +37398,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "c8df554e808ca1500cda9a63ed35227c7b1e637630cf0060e6f14fbc02e1e6fc",
+      "sha256": "f203b5a22fd8cb4eda6117736b92ce931e782648c9f45fc3df036a9f596aa84a",
       "component": "RadioIcon",
       "symbol": "rounded-radio"
     },
@@ -37463,7 +37463,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "3faac8462ec4a36cea5e9748068c9aa8f68a266053e295fc96391008f54d2dbf",
+      "sha256": "c170820c8581719a7b44f86b7d569a32599bda8796192cb08fb4b1a8b84e0b8e",
       "component": "RadioOffIcon",
       "symbol": "rounded-radio-off"
     },
@@ -38183,7 +38183,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "32340dbf356de7a55d1fff555a60dda24aed7fae72cca660af530c90fcc9a5ab",
+      "sha256": "27bfe38e2c2727f6f956fba65fa755a076513854de8cb0e361670a7d12a0f988",
       "component": "RefreshCcwDotIcon",
       "symbol": "rounded-refresh-ccw-dot"
     },
@@ -38595,7 +38595,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "b5e7faa5ba0e00845a14a453d4638bef1cd0b76e8fd0abca118de04fca444ed7",
+      "sha256": "713f1823d790cd7ee118828f201a9f9c3fde833b1993a3b8e885da668c782ab5",
       "component": "ReplaceIcon",
       "symbol": "rounded-replace"
     },
@@ -38616,7 +38616,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "fc71314ba6eb0ccfd0820e7df573881441b6a3f552ddd050a4ee9de98e13398c",
+      "sha256": "e828ce0cb61041b14494a405fc004bd41937d2f7d716c7f285ed2ab54271d506",
       "component": "ReplaceAllIcon",
       "symbol": "rounded-replace-all"
     },
@@ -38762,7 +38762,7 @@
         "V3"
       ],
       "lucideCanonical": false,
-      "sha256": "d4dfa0dcb8c73e73315070194e9584f9255c00b78632e232cbfeb8425e8c25e9",
+      "sha256": "556fe15a1db78e9cc392b2e09baee18a61539c3e5120006e99b156fd8dec6e72",
       "component": "RiskQuestionnaireIcon",
       "symbol": "rounded-risk-questionnaire"
     },
@@ -39716,7 +39716,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "bd88d0559447c0edcc8a8b1ebba6b97de9957630c8cb00768796f2fff2a27cde",
+      "sha256": "831fed9886595a0d2f715d7c0c3eef72ea98552021ac199be25aaeaa7affd16f",
       "component": "SatelliteIcon",
       "symbol": "rounded-satellite"
     },
@@ -40307,7 +40307,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "268cef56fc8a6ca47e53bd32f2b95b94d1dfd0a17edb981394dc1410e32c6d55",
+      "sha256": "64bac607e07abd76f42c94235ec22ef048b51b4255f679f26f853666e2c229ad",
       "component": "SchoolIcon",
       "symbol": "rounded-school"
     },
@@ -40586,7 +40586,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "f29d8a2ed1fd91f12bb0bc039f7bfa89d864c0d99aaa9110ee579abeff22e778",
+      "sha256": "529a14772b9093d9b73da5f6169c91bbe3a3a475858daff599c2e627182793ea",
       "component": "SearchAlertIcon",
       "symbol": "rounded-search-alert"
     },
@@ -40869,7 +40869,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "c2ec9d46f26db8a056f48e9962362135e05d875b78ff4d5ff344c72a4dadba17",
+      "sha256": "de57dd764a13a0615a57e83f37c9d9a500af396bdf55e66fc5bb81c4f29f0906",
       "component": "ServerCogIcon",
       "symbol": "rounded-server-cog"
     },
@@ -40890,7 +40890,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "413f2ff39b7b513fd323047f0dc30399544eac14fa416493bc249a7977df0498",
+      "sha256": "d21666e6814231703e5a04df85aa3cbdcb7026aed4f539bcb86e7dfc70fa6ab1",
       "component": "ServerCrashIcon",
       "symbol": "rounded-server-crash"
     },
@@ -40960,7 +40960,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "de34f4ba14600a22fcb622ab277149bdff90276504fedfc0c00da3e650c95f03",
+      "sha256": "f5b3b25179b3016f4ad3dac520d82bb4c2d6edc8bc438341594e3e42434b89fe",
       "component": "ServerPlusIcon",
       "symbol": "rounded-server-plus"
     },
@@ -40983,7 +40983,7 @@
         "V4"
       ],
       "lucideCanonical": false,
-      "sha256": "be92536382c84e47a79a89c0d1a0738baa5ae3ce840f7999b46409010c2ad119",
+      "sha256": "47d68c8b7fb4ee70fe43d7763892c798c5bdf597f52aa674717fb98c26fcb942",
       "component": "ServiceNetworkIcon",
       "symbol": "rounded-service-network"
     },
@@ -41132,7 +41132,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "a470a39c0c712090f7b19749f292ab2f6fcc71f702f502780b4cc3e4036e376d",
+      "sha256": "d967f8b673c2f752bbaae2e39c339be7146f4b4560fc8c9d20a7e9d8d1839bff",
       "component": "SheetIcon",
       "symbol": "rounded-sheet"
     },
@@ -41509,7 +41509,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "31a046612b725e5e173103af15bdb1686e165487469b517c1c94e7fac9b068be",
+      "sha256": "f42746959a12894659c45940057d0cde2b28b22905c0e9642d481ddf25611f46",
       "component": "ShieldEllipsisIcon",
       "symbol": "rounded-shield-ellipsis"
     },
@@ -41895,7 +41895,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "2ad6192b9048689c574851e215e48d185fd5f05ad727da8975ac247d865c8042",
+      "sha256": "39d90974ce55b9d09184e3f380a00767c5a92be0c82a4507dbd2887df9c69c8d",
       "component": "ShieldQuestionMarkIcon",
       "symbol": "rounded-shield-question-mark"
     },
@@ -42038,7 +42038,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "35f658fc3fa8a59ea162bfb91c159117b9851c4e111c5cce6d9f0a73880d18ec",
+      "sha256": "394b48873dc17ae2c8007e9e394f8143e0973a469f1833c05d0a1b9c2867ec5b",
       "component": "ShipWheelIcon",
       "symbol": "rounded-ship-wheel"
     },
@@ -42241,7 +42241,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "ea38c4776ffa810697f3a00cf6b28dc67f3ccab94db2ee95135f4b1461ec8f76",
+      "sha256": "0bc9e0c68093fd0e15f90617b5f5f44f923abe4d62e8e03b97ee3bfe20304870",
       "component": "ShowerHeadIcon",
       "symbol": "rounded-shower-head"
     },
@@ -43181,7 +43181,7 @@
         "V3"
       ],
       "lucideCanonical": false,
-      "sha256": "8edaa8215ca71fdad41595485d715e10dda23cc80239511567c0916f5766ba31",
+      "sha256": "f7ec889da8a4bac5a4f936077f81c1ffef59abf72f3ae3303e71ab005cddfb2e",
       "component": "SortAscendingIcon",
       "symbol": "rounded-sort-ascending"
     },
@@ -43202,7 +43202,7 @@
         "V3"
       ],
       "lucideCanonical": false,
-      "sha256": "2434937abdf26e4f07e7f346d7d6eef6d98bd9c1821e41e4c7a45ceb192914e0",
+      "sha256": "489e6a4052f8012217ef8041a461f6f1ba846ebca767dc38d8882063a0fb2278",
       "component": "SortDescendingIcon",
       "symbol": "rounded-sort-descending"
     },
@@ -43366,7 +43366,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "57508d182fed4fe52daa2f0915cb91a75c4668f03f53f4667296a78f63a4704b",
+      "sha256": "c66807ab970df1f7568f7e4b803c7fa9edeac1225381ca7741832e162ab12352",
       "component": "SpeechIcon",
       "symbol": "rounded-speech"
     },
@@ -44676,7 +44676,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "f8cfa3b48514ba85ed872411910496851ed165785d89d6175262bc2e22dac547",
+      "sha256": "e8de7d6eeddacf0c4f9bbe2f0e6bee28b6cbc8b32861deda72ab09dd35304039",
       "component": "SquareDivideIcon",
       "symbol": "rounded-square-divide"
     },
@@ -45100,7 +45100,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "16477a547f0cc1ff98bd10f0d4a6afe5cacde3083e395c6111751753b0042091",
+      "sha256": "79316618f68be35fc1b8dceb7699e0e41b00484396127a07b75a876aeda4868d",
       "component": "SquarePercentIcon",
       "symbol": "rounded-square-percent"
     },
@@ -45379,7 +45379,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "52e7daee50fe0797c7079266ef59ce5e0902ca1e7d688258f749a21810c1054c",
+      "sha256": "ee7350aaed0e053eefc3e5d9f7016ae1515a3e34b84fbad93e1a79c7f8e42b8f",
       "component": "SquareSparklesIcon",
       "symbol": "rounded-square-sparkles"
     },
@@ -45512,7 +45512,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "89703fad5b8ba9c85d09cf488c0ed13fafa1a6841e0cff7f858d9c2de1383859",
+      "sha256": "02c1fbad2367a182819cce202ecd1f3dd1b8c1a37263843967d9323689d5957f",
       "component": "SquareStopIcon",
       "symbol": "rounded-square-stop"
     },
@@ -46632,7 +46632,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "7eb66f5ea46766502e86e8d83f628e4eb5d0988048d72aa6982d848442dd29ca",
+      "sha256": "6132a663517c7b9ce36eb926c6051b6b9e0024c0060ab3e257e58ea7d9560dc4",
       "component": "SunMoonIcon",
       "symbol": "rounded-sun-moon"
     },
@@ -46655,7 +46655,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "9283e6d857817769914cf28bef0ad347bc7eb8755640ab25d4cf505116b57937",
+      "sha256": "6e0146fa79eb2ec67cb35af3361a000d64ec030e2bd777abdd900ab2cdcd7fe7",
       "component": "SunSnowIcon",
       "symbol": "rounded-sun-snow"
     },
@@ -46859,7 +46859,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "69ef7e1feb1b5d4181e7925b4015f3cdb9a25217f83a04173da5e65fb6129a11",
+      "sha256": "1d725e4051e6132636b86c6df18d388d75bf697f07ceaae62edd0dd9ce12fb98",
       "component": "SwordsIcon",
       "symbol": "rounded-swords"
     },
@@ -46883,7 +46883,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "083bcbce7cec424c5ce2aa13d97a3d776169a49d69d23415cd32861daac12cc5",
+      "sha256": "674cc9bd52434f3fc832d571bc3ac835657d18b230a5f031e67c79df5aef7b56",
       "component": "SyringeIcon",
       "symbol": "rounded-syringe"
     },
@@ -46943,7 +46943,7 @@
         "V3"
       ],
       "lucideCanonical": false,
-      "sha256": "1c5841f48b0a65bb768bd1d4508a5fa3ed641e2a761fec8af690cc669d397941",
+      "sha256": "5e01e6b76752d98b0a6005872ff7f251572f580e918d514a83763b45d4459f48",
       "component": "TableAddColumnIcon",
       "symbol": "rounded-table-add-column"
     },
@@ -46963,7 +46963,7 @@
         "V3"
       ],
       "lucideCanonical": false,
-      "sha256": "762a4d264933131e25063899aca645304f651f631ca3587acf5314c986a7d84e",
+      "sha256": "d94323420a50619da1986e9d9b7a9487ce72930fc72042515fa6cd642e954623",
       "component": "TableAddRowIcon",
       "symbol": "rounded-table-add-row"
     },
@@ -46983,7 +46983,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "2ca2633b1b47ae37118a004ac2f9d2a4335fbc42662edf16376d8eaddad757d2",
+      "sha256": "c953cd8b4d17357811a95b7c63ae69adb261ac3116380ea7ebd8a6543a5fee53",
       "component": "TableCellsMergeIcon",
       "symbol": "rounded-table-cells-merge"
     },
@@ -47003,7 +47003,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "86ffc4f8c1003f9ad6c737c7d8b1b4b62750e3e5ee68f3db29490232c6b8df97",
+      "sha256": "0058955678354ac6483f04b87a78e9a823f5196e55aee3deb3f03260d6609f0c",
       "component": "TableCellsSplitIcon",
       "symbol": "rounded-table-cells-split"
     },
@@ -47047,7 +47047,7 @@
         "V3"
       ],
       "lucideCanonical": false,
-      "sha256": "1cfc3f95fa22a070076404efe241ba2b8204287eba2fad6b43c6303f8e13cb35",
+      "sha256": "6fde06dc826570ff86b5dda67d085d49f63bd649b55f2111832d0f0b3e5d99f0",
       "component": "TableDeleteColumnIcon",
       "symbol": "rounded-table-delete-column"
     },
@@ -47067,7 +47067,7 @@
         "V3"
       ],
       "lucideCanonical": false,
-      "sha256": "70e10d89d726d2c8f83031b14ecedb2bce92debe01a44d895f03a112a5bea9fd",
+      "sha256": "d9d9cafe4e5380310059e6870cc6cf1864c388cdd7069e608cf1b463741a36f7",
       "component": "TableDeleteRowIcon",
       "symbol": "rounded-table-delete-row"
     },
@@ -47121,7 +47121,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "0bdb90c55f932997b49d9eb708576bcf6e48fa152806b6528072f3dc2935e939",
+      "sha256": "5f6ecf2283e8e255f7eae02d0f5e8989b6d34c100fb31b3b6bc676ffe7230b35",
       "component": "TablePropertiesIcon",
       "symbol": "rounded-table-properties"
     },
@@ -47311,7 +47311,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "26260ebd6c04e0d8ab509364c9eb2d798c62d287e61c0030fabb817c371b1bdd",
+      "sha256": "7c13be21516bf77b79d97255a9e07e99983a49deadca1782eef180e51f15ff1d",
       "component": "TagsIcon",
       "symbol": "rounded-tags"
     },
@@ -47659,7 +47659,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "7267fd58ab17b936a327df3b8101d92ebe49ec0b30531e9a4041cc9f0bc88dce",
+      "sha256": "d5bdda71e1fda416d580d45971c012a4c18c0c46c9aa21383c4caac8ed0e8017",
       "component": "TestTubeDiagonalIcon",
       "symbol": "rounded-test-tube-diagonal"
     },
@@ -47726,7 +47726,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "258fc13d3daee428fa0439f1405d1fffedeea31dfd35d511bc1e8b2b9ff1eda6",
+      "sha256": "ebc8a43786f6f8d15b87f5b862574e3ff374ba174fd881f2569cce578b64da2b",
       "component": "TextAlignEndIcon",
       "symbol": "rounded-text-align-end"
     },
@@ -47844,7 +47844,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "bc10e8f6ff4737c2124a298e6337cd247cd83f7ac1ca3493959eb5eb08090a20",
+      "sha256": "60b11b5ba6d32f650d480bd143d91781bb41f7f58b3024099f91b85f972abb8d",
       "component": "TextAlignStartIcon",
       "symbol": "rounded-text-align-start"
     },
@@ -48278,7 +48278,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "0d569dbc95ac6222f923e6f21ac1798f17ab85630c86a54bfc0e8000c71ca189",
+      "sha256": "a70dd049070f5507bf1a2357bcf7f7ff911beacafe91a0f8635f9096bece57f7",
       "component": "TicketPercentIcon",
       "symbol": "rounded-ticket-percent"
     },
@@ -48446,7 +48446,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "0ed31d2d4a92576d7bf2d1c2fc9977cd1431b1531e0a48777bce60156858ef82",
+      "sha256": "9ccfd013c4ad7e4fbf82e104a7055c33be8f20b5a9affb62b0abb0a5a9095bd0",
       "component": "TicketsPlaneIcon",
       "symbol": "rounded-tickets-plane"
     },
@@ -48465,7 +48465,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "3c40e9464167fabff37ed0d20910561a540009eb1225bcf344eeff0927af4dd9",
+      "sha256": "21b482d8e0196f7231ad2003d0e2d08277808efadb679542c55e0437932f09e5",
       "component": "TimelineIcon",
       "symbol": "rounded-timeline"
     },
@@ -48644,7 +48644,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "f202135ac44c4a043d4d7c0108c9ec236d61c000b99b86622c28ce593116bf63",
+      "sha256": "c67367e4bbfba4abfc8c527c03d0b7ca06d565f13bb54ff884956232a9a675e1",
       "component": "ToolCaseIcon",
       "symbol": "rounded-tool-case"
     },
@@ -49539,7 +49539,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "55f20d9855ef420f557001267bef065d5377899eb66dca0f229543c80fbdc69f",
+      "sha256": "a008a0a4cc37a85fbee5e48689bf55b00a7a73981afdf958cb514be7f384b355",
       "component": "TruckElectricIcon",
       "symbol": "rounded-truck-electric"
     },
@@ -49645,7 +49645,7 @@
         "V4"
       ],
       "lucideCanonical": true,
-      "sha256": "12a7ab8dbfbe62649949585cfdf6cf97f7600f8ede1e7b9c6d7d2cf830c3350f",
+      "sha256": "d80dd139a9d7be1bce039050ccbb9ae9ec983abacb1bac3e4d7a5e639910348f",
       "component": "TurtleIcon",
       "symbol": "rounded-turtle"
     },
@@ -50179,7 +50179,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "41f67b46d9e2558f19f0458118f3efc705370ee28a4295442fece504961115d8",
+      "sha256": "63c2292db0326dfaa0b5310919a1cacba4b1ecb609dac4bc6abc522209d4c35d",
       "component": "UnlinkIcon",
       "symbol": "rounded-unlink"
     },
@@ -50219,7 +50219,7 @@
         "V3"
       ],
       "lucideCanonical": false,
-      "sha256": "f2ef9f8c1924be576660d5e58dbef9c1c536eaeb87425820675b0f8b357fdf10",
+      "sha256": "a8b4be985e74326b3efc0256058ab9301d5b5752f631e0ea89f5292e87154977",
       "component": "UnlockIcon",
       "symbol": "rounded-unlock"
     },
@@ -50396,7 +50396,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "f152ccdaee240ac53714c5cbdefa3c0c4ec98abefdfda9693067474a92f8a5e1",
+      "sha256": "6bb58c12307dadfbd4f663d39c4e19b626d30be3ae9d3f2d9db9c18ca7423aac",
       "component": "UserCogIcon",
       "symbol": "rounded-user-cog"
     },
@@ -50429,7 +50429,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "1c62df69c1f71ef1536afc2633a449c67849e2130f622e4704b98b2d2f77fef5",
+      "sha256": "576ba9a7bec0dcbb1cdee68389bdc981b22f46c8eaab4864329c1b34afd9a0b0",
       "component": "UserGroupIcon",
       "symbol": "rounded-user-group"
     },
@@ -50481,7 +50481,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "4788304ac81ae4c8d474e6e48f8c20d9867bafaf82af7a44ff24b02a6be6331b",
+      "sha256": "6e558f97a86e48cafbc6f9b70294fe355ba4096a4623377344748ecb7ba5b192",
       "component": "UserLockIcon",
       "symbol": "rounded-user-lock"
     },
@@ -50502,7 +50502,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "71953e485665e2d70f3e2f04d6708435d716be7028b416a487d17bb4cea0b7e6",
+      "sha256": "9e0db5323745ad95066c21fa2d8efaeb72cbfa8b989400cbac8df02dead47498",
       "component": "UserMinusIcon",
       "symbol": "rounded-user-minus"
     },
@@ -50547,7 +50547,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "ce5cc5f5be9b8f846721d2dc6437915f776c5401de40d223835873e26174a9a7",
+      "sha256": "c8a1fe176b951572498458b7ed95146e77a047a01eba9085af67368c1a86815d",
       "component": "UserPlusIcon",
       "symbol": "rounded-user-plus"
     },
@@ -50643,7 +50643,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "9fb49fafd1373e727aad1feb1771ec089f2ca8111f9e31e466e68596233f5bfb",
+      "sha256": "c11f7ec03d55ce87763eb7decc520e8b300c80fbe72b86e43ebf390a0802be2e",
       "component": "UserRoundCogIcon",
       "symbol": "rounded-user-round-cog"
     },
@@ -50676,7 +50676,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "a79b42dc68f66632e001657f97f0c7ab684ad60743e665458b67aa469e280b09",
+      "sha256": "576ba9a7bec0dcbb1cdee68389bdc981b22f46c8eaab4864329c1b34afd9a0b0",
       "component": "UserRoundGroupIcon",
       "symbol": "rounded-user-round-group"
     },
@@ -50898,7 +50898,7 @@
         "V3"
       ],
       "lucideCanonical": false,
-      "sha256": "56f51ac23d1c138887e6ad584159fde0370c00f265e873e583510f537ab2312d",
+      "sha256": "9665a5be7e4490d4eaa66aa0fb281edecd4ba6168057ca8a25436cb941ff5acc",
       "component": "UserSettingsIcon",
       "symbol": "rounded-user-settings"
     },
@@ -51023,7 +51023,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "06b81a06f6060f111c2ae666159c9f5072904fabcb1d3b19224753d42356bdd3",
+      "sha256": "aa682128f8054720019ed156e1a25984126248e7f52c316337a05eccbb21f170",
       "component": "UsersCollaborationIcon",
       "symbol": "rounded-users-collaboration"
     },
@@ -51074,7 +51074,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "52283fdc50216ef69ad025db1932b211cd7632ccdfa98885f54963fe061dd23d",
+      "sha256": "aa682128f8054720019ed156e1a25984126248e7f52c316337a05eccbb21f170",
       "component": "UsersRoundCollaborationIcon",
       "symbol": "rounded-users-round-collaboration"
     },
@@ -51270,7 +51270,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "948ed4ecda12974c2f3d50d7a2f308fa5629efb0b2f3568721e93166d356f374",
+      "sha256": "3b75dd48814a43c431f6ccf3f963a7dad59812505374ef851cbf1f50bc30613e",
       "component": "VectorPolygonIcon",
       "symbol": "rounded-vector-polygon"
     },
@@ -51477,7 +51477,7 @@
         "V3"
       ],
       "lucideCanonical": false,
-      "sha256": "775f91ca243e6cee0e097a98084ce1e2c4a03372f68fccaec82a57a5c5ad9956",
+      "sha256": "4437086f7ae4a92817abf4dc646a25aa96e3bc7f41d3c52d8d347d914f5426da",
       "component": "VideoCallIcon",
       "symbol": "rounded-video-call"
     },
@@ -51929,7 +51929,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "4234e978d3f8fe82a53d377249d13cf0549c9f1356f705119b2d90ce1c8cd18d",
+      "sha256": "3486e0ebbbe1625ea297739ef0db9497dad27e0442a0d96bcd778e05749c3587",
       "component": "WallpaperIcon",
       "symbol": "rounded-wallpaper"
     },
@@ -52018,7 +52018,7 @@
         "V3"
       ],
       "lucideCanonical": true,
-      "sha256": "215f2910822baaffa8e2738f749ebd180c6aee450260496e29ba75d6220f5676",
+      "sha256": "11ad521f17eee8b2b3d7ea4da94e9fdd1ddd49be259a0b94f433e370832ceb2c",
       "component": "WashingMachineIcon",
       "symbol": "rounded-washing-machine"
     },
@@ -52649,7 +52649,7 @@
         "V13"
       ],
       "lucideCanonical": true,
-      "sha256": "89919c0339e68abb46015f3cf20f97d014c836cd2d4564c2cfcd8dacbb5823cb",
+      "sha256": "f78e8dc925432cec22414e86a6957d29b5136669c515786340d864d2ba7a73e0",
       "component": "WifiSyncIcon",
       "symbol": "rounded-wifi-sync"
     },
@@ -53423,6 +53423,110 @@
     "artworkThrough": "2026-10-26 V13",
     "canonicalCatalog": "lucide-static@1.61.0",
     "canonicalCount": 1903,
-    "extraCount": 262
+    "extraCount": 262,
+    "refinement": {
+      "revision": "svg-v13-refinement.1",
+      "basedOn": "svg-v13-complete"
+    }
+  },
+  "catalogAliases": {
+    "alarm": "alarm-clock",
+    "alarm-off": "alarm-clock-off",
+    "align-center-horizontal": "align-middle",
+    "align-end-horizontal": "align-bottom",
+    "align-start-horizontal": "align-top",
+    "ban": "prohibit",
+    "chart-bar-horizontal": "chart-bar",
+    "circle": "radio-button",
+    "circle-alert": "alert-circle",
+    "circle-check": "check-circle",
+    "circle-dot": "radio-button-selected",
+    "circle-question-mark": "help-circle",
+    "columns-2": "layout-columns",
+    "dollar-sign": "currency-dollar",
+    "ellipsis": "more-horizontal",
+    "ellipsis-vertical": "more-vertical",
+    "ethernet-port": "ethernet",
+    "euro": "currency-euro",
+    "face-slightly-frowning": "frown",
+    "face-slightly-smiling": "smile",
+    "file-chart-column": "file-chart",
+    "file-down": "file-download",
+    "file-music": "file-audio",
+    "file-up": "file-upload",
+    "fingerprint-pattern": "fingerprint",
+    "git-commit-horizontal": "git-commit",
+    "grid": "layout-grid",
+    "house": "home",
+    "languages": "language",
+    "list-bullets": "list",
+    "list-indent-decrease": "indent-decrease",
+    "list-indent-increase": "indent-increase",
+    "lock-keyhole-open": "unlock",
+    "message-square-check": "message-check",
+    "message-square-plus": "message-plus",
+    "message-typing": "message-square-more",
+    "messages-square": "messages",
+    "minus-circle": "circle-minus",
+    "original-accessibility": "person-standing",
+    "original-arrow-left-right": "arrow-right-left",
+    "original-audio-waveform": "audio-lines",
+    "original-battery": "battery-medium",
+    "original-briefcase": "briefcase-business",
+    "original-calendar-plus": "calendar-plus-2",
+    "original-chart-bar": "chart-column",
+    "original-code": "code-xml",
+    "original-contact": "contact-round",
+    "original-container": "container",
+    "original-database-backup": "database-backup",
+    "original-git-compare": "git-compare-arrows",
+    "original-layout-list": "list",
+    "original-lock": "lock-keyhole",
+    "original-network": "chart-network",
+    "original-paintbrush": "brush",
+    "original-picture-in-picture": "picture-in-picture-2",
+    "original-receipt": "receipt-text",
+    "original-share": "share-2",
+    "original-terminal": "square-terminal",
+    "original-user": "user",
+    "original-user-check": "user-check",
+    "original-user-minus": "user-minus",
+    "original-user-plus": "user-plus",
+    "original-user-search": "user-search",
+    "original-user-x": "user-x",
+    "original-users": "users",
+    "original-video": "clapperboard",
+    "original-volume": "volume-2",
+    "original-volume-off": "volume-x",
+    "original-wand": "wand-sparkles",
+    "original-workflow": "network",
+    "pause-circle": "circle-pause",
+    "pencil": "edit",
+    "pilcrow": "paragraph",
+    "play-circle": "circle-play",
+    "plus-circle": "circle-plus",
+    "refresh-cw": "refresh",
+    "repeat-1": "repeat-one",
+    "rotate-ccw": "rotate-left",
+    "rotate-cw": "rotate-right",
+    "rows-2": "layout-rows",
+    "sidebar-left": "panel-left",
+    "sidebar-right": "panel-right",
+    "sixteenth-notes": "music",
+    "square": "checkbox",
+    "square-check": "checkbox-checked",
+    "square-minus": "checkbox-indeterminate",
+    "text-align-center": "align-center",
+    "text-align-justify": "align-justify",
+    "tool-case": "toolbox",
+    "train-front": "train",
+    "triangle-alert": "alert-triangle",
+    "user-circle": "circle-user-round",
+    "user-round-group": "user-group",
+    "users-round-collaboration": "users-collaboration",
+    "volume-1": "volume-low",
+    "wifi-high": "wifi",
+    "x": "close",
+    "x-circle": "circle-x"
   }
 }

@@ -11,7 +11,7 @@ export const PopcornIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="M5 10h14l-2 11H7ZM9 10l1 11M15 10l-1 11M5 10c-4-3 0-7 3-5 0-5 8-5 8 0 4-2 7 3 3 5"/>
+        <path d="M5.5 10.8h13l-1.8 9.7H7.3Zm4.5 0 .7 9.7m3.3-9.7-.7 9.7M5.5 10.8a2.9 2.9 0 0 1 2.7-4.3 3.8 3.8 0 0 1 7.6 0 2.9 2.9 0 0 1 2.7 4.3"/>
         {children}
       </svg>
     );

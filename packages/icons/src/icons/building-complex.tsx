@@ -11,7 +11,7 @@ export const BuildingComplexIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, Ico
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="M3 21V9h7V3h11v18ZM10 9v12M6 12v1M6 16v1M14 7h3M14 11h3M14 15h3M14 21v-3h3v3"/>
+        <path d="M3.5 20.5V9.5H10V3.5h10.5v17ZM10 9.5v11m3.8-12.6h3m-3 4.2h3m-3 4.2h3"/>
         {children}
       </svg>
     );

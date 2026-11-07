@@ -11,7 +11,7 @@ export const PowerOffIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="M12 3v5M18 5a8 8 0 0 1 2 12M5 8a8 8 0 0 0 12 12"/><path d="M3 3l18 18"/>
+        <path d="M12 3.5v5.2M17.9 6a8.5 8.5 0 0 1 2 9.7M5.2 8.7a8.5 8.5 0 0 0 10.5 11.1M3.4 3.4l17.2 17.2"/>
         {children}
       </svg>
     );

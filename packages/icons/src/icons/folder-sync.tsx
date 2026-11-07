@@ -11,7 +11,7 @@ export const FolderSyncIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProp
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="M17 6h-5L9 3H5q-2 0-2 2v14q0 2 2 2h3"/><path strokeWidth="1.5" d="M20.5 16.677A5.75 5.75 0 1 1 17.875 10.02L21 13M21 9v4h-4"/>
+        <path d="M17 6h-5L9 3H5q-2 0-2 2v14q0 2 2 2h3"/><path d="M20.5 16.677A5.75 5.75 0 1 1 17.875 10.02L21 13M21 9v4h-4"/>
         {children}
       </svg>
     );

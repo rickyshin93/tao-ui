@@ -11,7 +11,7 @@ export const TagsIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="M3 3h8l9 9-8 8-9-9ZM15 4l7 7-1 3M4 15l7 7"/><circle cx="7.3" cy="7.3" r="1.3"/>
+        <path d="M3.5 4.1h7.1l8.1 8.1-6.9 7L3.5 11Zm10.6-.5 6.9 6.9q1.5 1.5 0 3l-.9.9"/><path d="M7.15 8h0.3"/>
         {children}
       </svg>
     );

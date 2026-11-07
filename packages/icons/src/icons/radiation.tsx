@@ -11,7 +11,7 @@ export const RadiationIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <circle cx="12" cy="12" r="1.7"/><path d="M9 8.5 6 3.5a10 10 0 0 0-4 9h6M15 8.5l3-5a10 10 0 0 1 4 9h-6M9 15.5l-3 5a10 10 0 0 0 12 0l-3-5"/>
+        <circle cx="12" cy="12" r="1.7"/><path d="m9 8.5-2.4-4a8.7 8.7 0 0 0-3.3 7.4H8m7-3.4 2.4-4a8.7 8.7 0 0 1 3.3 7.4H16m-6.7 3.8-2.5 4.1a9 9 0 0 0 10.4 0l-2.5-4.1"/>
         {children}
       </svg>
     );

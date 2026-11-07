@@ -11,7 +11,7 @@ export const Dice1Icon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <rect x="3.3" y="3.3" width="17.4" height="17.4" rx="2.3"/><circle cx="12" cy="12" r="1.1" fill="currentColor" stroke="none"/>
+        <rect x="3.3" y="3.3" width="17.4" height="17.4" rx="2.3"/><circle cx="12" cy="12" r="1.12" fill="currentColor" stroke="none"/>
         {children}
       </svg>
     );

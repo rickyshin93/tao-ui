@@ -11,7 +11,7 @@ export const TableDeleteRowIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, Icon
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <rect x="3.4" y="3.4" width="17.2" height="10.2" rx="1.8"/><path d="M3.6 8.5h16.8M9.2 3.6v9.8"/><path d="M9.9 19h4.2"/>
+        <rect x="3.6" y="3.3" width="16.8" height="9.6" rx="1.5"/><path d="M9.3 3.3v9.6m0-4.8h11.1"/><path d="M9.4 18.5h5.2"/>
         {children}
       </svg>
     );

@@ -11,7 +11,7 @@ export const OriginalDatabaseBackupIcon = /* @__PURE__ */ forwardRef<SVGSVGEleme
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="M19 7c0 2-3.1 3.5-7 3.5S5 9 5 7s3.1-3.5 7-3.5 7 1.5 7 3.5ZM5 7v10c0 2 3.1 3.5 7 3.5M19 7v4M5 12C5 13.7 7.24 15.04 10.31 15.4M16 21v-7m-3 3 3-3 3 3"/>
+        <ellipse cx="10" cy="5.5" rx="6.4" ry="2.8"/><path d="M3.6 5.5v11.7c0 2 3.3 3.3 7.8 3.3m5-15v5.8M3.6 11.4q3.8 3.8 9.6 2.2"/><path d="M14.8 16.8h3.7a2.4 2.4 0 1 1 0 4.8h-1.2m-.1-7.2-2.4 2.4 2.4 2.4"/>
         {children}
       </svg>
     );

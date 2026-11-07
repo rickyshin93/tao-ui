@@ -11,7 +11,7 @@ export const SquarePercentIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconP
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <rect x="3.4" y="3.4" width="17.2" height="17.2" rx="2"/><path d="m8 16 8-8"/><circle cx="8" cy="8" r="0.8" fill="currentColor" stroke="none"/><circle cx="16" cy="16" r="0.8" fill="currentColor" stroke="none"/>
+        <rect x="3.4" y="3.4" width="17.2" height="17.2" rx="2"/><path d="m8.6 15.4 6.8-6.8"/><path d="M8.025 8.35h0.65"/><path d="M15.325 15.65h0.65"/>
         {children}
       </svg>
     );

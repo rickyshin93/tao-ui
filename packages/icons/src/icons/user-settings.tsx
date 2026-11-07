@@ -11,7 +11,7 @@ export const UserSettingsIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconPr
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <circle cx="10" cy="6.7" r="3.2"/><path d="M3.4 20v-2.2c0-3 2.3-5 6.6-5 2 0 3.6.4 4.8 1.3"/><path d="M16 16h5M18 14v4M15 21h6M19 19v2"/>
+        <circle cx="8.7" cy="7" r="3.25"/><path d="M3.5 20v-2q0-4.1 5.2-4.1 2.1 0 3.3.65"/><path d="M15 14.8h6m-3.9-1.7v3.4M15 19.6h6m-2.1-1.7v3.4"/>
         {children}
       </svg>
     );

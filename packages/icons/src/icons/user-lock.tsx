@@ -11,7 +11,7 @@ export const UserLockIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <circle cx="9" cy="6" r="3"/><path d="M3 21v-3q0-5 6-5 1 0 2 .2"/><rect x="14" y="17" width="8" height="6" rx="1.4"/><path d="M16 17v-2a2 2 0 0 1 4 0v2"/>
+        <circle cx="8.7" cy="7" r="3.25"/><path d="M3.5 20v-2q0-4.1 5.2-4.1 2.1 0 3.3.65"/><rect x="14.4" y="16.2" width="6.8" height="5.2" rx="1.05"/><path d="M15.9 16.2v-1.6a1.9 1.9 0 0 1 3.8 0v1.6"/>
         {children}
       </svg>
     );

@@ -11,7 +11,7 @@ export const UserGroupIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <circle cx="12" cy="5" r="2.8"/><circle cx="4.5" cy="9" r="2"/><circle cx="19.5" cy="9" r="2"/><path d="M7 21v-3a5 5 0 0 1 10 0v3M1 20v-2q0-4 4-4M23 20v-2q0-4-4-4"/>
+        <circle cx="12" cy="6.3" r="2.9"/><circle cx="4.5" cy="10.3" r="1.7"/><circle cx="19.5" cy="10.3" r="1.7"/><path d="M7.1 20.5v-1.8q0-4.3 4.9-4.3t4.9 4.3v1.8m-14-1.1v-1.1q0-2.4 2-3.2m16.2 4.3v-1.1q0-2.4-2-3.2"/>
         {children}
       </svg>
     );

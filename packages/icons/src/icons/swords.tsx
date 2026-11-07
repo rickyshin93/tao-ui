@@ -11,7 +11,7 @@ export const SwordsIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="M3 3h5l13 13-5 5L3 8ZM4 18l2 2M6 16l4 4M3 21l3-3M16 3h5v5l-6 6M10 15l-4 4M14 4l3 3"/>
+        <path d="M3.5 3.5H8l11 11-4.5 4.5-11-11Zm9.3 13.8 4.5-4.5M15.4 4.8l1.3-1.3h3.8V8l-3 3m-9.1 3.6-4.9 4.9m-.2-3.3 4.5 4.5"/>
         {children}
       </svg>
     );

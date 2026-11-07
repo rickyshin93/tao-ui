@@ -11,7 +11,7 @@ export const CannabisIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="M12 22v-7M12 16C5 17 4 12 3 10l6 2C5 8 7 5 7 4l4 6C10 5 11 3 12 2c1 1 2 3 1 8l4-6c0 1 2 4-2 8l6-2c-1 2-2 7-9 6Z"/>
+        <path d="M12 21v-5m0 1c-4.8-.4-7-2.6-7.7-6l4.8 1.5C7.7 10.1 7.1 8 7.4 5.8l3.3 3.7C10.7 6.2 11 4.4 12 3c1 1.4 1.3 3.2 1.3 6.5l3.3-3.7c.3 2.2-.3 4.3-1.7 6.7l4.8-1.5c-.7 3.4-2.9 5.6-7.7 6Z"/>
         {children}
       </svg>
     );

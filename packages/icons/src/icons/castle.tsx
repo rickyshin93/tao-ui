@@ -11,7 +11,7 @@ export const CastleIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="M3 21V8h3V4h3v4h6V4h3v4h3v13ZM3 13h18M10 21v-4a2 2 0 0 1 4 0v4"/>
+        <path d="M3.6 20.5v-12h3V4.1h3.2v4.4h4.4V4.1h3.2v4.4h3v12ZM9.8 20.5v-3.4a2.2 2.2 0 0 1 4.4 0v3.4"/>
         {children}
       </svg>
     );

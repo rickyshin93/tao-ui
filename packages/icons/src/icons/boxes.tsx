@@ -11,7 +11,7 @@ export const BoxesIcon = /* @__PURE__ */ forwardRef<SVGSVGElement, IconProps>(
     return (
       <svg {...svgProps} ref={ref}>
         {title ? <title id={titleId}>{title}</title> : null}
-        <path d="m12 3 4 2v4l-4 2-4-2V5ZM8 5l4 2 4-2M12 7v4M3 14l4-2 4 2v4l-4 2-4-2Zm0 0 4 2 4-2M7 16v4M13 14l4-2 4 2v4l-4 2-4-2Zm0 0 4 2 4-2M17 16v4"/>
+        <path d="m12 3 3.7 2v4l-3.7 2-3.7-2V5ZM7.2 12.2l3.7 2v4l-3.7 2-3.7-2v-4Zm9.6 0 3.7 2v4l-3.7 2-3.7-2v-4Z"/>
         {children}
       </svg>
     );
