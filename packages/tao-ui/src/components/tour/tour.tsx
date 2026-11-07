@@ -10,7 +10,9 @@ import {
   type ReactNode,
   useEffect,
   useId,
+  useLayoutEffect,
   useRef,
+  useState,
 } from 'react';
 import {
   TaoPortalScope,
@@ -90,7 +92,9 @@ function TourPanel({
   actionsRender,
   classes,
   styles,
-  modal,
+  masked,
+  disabledInteraction,
+  stepActions,
 }: {
   step: TourStepProps;
   current: number;
@@ -99,12 +103,23 @@ function TourPanel({
   actionsRender: TourProps['actionsRender'];
   classes: TourSemanticType['classNames'];
   styles: TourSemanticType['styles'];
-  modal: boolean;
+  masked: boolean;
+  disabledInteraction?: boolean;
+  stepActions?: TourStepProps;
 }) {
   const { locale, mode, compact, tokenStyle } = useTaoInternalConfig();
   const titleId = useId();
   const descriptionId = useId();
   const panelRef = useRef<HTMLDivElement>(null);
+  const [hasTarget, setHasTarget] = useState(false);
+  useLayoutEffect(() => {
+    if (!masked || disabledInteraction) return;
+    const target =
+      typeof step.target === 'function' ? step.target() : step.target;
+    const available = Boolean(target);
+    if (available !== hasTarget) setHasTarget(available);
+  });
+  const modal = masked && (disabledInteraction || !hasTarget);
   const {
     total = 1,
     title,
@@ -139,8 +154,10 @@ function TourPanel({
           variant={primary ? 'ghost' : 'secondary'}
           {...prevButtonProps}
           onClick={(event) => {
-            step.onPrev?.();
             prevButtonProps?.onClick?.(event);
+            if (event.defaultPrevented) return;
+            stepActions?.onPrev?.();
+            step.onPrev?.();
           }}
         >
           {prevButtonProps?.children ?? locale.previous}
@@ -151,9 +168,15 @@ function TourPanel({
         variant={primary ? 'secondary' : 'primary'}
         {...nextButtonProps}
         onClick={(event) => {
-          if (last) step.onFinish?.();
-          else step.onNext?.();
           nextButtonProps?.onClick?.(event);
+          if (event.defaultPrevented) return;
+          if (last) {
+            stepActions?.onFinish?.();
+            step.onFinish?.();
+          } else {
+            stepActions?.onNext?.();
+            step.onNext?.();
+          }
         }}
       >
         {nextButtonProps?.children ?? (last ? locale.done : locale.next)}
@@ -196,7 +219,10 @@ function TourPanel({
                 {...closeAttrs}
                 className={cn.close}
                 style={st.close}
-                onClick={step.onClose}
+                onClick={() => {
+                  stepActions?.onClose?.();
+                  step.onClose?.();
+                }}
               >
                 {closeIcon ?? step.closeIcon ?? <CloseIcon />}
               </button>
@@ -290,30 +316,50 @@ export function Tour(props: TourProps) {
     rootClassName,
     keyboard = true,
     zIndex,
+    open,
+    defaultOpen,
+    onClose,
     ...rest
   } = props;
+  const [innerOpen, setInnerOpen] = useState(defaultOpen ?? true);
   const cn =
     typeof classNames === 'function' ? classNames({ props }) : classNames;
   const st = typeof styles === 'function' ? styles({ props }) : styles;
   const layer =
     zIndex ??
     'calc(var(--tao-z-index-base) + var(--tao-z-index-popup-base) + 170)';
-  const mergedSteps = steps.map((step) => ({
-    ...step,
-    style: {
-      ...tokenStyle,
-      position: 'absolute' as const,
-      zIndex: layer,
-      width: 360,
-      maxWidth: 'calc(100vw - 24px)',
-      ...style,
-      ...step.style,
-    },
-    className: cx(className, step.className),
-  }));
+  // The engine spreads step props after its navigation callbacks.
+  const mergedSteps = steps.map(
+    ({
+      onClose: _close,
+      onFinish: _finish,
+      onNext: _next,
+      onPrev: _prev,
+      ...step
+    }) => ({
+      ...step,
+      scrollIntoViewOptions:
+        step.scrollIntoViewOptions ?? props.scrollIntoViewOptions,
+      style: {
+        ...tokenStyle,
+        position: 'absolute' as const,
+        zIndex: layer,
+        width: 360,
+        maxWidth: 'calc(100vw - 24px)',
+        ...style,
+        ...step.style,
+      },
+      className: cx(className, step.className),
+    }),
+  );
   return (
     <RcTourComponent
       {...rest}
+      open={open ?? innerOpen}
+      onClose={(current) => {
+        if (open === undefined) setInnerOpen(false);
+        onClose?.(current);
+      }}
       prefixCls={prefixCls}
       steps={mergedSteps}
       keyboard={keyboard}
@@ -339,21 +385,20 @@ export function Tour(props: TourProps) {
           ))
       }
       rootClassName={rootClassName}
-      classNames={{ mask: cn?.mask }}
+      classNames={{ mask: cx('tao-tour-mask-layer', cn?.mask) }}
       styles={{ mask: { ...tokenStyle, zIndex: layer, ...st?.mask } }}
       renderPanel={(step, current) => (
         <TourPanel
           step={step as TourStepProps}
+          stepActions={steps[current]}
           current={current}
           type={type}
           classes={cn}
           styles={st}
           indicatorsRender={indicatorsRender}
           actionsRender={actionsRender}
-          modal={
-            (steps[current]?.mask ?? props.mask) !== false &&
-            (props.disabledInteraction === true || !steps[current]?.target)
-          }
+          masked={(step.mask ?? props.mask) !== false}
+          disabledInteraction={props.disabledInteraction}
         />
       )}
     />

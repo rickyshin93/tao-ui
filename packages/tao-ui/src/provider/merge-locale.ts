@@ -4,6 +4,12 @@ import { enUS, zhCN } from './locale';
 
 export type ResolvedTaoLocale = TaoLocale & { messages: TaoMessages };
 
+function defined<T extends object>(value: T | undefined): Partial<T> {
+  return Object.fromEntries(
+    Object.entries(value ?? {}).filter(([, entry]) => entry !== undefined),
+  ) as Partial<T>;
+}
+
 /** rc Form groups contain templates; override individual templates, not siblings. */
 export function mergeValidateMessages(
   parent: ValidateMessages | undefined,
@@ -12,13 +18,13 @@ export function mergeValidateMessages(
   if (!override) return parent;
   return {
     ...parent,
-    ...override,
-    date: { ...parent?.date, ...override.date },
-    types: { ...parent?.types, ...override.types },
-    string: { ...parent?.string, ...override.string },
-    number: { ...parent?.number, ...override.number },
-    array: { ...parent?.array, ...override.array },
-    pattern: { ...parent?.pattern, ...override.pattern },
+    ...defined(override),
+    date: { ...parent?.date, ...defined(override.date) },
+    types: { ...parent?.types, ...defined(override.types) },
+    string: { ...parent?.string, ...defined(override.string) },
+    number: { ...parent?.number, ...defined(override.number) },
+    array: { ...parent?.array, ...defined(override.array) },
+    pattern: { ...parent?.pattern, ...defined(override.pattern) },
   };
 }
 
@@ -46,8 +52,12 @@ export function mergeLocale(
           pickerLocale: legacy.pickerLocale,
         }
       : {}),
-    ...override,
-    messages: { ...parent.messages, ...legacy?.messages, ...override.messages },
+    ...defined(override),
+    messages: {
+      ...parent.messages,
+      ...legacy?.messages,
+      ...defined(override.messages),
+    },
     form: mergeValidateMessages(legacy?.form ?? parent.form, override.form),
   };
 }

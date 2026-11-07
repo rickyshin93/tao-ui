@@ -163,7 +163,8 @@
   [data-tao-timeline][data-tao-orientation="horizontal"]
     [data-tao-timeline-item] {
     flex: 1;
-    padding: 0 16px 0 0;
+    padding: 0;
+    padding-inline-end: 16px;
   }
   [data-tao-timeline][data-tao-orientation="horizontal"]
     [data-tao-timeline-section] {
@@ -229,6 +230,10 @@
     top: 50%;
     inset-inline-start: 50%;
     transform: translate(-50%, -50%);
+  }
+  [data-tao-timeline][data-tao-orientation="horizontal"][data-tao-mode="alternate"]
+    [data-tao-timeline-icon]:dir(rtl) {
+    transform: translate(50%, -50%);
   }
   [data-tao-timeline][data-tao-orientation="horizontal"][data-tao-mode="alternate"]
     [data-tao-timeline-rail] {

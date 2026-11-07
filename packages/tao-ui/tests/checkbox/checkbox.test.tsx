@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { afterAll, beforeAll, expect, rstest, test } from '@rstest/core';
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import {
   Checkbox,
@@ -19,6 +19,37 @@ beforeAll(() => {
 afterAll(() => checkboxStyle.remove());
 
 // ---- Checkbox ----
+
+test('canceling an item change keeps the CheckboxGroup selection', async () => {
+  const onChange = rstest.fn();
+  render(
+    <CheckboxGroup onChange={onChange}>
+      <Checkbox value="a" onChange={(event) => event.preventDefault()}>
+        Option A
+      </Checkbox>
+    </CheckboxGroup>,
+  );
+  const checkbox = screen.getByRole('checkbox', { name: 'Option A' });
+  await userEvent.click(checkbox);
+  expect(onChange).not.toHaveBeenCalled();
+  expect(checkbox).not.toBeChecked();
+});
+
+test('mutating a CheckboxGroup change payload cannot change its selection', async () => {
+  render(
+    <CheckboxGroup
+      defaultValue={['a']}
+      options={['a', 'b']}
+      onChange={(values) => {
+        values.length = 0;
+      }}
+    />,
+  );
+  const second = screen.getByRole('checkbox', { name: 'b' });
+  await userEvent.click(second);
+  expect(screen.getByRole('checkbox', { name: 'a' })).toBeChecked();
+  expect(second).toBeChecked();
+});
 
 test('renders label text', () => {
   render(<Checkbox>Accept terms</Checkbox>);
@@ -227,11 +258,44 @@ test('indeterminate icon remains visible independently of checked state', async 
   );
   expect(container.querySelector('[data-tao-checkbox-icon]')).toBeVisible();
   await userEvent.click(screen.getByRole('checkbox'));
+  expect(screen.getByRole('checkbox')).toHaveProperty('indeterminate', true);
   expect(screen.getByRole('checkbox')).toHaveAttribute('aria-checked', 'mixed');
   expect(container.querySelector('[data-tao-checkbox-icon]')).toBeVisible();
   rerender(<Checkbox>Choice</Checkbox>);
   expect(screen.getByRole('checkbox')).toBeChecked();
   expect(container.querySelector('[data-tao-checkbox-icon]')).toBeVisible();
+});
+
+test('a grouped checkbox calls its own onChange as well as the group handler', async () => {
+  const onChange = rstest.fn();
+  const onGroupChange = rstest.fn();
+  render(
+    <CheckboxGroup onChange={onGroupChange}>
+      <Checkbox value="choice" onChange={onChange}>
+        Choice
+      </Checkbox>
+    </CheckboxGroup>,
+  );
+  await userEvent.click(screen.getByRole('checkbox', { name: 'Choice' }));
+  expect(onChange).toHaveBeenCalledTimes(1);
+  expect(onGroupChange).toHaveBeenCalledExactlyOnceWith(['choice']);
+});
+
+test('a valueless checkbox inside a group is independent of an empty string option', async () => {
+  const onChange = rstest.fn();
+  render(
+    <CheckboxGroup defaultValue={['']} onChange={onChange}>
+      <Checkbox value="">Empty value</Checkbox>
+      <Checkbox>Independent</Checkbox>
+    </CheckboxGroup>,
+  );
+  const emptyValue = screen.getByRole('checkbox', { name: 'Empty value' });
+  const independent = screen.getByRole('checkbox', { name: 'Independent' });
+  expect(emptyValue).toBeChecked();
+  expect(independent).not.toBeChecked();
+  await userEvent.click(independent);
+  expect(independent).toBeChecked();
+  expect(onChange).not.toHaveBeenCalled();
 });
 
 test('uncontrolled CheckboxGroup seeds defaultValue and preserves selection order without duplicates', async () => {
@@ -325,4 +389,78 @@ test('CheckboxGroup removal also deduplicates controlled values without changing
   );
   await userEvent.click(screen.getByRole('checkbox', { name: 'C' }));
   expect(onChange).toHaveBeenLastCalledWith(['B', 'A']);
+});
+
+test('an explicitly undefined checked checkbox stays controlled and unchecked', async () => {
+  const onChange = rstest.fn();
+  render(
+    <Checkbox checked={undefined} defaultChecked onChange={onChange}>
+      Check me
+    </Checkbox>,
+  );
+  const input = screen.getByRole('checkbox', { name: 'Check me' });
+  expect(input).not.toBeChecked();
+  await userEvent.click(input);
+  expect(onChange).toHaveBeenCalledTimes(1);
+  expect(input).not.toBeChecked();
+});
+
+test('CheckboxGroup native reset restores its selection and the next change payload', async () => {
+  const onChange = rstest.fn();
+  const view = render(
+    <form>
+      <CheckboxGroup
+        options={['A', 'B', 'C']}
+        defaultValue={['A']}
+        onChange={onChange}
+      />
+    </form>,
+  );
+  await userEvent.click(screen.getByRole('checkbox', { name: 'B' }));
+  await act(async () => view.container.querySelector('form')!.reset());
+  expect(screen.getByRole('checkbox', { name: 'A' })).toBeChecked();
+  expect(screen.getByRole('checkbox', { name: 'B' })).not.toBeChecked();
+  await userEvent.click(screen.getByRole('checkbox', { name: 'C' }));
+  expect(onChange).toHaveBeenLastCalledWith(['A', 'C']);
+});
+
+test('checkbox size follows the provider and a local group can override it', () => {
+  render(
+    <TaoProvider size="small">
+      <Checkbox>Outside</Checkbox>
+      <CheckboxGroup size="large" options={['Inside']} />
+    </TaoProvider>,
+  );
+  expect(
+    screen.getByRole('checkbox', { name: 'Outside' }).closest('label'),
+  ).toHaveAttribute('data-tao-size', 'small');
+  expect(
+    screen.getByRole('checkbox', { name: 'Inside' }).closest('label'),
+  ).toHaveAttribute('data-tao-size', 'large');
+});
+test('a required checkbox participates in native form validation', async () => {
+  render(
+    <form aria-label="Agreement">
+      <Checkbox required>Accept terms</Checkbox>
+    </form>,
+  );
+  const form = screen.getByRole<HTMLFormElement>('form', { name: 'Agreement' });
+  const checkbox = screen.getByRole('checkbox', { name: 'Accept terms' });
+  expect(form.checkValidity()).toBe(false);
+  await userEvent.click(checkbox);
+  expect(form.checkValidity()).toBe(true);
+});
+
+test('an ARIA-only checkbox requirement leaves native submission available', () => {
+  render(
+    <form aria-label="Custom validation">
+      <Checkbox aria-required>Accept terms</Checkbox>
+    </form>,
+  );
+  expect(screen.getByRole('checkbox')).toHaveAttribute('aria-required', 'true');
+  expect(
+    screen
+      .getByRole<HTMLFormElement>('form', { name: 'Custom validation' })
+      .checkValidity(),
+  ).toBe(true);
 });

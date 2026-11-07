@@ -1,10 +1,11 @@
 import * as RC from '@radix-ui/react-context-menu';
-import type { CSSProperties, ReactNode } from 'react';
+import { type CSSProperties, type ReactNode, useEffect } from 'react';
 import {
   TaoPortalScope,
   useTaoConfig,
   useTaoDirection,
 } from '../../provider/tao-provider';
+import { useControlledOpen } from '../../utils/overlay';
 import {
   cx,
   type SemanticClassNames,
@@ -65,11 +66,23 @@ export function ContextMenu({
   const [direction, directionRef] = useTaoDirection(directionProp, 'self');
   const { size, disabled: ctxDisabled } = useTaoConfig();
   const resolvedDisabled = disabled ?? ctxDisabled;
+  const [realOpen, setOpen] = useControlledOpen({
+    open,
+    onOpenChange,
+    canOpen: !resolvedDisabled,
+  });
+  useEffect(() => {
+    if (resolvedDisabled && realOpen && open == null) setOpen(false);
+  }, [open, realOpen, resolvedDisabled, setOpen]);
 
-  const content = useMenuController(menu, CM, { classNames, styles });
+  const { content } = useMenuController(menu, CM, { classNames, styles });
 
   return (
-    <RC.Root dir={direction} open={open} onOpenChange={onOpenChange}>
+    <RC.Root
+      dir={direction}
+      open={realOpen && !resolvedDisabled}
+      onOpenChange={setOpen}
+    >
       <RC.Trigger
         ref={directionRef}
         disabled={resolvedDisabled}

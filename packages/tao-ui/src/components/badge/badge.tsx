@@ -7,6 +7,7 @@ import {
   useImperativeHandle,
   useRef,
 } from 'react';
+import { useTaoConfig } from '../../provider/tao-provider';
 import {
   cx,
   type SemanticClassNames,
@@ -69,9 +70,13 @@ const presetColors: Record<string, string> = {
   default: 'var(--tao-color-text-quaternary)',
 };
 const renderable = (node: ReactNode) =>
-  node !== null && node !== undefined && typeof node !== 'boolean';
+  node !== null &&
+  node !== undefined &&
+  node !== '' &&
+  typeof node !== 'boolean';
 
 const BadgeRoot = forwardRef<HTMLSpanElement, BadgeProps>((props, ref) => {
+  const { size: contextSize } = useTaoConfig();
   const {
     count = null,
     showZero = false,
@@ -83,7 +88,7 @@ const BadgeRoot = forwardRef<HTMLSpanElement, BadgeProps>((props, ref) => {
     status,
     color,
     text,
-    size = 'medium',
+    size = contextSize === 'small' ? 'small' : 'medium',
     offset,
     title,
     children,
@@ -108,20 +113,24 @@ const BadgeRoot = forwardRef<HTMLSpanElement, BadgeProps>((props, ref) => {
     numeric !== undefined && numeric > overflowCount
       ? `${overflowCount}+`
       : count;
-  const zero = label === 0 || label === '0' || text === 0 || text === '0';
+  const zero = label === 0 || label === '0';
   const statusMode =
     (status !== undefined || color !== undefined) &&
-    (count === null || (zero && !showZero));
-  const standaloneStatus =
-    !children && statusMode && (!!text || status !== undefined || !zero);
-  const asDot = dot && !zero;
+    (!renderable(label) || (zero && !showZero));
+  const hasChildren = Boolean(children) || children === 0;
+  const statusDot = statusMode && (!!text || status !== undefined || !zero);
+  const standaloneStatus = !hasChildren && statusDot;
+  const asDot = statusDot || (dot && !zero);
+  const visibleText =
+    renderable(text) && (showZero || (text !== 0 && text !== '0'));
   const hidden =
-    ((!renderable(label) && !renderable(text)) || (zero && !showZero)) &&
-    !asDot;
+    ((!renderable(label) && !visibleText) || (zero && !showZero)) && !asDot;
   const offsetStyle: CSSProperties = offset
     ? {
         marginTop: offset[1],
-        insetInlineEnd: -Number.parseFloat(String(offset[0])),
+        insetInlineEnd: Number.isFinite(Number(offset[0]))
+          ? -Number(offset[0])
+          : `calc(0px - (${offset[0]}))`,
       }
     : {};
   const customColor =
@@ -133,8 +142,6 @@ const BadgeRoot = forwardRef<HTMLSpanElement, BadgeProps>((props, ref) => {
         (typeof count === 'number' || typeof count === 'string'
           ? String(count)
           : undefined));
-  const visibleText =
-    !hidden && (text === 0 ? showZero : !!text && text !== true);
   const indicatorStyle: CSSProperties = {
     ...offsetStyle,
     ...slots?.indicator,
@@ -146,7 +153,7 @@ const BadgeRoot = forwardRef<HTMLSpanElement, BadgeProps>((props, ref) => {
       {...rest}
       ref={ref}
       data-tao-badge=""
-      data-tao-wrapper={!!children || undefined}
+      data-tao-wrapper={hasChildren || undefined}
       data-tao-status-only={standaloneStatus || undefined}
       className={cx(prefixCls, classes?.root, className, rootClassName)}
       style={{
@@ -155,18 +162,18 @@ const BadgeRoot = forwardRef<HTMLSpanElement, BadgeProps>((props, ref) => {
       }}
     >
       {children}
-      {(standaloneStatus || !hidden) && (
+      {!hidden && (
         <span
           data-tao-badge-indicator=""
           data-tao-status={status}
-          data-tao-dot={standaloneStatus || asDot || undefined}
+          data-tao-dot={asDot || undefined}
           data-tao-size={size === 'small' ? 'small' : 'medium'}
           data-tao-custom={isValidElement(count) || undefined}
           className={cx(scrollNumberPrefixCls, classes?.indicator)}
           title={standaloneStatus ? undefined : titleValue}
           style={indicatorStyle}
         >
-          {!standaloneStatus && !asDot && label}
+          {!asDot && label}
         </span>
       )}
       {visibleText && <span data-tao-badge-text="">{text}</span>}

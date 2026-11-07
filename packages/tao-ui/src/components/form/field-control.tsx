@@ -2,16 +2,22 @@ import { getNodeRef, supportNodeRef } from '@rc-component/util/es/ref';
 import useLayoutEffect from '@rc-component/util/es/hooks/useLayoutEffect';
 import { cloneElement, type ReactElement, useId, useMemo } from 'react';
 import { mergeRefs } from '../../utils/refs';
-import { useFormLayout } from './form-context';
+import {
+  type FormFieldChange,
+  FormFieldChangeContext,
+  useFormLayout,
+} from './form-context';
 import { type FieldTarget, fieldKey } from './use-form';
 
 /** Register the actual control, including noStyle and Form.List fields. */
 export function FieldControl({
   name,
   children,
+  valueChange,
 }: {
   name: (string | number)[];
   children: ReactElement<Record<string, unknown>>;
+  valueChange: FormFieldChange | null;
 }) {
   const { fields } = useFormLayout();
   const generatedId = useId();
@@ -31,14 +37,22 @@ export function FieldControl({
   );
 
   useLayoutEffect(() => {
-    fields?.set(key, target);
+    if (!fields) return;
+    const targets = fields.get(key) ?? new Set<FieldTarget>();
+    targets.add(target);
+    fields.set(key, targets);
     return () => {
-      fields?.delete(key);
+      targets.delete(target);
+      if (!targets.size) fields.delete(key);
     };
   }, [fields, key, target]);
 
-  return cloneElement(children, {
-    id,
-    ...(supportNodeRef(children) ? { ref } : {}),
-  });
+  return (
+    <FormFieldChangeContext.Provider value={valueChange}>
+      {cloneElement(children, {
+        id,
+        ...(supportNodeRef(children) ? { ref } : {}),
+      })}
+    </FormFieldChangeContext.Provider>
+  );
 }

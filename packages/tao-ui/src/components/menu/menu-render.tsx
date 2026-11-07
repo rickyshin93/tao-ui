@@ -1,7 +1,9 @@
+import { isReactRenderable } from '@rc-component/util';
 import {
   type ComponentType,
   type ReactNode,
   useCallback,
+  useId,
   useState,
 } from 'react';
 import { TaoPortalScope } from '../../provider/tao-provider';
@@ -51,6 +53,9 @@ export interface MenuGroupType {
 }
 
 export type MenuItem = MenuItemType | MenuDividerType | MenuGroupType;
+
+/** Internal marker for composed menu items whose label is the action element. */
+export const menuItemAsChild = Symbol('menuItemAsChild');
 
 export interface MenuProps {
   items: MenuItem[];
@@ -172,7 +177,7 @@ function ItemBody({
 }) {
   return (
     <>
-      {icon != null && (
+      {isReactRenderable(icon) && icon !== true && (
         <span
           data-tao-menu-item-icon=""
           className={cx(ctx.classNames?.itemIcon)}
@@ -188,7 +193,7 @@ function ItemBody({
       >
         {label}
       </span>
-      {extra != null && (
+      {isReactRenderable(extra) && extra !== true && (
         <span
           data-tao-menu-item-extra=""
           className={cx(ctx.classNames?.itemExtra)}
@@ -202,6 +207,29 @@ function ItemBody({
 }
 
 // ---- Recursive renderer ----
+
+function MenuGroup({ item, ctx }: { item: MenuGroupType; ctx: RenderCtx }) {
+  const { P } = ctx;
+  const labelId = useId();
+  return (
+    <P.Group
+      data-tao-menu-group=""
+      aria-labelledby={item.label != null ? labelId : undefined}
+    >
+      {item.label != null && (
+        <P.Label
+          id={labelId}
+          data-tao-menu-group-label=""
+          className={cx(ctx.classNames?.groupLabel)}
+          style={ctx.styles?.groupLabel}
+        >
+          {item.label}
+        </P.Label>
+      )}
+      {renderMenuItems(item.children, ctx)}
+    </P.Group>
+  );
+}
 
 export function renderMenuItems(items: MenuItem[], ctx: RenderCtx): ReactNode {
   const { P } = ctx;
@@ -223,20 +251,14 @@ export function renderMenuItems(items: MenuItem[], ctx: RenderCtx): ReactNode {
     // Group
     if ('type' in item && item.type === 'group') {
       return (
-        <P.Group key={item.key ?? `group-${index}`} data-tao-menu-group="">
-          {item.label != null && (
-            <P.Label
-              data-tao-menu-group-label=""
-              className={cx(ctx.classNames?.groupLabel)}
-              style={ctx.styles?.groupLabel}
-            >
-              {item.label}
-            </P.Label>
-          )}
-          {renderMenuItems(item.children, ctx)}
-        </P.Group>
+        <MenuGroup key={item.key ?? `group-${index}`} item={item} ctx={ctx} />
       );
     }
+
+    const textValue =
+      typeof item.label === 'string' || typeof item.label === 'number'
+        ? String(item.label).trim()
+        : undefined;
 
     // Submenu
     if (item.children && item.children.length > 0) {
@@ -244,6 +266,7 @@ export function renderMenuItems(items: MenuItem[], ctx: RenderCtx): ReactNode {
         <P.Sub key={item.key}>
           <P.SubTrigger
             disabled={item.disabled}
+            textValue={textValue}
             data-tao-menu-item=""
             data-tao-menu-sub-trigger=""
             data-tao-danger={item.danger || undefined}
@@ -283,6 +306,7 @@ export function renderMenuItems(items: MenuItem[], ctx: RenderCtx): ReactNode {
           <P.CheckboxItem
             key={item.key}
             disabled={item.disabled}
+            textValue={textValue}
             checked={ctx.selectedKeys.includes(item.key)}
             onCheckedChange={() => {
               ctx.onToggle(item.key);
@@ -314,6 +338,7 @@ export function renderMenuItems(items: MenuItem[], ctx: RenderCtx): ReactNode {
           key={item.key}
           value={item.key}
           disabled={item.disabled}
+          textValue={textValue}
           onSelect={() => ctx.onAction(item)}
           data-tao-menu-item=""
           data-tao-menu-selectable=""
@@ -337,22 +362,29 @@ export function renderMenuItems(items: MenuItem[], ctx: RenderCtx): ReactNode {
     }
 
     // Plain action item
+    const asChild = menuItemAsChild in item;
     return (
       <P.Item
         key={item.key}
+        asChild={asChild}
         disabled={item.disabled}
+        textValue={textValue}
         onSelect={() => ctx.onAction(item)}
         data-tao-menu-item=""
         data-tao-danger={item.danger || undefined}
         className={cx(ctx.classNames?.item)}
         style={ctx.styles?.item}
       >
-        <ItemBody
-          icon={item.icon}
-          label={item.label}
-          extra={item.extra}
-          ctx={ctx}
-        />
+        {asChild ? (
+          item.label
+        ) : (
+          <ItemBody
+            icon={item.icon}
+            label={item.label}
+            extra={item.extra}
+            ctx={ctx}
+          />
+        )}
       </P.Item>
     );
   });
@@ -363,8 +395,8 @@ export function renderMenuItems(items: MenuItem[], ctx: RenderCtx): ReactNode {
 /**
  * Encapsulates a menu's selection state (controlled / uncontrolled), the
  * item-click dispatch (`item.onClick` → `menu.onClick`), and rendering of the
- * item tree (wrapping in a RadioGroup for single-select). Returns the ready
- * content node. Shared by Dropdown and ContextMenu.
+ * item tree (wrapping in a RadioGroup for single-select). Shared by Dropdown
+ * and ContextMenu.
  */
 export function useMenuController(
   menu: MenuProps,
@@ -373,10 +405,10 @@ export function useMenuController(
     classNames?: SemanticClassNames<MenuSemanticPart>;
     styles?: SemanticStyles<MenuSemanticPart>;
   },
-): ReactNode {
+) {
   const selectable = !!menu.selectable;
   const multiple = !!menu.multiple;
-  const isSelControlled = menu.selectedKeys != null;
+  const isSelControlled = 'selectedKeys' in menu;
   const [selInternal, setSelInternal] = useState<string[]>(
     menu.defaultSelectedKeys ?? [],
   );
@@ -387,7 +419,7 @@ export function useMenuController(
   const commitSel = useCallback(
     (next: string[], changedKey: string) => {
       if (!isSelControlled) setSelInternal(next);
-      menu.onSelect?.({ key: changedKey, selectedKeys: next });
+      menu.onSelect?.({ key: changedKey, selectedKeys: [...next] });
     },
     [isSelControlled, menu],
   );
@@ -425,12 +457,13 @@ export function useMenuController(
   };
 
   const body = renderMenuItems(menu.items, ctx);
-  if (selectable && !multiple) {
-    return (
+  const content =
+    selectable && !multiple ? (
       <P.RadioGroup value={selectedKeys[0]} onValueChange={radioChange}>
         {body}
       </P.RadioGroup>
+    ) : (
+      body
     );
-  }
-  return body;
+  return { content, selectedKeys, commitSelection: commitSel };
 }

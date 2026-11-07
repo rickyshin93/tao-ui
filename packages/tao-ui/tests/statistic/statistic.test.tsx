@@ -8,6 +8,11 @@ import {
 
 afterEach(() => rstest.useRealTimers());
 
+test('formatter false displays the original metric without numeric formatting', () => {
+  render(<Statistic formatter={false} value="0001234.50" precision={0} />);
+  expect(screen.getByText('0001234.50')).toBeVisible();
+});
+
 test('formats groups and truncates precision while preserving large numeric strings', () => {
   const { rerender, container } = render(
     <Statistic
@@ -106,4 +111,80 @@ test('countup formats literals, restarts for new values and tears down on unmoun
   expect(onFinish).toHaveBeenCalledTimes(1);
   unmount();
   expect(rstest.getTimerCount()).toBe(0);
+});
+
+test.each([undefined, 'invalid date'])(
+  'countdown waits for a valid target (%s)',
+  (value) => {
+    rstest.useFakeTimers();
+    rstest.setSystemTime(new Date('2026-01-01T00:00:00Z'));
+    const onChange = rstest.fn();
+    const { rerender } = render(
+      <Statistic.Countdown value={value} format="ss" onChange={onChange} />,
+    );
+    expect(screen.getByText('-')).toBeVisible();
+    act(() => rstest.advanceTimersByTime(100));
+    expect(onChange).not.toHaveBeenCalled();
+    expect(rstest.getTimerCount()).toBe(0);
+    rerender(
+      <Statistic.Countdown
+        value={Date.now() + 1500}
+        format="ss"
+        onChange={onChange}
+      />,
+    );
+    expect(screen.getByText('01')).toBeVisible();
+  },
+);
+
+test('countdown reports zero for its last tick when the deadline has passed', () => {
+  rstest.useFakeTimers();
+  rstest.setSystemTime(new Date('2026-01-01T00:00:00Z'));
+  const onChange = rstest.fn();
+  const onFinish = rstest.fn();
+  render(
+    <Statistic.Countdown
+      value={Date.now() + 101}
+      onChange={onChange}
+      onFinish={onFinish}
+    />,
+  );
+  act(() => rstest.advanceTimersByTime(160));
+  expect(onFinish).toHaveBeenCalledTimes(1);
+  expect(onChange).toHaveBeenLastCalledWith(0);
+});
+
+test('timer valueRender wraps the already formatted duration', () => {
+  rstest.useFakeTimers();
+  rstest.setSystemTime(new Date('2026-01-01T00:00:00Z'));
+  render(
+    <Statistic.Timer
+      type="countup"
+      value={Date.now() - 5000}
+      format="ss[s]"
+      valueRender={(value) => (
+        <strong data-testid="timer-value">{value}</strong>
+      )}
+    />,
+  );
+  expect(screen.getByTestId('timer-value')).toHaveTextContent('05s');
+});
+
+test('countup callbacks and display both remain at zero before the start time', () => {
+  rstest.useFakeTimers();
+  rstest.setSystemTime(new Date('2026-01-01T00:00:00Z'));
+  const onChange = rstest.fn();
+  render(
+    <Statistic.Timer
+      type="countup"
+      value={Date.now() + 1000}
+      format="ss"
+      onChange={onChange}
+    />,
+  );
+  act(() => rstest.advanceTimersByTime(20));
+  expect(screen.getByText('00')).toBeVisible();
+  expect(onChange).toHaveBeenLastCalledWith(0);
+  act(() => rstest.advanceTimersByTime(2000));
+  expect(onChange.mock.lastCall?.[0]).toBeGreaterThan(0);
 });

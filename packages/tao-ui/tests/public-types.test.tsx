@@ -72,7 +72,9 @@ const selectRef = createRef<SelectRef>();
 const pickerRef = createRef<PickerRef>();
 
 <Button ref={buttonRef}>Save</Button>;
-<Checkbox ref={inputRef}>Accept</Checkbox>;
+<Checkbox ref={inputRef} required>
+  Accept
+</Checkbox>;
 <Radio ref={inputRef}>Option</Radio>;
 <Input ref={inputRef} status="warning" />;
 <InputNumber ref={inputRef} status="error" />;

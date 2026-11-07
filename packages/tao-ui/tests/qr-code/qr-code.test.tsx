@@ -42,6 +42,25 @@ test('SVG encodes values and reacts to error level, segment, margin and icon cha
     '/logo.svg',
   );
 });
+
+test('ARIA references name and describe the rendered QR image', () => {
+  render(
+    <>
+      <h2 id="qr-label">Connect your device</h2>
+      <p id="qr-description">Scan with your camera</p>
+      <QRCode
+        type="svg"
+        value="pair-device"
+        aria-labelledby="qr-label"
+        aria-describedby="qr-description"
+      />
+    </>,
+  );
+  expect(
+    screen.getByRole('img', { name: 'Connect your device' }),
+  ).toHaveAccessibleDescription('Scan with your camera');
+});
+
 test('expired, scanned and custom status renderers receive locale and refresh behavior', () => {
   let refreshes = 0;
   const onRefresh = () => {
@@ -89,6 +108,9 @@ test('semantic callbacks see defaults and the ref resolves the native bordered r
   expect(ref.current!.nativeElement.style.width).toBe('220px');
   expect(ref.current!.nativeElement.style.padding).toBe('8px');
   expect(ref.current!.nativeElement.getAttribute('data-bordered')).toBe('true');
-  rerender(<QRCode type="svg" value="" />);
+  rerender(<QRCode ref={ref} type="svg" value="" />);
   expect(document.querySelector('[data-tao-qr-code]')).toBeNull();
+  expect(ref.current).toBeNull();
+  rerender(<QRCode ref={ref} type="svg" value="ref restored" />);
+  expect(ref.current?.nativeElement).toHaveAttribute('data-tao-qr-code', '');
 });

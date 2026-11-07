@@ -80,7 +80,8 @@
     animation: tao-badge-processing calc(var(--tao-motion-unit) * 14) ease-out
       infinite;
   }
-  [data-tao-badge-indicator][data-tao-status="processing"][data-tao-dot] {
+  [data-tao-badge]:not([data-tao-wrapper])
+    > [data-tao-badge-indicator][data-tao-status="processing"][data-tao-dot] {
     position: relative;
   }
   [data-tao-ribbon] {

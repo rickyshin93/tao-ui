@@ -4,8 +4,10 @@ import {
   forwardRef,
   type ReactNode,
   useId,
+  useMemo,
 } from 'react';
-import { useTaoConfig } from '../../provider/tao-provider';
+import { useTaoConfig, useTaoDirection } from '../../provider/tao-provider';
+import { mergeRefs } from '../../utils/refs';
 import {
   cx,
   type SemanticClassNames,
@@ -86,6 +88,15 @@ export interface ProgressProps
 
 const clamp = (percent = 0) => Math.min(100, Math.max(0, percent || 0));
 
+function formatPercent(percent: number, locale: string | undefined) {
+  const [digits, exponent = '0'] = String(percent).split('e');
+  const fractionDigits = (digits.split('.')[1]?.length ?? 0) - Number(exponent);
+  return new Intl.NumberFormat(locale ?? 'en-US', {
+    style: 'percent',
+    maximumFractionDigits: Math.min(20, Math.max(0, fractionDigits)),
+  }).format(percent / 100);
+}
+
 function gradientStops(gradient: ProgressGradient) {
   if ('from' in gradient && 'to' in gradient)
     return [
@@ -156,7 +167,14 @@ export const Progress = forwardRef<HTMLDivElement, ProgressProps>(
       percentPosition = {},
       rounding = Math.round,
     } = props;
-    const { size: contextSize } = useTaoConfig();
+    const { size: contextSize, locale } = useTaoConfig();
+    const [direction, directionRef] = useTaoDirection();
+    const logicalGap =
+      type !== 'line' && (gapPlacement === 'start' || gapPlacement === 'end');
+    const rootRef = useMemo(
+      () => (logicalGap ? mergeRefs(ref, directionRef) : ref),
+      [logicalGap, ref, directionRef],
+    );
     const size =
       props.size ??
       (type === 'line'
@@ -191,6 +209,12 @@ export const Progress = forwardRef<HTMLDivElement, ProgressProps>(
     const infoPosition = percentPosition.type ?? 'outer';
     const infoAlign = percentPosition.align ?? 'end';
     const count = typeof steps === 'number' ? steps : steps?.count;
+    const roundSteps = type === 'line' ? rounding : Math.round;
+    const filledSteps = count ? roundSteps((count * value) / 100) : 0;
+    const successSteps =
+      count && successValue > 0
+        ? Math.min(filledSteps, roundSteps((count * successValue) / 100))
+        : 0;
     const radiusStyle = strokeLinecap === 'round' ? undefined : 0;
     const info = showInfo ? (
       <span
@@ -203,7 +227,7 @@ export const Progress = forwardRef<HTMLDivElement, ProgressProps>(
         ) : infoPosition === 'inner' ||
           resolvedStatus === 'normal' ||
           resolvedStatus === 'active' ? (
-          `${value}%`
+          formatPercent(value, locale.numberLocale)
         ) : (
           <StatusIcon status={resolvedStatus} />
         )}
@@ -226,7 +250,6 @@ export const Progress = forwardRef<HTMLDivElement, ProgressProps>(
           (size === 'small' && !count ? 6 : 8));
       if (count) {
         const unitWidth = lineWidth ?? (size === 'small' ? 2 : 14);
-        const filled = rounding((count * value) / 100);
         const stepNumbers = Array.from({ length: count }, (_, index) => index);
         content = (
           <div
@@ -239,18 +262,21 @@ export const Progress = forwardRef<HTMLDivElement, ProgressProps>(
               <span
                 key={`step-${index}`}
                 data-tao-progress-step=""
-                data-tao-active={index < filled || undefined}
+                data-tao-active={index < filledSteps || undefined}
+                data-tao-success={index < successSteps || undefined}
                 className={cx(`${prefixCls}-steps-item`, names?.track)}
                 style={{
                   width: unitWidth,
                   height,
                   borderRadius: radiusStyle,
                   background:
-                    index < filled
-                      ? Array.isArray(strokeColor)
-                        ? strokeColor[index]
-                        : trackColor
-                      : rail,
+                    index < successSteps
+                      ? success?.strokeColor
+                      : index < filledSteps
+                        ? Array.isArray(strokeColor)
+                          ? strokeColor[index]
+                          : trackColor
+                        : rail,
                   ...slots?.track,
                 }}
               />
@@ -323,21 +349,22 @@ export const Progress = forwardRef<HTMLDivElement, ProgressProps>(
                 ? 60
                 : 120;
       const numericDiameter = typeof diameter === 'number' ? diameter : 120;
-      const thickness = strokeWidth ?? Math.max(300 / numericDiameter, 6);
+      const thickness =
+        strokeWidth ?? Math.min(50, Math.max(300 / numericDiameter, 6));
       const radius = 50 - thickness / 2;
       const gap = Math.min(
         295,
         Math.max(0, gapDegree ?? (type === 'dashboard' ? 75 : 0)),
       );
       const placement = gapPlacement ?? gapPosition ?? 'bottom';
-      const center =
-        placement === 'top'
-          ? 270
-          : placement === 'left' || placement === 'start'
-            ? 180
-            : placement === 'right' || placement === 'end'
-              ? 0
-              : 90;
+      const center = {
+        top: 270,
+        bottom: 90,
+        left: 180,
+        right: 0,
+        start: direction === 'rtl' ? 0 : 180,
+        end: direction === 'rtl' ? 180 : 0,
+      }[placement];
       const start = gap ? center + gap / 2 : -90;
       const sweep = 360 - gap;
       const path = arcPath(radius, start, sweep);
@@ -348,9 +375,6 @@ export const Progress = forwardRef<HTMLDivElement, ProgressProps>(
       );
       const stepGap = typeof steps === 'object' ? steps.gap : 2;
       const gapAngle = (stepGap * 180) / (Math.PI * radius);
-      const filled = count
-        ? Math.round((count * clamp(value - successValue)) / 100)
-        : 0;
       const circleContent = (
         <div
           data-tao-progress-body=""
@@ -388,7 +412,8 @@ export const Progress = forwardRef<HTMLDivElement, ProgressProps>(
                 <path
                   key={`step-${index}`}
                   data-tao-progress-step=""
-                  data-tao-active={index < filled || undefined}
+                  data-tao-active={index < filledSteps || undefined}
+                  data-tao-success={index < successSteps || undefined}
                   d={arcPath(
                     radius,
                     start + (index * sweep) / count + gapAngle / 2,
@@ -398,7 +423,14 @@ export const Progress = forwardRef<HTMLDivElement, ProgressProps>(
                   strokeWidth={thickness}
                   strokeLinecap="butt"
                   style={{
-                    stroke: index < filled ? circleStroke : rail,
+                    stroke:
+                      index < successSteps
+                        ? success?.strokeColor
+                        : index < filledSteps
+                          ? Array.isArray(strokeColor)
+                            ? strokeColor[index]
+                            : circleStroke
+                          : rail,
                     ...slots?.track,
                   }}
                 />
@@ -447,7 +479,13 @@ export const Progress = forwardRef<HTMLDivElement, ProgressProps>(
       );
       content =
         numericDiameter <= 20 && showInfo ? (
-          <Tooltip title={format ? format(value, successValue) : `${value}%`}>
+          <Tooltip
+            title={
+              format
+                ? format(value, successValue)
+                : formatPercent(value, locale.numberLocale)
+            }
+          >
             {circleContent}
           </Tooltip>
         ) : (
@@ -457,7 +495,7 @@ export const Progress = forwardRef<HTMLDivElement, ProgressProps>(
 
     return (
       <div
-        ref={ref}
+        ref={rootRef}
         role="progressbar"
         aria-valuenow={value}
         aria-valuemin={0}

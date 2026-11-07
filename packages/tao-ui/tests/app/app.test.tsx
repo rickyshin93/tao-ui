@@ -71,6 +71,103 @@ test('message APIs are scoped, update by key, and return a callable thenable', a
   act(() => second.message.destroy());
 });
 
+test('a failed keyed message update leaves the existing close callback intact', async () => {
+  let api!: AppInstance;
+  render(
+    <App>
+      <Capture
+        capture={(value) => {
+          api = value;
+        }}
+      />
+    </App>,
+  );
+  const onClose = rstest.fn();
+  const failedOnClose = rstest.fn();
+  let result!: AppMessageType;
+  act(() => {
+    result = api.message.open({
+      key: 'task',
+      content: 'Active task',
+      duration: 0,
+      onClose,
+    });
+  });
+  expect(() =>
+    api.message.open({
+      key: 'task',
+      content: 'Failed update',
+      duration: 0,
+      onClose: failedOnClose,
+      classNames: () => {
+        throw new Error('Invalid message styling');
+      },
+    }),
+  ).toThrow('Invalid message styling');
+  expect(screen.getByText('Active task')).toBeVisible();
+  act(() => result());
+  expect(await result).toBe(true);
+  expect(onClose).toHaveBeenCalledTimes(1);
+  expect(failedOnClose).not.toHaveBeenCalled();
+});
+
+test('a closed message handle cannot close a future message with the same key', async () => {
+  let api!: AppInstance;
+  render(
+    <App>
+      <Capture
+        capture={(value) => {
+          api = value;
+        }}
+      />
+    </App>,
+  );
+  let first!: AppMessageType;
+  act(() => {
+    first = api.message.loading({
+      key: 'task',
+      content: 'First task',
+      duration: 0,
+    });
+  });
+  act(() => first());
+  expect(await first).toBe(true);
+
+  act(() => {
+    api.message.info({ key: 'task', content: 'Next task', duration: 0 });
+  });
+  expect(screen.getByText('Next task')).toBeVisible();
+  act(() => first());
+  expect(screen.getByText('Next task')).toBeVisible();
+});
+
+test('shrinking maxCount settles every message evicted by the next open', async () => {
+  let api!: AppInstance;
+  const holder = (maxCount: number) => (
+    <App message={{ maxCount, duration: 0 }}>
+      <Capture
+        capture={(value) => {
+          api = value;
+        }}
+      />
+    </App>
+  );
+  const view = render(holder(3));
+  const settled = rstest.fn();
+  act(() => {
+    for (const content of ['First', 'Second', 'Third']) {
+      api.message.info(content).then(settled);
+    }
+  });
+  view.rerender(holder(1));
+  act(() => {
+    api.message.info('Current');
+  });
+  expect(screen.getByText('Current')).toBeVisible();
+  expect(screen.queryByText('Second')).toBeNull();
+  await waitFor(() => expect(settled).toHaveBeenCalledTimes(3));
+});
+
 test('message close callback and Promise resolve after duration', async () => {
   let api!: AppInstance;
   const closed = rstest.fn();
@@ -255,6 +352,64 @@ test('modal update supports functions and destroy resolves false; close callback
   expect(await result).toBe(false);
   expect(screen.queryByText('Destroy me')).toBeNull();
 });
+
+test('an initially hidden App modal can be updated and then opened', async () => {
+  let api!: AppInstance;
+  const afterClose = rstest.fn();
+  render(
+    <App>
+      <Capture
+        capture={(value) => {
+          api = value;
+        }}
+      />
+    </App>,
+  );
+  let result!: ReturnType<AppInstance['modal']['confirm']>;
+  act(() => {
+    result = api.modal.confirm({ open: false, title: 'Hidden', afterClose });
+  });
+  expect(screen.queryByRole('dialog')).toBeNull();
+  act(() => result.update({ title: 'Updated while hidden' }));
+  act(() => result.update(() => ({ title: 'Ready to open', afterClose })));
+  expect(screen.queryByRole('dialog')).toBeNull();
+  expect(afterClose).not.toHaveBeenCalled();
+  act(() => result.update({ open: true }));
+  expect(screen.getByRole('dialog')).toHaveTextContent('Ready to open');
+  fireEvent.click(screen.getByRole('button', { name: 'OK' }));
+  expect(await result).toBe(true);
+  expect(afterClose).toHaveBeenCalledTimes(1);
+});
+
+test.each(['destroy', 'queued open', 'update'] as const)(
+  '%s settles a hidden App modal and calls afterClose once',
+  async (method) => {
+    let api!: AppInstance;
+    const afterClose = rstest.fn();
+    render(
+      <App>
+        <Capture
+          capture={(value) => {
+            api = value;
+          }}
+        />
+      </App>,
+    );
+    let result!: ReturnType<AppInstance['modal']['confirm']>;
+    act(() => {
+      result = api.modal.confirm({ open: false, title: 'Hidden', afterClose });
+    });
+    act(() => {
+      if (method === 'queued open') result.update({ open: true });
+      if (method === 'update') result.update({ open: false });
+      else result.destroy();
+    });
+    expect(afterClose).toHaveBeenCalledTimes(1);
+    act(() => result.destroy());
+    expect(await result).toBe(false);
+    expect(afterClose).toHaveBeenCalledTimes(1);
+  },
+);
 
 test('App supports custom and absent roots and forwards native ref', () => {
   const ref = createRef<HTMLElement>();
@@ -454,6 +609,45 @@ test('unmounting App settles outstanding handles and removes its feedback', asyn
   expect(await message).toBe(true);
   expect(await modal).toBe(false);
   expect(screen.queryByText('Pending')).toBeNull();
+  expect(screen.queryByRole('dialog')).toBeNull();
+});
+
+test('a message opened through an unmounted App settles immediately', async () => {
+  let api!: AppInstance;
+  const view = render(
+    <App>
+      <Capture
+        capture={(value) => {
+          api = value;
+        }}
+      />
+    </App>,
+  );
+  view.unmount();
+  const settled = rstest.fn();
+  api.message.loading('Late upload result', 0).then(settled);
+  await Promise.resolve();
+  expect(settled).toHaveBeenCalledExactlyOnceWith(true);
+  expect(screen.queryByText('Late upload result')).toBeNull();
+});
+
+test('a confirmation requested through an unmounted App resolves false', async () => {
+  let api!: AppInstance;
+  const view = render(
+    <App>
+      <Capture
+        capture={(value) => {
+          api = value;
+        }}
+      />
+    </App>,
+  );
+  view.unmount();
+  const settled = rstest.fn();
+  const result = api.modal.confirm({ title: 'Late confirmation' });
+  result.then(settled);
+  await Promise.resolve();
+  expect(settled).toHaveBeenCalledExactlyOnceWith(false);
   expect(screen.queryByRole('dialog')).toBeNull();
 });
 

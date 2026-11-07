@@ -7,6 +7,17 @@ import {
   type CardMetaRef,
 } from '../../src/components/card/card';
 
+test('an empty tab-extra map leaves no Card header but keeps zero', () => {
+  const { container, rerender } = render(
+    <Card tabList={[]} tabBarExtraContent={{ left: false, right: null }} />,
+  );
+  expect(container.querySelector('[data-tao-card-header]')).toBeNull();
+  rerender(<Card tabList={[]} tabBarExtraContent={{ left: 0 }} />);
+  expect(container.querySelector('[data-tao-card-header]')).toHaveTextContent(
+    '0',
+  );
+});
+
 test('renders title, extra, cover, actions and native div ref', () => {
   const ref = createRef<HTMLDivElement>();
   render(
@@ -28,6 +39,13 @@ test('renders title, extra, cover, actions and native div ref', () => {
   expect(screen.getByRole('link', { name: 'Settings' })).toBeTruthy();
   expect(screen.getByAltText('Cover')).toBeTruthy();
   expect(screen.getByRole('button', { name: 'Edit' })).toBeTruthy();
+});
+
+test('Card keeps the tab name when its optional label is undefined', () => {
+  render(
+    <Card tabList={[{ key: 'details', tab: 'Details', label: undefined }]} />,
+  );
+  expect(screen.getByRole('tab', { name: 'Details' })).toBeVisible();
 });
 test('loading substitutes content and restores it when ready', () => {
   const { rerender, container } = render(
@@ -97,6 +115,39 @@ test('uncontrolled initial tabs and editable tab callbacks retain antd payloads'
   expect(actions[1][1]).toBe('add');
   expect(typeof actions[1][0]).toBe('object');
 });
+
+test('tab bar extras passed through tabProps render unless the Card overrides them', () => {
+  const tabList = [{ key: 'one', label: 'Overview' }];
+  const tabProps = { tabBarExtraContent: <span>Tab tools</span> };
+  const { rerender } = render(<Card tabList={tabList} tabProps={tabProps} />);
+  expect(screen.getByText('Tab tools')).toBeInTheDocument();
+  rerender(
+    <Card
+      tabList={tabList}
+      tabProps={tabProps}
+      tabBarExtraContent={<span>Card tools</span>}
+    />,
+  );
+  expect(screen.getByText('Card tools')).toBeInTheDocument();
+  expect(screen.queryByText('Tab tools')).not.toBeInTheDocument();
+});
+
+test('Card renders tab bar extras supplied as a React node array', () => {
+  render(
+    <Card
+      tabList={[]}
+      tabBarExtraContent={[
+        <span key="label">Review actions</span>,
+        <button key="button" type="button">
+          Retry
+        </button>,
+      ]}
+    />,
+  );
+
+  expect(screen.getByText('Review actions')).toBeVisible();
+  expect(screen.getByRole('button', { name: 'Retry' })).toBeVisible();
+});
 test('semantic style callbacks receive resolved size and variant; style overrides remain scoped', () => {
   render(
     <Card
@@ -139,4 +190,39 @@ test('Grid and Meta expose their documented refs and semantic parts', () => {
   expect(grid.current?.nativeElement.dataset.taoHoverable).toBeUndefined();
   expect(meta.current?.nativeElement).toContainElement(screen.getByText('Ada'));
   expect(screen.getByText('Designer').parentElement?.className).toBe('details');
+});
+
+test('an empty tab list leaves no blank card header', () => {
+  const view = render(<Card tabList={[]}>Content</Card>);
+  expect(view.container.querySelector('[data-tao-card-header]')).toBeNull();
+  expect(screen.getByText('Content')).toBeVisible();
+});
+
+test('conditional tab bar content does not leave a blank Card header', () => {
+  const { container, rerender } = render(
+    <Card tabList={[]} tabBarExtraContent={false}>
+      Content
+    </Card>,
+  );
+  expect(container.querySelector('[data-tao-card-header]')).toBeNull();
+
+  rerender(
+    <Card tabList={[]} tabBarExtraContent={0}>
+      Content
+    </Card>,
+  );
+  expect(container.querySelector('[data-tao-card-header]')).toHaveTextContent(
+    '0',
+  );
+});
+
+test('conditional actions leave no blank footer and numeric actions remain', () => {
+  const { container, rerender } = render(
+    <Card actions={[false, null]}>Content</Card>,
+  );
+  expect(container.querySelector('[data-tao-card-actions]')).toBeNull();
+
+  rerender(<Card actions={[false, 0]}>Content</Card>);
+  expect(screen.getByRole('list')).toHaveTextContent('0');
+  expect(screen.getAllByRole('listitem')).toHaveLength(1);
 });

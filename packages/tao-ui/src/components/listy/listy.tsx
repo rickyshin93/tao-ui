@@ -10,7 +10,10 @@ import {
   type Key,
   type ReactElement,
   type Ref,
+  useImperativeHandle,
+  useRef,
 } from 'react';
+import { useTaoDirection } from '../../provider/tao-provider';
 import { cx } from '../../utils/semantic';
 import './listy.css';
 import { interopDefault } from '../../utils/interop-default';
@@ -49,18 +52,51 @@ function ListyRoot<T, K extends Key = Key>(
     styles,
     rowHoverable = true,
     virtual = false,
+    direction: directionProp,
+    scrollWidth,
     ...rest
   } = props;
+  const [direction, directionRef] = useTaoDirection(directionProp);
+  const listRef = useRef<ListyRef>(null);
+  useImperativeHandle(
+    ref,
+    () => ({
+      scrollTo(config) {
+        if (
+          !virtual &&
+          direction === 'rtl' &&
+          config &&
+          typeof config === 'object' &&
+          'left' in config &&
+          config.left !== undefined
+        ) {
+          // Match virtual list offsets while preserving native negative inputs.
+          listRef.current?.scrollTo({ ...config, left: -Math.abs(config.left) });
+          return;
+        }
+        listRef.current?.scrollTo(config);
+      },
+    }),
+    [direction, virtual],
+  );
+  const rawWidth = !virtual ? scrollWidth : undefined;
   const classes =
     typeof classNames === 'function' ? classNames({ props }) : classNames;
   const semanticStyles =
     typeof styles === 'function' ? styles({ props }) : styles;
   return (
-    <div data-tao-listy="" data-tao-hoverable={rowHoverable ? '' : undefined}>
+    <div
+      ref={directionRef}
+      dir={direction}
+      data-tao-listy=""
+      data-tao-hoverable={rowHoverable ? '' : undefined}
+    >
       <RcListyComponent
         {...rest}
-        ref={ref}
+        ref={listRef}
         prefixCls={prefixCls}
+        direction={direction}
+        scrollWidth={scrollWidth}
         virtual={virtual}
         itemHeight={46}
         classNames={{
@@ -71,7 +107,17 @@ function ListyRoot<T, K extends Key = Key>(
         }}
         styles={{
           ...semanticStyles,
-          root: { ...semanticStyles?.root, ...style },
+          root: {
+            overflowX: rawWidth ? 'auto' : undefined,
+            ...semanticStyles?.root,
+            ...style,
+          },
+          item: rawWidth
+            ? { minWidth: rawWidth, ...semanticStyles?.item }
+            : semanticStyles?.item,
+          groupHeader: rawWidth
+            ? { minWidth: rawWidth, ...semanticStyles?.groupHeader }
+            : semanticStyles?.groupHeader,
         }}
       />
     </div>

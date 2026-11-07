@@ -46,6 +46,33 @@ test('displays formatted range values', () => {
   expect(inputs[1]).toHaveValue('2026-06-15');
 });
 
+test.each([
+  { index: 0, text: '2025-07-25', edge: 'start' },
+  { index: 1, text: '2027-07-25', edge: 'end' },
+])(
+  'typing the $edge date previews its month and range edge before committing',
+  async ({ index, text, edge }) => {
+    const onChange = rstest.fn();
+    render(
+      <RangePicker
+        mobile={false}
+        defaultValue={[dayjs('2026-06-01'), dayjs('2026-06-15')]}
+        onChange={onChange}
+      />,
+    );
+    const input = screen.getAllByRole('combobox')[index];
+    await userEvent.clear(input);
+    await userEvent.type(input, text);
+    expect(screen.getByRole('button', { name: text })).toHaveAttribute(
+      `data-tao-range-${edge}`,
+    );
+    expect(input).toHaveFocus();
+    expect(onChange).not.toHaveBeenCalled();
+    await userEvent.keyboard('{Enter}');
+    expect(onChange.mock.calls.at(-1)?.[1][index]).toBe(text);
+  },
+);
+
 test('shows separator', () => {
   render(<RangePicker separator="→" />);
   expect(screen.getByText('→')).toBeTruthy();
@@ -59,6 +86,24 @@ test('range content aligns to the start without excess leading space', () => {
   const rule = css.match(/\[data-tao-range-input\] \{([^}]+)\}/)?.[1];
 
   expect(rule).toContain('text-align: start;');
+});
+
+test('clicking the other RangePicker input keeps the open calendar available', async () => {
+  const opened: boolean[] = [];
+  render(
+    <RangePicker
+      mobile={false}
+      defaultValue={[dayjs('2026-06-01'), dayjs('2026-06-15')]}
+      onOpenChange={(open) => opened.push(open)}
+    />,
+  );
+  const [start, end] = screen.getAllByRole('combobox');
+  await userEvent.click(start);
+  await screen.findByRole('dialog');
+  await userEvent.click(end);
+  expect(end).toHaveFocus();
+  expect(screen.getByRole('dialog')).toBeInTheDocument();
+  expect(opened).toEqual([true]);
 });
 
 test('click opens dual calendar panels', async () => {
@@ -214,6 +259,22 @@ test('mobile trigger remains a button', () => {
   render(<RangePicker mobile />);
   expect(screen.getByRole('button')).toBeTruthy();
   expect(screen.queryByRole('combobox')).toBeNull();
+});
+
+test('clearing the range does not commit pending text first', async () => {
+  const onChange = rstest.fn();
+  render(
+    <RangePicker
+      mobile={false}
+      defaultValue={[dayjs('2026-06-01'), dayjs('2026-06-15')]}
+      onChange={onChange}
+    />,
+  );
+  const start = screen.getAllByRole('combobox')[0];
+  await userEvent.click(start);
+  fireEvent.change(start, { target: { value: '2026-06-05' } });
+  await userEvent.click(screen.getByRole('button', { name: 'Clear' }));
+  expect(onChange).toHaveBeenCalledExactlyOnceWith(null, ['', '']);
 });
 
 test('clear button resets range', async () => {
@@ -480,6 +541,20 @@ test.each(['start', 'end'] as const)(
     expect(onChange).not.toHaveBeenCalled();
   },
 );
+
+test('mobile range opens on the editable endpoint when the start is disabled', () => {
+  render(
+    <RangePicker
+      mobile
+      open
+      disabled={[true, false]}
+      value={[dayjs('2026-06-01'), dayjs('2026-09-20')]}
+    />,
+  );
+  expect(screen.getByRole('button', { name: '2026-09-20' })).toHaveAttribute(
+    'data-tao-range-end',
+  );
+});
 
 test.each(['start', 'end'] as const)(
   'mobile calendar changes only the editable endpoint with %s disabled',

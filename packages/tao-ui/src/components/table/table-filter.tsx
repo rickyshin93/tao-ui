@@ -12,7 +12,7 @@ export function TableFilterDropdown({
   activeValues: string[];
   onSelect: (values: string[]) => void;
 }) {
-  const { locale } = useTaoConfig();
+  const { locale, disabled } = useTaoConfig();
   const toggle = (value: string) => {
     onSelect(
       activeValues.includes(value)
@@ -21,17 +21,21 @@ export function TableFilterDropdown({
     );
   };
 
+  const trigger = (
+    <button
+      type="button"
+      data-tao-table-filter-trigger=""
+      aria-label={locale.messages.filter}
+      disabled={disabled}
+    >
+      <FilterIcon active={activeValues.length > 0} />
+    </button>
+  );
+  if (disabled) return trigger;
+
   return (
     <DropdownMenu.Root>
-      <DropdownMenu.Trigger asChild>
-        <button
-          type="button"
-          data-tao-table-filter-trigger=""
-          aria-label={locale.messages.filter}
-        >
-          <FilterIcon active={activeValues.length > 0} />
-        </button>
-      </DropdownMenu.Trigger>
+      <DropdownMenu.Trigger asChild>{trigger}</DropdownMenu.Trigger>
       <DropdownMenu.Portal>
         <TaoPortalScope asChild>
           <DropdownMenu.Content

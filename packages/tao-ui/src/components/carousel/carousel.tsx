@@ -29,7 +29,10 @@ import './carousel.css';
 const SlickCarouselComponent = /*#__PURE__*/ interopDefault(SlickCarousel);
 
 function useResponsiveSettings(responsive: Settings['responsive']) {
-  const [settings, setSettings] = useState<Settings | 'unslick'>();
+  // null means the initial viewport is still unknown; undefined means no match.
+  const [settings, setSettings] = useState<
+    Settings | 'unslick' | null | undefined
+  >(responsive?.length ? null : undefined);
   useEffect(() => {
     const queries = [...(responsive ?? [])]
       .sort((a, b) => a.breakpoint - b.breakpoint)
@@ -77,7 +80,7 @@ export interface CarouselRef {
   next: () => void;
   prev: () => void;
   autoPlay: (playType?: 'update' | 'leave' | 'blur') => void;
-  innerSlider: NonNullable<SlickCarousel['innerSlider']>;
+  innerSlider: SlickCarousel['innerSlider'];
 }
 type InnerSlider = NonNullable<SlickCarousel['innerSlider']> & {
   autoPlay: CarouselRef['autoPlay'];
@@ -88,7 +91,11 @@ function Arrow({
   ...props
 }: CustomArrowProps & { 'aria-label': string }) {
   return (
-    <button type="button" {...props}>
+    <button
+      type="button"
+      disabled={props.className?.split(' ').includes('slick-disabled')}
+      {...props}
+    >
       <svg
         width="20"
         height="20"
@@ -144,6 +151,7 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
       classNames,
       styles,
       appendDots,
+      customPaging,
       ...rest
     } = { ...baseProps, ...(unslick ? {} : responsiveSettings) };
     const placement =
@@ -166,34 +174,81 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
       () => mergeRefs(rootRef, directionRef),
       [directionRef],
     );
-    const count = Children.count(children);
+    const childCount = Children.toArray(children).filter((child) =>
+      typeof child === 'string' ? Boolean(child.trim()) : Boolean(child),
+    ).length;
+    const itemsPerSlide = (rest.rows ?? 1) * (rest.slidesPerRow ?? 1);
+    const count = Math.ceil(childCount / itemsPerSlide);
+    const ready = count > 0 && !unslick && responsiveSettings !== null;
+    const previousPosition = useRef<{
+      ready: boolean;
+      isRtl: boolean;
+      initialSlide: number;
+      slickGoTo: number | undefined;
+    } | null>(null);
     useImperativeHandle(
       ref,
       () => ({
         nativeElement: rootRef.current!,
         goTo: (slide, dontAnimate = false) =>
-          sliderRef.current!.slickGoTo(slide, dontAnimate),
-        next: () => sliderRef.current!.slickNext(),
-        prev: () => sliderRef.current!.slickPrev(),
+          sliderRef.current?.slickGoTo(slide, dontAnimate),
+        next: () => sliderRef.current?.slickNext(),
+        prev: () => sliderRef.current?.slickPrev(),
         autoPlay: (playType) =>
-          (sliderRef.current!.innerSlider as InnerSlider).autoPlay(playType),
+          (sliderRef.current?.innerSlider as InnerSlider | undefined)?.autoPlay(
+            playType,
+          ),
         get innerSlider() {
-          return sliderRef.current!.innerSlider!;
+          return sliderRef.current?.innerSlider;
         },
       }),
       [],
     );
     useEffect(() => {
-      if (count > 0 && !unslick)
-        sliderRef.current!.slickGoTo(
+      const root = rootRef.current;
+      if (!root) return;
+      // Slick hides slides from assistive technology but leaves their controls focusable.
+      const syncSlides = () => {
+        for (const slide of root.querySelectorAll(
+          '.slick-slide[aria-hidden]',
+        )) {
+          if (slide.closest('[data-tao-carousel]') === root) {
+            slide.toggleAttribute(
+              'inert',
+              slide.getAttribute('aria-hidden') === 'true',
+            );
+          }
+        }
+      };
+      syncSlides();
+      const observer = new MutationObserver(syncSlides);
+      observer.observe(root, {
+        subtree: true,
+        childList: true,
+        attributes: true,
+        attributeFilter: ['aria-hidden'],
+      });
+      return () => observer.disconnect();
+    }, []);
+    useEffect(() => {
+      const previous = previousPosition.current;
+      previousPosition.current = { ready, isRtl, initialSlide, slickGoTo };
+      if (!ready) return;
+      if (slickGoTo !== undefined) {
+        if (!previous?.ready || previous.slickGoTo !== slickGoTo) {
+          sliderRef.current?.slickGoTo(slickGoTo);
+        }
+      } else if (
+        !previous?.ready ||
+        previous.isRtl !== isRtl ||
+        previous.initialSlide !== initialSlide
+      ) {
+        sliderRef.current?.slickGoTo(
           isRtl ? count - initialSlide - 1 : initialSlide,
           true,
         );
-    }, [count, initialSlide, isRtl, unslick]);
-    useEffect(() => {
-      if (slickGoTo !== undefined && !unslick)
-        sliderRef.current!.slickGoTo(slickGoTo);
-    }, [slickGoTo, unslick]);
+      }
+    }, [count, initialSlide, isRtl, ready, slickGoTo]);
     return (
       <div
         ref={mergedRootRef}
@@ -231,6 +286,10 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
             )}
             appendDots={
               appendDots ?? ((items) => <ul style={styles?.dots}>{items}</ul>)
+            }
+            customPaging={
+              customPaging ??
+              ((index) => <button type="button">{index + 1}</button>)
             }
             arrows={arrows}
             prevArrow={

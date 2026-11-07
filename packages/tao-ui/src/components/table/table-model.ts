@@ -31,7 +31,7 @@ export function getCellValue<T extends TableRecord>(
   record: T,
   dataIndex?: keyof T,
 ): unknown {
-  if (!dataIndex) return undefined;
+  if (dataIndex == null) return undefined;
   return record[dataIndex];
 }
 

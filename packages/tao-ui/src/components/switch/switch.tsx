@@ -43,13 +43,16 @@ export interface SwitchProps
 }
 
 export const Switch = forwardRef(function Switch(
-  {
+  props: SwitchProps,
+  ref: ForwardedRef<HTMLButtonElement>,
+) {
+  const {
     checked,
     defaultChecked,
     onChange,
     disabled,
     loading,
-    size = 'medium',
+    size,
     checkedChildren,
     unCheckedChildren,
     className,
@@ -57,17 +60,16 @@ export const Switch = forwardRef(function Switch(
     classNames,
     styles,
     ...ariaProps
-  }: SwitchProps,
-  ref: ForwardedRef<HTMLButtonElement>,
-) {
+  } = props;
   const ctx = useTaoConfig();
+  const resolvedSize = size ?? (ctx.size === 'small' ? 'small' : 'medium');
   const resolvedDisabled = disabled ?? ctx.disabled ?? false;
   const isDisabled = resolvedDisabled || loading;
-  const controlled = checked !== undefined;
+  const controlled = 'checked' in props;
   const [internalChecked, setInternalChecked] = useState(
     defaultChecked ?? false,
   );
-  const resolvedChecked = controlled ? checked : internalChecked;
+  const resolvedChecked = controlled ? (checked ?? false) : internalChecked;
 
   const handleChange = () => {
     const next = !resolvedChecked;
@@ -87,7 +89,7 @@ export const Switch = forwardRef(function Switch(
       className={cx(classNames?.root, className)}
       style={{ ...styles?.root, ...style }}
       data-tao-switch=""
-      data-tao-size={size}
+      data-tao-size={resolvedSize}
       data-tao-checked={resolvedChecked || undefined}
       onClick={handleChange}
     >

@@ -181,6 +181,7 @@ export interface TransferProps<T extends TransferItem = TransferItem>
   dataSource?: T[];
   targetKeys?: TransferKey[];
   selectedKeys?: TransferKey[];
+  /** Item content; defaults to the title, or the key when the title is omitted. */
   render?: (item: T) => RenderResult;
   onChange?: (
     targetKeys: TransferKey[],

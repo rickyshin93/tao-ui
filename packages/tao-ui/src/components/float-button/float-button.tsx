@@ -59,6 +59,7 @@ export interface FloatButtonProps extends DOMAttributes<FloatButtonElement> {
   target?: HTMLAttributeAnchorTarget;
   badge?: FloatButtonBadgeProps;
   disabled?: boolean;
+  tabIndex?: number;
   htmlType?: 'button' | 'submit' | 'reset';
   'aria-label'?: string;
 }
@@ -146,7 +147,7 @@ const FloatButtonRoot = forwardRef<FloatButtonElement, FloatButtonProps>(
         type={href ? undefined : htmlType}
         disabled={href ? undefined : disabled}
         aria-disabled={(href && disabled) || undefined}
-        tabIndex={href && disabled ? -1 : undefined}
+        tabIndex={href && disabled ? -1 : rest.tabIndex}
         aria-label={
           props['aria-label'] ??
           (!hasLabel
@@ -207,7 +208,11 @@ const FloatButtonRoot = forwardRef<FloatButtonElement, FloatButtonProps>(
       !('$$typeof' in tooltip)
         ? (tooltip as Omit<TooltipProps, 'children'>)
         : { title: tooltip as ReactNode };
-    return tooltip ? <Tooltip {...tooltipProps}>{button}</Tooltip> : button;
+    return tooltip == null ? (
+      button
+    ) : (
+      <Tooltip {...tooltipProps}>{button}</Tooltip>
+    );
   },
 );
 FloatButtonRoot.displayName = 'FloatButton';
@@ -269,6 +274,7 @@ const FloatButtonGroup = forwardRef<FloatButtonGroupRef, FloatButtonGroupProps>(
     const expanded = open ?? internal;
     const root = useRef<HTMLDivElement>(null);
     const triggerRef = useRef<FloatButtonElement>(null);
+    const pointerInside = useRef(false);
     useImperativeHandle(ref, () => ({ nativeElement: root.current! }));
     const change = (next: boolean) => {
       if (disabled || next === expanded) return;
@@ -280,13 +286,14 @@ const FloatButtonGroup = forwardRef<FloatButtonGroupRef, FloatButtonGroupProps>(
       latestChange.current = change;
     });
     useEffect(() => {
-      if (trigger !== 'click') return;
+      const owner = root.current?.ownerDocument;
+      if (trigger !== 'click' || !owner) return;
       const outside = (event: MouseEvent) => {
         if (!root.current?.contains(event.target as Node))
           latestChange.current(false);
       };
-      document.addEventListener('click', outside, true);
-      return () => document.removeEventListener('click', outside, true);
+      owner.addEventListener('click', outside, true);
+      return () => owner.removeEventListener('click', outside, true);
     }, [trigger]);
     const merged = { ...props, shape, type, placement, disabled };
     const classes =
@@ -337,12 +344,28 @@ const FloatButtonGroup = forwardRef<FloatButtonGroupRef, FloatButtonGroupProps>(
         )}
         style={{ ...slots?.root, ...style }}
         onMouseEnter={() => {
+          pointerInside.current = true;
           if (trigger === 'hover') change(true);
         }}
-        onMouseLeave={() => {
-          if (trigger === 'hover') change(false);
+        onMouseLeave={(event) => {
+          pointerInside.current = false;
+          const group = event.currentTarget;
+          if (
+            trigger === 'hover' &&
+            !group.contains(group.ownerDocument.activeElement)
+          )
+            change(false);
+        }}
+        onBlur={(event) => {
+          if (
+            trigger === 'hover' &&
+            !pointerInside.current &&
+            !event.currentTarget.contains(event.relatedTarget)
+          )
+            change(false);
         }}
         onKeyDown={(event) => {
+          if (event.defaultPrevented) return;
           if (
             [
               'ArrowUp',
@@ -403,8 +426,10 @@ const FloatButtonGroup = forwardRef<FloatButtonGroupRef, FloatButtonGroupProps>(
               disabled={disabled}
               aria-expanded={expanded}
               onClick={(event) => {
-                if (trigger === 'click') change(!expanded);
                 onClick?.(event);
+                if (!event.defaultPrevented && trigger === 'click') {
+                  change(!expanded);
+                }
               }}
               onFocus={(event) => {
                 if (trigger === 'hover') change(true);
@@ -427,11 +452,11 @@ export interface FloatButtonBackTopProps
 }
 export type BackTopProps = FloatButtonBackTopProps;
 const defaultTarget = () => document;
-function scrollElement(target: HTMLElement | Window | Document): HTMLElement {
-  return target === window || target instanceof Document
-    ? ((target instanceof Document ? target : document)
-        .scrollingElement as HTMLElement)
-    : (target as HTMLElement);
+function scrollElement(target: HTMLElement | Window | Document): Element {
+  if ('document' in target) return scrollElement(target.document);
+  if ('scrollingElement' in target)
+    return target.scrollingElement ?? target.documentElement;
+  return target;
 }
 const BackTop = forwardRef<FloatButtonRef, FloatButtonBackTopProps>(
   (props, ref) => {
@@ -449,17 +474,21 @@ const BackTop = forwardRef<FloatButtonRef, FloatButtonBackTopProps>(
     const [scroll, setScroll] = useState({ visible: false, progress: 0 });
     const node = useRef<FloatButtonElement>(null);
     const animation = useRef(0);
-    const previousTarget = useRef<HTMLElement | Window | Document | undefined>(
-      undefined,
-    );
+    const [container, setContainer] = useState<
+      HTMLElement | Window | Document
+    >();
     useImperativeHandle(ref, () => ({ nativeElement: node.current }));
     useEffect(() => () => cancelAnimationFrame(animation.current), []);
     useEffect(() => {
-      const container = target();
-      if (container !== previousTarget.current)
-        cancelAnimationFrame(animation.current);
-      previousTarget.current = container;
+      const next = target();
+      if (next === container) return;
+      cancelAnimationFrame(animation.current);
+      setContainer(next);
+    });
+    useEffect(() => {
+      if (!container) return;
       const element = scrollElement(container);
+      const view = element.ownerDocument.defaultView ?? window;
       const update = () => {
         const top = element.scrollTop;
         const total = element.scrollHeight - element.clientHeight;
@@ -469,18 +498,20 @@ const BackTop = forwardRef<FloatButtonRef, FloatButtonBackTopProps>(
         });
       };
       container.addEventListener('scroll', update, { passive: true });
-      window.addEventListener('resize', update);
+      view.addEventListener('resize', update);
       const observer = new ResizeObserver(update);
       observer.observe(element);
       update();
       return () => {
         container.removeEventListener('scroll', update);
-        window.removeEventListener('resize', update);
+        view.removeEventListener('resize', update);
         observer.disconnect();
       };
-    }, [target, visibilityHeight]);
+    }, [container, visibilityHeight]);
     const click: FloatButtonProps['onClick'] = (event) => {
-      const element = scrollElement(target());
+      onClick?.(event);
+      if (!container || event.defaultPrevented) return;
+      const element = scrollElement(container);
       const start = element.scrollTop;
       const time = performance.now();
       cancelAnimationFrame(animation.current);
@@ -497,7 +528,6 @@ const BackTop = forwardRef<FloatButtonRef, FloatButtonBackTopProps>(
         };
         animation.current = requestAnimationFrame(tick);
       }
-      onClick?.(event);
     };
     return scroll.visible ? (
       <FloatButtonRoot

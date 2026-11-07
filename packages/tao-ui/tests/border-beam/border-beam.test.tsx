@@ -83,3 +83,59 @@ test('empty items and text children preserve their content without creating effe
   expect(screen.getByText('Text')).toBeTruthy();
   expect(container.querySelector('[data-tao-border-beam]')).toBeNull();
 });
+
+test('restarts the animation on a replacement host', () => {
+  const frames: FrameRequestCallback[] = [];
+  rstest
+    .spyOn(globalThis, 'requestAnimationFrame')
+    .mockImplementation((callback) => {
+      frames.push(callback);
+      return frames.length;
+    });
+  const cancel = rstest.spyOn(globalThis, 'cancelAnimationFrame');
+  const { rerender } = render(
+    <BorderBeam>
+      <div key="before">First host</div>
+    </BorderBeam>,
+  );
+  act(() => frames[0](10));
+  const oldFrame = frames.length;
+
+  rerender(
+    <BorderBeam>
+      <div key="after">Replacement host</div>
+    </BorderBeam>,
+  );
+
+  expect(cancel).toHaveBeenCalledWith(oldFrame);
+  act(() => frames[oldFrame](20));
+  expect(
+    screen
+      .getByText('Replacement host')
+      .querySelector<HTMLElement>('[data-tao-border-beam-light]')?.style
+      .transform,
+  ).toContain('translate');
+});
+
+test('releases the positioning override when all beams are paused', () => {
+  const { rerender } = render(
+    <BorderBeam>
+      <div style={{ position: 'static' }}>Host</div>
+    </BorderBeam>,
+  );
+  const host = screen.getByText('Host');
+  expect(host).toHaveStyle({ position: 'relative' });
+  rerender(
+    <BorderBeam items={[]}>
+      <div style={{ position: 'static' }}>Host</div>
+    </BorderBeam>,
+  );
+  expect(host).toHaveStyle({ position: 'static' });
+  expect(host.querySelector('[data-tao-border-beam]')).toBeNull();
+  rerender(
+    <BorderBeam>
+      <div style={{ position: 'static' }}>Host</div>
+    </BorderBeam>,
+  );
+  expect(host).toHaveStyle({ position: 'relative' });
+});

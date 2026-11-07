@@ -77,12 +77,16 @@ export interface DescriptionsRef {
 }
 const renderable = (value: ReactNode) =>
   value !== undefined && value !== null && typeof value !== 'boolean';
-function childrenToItems(children: ReactNode): DescriptionsItemType[] {
+function childrenToItems(
+  children: ReactNode,
+  parentKeys: (string | null)[] = [],
+): DescriptionsItemType[] {
   return Children.toArray(children).flatMap((child) => {
     if (!isValidElement<DescriptionsItemProps>(child)) return [];
+    const keys = [...parentKeys, child.key];
     return child.type === Fragment
-      ? childrenToItems(child.props.children)
-      : [{ ...child.props, key: child.key ?? undefined }];
+      ? childrenToItems(child.props.children, keys)
+      : [{ ...child.props, key: JSON.stringify(keys) }];
   });
 }
 function DescriptionsItem({ children }: DescriptionsItemProps) {

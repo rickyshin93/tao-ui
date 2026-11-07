@@ -168,7 +168,9 @@ const StatisticRoot = forwardRef<StatisticRef, StatisticProps>((props, ref) => {
     >
       {typeof formatter === 'function'
         ? formatter(value)
-        : formattedNumber(value, precision, numberFormat)}
+        : formatter === false
+          ? value
+          : formattedNumber(value, precision, numberFormat)}
     </span>
   );
   return (
@@ -273,16 +275,23 @@ function StatisticTimer({
   useLayoutEffect(() => {
     callbacks.current = { onChange, onFinish };
   }, [onChange, onFinish]);
-  const target = new Date(value as StatisticValue).getTime();
+  const timestamp = value === undefined ? NaN : new Date(value).getTime();
+  const target = Number.isNaN(timestamp) ? undefined : timestamp;
   useEffect(() => {
+    if (target === undefined) {
+      setNow(undefined);
+      return;
+    }
     setNow(Date.now());
     const timer = setInterval(() => {
       const current = Date.now();
-      const difference =
-        type === 'countdown' ? target - current : current - target;
+      const difference = Math.max(
+        0,
+        type === 'countdown' ? target - current : current - target,
+      );
       setNow(current);
       callbacks.current.onChange?.(difference);
-      if (type === 'countdown' && current > target) {
+      if (type === 'countdown' && current >= target) {
         clearInterval(timer);
         callbacks.current.onFinish?.();
       }
@@ -293,9 +302,8 @@ function StatisticTimer({
     <StatisticRoot
       {...rest}
       value={value}
-      valueRender={undefined}
       formatter={() =>
-        now === undefined
+        now === undefined || target === undefined
           ? '-'
           : formatDuration(
               type === 'countdown' ? target - now : now - target,

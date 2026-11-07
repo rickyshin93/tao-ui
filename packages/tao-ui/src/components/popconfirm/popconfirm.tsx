@@ -2,6 +2,7 @@ import {
   type CSSProperties,
   type MouseEvent,
   type ReactNode,
+  useEffect,
   useId,
 } from 'react';
 import { useControlledOpen } from '../../utils/overlay';
@@ -72,7 +73,7 @@ export function Popconfirm({
   okButtonProps,
   cancelButtonProps,
   icon,
-  disabled = false,
+  disabled: disabledProp,
   open,
   defaultOpen,
   onOpenChange,
@@ -83,17 +84,21 @@ export function Popconfirm({
   styles,
   children,
 }: PopconfirmProps) {
-  const { locale } = useTaoConfig();
+  const { locale, disabled: providerDisabled } = useTaoConfig();
+  const disabled = disabledProp ?? providerDisabled;
   const titleId = useId();
   const descriptionId = useId();
   // antd semantics: a disabled Popconfirm never opens on click,
   // while the trigger element itself stays enabled.
   const [realOpen, setOpen] = useControlledOpen({
     open,
-    defaultOpen,
+    defaultOpen: !disabled && defaultOpen,
     onOpenChange,
     canOpen: !disabled,
   });
+  useEffect(() => {
+    if (disabled && realOpen && open == null) setOpen(false);
+  }, [disabled, open, realOpen, setOpen]);
 
   const handleConfirm = (e: MouseEvent<HTMLElement>) => {
     onConfirm?.(e);
@@ -154,16 +159,24 @@ export function Popconfirm({
         <Button
           variant="secondary"
           size="small"
-          onClick={handleCancel}
           {...cancelButtonProps}
+          disabled={cancelButtonProps?.disabled ?? disabled}
+          onClick={(event) => {
+            cancelButtonProps?.onClick?.(event);
+            if (!event.defaultPrevented) handleCancel(event);
+          }}
         >
           {cancelText === undefined ? locale.cancel : cancelText}
         </Button>
         <Button
           variant="primary"
           size="small"
-          onClick={handleConfirm}
           {...okButtonProps}
+          disabled={okButtonProps?.disabled ?? disabled}
+          onClick={(event) => {
+            okButtonProps?.onClick?.(event);
+            if (!event.defaultPrevented) handleConfirm(event);
+          }}
         >
           {okText === undefined ? locale.ok : okText}
         </Button>
@@ -175,7 +188,7 @@ export function Popconfirm({
     <Popover
       trigger="click"
       placement={placement}
-      open={realOpen}
+      open={realOpen && !disabled}
       onOpenChange={setOpen}
       content={content}
       aria-labelledby={title != null ? titleId : undefined}

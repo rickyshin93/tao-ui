@@ -54,6 +54,14 @@ function parseSize(
   return parseFloat(value);
 }
 
+function canResizeBetween(panels: SplitterPanelProps[], index: number) {
+  return (
+    index < panels.length - 1 &&
+    (panels[index].resizable ?? true) &&
+    (panels[index + 1].resizable ?? true)
+  );
+}
+
 function allocateSizes(
   panels: SplitterPanelProps[],
   previous: number[],
@@ -236,8 +244,19 @@ export function Splitter({
   }, [containerSize, panelCount, panels, sizes]);
 
   // ---- Drag logic ----
-  const dragCleanup = useRef<(() => void) | null>(null);
-  useEffect(() => () => dragCleanup.current?.(), []);
+  const activeDrag = useRef<{ index: number; cleanup: () => void } | null>(
+    null,
+  );
+  useEffect(() => {
+    // A drag belongs to the orientation and panel count where it started.
+    void orientation;
+    void panelCount;
+    return () => activeDrag.current?.cleanup();
+  }, [orientation, panelCount]);
+  useEffect(() => {
+    const drag = activeDrag.current;
+    if (drag && !canResizeBetween(panels, drag.index)) drag.cleanup();
+  }, [panels]);
 
   const resizePanels = useCallback(
     (index: number, delta: number, startSizes: number[]) => {
@@ -268,9 +287,11 @@ export function Splitter({
 
   const handleDragStart = useCallback(
     (index: number, e: React.PointerEvent) => {
+      if (e.button !== 0) return;
       e.preventDefault();
-      dragCleanup.current?.();
+      activeDrag.current?.cleanup();
       const pos = isHorizontal ? e.clientX : e.clientY;
+      const ownerDocument = e.currentTarget.ownerDocument;
       const pointerId = e.pointerId;
       const sign =
         isHorizontal &&
@@ -279,7 +300,6 @@ export function Splitter({
           : 1;
       const startSizes = [...sizes];
       let currentSizes = startSizes;
-      onResizeStart?.(sizes);
 
       const handleMove = (ev: PointerEvent) => {
         if (ev.pointerId !== pointerId) return;
@@ -293,27 +313,30 @@ export function Splitter({
       };
 
       const cleanup = () => {
-        document.removeEventListener('pointermove', handleMove);
-        document.removeEventListener('pointerup', handleEnd);
-        document.removeEventListener('pointercancel', handleEnd);
-        dragCleanup.current = null;
+        ownerDocument.removeEventListener('pointermove', handleMove);
+        ownerDocument.removeEventListener('pointerup', handleEnd);
+        ownerDocument.removeEventListener('pointercancel', handleEnd);
+        activeDrag.current = null;
       };
       const handleEnd = (ev: PointerEvent) => {
         if (ev.pointerId !== pointerId) return;
         cleanup();
         onResizeEnd?.(currentSizes);
       };
-      dragCleanup.current = cleanup;
+      activeDrag.current = { index, cleanup };
 
-      document.addEventListener('pointermove', handleMove);
-      document.addEventListener('pointerup', handleEnd);
-      document.addEventListener('pointercancel', handleEnd);
+      ownerDocument.addEventListener('pointermove', handleMove);
+      ownerDocument.addEventListener('pointerup', handleEnd);
+      ownerDocument.addEventListener('pointercancel', handleEnd);
+      onResizeStart?.(sizes);
     },
     [isHorizontal, sizes, onResize, onResizeEnd, onResizeStart, resizePanels],
   );
 
   const handleDraggerKeyDown = useCallback(
     (index: number, event: React.KeyboardEvent<HTMLDivElement>) => {
+      if (event.defaultPrevented || event.target !== event.currentTarget)
+        return;
       const rtl = getComputedStyle(event.currentTarget).direction === 'rtl';
       const growKey = isHorizontal
         ? rtl
@@ -328,8 +351,10 @@ export function Splitter({
       if (event.key !== growKey && event.key !== shrinkKey) return;
       event.preventDefault();
       const delta = event.key === growKey ? 10 : -10;
-      onResizeStart?.(sizes);
       const next = resizePanels(index, delta, sizes);
+      if (next[index] === sizes[index] && next[index + 1] === sizes[index + 1])
+        return;
+      onResizeStart?.(sizes);
       setSizes(next);
       onResize?.(next);
       onResizeEnd?.(next);
@@ -338,7 +363,7 @@ export function Splitter({
   );
 
   // ---- Collapse ----
-  const handleCollapse = useCallback(
+  const getCollapseSizes = useCallback(
     (index: number, direction: 'start' | 'end') => {
       const draggerSpace = (panelCount - 1) * 1;
       const available = containerSize - draggerSpace;
@@ -346,30 +371,47 @@ export function Splitter({
       const targetIdx = direction === 'start' ? index : index + 1;
       const adjacentIdx = direction === 'start' ? index + 1 : index;
 
-      setSizes((prev) => {
-        const next = [...prev];
-        const isCollapsed = next[targetIdx] <= 0;
+      const next = [...sizes];
+      const isCollapsed = next[targetIdx] <= 0;
+      const target = panels[targetIdx];
+      const adjacent = panels[adjacentIdx];
+      const adjacentMax = parseSize(adjacent.max, available);
 
-        if (isCollapsed) {
-          // Expand to default or equal split
-          const def = parseSize(panels[targetIdx].defaultSize, available);
-          const expandTo = def ?? available / panelCount;
-          const take = Math.min(expandTo, next[adjacentIdx]);
-          next[targetIdx] = take;
-          next[adjacentIdx] -= take;
-        } else {
-          // Collapse
-          next[adjacentIdx] += next[targetIdx];
-          next[targetIdx] = 0;
+      if (isCollapsed) {
+        const adjacentMin = parseSize(adjacent.min, available) ?? 0;
+        const targetMin = parseSize(target.min, available) ?? 0;
+        const targetMax = parseSize(target.max, available) ?? Infinity;
+        const minTake = Math.max(
+          targetMin,
+          next[adjacentIdx] - (adjacentMax ?? Infinity),
+        );
+        const maxTake = Math.min(targetMax, next[adjacentIdx] - adjacentMin);
+        if (maxTake < minTake || maxTake <= 0) return;
+        const def = parseSize(target.defaultSize, available);
+        const expandTo = def && def > 0 ? def : available / panelCount;
+        const take = Math.max(minTake, Math.min(expandTo, maxTake));
+        next[targetIdx] = take;
+        next[adjacentIdx] -= take;
+      } else {
+        if (
+          adjacentMax !== undefined &&
+          next[adjacentIdx] + next[targetIdx] > adjacentMax
+        ) {
+          return;
         }
-
-        onResize?.(next);
-        onResizeEnd?.(next);
-        return next;
-      });
+        next[adjacentIdx] += next[targetIdx];
+        next[targetIdx] = 0;
+      }
+      return next;
     },
-    [panelCount, containerSize, panels, onResize, onResizeEnd],
+    [panelCount, containerSize, panels, sizes],
   );
+
+  const handleCollapse = (next: number[]) => {
+    setSizes(next);
+    onResize?.(next);
+    onResizeEnd?.(next);
+  };
 
   // ---- Collapsible config for each dragger ----
   function getDraggerCollapse(index: number): { start: boolean; end: boolean } {
@@ -418,14 +460,15 @@ export function Splitter({
           ? { width: sizes[i], flexShrink: 0, flexGrow: 0 }
           : { height: sizes[i], flexShrink: 0, flexGrow: 0 };
         const isCollapsed = sizes[i] <= 0;
-        const draggerResizable =
-          i < panelCount - 1 &&
-          (panel.resizable ?? true) &&
-          (panels[i + 1]?.resizable ?? true);
+        const draggerResizable = canResizeBetween(panels, i);
         const available = containerSize - (panelCount - 1);
         const pairSize = sizes[i] + (sizes[i + 1] ?? 0);
-        const valueMin = parseSize(panel.min, available) ?? 0;
         const nextMin = parseSize(panels[i + 1]?.min, available) ?? 0;
+        const nextMax = parseSize(panels[i + 1]?.max, available) ?? pairSize;
+        const valueMin = Math.max(
+          parseSize(panel.min, available) ?? 0,
+          pairSize - nextMax,
+        );
         const valueMax = Math.min(
           parseSize(panel.max, available) ?? pairSize,
           pairSize - nextMin,
@@ -450,8 +493,8 @@ export function Splitter({
                 role="separator"
                 aria-label={locale.messages.resizePanels(i + 1, i + 2)}
                 aria-orientation={isHorizontal ? 'vertical' : 'horizontal'}
-                aria-valuemin={Math.round(valueMin)}
-                aria-valuemax={Math.round(valueMax)}
+                aria-valuemin={Math.round(Math.min(valueMin, sizes[i]))}
+                aria-valuemax={Math.round(Math.max(valueMax, sizes[i]))}
                 aria-valuenow={Math.round(sizes[i])}
                 tabIndex={draggerResizable ? 0 : undefined}
                 className={cx(classNames?.dragger)}
@@ -468,6 +511,10 @@ export function Splitter({
                 <div data-tao-splitter-dragger-bar="" />
                 {(() => {
                   const { start, end } = getDraggerCollapse(i);
+                  const startSizes = start
+                    ? getCollapseSizes(i, 'start')
+                    : undefined;
+                  const endSizes = end ? getCollapseSizes(i, 'end') : undefined;
                   return (
                     <>
                       {start && (
@@ -477,7 +524,9 @@ export function Splitter({
                           data-tao-collapse-direction="start"
                           data-tao-orientation={orientation}
                           aria-label={locale.messages.collapsePanel}
-                          onClick={() => handleCollapse(i, 'start')}
+                          disabled={!startSizes}
+                          onPointerDown={(event) => event.stopPropagation()}
+                          onClick={() => startSizes && handleCollapse(startSizes)}
                         >
                           <CollapseIcon
                             direction={sizes[i] <= 0 ? 'end' : 'start'}
@@ -492,7 +541,9 @@ export function Splitter({
                           data-tao-collapse-direction="end"
                           data-tao-orientation={orientation}
                           aria-label={locale.messages.collapsePanel}
-                          onClick={() => handleCollapse(i, 'end')}
+                          disabled={!endSizes}
+                          onPointerDown={(event) => event.stopPropagation()}
+                          onClick={() => endSizes && handleCollapse(endSizes)}
                         >
                           <CollapseIcon
                             direction={sizes[i + 1] <= 0 ? 'start' : 'end'}

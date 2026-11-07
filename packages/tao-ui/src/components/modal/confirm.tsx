@@ -30,17 +30,12 @@ export default function confirm(config: ModalFuncProps): ModalFuncReturn {
     mounted = true;
   }
 
-  function destroy() {
+  function afterClose() {
     if (destroyed) return;
     destroyed = true;
     root.unmount();
-    const idx = destroyFns.indexOf(destroy);
+    const idx = destroyFns.indexOf(afterClose);
     if (idx !== -1) destroyFns.splice(idx, 1);
-  }
-
-  function afterClose() {
-    if (destroyed) return;
-    destroy();
     currentConfig.afterClose?.();
   }
 
@@ -77,7 +72,7 @@ export default function confirm(config: ModalFuncProps): ModalFuncReturn {
   }
 
   render();
-  destroyFns.push(destroy);
+  destroyFns.push(afterClose);
 
   return { destroy: close, update };
 }

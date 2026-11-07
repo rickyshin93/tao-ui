@@ -5,6 +5,7 @@ import {
   Fragment,
   forwardRef,
   type HTMLAttributes,
+  isValidElement,
   type Key,
   type ReactElement,
   type ReactNode,
@@ -201,15 +202,23 @@ const ItemRoot = forwardRef<HTMLDivElement, ListItemProps>(
     ref,
   ) => {
     const { itemLayout = 'horizontal', grid } = useContext(ListContext);
-    const actionNodes = actions?.length ? (
+    const actionItems = actions?.flatMap((action, index) => {
+      if (action == null || typeof action === 'boolean' || action === '')
+        return [];
+      const key = isValidElement(action) ? action.key : null;
+      return [
+        <li key={key == null ? `index:${index}` : `action:${key}`}>
+          {action}
+        </li>,
+      ];
+    });
+    const actionNodes = actionItems?.length ? (
       <ul
         data-tao-list-item-actions=""
         className={classNames?.actions}
         style={styles?.actions}
       >
-        {actions.map((action, index) => (
-          <li key={String(index)}>{action}</li>
-        ))}
+        {actionItems}
       </ul>
     ) : null;
     return (
@@ -306,6 +315,8 @@ function ListRoot<T>(
     1,
     Math.min(paging.current ?? page, Math.ceil(total / resolvedPageSize)),
   );
+  if (pagination && paging.current === undefined && page !== current)
+    setPage(current);
   const start = (current - 1) * resolvedPageSize;
   const data =
     pagination && dataSource.length > start
@@ -338,13 +349,19 @@ function ListRoot<T>(
     ) : null;
   const content = data.length
     ? data.map((value, index) => {
-        const key =
+        const rendered = renderItem?.(value, index);
+        const configuredKey =
           typeof rowKey === 'function'
             ? rowKey(value)
-            : rowKey
+            : rowKey != null
               ? (value[rowKey] as Key)
-              : ((value as { key?: Key })?.key ?? index);
-        return <Fragment key={key}>{renderItem?.(value, index)}</Fragment>;
+              : undefined;
+        const key =
+          configuredKey ??
+          (value as { key?: Key })?.key ??
+          (isValidElement(rendered) ? rendered.key : null) ??
+          index;
+        return <Fragment key={key}>{rendered}</Fragment>;
       })
     : children;
   return (
@@ -377,7 +394,7 @@ function ListRoot<T>(
             className={classNames?.items}
             style={styles?.items}
           >
-            {Children.count(content) ? (
+            {data.length || Children.toArray(children).length ? (
               content
             ) : isLoading ? (
               <li data-tao-list-loading="" />

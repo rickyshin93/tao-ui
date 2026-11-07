@@ -1,6 +1,7 @@
 import { expect, test } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
 import { FormField } from '../../src/components/form-field/form-field';
+import { Form } from '../../src/components/form/form';
 import { Select } from '../../src/components/select/select';
 
 test('renders label text', () => {
@@ -50,46 +51,46 @@ test.each([
   { name: 'desktop', mobile: false, showSearch: false },
   { name: 'searchable', mobile: false, showSearch: true },
   { name: 'mobile', mobile: true, showSearch: false },
-])('links label and validation to the $name Select control', ({
-  mobile,
-  showSearch,
-}) => {
-  const field = (error?: string) => (
-    <>
-      <p id="language-hint">Existing language hint</p>
-      <FormField
-        label="Language"
-        required
-        error={error}
-        description="Choose your language"
-      >
-        <Select
-          mobile={mobile}
-          showSearch={showSearch}
-          defaultValue="zh"
-          options={[{ label: 'Chinese', value: 'zh' }]}
-          aria-describedby="language-hint"
-        />
-      </FormField>
-    </>
-  );
-  const { rerender } = render(field('Unsupported language'));
-  const control = screen.getByRole(mobile ? 'button' : 'combobox');
-  expect(control).toHaveAccessibleName('Language');
-  expect(control).toHaveAccessibleDescription(
-    'Existing language hint Unsupported language',
-  );
-  expect(control).toHaveAccessibleErrorMessage('Unsupported language');
-  expect(control).toHaveAttribute('aria-required', 'true');
+])(
+  'links label and validation to the $name Select control',
+  ({ mobile, showSearch }) => {
+    const field = (error?: string) => (
+      <>
+        <p id="language-hint">Existing language hint</p>
+        <FormField
+          label="Language"
+          required
+          error={error}
+          description="Choose your language"
+        >
+          <Select
+            mobile={mobile}
+            showSearch={showSearch}
+            defaultValue="zh"
+            options={[{ label: 'Chinese', value: 'zh' }]}
+            aria-describedby="language-hint"
+          />
+        </FormField>
+      </>
+    );
+    const { rerender } = render(field('Unsupported language'));
+    const control = screen.getByRole(mobile ? 'button' : 'combobox');
+    expect(control).toHaveAccessibleName('Language');
+    expect(control).toHaveAccessibleDescription(
+      'Existing language hint Unsupported language',
+    );
+    expect(control).toHaveAccessibleErrorMessage('Unsupported language');
+    expect(control).toHaveAttribute('aria-required', 'true');
 
-  rerender(field());
-  expect(control).toHaveAccessibleName('Language');
-  expect(control).toHaveAccessibleDescription(
-    'Existing language hint Choose your language',
-  );
-  expect(control).not.toHaveAttribute('aria-invalid');
-  expect(control).not.toHaveAttribute('aria-errormessage');
-});
+    rerender(field());
+    expect(control).toHaveAccessibleName('Language');
+    expect(control).toHaveAccessibleDescription(
+      'Existing language hint Choose your language',
+    );
+    expect(control).not.toHaveAttribute('aria-invalid');
+    expect(control).not.toHaveAttribute('aria-errormessage');
+  },
+);
 
 test('preserves native control errors unless the field supplies its own error', () => {
   const field = (error?: string) => (
@@ -166,4 +167,26 @@ test('description renders when provided', () => {
     </FormField>,
   );
   expect(screen.getByText('Your full name')).toBeTruthy();
+});
+
+test('conditional Form.Item labels do not create an empty labelling element', () => {
+  const { container } = render(
+    <Form.Item label={false} required>
+      <input placeholder="Email" />
+    </Form.Item>,
+  );
+  expect(container.querySelector('[data-tao-form-label]')).toBeNull();
+  expect(screen.getByRole('textbox')).not.toHaveAttribute('aria-labelledby');
+});
+
+test('numeric zero is rendered and connected as a Form.Item error', () => {
+  render(
+    <Form.Item label="Code" validateStatus="error" help={0}>
+      <input />
+    </Form.Item>,
+  );
+  expect(screen.getByRole('alert')).toHaveTextContent('0');
+  expect(
+    screen.getByRole('textbox', { name: 'Code' }),
+  ).toHaveAccessibleDescription('0');
 });

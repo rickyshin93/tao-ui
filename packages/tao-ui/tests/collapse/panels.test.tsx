@@ -69,6 +69,23 @@ test('headers support native Enter and Space activation', async () => {
   expect(screen.getByText('Account details')).not.toBeVisible();
 });
 
+test('an explicitly empty controlled key overrides the default and rejects local expansion', async () => {
+  const onChange = rs.fn();
+  render(
+    <Collapse
+      items={items}
+      activeKey={undefined}
+      defaultActiveKey="a"
+      onChange={onChange}
+    />,
+  );
+  const account = screen.getByRole('button', { name: 'Account' });
+  expect(account).toHaveAttribute('aria-expanded', 'false');
+  await userEvent.click(account);
+  expect(onChange).toHaveBeenCalledExactlyOnceWith(['a']);
+  expect(account).toHaveAttribute('aria-expanded', 'false');
+});
+
 test('provider and per-item disabled states prevent expansion', async () => {
   const user = userEvent.setup();
   const view = render(

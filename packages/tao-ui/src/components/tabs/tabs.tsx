@@ -5,10 +5,16 @@ import {
   useCallback,
   useEffect,
   useId,
+  useMemo,
   useRef,
   useState,
 } from 'react';
-import { type TaoSize, useTaoConfig } from '../../provider/tao-provider';
+import {
+  type TaoSize,
+  useTaoConfig,
+  useTaoDirection,
+} from '../../provider/tao-provider';
+import { mergeRefs } from '../../utils/refs';
 import {
   cx,
   type SemanticClassNames,
@@ -60,6 +66,8 @@ export function Tabs({
   const ctx = useTaoConfig();
   const id = useId();
   const resolvedSize = size ?? ctx.size;
+  const getItemId = (part: 'tab' | 'panel', key: string) =>
+    `${id}-${part}-${encodeURIComponent(key)}`;
 
   // Controlled / uncontrolled
   const isControlled = activeKeyProp !== undefined;
@@ -83,22 +91,34 @@ export function Tabs({
     : isInternalKeyEnabled
       ? internalKey
       : firstEnabledKey;
-  const focusKey = items.some(
+  const [focusedKey, setFocusedKey] = useState<string>();
+  const entryKey = items.some(
     (item) => item.key === currentKey && !item.disabled,
   )
     ? currentKey
     : firstEnabledKey;
+  const focusKey = items.some(
+    (item) => item.key === focusedKey && !item.disabled,
+  )
+    ? focusedKey
+    : entryKey;
 
   const handleSelect = useCallback(
     (key: string) => {
+      if (key === currentKey) return;
       if (!isControlled) setInternalKey(key);
       onChange?.(key);
     },
-    [isControlled, onChange],
+    [currentKey, isControlled, onChange],
   );
 
   // Ink bar (line variant)
   const tablistRef = useRef<HTMLDivElement>(null);
+  const [direction, directionRef] = useTaoDirection(undefined, 'self');
+  const listRef = useMemo(
+    () => mergeRefs(tablistRef, directionRef),
+    [directionRef],
+  );
   const [inkStyle, setInkStyle] = useState<{
     left: number;
     width: number;
@@ -114,14 +134,37 @@ export function Tabs({
           `[data-tao-tab-key="${CSS.escape(activeItem.key)}"]`,
         )
       : null;
-    setInkStyle(
-      active ? { left: active.offsetLeft, width: active.offsetWidth } : null,
-    );
-  }, [currentKey, variant, items]);
+    if (!active) {
+      setInkStyle(null);
+      return;
+    }
+    const measure = () => {
+      const { offsetLeft, offsetWidth: width } = active;
+      // The ink starts at the right edge of the list in RTL.
+      const left =
+        direction === 'rtl'
+          ? offsetLeft + width - list.clientWidth
+          : offsetLeft;
+      setInkStyle((previous) =>
+        previous?.left === left && previous.width === width
+          ? previous
+          : { left, width },
+      );
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(list);
+    for (const tab of list.querySelectorAll('[data-tao-tab]')) {
+      observer.observe(tab);
+    }
+    return () => observer.disconnect();
+  }, [currentKey, direction, variant, items]);
 
   // Keyboard nav
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
+      if (e.defaultPrevented || !e.currentTarget.contains(e.target as Node))
+        return;
       const enabledItems = items.filter((t) => !t.disabled);
       if (enabledItems.length === 0) return;
       const focusedKey =
@@ -132,16 +175,10 @@ export function Tabs({
       let next: TabItem | undefined;
 
       const rtl = getComputedStyle(e.currentTarget).direction === 'rtl';
-      if (
-        e.key === (rtl ? 'ArrowLeft' : 'ArrowRight') ||
-        e.key === 'ArrowDown'
-      ) {
+      if (e.key === (rtl ? 'ArrowLeft' : 'ArrowRight')) {
         e.preventDefault();
         next = enabledItems[(idx + 1) % enabledItems.length];
-      } else if (
-        e.key === (rtl ? 'ArrowRight' : 'ArrowLeft') ||
-        e.key === 'ArrowUp'
-      ) {
+      } else if (e.key === (rtl ? 'ArrowRight' : 'ArrowLeft')) {
         e.preventDefault();
         next =
           enabledItems[(idx - 1 + enabledItems.length) % enabledItems.length];
@@ -180,17 +217,25 @@ export function Tabs({
         style={styles?.nav}
       >
         <div
-          ref={tablistRef}
+          ref={listRef}
           role="tablist"
           aria-label={ariaLabel}
           aria-labelledby={ariaLabelledBy}
           data-tao-tabs-list=""
+          onBlur={(event) => {
+            if (
+              !(event.relatedTarget instanceof Node) ||
+              !event.currentTarget.contains(event.relatedTarget)
+            ) {
+              setFocusedKey(undefined);
+            }
+          }}
           onKeyDown={handleKeyDown}
         >
           {items.map((item) => {
             const isActive = item.key === currentKey;
-            const tabId = `${id}-tab-${item.key}`;
-            const panelId = `${id}-panel-${item.key}`;
+            const tabId = getItemId('tab', item.key);
+            const panelId = getItemId('panel', item.key);
             return (
               <button
                 key={item.key}
@@ -208,7 +253,14 @@ export function Tabs({
                 data-tao-active={isActive || undefined}
                 data-tao-disabled={item.disabled || undefined}
                 disabled={item.disabled}
-                onClick={() => handleSelect(item.key)}
+                onFocus={(event) => {
+                  if (event.currentTarget.contains(event.target))
+                    setFocusedKey(item.key);
+                }}
+                onClick={(event) => {
+                  if (event.currentTarget.contains(event.target as Node))
+                    handleSelect(item.key);
+                }}
                 className={cx(classNames?.tab)}
                 style={styles?.tab}
               >
@@ -221,6 +273,8 @@ export function Tabs({
               data-tao-tabs-ink=""
               style={{
                 transform: `translateX(${inkStyle.left}px) scaleX(${inkStyle.width})`,
+                transformOrigin:
+                  direction === 'rtl' ? 'right center' : undefined,
                 ...styles?.indicator,
               }}
               className={cx(classNames?.indicator)}
@@ -231,15 +285,14 @@ export function Tabs({
 
       {items.map((item) => {
         const isActive = item.key === currentKey;
-        const tabId = `${id}-tab-${item.key}`;
-        const panelId = `${id}-panel-${item.key}`;
+        const tabId = getItemId('tab', item.key);
+        const panelId = getItemId('panel', item.key);
         if (destroyInactiveTabPane && !isActive) return null;
         return (
           <div
             key={item.key}
             role="tabpanel"
-            // biome-ignore lint/a11y/noNoninteractiveTabindex: WAI-ARIA APG includes text-only tabpanels in the Tab sequence.
-            tabIndex={0}
+            tabIndex={isActive ? 0 : -1}
             id={panelId}
             aria-labelledby={tabId}
             hidden={!isActive}

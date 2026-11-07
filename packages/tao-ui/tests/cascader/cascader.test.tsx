@@ -126,6 +126,142 @@ test('mobile drawer search uses the cascader path search', async () => {
   );
 });
 
+test('mobile multiple selection clears uncontrolled search after a pick', async () => {
+  render(<Cascader mobile multiple defaultOpen showSearch options={options} />);
+  const dialog = await screen.findByRole('dialog');
+  const input = within(dialog).getByRole('searchbox');
+  fireEvent.change(input, { target: { value: 'Shanghai' } });
+  const result = await within(dialog).findByText('China / Shanghai');
+  fireEvent.click(result.parentElement!.querySelector('[class*="-checkbox"]')!);
+  expect(input).toHaveValue('');
+  expect(within(dialog).getByText('China')).toBeVisible();
+});
+
+test('mobile Done publishes current selected option objects after an async update', async () => {
+  const onChange = rstest.fn();
+  const picker = (label: string) => (
+    <Cascader
+      mobile
+      multiple
+      open
+      fieldNames={{ value: 'id', label: 'name' }}
+      options={[{ id: 'a', name: label }]}
+      onChange={onChange}
+    />
+  );
+  const view = render(picker('Alpha'));
+  const dialog = await screen.findByRole('dialog');
+  fireEvent.click(
+    within(dialog)
+      .getByText('Alpha')
+      .parentElement!.querySelector('[class*="-checkbox"]')!,
+  );
+  view.rerender(picker('Updated Alpha'));
+  expect(within(dialog).getByText('Updated Alpha')).toBeVisible();
+  fireEvent.click(within(dialog).getByRole('button', { name: 'Done' }));
+  expect(onChange).toHaveBeenCalledExactlyOnceWith(
+    [['a']],
+    [[{ id: 'a', name: 'Updated Alpha' }]],
+  );
+});
+
+test('mobile Done does not publish a draft option that became disabled', async () => {
+  const onChange = rstest.fn();
+  const picker = (disabled: boolean) => (
+    <Cascader
+      mobile
+      multiple
+      open
+      options={[{ value: 'a', label: 'Alpha', disabled }]}
+      onChange={onChange}
+    />
+  );
+  const view = render(picker(false));
+  const dialog = await screen.findByRole('dialog');
+  fireEvent.click(
+    within(dialog)
+      .getByText('Alpha')
+      .parentElement!.querySelector('[class*="-checkbox"]')!,
+  );
+  view.rerender(picker(true));
+  fireEvent.click(within(dialog).getByRole('button', { name: 'Done' }));
+
+  expect(onChange).not.toHaveBeenCalled();
+});
+
+test('mobile Done does not publish a draft option removed while the drawer is open', async () => {
+  const onChange = rstest.fn();
+  const picker = (available: typeof options) => (
+    <Cascader mobile multiple open options={available} onChange={onChange} />
+  );
+  const view = render(picker(options));
+  const dialog = await screen.findByRole('dialog');
+  fireEvent.click(
+    within(dialog)
+      .getByText('China')
+      .parentElement!.querySelector('[class*="-checkbox"]')!,
+  );
+  view.rerender(picker([]));
+  fireEvent.click(within(dialog).getByRole('button', { name: 'Done' }));
+
+  expect(onChange).not.toHaveBeenCalled();
+});
+
+test('external mobile close discards internal search before a controlled reopening', async () => {
+  const onSearch = rstest.fn();
+  const picker = (open: boolean) => (
+    <Cascader
+      mobile
+      multiple
+      showSearch
+      open={open}
+      options={options}
+      onSearch={onSearch}
+    />
+  );
+  const view = render(picker(true));
+  const dialog = await screen.findByRole('dialog');
+  fireEvent.change(within(dialog).getByRole('searchbox'), {
+    target: { value: 'Shanghai' },
+  });
+  expect(await within(dialog).findByText('China / Shanghai')).toBeVisible();
+  view.rerender(picker(false));
+  await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+  view.rerender(picker(true));
+  const reopened = await screen.findByRole('dialog');
+  expect(within(reopened).getByRole('searchbox')).toHaveValue('');
+  expect(within(reopened).getByText('China')).toBeVisible();
+  expect(onSearch).toHaveBeenCalledExactlyOnceWith('Shanghai');
+});
+
+test('disabling an open mobile Cascader discards its pending selection', async () => {
+  const onChange = rstest.fn();
+  const picker = (disabled: boolean) => (
+    <Cascader
+      mobile
+      multiple
+      open
+      disabled={disabled}
+      options={options}
+      onChange={onChange}
+    />
+  );
+  const view = render(picker(false));
+  const dialog = await screen.findByRole('dialog');
+  fireEvent.click(
+    within(dialog)
+      .getByText('China')
+      .parentElement!.querySelector('[class*="-checkbox"]')!,
+  );
+  expect(dialog.querySelector('[class*="-checkbox-checked"]')).not.toBeNull();
+  view.rerender(picker(true));
+  await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+  view.rerender(picker(false));
+  const reopened = await screen.findByRole('dialog');
+  expect(reopened.querySelector('[class*="-checkbox-checked"]')).toBeNull();
+  expect(onChange).not.toHaveBeenCalled();
+});
+
 test('external mobile close discards the draft before a controlled reopening', async () => {
   const onChange = rstest.fn();
   const props = { mobile: true, multiple: true as const, options, onChange };
@@ -144,6 +280,32 @@ test('external mobile close discards the draft before a controlled reopening', a
   const reopened = await screen.findByRole('dialog');
   expect(reopened.querySelector('[class*="-checkbox-checked"]')).toBeNull();
   expect(onChange).not.toHaveBeenCalled();
+});
+
+test('an ignored mobile Cascader close preserves the pending edits', async () => {
+  const onOpenChange = rstest.fn();
+  render(
+    <Cascader
+      mobile
+      multiple
+      open
+      showSearch={{ autoClearSearchValue: false }}
+      options={options}
+      onOpenChange={onOpenChange}
+    />,
+  );
+  const dialog = await screen.findByRole('dialog');
+  const search = within(dialog).getByRole('searchbox');
+  fireEvent.change(search, { target: { value: 'Shanghai' } });
+  const match = await within(dialog).findByText('China / Shanghai');
+  fireEvent.click(match);
+  expect(dialog.querySelector('[class*="-checkbox-checked"]')).not.toBeNull();
+
+  fireEvent.keyDown(dialog, { key: 'Escape' });
+
+  expect(onOpenChange).toHaveBeenCalledWith(false);
+  expect(search).toHaveValue('Shanghai');
+  expect(dialog.querySelector('[class*="-checkbox-checked"]')).not.toBeNull();
 });
 
 test('mobile title inherits the field label and custom option fields retain selection', async () => {
@@ -201,6 +363,38 @@ test.each([false, true])(
     await waitFor(() =>
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument(),
     );
+  },
+);
+
+test.each([false, true])(
+  'mobile multiple selection handles successive Enter presses with a custom trigger=%s',
+  async (customTrigger) => {
+    const onChange = rstest.fn();
+    render(
+      <Cascader
+        mobile
+        multiple
+        defaultOpen
+        options={[
+          { value: 'a', label: 'Alpha' },
+          { value: 'b', label: 'Beta' },
+        ]}
+        onChange={onChange}
+      >
+        {customTrigger ? (
+          <button type="button">Pick locations</button>
+        ) : undefined}
+      </Cascader>,
+    );
+    const dialog = await screen.findByRole('dialog');
+    const menu = within(dialog).getByRole('group');
+    menu.focus();
+    for (const key of ['ArrowDown', 'Enter', 'ArrowDown', 'Enter']) {
+      fireEvent.keyDown(menu, { key });
+      fireEvent.keyUp(menu, { key });
+    }
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Done' }));
+    expect(onChange.mock.calls[0][0]).toEqual([['a'], ['b']]);
   },
 );
 
@@ -391,6 +585,31 @@ test('Panel supports multiple values and provider disabled state', () => {
   expect(onChange).toHaveBeenCalledOnce();
 });
 
+test('Panel treats explicit undefined as an empty controlled selection', () => {
+  const onChange = rstest.fn();
+  const view = render(
+    <Cascader.Panel
+      multiple
+      options={options}
+      value={undefined}
+      defaultValue={[['cn']]}
+      onChange={onChange}
+    />,
+  );
+  expect(
+    view.container.querySelector('[class*="-checkbox-checked"]'),
+  ).toBeNull();
+  fireEvent.click(
+    screen
+      .getByText('China')
+      .parentElement!.querySelector('[class*="-checkbox"]')!,
+  );
+  expect(onChange.mock.calls[0][0]).toEqual([['cn']]);
+  expect(
+    view.container.querySelector('[class*="-checkbox-checked"]'),
+  ).toBeNull();
+});
+
 test('forwards refs, semantics and dark portal theme', async () => {
   const ref = createRef<CascaderRef>();
   const { container } = render(
@@ -437,4 +656,27 @@ test('maps the public middle size alias to the shared medium control', () => {
     'data-tao-size',
     'medium',
   );
+});
+
+test('Cascader Done cannot restore a selection that the parent replaced while open', async () => {
+  const changed = rstest.fn();
+  const options = [
+    { value: 'a', label: 'Alpha' },
+    { value: 'b', label: 'Beta' },
+    { value: 'c', label: 'Gamma' },
+  ];
+  const props = {
+    open: true,
+    mobile: true,
+    multiple: true as const,
+    options,
+    onChange: changed,
+  };
+  const view = render(<Cascader {...props} value={[['a']]} />);
+  const dialog = await screen.findByRole('dialog');
+  const beta = within(dialog).getByText('Beta');
+  fireEvent.click(beta.parentElement!.querySelector('[class*="-checkbox"]')!);
+  view.rerender(<Cascader {...props} value={[['c']]} />);
+  fireEvent.click(within(dialog).getByRole('button', { name: 'Done' }));
+  expect(changed).not.toHaveBeenCalled();
 });

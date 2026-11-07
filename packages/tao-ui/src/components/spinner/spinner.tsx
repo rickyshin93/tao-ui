@@ -1,6 +1,7 @@
 import {
   type AriaAttributes,
   type CSSProperties,
+  Children,
   type ReactNode,
   useEffect,
   useState,
@@ -54,6 +55,9 @@ export function Spinner({
 }: SpinnerProps) {
   const ctx = useTaoConfig();
   const resolvedSize = size ?? ctx.size;
+  const hasChildren = Children.toArray(children).length > 0;
+  const standalone = !hasChildren && !fullscreen;
+  const hasTip = tip != null && tip !== '' && typeof tip !== 'boolean';
 
   // Delay: hold off showing the spinner for `delay` ms after it turns on.
   const [active, setActive] = useState(delay ? false : spinning);
@@ -69,17 +73,13 @@ export function Spinner({
     <span
       data-tao-spinner=""
       data-tao-size={resolvedSize}
-      className={cx(classNames?.root, !children && !fullscreen && className)}
-      style={
-        !children && !fullscreen ? { ...styles?.root, ...style } : styles?.root
-      }
+      className={cx(classNames?.root, standalone && className)}
+      style={standalone ? { ...styles?.root, ...style } : styles?.root}
       role="status"
       aria-live="polite"
       aria-label={
         ariaLabel ??
-        (tip == null && !ariaLabelledBy
-          ? ctx.locale.messages.loading
-          : undefined)
+        (!hasTip && !ariaLabelledBy ? ctx.locale.messages.loading : undefined)
       }
       aria-labelledby={ariaLabelledBy}
     >
@@ -90,7 +90,7 @@ export function Spinner({
       >
         {indicator ?? <DefaultIndicator />}
       </span>
-      {tip != null && (
+      {hasTip && (
         <span
           data-tao-spinner-tip=""
           className={cx(classNames?.tip)}
@@ -117,7 +117,7 @@ export function Spinner({
   }
 
   // ---- Wrapper / overlay mode ----
-  if (children != null) {
+  if (hasChildren) {
     return (
       <div
         data-tao-spinner-container=""

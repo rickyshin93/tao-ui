@@ -23,7 +23,9 @@ export interface FieldTarget {
   instance: unknown;
 }
 
-const fieldRegistries = new WeakMap<object, Map<string, FieldTarget>>();
+export type FieldRegistry = Map<string, Set<FieldTarget>>;
+
+const fieldRegistries = new WeakMap<object, FieldRegistry>();
 
 export function getFieldRegistry(form: object) {
   return fieldRegistries.get(form);
@@ -40,11 +42,12 @@ export function useForm<Values = any>(
   const [rcForm] = useRcForm<Values>(form);
   const wrapped = useMemo(() => {
     if (form) return form;
-    const fields = new Map<string, FieldTarget>();
+    const fields: FieldRegistry = new Map();
     const instance: FormInstance<Values> = {
       ...rcForm,
       scrollToField(name, options = {}) {
-        const target = fields.get(fieldKey(name));
+        const targets = fields.get(fieldKey(name));
+        const target = targets && Array.from(targets).at(-1);
         if (!target) return;
         const node =
           getDOM(target.instance) ?? document.getElementById(target.id);

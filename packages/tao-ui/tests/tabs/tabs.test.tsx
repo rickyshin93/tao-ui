@@ -1,5 +1,7 @@
 import { expect, rs, test } from '@rstest/core';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
+import { userEvent } from '@testing-library/user-event';
+import { createPortal } from 'react-dom';
 import { Tabs } from '../../src/components/tabs/tabs';
 import { TaoProvider } from '../../src/provider/tao-provider';
 
@@ -8,6 +10,41 @@ const items = [
   { key: 'b', label: 'Tab B', children: 'Content B' },
   { key: 'c', label: 'Tab C', children: 'Content C', disabled: true },
 ];
+
+test('a portaled control in a tab label keeps its keyboard and click events', () => {
+  const onChange = rs.fn();
+  render(
+    <Tabs
+      defaultActiveKey="b"
+      items={[
+        {
+          ...items[0],
+          label: (
+            <>
+              Tab A
+              {createPortal(
+                <button type="button">Popup action</button>,
+                document.body,
+              )}
+            </>
+          ),
+        },
+        items[1],
+      ]}
+      onChange={onChange}
+    />,
+  );
+  const action = screen.getByRole('button', { name: 'Popup action' });
+  act(() => action.focus());
+  expect(fireEvent.keyDown(action, { key: 'ArrowRight' })).toBe(true);
+  fireEvent.click(action);
+  expect(action).toHaveFocus();
+  expect(screen.getByRole('tab', { name: 'Tab B' })).toHaveAttribute(
+    'aria-selected',
+    'true',
+  );
+  expect(onChange).not.toHaveBeenCalled();
+});
 
 test('renders all tabs', () => {
   render(<Tabs items={items} />);
@@ -36,6 +73,29 @@ test('controlled activeKey', () => {
 
   rerender(<Tabs items={items} activeKey="b" />);
   expect(screen.getByText('Content B')).toBeVisible();
+});
+
+test('Tab leaves a controlled tablist after focusing an unselected tab', async () => {
+  const onChange = rs.fn();
+  const user = userEvent.setup();
+  render(<Tabs items={items} activeKey="b" onChange={onChange} />);
+  await user.tab();
+  expect(screen.getByRole('tab', { name: 'Tab B' })).toHaveFocus();
+  await user.keyboard('{ArrowLeft}');
+  expect(screen.getByRole('tab', { name: 'Tab A' })).toHaveFocus();
+  expect(onChange).toHaveBeenCalledExactlyOnceWith('a');
+  await user.tab();
+  expect(screen.getByRole('tabpanel', { name: 'Tab B' })).toHaveFocus();
+  await user.tab({ shift: true });
+  expect(screen.getByRole('tab', { name: 'Tab B' })).toHaveFocus();
+});
+
+test('activating the selected tab does not emit a redundant change', () => {
+  const onChange = rs.fn();
+  render(<Tabs items={items} onChange={onChange} />);
+  fireEvent.click(screen.getByRole('tab', { name: 'Tab A' }));
+  fireEvent.keyDown(screen.getByRole('tab', { name: 'Tab A' }), { key: 'Home' });
+  expect(onChange).not.toHaveBeenCalled();
 });
 
 test('onChange fires on tab click', () => {
@@ -143,35 +203,35 @@ test('async items initialize an available uncontrolled tab without firing onChan
   expect(onChange).not.toHaveBeenCalled();
 });
 
-test.each([
-  'remove',
-  'disable',
-])('uncontrolled Tabs recover when the current item is %sd', (change) => {
-  const onChange = rs.fn();
-  const { rerender } = render(<Tabs items={items} onChange={onChange} />);
-  const nextItems =
-    change === 'remove'
-      ? items.slice(1)
-      : items.map((item) =>
-          item.key === 'a' ? { ...item, disabled: true } : item,
-        );
-  rerender(<Tabs items={nextItems} onChange={onChange} />);
-  expect(screen.getByRole('tab', { name: 'Tab B' })).toHaveAttribute(
-    'aria-selected',
-    'true',
-  );
-  expect(screen.getByRole('tab', { name: 'Tab B' })).toHaveAttribute(
-    'tabindex',
-    '0',
-  );
-  expect(screen.getByRole('tabpanel')).toHaveTextContent('Content B');
-  rerender(<Tabs items={items} onChange={onChange} />);
-  expect(screen.getByRole('tab', { name: 'Tab B' })).toHaveAttribute(
-    'aria-selected',
-    'true',
-  );
-  expect(onChange).not.toHaveBeenCalled();
-});
+test.each(['remove', 'disable'])(
+  'uncontrolled Tabs recover when the current item is %sd',
+  (change) => {
+    const onChange = rs.fn();
+    const { rerender } = render(<Tabs items={items} onChange={onChange} />);
+    const nextItems =
+      change === 'remove'
+        ? items.slice(1)
+        : items.map((item) =>
+            item.key === 'a' ? { ...item, disabled: true } : item,
+          );
+    rerender(<Tabs items={nextItems} onChange={onChange} />);
+    expect(screen.getByRole('tab', { name: 'Tab B' })).toHaveAttribute(
+      'aria-selected',
+      'true',
+    );
+    expect(screen.getByRole('tab', { name: 'Tab B' })).toHaveAttribute(
+      'tabindex',
+      '0',
+    );
+    expect(screen.getByRole('tabpanel')).toHaveTextContent('Content B');
+    rerender(<Tabs items={items} onChange={onChange} />);
+    expect(screen.getByRole('tab', { name: 'Tab B' })).toHaveAttribute(
+      'aria-selected',
+      'true',
+    );
+    expect(onChange).not.toHaveBeenCalled();
+  },
+);
 
 test('uncontrolled Tabs clear selection and indicator when all items become unavailable', () => {
   const { container, rerender } = render(<Tabs items={items} />);
@@ -200,63 +260,63 @@ test('an empty string item key remains a valid key without selecting a disabled 
   expect(screen.queryByRole('tabpanel')).toBeNull();
 });
 
-test.each([
-  'missing',
-  'a',
-])('controlled invalid or disabled key %s stays parent-owned with usable keyboard navigation', (activeKey) => {
-  const onChange = rs.fn();
-  const entries = items.map((item) => ({
-    ...item,
-    disabled: item.key === 'a',
-  }));
-  render(<Tabs items={entries} activeKey={activeKey} onChange={onChange} />);
-  expect(onChange).not.toHaveBeenCalled();
-  const available = screen.getByRole('tab', { name: 'Tab B' });
-  expect(available).toHaveAttribute('tabindex', '0');
-  expect(available).toHaveAttribute('aria-selected', 'false');
-  available.focus();
-  fireEvent.keyDown(available, { key: 'ArrowRight' });
-  expect(onChange).toHaveBeenCalledWith('c');
-  expect(screen.getByRole('tab', { name: 'Tab C' })).toHaveFocus();
-  expect(screen.getByRole('tab', { name: 'Tab A' })).toHaveAttribute(
-    'aria-selected',
-    String(activeKey === 'a'),
-  );
-});
+test.each(['missing', 'a'])(
+  'controlled invalid or disabled key %s stays parent-owned with usable keyboard navigation',
+  (activeKey) => {
+    const onChange = rs.fn();
+    const entries = items.map((item) => ({
+      ...item,
+      disabled: item.key === 'a',
+    }));
+    render(<Tabs items={entries} activeKey={activeKey} onChange={onChange} />);
+    expect(onChange).not.toHaveBeenCalled();
+    const available = screen.getByRole('tab', { name: 'Tab B' });
+    expect(available).toHaveAttribute('tabindex', '0');
+    expect(available).toHaveAttribute('aria-selected', 'false');
+    available.focus();
+    fireEvent.keyDown(available, { key: 'ArrowRight' });
+    expect(onChange).toHaveBeenCalledWith('c');
+    expect(screen.getByRole('tab', { name: 'Tab C' })).toHaveFocus();
+    expect(screen.getByRole('tab', { name: 'Tab A' })).toHaveAttribute(
+      'aria-selected',
+      String(activeKey === 'a'),
+    );
+  },
+);
 
-test.each([
-  false,
-  true,
-])('dynamic fallback preserves destroyInactiveTabPane=%s behavior', (destroyInactiveTabPane) => {
-  const entries = [
-    {
-      key: 'a',
-      label: 'Tab A',
-      children: <input aria-label="Draft" defaultValue="initial" />,
-    },
-    { key: 'b', label: 'Tab B', children: 'Content B' },
-  ];
-  const { rerender } = render(
-    <Tabs items={entries} destroyInactiveTabPane={destroyInactiveTabPane} />,
-  );
-  fireEvent.change(screen.getByRole('textbox', { name: 'Draft' }), {
-    target: { value: 'edited' },
-  });
-  rerender(
-    <Tabs
-      items={[{ ...entries[0], disabled: true }, entries[1]]}
-      destroyInactiveTabPane={destroyInactiveTabPane}
-    />,
-  );
-  expect(screen.getByRole('tabpanel')).toHaveTextContent('Content B');
-  rerender(
-    <Tabs items={entries} destroyInactiveTabPane={destroyInactiveTabPane} />,
-  );
-  fireEvent.click(screen.getByRole('tab', { name: 'Tab A' }));
-  expect(screen.getByRole('textbox', { name: 'Draft' })).toHaveValue(
-    destroyInactiveTabPane ? 'initial' : 'edited',
-  );
-});
+test.each([false, true])(
+  'dynamic fallback preserves destroyInactiveTabPane=%s behavior',
+  (destroyInactiveTabPane) => {
+    const entries = [
+      {
+        key: 'a',
+        label: 'Tab A',
+        children: <input aria-label="Draft" defaultValue="initial" />,
+      },
+      { key: 'b', label: 'Tab B', children: 'Content B' },
+    ];
+    const { rerender } = render(
+      <Tabs items={entries} destroyInactiveTabPane={destroyInactiveTabPane} />,
+    );
+    fireEvent.change(screen.getByRole('textbox', { name: 'Draft' }), {
+      target: { value: 'edited' },
+    });
+    rerender(
+      <Tabs
+        items={[{ ...entries[0], disabled: true }, entries[1]]}
+        destroyInactiveTabPane={destroyInactiveTabPane}
+      />,
+    );
+    expect(screen.getByRole('tabpanel')).toHaveTextContent('Content B');
+    rerender(
+      <Tabs items={entries} destroyInactiveTabPane={destroyInactiveTabPane} />,
+    );
+    fireEvent.click(screen.getByRole('tab', { name: 'Tab A' }));
+    expect(screen.getByRole('textbox', { name: 'Draft' })).toHaveValue(
+      destroyInactiveTabPane ? 'initial' : 'edited',
+    );
+  },
+);
 
 test('async items still honor a requested defaultActiveKey once it becomes available', () => {
   const { rerender } = render(<Tabs items={[]} defaultActiveKey="b" />);
@@ -265,4 +325,72 @@ test('async items still honor a requested defaultActiveKey once it becomes avail
     'aria-selected',
     'true',
   );
+});
+
+test('tabs with spaces in their keys still name their panels', () => {
+  render(
+    <Tabs
+      items={[
+        { key: 'monthly report', label: 'Monthly report', children: 'Details' },
+        { key: 'monthly%20report', label: 'Archive', children: 'Old details' },
+      ]}
+    />,
+  );
+
+  const panel = screen.getByRole('tabpanel');
+  expect(panel).toHaveAccessibleName('Monthly report');
+  expect(screen.getByRole('tab', { name: 'Monthly report' })).toHaveAttribute(
+    'aria-controls',
+    panel.id,
+  );
+  expect(screen.getByRole('tab', { name: 'Archive' }).id).not.toBe(
+    screen.getByRole('tab', { name: 'Monthly report' }).id,
+  );
+});
+
+test('a resized label repositions the active underline without changing items', () => {
+  let notifyResize: (() => void) | undefined;
+  const observe = rs.fn();
+  const disconnect = rs.fn();
+  rs.stubGlobal(
+    'ResizeObserver',
+    class {
+      constructor(callback: () => void) {
+        notifyResize = callback;
+      }
+      observe = observe;
+      disconnect = disconnect;
+    },
+  );
+  try {
+    const view = render(<Tabs items={items} defaultActiveKey="b" />);
+    const preceding = screen.getByRole('tab', { name: 'Tab A' });
+    const active = screen.getByRole('tab', { name: 'Tab B' });
+    Object.defineProperties(active, {
+      offsetLeft: { value: 110 },
+      offsetWidth: { value: 65 },
+    });
+
+    act(() => notifyResize?.());
+    const ink = view.container.querySelector<HTMLElement>(
+      '[data-tao-tabs-ink]',
+    );
+    expect(ink?.style.transform).toBe('translateX(110px) scaleX(65)');
+    expect(observe).toHaveBeenCalledWith(preceding);
+    view.unmount();
+    expect(disconnect).toHaveBeenCalled();
+  } finally {
+    rs.unstubAllGlobals();
+  }
+});
+
+test('horizontal tabs leave vertical arrow keys available for page scrolling', () => {
+  const onChange = rs.fn();
+  render(<Tabs items={items} onChange={onChange} />);
+  const first = screen.getByRole('tab', { name: 'Tab A' });
+  first.focus();
+  expect(fireEvent.keyDown(first, { key: 'ArrowDown' })).toBe(true);
+  expect(fireEvent.keyDown(first, { key: 'ArrowUp' })).toBe(true);
+  expect(onChange).not.toHaveBeenCalled();
+  expect(first).toHaveFocus();
 });

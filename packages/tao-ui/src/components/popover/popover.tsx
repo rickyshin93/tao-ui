@@ -1,8 +1,10 @@
 import * as RadixPopover from '@radix-ui/react-popover';
 import {
   type AriaAttributes,
+  type ComponentPropsWithoutRef,
   type CSSProperties,
   type FocusEvent,
+  forwardRef,
   type MouseEvent,
   type ReactNode,
   useCallback,
@@ -104,8 +106,21 @@ function getRenderNode(node: PopoverRender | undefined) {
 }
 
 function isRenderable(node: ReactNode) {
-  return node !== null && node !== undefined && node !== false && node !== '';
+  return node != null && typeof node !== 'boolean' && node !== '';
 }
+
+const PopoverSurface = forwardRef<
+  HTMLDivElement,
+  ComponentPropsWithoutRef<'div'> & {
+    'data-tao-keep-alive'?: boolean;
+    'data-state'?: 'open' | 'closed';
+  }
+>(function PopoverSurface(props, ref) {
+  // Keep the content mounted without registering a hidden Radix interaction layer.
+  const retainedHidden =
+    props['data-tao-keep-alive'] && props['data-state'] === 'closed';
+  return <div {...props} ref={retainedHidden ? null : ref} />;
+});
 
 export function Popover({
   direction: directionProp,
@@ -151,7 +166,7 @@ export function Popover({
 
   const [realOpen, setOpen] = useControlledOpen({
     open,
-    defaultOpen,
+    defaultOpen: hasPopup && defaultOpen,
     onOpenChange,
     canOpen: hasPopup,
   });
@@ -164,6 +179,8 @@ export function Popover({
   );
   const popupRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLElement | null>(null);
+  const restoringFocus = useRef(false);
+  const restoreAfterEscape = useRef(false);
   const setTriggerRef = useCallback(
     (node: HTMLElement | null) => {
       triggerRef.current = node;
@@ -183,7 +200,24 @@ export function Popover({
     clearTimeout(openTimer.current);
     clearTimeout(closeTimer.current);
   }, []);
-  useEffect(() => cancelTimers, [cancelTimers]);
+  const changeOpen = useCallback(
+    (next: boolean) => {
+      cancelTimers();
+      setOpen(next);
+    },
+    [cancelTimers, setOpen],
+  );
+  const hoverEnabled = hasPopup && hoverMode;
+  useEffect(() => {
+    if (hoverEnabled) return cancelTimers;
+  }, [cancelTimers, hoverEnabled]);
+  useEffect(() => {
+    if (realOpen) clearTimeout(openTimer.current);
+    else clearTimeout(closeTimer.current);
+  }, [realOpen]);
+  useEffect(() => {
+    if (!hasPopup && realOpen && open == null) changeOpen(false);
+  }, [changeOpen, hasPopup, open, realOpen]);
 
   const scheduleOpen = useCallback(() => {
     cancelTimers();
@@ -196,6 +230,7 @@ export function Popover({
 
   const scheduleClose = useCallback(() => {
     cancelTimers();
+    if (!realOpen) return;
     const close = () => {
       if (!focusMode || !containsFocusTarget(document.activeElement))
         setOpen(false);
@@ -205,16 +240,23 @@ export function Popover({
       return;
     }
     closeTimer.current = setTimeout(close, mouseLeaveDelay * 1000);
-  }, [cancelTimers, containsFocusTarget, focusMode, mouseLeaveDelay, setOpen]);
+  }, [
+    cancelTimers,
+    containsFocusTarget,
+    focusMode,
+    mouseLeaveDelay,
+    realOpen,
+    setOpen,
+  ]);
 
   const handleBlur = useCallback(
     (event: FocusEvent<HTMLElement>) => {
       if (!containsFocusTarget(event.relatedTarget)) {
-        cancelTimers();
-        setOpen(false);
+        restoreAfterEscape.current = false;
+        changeOpen(false);
       }
     },
-    [cancelTimers, containsFocusTarget, setOpen],
+    [changeOpen, containsFocusTarget],
   );
 
   if (!hasPopup) return <>{children}</>;
@@ -229,27 +271,28 @@ export function Popover({
     ...hoverProps,
     onFocus: focusMode
       ? () => {
-          cancelTimers();
-          setOpen(true);
+          if (!restoringFocus.current) changeOpen(true);
         }
       : undefined,
     onBlur: focusMode ? handleBlur : undefined,
     onContextMenu: contextMenuMode
       ? (event: MouseEvent<HTMLElement>) => {
+          if (event.defaultPrevented) return;
           event.preventDefault();
-          setOpen(true);
+          changeOpen(true);
         }
       : undefined,
   };
 
   return (
-    <RadixPopover.Root open={realOpen} onOpenChange={setOpen}>
+    <RadixPopover.Root open={realOpen} onOpenChange={changeOpen}>
       <TriggerPrimitive asChild ref={setTriggerRef} {...triggerProps}>
         {asTriggerChild(children)}
       </TriggerPrimitive>
       <RadixPopover.Portal forceMount={shouldDestroy ? undefined : true}>
         <TaoPortalScope asChild direction={direction}>
           <RadixPopover.Content
+            asChild
             ref={popupRef}
             aria-label={ariaLabel}
             aria-labelledby={
@@ -276,48 +319,68 @@ export function Popover({
             sideOffset={4}
             forceMount={shouldDestroy ? undefined : true}
             onOpenAutoFocus={(event) => event.preventDefault()}
+            onEscapeKeyDown={() => {
+              restoreAfterEscape.current =
+                focusMode &&
+                !!popupRef.current?.contains(document.activeElement);
+            }}
+            onCloseAutoFocus={(event) => {
+              const focusedRetainedContent =
+                !shouldDestroy &&
+                event.currentTarget instanceof HTMLElement &&
+                event.currentTarget.contains(document.activeElement);
+              if (restoreAfterEscape.current || focusedRetainedContent) {
+                restoreAfterEscape.current = false;
+                event.preventDefault();
+                restoringFocus.current = true;
+                triggerRef.current?.focus();
+                restoringFocus.current = false;
+              }
+            }}
             onFocusCapture={focusMode ? cancelTimers : undefined}
             onBlurCapture={focusMode ? handleBlur : undefined}
             onFocusOutside={(event) => {
-              if (focusMode && containsFocusTarget(event.target))
-                event.preventDefault();
+              // Focus mode owns the close request in handleBlur.
+              if (focusMode) event.preventDefault();
             }}
             {...hoverProps}
           >
-            <div
-              data-tao-popover-container=""
-              className={cx(classNames?.container)}
-              style={styles?.container}
-            >
-              {isRenderable(titleNode) && (
-                <div
-                  data-tao-popover-title=""
-                  id={titleId}
-                  className={cx(classNames?.title)}
-                  style={styles?.title}
-                >
-                  {titleNode}
-                </div>
+            <PopoverSurface>
+              <div
+                data-tao-popover-container=""
+                className={cx(classNames?.container)}
+                style={styles?.container}
+              >
+                {isRenderable(titleNode) && (
+                  <div
+                    data-tao-popover-title=""
+                    id={titleId}
+                    className={cx(classNames?.title)}
+                    style={styles?.title}
+                  >
+                    {titleNode}
+                  </div>
+                )}
+                {isRenderable(contentNode) && (
+                  <div
+                    data-tao-popover-content=""
+                    className={cx(classNames?.content)}
+                    style={styles?.content}
+                  >
+                    {contentNode}
+                  </div>
+                )}
+              </div>
+              {arrow !== false && (
+                <RadixPopover.Arrow asChild>
+                  <span
+                    data-tao-popover-arrow=""
+                    className={cx(classNames?.arrow)}
+                    style={styles?.arrow}
+                  />
+                </RadixPopover.Arrow>
               )}
-              {isRenderable(contentNode) && (
-                <div
-                  data-tao-popover-content=""
-                  className={cx(classNames?.content)}
-                  style={styles?.content}
-                >
-                  {contentNode}
-                </div>
-              )}
-            </div>
-            {arrow !== false && (
-              <RadixPopover.Arrow asChild>
-                <span
-                  data-tao-popover-arrow=""
-                  className={cx(classNames?.arrow)}
-                  style={styles?.arrow}
-                />
-              </RadixPopover.Arrow>
-            )}
+            </PopoverSurface>
           </RadixPopover.Content>
         </TaoPortalScope>
       </RadixPopover.Portal>

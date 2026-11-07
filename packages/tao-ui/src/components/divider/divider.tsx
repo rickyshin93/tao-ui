@@ -99,7 +99,8 @@ export const Divider = forwardRef<DividerRef, DividerProps>((props, ref) => {
     children !== undefined &&
     typeof children !== 'boolean';
   const margin =
-    typeof orientationMargin === 'string' && /^\d+$/.test(orientationMargin)
+    typeof orientationMargin === 'string' &&
+    /^-?(?:\d+\.?\d*|\.\d+)$/.test(orientationMargin.trim())
       ? Number(orientationMargin)
       : orientationMargin;
   const titleStyle: CSSProperties = {

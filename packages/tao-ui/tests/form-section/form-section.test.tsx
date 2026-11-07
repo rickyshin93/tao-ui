@@ -20,3 +20,15 @@ test('renders children', () => {
   );
   expect(screen.getByTestId('kid')).toBeTruthy();
 });
+
+test('a titled form section has the visible title as its accessible name', () => {
+  render(
+    <FormSection title="Contact details">
+      <input />
+    </FormSection>,
+  );
+
+  expect(
+    screen.getByRole('region', { name: 'Contact details' }),
+  ).toContainElement(screen.getByRole('textbox'));
+});

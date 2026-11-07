@@ -291,6 +291,7 @@ const SingleTimePicker = forwardRef<TimePickerRef, TimePickerProps>(
       onCalendarChange,
       onChange,
       onOk,
+      value,
       defaultValue,
       disabled = appearance.config.disabled,
       allowClear = true,
@@ -341,6 +342,7 @@ const SingleTimePicker = forwardRef<TimePickerRef, TimePickerProps>(
           picker="time"
           generateConfig={appearance.generateConfig}
           locale={appearance.locale}
+          value={'value' in props ? (value ?? null) : undefined}
           defaultValue={defaultValue ?? undefined}
           disabled={disabled}
           placeholder={
@@ -424,6 +426,7 @@ export const TimeRangePicker = forwardRef<
     styles,
     panelRender,
     components,
+    value,
     disabled = appearance.config.disabled,
     allowClear = true,
     suffix,
@@ -462,7 +465,11 @@ export const TimeRangePicker = forwardRef<
       data-tao-variant={appearance.variant}
       data-tao-error={status === 'error' || undefined}
       data-tao-warning={status === 'warning' || undefined}
-      data-disabled={disabled === true || undefined}
+      data-disabled={
+        disabled === true ||
+        (Array.isArray(disabled) && disabled[0] && disabled[1]) ||
+        undefined
+      }
       className={cx(names?.root, className, props.rootClassName)}
       style={{ ...semanticStyles?.root, ...style }}
     >
@@ -473,6 +480,7 @@ export const TimeRangePicker = forwardRef<
         picker="time"
         generateConfig={appearance.generateConfig}
         locale={appearance.locale}
+        value={'value' in props ? (value ?? null) : undefined}
         disabled={disabled}
         placeholder={
           placeholder ??

@@ -18,8 +18,10 @@ export const Password = forwardRef<HTMLInputElement, PasswordProps>(
   ) {
     const ctx = useTaoConfig();
     const [innerVisible, setVisible] = useState(false);
+    if (visibilityToggle === false && innerVisible) setVisible(false);
     const config = typeof visibilityToggle === 'object' ? visibilityToggle : {};
-    const visible = config.visible ?? innerVisible;
+    const visible =
+      visibilityToggle !== false && (config.visible ?? innerVisible);
     const resolvedDisabled = disabled ?? ctx.disabled;
     return (
       <BaseInput

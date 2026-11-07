@@ -1,4 +1,4 @@
-import { beforeAll, expect, test } from '@rstest/core';
+import { beforeAll, expect, rs, test } from '@rstest/core';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { Breadcrumb } from '../../src/components/breadcrumb/breadcrumb';
@@ -151,6 +151,18 @@ test('clicking the ellipsis reveals the collapsed items in a dropdown', async ()
   expect(screen.getByText('D')).toBeTruthy();
 });
 
+test('a false separator omits decorative layout items', () => {
+  const { container } = render(
+    <Breadcrumb
+      separator={false}
+      items={[{ title: 'Home', href: '/' }, { title: 'Data' }]}
+    />,
+  );
+
+  expect(container.querySelector('[data-tao-breadcrumb-separator]')).toBeNull();
+  expect(screen.getByRole('link', { name: 'Home' })).toBeInTheDocument();
+});
+
 test('custom separator is used', () => {
   const { container } = render(
     <Breadcrumb
@@ -162,6 +174,28 @@ test('custom separator is used', () => {
     '[data-tao-breadcrumb-separator]',
   ) as HTMLElement;
   expect(sep.textContent).toBe('/');
+});
+
+test('a fragment itemRender keeps the original breadcrumb link', () => {
+  render(
+    <Breadcrumb
+      items={[{ title: 'Home', href: '/' }, { title: 'Data' }]}
+      itemRender={(item) => (
+        <>
+          <span aria-hidden="true">→</span>
+          <strong>{item.title}</strong>
+        </>
+      )}
+    />,
+  );
+
+  expect(screen.getByRole('link', { name: 'Home' })).toHaveAttribute(
+    'href',
+    '/',
+  );
+  expect(
+    screen.getByText('Data').closest('[aria-current="page"]'),
+  ).not.toBeNull();
 });
 
 test('itemRender custom element receives breadcrumb link props via Slot', () => {
@@ -181,4 +215,55 @@ test('itemRender custom element receives breadcrumb link props via Slot', () => 
 test('nav has accessible label', () => {
   render(<Breadcrumb items={[{ title: 'Only' }]} />);
   expect(screen.getByLabelText('breadcrumb')).toBeTruthy();
+});
+
+test('disabled links cannot be reached or activated by keyboard', async () => {
+  render(
+    <Breadcrumb
+      items={[
+        { title: 'Archived', href: '#archived', disabled: true },
+        { title: 'Available', href: '#available' },
+        { title: 'Current' },
+      ]}
+    />,
+  );
+  expect(screen.getByText('Archived')).not.toHaveAttribute('href');
+  await userEvent.tab();
+  expect(screen.getByRole('link', { name: 'Available' })).toHaveFocus();
+});
+
+test('Enter activates the link inside a collapsed breadcrumb', async () => {
+  const selected = rs.fn((event: React.MouseEvent) => event.preventDefault());
+  render(
+    <Breadcrumb
+      maxItems={2}
+      items={[
+        { title: 'Home', href: '/' },
+        { title: 'Settings', href: '/settings', onClick: selected },
+        { title: 'Current' },
+      ]}
+    />,
+  );
+  const user = userEvent.setup();
+  screen.getByRole('button', { name: 'Show more' }).focus();
+  await user.keyboard('{Enter}');
+  const item = await screen.findByRole('menuitem', { name: 'Settings' });
+  item.focus();
+  await user.keyboard('{Enter}');
+  expect(selected).toHaveBeenCalledTimes(1);
+  expect(screen.queryByRole('menu')).not.toBeInTheDocument();
+});
+
+test('itemRender uses the original path index for entries after the ellipsis', () => {
+  const items = ['Home', 'Account', 'Settings', 'Current'].map((title) => ({
+    title,
+  }));
+  render(
+    <Breadcrumb
+      maxItems={2}
+      items={items}
+      itemRender={(item, { index }) => `${index} ${item.title}`}
+    />,
+  );
+  expect(screen.getByText('3 Current')).toBeVisible();
 });

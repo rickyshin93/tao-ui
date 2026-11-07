@@ -1,11 +1,36 @@
 import { expect, rs, test } from '@rstest/core';
 import { fireEvent, render, screen } from '@testing-library/react';
+import { userEvent } from '@testing-library/user-event';
 import { createRef } from 'react';
 import { List, type ListItemMetaRef } from '../../src/components/list/list';
 import { TaoProvider } from '../../src/provider/tao-provider';
 
 const items = ['One', 'Two', 'Three', 'Four', 'Five'];
 const item = (value: string) => <List.Item>{value}</List.Item>;
+
+test('conditional List.Item actions do not leave blank action separators', () => {
+  const { container } = render(
+    <List>
+      <List.Item actions={[false, null, 0, <span key="view">View</span>]}>
+        Row
+      </List.Item>
+    </List>,
+  );
+  const actions = container.querySelector('[data-tao-list-item-actions]')!;
+  expect([...actions.children].map((action) => action.textContent)).toEqual([
+    '0',
+    'View',
+  ]);
+});
+
+test('conditional children that render nothing show the empty list content', () => {
+  render(
+    <List locale={{ emptyText: 'Nothing here' }}>
+      {[false, null, undefined]}
+    </List>,
+  );
+  expect(screen.getByText('Nothing here')).toBeInTheDocument();
+});
 
 test('renders item metadata, actions, extra and structural slots', () => {
   render(
@@ -55,6 +80,22 @@ test('uncontrolled pagination slices items and reports navigation', () => {
   expect(screen.getByText('Three')).toBeTruthy();
   expect(screen.queryByText('One')).toBeNull();
   expect(onChange).toHaveBeenCalledWith(2, 2);
+});
+
+test('a key supplied by renderItem preserves the row when data is reordered', () => {
+  const renderItem = (value: string) => (
+    <List.Item key={value}>
+      <input aria-label={value} />
+    </List.Item>
+  );
+  const { rerender } = render(
+    <List dataSource={['A', 'B']} renderItem={renderItem} />,
+  );
+  const original = screen.getByRole('textbox', { name: 'A' });
+  fireEvent.change(original, { target: { value: 'draft' } });
+  rerender(<List dataSource={['B', 'A']} renderItem={renderItem} />);
+  expect(screen.getByRole('textbox', { name: 'A' })).toBe(original);
+  expect(original).toHaveValue('draft');
 });
 
 test('controlled pagination and server-side page data remain authoritative', () => {
@@ -134,6 +175,23 @@ test('root and metadata refs expose real elements and preserve numeric content',
     true,
   );
   expect(screen.getAllByText('0').length).toBe(3);
+});
+
+test('read-only simple pagination is keyboard accessible on its first page', async () => {
+  const onChange = rs.fn();
+  render(
+    <List
+      dataSource={items}
+      renderItem={item}
+      pagination={{ pageSize: 2, simple: { readOnly: true }, onChange }}
+    />,
+  );
+  const user = userEvent.setup();
+  await user.tab();
+  expect(screen.getByRole('button', { name: 'Next' })).toHaveFocus();
+  await user.keyboard('{Enter}');
+  expect(screen.getByText('Three')).toBeInTheDocument();
+  expect(onChange).toHaveBeenCalledExactlyOnceWith(2, 2);
 });
 
 test('pagination supports quick jumping, simple mode and custom size changer callbacks', () => {

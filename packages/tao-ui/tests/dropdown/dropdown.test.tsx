@@ -292,3 +292,81 @@ test('Dropdown.Button renders main + trigger buttons; main onClick fires', async
   expect(mainClicked).toBe(true);
   expect(screen.getByLabelText('More')).toBeTruthy();
 });
+
+test('disabling a split Dropdown disables both actions', async () => {
+  const calls: string[] = [];
+  render(
+    <Dropdown.Button
+      disabled
+      menu={{ items: basicItems }}
+      onClick={() => calls.push('main')}
+    >
+      Save
+    </Dropdown.Button>,
+  );
+  const main = screen.getByRole('button', { name: 'Save' });
+  const more = screen.getByRole('button', { name: 'More' });
+  expect(main).toBeDisabled();
+  expect(more).toBeDisabled();
+  await userEvent.click(main);
+  expect(calls).toEqual([]);
+});
+
+test('an uncontrolled menu selection survives switching Dropdown trigger modes', () => {
+  const dropdown = (context: boolean) => (
+    <Dropdown
+      open
+      trigger={context ? ['contextMenu'] : ['click']}
+      menu={{ selectable: true, multiple: true, items: basicItems }}
+    >
+      <button type="button">Menu</button>
+    </Dropdown>
+  );
+  const view = render(dropdown(false));
+  fireEvent.click(screen.getByRole('menuitemcheckbox', { name: 'Edit' }));
+  view.rerender(dropdown(true));
+  expect(
+    screen.getByRole('menuitemcheckbox', { name: 'Edit' }),
+  ).toHaveAttribute('aria-checked', 'true');
+
+  fireEvent.click(screen.getByRole('menuitemcheckbox', { name: 'Copy' }));
+  view.rerender(dropdown(false));
+
+  expect(
+    screen.getByRole('menuitemcheckbox', { name: 'Edit' }),
+  ).toHaveAttribute('aria-checked', 'true');
+  expect(
+    screen.getByRole('menuitemcheckbox', { name: 'Copy' }),
+  ).toHaveAttribute('aria-checked', 'true');
+});
+
+test('a context-triggered Dropdown applies defaultOpen and closes after an action', async () => {
+  const changes: boolean[] = [];
+  render(
+    <Dropdown
+      trigger={['contextMenu']}
+      defaultOpen
+      menu={{ items: basicItems }}
+      onOpenChange={(open) => changes.push(open)}
+    >
+      <span>Right-click area</span>
+    </Dropdown>,
+  );
+  await userEvent.click(screen.getByRole('menuitem', { name: 'Edit' }));
+  expect(changes).toEqual([false]);
+  expect(screen.queryByRole('menu')).toBeNull();
+});
+
+test('disabling an uncontrolled Dropdown discards its open menu', () => {
+  const renderMenu = (disabled: boolean) => (
+    <Dropdown defaultOpen disabled={disabled} menu={{ items: basicItems }}>
+      <button type="button">Actions</button>
+    </Dropdown>
+  );
+  const view = render(renderMenu(false));
+  expect(screen.getByRole('menu')).toBeInTheDocument();
+  view.rerender(renderMenu(true));
+  expect(screen.queryByRole('menu')).toBeNull();
+  view.rerender(renderMenu(false));
+  expect(screen.queryByRole('menu')).toBeNull();
+});

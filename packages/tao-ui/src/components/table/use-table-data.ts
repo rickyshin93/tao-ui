@@ -1,32 +1,40 @@
 import { useMemo, useState } from 'react';
 import { getColKey, nextSortOrder } from './table-model';
-import type { SortOrder, TableProps, TableRecord } from './table-types';
+import type {
+  SortOrder,
+  TableColumn,
+  TableProps,
+  TableRecord,
+} from './table-types';
 
 type TableDataProps<T extends TableRecord> = Pick<
   TableProps<T>,
   'columns' | 'dataSource' | 'pagination' | 'onChange'
->;
+> & { configuredColumns: TableColumn<T>[] };
 
 type SortState = { key: string | null; order: SortOrder };
 
 export function useTableData<T extends TableRecord>({
   columns,
+  configuredColumns,
   dataSource,
   pagination: paginationProp,
   onChange,
 }: TableDataProps<T>) {
   const [sort, setSort] = useState<SortState>(() => {
-    const index = columns.findIndex((column) => column.defaultSortOrder);
+    const index = configuredColumns.findIndex(
+      (column) => column.defaultSortOrder,
+    );
     return index < 0
       ? { key: null, order: null }
       : {
-          key: getColKey(columns[index], index),
-          order: columns[index].defaultSortOrder ?? null,
+          key: getColKey(configuredColumns[index], index),
+          order: configuredColumns[index].defaultSortOrder ?? null,
         };
   });
   const [filters, setFilters] = useState<Record<string, string[]>>(() => {
-    const values: Record<string, string[]> = {};
-    columns.forEach((column, index) => {
+    const values: Record<string, string[]> = Object.create(null);
+    configuredColumns.forEach((column, index) => {
       if (column.filters)
         values[getColKey(column, index)] = column.filteredValue ?? [];
     });
@@ -41,32 +49,50 @@ export function useTableData<T extends TableRecord>({
     paginationConfig?.defaultPageSize ?? paginationConfig?.pageSize ?? 10,
   );
   const pageSize = paginationConfig?.pageSize ?? internalPageSize;
+  const hasControlledSort = columns.some(
+    (column) => column.sorter && column.sortOrder,
+  );
+  const columnKeys = useMemo(() => {
+    const configuredIndexes = new Map(
+      configuredColumns.map((column, index) => [column, index]),
+    );
+    return columns.map((column, index) =>
+      getColKey(column, configuredIndexes.get(column) ?? index),
+    );
+  }, [columns, configuredColumns]);
 
   // Rendering, data processing and change events share the same resolved state.
   const columnStates = useMemo(
     () =>
       columns.map((column, index) => {
-        const key = getColKey(column, index);
+        const key = columnKeys[index];
         return {
           column,
           key,
           order:
-            column.sortOrder !== undefined
-              ? column.sortOrder
-              : sort.key === key
-                ? sort.order
-                : null,
-          values: column.filteredValue ?? filters[key] ?? [],
+            !column.sorter
+              ? null
+              : column.sortOrder !== undefined
+                ? column.sortOrder
+                : !hasControlledSort && sort.key === key
+                  ? sort.order
+                  : null,
+          values:
+            column.filteredValue ??
+            (Object.hasOwn(filters, key) ? filters[key] : []),
         };
       }),
-    [columns, sort, filters],
+    [columns, columnKeys, sort, filters, hasControlledSort],
   );
   const resolvedSort = columnStates.find((state) => state.order) ?? {
     key: null,
     order: null,
   };
   const resolvedFilters = useMemo(() => {
-    const values = { ...filters };
+    const values: Record<string, string[]> = Object.assign(
+      Object.create(null),
+      filters,
+    );
     for (const state of columnStates) {
       if (state.column.filteredValue !== undefined)
         values[state.key] = state.values;
@@ -90,7 +116,7 @@ export function useTableData<T extends TableRecord>({
     if (activeSort && typeof activeSort.column.sorter === 'function') {
       const compare = activeSort.column.sorter;
       data.sort((a, b) => {
-        const result = compare(a, b);
+        const result = compare.call(activeSort.column, a, b);
         return activeSort.order === 'descend' ? -result : result;
       });
     }
@@ -121,20 +147,25 @@ export function useTableData<T extends TableRecord>({
     nextSort: SortState = resolvedSort,
     nextFilters = resolvedFilters,
   ) {
-    const filterResult: Record<string, string[] | null> = {};
+    const filterEntries: [string, string[] | null][] = [];
     for (const { column, key } of columnStates) {
       if (!column.filters) continue;
-      const values = nextFilters[key];
-      filterResult[column.dataIndex == null ? key : String(column.dataIndex)] =
-        values?.length ? values : null;
+      const values = Object.hasOwn(nextFilters, key)
+        ? nextFilters[key]
+        : undefined;
+      filterEntries.push([
+        column.dataIndex == null ? key : String(column.dataIndex),
+        values?.length ? [...values] : null,
+      ]);
     }
-    const column = nextSort.key
-      ? columnStates.find((state) => state.key === nextSort.key)?.column
-      : undefined;
+    const column =
+      nextSort.key === null
+        ? undefined
+        : columnStates.find((state) => state.key === nextSort.key)?.column;
     onChange?.(
       { current: page, pageSize: size },
-      filterResult,
-      nextSort.key && nextSort.order
+      Object.fromEntries(filterEntries),
+      nextSort.key !== null && nextSort.order
         ? { column, order: nextSort.order, field: column?.dataIndex }
         : { order: null },
     );
@@ -147,18 +178,16 @@ export function useTableData<T extends TableRecord>({
       filteredValue: values,
       onSort() {
         const controlled = column.sortOrder !== undefined;
-        const nextOrder: SortOrder = controlled
-          ? nextSortOrder(column.sortOrder ?? null)
-          : sort.key === key
-            ? nextSortOrder(sort.order)
-            : 'ascend';
+        const nextOrder = nextSortOrder(order);
         const next = { key: nextOrder ? key : null, order: nextOrder };
         if (!controlled) setSort(next);
         notifyChange(currentPage, pageSize, next);
       },
       onFilter(nextValues: string[]) {
         const next = { ...resolvedFilters, [key]: nextValues };
-        setFilters(next);
+        if (column.filteredValue === undefined) {
+          setFilters((previous) => ({ ...previous, [key]: nextValues }));
+        }
         setPage(1);
         notifyChange(1, pageSize, resolvedSort, next);
       },
@@ -167,6 +196,7 @@ export function useTableData<T extends TableRecord>({
 
   return {
     rows,
+    columnKeys,
     getColumnState,
     pagination:
       paginationProp === false

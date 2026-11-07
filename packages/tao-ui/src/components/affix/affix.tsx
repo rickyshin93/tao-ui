@@ -39,13 +39,12 @@ interface Position {
   width: number;
   height: number;
 }
-const getWindow = () => window;
 export const Affix = forwardRef<AffixRef, AffixProps>((props, ref) => {
   const {
     offsetTop,
     offsetBottom,
     onChange,
-    target = getWindow,
+    target,
     prefixCls,
     rootClassName,
     className,
@@ -57,6 +56,9 @@ export const Affix = forwardRef<AffixRef, AffixProps>((props, ref) => {
   } = props;
   const holder = useRef<HTMLDivElement>(null);
   const content = useRef<HTMLDivElement>(null);
+  const [scrollTarget, setScrollTarget] = useState<Window | HTMLElement | null>(
+    null,
+  );
   const [position, setPosition] = useState<Position>();
   const affixed = useRef(false);
   const measure = useRef<() => void>(() => {});
@@ -64,15 +66,17 @@ export const Affix = forwardRef<AffixRef, AffixProps>((props, ref) => {
     measure.current = () => {
       const node = holder.current;
       const inner = content.current;
-      const scrollTarget = target();
       if (!node || !inner) return;
+      const view = node.ownerDocument.defaultView ?? window;
+      const measuredTarget = target ? target() : view;
+      if (measuredTarget !== scrollTarget) setScrollTarget(measuredTarget);
       let next: Position | undefined;
-      if (scrollTarget) {
+      if (measuredTarget) {
         const rect = node.getBoundingClientRect();
         const bounds =
-          scrollTarget === window
-            ? { top: 0, bottom: window.innerHeight }
-            : (scrollTarget as HTMLElement).getBoundingClientRect();
+          'getBoundingClientRect' in measuredTarget
+            ? measuredTarget.getBoundingClientRect()
+            : { top: 0, bottom: measuredTarget.innerHeight };
         const topOffset =
           offsetTop ?? (offsetBottom === undefined ? 0 : undefined);
         const top =
@@ -83,7 +87,7 @@ export const Affix = forwardRef<AffixRef, AffixProps>((props, ref) => {
         const bottom =
           offsetBottom !== undefined &&
           Math.round(rect.bottom) + offsetBottom > Math.round(bounds.bottom)
-            ? window.innerHeight - bounds.bottom + offsetBottom
+            ? view.innerHeight - bounds.bottom + offsetBottom
             : undefined;
         if (top !== undefined || bottom !== undefined)
           next = {
@@ -126,7 +130,7 @@ export const Affix = forwardRef<AffixRef, AffixProps>((props, ref) => {
   }, []);
   useImperativeHandle(ref, () => ({ updatePosition }), [updatePosition]);
   useEffect(() => {
-    const scrollTarget = target();
+    const view = holder.current?.ownerDocument.defaultView ?? window;
     const events = [
       'resize',
       'scroll',
@@ -139,23 +143,27 @@ export const Affix = forwardRef<AffixRef, AffixProps>((props, ref) => {
     events.forEach((event) => {
       scrollTarget?.addEventListener(event, updatePosition, { passive: true });
     });
-    if (scrollTarget !== window)
-      window.addEventListener('resize', updatePosition);
+    if (scrollTarget !== view) view.addEventListener('resize', updatePosition);
     const observer = new ResizeObserver(updatePosition);
     if (holder.current) observer.observe(holder.current);
     if (content.current) observer.observe(content.current);
-    if (scrollTarget instanceof HTMLElement) observer.observe(scrollTarget);
+    if (scrollTarget && 'getBoundingClientRect' in scrollTarget)
+      observer.observe(scrollTarget);
     updatePosition();
     return () => {
       events.forEach((event) => {
         scrollTarget?.removeEventListener(event, updatePosition);
       });
-      window.removeEventListener('resize', updatePosition);
+      view.removeEventListener('resize', updatePosition);
       observer.disconnect();
       updatePosition.cancel();
     };
-  }, [target, updatePosition]);
+  }, [scrollTarget, updatePosition]);
   useLayoutEffect(() => {
+    const nextTarget = target
+      ? target()
+      : (holder.current?.ownerDocument.defaultView ?? window);
+    if (nextTarget !== scrollTarget) setScrollTarget(nextTarget);
     updatePosition();
   });
   const fixedStyle: CSSProperties = position
@@ -166,7 +174,7 @@ export const Affix = forwardRef<AffixRef, AffixProps>((props, ref) => {
       {...rest}
       ref={holder}
       data-tao-affix=""
-      className={cx(classNames?.root, className)}
+      className={cx(prefixCls, classNames?.root, rootClassName, className)}
       style={{ ...styles?.root, ...style }}
     >
       {position && (

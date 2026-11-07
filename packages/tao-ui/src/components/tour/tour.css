@@ -1,4 +1,9 @@
 @layer tao {
+  .tao-tour-mask-layer:empty {
+    /* The engine keeps an empty layer with inline pointer-events for mask={false}. */
+    pointer-events: none !important;
+  }
+
   [data-tao-tour] {
     position: relative;
     box-sizing: border-box;

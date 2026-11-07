@@ -1,7 +1,7 @@
-import { expect, test } from '@rstest/core';
+import { expect, rs, test } from '@rstest/core';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { Pagination } from '../../src/components/pagination/pagination';
-import { TaoProvider } from '../../src/provider/tao-provider';
+import { TaoProvider, zhCN } from '../../src/provider/tao-provider';
 
 test('renders correct page buttons for small total', () => {
   render(<Pagination total={50} />);
@@ -42,6 +42,16 @@ test('onChange fires on page click', () => {
   );
   fireEvent.click(screen.getByLabelText('Page 3'));
   expect(page).toBe(3);
+});
+
+test('selecting the current page does not emit a redundant change', () => {
+  const onChange = rs.fn();
+  render(<Pagination total={50} defaultCurrent={2} onChange={onChange} />);
+  fireEvent.click(screen.getByLabelText('Page 2'));
+  expect(onChange).not.toHaveBeenCalled();
+  fireEvent.click(screen.getByLabelText('Page 3'));
+  fireEvent.click(screen.getByLabelText('Page 3'));
+  expect(onChange).toHaveBeenCalledExactlyOnceWith(3, 10);
 });
 
 test('prev button disabled on first page', () => {
@@ -147,4 +157,56 @@ test('controlled current remains parent-owned after total changes', () => {
     'aria-current',
     'page',
   );
+});
+
+test('size changer shows the active size even when it is absent from the options', () => {
+  const view = render(
+    <Pagination
+      total={100}
+      pageSize={15}
+      pageSizeOptions={[10, 20]}
+      showSizeChanger
+    />,
+  );
+  expect(screen.getByRole('combobox')).toHaveTextContent('15 / page');
+
+  view.rerender(
+    <Pagination
+      total={100}
+      pageSize={20}
+      pageSizeOptions={[10, 20]}
+      showSizeChanger
+    />,
+  );
+  expect(screen.getByRole('combobox')).toHaveTextContent('20 / page');
+});
+
+test('labels the page-size control in the current locale', () => {
+  render(
+    <TaoProvider locale={zhCN}>
+      <Pagination total={100} showSizeChanger />
+    </TaoProvider>,
+  );
+  expect(screen.getByRole('combobox', { name: '每页条数' })).toHaveTextContent(
+    '10 条/页',
+  );
+});
+
+test('shows an empty range while the requested controlled page has no data', () => {
+  const view = render(
+    <Pagination
+      current={3}
+      total={30}
+      showTotal={(_, range) => range.join('–')}
+    />,
+  );
+  expect(screen.getByText('21–30')).toBeInTheDocument();
+  view.rerender(
+    <Pagination
+      current={3}
+      total={11}
+      showTotal={(_, range) => range.join('–')}
+    />,
+  );
+  expect(screen.getByText('0–0')).toBeInTheDocument();
 });

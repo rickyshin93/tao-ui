@@ -55,6 +55,18 @@
   }
   [data-tao-divider][data-tao-custom-margin][data-tao-placement="start"]
     [data-tao-divider-rail="start"],
+  [data-tao-divider][data-tao-custom-margin][data-tao-placement="left"]:dir(ltr)
+    [data-tao-divider-rail="start"],
+  [data-tao-divider][data-tao-custom-margin][data-tao-placement="left"]:dir(rtl)
+    [data-tao-divider-rail="end"],
+  [data-tao-divider][data-tao-custom-margin][data-tao-placement="right"]:dir(
+      ltr
+    )
+    [data-tao-divider-rail="end"],
+  [data-tao-divider][data-tao-custom-margin][data-tao-placement="right"]:dir(
+      rtl
+    )
+    [data-tao-divider-rail="start"],
   [data-tao-divider][data-tao-custom-margin][data-tao-placement="end"]
     [data-tao-divider-rail="end"] {
     flex-basis: 0;

@@ -249,7 +249,7 @@ export function Steps({
   classNames,
   styles,
 }: StepsProps) {
-  const { size: contextSize } = useTaoConfig();
+  const { size: contextSize, disabled: contextDisabled } = useTaoConfig();
   const screens = useBreakpoint();
 
   // `large` is not part of the Steps API — fall back to `medium`.
@@ -345,6 +345,7 @@ export function Steps({
           const stepIndex = originIndex >= 0 ? initial + originIndex : displayIndex;
 
           const hasTitle = item.title !== undefined && item.title !== null;
+          const hasIcon = !!item.icon || item.icon === 0;
           const hasSubTitle =
             item.subTitle !== undefined && item.subTitle !== null;
           const hasContent = item.content !== undefined && item.content !== null;
@@ -352,13 +353,14 @@ export function Steps({
           const itemClassNames = item.classNames;
           const itemStyles = item.styles;
 
+          const disabled = contextDisabled || item.disabled;
           const clickable =
-            (!!onChange || !!item.onClick) && !item.disabled && !isEllipsisStep;
+            (!!onChange || !!item.onClick) && !disabled && !isEllipsisStep;
 
           // ---------------------------- Icon ----------------------------
           let iconContent: ReactNode = null;
 
-          if (isDot || item.icon) {
+          if (isDot || hasIcon) {
             // Dot steps render the dot itself; custom icons render as-is.
             iconContent = item.icon;
           } else if (stepStatus === 'finish') {
@@ -396,20 +398,36 @@ export function Steps({
                 role: 'button' as const,
                 tabIndex: 0,
                 onClick: (event: MouseEvent<HTMLElement>) => {
+                  if (!event.currentTarget.contains(event.target as Node))
+                    return;
+                  const control =
+                    event.target instanceof Element
+                      ? event.target.closest(
+                          'button, a[href], input, select, textarea, label, summary, [contenteditable="true"], [tabindex]',
+                        )
+                      : null;
+                  if (control && control !== event.currentTarget) return;
                   item.onClick?.(event);
-                  handleStepClick(displayIndex);
+                  if (!event.defaultPrevented) handleStepClick(displayIndex);
                 },
                 onKeyDown: (event: KeyboardEvent<HTMLElement>) => {
-                  if (event.key === 'Enter' || event.key === ' ') {
+                  if (
+                    !event.defaultPrevented &&
+                    event.target === event.currentTarget &&
+                    (event.key === 'Enter' || event.key === ' ')
+                  ) {
                     event.preventDefault();
-                    event.currentTarget.click();
+                    if (!event.repeat) event.currentTarget.click();
                   }
                 },
               }
             : {};
 
-          const itemKey =
-            originIndex >= 0 ? `step-${initial + originIndex}` : (item.key as Key);
+          const itemKey = isEllipsisStep
+            ? item.key
+            : item.key != null
+              ? `key:${item.key}`
+              : `step:${stepIndex}`;
 
           const stepNode = (
             <div
@@ -418,8 +436,8 @@ export function Steps({
               data-tao-step=""
               data-tao-status={stepStatus}
               data-tao-active={active || undefined}
-              data-tao-disabled={item.disabled || undefined}
-              data-tao-custom={item.icon ? true : undefined}
+              data-tao-disabled={disabled || undefined}
+              data-tao-custom={hasIcon || undefined}
               data-tao-empty-header={!hasTitle && !hasSubTitle ? true : undefined}
               data-tao-ellipsis={isEllipsisStep || undefined}
               aria-current={active ? 'step' : undefined}

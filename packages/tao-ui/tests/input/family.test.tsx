@@ -1,7 +1,8 @@
-import { expect, test } from '@rstest/core';
+import { expect, rs, test } from '@rstest/core';
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { createRef, useState } from 'react';
+import { Button } from '../../src/components/button/button';
 import { Input, type InputRef } from '../../src/components/input/input';
 import { Textarea } from '../../src/components/textarea/textarea';
 import { zhCN } from '../../src/provider/locale';
@@ -113,7 +114,74 @@ for (const Control of [Input, Textarea]) {
     expect(screen.getByRole('textbox')).toHaveValue('start');
     expect(screen.getByText('5')).toBeInTheDocument();
   });
+  test('blur ends an interrupted composition for the next Enter', () => {
+    const onBlur = rs.fn();
+    const onPressEnter = rs.fn();
+    render(<Control onBlur={onBlur} onPressEnter={onPressEnter} />);
+    const input = screen.getByRole('textbox');
+    fireEvent.compositionStart(input);
+    fireEvent.blur(input);
+    fireEvent.focus(input);
+    fireEvent.keyDown(input, { key: 'Enter' });
+
+    expect(onBlur).toHaveBeenCalledTimes(1);
+    expect(onPressEnter).toHaveBeenCalledTimes(1);
+  });
+
+  test('native reset ends a stale composition for the next Enter', async () => {
+    const onPressEnter = rs.fn();
+    render(
+      <form aria-label="Editor">
+        <Control defaultValue="start" onPressEnter={onPressEnter} />
+      </form>,
+    );
+    const input = screen.getByRole('textbox');
+    fireEvent.compositionStart(input);
+    fireEvent.change(input, { target: { value: 'draft' } });
+    const form = screen.getByRole<HTMLFormElement>('form', { name: 'Editor' });
+    await act(async () => form.reset());
+    expect(input).toHaveValue('start');
+
+    fireEvent.keyDown(input, { key: 'Enter' });
+
+    expect(onPressEnter).toHaveBeenCalledTimes(1);
+  });
+  test(`${Control === Input ? 'Input' : 'Textarea'} follows its current native form on reset`, async () => {
+    const form = (formId: string) => (
+      <>
+        <form id="first">
+          <button type="reset">Reset first</button>
+        </form>
+        <form id="second">
+          <button type="reset">Reset second</button>
+        </form>
+        <Control form={formId} defaultValue="start" />
+      </>
+    );
+    const { rerender } = render(form('first'));
+    const input = screen.getByRole('textbox');
+    fireEvent.change(input, { target: { value: 'changed' } });
+    rerender(form('second'));
+    await userEvent.click(screen.getByRole('button', { name: 'Reset first' }));
+    expect(input).toHaveValue('changed');
+    await userEvent.click(screen.getByRole('button', { name: 'Reset second' }));
+    expect(input).toHaveValue('start');
+  });
 }
+
+test('Input skips conditional affixes and preserves numeric zero', () => {
+  const { container, rerender } = render(
+    <Input prefix={false} suffix="" addonBefore={false} addonAfter={true} />,
+  );
+  expect(container.querySelector('[data-tao-prefix]')).toBeNull();
+  expect(container.querySelector('[data-tao-suffix]')).toBeNull();
+  expect(container.querySelector('[data-tao-input-addon]')).toBeNull();
+  rerender(<Input prefix={0} addonAfter={0} />);
+  expect(container.querySelector('[data-tao-prefix]')).toHaveTextContent('0');
+  expect(container.querySelector('[data-tao-input-addon]')).toHaveTextContent(
+    '0',
+  );
+});
 
 test('native ref supports extended cursor focus without replacing the node', () => {
   const ref = createRef<InputRef>();
@@ -199,6 +267,30 @@ test('Search reports click, enter and clear sources; loading suppresses searches
   fireEvent.keyDown(screen.getByRole('textbox'), { key: 'Enter' });
   expect(screen.getByRole('button', { name: 'Search' })).toBeDisabled();
   expect(events).toHaveLength(3);
+});
+
+test('a Search clear event can cancel the follow-up search', async () => {
+  const onSearch = rs.fn();
+  const prevented = rs.fn();
+  render(
+    <Input.Search
+      defaultValue="hello"
+      allowClear
+      onSearch={onSearch}
+      onChange={(event) => {
+        if (typeof event.preventDefault === 'function') {
+          event.preventDefault();
+          prevented(event.defaultPrevented);
+        }
+      }}
+    />,
+  );
+
+  await userEvent.click(screen.getByRole('button', { name: 'Clear' }));
+
+  expect(prevented).toHaveBeenCalledExactlyOnceWith(true);
+  expect(onSearch).not.toHaveBeenCalled();
+  expect(screen.getByRole('textbox')).toHaveValue('');
 });
 
 test('OTP distributes paste, supports holes and only emits complete values', async () => {
@@ -292,4 +384,45 @@ test('Search preserves custom button styles and lets its handler cancel search',
   expect(button).toHaveStyle({ padding: '8px', color: 'red' });
   await userEvent.click(button);
   expect(searches).toBe(0);
+});
+
+test('disabling the password visibility toggle masks an exposed value', async () => {
+  const view = render(
+    <Input.Password aria-label="Password" defaultValue="secret" />,
+  );
+  const input = screen.getByLabelText('Password');
+  await userEvent.click(screen.getByRole('button', { name: 'Show password' }));
+  expect(input).toHaveAttribute('type', 'text');
+  view.rerender(
+    <Input.Password
+      aria-label="Password"
+      defaultValue="secret"
+      visibilityToggle={false}
+    />,
+  );
+  expect(input).toHaveAttribute('type', 'password');
+  expect(screen.queryByRole('button', { name: 'Hide password' })).toBeNull();
+  view.rerender(<Input.Password aria-label="Password" defaultValue="secret" />);
+  expect(input).toHaveAttribute('type', 'password');
+});
+
+test('a custom loading Search button blocks pointer and Enter searches', async () => {
+  const searches: string[] = [];
+  const control = (loading: boolean) => (
+    <Input.Search
+      defaultValue="record"
+      enterButton={<Button loading={loading}>Go</Button>}
+      onSearch={(value) => searches.push(value)}
+    />
+  );
+  const view = render(control(true));
+  const button = screen.getByRole('button', { name: 'Search' });
+  expect(button).toBeDisabled();
+  expect(button).toHaveAttribute('aria-busy', 'true');
+  await userEvent.click(button);
+  fireEvent.keyDown(screen.getByRole('textbox'), { key: 'Enter' });
+  expect(searches).toEqual([]);
+  view.rerender(control(false));
+  await userEvent.click(button);
+  expect(searches).toEqual(['record']);
 });

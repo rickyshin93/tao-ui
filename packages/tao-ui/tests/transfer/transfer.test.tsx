@@ -95,6 +95,7 @@ test('search uses render.value and directional filter callbacks', () => {
     target: { value: 'search-b' },
   });
   expect(screen.getByText('Beta')).toBeTruthy();
+  expect(screen.getByRole('checkbox', { name: 'Beta' })).toBeInTheDocument();
   expect(screen.queryByText('Alpha')).toBeNull();
   expect(search).toHaveBeenCalledWith('left', 'search-b');
   fireEvent.click(screen.getByRole('button', { name: 'Clear search' }));
@@ -112,6 +113,22 @@ test('search uses render.value and directional filter callbacks', () => {
   });
   expect(filter).toHaveBeenCalledWith('Beta', data[0], 'left');
 });
+
+test('hiding Transfer search removes its filter until search is shown again', () => {
+  const { rerender } = render(<Transfer dataSource={data} showSearch />);
+  const source = within(screen.getByRole('region', { name: 'Source' }));
+  fireEvent.change(source.getByRole('textbox'), { target: { value: 'Beta' } });
+  expect(source.queryByText('Alpha')).toBeNull();
+
+  rerender(<Transfer dataSource={data} showSearch={false} />);
+  expect(source.queryByRole('textbox')).toBeNull();
+  expect(source.getByText('Alpha')).toBeInTheDocument();
+
+  rerender(<Transfer dataSource={data} showSearch />);
+  expect(source.getByRole('textbox')).toHaveValue('Beta');
+  expect(source.queryByText('Alpha')).toBeNull();
+});
+
 test('select all skips disabled records and shift selection uses visible records', () => {
   const select = rs.fn();
   render(

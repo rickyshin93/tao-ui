@@ -2,6 +2,7 @@ import { Field, type Meta, type NamePath, type Rule } from '@rc-component/form';
 import {
   type CSSProperties,
   cloneElement,
+  Fragment,
   isValidElement,
   type ReactElement,
   type ReactNode,
@@ -9,8 +10,8 @@ import {
 import type { TaoStatus } from '../../provider/tao-provider';
 import type { SemanticClassNames, SemanticStyles } from '../../utils/semantic';
 import { FormFieldView } from '../form-field/form-field-view';
-import { useFormLayout } from './form-context';
 import { FieldControl } from './field-control';
+import { useFormLayout } from './form-context';
 import type { FormInstance } from './use-form';
 
 export type FormItemSemanticPart = 'root' | 'label' | 'error' | 'description';
@@ -109,22 +110,20 @@ export function FormItem<Values = Record<string, unknown>>({
   children,
 }: FormItemProps<Values>): ReactNode {
   const { layout, form: formInstance } = useFormLayout();
-  const requiredMark =
-    required ??
-    rules?.some(
-      (rule) =>
-        typeof rule === 'object' &&
-        rule != null &&
-        'required' in rule &&
-        Boolean(rule.required),
-    ) ??
-    false;
 
   const renderShell = (
     content: ReactNode,
     meta: Meta | undefined,
     control: Record<string, unknown> | null,
   ) => {
+    const requiredMark =
+      required ??
+      rules?.some((rule) =>
+        typeof rule === 'function'
+          ? !!(formInstance && rule(formInstance).required)
+          : !!rule?.required,
+      ) ??
+      false;
     const status: FormItemValidateStatus | undefined =
       validateStatus ??
       (meta?.errors.length
@@ -135,19 +134,24 @@ export function FormItem<Values = Record<string, unknown>>({
     const message = help ?? meta?.errors[0] ?? meta?.warnings[0];
     const showAsStatus = message != null && status != null;
     const errorSlot = showAsStatus ? message : undefined;
-    const descriptionSlot = extra ?? (!showAsStatus ? message : undefined);
+    const descriptionSlot = !showAsStatus ? message : undefined;
 
     // Push the status into custom (non-host) controls that expose
     // status/error props (tao Input/Select/…); host elements would warn on
     // the unknown DOM attribute.
     let controlProps = control ?? undefined;
-    if (
-      controlProps &&
-      status &&
+    const valueProp = valuePropName ?? 'value';
+    const element =
       isValidElement<Record<string, unknown>>(content) &&
-      typeof content.type !== 'string' &&
-      content.props.status == null &&
-      content.props.error == null
+      content.type !== Fragment
+        ? content
+        : undefined;
+    if (
+      status &&
+      element &&
+      typeof element.type !== 'string' &&
+      element.props.status == null &&
+      element.props.error == null
     ) {
       controlProps = { ...controlProps, status };
     }
@@ -155,31 +159,66 @@ export function FormItem<Values = Record<string, unknown>>({
       controlProps &&
       valuePropName === 'checked' &&
       'checked' in controlProps &&
-      controlProps.checked === undefined
+      (controlProps.checked === undefined ||
+        (controlProps.checked === null && element?.type === 'input'))
     ) {
       controlProps = { ...controlProps, checked: false };
     }
-    // Native text controls need an empty string to stay controlled. Custom
-    // text controls receive the store value unchanged and handle their own empty value.
-    if (
-      controlProps &&
-      isValidElement(content) &&
-      (content.type === 'input' || content.type === 'textarea') &&
-      valuePropName == null &&
-      controlProps.value === undefined
-    ) {
-      controlProps = { ...controlProps, value: '' };
+    // Native controls need a concrete empty value to remain controlled.
+    if (controlProps && valueProp === 'value' && controlProps.value == null) {
+      if (element?.type === 'select') {
+        controlProps = {
+          ...controlProps,
+          value: element.props.multiple ? [] : '',
+        };
+      } else if (element?.type === 'input' || element?.type === 'textarea') {
+        controlProps = { ...controlProps, value: '' };
+      }
     }
+    // The rc Field render function supplies collection and validation handlers
+    // without the direct child's handlers. Render-prop consumers already receive
+    // these handlers and can compose them explicitly.
+    if (controlProps && element) {
+      for (const [prop, handler] of Object.entries(controlProps)) {
+        const childHandler = element.props[prop];
+        if (
+          prop !== valueProp &&
+          typeof handler === 'function' &&
+          typeof childHandler === 'function'
+        ) {
+          controlProps = {
+            ...controlProps,
+            [prop]:
+              typeof children === 'function'
+                ? childHandler
+                : (...args: unknown[]) => {
+                    handler(...args);
+                    childHandler(...args);
+                  },
+          };
+        }
+      }
+    }
+    const collect = control?.onChange;
+    const valueChange =
+      (trigger ?? 'onChange') === 'onChange' &&
+      valueProp === 'value' &&
+      typeof collect === 'function'
+        ? {
+            onChange: controlProps?.onChange,
+            collect: (value: unknown) => collect(value),
+          }
+        : null;
 
     if (noStyle) {
-      const child =
-        isValidElement(content) && controlProps
-          ? cloneElement(content, controlProps)
-          : content;
-      return name != null &&
-        meta &&
-        isValidElement<Record<string, unknown>>(child) ? (
-        <FieldControl name={meta.name}>{child}</FieldControl>
+      if (!element) return content;
+      const child = controlProps
+        ? cloneElement(element, controlProps)
+        : element;
+      return name != null && meta ? (
+        <FieldControl name={meta.name} valueChange={valueChange}>
+          {child}
+        </FieldControl>
       ) : (
         child
       );
@@ -198,14 +237,18 @@ export function FormItem<Values = Record<string, unknown>>({
         htmlFor={htmlFor}
         required={requiredMark}
         error={errorSlot}
+        invalid={status === 'error'}
         warning={status === 'warning'}
         description={descriptionSlot}
+        extra={extra}
         layout={layout}
         controlProps={controlProps}
         renderControl={
           name != null && meta
             ? (child: ReactElement<Record<string, unknown>>) => (
-                <FieldControl name={meta.name}>{child}</FieldControl>
+                <FieldControl name={meta.name} valueChange={valueChange}>
+                  {child}
+                </FieldControl>
               )
             : undefined
         }

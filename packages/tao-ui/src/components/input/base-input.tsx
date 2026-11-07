@@ -1,3 +1,4 @@
+import { isReactRenderable } from '@rc-component/util';
 import {
   forwardRef,
   type InputHTMLAttributes,
@@ -59,6 +60,9 @@ export interface InputProps
   styles?: InputSemanticValue<SemanticStyles<InputSemanticPart>, InputProps>;
 }
 
+const hasAffixContent = (node: ReactNode) =>
+  node !== true && isReactRenderable(node);
+
 export const BaseInput = forwardRef<HTMLInputElement, InputProps>(
   function Input(props, ref) {
     const {
@@ -118,7 +122,7 @@ export const BaseInput = forwardRef<HTMLInputElement, InputProps>(
         data-tao-warning={status === 'warning' || undefined}
         data-disabled={resolvedDisabled || undefined}
       >
-        {addonBefore != null && (
+        {hasAffixContent(addonBefore) && (
           <span
             data-tao-input-addon=""
             className={classNames?.addonBefore}
@@ -127,7 +131,7 @@ export const BaseInput = forwardRef<HTMLInputElement, InputProps>(
             {addonBefore}
           </span>
         )}
-        {prefix != null && (
+        {hasAffixContent(prefix) && (
           <span
             className={classNames?.prefix}
             style={styles?.prefix}
@@ -147,6 +151,7 @@ export const BaseInput = forwardRef<HTMLInputElement, InputProps>(
             status === 'error' || error ? true : rest['aria-invalid']
           }
           onChange={field.change}
+          onBlur={field.blur}
           onKeyDown={(event) => {
             onKeyDown?.(event);
             if (
@@ -163,12 +168,7 @@ export const BaseInput = forwardRef<HTMLInputElement, InputProps>(
             onCompositionStart?.(event);
           }}
           onCompositionEnd={(event) => {
-            field.composing.current = false;
-            if (
-              field.normalize(event.currentTarget.value) !==
-              event.currentTarget.value
-            )
-              field.change({ ...event, target: event.currentTarget });
+            field.endComposition(event);
             onCompositionEnd?.(event);
           }}
         />
@@ -180,7 +180,7 @@ export const BaseInput = forwardRef<HTMLInputElement, InputProps>(
             style={styles?.clear}
           />
         )}
-        {suffix != null && (
+        {hasAffixContent(suffix) && (
           <span
             className={classNames?.suffix}
             style={styles?.suffix}
@@ -199,7 +199,7 @@ export const BaseInput = forwardRef<HTMLInputElement, InputProps>(
             {field.counter}
           </span>
         )}
-        {addonAfter != null && (
+        {hasAffixContent(addonAfter) && (
           <span
             data-tao-input-addon=""
             className={classNames?.addonAfter}

@@ -66,7 +66,8 @@ function getMentions(
   { prefix = '@', split = ' ' }: MentionsConfig = {},
 ): MentionsEntity[] {
   const prefixes = Array.isArray(prefix) ? prefix : [prefix];
-  return value.split(split).flatMap((text) => {
+  const tokens = split === ' ' ? value.split(/\s+/u) : value.split(split);
+  return tokens.flatMap((text) => {
     const match = prefixes.find((candidate) => text.startsWith(candidate));
     return match !== undefined && text.length > match.length
       ? [{ prefix: match, value: text.slice(match.length) }]
@@ -96,6 +97,7 @@ const MentionsComponent = forwardRef<MentionsRef, MentionsProps>(
       notFoundContent = config.locale.noResults,
       popupClassName,
       popupRender,
+      value,
       ...rest
     } = props;
     const size = sizeProp === 'middle' ? 'medium' : sizeProp;
@@ -106,13 +108,14 @@ const MentionsComponent = forwardRef<MentionsRef, MentionsProps>(
         : classNames;
     const semanticStyles =
       typeof styles === 'function' ? styles({ props: resolvedProps }) : styles;
-    const clearConfig = allowClear
-      ? {
-          clearIcon: <CloseIcon />,
-          label: config.locale.clear,
-          ...(typeof allowClear === 'object' ? allowClear : {}),
-        }
-      : false;
+    const clearConfig =
+      allowClear && !props.readOnly
+        ? {
+            clearIcon: <CloseIcon />,
+            label: config.locale.clear,
+            ...(typeof allowClear === 'object' ? allowClear : {}),
+          }
+        : false;
     const loadingOptions: MentionsOptionProps[] = [
       {
         value: '__tao_loading__',
@@ -141,6 +144,19 @@ const MentionsComponent = forwardRef<MentionsRef, MentionsProps>(
           ref={ref}
           prefixCls={prefixCls}
           disabled={disabled}
+          onKeyDownCapture={(event) => {
+            props.onKeyDownCapture?.(event);
+            if (
+              !event.isPropagationStopped() &&
+              event.key === 'Enter' &&
+              (event.nativeEvent.isComposing || event.keyCode === 229)
+            ) {
+              // The mention engine handles Enter without checking composition.
+              props.onKeyDown?.(event);
+              event.stopPropagation();
+            }
+          }}
+          value={'value' in props ? (value ?? '') : undefined}
           silent={loading}
           allowClear={clearConfig}
           options={loading ? loadingOptions : options}

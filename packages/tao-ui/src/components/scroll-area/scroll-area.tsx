@@ -91,6 +91,8 @@ export function ScrollArea({
 
   const [textDirection, directionRef] = useTaoDirection(undefined, 'self');
   const { locale } = useTaoConfig();
+  const firedScrollEnd = useRef(false);
+  const lastScrollTop = useRef(0);
   const updateScrollState = useCallback(() => {
     const el = viewportRef.current;
     if (!el) return;
@@ -121,58 +123,79 @@ export function ScrollArea({
       atLeft: scrollLeft <= 1,
       atRight: scrollLeft + clientWidth >= scrollWidth - 1,
     });
-  }, [textDirection]);
+    const nearBottom =
+      direction !== 'horizontal' &&
+      scrollHeight > clientHeight &&
+      scrollTop + clientHeight >= scrollHeight - scrollEndThreshold;
+    if (!nearBottom) firedScrollEnd.current = false;
+    return nearBottom;
+  }, [direction, textDirection, scrollEndThreshold]);
 
   // Observe content size changes
   useEffect(() => {
     const el = viewportRef.current;
     if (!el) return;
-    updateScrollState();
-    const observer = new ResizeObserver(() => updateScrollState());
-    observer.observe(el);
-    // Also observe first child if exists
-    if (el.firstElementChild) observer.observe(el.firstElementChild);
-    return () => observer.disconnect();
+    const observer = new ResizeObserver(updateScrollState);
+    const observeContent = () => {
+      observer.disconnect();
+      observer.observe(el);
+      for (const child of el.children) observer.observe(child);
+      updateScrollState();
+    };
+    const mutations = new MutationObserver(observeContent);
+    mutations.observe(el, { childList: true });
+    observeContent();
+    return () => {
+      mutations.disconnect();
+      observer.disconnect();
+    };
   }, [updateScrollState]);
 
   // ---- Scroll handler ----
-  const firedScrollEnd = useRef(false);
-
   const handleScroll = useCallback(
     (e: UIEvent<HTMLDivElement>) => {
-      updateScrollState();
+      const scrollTop = e.currentTarget.scrollTop;
+      const movedVertically = scrollTop !== lastScrollTop.current;
+      lastScrollTop.current = scrollTop;
+      const nearBottom = updateScrollState();
       onScrollProp?.(e);
 
-      // onScrollEnd detection
-      if (onScrollEnd) {
-        const el = e.currentTarget;
-        const { scrollTop, scrollHeight, clientHeight } = el;
-        const nearBottom =
-          scrollTop + clientHeight >= scrollHeight - scrollEndThreshold;
-        if (nearBottom && !firedScrollEnd.current) {
-          firedScrollEnd.current = true;
-          onScrollEnd();
-        } else if (!nearBottom) {
-          firedScrollEnd.current = false;
-        }
+      if (
+        onScrollEnd &&
+        movedVertically &&
+        nearBottom &&
+        !firedScrollEnd.current
+      ) {
+        firedScrollEnd.current = true;
+        onScrollEnd();
       }
     },
-    [updateScrollState, onScrollProp, onScrollEnd, scrollEndThreshold],
+    [updateScrollState, onScrollProp, onScrollEnd],
   );
 
   // ---- Thumb drag ----
-  const dragCleanup = useRef<(() => void) | null>(null);
-  useEffect(() => () => dragCleanup.current?.(), []);
+  const activeDrag = useRef<{ thumb: Element; cleanup: () => void } | null>(
+    null,
+  );
+  useEffect(() => () => activeDrag.current?.cleanup(), []);
+  useEffect(() => {
+    const drag = activeDrag.current;
+    if (drag && !viewportRef.current?.parentElement?.contains(drag.thumb)) {
+      drag.cleanup();
+    }
+  });
 
   const handleThumbPointerDown = useCallback(
     (axis: 'x' | 'y', e: React.PointerEvent) => {
+      if (e.button !== 0) return;
       e.preventDefault();
       e.stopPropagation();
-      dragCleanup.current?.();
+      activeDrag.current?.cleanup();
       const el = viewportRef.current;
       if (!el) return;
 
       const thumb = e.currentTarget;
+      const ownerDocument = thumb.ownerDocument;
       const track = thumb.parentElement;
       if (!track) return;
       const pos = axis === 'y' ? e.clientY : e.clientX;
@@ -204,19 +227,19 @@ export function ScrollArea({
       };
 
       const cleanup = () => {
-        document.removeEventListener('pointermove', handleMove);
-        document.removeEventListener('pointerup', handleEnd);
-        document.removeEventListener('pointercancel', handleEnd);
-        dragCleanup.current = null;
+        ownerDocument.removeEventListener('pointermove', handleMove);
+        ownerDocument.removeEventListener('pointerup', handleEnd);
+        ownerDocument.removeEventListener('pointercancel', handleEnd);
+        activeDrag.current = null;
       };
       const handleEnd = (ev: PointerEvent) => {
         if (ev.pointerId === pointerId) cleanup();
       };
-      dragCleanup.current = cleanup;
+      activeDrag.current = { thumb, cleanup };
 
-      document.addEventListener('pointermove', handleMove);
-      document.addEventListener('pointerup', handleEnd);
-      document.addEventListener('pointercancel', handleEnd);
+      ownerDocument.addEventListener('pointermove', handleMove);
+      ownerDocument.addEventListener('pointerup', handleEnd);
+      ownerDocument.addEventListener('pointercancel', handleEnd);
     },
     [],
   );
@@ -231,10 +254,11 @@ export function ScrollArea({
         return;
 
       const rect = e.currentTarget.getBoundingClientRect();
+      const trackSize = axis === 'y' ? rect.height : rect.width;
+      if (trackSize <= 0) return;
       const clickPos =
-        axis === 'y'
-          ? (e.clientY - rect.top) / rect.height
-          : (e.clientX - rect.left) / rect.width;
+        (axis === 'y' ? e.clientY - rect.top : e.clientX - rect.left) /
+        trackSize;
 
       if (axis === 'y') {
         el.scrollTop = clickPos * (el.scrollHeight - el.clientHeight);

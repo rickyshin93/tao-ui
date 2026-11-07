@@ -198,24 +198,27 @@ export const DatePicker = forwardRef(function DatePicker(
     defaultValue ?? null,
   );
   const resolvedValue = isValueControlled ? (value ?? null) : internalValue;
+  const displayValue = formatValue(resolvedValue);
+  const [inputValue, setInputValue] = useState(displayValue);
   const emitChange = useCallback(
     (next: Dayjs | null, dateString: string) => {
+      if (resolvedDisabled) return;
+      setInputValue(isValueControlled ? displayValue : dateString);
       if (!isValueControlled) setInternalValue(next);
       onChange?.(next, dateString);
     },
-    [isValueControlled, onChange],
+    [displayValue, isValueControlled, onChange, resolvedDisabled],
   );
 
   const [internalOpen, setInternalOpen] = useState(false);
-  const displayValue = formatValue(resolvedValue);
-  const [inputValue, setInputValue] = useState(displayValue);
   const isOpen = controlledOpen ?? internalOpen;
   const setOpen = useCallback(
     (v: boolean) => {
+      if (v === isOpen) return;
       setInternalOpen(v);
       onOpenChange?.(v);
     },
-    [onOpenChange],
+    [isOpen, onOpenChange],
   );
 
   useEffect(() => {
@@ -229,6 +232,17 @@ export const DatePicker = forwardRef(function DatePicker(
     picker === 'year' ? 'year' : picker === 'month' ? 'month' : 'date',
   );
   const [timeScrollKey, setTimeScrollKey] = useState(0);
+  const typedValue = useMemo(() => {
+    if (inputValue === displayValue || !inputValue.trim()) return null;
+    const parsed = parsePickerDate(
+      inputValue.trim(),
+      fmt,
+      dayjsLocale,
+      numberLocale,
+    );
+    return isDateBlocked(parsed) ? null : parsed;
+  }, [inputValue, displayValue, fmt, dayjsLocale, numberLocale, isDateBlocked]);
+  const panelValue = typedValue ?? resolvedValue;
 
   // Reset panel state when opening
   useEffect(() => {
@@ -241,25 +255,35 @@ export const DatePicker = forwardRef(function DatePicker(
     }
   }, [isOpen, picker, resolvedValue]);
 
+  useEffect(() => {
+    if (!typedValue) return;
+    setViewDate(typedValue);
+    setPanelMode(
+      picker === 'year' ? 'year' : picker === 'month' ? 'month' : 'date',
+    );
+    setTimeScrollKey((k) => k + 1);
+  }, [typedValue, picker]);
+
   // Time state
   const timeValue = useMemo(
     () => ({
-      hour: resolvedValue?.hour() ?? 0,
-      minute: resolvedValue?.minute() ?? 0,
-      second: resolvedValue?.second() ?? 0,
+      hour: panelValue?.hour() ?? 0,
+      minute: panelValue?.minute() ?? 0,
+      second: panelValue?.second() ?? 0,
     }),
-    [resolvedValue],
+    [panelValue],
   );
 
   const handleDateSelect = useCallback(
     (date: Dayjs) => {
       let result = date;
-      if (showTime && resolvedValue) {
+      if (showTime && panelValue) {
         result = date
-          .hour(resolvedValue.hour())
-          .minute(resolvedValue.minute())
-          .second(resolvedValue.second());
+          .hour(panelValue.hour())
+          .minute(panelValue.minute())
+          .second(panelValue.second());
       }
+      if (isDateBlocked(result)) return;
       if (!showTime) {
         emitChange(result, formatValue(result));
         setOpen(false);
@@ -268,7 +292,7 @@ export const DatePicker = forwardRef(function DatePicker(
         // Keep open for time selection
       }
     },
-    [emitChange, formatValue, showTime, resolvedValue, setOpen],
+    [emitChange, formatValue, showTime, panelValue, setOpen, isDateBlocked],
   );
 
   const handleMonthSelect = useCallback(
@@ -299,11 +323,12 @@ export const DatePicker = forwardRef(function DatePicker(
 
   const handleTimeChange = useCallback(
     (h: number, m: number, s: number) => {
-      const base = resolvedValue ?? dayjs();
+      const base = panelValue ?? dayjs();
       const result = base.hour(h).minute(m).second(s);
+      if (resolvedDisabled || isDateBlocked(result)) return;
       emitChange(result, formatValue(result));
     },
-    [resolvedValue, emitChange, formatValue],
+    [panelValue, resolvedDisabled, isDateBlocked, emitChange, formatValue],
   );
 
   const handleClear = useCallback(
@@ -324,17 +349,14 @@ export const DatePicker = forwardRef(function DatePicker(
     [emitChange, formatValue, setOpen, isDateBlocked],
   );
 
-  const handleOk = useCallback(() => {
-    setOpen(false);
-  }, [setOpen]);
-
   const handleNow = useCallback(() => {
     const now = dayjs();
+    if (resolvedDisabled || isDateBlocked(now)) return;
     emitChange(now, formatValue(now));
     setViewDate(now);
     setPanelMode('date');
     setTimeScrollKey((k) => k + 1);
-  }, [emitChange, formatValue]);
+  }, [resolvedDisabled, isDateBlocked, emitChange, formatValue]);
 
   const showClearBtn = allowClear && resolvedValue && !resolvedDisabled;
 
@@ -344,13 +366,13 @@ export const DatePicker = forwardRef(function DatePicker(
       if (displayValue) emitChange(null, '');
       setInputValue(isValueControlled ? displayValue : '');
       setOpen(false);
-      return;
+      return true;
     }
 
     const parsed = parsePickerDate(text, fmt, dayjsLocale, numberLocale);
     if (isDateBlocked(parsed)) {
       setInputValue(displayValue);
-      return;
+      return false;
     }
 
     const formatted = formatValue(parsed);
@@ -358,6 +380,7 @@ export const DatePicker = forwardRef(function DatePicker(
     setViewDate(parsed);
     if (formatted !== displayValue) emitChange(parsed, formatted);
     setOpen(false);
+    return true;
   }, [
     displayValue,
     fmt,
@@ -372,6 +395,12 @@ export const DatePicker = forwardRef(function DatePicker(
   ]);
 
   const showTimePanel = !!(showTime && panelMode === 'date');
+  const today = isOpen && showTimePanel ? dayjs() : null;
+  const nowBlocked = today != null && isDateBlocked(today);
+  const timeBlocked =
+    today != null && (panelValue ? isDateBlocked(panelValue) : nowBlocked);
+  const isPanelDateDisabled = (date: Dayjs) =>
+    resolvedDisabled || Boolean(disabledDate?.(date));
 
   const datePanel = (
     <>
@@ -385,10 +414,10 @@ export const DatePicker = forwardRef(function DatePicker(
         {panelMode === 'date' && (
           <CalendarGrid
             viewDate={viewDate}
-            value={resolvedValue}
+            value={panelValue}
             onSelect={handleDateSelect}
             onViewDateChange={setViewDate}
-            disabledDate={disabledDate}
+            disabledDate={isPanelDateDisabled}
             minDate={minDate}
             maxDate={maxDate}
             className={classNames?.calendar}
@@ -400,9 +429,9 @@ export const DatePicker = forwardRef(function DatePicker(
         {panelMode === 'month' && (
           <MonthGrid
             viewDate={viewDate}
-            value={resolvedValue}
+            value={panelValue}
             onSelect={handleMonthSelect}
-            disabledDate={disabledDate}
+            disabledDate={isPanelDateDisabled}
             minDate={minDate}
             maxDate={maxDate}
           />
@@ -410,9 +439,9 @@ export const DatePicker = forwardRef(function DatePicker(
         {(panelMode === 'year' || panelMode === 'decade') && (
           <YearGrid
             viewDate={viewDate}
-            value={resolvedValue}
+            value={panelValue}
             onSelect={handleYearSelect}
-            disabledDate={disabledDate}
+            disabledDate={isPanelDateDisabled}
             minDate={minDate}
             maxDate={maxDate}
           />
@@ -442,6 +471,7 @@ export const DatePicker = forwardRef(function DatePicker(
               hour={timeValue.hour}
               minute={timeValue.minute}
               second={timeValue.second}
+              disabled={resolvedDisabled || timeBlocked}
               onChange={handleTimeChange}
               config={typeof showTime === 'object' ? showTime : undefined}
               scrollKey={timeScrollKey}
@@ -452,7 +482,11 @@ export const DatePicker = forwardRef(function DatePicker(
         datePanel
       )}
       {presets && presets.length > 0 && (
-        <Presets items={presets} onSelect={handlePresetSelect} />
+        <Presets
+          items={presets}
+          disabled={resolvedDisabled}
+          onSelect={handlePresetSelect}
+        />
       )}
       {showTimePanel && (
         <div
@@ -463,7 +497,7 @@ export const DatePicker = forwardRef(function DatePicker(
           <Button
             variant="secondary"
             size="small"
-            disabled={false}
+            disabled={resolvedDisabled || nowBlocked}
             data-tao-picker-footer-btn=""
             onClick={handleNow}
           >
@@ -474,7 +508,9 @@ export const DatePicker = forwardRef(function DatePicker(
             disabled={false}
             data-tao-picker-footer-btn=""
             data-tao-primary=""
-            onClick={handleOk}
+            onClick={() => {
+              if (inputValue === displayValue || !commitInputValue()) setOpen(false);
+            }}
           >
             {ctx.locale.ok}
           </Button>
@@ -492,6 +528,7 @@ export const DatePicker = forwardRef(function DatePicker(
         // biome-ignore lint/a11y/useSemanticElements: nested buttons are invalid in the mobile trigger; the desktop trigger shares this content.
         <span
           data-tao-picker-clear=""
+          onMouseDown={(event) => event.preventDefault()}
           onClick={(event) => {
             event.stopPropagation();
             handleClear(event);
@@ -617,9 +654,11 @@ export const DatePicker = forwardRef(function DatePicker(
           ) {
             return;
           }
+          keyboardOpenRef.current = false;
           commitInputValue();
         }}
         onKeyDown={(event) => {
+          if (event.nativeEvent.isComposing || event.keyCode === 229) return;
           if (event.key === 'ArrowDown') {
             event.preventDefault();
             openFromKeyboard();

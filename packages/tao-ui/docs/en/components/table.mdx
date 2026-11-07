@@ -1,6 +1,6 @@
 ---
 title: Table
-description: "Displays structured row and column data with selection, sorting, filtering, and pagination hooks. Usage guidance, runnable example, and API reference."
+description: "Display structured data with sorting, filtering, pagination and controlled row selection."
 ---
 
 import Preview from '../../_components/demo-preview';
@@ -388,7 +388,9 @@ export default function TableFiltering() {
 
 ### Controlled row selection
 
-Maintain selected row keys and keep stable business identifiers when selection changes.
+Use a stable record ID for `rowKey`, such as a database ID. Keep selected keys in `rowSelection.selectedRowKeys` and update them from `rowSelection.onChange`.
+
+Return `{ disabled: true }` from `rowSelection.getCheckboxProps(record)` for rows that cannot be selected. The header checkbox applies to eligible rows on the current page and preserves selection on other pages. Since [0.0.49](/guide/changelog), Table also uses the current disabled state when rows change and the callback stays the same.
 
 ```tsx preview
 import { Stack, Table, type TableColumn } from '@rockshin/tao-ui';

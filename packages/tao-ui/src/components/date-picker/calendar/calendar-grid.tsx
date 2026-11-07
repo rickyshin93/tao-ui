@@ -69,12 +69,12 @@ export function CalendarGrid({
   };
   const dates = weeks.flat();
   const preferredFocus =
-    [value, rangeStart, today].find(
-      (candidate) =>
-        candidate != null &&
-        dates.some((date) => date.isSame(candidate, 'day')) &&
-        !isDisabled(candidate),
-    ) ??
+    [value, rangeStart, today]
+      .filter((candidate) => candidate != null)
+      .map((candidate) =>
+        dates.find((date) => date.isSame(candidate, 'day') && !isDisabled(date)),
+      )
+      .find((date) => date != null) ??
     dates.find((date) => date.month() === currentMonth && !isDisabled(date)) ??
     dates.find((date) => !isDisabled(date)) ??
     viewDate;
@@ -82,13 +82,18 @@ export function CalendarGrid({
   const focusedDateRef = useRef(focusedDate);
   const buttonRefs = useRef(new Map<string, HTMLButtonElement>());
   const shouldRestoreFocus = useRef(false);
+  const tabStop = dates.some(
+    (date) => date.isSame(focusedDateRef.current, 'day') && !isDisabled(date),
+  )
+    ? focusedDateRef.current
+    : preferredFocus;
 
   useEffect(() => {
-    if (!dates.some((date) => date.isSame(focusedDateRef.current, 'day'))) {
-      focusedDateRef.current = preferredFocus;
-      setFocusedDate(preferredFocus);
+    if (!tabStop.isSame(focusedDateRef.current, 'day')) {
+      focusedDateRef.current = tabStop;
+      setFocusedDate(tabStop);
     }
-  }, [dates, preferredFocus]);
+  }, [tabStop]);
 
   useEffect(() => {
     if (!shouldRestoreFocus.current) return;
@@ -99,7 +104,10 @@ export function CalendarGrid({
   const moveFocus = (nextDate: Dayjs) => {
     let next = nextDate;
     const direction = next.isBefore(focusedDateRef.current, 'day') ? -1 : 1;
+    // A disabledDate predicate may reject every date in this direction.
+    const searchEnd = nextDate.add(direction, 'month');
     while (isDisabled(next)) {
+      if (next.isSame(searchEnd, 'day')) return;
       next = next.add(direction, 'day');
       if (minDate && next.isBefore(minDate, 'day')) return;
       if (maxDate && next.isAfter(maxDate, 'day')) return;
@@ -231,6 +239,7 @@ export function CalendarGrid({
                     className={cellClassName}
                     style={cellStyle}
                     data-tao-calendar-cell-button=""
+                    data-tao-calendar-date={date.format('YYYY-MM-DD')}
                     data-tao-selected={isSelected || undefined}
                     data-tao-today={isToday || undefined}
                     data-tao-other-month={isOtherMonth || undefined}
@@ -239,9 +248,7 @@ export function CalendarGrid({
                     data-tao-range-start={rStart || undefined}
                     data-tao-range-end={rEnd || undefined}
                     disabled={disabled}
-                    tabIndex={
-                      date.isSame(focusedDateRef.current, 'day') ? 0 : -1
-                    }
+                    tabIndex={!disabled && date.isSame(tabStop, 'day') ? 0 : -1}
                     onFocus={(event) => {
                       const previous = buttonRefs.current.get(
                         focusedDateRef.current.format('YYYY-MM-DD'),

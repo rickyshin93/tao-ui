@@ -10,6 +10,18 @@ test('renders the spinner when spinning (default)', () => {
   expect(el.querySelector('[data-tao-spinner-indicator]')).toBeTruthy();
 });
 
+test('empty conditional children do not switch Spinner into wrapper mode', () => {
+  const { container, rerender } = render(
+    <Spinner className="standalone">{[null, false]}</Spinner>,
+  );
+  expect(screen.getByRole('status')).toHaveClass('standalone');
+  expect(container.querySelector('[data-tao-spinner-container]')).toBeNull();
+  rerender(<Spinner>{0}</Spinner>);
+  expect(
+    container.querySelector('[data-tao-spinner-container]'),
+  ).toHaveTextContent('0');
+});
+
 test('renders nothing when spinning=false (standalone)', () => {
   render(<Spinner spinning={false} />);
   expect(screen.queryByRole('status')).toBeNull();
@@ -90,4 +102,21 @@ test('classNames and styles apply to semantic parts', () => {
   const tip = document.querySelector('[data-tao-spinner-tip]') as HTMLElement;
   expect(tip.classList.contains('my-tip')).toBe(true);
   expect(tip.style.color).toBe('rgb(1, 2, 3)');
+});
+
+test('keeps wrapper className and style off the indicator with numeric children', () => {
+  render(
+    <Spinner className="wrapper" style={{ padding: 10 }}>
+      {0}
+    </Spinner>,
+  );
+  expect(screen.getByText('0').parentElement).toHaveClass('wrapper');
+  expect(screen.getByRole('status')).not.toHaveClass('wrapper');
+  expect(screen.getByRole('status')).not.toHaveStyle({ padding: '10px' });
+});
+
+test('an omitted conditional tip leaves the localized loading name intact', () => {
+  const { container } = render(<Spinner tip={false} />);
+  expect(screen.getByRole('status', { name: 'Loading' })).toBeVisible();
+  expect(container.querySelector('[data-tao-spinner-tip]')).toBeNull();
 });

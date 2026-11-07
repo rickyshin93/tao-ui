@@ -246,8 +246,12 @@ const SkeletonRoot = forwardRef<SkeletonRef, SkeletonProps>(
         {avatar && (
           <div
             data-tao-skeleton-header=""
-            className={cx(`${prefixCls}-header`, names?.header)}
-            style={slots?.header}
+            className={cx(
+              `${prefixCls}-header`,
+              names?.header,
+              avatarProps.classNames?.root,
+            )}
+            style={{ ...avatarProps.styles?.root, ...slots?.header }}
             aria-hidden="true"
           >
             <span
@@ -262,6 +266,7 @@ const SkeletonRoot = forwardRef<SkeletonRef, SkeletonProps>(
               className={cx(
                 avatarProps.prefixCls ?? `${prefixCls}-avatar`,
                 names?.avatar,
+                avatarProps.classNames?.content,
                 avatarProps.className,
                 avatarProps.rootClassName,
               )}
@@ -269,6 +274,7 @@ const SkeletonRoot = forwardRef<SkeletonRef, SkeletonProps>(
                 ...(typeof avatarSize === 'number'
                   ? { width: avatarSize, height: avatarSize }
                   : {}),
+                ...avatarProps.styles?.content,
                 ...avatarProps.style,
                 ...slots?.avatar,
               }}

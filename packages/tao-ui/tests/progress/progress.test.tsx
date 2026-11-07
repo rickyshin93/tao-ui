@@ -1,5 +1,5 @@
 import { expect, test } from '@rstest/core';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { createRef } from 'react';
 import { Progress } from '../../src/components/progress/progress';
 import { TaoProvider } from '../../src/provider/tao-provider';
@@ -269,6 +269,68 @@ test('logical and physical gap placements alter dashboard geometry', () => {
   ).not.toBe(start);
 });
 
+test('dashboard logical gaps follow RTL while physical gaps stay fixed', () => {
+  const { container } = render(
+    <div style={{ direction: 'rtl' }}>
+      <Progress type="dashboard" gapPlacement="start" />
+      <Progress type="dashboard" gapPlacement="end" />
+      <Progress type="dashboard" gapPosition="left" />
+      <Progress type="dashboard" gapPosition="right" />
+    </div>,
+  );
+  const [start, end, left, right] = Array.from(
+    container.querySelectorAll('[data-tao-progress-rail]'),
+    (rail) => rail.getAttribute('d'),
+  );
+  expect(start).toBe(right);
+  expect(end).toBe(left);
+  expect(left).not.toBe(right);
+});
+
+test('circle steps use the individual stroke colors of completed segments', () => {
+  const { container } = render(
+    <Progress
+      type="circle"
+      percent={75}
+      steps={4}
+      strokeColor={['red', 'green', 'blue']}
+      railColor="gray"
+    />,
+  );
+  const segments = container.querySelectorAll<SVGPathElement>(
+    '[data-tao-progress-step]',
+  );
+  expect(Array.from(segments, (segment) => segment.style.stroke)).toEqual([
+    'red',
+    'green',
+    'blue',
+    'gray',
+  ]);
+});
+
+test('the small circle tooltip formats percent with the provider locale', async () => {
+  const { container } = render(
+    <TaoProvider locale={{ numberLocale: 'fr-FR' }}>
+      <Progress type="circle" size={20} percent={12.5} />
+    </TaoProvider>,
+  );
+  fireEvent.focus(container.querySelector('[data-tao-progress-body]')!);
+  const text = new Intl.NumberFormat('fr-FR', {
+    style: 'percent',
+    maximumFractionDigits: 1,
+  }).format(0.125);
+  expect((await screen.findByRole('tooltip')).textContent).toBe(text);
+});
+
+test('a very small circle keeps a positive SVG arc radius', () => {
+  const { container } = render(
+    <Progress type="circle" size={2} percent={50} />,
+  );
+  const path = container.querySelector('[data-tao-progress-rail]')!;
+  const radius = Number(path.getAttribute('d')?.match(/ A ([^ ]+)/)?.[1]);
+  expect(radius).toBeGreaterThan(0);
+});
+
 test('circle steps render the requested count, gap and active segments', () => {
   const { container, rerender } = render(
     <Progress
@@ -325,4 +387,52 @@ test('semantic functions receive resolved values and style overrides reach parts
   expect(
     container.querySelector('.custom-progress-body.custom-body'),
   ).toBeTruthy();
+});
+
+test.each(['line', 'circle', 'dashboard'] as const)(
+  '%s stepped progress counts the success portion inside the overall value',
+  (type) => {
+    const { container } = render(
+      <Progress
+        type={type}
+        percent={80}
+        success={{ percent: 30, strokeColor: 'green' }}
+        steps={10}
+        strokeColor="red"
+        railColor="gray"
+      />,
+    );
+    const steps = [
+      ...container.querySelectorAll<HTMLElement | SVGElement>(
+        '[data-tao-progress-step]',
+      ),
+    ];
+    expect(
+      steps.filter((step) => step.hasAttribute('data-tao-active')),
+    ).toHaveLength(8);
+    expect(
+      steps.filter((step) => step.hasAttribute('data-tao-success')),
+    ).toEqual(steps.slice(0, 3));
+    const property = type === 'line' ? 'background' : 'stroke';
+    expect(steps[0].style[property]).toBe('green');
+    expect(steps[3].style[property]).toBe('red');
+    expect(steps[8].style[property]).toBe('gray');
+  },
+);
+
+test('localizes the default percentage without changing the underlying numeric value', () => {
+  render(
+    <TaoProvider locale={{ numberLocale: 'ar-EG' }}>
+      <Progress percent={33.3} aria-label="Upload" />
+    </TaoProvider>,
+  );
+  const formatted = new Intl.NumberFormat('ar-EG', {
+    style: 'percent',
+    maximumFractionDigits: 1,
+  }).format(0.333);
+  expect(screen.getByText(formatted)).toBeInTheDocument();
+  expect(screen.getByRole('progressbar', { name: 'Upload' })).toHaveAttribute(
+    'aria-valuenow',
+    '33.3',
+  );
 });

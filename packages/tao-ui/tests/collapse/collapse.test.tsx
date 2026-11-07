@@ -1,5 +1,5 @@
-import { beforeAll, expect, test } from '@rstest/core';
-import { render, screen } from '@testing-library/react';
+import { beforeAll, expect, rs, test } from '@rstest/core';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { Collapse } from '../../src/components/collapse/collapse';
 import { TaoProvider } from '../../src/provider/tao-provider';
@@ -89,4 +89,68 @@ test('semantic classNames/styles apply to parts', () => {
   expect(trigger).toBeTruthy();
   expect(trigger.style.color).toBe('rgb(1, 2, 3)');
   expect(document.querySelector('.my-content')).toBeTruthy();
+});
+
+test('disabled custom link triggers cannot toggle or navigate', () => {
+  const onOpenChange = rs.fn();
+  render(
+    <Collapse disabled onOpenChange={onOpenChange}>
+      <Collapse.Trigger asChild>
+        <a href="#details" tabIndex={0} aria-disabled={false}>
+          Details
+        </a>
+      </Collapse.Trigger>
+      <Collapse.Content>Expanded details</Collapse.Content>
+    </Collapse>,
+  );
+  const trigger = screen.getByRole('link', { name: 'Details' });
+  expect(trigger).not.toHaveAttribute('href');
+  expect(fireEvent.click(trigger)).toBe(false);
+  expect(
+    fireEvent(
+      trigger,
+      new MouseEvent('auxclick', {
+        button: 1,
+        bubbles: true,
+        cancelable: true,
+      }),
+    ),
+  ).toBe(false);
+  expect(onOpenChange).not.toHaveBeenCalled();
+  expect(trigger).toHaveAttribute('aria-expanded', 'false');
+  expect(trigger).toHaveAttribute('aria-disabled', 'true');
+  expect(trigger).toHaveAttribute('tabindex', '-1');
+});
+
+test('opening a panel after a data update omits keys for removed panels', () => {
+  const onChange = rs.fn();
+  const first = { key: 'first', label: 'First', children: 'First panel' };
+  const second = { key: 'second', label: 'Second', children: 'Second panel' };
+  const view = render(
+    <Collapse
+      items={[first, second]}
+      defaultActiveKey="first"
+      onChange={onChange}
+    />,
+  );
+  view.rerender(
+    <Collapse items={[second]} defaultActiveKey="first" onChange={onChange} />,
+  );
+  fireEvent.click(screen.getByRole('button', { name: 'Second' }));
+  expect(onChange).toHaveBeenCalledExactlyOnceWith(['second']);
+});
+
+test('a consumer changing onChange keys does not overwrite open panels', () => {
+  render(
+    <Collapse
+      items={[{ key: 'details', label: 'Details', children: 'Expanded' }]}
+      onChange={(keys) => {
+        keys.splice(0);
+      }}
+    />,
+  );
+  const trigger = screen.getByRole('button', { name: 'Details' });
+  fireEvent.click(trigger);
+  expect(trigger).toHaveAttribute('aria-expanded', 'true');
+  expect(screen.getByText('Expanded')).toBeVisible();
 });

@@ -1,6 +1,8 @@
 import {
   type ChangeEvent,
+  type CompositionEvent,
   type CSSProperties,
+  type FocusEvent,
   type KeyboardEvent,
   type MouseEvent,
   type ReactNode,
@@ -87,16 +89,18 @@ export function useTextControl<
   props: TextControlProps<T> & {
     value?: string | number | readonly string[];
     defaultValue?: string | number | readonly string[];
+    form?: string;
     maxLength?: number;
     onChange?: (event: ChangeEvent<T>) => void;
+    onBlur?: (event: FocusEvent<T>) => void;
   },
   nodeRef: RefObject<T | null>,
 ) {
   const [innerValue, setInnerValue] = useState(
     String(props.defaultValue ?? ''),
   );
-  const value =
-    props.value !== undefined ? String(props.value ?? '') : innerValue;
+  const controlled = 'value' in props;
+  const value = controlled ? String(props.value ?? '') : innerValue;
   const composing = useRef(false);
   const count = props.count?.strategy?.(value) ?? value.length;
   const max = props.count?.max ?? props.maxLength;
@@ -118,28 +122,50 @@ export function useTextControl<
       ? config.exceedFormatter(next, { max })
       : next;
   };
-  const change = (event: ChangeEvent<T>, next = event.target.value) => {
-    const normalized = composing.current ? next : normalize(next);
-    event.target.value = normalized;
-    if (props.value === undefined) setInnerValue(normalized);
+  const applyChange = (event: ChangeEvent<T>, next: string) => {
+    event.target.value = next;
+    if (!controlled) setInnerValue(next);
     props.onChange?.(event);
   };
+  const change = (event: ChangeEvent<T>, next = event.target.value) => {
+    applyChange(event, composing.current ? next : normalize(next));
+  };
+  const blur = (event: FocusEvent<T>) => {
+    composing.current = false;
+    props.onBlur?.(event);
+  };
+  const endComposition = (event: CompositionEvent<T>) => {
+    composing.current = false;
+    const target = event.currentTarget;
+    const normalized = normalize(target.value);
+    if (normalized !== target.value) {
+      applyChange(
+        Object.create(event, { target: { value: target } }),
+        normalized,
+      );
+    }
+  };
+  // biome-ignore lint/correctness/useExhaustiveDependencies: changing props.form changes the node's native form owner.
   useEffect(() => {
     const form = nodeRef.current?.form;
     const reset = (event: Event) => {
       queueMicrotask(() => {
-        if (!event.defaultPrevented && props.value === undefined)
-          setInnerValue(String(props.defaultValue ?? ''));
+        if (event.defaultPrevented) return;
+        composing.current = false;
+        if (!controlled) setInnerValue(String(props.defaultValue ?? ''));
       });
     };
     form?.addEventListener('reset', reset);
     return () => form?.removeEventListener('reset', reset);
-  }, [nodeRef, props.value, props.defaultValue]);
+  }, [nodeRef, controlled, props.defaultValue, props.form]);
   const clear = (event: MouseEvent<HTMLButtonElement>) => {
     const target = nodeRef.current!.cloneNode(true) as T;
     target.value = '';
     change(
-      { ...event, target, currentTarget: target } as unknown as ChangeEvent<T>,
+      Object.create(event, {
+        target: { value: target },
+        currentTarget: { value: target },
+      }) as ChangeEvent<T>,
       '',
     );
     props.onClear?.();
@@ -149,7 +175,8 @@ export function useTextControl<
     value,
     composing,
     change,
-    normalize,
+    blur,
+    endComposition,
     clear,
     counter: show ? counter : null,
     exceeded: max !== undefined && count > max,

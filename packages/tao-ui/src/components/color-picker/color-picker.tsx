@@ -1,7 +1,10 @@
 import * as Popover from '@radix-ui/react-popover';
 import RcColorPicker, { Color as BaseColor } from '@rc-component/color-picker';
 import {
+  type ComponentPropsWithoutRef,
+  cloneElement,
   createContext,
+  forwardRef,
   isValidElement,
   useContext,
   useEffect,
@@ -75,6 +78,7 @@ function PickerPanel() {
   const selected = mode === 'gradient' ? stops[activeIndex].color : value;
   const hex = selected.toHexString();
   const [draft, setDraft] = useState(hex);
+  const pendingStopColor = useRef<Color | null>(null);
   useEffect(() => setDraft(hex), [hex]);
   const replace = (next: Color) =>
     mode === 'gradient'
@@ -202,9 +206,15 @@ function PickerPanel() {
                   .map((stop, index) => (index === activeIndex ? moved : stop))
                   .sort((a, b) => a.percent - b.percent);
                 panel.setActive(next.indexOf(moved));
-                panel.change(new Color(next), false);
+                const color = new Color(next);
+                pendingStopColor.current = color;
+                panel.change(color, false);
               }}
-              onChangeComplete={() => panel.complete(value)}
+              onChangeComplete={() => {
+                const color = pendingStopColor.current ?? value;
+                pendingStopColor.current = null;
+                panel.complete(color);
+              }}
             />
             <span>{stops[activeIndex].percent}%</span>
           </div>
@@ -212,11 +222,11 @@ function PickerPanel() {
       )}
       <RcColorPickerComponent
         prefixCls={prefix}
-        value={new BaseColor(selected.toRgb())}
+        value={new BaseColor(selected.toHsb())}
         disabledAlpha={props.disabledAlpha}
-        onChange={(next) => changeSelected(new Color(next.toRgb()), false)}
+        onChange={(next) => changeSelected(new Color(next.toHsb()), false)}
         onChangeComplete={(next) =>
-          panel.complete(replace(new Color(next.toRgb())))
+          panel.complete(replace(new Color(next.toHsb())))
         }
       />
       <div data-tao-color-inputs="">
@@ -249,14 +259,17 @@ function PickerPanel() {
             }
             onChange={(event) => {
               setDraft(event.target.value);
-              if (
-                /^#?(?:[\da-f]{3}|[\da-f]{4}|[\da-f]{6}|[\da-f]{8})$/i.test(
-                  event.target.value,
-                )
-              )
+              if (/^#?(?:[\da-f]{6}|[\da-f]{8})$/i.test(event.target.value))
                 changeSelected(
                   new Color(`#${event.target.value.replace(/^#/, '')}`),
                 );
+            }}
+            onBlur={(event) => {
+              if (/^#?(?:[\da-f]{3}|[\da-f]{4})$/i.test(event.target.value)) {
+                changeSelected(
+                  new Color(`#${event.target.value.replace(/^#/, '')}`),
+                );
+              }
             }}
           />
         ) : format === 'rgb' ? (
@@ -302,7 +315,7 @@ function PickerPanel() {
             messages.colorAlpha,
             Math.round(rgb.a * 100),
             100,
-            (alpha) => changeSelected(new Color({ ...rgb, a: alpha / 100 })),
+            (alpha) => changeSelected(new Color({ ...hsb, a: alpha / 100 })),
           )}
       </div>
       {props.allowClear && (
@@ -364,11 +377,24 @@ function opaque(value: Color) {
     ? new Color(
         value.getColors().map((stop) => ({
           ...stop,
-          color: new Color({ ...stop.color.toRgb(), a: 1 }),
+          color: new Color({ ...stop.color.toHsb(), a: 1 }),
         })),
       )
-    : new Color({ ...value.toRgb(), a: 1 });
+    : new Color({ ...value.toHsb(), a: 1 });
 }
+
+const PickerSurface = forwardRef<
+  HTMLDivElement,
+  ComponentPropsWithoutRef<'div'> & {
+    'data-tao-keep-alive'?: boolean;
+    'data-state'?: 'open' | 'closed';
+  }
+>(function PickerSurface(props, ref) {
+  // Retain the editor without keeping a closed popup in Radix's dismissal stack.
+  const hidden =
+    props['data-tao-keep-alive'] && props['data-state'] === 'closed';
+  return <div {...props} ref={hidden ? null : ref} />;
+});
 
 export function ColorPicker(props: ColorPickerProps) {
   const config = useTaoConfig();
@@ -386,14 +412,15 @@ export function ColorPicker(props: ColorPickerProps) {
     [triggerElement, setTriggerElement] = useState<HTMLSpanElement | null>(
       null,
     );
+  const controlled = 'value' in props;
   const [innerMode, setMode] = useState<ModeType>(() =>
-    new Color(props.value ?? props.defaultValue).isGradient()
+    (controlled ? new Color(props.value) : innerValue).isGradient()
       ? 'gradient'
       : ((Array.isArray(props.mode) ? props.mode[0] : props.mode) ?? 'single'),
   );
   const cachedGradient = useRef<Color | null>(null),
     hoverTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
-  useEffect(() => () => clearTimeout(hoverTimer.current), []);
+  const keyboardOpening = useRef(false);
   const configuredModes = props.mode
     ? Array.isArray(props.mode)
       ? props.mode
@@ -401,8 +428,7 @@ export function ColorPicker(props: ColorPickerProps) {
     : ['single' as const];
   const modes = configuredModes.length ? configuredModes : ['single' as const];
   const mode = modes.includes(innerMode) ? innerMode : modes[0];
-  const rawColor =
-    props.value === undefined ? innerValue : new Color(props.value);
+  const rawColor = controlled ? new Color(props.value) : innerValue;
   const isGradient = rawColor.isGradient();
   useEffect(() => {
     setMode(isGradient ? 'gradient' : 'single');
@@ -424,6 +450,14 @@ export function ColorPicker(props: ColorPickerProps) {
   const format = props.format ?? innerFormat,
     disabled = props.disabled ?? config.disabled;
   const open = !disabled && (props.open ?? innerOpen);
+  useEffect(() => {
+    if (disabled && props.open === undefined) setOpen(false);
+  }, [disabled, props.open]);
+  const hoverEnabled = props.trigger === 'hover' && open;
+  useEffect(() => {
+    if (hoverEnabled) return () => clearTimeout(hoverTimer.current);
+  }, [hoverEnabled]);
+  const keepAlive = !(props.destroyOnHidden || props.destroyTooltipOnHide);
   const names =
     typeof props.classNames === 'function'
       ? props.classNames({ props })
@@ -433,12 +467,13 @@ export function ColorPicker(props: ColorPickerProps) {
   const { messages } = config.locale;
   const normalize = (next: Color) =>
     props.disabledAlpha && !next.cleared ? opaque(next) : next;
-  const complete = (next: Color) => props.onChangeComplete?.(normalize(next));
+  const complete = (next: Color) =>
+    props.onChangeComplete?.(new Color(normalize(next)));
   const change = (next: Color, finished = true) => {
     const color = normalize(next);
-    if (props.value === undefined) setValue(color);
+    if (!controlled) setValue(color);
     cachedGradient.current = null;
-    props.onChange?.(color, color.toCssString());
+    props.onChange?.(new Color(color), color.toCssString());
     if (finished) complete(color);
   };
   const openChange = (next: boolean) => {
@@ -448,11 +483,16 @@ export function ColorPicker(props: ColorPickerProps) {
   };
   const enter = () => {
     clearTimeout(hoverTimer.current);
-    if (props.trigger === 'hover') openChange(true);
+    if (props.trigger === 'hover') {
+      keyboardOpening.current = false;
+      openChange(true);
+    }
   };
   const leave = () => {
-    if (props.trigger === 'hover')
+    if (hoverEnabled) {
+      clearTimeout(hoverTimer.current);
       hoverTimer.current = setTimeout(() => openChange(false), 100);
+    }
   };
   const panelState: PanelState = {
     props,
@@ -549,6 +589,13 @@ export function ColorPicker(props: ColorPickerProps) {
       )}
     </button>
   );
+  const customTrigger = props.children;
+  const trigger =
+    disabled &&
+    isValidElement<{ disabled?: boolean }>(customTrigger) &&
+    customTrigger.type === 'button'
+      ? cloneElement(customTrigger, { disabled: true })
+      : customTrigger;
   return (
     <span
       ref={setTriggerElement}
@@ -567,14 +614,16 @@ export function ColorPicker(props: ColorPickerProps) {
           onPointerEnter={enter}
           onPointerLeave={leave}
           onClick={(event) => {
-            if (props.trigger === 'hover' || disabled) event.preventDefault();
+            if (disabled || (props.trigger === 'hover' && event.detail !== 0))
+              event.preventDefault();
+            else if (!open) keyboardOpening.current = event.detail === 0;
           }}
         >
-          {isValidElement(props.children) ? (
-            props.children
-          ) : props.children ? (
+          {isValidElement(trigger) ? (
+            trigger
+          ) : trigger ? (
             <button type="button" disabled={disabled}>
-              {props.children}
+              {trigger}
             </button>
           ) : (
             defaultTrigger
@@ -586,15 +635,13 @@ export function ColorPicker(props: ColorPickerProps) {
               ? props.getPopupContainer?.(triggerElement)
               : undefined
           }
-          forceMount={
-            props.destroyOnHidden || props.destroyTooltipOnHide
-              ? undefined
-              : true
-          }
+          forceMount={keepAlive || undefined}
         >
           <TaoPortalScope asChild>
             <Popover.Content
+              asChild
               data-tao-color-popup=""
+              data-tao-keep-alive={keepAlive || undefined}
               aria-label={messages.colorPicker}
               side={side}
               align={align}
@@ -603,37 +650,44 @@ export function ColorPicker(props: ColorPickerProps) {
               avoidCollisions={props.autoAdjustOverflow ?? true}
               onPointerEnter={enter}
               onPointerLeave={leave}
+              onInteractOutside={(event) => {
+                if (!open) event.preventDefault();
+              }}
               className={names?.popup?.root}
               style={{
                 ...styles?.popup?.root,
                 ...(open ? {} : { display: 'none' }),
               }}
               onOpenAutoFocus={(event) => {
-                if (props.trigger === 'hover') event.preventDefault();
+                if (props.trigger === 'hover' && !keyboardOpening.current)
+                  event.preventDefault();
+                keyboardOpening.current = false;
               }}
             >
-              <div
-                data-tao-color-container=""
-                className={names?.popup?.container}
-                style={{
-                  ...styles?.popupOverlayInner,
-                  ...styles?.popup?.container,
-                }}
-              >
-                <PanelContext.Provider value={panelState}>
-                  {props.panelRender
-                    ? props.panelRender(basicPanel, {
-                        components: {
-                          Picker: PickerPanel,
-                          Presets: PresetsPanel,
-                        },
-                      })
-                    : basicPanel}
-                </PanelContext.Provider>
-              </div>
-              {props.arrow !== false && (
-                <Popover.Arrow data-tao-color-arrow="" />
-              )}
+              <PickerSurface>
+                <div
+                  data-tao-color-container=""
+                  className={names?.popup?.container}
+                  style={{
+                    ...styles?.popupOverlayInner,
+                    ...styles?.popup?.container,
+                  }}
+                >
+                  <PanelContext.Provider value={panelState}>
+                    {props.panelRender
+                      ? props.panelRender(basicPanel, {
+                          components: {
+                            Picker: PickerPanel,
+                            Presets: PresetsPanel,
+                          },
+                        })
+                      : basicPanel}
+                  </PanelContext.Provider>
+                </div>
+                {props.arrow !== false && (
+                  <Popover.Arrow data-tao-color-arrow="" />
+                )}
+              </PickerSurface>
             </Popover.Content>
           </TaoPortalScope>
         </Popover.Portal>

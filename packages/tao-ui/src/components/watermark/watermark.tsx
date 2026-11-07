@@ -149,28 +149,27 @@ export const Watermark = forwardRef<WatermarkRef, WatermarkProps>(
             (size.fontBoundingBoxDescent ?? size.actualBoundingBoxDescent ?? 4),
         };
       });
-      const markWidth =
-        width ??
-        (image
-          ? 120
-          : Math.ceil(Math.max(0, ...metrics.map((metric) => metric.width))));
-      const markHeight =
-        height ??
-        (image
-          ? 64
-          : metrics.reduce((sum, metric) => sum + metric.height, 0) +
-            Math.max(0, lines.length - 1) * 3);
+      const textWidth = Math.ceil(
+        Math.max(0, ...metrics.map((metric) => metric.width)),
+      );
+      const textHeight =
+        metrics.reduce((sum, metric) => sum + metric.height, 0) +
+        Math.max(0, lines.length - 1) * 3;
       const radians = (rotate * Math.PI) / 180;
-      const rotatedWidth =
-        Math.abs(markWidth * Math.cos(radians)) +
-        Math.abs(markHeight * Math.sin(radians));
-      const rotatedHeight =
-        Math.abs(markWidth * Math.sin(radians)) +
-        Math.abs(markHeight * Math.cos(radians));
-      const tileWidth = Math.max(1, Math.ceil(rotatedWidth + gapX));
-      const tileHeight = Math.max(1, Math.ceil(rotatedHeight + gapY));
       const draw = (picture?: HTMLImageElement) => {
         if (cancelled) return;
+        const markWidth =
+          width ?? Math.max(image ? 120 : 0, picture ? 0 : textWidth);
+        const markHeight =
+          height ?? Math.max(image ? 64 : 0, picture ? 0 : textHeight);
+        const rotatedWidth =
+          Math.abs(markWidth * Math.cos(radians)) +
+          Math.abs(markHeight * Math.sin(radians));
+        const rotatedHeight =
+          Math.abs(markWidth * Math.sin(radians)) +
+          Math.abs(markHeight * Math.cos(radians));
+        const tileWidth = Math.max(1, Math.ceil(rotatedWidth + gapX));
+        const tileHeight = Math.max(1, Math.ceil(rotatedHeight + gapY));
         const ratio = window.devicePixelRatio || 1;
         canvas.width = Math.ceil(tileWidth * ratio);
         canvas.height = Math.ceil(tileHeight * ratio);
@@ -265,17 +264,18 @@ export const Watermark = forwardRef<WatermarkRef, WatermarkProps>(
           backgroundPosition: `${Math.min(0, offsetX)}px ${Math.min(0, offsetY)}px`,
           ...styles?.mark,
         };
-        Object.assign(
-          mark.style,
-          Object.fromEntries(
-            Object.entries(markStyle).map(([key, value]) => [
-              key,
-              typeof value === 'number' && key !== 'zIndex' && key !== 'opacity'
-                ? `${value}px`
-                : value,
-            ]),
-          ),
-        );
+        for (const [key, value] of Object.entries(markStyle)) {
+          if (value == null) continue;
+          const property = key.startsWith('--')
+            ? key
+            : key.replace(/[A-Z]/g, (letter) => `-${letter.toLowerCase()}`);
+          mark.style.setProperty(property, String(value));
+          if (
+            typeof value === 'number' &&
+            !mark.style.getPropertyValue(property)
+          )
+            mark.style.setProperty(property, `${value}px`);
+        }
         mark.style.setProperty('visibility', 'visible', 'important');
         const expectedStyle = mark.style.cssText;
         const expectedClass = classNames?.mark ?? '';
@@ -298,7 +298,10 @@ export const Watermark = forwardRef<WatermarkRef, WatermarkProps>(
           }
           mark.style.cssText = expectedStyle;
           mark.className = expectedClass;
+          mark.setAttribute('data-tao-watermark-mark', '');
+          mark.setAttribute('aria-hidden', 'true');
           mark.removeAttribute('hidden');
+          mark.replaceChildren();
           if (rootChanged) {
             holder.style.position = rootPosition;
             holder.style.overflow = rootOverflow;
@@ -350,13 +353,9 @@ export const Watermark = forwardRef<WatermarkRef, WatermarkProps>(
           ...style,
         }}
       >
-        {inherit ? (
-          <WatermarkContext.Provider value={context}>
-            {children}
-          </WatermarkContext.Provider>
-        ) : (
-          children
-        )}
+        <WatermarkContext.Provider value={inherit ? context : null}>
+          {children}
+        </WatermarkContext.Provider>
       </div>
     );
   },

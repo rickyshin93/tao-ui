@@ -1,4 +1,3 @@
-import { treeKeyboardPopup } from '../tree/tree-keyboard';
 import type { BaseSelectRef } from '@rc-component/select';
 import RcTreeSelect, {
   type TreeSelectProps as RcTreeSelectProps,
@@ -30,6 +29,7 @@ import { ChevronDownIcon, CloseIcon } from '../select/select-icons';
 import { Spinner } from '../spinner/spinner';
 import type { TreeProps } from '../tree/tree';
 import { TreeCheck } from '../tree/tree-check';
+import { treeKeyboardPopup } from '../tree/tree-keyboard';
 import {
   type SelectEnginePart,
   SelectEnginePopup,
@@ -161,6 +161,7 @@ function InternalTreeSelect<
     notFoundContent = config.locale.noResults,
     maxCount,
     loadData,
+    value,
     bordered: _bordered,
     ...rest
   } = props;
@@ -187,6 +188,7 @@ function InternalTreeSelect<
     typeof styles === 'function' ? styles({ props: resolvedProps }) : styles;
   const renderPopup = popupRender ?? dropdownRender;
   const [direction, directionRef] = useTaoDirection(props.direction);
+  const popupRef = useRef<HTMLDivElement>(null);
   const mergedRef = useMemo(
     () =>
       mergeRefs<TreeSelectRef>(ref, (node) =>
@@ -216,6 +218,17 @@ function InternalTreeSelect<
       data-tao-error={status === 'error' || undefined}
       data-tao-warning={status === 'warning' || undefined}
       disabled={disabled}
+      onInputKeyDown={(event) => {
+        props.onInputKeyDown?.(event);
+        if (
+          event.key === 'Enter' &&
+          (event.nativeEvent.isComposing || event.keyCode === 229)
+        ) {
+          event.stopPropagation();
+        }
+      }}
+      // rc-tree-select uses null for an empty controlled selection.
+      value={'value' in props ? (value ?? (null as ValueType)) : undefined}
       className={cx(className, rootClassName, classes?.root)}
       style={{ ...semanticStyles?.root, ...style }}
       classNames={classes}
@@ -295,18 +308,35 @@ function InternalTreeSelect<
         ...popupStyle,
         ...semanticStyles?.popup?.root,
       }}
-      popupRender={(menu) => (
-        <SelectEnginePopup
-          direction={direction}
-          tree
-          treeLine={!!treeLine}
-          size={size}
-        >
-          {renderPopup
-            ? renderPopup(treeKeyboardPopup(menu, direction))
-            : treeKeyboardPopup(menu, direction)}
-        </SelectEnginePopup>
-      )}
+      popupRender={(menu) => {
+        const checkable = treeCheckable || props.treeCheckStrictly;
+        const tree = treeKeyboardPopup(menu, direction, (event) => {
+          if (event.key !== 'Enter') return true;
+          // The engine's active key may still point to a node removed by filtering.
+          const active = popupRef.current?.getElementsByClassName(
+            `${prefixCls}-tree-treenode-active`,
+          )[0];
+          if (!active) return false;
+          // rc-tree-select's Enter handler forwards only the key to its checkbox guard.
+          return (
+            !checkable ||
+            !!active.querySelector(
+              ':scope > [role="checkbox"]:not([aria-disabled="true"])',
+            )
+          );
+        });
+        return (
+          <SelectEnginePopup
+            contentRef={popupRef}
+            direction={direction}
+            tree
+            treeLine={!!treeLine}
+            size={size}
+          >
+            {renderPopup ? renderPopup(tree) : tree}
+          </SelectEnginePopup>
+        );
+      }}
       onPopupVisibleChange={
         onOpenChange ?? onDropdownVisibleChange ?? onPopupVisibleChange
       }

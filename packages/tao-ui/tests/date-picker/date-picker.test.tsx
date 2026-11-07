@@ -1,5 +1,5 @@
 import { expect, rstest, test } from '@rstest/core';
-import { render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen, within } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import dayjs from 'dayjs';
 import { DatePicker } from '../../src/components/date-picker/date-picker';
@@ -102,6 +102,56 @@ test('controlled input restores the value when its change is rejected', async ()
   expect(input).toHaveValue('2026-06-15');
 });
 
+test('typing previews the date and time without committing or stealing focus', async () => {
+  const onChange = rstest.fn();
+  render(
+    <DatePicker
+      mobile={false}
+      showTime
+      defaultValue={dayjs('2026-06-15')}
+      onChange={onChange}
+    />,
+  );
+  const input = screen.getByRole('combobox');
+  await userEvent.clear(input);
+  await userEvent.type(input, '2027-07-25 13:24:35');
+  expect(screen.getByRole('button', { name: '2027-07-25' })).toHaveAttribute(
+    'data-tao-selected',
+  );
+  expect(
+    within(screen.getByRole('group', { name: 'Hour' })).getByRole('button', {
+      name: '13',
+    }),
+  ).toHaveAttribute('aria-pressed', 'true');
+  expect(input).toHaveFocus();
+  expect(onChange).not.toHaveBeenCalled();
+  await userEvent.click(
+    within(screen.getByRole('group', { name: 'Minute' })).getByRole('button', {
+      name: '30',
+    }),
+  );
+  expect(onChange.mock.calls.at(-1)?.[1]).toBe('2027-07-25 13:30:35');
+});
+
+test.each(['2027-07', '2026-02-31', '2027-07-25'])(
+  'incomplete, invalid or blocked input %s does not move the calendar',
+  async (text) => {
+    render(
+      <DatePicker
+        mobile={false}
+        defaultValue={dayjs('2026-06-15')}
+        maxDate={dayjs('2026-12-31')}
+      />,
+    );
+    const input = screen.getByRole('combobox');
+    await userEvent.clear(input);
+    await userEvent.type(input, text);
+    expect(screen.getByRole('button', { name: '2026-06-15' })).toHaveAttribute(
+      'data-tao-selected',
+    );
+  },
+);
+
 test('PC trigger accepts a typed date and commits it with Enter', async () => {
   let result: string | null = null;
   render(
@@ -195,6 +245,22 @@ test('allowClear shows clear button on hover', async () => {
   const trigger = container.querySelector('[data-tao-picker-trigger]')!;
   await userEvent.hover(trigger);
   expect(screen.getByLabelText('Clear')).toBeTruthy();
+});
+
+test('clearing a focused DatePicker does not commit pending text first', async () => {
+  const changes: (string | null)[] = [];
+  render(
+    <DatePicker
+      mobile={false}
+      defaultValue={dayjs('2026-06-15')}
+      onChange={(date) => changes.push(date?.format('YYYY-MM-DD') ?? null)}
+    />,
+  );
+  const input = screen.getByRole('combobox');
+  act(() => input.focus());
+  fireEvent.change(input, { target: { value: '2026-06-20' } });
+  await userEvent.click(screen.getByRole('button', { name: 'Clear' }));
+  expect(changes).toEqual([null]);
 });
 
 test('clear button resets value', async () => {
@@ -491,4 +557,28 @@ test('preset validation follows updated boundaries without changing the preset l
   );
   await userEvent.click(screen.getByRole('button', { name: 'January 10' }));
   expect(onChange).not.toHaveBeenCalled();
+});
+
+test('DatePicker confirms a valid typed date and time when clicking OK', () => {
+  const typed = '2026-06-18 12:34:56';
+  const start = dayjs('2026-06-15T09:00:00');
+  const changed = rstest.fn();
+  render(
+    <DatePicker
+      mobile={false}
+      defaultValue={start}
+      showTime
+      onChange={changed}
+    />,
+  );
+  const input = screen.getByRole('combobox');
+  act(() => input.focus());
+  fireEvent.click(input);
+  fireEvent.change(input, { target: { value: typed } });
+  const ok = screen.getByRole('button', { name: 'OK' });
+  act(() => ok.focus());
+  fireEvent.click(ok);
+  expect(input).toHaveValue(typed);
+  expect(input).toHaveAttribute('aria-expanded', 'false');
+  expect(changed.mock.calls.map(([, text]) => text)).toEqual([typed]);
 });

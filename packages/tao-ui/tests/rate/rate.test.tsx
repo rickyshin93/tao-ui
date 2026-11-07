@@ -11,6 +11,25 @@ test('the upstream middle size alias resolves to the native medium size', () => 
   ).toBe('medium');
 });
 
+test('a smaller count keeps the displayed rating accessible without changing the value', () => {
+  const onChange = rs.fn();
+  const picker = (count: number) => (
+    <Rate count={count} value={5} onChange={onChange} />
+  );
+  const view = render(picker(5));
+  view.rerender(picker(3));
+  expect(screen.getByRole('radio', { name: '3 / 3' })).toHaveAttribute(
+    'aria-checked',
+    'true',
+  );
+  view.rerender(picker(5));
+  expect(screen.getByRole('radio', { name: '5 / 5' })).toHaveAttribute(
+    'aria-checked',
+    'true',
+  );
+  expect(onChange).not.toHaveBeenCalled();
+});
+
 test('uncontrolled rating updates, clears and respects allowClear', () => {
   const change = rs.fn();
   const { rerender } = render(<Rate defaultValue={2} onChange={change} />);
@@ -58,6 +77,23 @@ test('keyboard supports half steps and reverse direction', () => {
   });
   expect(change).toHaveBeenLastCalledWith(1);
 });
+test.each([
+  [0.2, 'ArrowLeft', 37, 0],
+  [4.8, 'ArrowRight', 39, 5],
+] as const)(
+  'half-step keyboard ratings stay within bounds from %s',
+  (value, key, keyCode, expected) => {
+    const onChange = rs.fn();
+    render(
+      <Rate defaultValue={value} count={5} allowHalf onChange={onChange} />,
+    );
+
+    fireEvent.keyDown(screen.getByRole('radiogroup'), { key, keyCode });
+
+    expect(onChange).toHaveBeenCalledExactlyOnceWith(expected);
+  },
+);
+
 test('disabled, readOnly and keyboard=false prevent respective interactions', () => {
   const change = rs.fn();
   const { rerender } = render(
@@ -88,6 +124,39 @@ test('hover reports a preview and resets without changing selected value', () =>
   expect(screen.getAllByRole('radio')[3]?.getAttribute('aria-checked')).toBe(
     'false',
   );
+});
+
+test('ratings expose only the committed score as checked, including half stars', () => {
+  render(<Rate defaultValue={2.5} allowHalf count={4} />);
+  const radios = screen.getAllByRole('radio');
+  expect(radios.map((radio) => radio.getAttribute('aria-checked'))).toEqual([
+    'false',
+    'false',
+    'true',
+    'false',
+  ]);
+  expect(radios[2]).toHaveAccessibleName('2.5 / 4');
+  fireEvent.mouseMove(radios[3]!);
+  expect(radios[2]).toHaveAttribute('aria-checked', 'true');
+  expect(radios[3]).toHaveAttribute('aria-checked', 'false');
+});
+
+test('explicitly empty controlled ratings ignore the default and pending edits', () => {
+  const onChange = rs.fn();
+  render(<Rate defaultValue={2} value={undefined} onChange={onChange} />);
+  expect(screen.queryByRole('radio', { checked: true })).toBeNull();
+  fireEvent.click(screen.getAllByRole('radio')[2]!);
+  expect(onChange).toHaveBeenCalledExactlyOnceWith(3);
+  expect(screen.queryByRole('radio', { checked: true })).toBeNull();
+});
+
+test('keyboard=false also prevents Enter activation from a focused star', () => {
+  const onChange = rs.fn();
+  render(<Rate keyboard={false} onChange={onChange} />);
+  const star = screen.getAllByRole('radio')[2]!;
+  star.focus();
+  fireEvent.keyDown(star, { key: 'Enter', keyCode: 13 });
+  expect(onChange).not.toHaveBeenCalled();
 });
 test('ref focuses and blurs the rating and semantic customization survives tooltips', () => {
   const ref = createRef<RateRef>();

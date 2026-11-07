@@ -4,6 +4,17 @@ import { createRef } from 'react';
 import { Divider, type DividerRef } from '../../src/components/divider/divider';
 import { TaoProvider } from '../../src/provider/tao-provider';
 
+test('fractional numeric margin strings resolve to pixels', () => {
+  const { container } = render(
+    <Divider titlePlacement="start" orientationMargin="12.5">
+      Title
+    </Divider>,
+  );
+  expect(container.querySelector('[data-tao-divider-content]')).toHaveStyle({
+    marginInlineStart: '12.5px',
+  });
+});
+
 test('renders a titled separator and exposes its native element', () => {
   const ref = createRef<DividerRef>();
   render(

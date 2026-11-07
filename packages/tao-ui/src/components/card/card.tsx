@@ -248,6 +248,28 @@ const CardRoot = forwardRef<HTMLDivElement, CardProps>((props, ref) => {
   const slots =
     typeof styles === 'function' ? styles({ props: mergedProps }) : styles;
   const hasBody = loading || Children.toArray(children).length > 0;
+  const actionItems = Children.toArray(actions);
+  let tabExtra =
+    tabBarExtraContent === undefined
+      ? tabProps.tabBarExtraContent
+      : tabBarExtraContent;
+  if (tabExtra && typeof tabExtra === 'object' && Symbol.iterator in tabExtra) {
+    const extras = Children.toArray(tabExtra);
+    tabExtra = extras.some((node) => node !== '') ? { right: extras } : null;
+  }
+  const extraMap =
+    tabExtra !== null &&
+    typeof tabExtra === 'object' &&
+    !isValidElement(tabExtra)
+      ? (tabExtra as { left?: ReactNode; right?: ReactNode })
+      : undefined;
+  const extraNodes = extraMap
+    ? [extraMap.left, extraMap.right]
+    : [tabExtra as ReactNode];
+  const hasTabs =
+    tabList &&
+    (tabList.length > 0 ||
+      extraNodes.some((node) => renderable(node) && node !== ''));
   return (
     <div
       {...rest}
@@ -262,7 +284,7 @@ const CardRoot = forwardRef<HTMLDivElement, CardProps>((props, ref) => {
       className={cx(prefixCls, classes?.root, className, rootClassName)}
       style={{ ...slots?.root, ...style }}
     >
-      {(renderable(title) || renderable(extra) || tabList) && (
+      {(renderable(title) || renderable(extra) || hasTabs) && (
         <div
           data-tao-card-header=""
           className={classes?.header}
@@ -290,7 +312,7 @@ const CardRoot = forwardRef<HTMLDivElement, CardProps>((props, ref) => {
               )}
             </div>
           )}
-          {tabList && (
+          {hasTabs && (
             <CardTabs
               size={size === 'small' ? 'small' : 'large'}
               direction={
@@ -303,10 +325,10 @@ const CardRoot = forwardRef<HTMLDivElement, CardProps>((props, ref) => {
                     defaultActiveKey:
                       defaultActiveTabKey ?? tabProps.defaultActiveKey,
                   })}
-              tabBarExtraContent={tabBarExtraContent}
-              items={tabList.map(({ tab, ...item }) => ({
-                label: tab,
+              tabBarExtraContent={tabExtra}
+              items={tabList.map(({ tab, label, ...item }) => ({
                 ...item,
+                label: label === undefined ? tab : label,
               }))}
               onChange={(key) => {
                 tabProps.onChange?.(key);
@@ -340,13 +362,13 @@ const CardRoot = forwardRef<HTMLDivElement, CardProps>((props, ref) => {
           )}
         </div>
       )}
-      {!!actions?.length && (
+      {actionItems.length > 0 && (
         <ul
           data-tao-card-actions=""
           className={classes?.actions}
           style={slots?.actions}
         >
-          {Children.toArray(actions).map((action, index) => {
+          {actionItems.map((action, index) => {
             const key = isValidElement(action) ? action.key : `action-${index}`;
             return <li key={key}>{action}</li>;
           })}

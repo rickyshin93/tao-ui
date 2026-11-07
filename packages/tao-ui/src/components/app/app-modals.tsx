@@ -1,6 +1,8 @@
+import { useLayoutEffect as useClientLayoutEffect } from '@rc-component/util';
 import {
-  type FC,
-  useEffect,
+  createContext,
+  type ReactNode,
+  useContext,
   useLayoutEffect,
   useMemo,
   useRef,
@@ -22,16 +24,29 @@ interface DialogEntry {
   key: number;
   config: AppModalConfig;
   open: boolean;
-  mount: () => void;
+  markOpen: (open: boolean) => void;
   close: (confirmed: boolean) => void;
   remove: () => void;
 }
 
-function AppConfirm({ config, open, mount, close, remove }: DialogEntry) {
+const ActionContext = createContext<{ ok: ReactNode; cancel: ReactNode }>({
+  ok: null,
+  cancel: null,
+});
+
+function OkBtn() {
+  return useContext(ActionContext).ok;
+}
+
+function CancelBtn() {
+  return useContext(ActionContext).cancel;
+}
+
+function AppConfirm({ config, open, markOpen, close, remove }: DialogEntry) {
   const { locale } = useTaoConfig();
   const [pending, setPending] = useState<'ok' | 'cancel' | null>(null);
   const busy = useRef(false);
-  useLayoutEffect(mount, [mount]);
+  useLayoutEffect(() => markOpen(open), [markOpen, open]);
   const run = async (action: 'ok' | 'cancel') => {
     if (busy.current) return;
     const callback = action === 'ok' ? config.onOk : config.onCancel;
@@ -57,7 +72,7 @@ function AppConfirm({ config, open, mount, close, remove }: DialogEntry) {
       : config.okType === 'link'
         ? 'bare'
         : (config.okType ?? 'primary');
-  const OkBtn: FC = () => (
+  const okButton = (
     <Button
       variant={variant}
       {...config.okButtonProps}
@@ -76,7 +91,7 @@ function AppConfirm({ config, open, mount, close, remove }: DialogEntry) {
       {config.okText ?? locale.ok}
     </Button>
   );
-  const CancelBtn: FC = () => (
+  const cancelButton = (
     <Button
       variant="secondary"
       {...config.cancelButtonProps}
@@ -112,59 +127,65 @@ function AppConfirm({ config, open, mount, close, remove }: DialogEntry) {
   const icon =
     config.icon === undefined ? <StatusIcon type={type} /> : config.icon;
   return (
-    <Modal
-      {...config}
-      open={open}
-      title={config.title}
-      width={config.width ?? 416}
-      centered={config.centered ?? false}
-      closable={
-        config.closable
-          ? {
-              'aria-label': locale.close,
-              ...(typeof config.closable === 'object' ? config.closable : {}),
-            }
-          : false
-      }
-      maskClosable={config.maskClosable ?? false}
-      onClose={() => {
-        void run('cancel');
-      }}
-      onOk={() => {
-        void run('ok');
-      }}
-      afterClose={remove}
-      focusTriggerAfterClose={config.focusTriggerAfterClose ?? true}
-      autoFocusButton={
-        config.autoFocusButton === undefined ? 'ok' : config.autoFocusButton
-      }
-      footer={footer}
-      classNames={{
-        ...classes,
-        root: cx(
-          classes?.root,
-          config.className,
-          config.rootClassName,
-          config.prefixCls,
-        ),
-        wrapper: cx(classes?.wrapper, config.wrapClassName),
-      }}
-      styles={{
-        ...styles,
-        root: { ...styles?.root, ...config.style, direction: config.direction },
-        body: { ...config.bodyStyle, ...styles?.body },
-        mask: { ...config.maskStyle, ...styles?.mask },
-      }}
-    >
-      <div data-tao-app-modal-body="">
-        {icon != null && (
-          <span data-tao-modal-confirm-icon="" data-tao-status={type}>
-            {icon}
-          </span>
-        )}
-        <div data-tao-app-modal-content="">{config.content}</div>
-      </div>
-    </Modal>
+    <ActionContext.Provider value={{ ok: okButton, cancel: cancelButton }}>
+      <Modal
+        {...config}
+        open={open}
+        title={config.title}
+        width={config.width ?? 416}
+        centered={config.centered ?? false}
+        closable={
+          config.closable
+            ? {
+                'aria-label': locale.close,
+                ...(typeof config.closable === 'object' ? config.closable : {}),
+              }
+            : false
+        }
+        maskClosable={config.maskClosable ?? false}
+        onClose={() => {
+          void run('cancel');
+        }}
+        onOk={() => {
+          void run('ok');
+        }}
+        afterClose={remove}
+        focusTriggerAfterClose={config.focusTriggerAfterClose ?? true}
+        autoFocusButton={
+          config.autoFocusButton === undefined ? 'ok' : config.autoFocusButton
+        }
+        footer={footer}
+        classNames={{
+          ...classes,
+          root: cx(
+            classes?.root,
+            config.className,
+            config.rootClassName,
+            config.prefixCls,
+          ),
+          wrapper: cx(classes?.wrapper, config.wrapClassName),
+        }}
+        styles={{
+          ...styles,
+          root: {
+            ...styles?.root,
+            ...config.style,
+            direction: config.direction,
+          },
+          body: { ...config.bodyStyle, ...styles?.body },
+          mask: { ...config.maskStyle, ...styles?.mask },
+        }}
+      >
+        <div data-tao-app-modal-body="">
+          {icon != null && (
+            <span data-tao-modal-confirm-icon="" data-tao-status={type}>
+              {icon}
+            </span>
+          )}
+          <div data-tao-app-modal-content="">{config.content}</div>
+        </div>
+      </Modal>
+    </ActionContext.Provider>
   );
 }
 
@@ -172,25 +193,37 @@ export function useAppModals() {
   const [dialogs, setDialogs] = useState<DialogEntry[]>([]);
   const resolvers = useRef(new Set<(value: boolean) => void>());
   const sequence = useRef(0);
-  useEffect(
-    () => () => {
+  const disposed = useRef(false);
+  useClientLayoutEffect(() => {
+    disposed.current = false;
+    return () => {
+      disposed.current = true;
       for (const resolve of resolvers.current) resolve(false);
       resolvers.current.clear();
-    },
-    [],
-  );
+    };
+  }, []);
   const api = useMemo<AppModalInstance>(() => {
     const show = (
       initial: AppModalConfig,
       type: NonNullable<AppModalConfig['type']>,
     ): AppModalResult => {
+      if (disposed.current) {
+        const result = Promise.resolve(false);
+        return {
+          destroy: () => {},
+          update: () => {},
+          // biome-ignore lint/suspicious/noThenProperty: The hook modal API intentionally supports awaiting confirmation.
+          then: result.then.bind(result),
+        };
+      }
       const key = sequence.current++;
       let config: AppModalConfig = {
         okCancel: type === 'confirm',
         ...initial,
         type,
       };
-      let mounted = false;
+      let open = config.open ?? true;
+      let committedOpen = false;
       let closed = false;
       let removed = false;
       let resolve!: (value: boolean) => void;
@@ -207,11 +240,11 @@ export function useAppModals() {
         config.afterClose?.();
       };
       const close = (confirmed: boolean) => {
-        if (closed) return;
+        if (closed || disposed.current) return;
         closed = true;
         resolve(confirmed);
         resolvers.current.delete(resolve);
-        if (!mounted) remove();
+        if (!committedOpen) remove();
         else
           setDialogs((previous) =>
             previous.map((dialog) =>
@@ -224,9 +257,9 @@ export function useAppModals() {
         {
           key,
           config,
-          open: config.open ?? true,
-          mount: () => {
-            mounted = true;
+          open,
+          markOpen: (value) => {
+            committedOpen = value;
           },
           close,
           remove,
@@ -235,18 +268,28 @@ export function useAppModals() {
       return {
         destroy: () => close(false),
         update: (update) => {
-          if (closed) return;
+          if (closed || disposed.current) return;
           config =
             typeof update === 'function'
               ? update(config)
               : { ...config, ...update };
-          if (config.open === false) close(false);
-          else
-            setDialogs((previous) =>
-              previous.map((dialog) =>
-                dialog.key === key ? { ...dialog, config } : dialog,
-              ),
-            );
+          const closeRequested =
+            typeof update === 'function'
+              ? open && config.open === false
+              : update.open === false;
+          if (closeRequested) {
+            close(false);
+            return;
+          }
+          const nextOpen = config.open ?? open;
+          open = nextOpen;
+          setDialogs((previous) =>
+            previous.map((dialog) =>
+              dialog.key === key
+                ? { ...dialog, config, open: nextOpen }
+                : dialog,
+            ),
+          );
         },
         // biome-ignore lint/suspicious/noThenProperty: The hook modal API intentionally supports awaiting confirmation.
         then: promise.then.bind(promise),

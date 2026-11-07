@@ -214,6 +214,32 @@ test('missing and unmounted fields do not scroll', () => {
   expect(scrollIntoView).not.toHaveBeenCalled();
 });
 
+test.each(['first', 'second'] as const)(
+  'removing the %s duplicate field keeps the remaining scroll target',
+  (removed) => {
+    const form = createRef<FormInstance>();
+    const view = (showBoth: boolean) => (
+      <Form ref={form}>
+        {(showBoth || removed !== 'first') && (
+          <Form.Item name="shared" key="first">
+            <input id="first" />
+          </Form.Item>
+        )}
+        {(showBoth || removed !== 'second') && (
+          <Form.Item name="shared" key="second">
+            <input id="second" />
+          </Form.Item>
+        )}
+      </Form>
+    );
+    const { rerender } = render(view(true));
+    rerender(view(false));
+    const remaining = screen.getByRole('textbox');
+    form.current?.scrollToField('shared', { focus: true });
+    expect(remaining).toHaveFocus();
+  },
+);
+
 test('distinct paths containing underscores do not collide', () => {
   const form = createRef<FormInstance>();
   render(

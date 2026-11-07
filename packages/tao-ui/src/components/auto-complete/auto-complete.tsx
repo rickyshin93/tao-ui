@@ -10,6 +10,7 @@ import type {
 import {
   Children,
   type CSSProperties,
+  cloneElement,
   forwardRef,
   isValidElement,
   type ReactElement,
@@ -144,7 +145,8 @@ function InternalAutoComplete<
     listHeight = 256,
     listItemHeight = 32,
     showSearch = true,
-    notFoundContent = null,
+    notFoundContent,
+    value,
     bordered: _bordered,
     showArrow: _showArrow,
     ...rest
@@ -158,6 +160,13 @@ function InternalAutoComplete<
       ? nodes[0]
       : undefined;
   const optionsChildren = customInput ? undefined : children;
+  const input = customInput ?? components?.input;
+  const mergedComponents =
+    disabled && isValidElement<{ disabled?: boolean }>(input)
+      ? { ...components, input: cloneElement(input, { disabled: true }) }
+      : customInput
+        ? { ...components, input: customInput }
+        : components;
   const legacyOptions = dataSource?.map((item) => {
     if (isValidElement(item)) return item;
     if (typeof item === 'string')
@@ -210,15 +219,32 @@ function InternalAutoComplete<
       data-tao-error={status === 'error' || undefined}
       data-tao-warning={status === 'warning' || undefined}
       disabled={disabled}
+      onInputKeyDown={(event) => {
+        props.onInputKeyDown?.(event);
+        if (
+          event.key === 'Enter' &&
+          (event.nativeEvent.isComposing || event.keyCode === 229)
+        ) {
+          // Leave IME confirmation to the browser before the select root can commit an option.
+          event.stopPropagation();
+        }
+      }}
+      value={'value' in props ? (value ?? (null as ValueType)) : undefined}
       className={cx(className, rootClassName, classes?.root)}
       style={{ ...semanticStyles?.root, ...style }}
       classNames={classes}
       styles={semanticStyles}
-      components={
-        customInput ? { ...components, input: customInput } : components
-      }
+      components={mergedComponents}
       showSearch={showSearch}
-      notFoundContent={notFoundContent}
+      notFoundContent={
+        notFoundContent === undefined ? (
+          renderPopup ? (
+            <span hidden />
+          ) : null
+        ) : (
+          notFoundContent
+        )
+      }
       listHeight={listHeight}
       listItemHeight={listItemHeight}
       suffix={suffix !== undefined ? suffix : (suffixIcon ?? null)}

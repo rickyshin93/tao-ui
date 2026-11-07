@@ -1,6 +1,6 @@
 ---
 title: Cascader
-description: "通过搜索、多选或独立面板，从层级选项中选择完整路径。"
+description: "从层级选项中选择路径，支持搜索、独立面板和需要确认多选结果的移动端抽屉。"
 ---
 
 import Preview from '../../_components/demo-preview';
@@ -430,6 +430,8 @@ export default function LocationPanel() {
 ### 手机底部抽屉
 
 在手机模式下通过底部抽屉选择三级路径，级联列超出可用宽度时可以横向滚动。
+
+单选在选中路径时立即生效。使用 `multiple` 时，抽屉里的更改在点击「完成」后才应用。从 [0.0.49](/zh/guide/changelog) 起，组件会跳过确认前被移除或禁用的新选路径，保留此前已经提交且用户仍保留选中的路径。
 
 ```tsx preview="iframe-follow"
 import { Cascader } from '@rockshin/tao-ui';

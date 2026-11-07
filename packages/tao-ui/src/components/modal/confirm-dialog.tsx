@@ -142,18 +142,24 @@ export function ConfirmDialog({
           {showCancel && (
             <Button
               variant="secondary"
-              loading={cancelLoading}
-              onClick={handleCancel}
               {...cancelButtonProps}
+              loading={cancelLoading || cancelButtonProps?.loading}
+              onClick={(event) => {
+                cancelButtonProps?.onClick?.(event);
+                if (!event.defaultPrevented) void handleCancel();
+              }}
             >
               {cancelText ?? locale.cancel}
             </Button>
           )}
           <Button
             variant="primary"
-            loading={loading}
-            onClick={handleOk}
             {...okButtonProps}
+            loading={loading || okButtonProps?.loading}
+            onClick={(event) => {
+              okButtonProps?.onClick?.(event);
+              if (!event.defaultPrevented) void handleOk();
+            }}
             disabled={cancelLoading || okButtonProps?.disabled}
           >
             {okText ?? locale.ok}

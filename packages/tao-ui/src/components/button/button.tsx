@@ -41,6 +41,7 @@ export interface ButtonProps
 
 export const Button = forwardRef(function Button(
   {
+    type = 'button',
     variant = 'primary',
     size,
     disabled,
@@ -63,25 +64,30 @@ export const Button = forwardRef(function Button(
 
   // Icon slot stays mounted in both states; only opacity toggles, so loading
   // never adds/removes DOM and never triggers reflow/repaint flicker.
-  const hasIconSlot = icon != null || loading;
+  const hasIcon = icon != null && typeof icon !== 'boolean' && icon !== '';
+  const hasIconSlot = hasIcon || loading;
 
   return (
     <button
       ref={ref}
-      type="button"
+      type={type}
       {...rest}
       className={cx(classNames?.root, className)}
       style={{ ...styles?.root, ...style }}
       disabled={isDisabled}
-      aria-busy={loading || undefined}
+      aria-busy={loading || rest['aria-busy']}
       data-tao-button=""
       data-tao-has-icon={hasIconSlot || undefined}
       data-tao-variant={variant}
       data-tao-size={resolvedSize}
     >
       {hasIconSlot && (
-        <span data-tao-button-icon="" data-tao-loading={loading || undefined}>
-          {icon != null && <span data-tao-button-icon-idle="">{icon}</span>}
+        <span
+          aria-hidden="true"
+          data-tao-button-icon=""
+          data-tao-loading={loading || undefined}
+        >
+          {hasIcon && <span data-tao-button-icon-idle="">{icon}</span>}
           <span data-tao-button-icon-spin="">
             {loadingIcon ?? <LoadingSpinner />}
           </span>

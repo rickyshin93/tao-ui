@@ -35,6 +35,51 @@ const columns: TableColumn<User>[] = [
   { key: 'role', dataIndex: 'role', title: 'Role' },
 ];
 
+test('sticky selection offsets include a pixel string column width', () => {
+  render(
+    <Table
+      columns={[{ ...columns[0], fixed: 'left', width: 90 }]}
+      dataSource={data}
+      rowKey="id"
+      scroll={{ x: 400 }}
+      pagination={false}
+      rowSelection={{ fixed: true, columnWidth: '48px' }}
+    />,
+  );
+  expect(screen.getByRole('columnheader', { name: 'Name' })).toHaveStyle({
+    position: 'sticky',
+    left: '48px',
+  });
+});
+
+test('a user column key cannot overwrite the sticky selection offset', () => {
+  render(
+    <Table
+      columns={[
+        {
+          key: '__selection__',
+          dataIndex: 'name',
+          title: 'Name',
+          fixed: 'left',
+          width: 90,
+        },
+      ]}
+      dataSource={data}
+      rowKey="id"
+      scroll={{ x: 400 }}
+      pagination={false}
+      rowSelection={{ fixed: true, columnWidth: 48 }}
+    />,
+  );
+  expect(
+    screen.getByRole('checkbox', { name: 'Select all rows' }).closest('th'),
+  ).toHaveStyle({ position: 'sticky', left: '0px' });
+  expect(screen.getByRole('columnheader', { name: 'Name' })).toHaveStyle({
+    position: 'sticky',
+    left: '48px',
+  });
+});
+
 // ---- Basic rendering ----
 
 test('renders all rows', () => {
@@ -436,6 +481,34 @@ test('sort cycles ascend -> descend -> null', () => {
   expect(lastSorter.order).toBe(null);
 });
 
+test('reports the sorter for an empty-string column key', () => {
+  const column: TableColumn<User> = {
+    key: '',
+    dataIndex: 'age',
+    title: 'Age',
+    sorter: (a, b) => a.age - b.age,
+  };
+  const onChange = rstest.fn();
+  render(
+    <Table
+      columns={[column]}
+      dataSource={data}
+      rowKey="id"
+      pagination={false}
+      onChange={onChange}
+    />,
+  );
+
+  fireEvent.click(screen.getByText('Age'));
+
+  expect(screen.getAllByRole('row')[1]).toHaveTextContent('22');
+  expect(onChange).toHaveBeenCalledExactlyOnceWith(
+    { current: 1, pageSize: 10 },
+    {},
+    { column, order: 'ascend', field: 'age' },
+  );
+});
+
 test('sortable headers expose aria-sort and plain headers are not disabled buttons', () => {
   render(
     <Table
@@ -464,6 +537,28 @@ test('sortable headers expose aria-sort and plain headers are not disabled butto
 });
 
 // ---- Filtering ----
+
+test('editing the filter callback payload cannot change the table filter', async () => {
+  render(
+    <Table
+      columns={[
+        columns[0],
+        {
+          ...columns[2],
+          filters: [{ text: 'Admin', value: 'admin' }],
+          onFilter: (value, record) => record.role === value,
+        },
+      ]}
+      dataSource={data}
+      rowKey="id"
+      pagination={false}
+      onChange={(_, filters) => filters.role?.splice(0)}
+    />,
+  );
+  await userEvent.click(screen.getByRole('button', { name: 'Filter' }));
+  await userEvent.click(screen.getByRole('menuitemcheckbox', { name: 'Admin' }));
+  expect(screen.queryByText('Bob')).not.toBeInTheDocument();
+});
 
 test('client-side filter', async () => {
   const filterColumns: TableColumn<User>[] = [
@@ -501,6 +596,59 @@ test('client-side filter', async () => {
   expect(screen.queryByText('Bob')).toBeNull();
 });
 
+test('column sorter methods retain their column receiver', () => {
+  const sortColumns: TableColumn<User>[] = [
+    columns[0],
+    {
+      ...columns[1],
+      defaultSortOrder: 'ascend',
+      sorter(a, b) {
+        return Number(a[this.dataIndex!]) - Number(b[this.dataIndex!]);
+      },
+    },
+  ];
+  render(<Table columns={sortColumns} dataSource={data} rowKey="id" />);
+  expect(screen.getAllByRole('row')[1]).toHaveTextContent('Eve');
+});
+
+test('built-in table actions inherit the provider disabled state', () => {
+  const onSelect = rstest.fn();
+  const onExpand = rstest.fn();
+  const onChange = rstest.fn();
+  const table = (
+    <Table
+      columns={[
+        { ...columns[0], sorter: true },
+        { ...columns[2], filters: [{ text: 'Admin', value: 'admin' }] },
+      ]}
+      dataSource={data}
+      rowKey="id"
+      rowSelection={{ onChange: onSelect }}
+      expandable={{
+        expandRowByClick: true,
+        expandedRowRender: () => 'Details',
+        onExpand,
+      }}
+      onChange={onChange}
+    />
+  );
+  const view = render(<TaoProvider disabled>{table}</TaoProvider>);
+  const getBuiltInControls = () => [
+    screen.getByRole('checkbox', { name: 'Select all rows' }),
+    screen.getByRole('checkbox', { name: 'Select row 1' }),
+    screen.getByRole('button', { name: 'Name' }),
+    screen.getByRole('button', { name: 'Filter' }),
+    screen.getAllByRole('button', { name: 'Expand row' })[0],
+  ];
+  for (const control of getBuiltInControls()) expect(control).toBeDisabled();
+  fireEvent.click(screen.getByText('Alice'));
+  expect(onSelect).not.toHaveBeenCalled();
+  expect(onChange).not.toHaveBeenCalled();
+  expect(onExpand).not.toHaveBeenCalled();
+  view.rerender(<TaoProvider disabled={false}>{table}</TaoProvider>);
+  for (const control of getBuiltInControls()) expect(control).toBeEnabled();
+});
+
 test('column filter methods retain their column receiver', () => {
   const filterColumns: TableColumn<User>[] = [
     columns[0],
@@ -524,6 +672,64 @@ test('column filter methods retain their column receiver', () => {
   expect(screen.getByText('Alice')).toBeTruthy();
   expect(screen.getByText('Diana')).toBeTruthy();
   expect(screen.queryByText('Bob')).toBeNull();
+});
+
+test('adding filters to a column with an Object-prototype key still renders', async () => {
+  const base: TableColumn<User> = {
+    key: 'constructor',
+    title: 'Role',
+    dataIndex: 'role',
+  };
+  const view = render(
+    <Table columns={[columns[0], base]} dataSource={data} rowKey="id" />,
+  );
+  view.rerender(
+    <Table
+      columns={[
+        columns[0],
+        {
+          ...base,
+          filters: [{ text: 'Admin', value: 'admin' }],
+          onFilter: (value, row) => row.role === value,
+        },
+      ]}
+      dataSource={data}
+      rowKey="id"
+    />,
+  );
+  await userEvent.click(screen.getByRole('button', { name: 'Filter' }));
+  await userEvent.click(
+    screen.getByRole('menuitemcheckbox', { name: 'Admin' }),
+  );
+  expect(screen.getByText('Alice')).toBeInTheDocument();
+  expect(screen.queryByText('Bob')).toBeNull();
+});
+
+test('filter callbacks include an own property for a __proto__ data field', async () => {
+  const onChange = rstest.fn();
+  const rows = [{ id: 1, ['__proto__']: 'A' }];
+  render(
+    <Table
+      dataSource={rows}
+      rowKey="id"
+      columns={[
+        {
+          dataIndex: '__proto__',
+          title: 'Field',
+          filters: [{ text: 'Filter A', value: 'A' }],
+        },
+      ]}
+      onChange={onChange}
+    />,
+  );
+  await userEvent.click(screen.getByRole('button', { name: 'Filter' }));
+  await userEvent.click(
+    screen.getByRole('menuitemcheckbox', { name: 'Filter A' }),
+  );
+  const filterValues = onChange.mock.calls.at(-1)?.[1];
+  expect(
+    Object.getOwnPropertyDescriptor(filterValues, '__proto__')?.value,
+  ).toEqual(['A']);
 });
 
 test('filter menu exposes keyboard menu semantics', async () => {
@@ -636,6 +842,38 @@ test('pagination callbacks preserve current controlled sorting and filters', () 
   });
 });
 
+test('a proposed local sort cannot replace a still-active controlled sort', () => {
+  const onChange = rstest.fn();
+  render(
+    <Table
+      columns={[
+        { ...columns[0], sorter: (a, b) => a.name.localeCompare(b.name) },
+        { ...columns[1], sorter: (a, b) => a.age - b.age, sortOrder: 'descend' },
+      ]}
+      dataSource={data}
+      rowKey="id"
+      onChange={onChange}
+    />,
+  );
+  fireEvent.click(screen.getByRole('button', { name: 'Name' }));
+  expect(onChange.mock.calls[0][2]).toMatchObject({ field: 'name', order: 'ascend' });
+  expect(screen.getByRole('columnheader', { name: 'Age' })).toHaveAttribute('aria-sort', 'descending');
+  expect(screen.getByRole('columnheader', { name: 'Name' })).toHaveAttribute('aria-sort', 'none');
+  expect(screen.getAllByRole('row')[1]).toHaveTextContent('Charlie');
+});
+
+test('removing a column sorter clears its metadata from subsequent pagination', () => {
+  const onChange = rstest.fn();
+  const view = render(
+    <Table columns={[{ ...columns[1], sorter: true, defaultSortOrder: 'ascend' }]} dataSource={data} rowKey="id" pagination={{ pageSize: 2 }} onChange={onChange} />,
+  );
+  view.rerender(
+    <Table columns={[columns[1]]} dataSource={data} rowKey="id" pagination={{ pageSize: 2 }} onChange={onChange} />,
+  );
+  fireEvent.click(screen.getByRole('button', { name: 'Next page' }));
+  expect(onChange.mock.calls[0][2]).toEqual({ order: null });
+});
+
 test('sort, filter and page interactions report the same data view', async () => {
   const changes: Parameters<NonNullable<TableProps<User>['onChange']>>[] = [];
   render(
@@ -695,6 +933,31 @@ test('sort, filter and page interactions report the same data view', async () =>
     'Diana',
     'Eve',
   ]);
+});
+
+test('a rejected controlled filter does not overwrite its local fallback', async () => {
+  const renderTable = (filteredValue?: string[]) => (
+    <Table
+      columns={[
+        columns[0],
+        {
+          ...columns[2],
+          filters: [{ text: 'Admin', value: 'admin' }],
+          filteredValue,
+          onFilter: (value, record) => record.role === value,
+        },
+      ]}
+      dataSource={data}
+      rowKey="id"
+      pagination={false}
+    />
+  );
+  const view = render(renderTable(['admin']));
+  await userEvent.click(screen.getByRole('button', { name: 'Filter' }));
+  await userEvent.click(screen.getByRole('menuitemcheckbox', { name: 'Admin' }));
+  expect(screen.queryByText('Bob')).not.toBeInTheDocument();
+  view.rerender(renderTable());
+  expect(screen.queryByText('Bob')).not.toBeInTheDocument();
 });
 
 test('controlled data view rejects edits until its parent supplies new conditions', async () => {
@@ -789,6 +1052,21 @@ test('rowSelection renders checkboxes', () => {
   expect(checkboxes.length).toBe(6);
 });
 
+test('editing selected keys in the callback cannot clear table selection', async () => {
+  render(
+    <Table
+      columns={columns}
+      dataSource={data}
+      rowKey="id"
+      pagination={false}
+      rowSelection={{ onChange: (keys) => keys.splice(0) }}
+    />,
+  );
+  const row = screen.getByRole('checkbox', { name: 'Select row 1' });
+  await userEvent.click(row);
+  expect(row).toBeChecked();
+});
+
 test('uncontrolled selection works without a change callback', () => {
   render(
     <Table
@@ -863,6 +1141,50 @@ test('uncontrolled radio selection replaces the previous row', () => {
   fireEvent.click(radios[1]);
   expect(radios[0]).not.toBeChecked();
   expect(radios[1]).toBeChecked();
+});
+
+test('row selection radios support arrow navigation without entering another table', async () => {
+  render(
+    <>
+      <Table
+        columns={columns}
+        dataSource={data.slice(0, 2)}
+        rowKey="id"
+        rowSelection={{ type: 'radio' }}
+      />
+      <Table
+        columns={columns}
+        dataSource={data.slice(2, 3)}
+        rowKey="id"
+        rowSelection={{ type: 'radio' }}
+      />
+    </>,
+  );
+  const first = screen.getByRole('radio', { name: 'Select row 1' });
+  const second = screen.getByRole('radio', { name: 'Select row 2' });
+  await userEvent.click(first);
+  await userEvent.keyboard('{ArrowRight}');
+  expect(second).toHaveFocus();
+  expect(second).toBeChecked();
+  await userEvent.keyboard('{ArrowRight}');
+  expect(first).toHaveFocus();
+  expect(first).toBeChecked();
+});
+
+test('an explicitly empty selectedRowKeys rejects local edits', async () => {
+  const onChange = rstest.fn();
+  render(
+    <Table
+      columns={columns}
+      dataSource={data}
+      rowKey="id"
+      rowSelection={{ selectedRowKeys: undefined, onChange }}
+    />,
+  );
+  const row = screen.getByRole('checkbox', { name: 'Select row 1' });
+  await userEvent.click(row);
+  expect(onChange).toHaveBeenCalledExactlyOnceWith([1], [data[0]]);
+  expect(row).not.toBeChecked();
 });
 
 test('controlled selection waits for its parent to accept the change', () => {
@@ -1013,6 +1335,32 @@ test('large controlled selection preserves key and row order across updates', ()
   expect(screen.getAllByRole('checkbox')[1]).toBeChecked();
 });
 
+test('select all follows current disabled rows when the selection callback is stable', async () => {
+  let locked = 0;
+  const onChange = rstest.fn();
+  const rowSelection = {
+    getCheckboxProps: (record: User) => ({ disabled: record.id === locked }),
+    onChange,
+  };
+  const table = () => (
+    <Table
+      columns={columns}
+      dataSource={data}
+      rowKey="id"
+      rowSelection={rowSelection}
+      pagination={false}
+    />
+  );
+  const view = render(table());
+  locked = 1;
+  view.rerender(table());
+  expect(screen.getByRole('checkbox', { name: 'Select row 1' })).toBeDisabled();
+  await userEvent.click(
+    screen.getByRole('checkbox', { name: 'Select all rows' }),
+  );
+  expect(onChange.mock.calls.at(-1)?.[0]).toEqual([2, 3, 4, 5]);
+});
+
 test('selection header reflects only selectable rows on the current page', () => {
   const table = (keys: React.Key[], disabled: boolean, current = 1) => (
     <Table
@@ -1110,6 +1458,30 @@ test('column with responsive list renders only when a breakpoint matches', async
   await waitFor(() => expect(screen.getByText('Alice')).toBeTruthy());
   expect(screen.queryByText('Role')).toBeNull();
   expect(screen.queryByText('admin')).toBeNull();
+});
+
+test('a responsive column applies its default sort when it becomes visible', async () => {
+  setViewportWidth(1200);
+  render(
+    <Table
+      columns={[
+        columns[0],
+        {
+          ...columns[1],
+          responsive: ['lg'],
+          sorter: (a, b) => a.age - b.age,
+          defaultSortOrder: 'ascend',
+        },
+      ]}
+      dataSource={data}
+      rowKey="id"
+      pagination={false}
+    />,
+  );
+  expect(await screen.findByRole('columnheader', { name: 'Age' })).toHaveAttribute(
+    'aria-sort',
+    'ascending',
+  );
 });
 
 test('responsive column appears once its breakpoint matches', async () => {
@@ -1216,6 +1588,43 @@ test('controlled local pagination retains the page requested by its parent', () 
     <Table columns={cols} dataSource={rows} pagination={{ current: 2 }} />,
   );
   expect(screen.getByText('Controlled 11')).toBeTruthy();
+});
+
+test('fixed offsets follow the measured width of a relative-width header', async () => {
+  const callbacks: ResizeObserverCallback[] = [];
+  const Original = globalThis.ResizeObserver;
+  globalThis.ResizeObserver = class {
+    constructor(callback: ResizeObserverCallback) {
+      callbacks.push(callback);
+    }
+    observe() {}
+    disconnect() {}
+  } as unknown as typeof ResizeObserver;
+
+  try {
+    render(
+      <Table
+        columns={[
+          { ...columns[0], fixed: 'left', width: '25%' },
+          { ...columns[1], fixed: 'left', width: 80 },
+        ]}
+        dataSource={data}
+        rowKey="id"
+        scroll={{ x: 400 }}
+        pagination={false}
+      />,
+    );
+    const name = screen.getByRole('columnheader', { name: 'Name' });
+    Object.defineProperty(name, 'offsetWidth', { value: 117 });
+    for (const callback of callbacks) callback([], {} as ResizeObserver);
+    await waitFor(() =>
+      expect(screen.getByRole('columnheader', { name: 'Age' })).toHaveStyle({
+        left: '117px',
+      }),
+    );
+  } finally {
+    globalThis.ResizeObserver = Original;
+  }
 });
 
 test('recomputes fixed-column scroll state when the scroll container resizes', async () => {
@@ -1384,7 +1793,62 @@ test('controlled expandedRowKeys and defaultExpandedRowKeys', async () => {
   expect(screen.queryByText('Detail of Alice')).toBeNull();
 });
 
+test('preventing the row click default cancels expansion', () => {
+  const onExpand = rstest.fn();
+  render(
+    <Table
+      columns={columns}
+      dataSource={data}
+      rowKey="id"
+      onRow={() => ({ onClick: (event) => event.preventDefault() })}
+      expandable={{
+        expandedRowRender: (record) => `Detail of ${record.name}`,
+        expandRowByClick: true,
+        onExpand,
+      }}
+    />,
+  );
+  fireEvent.click(screen.getByText('Alice'));
+  expect(screen.queryByText('Detail of Alice')).toBeNull();
+  expect(onExpand).not.toHaveBeenCalled();
+});
+
+test('an explicitly empty expandedRowKeys ignores default expansion', () => {
+  render(
+    <Table
+      columns={columns}
+      dataSource={data}
+      rowKey="id"
+      expandable={{
+        expandedRowRender: (record) => `Detail of ${record.name}`,
+        defaultExpandedRowKeys: [1],
+        expandedRowKeys: undefined,
+      }}
+    />,
+  );
+  expect(screen.queryByText('Detail of Alice')).toBeNull();
+});
+
 // ---- Summary ----
+
+test('editing the summary input array cannot reorder the table rows', () => {
+  const { container } = render(
+    <Table
+      columns={[columns[0]]}
+      dataSource={data}
+      rowKey="id"
+      pagination={false}
+      summary={(rows) => {
+        rows.reverse();
+        return null;
+      }}
+    />,
+  );
+  const names = [...container.querySelectorAll('[data-tao-table-row]')].map(
+    (row) => row.textContent,
+  );
+  expect(names).toEqual(data.map((record) => record.name));
+});
 
 test('summary renders footer rows and syncs fixed columns by index', () => {
   const { container } = render(

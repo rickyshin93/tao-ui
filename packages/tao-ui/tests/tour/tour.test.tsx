@@ -4,6 +4,42 @@ import userEvent from '@testing-library/user-event';
 import { Tour } from '../../src/components/tour/tour';
 import { TaoProvider, zhCN } from '../../src/provider/tao-provider';
 
+test.each([undefined, { block: 'start', behavior: 'smooth' }] as const)(
+  'an uncontrolled open Tour scrolls an offscreen step target with options %j',
+  async (scrollIntoViewOptions) => {
+    const scroll = rstest.fn();
+    let target: HTMLButtonElement | null = null;
+    render(
+      <>
+        <button
+          type="button"
+          ref={(node) => {
+            target = node;
+            if (node) {
+              node.getBoundingClientRect = () => new DOMRect(0, 9000, 80, 40);
+              node.scrollIntoView = scroll;
+            }
+          }}
+        >
+          Offscreen target
+        </button>
+        <Tour
+          defaultOpen
+          scrollIntoViewOptions={scrollIntoViewOptions}
+          steps={[{ title: 'Target', target: () => target }]}
+        />
+      </>,
+    );
+
+    expect(
+      await screen.findByRole('dialog', { name: 'Target' }),
+    ).toBeInTheDocument();
+    expect(scroll).toHaveBeenCalled();
+    if (scrollIntoViewOptions)
+      expect(scroll).toHaveBeenCalledWith(scrollIntoViewOptions);
+  },
+);
+
 test('renders accessible steps, moves next/previous and finishes', async () => {
   const onChange = rstest.fn();
   const onFinish = rstest.fn();
@@ -161,4 +197,100 @@ test('interactive target steps stay nonmodal unless target interaction is disabl
     'aria-modal',
     'true',
   );
+});
+
+test('a masked step is modal while its target getter has no element', async () => {
+  const steps = [
+    {
+      title: 'Conditional target',
+      target: () => document.getElementById('conditional-tour-target')!,
+    },
+  ];
+  const view = (showTarget: boolean) => (
+    <>
+      {showTarget && (
+        <button type="button" id="conditional-tour-target">
+          Target action
+        </button>
+      )}
+      <Tour open steps={steps} />
+    </>
+  );
+  const { rerender } = render(view(false));
+  expect(await screen.findByRole('dialog')).toHaveAttribute(
+    'aria-modal',
+    'true',
+  );
+
+  rerender(view(true));
+  await waitFor(() =>
+    expect(screen.getByRole('dialog')).not.toHaveAttribute('aria-modal'),
+  );
+  rerender(view(false));
+  await waitFor(() =>
+    expect(screen.getByRole('dialog')).toHaveAttribute('aria-modal', 'true'),
+  );
+});
+
+test('step callbacks run alongside tour navigation and completion', async () => {
+  const onNext = rstest.fn();
+  const onPrev = rstest.fn();
+  const onStepFinish = rstest.fn();
+  const onFinish = rstest.fn();
+  render(
+    <Tour
+      defaultOpen
+      onFinish={onFinish}
+      steps={[
+        { title: 'First', onNext },
+        { title: 'Second', onPrev, onFinish: onStepFinish },
+      ]}
+    />,
+  );
+  fireEvent.click(await screen.findByRole('button', { name: 'Next' }));
+  fireEvent.click(await screen.findByRole('button', { name: 'Previous' }));
+  fireEvent.click(await screen.findByRole('button', { name: 'Next' }));
+  fireEvent.click(await screen.findByRole('button', { name: 'Done' }));
+  expect(onNext).toHaveBeenCalledTimes(2);
+  expect(onPrev).toHaveBeenCalledTimes(1);
+  expect(onStepFinish).toHaveBeenCalledTimes(1);
+  expect(onFinish).toHaveBeenCalledTimes(1);
+});
+
+test('a step close callback does not replace tour dismissal', async () => {
+  const onStepClose = rstest.fn();
+  const onClose = rstest.fn();
+  render(
+    <Tour
+      defaultOpen
+      onClose={onClose}
+      steps={[{ title: 'Intro', onClose: onStepClose }]}
+    />,
+  );
+  fireEvent.click(await screen.findByRole('button', { name: 'Close' }));
+  expect(onStepClose).toHaveBeenCalledTimes(1);
+  expect(onClose).toHaveBeenCalledWith(0);
+  await waitFor(() =>
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument(),
+  );
+});
+
+test('preventDefault in a custom tour action keeps the current step', async () => {
+  const onChange = rstest.fn();
+  render(
+    <Tour
+      defaultOpen
+      onChange={onChange}
+      steps={[
+        {
+          title: 'First',
+          nextButtonProps: { onClick: (event) => event.preventDefault() },
+        },
+        { title: 'Second' },
+      ]}
+    />,
+  );
+  fireEvent.click(await screen.findByRole('button', { name: 'Next' }));
+  expect(onChange).not.toHaveBeenCalled();
+  expect(screen.getByRole('dialog', { name: 'First' })).toBeInTheDocument();
 });

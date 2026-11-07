@@ -6,6 +6,7 @@ import {
   useCallback,
   useLayoutEffect,
   useRef,
+  useState,
 } from 'react';
 import {
   type TaoSize,
@@ -102,30 +103,46 @@ export const Textarea = forwardRef(function Textarea(
   const rootRef = useRef<HTMLDivElement>(null);
   const field = useTextControl(props, innerRef);
   useTextControlRef(ref, innerRef, rootRef);
+  const [measuredStyle, setMeasuredStyle] = useState<{
+    height: number;
+    overflowY: 'auto' | 'hidden';
+  }>();
 
   const resize = useCallback(() => {
     const el = innerRef.current;
     if (!el || !autoSize) return;
+    const previousHeight = el.style.height;
     el.style.height = 'auto';
     const cs = getComputedStyle(el);
     const lineHeight = Number.parseFloat(cs.lineHeight) || 0;
-    const padV =
-      Number.parseFloat(cs.paddingTop) + Number.parseFloat(cs.paddingBottom);
+    const padding =
+      (Number.parseFloat(cs.paddingTop) || 0) +
+      (Number.parseFloat(cs.paddingBottom) || 0);
+    const border =
+      (Number.parseFloat(cs.borderTopWidth) || 0) +
+      (Number.parseFloat(cs.borderBottomWidth) || 0);
+    // scrollHeight includes padding and excludes borders.
+    const offset = cs.boxSizing === 'content-box' ? -padding : border;
+    const rowOffset = padding + offset;
     const opts = typeof autoSize === 'object' ? autoSize : {};
-    let height = el.scrollHeight;
+    let height = Math.max(0, el.scrollHeight + offset);
     if (opts.minRows) {
-      height = Math.max(height, opts.minRows * lineHeight + padV);
+      height = Math.max(height, opts.minRows * lineHeight + rowOffset);
     }
-    let overflowY = 'hidden';
+    let overflowY: 'auto' | 'hidden' = 'hidden';
     if (opts.maxRows) {
-      const max = opts.maxRows * lineHeight + padV;
+      const max = opts.maxRows * lineHeight + rowOffset;
       if (height > max) {
         height = max;
         overflowY = 'auto';
       }
     }
-    el.style.height = `${height}px`;
-    el.style.overflowY = overflowY;
+    el.style.height = previousHeight;
+    setMeasuredStyle((previous) =>
+      previous?.height === height && previous.overflowY === overflowY
+        ? previous
+        : { height, overflowY },
+    );
   }, [autoSize]);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: re-measure on value change
@@ -169,14 +186,16 @@ export const Textarea = forwardRef(function Textarea(
         value={field.value}
         ref={innerRef}
         className={classNames?.textarea}
-        style={styles?.textarea}
+        style={
+          autoSize
+            ? { ...styles?.textarea, ...measuredStyle }
+            : styles?.textarea
+        }
         disabled={resolvedDisabled}
         aria-invalid={status === 'error' || error ? true : rest['aria-invalid']}
         data-tao-autosize={autoSize ? '' : undefined}
-        onChange={(e) => {
-          if (autoSize) resize();
-          field.change(e);
-        }}
+        onChange={field.change}
+        onBlur={field.blur}
         onKeyDown={(event) => {
           onKeyDown?.(event);
           if (
@@ -193,12 +212,7 @@ export const Textarea = forwardRef(function Textarea(
           onCompositionStart?.(event);
         }}
         onCompositionEnd={(event) => {
-          field.composing.current = false;
-          if (
-            field.normalize(event.currentTarget.value) !==
-            event.currentTarget.value
-          )
-            field.change({ ...event, target: event.currentTarget });
+          field.endComposition(event);
           onCompositionEnd?.(event);
         }}
       />

@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs';
-import { expect, test } from '@rstest/core';
+import { expect, rstest, test } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { Button } from '../../src/components/button/button';
@@ -8,6 +8,21 @@ import { TaoProvider } from '../../src/provider/tao-provider';
 test('renders children text', () => {
   render(<Button>Submit</Button>);
   expect(screen.getByRole('button', { name: 'Submit' })).toBeTruthy();
+});
+
+test('an undefined button type does not accidentally submit a form', async () => {
+  const submit = rstest.fn((event) => event.preventDefault());
+  render(
+    <form onSubmit={submit}>
+      <Button type={undefined}>Open details</Button>
+      <Button type="submit">Save</Button>
+    </form>,
+  );
+  const user = userEvent.setup();
+  await user.click(screen.getByRole('button', { name: 'Open details' }));
+  expect(submit).not.toHaveBeenCalled();
+  await user.click(screen.getByRole('button', { name: 'Save' }));
+  expect(submit).toHaveBeenCalledTimes(1);
 });
 
 test('keeps a typographic line box while flex-centering content', () => {
@@ -147,4 +162,40 @@ test('loadingIcon overrides the built-in spinner', () => {
   );
   expect(screen.getByTestId('custom')).toBeTruthy();
   expect(document.querySelector('[data-tao-button-spinner]')).toBeNull();
+});
+
+test('decorative button icons do not change its accessible name', () => {
+  const view = render(<Button icon={<span>Download icon</span>}>Save</Button>);
+  expect(screen.getByRole('button')).toHaveAccessibleName('Save');
+  view.rerender(
+    <Button
+      loading
+      icon={<span>Download icon</span>}
+      loadingIcon={<span>Loading icon</span>}
+    >
+      Save
+    </Button>,
+  );
+  expect(screen.getByRole('button')).toHaveAccessibleName('Save');
+});
+
+test('Button preserves an explicit aria-busy outside its loading state', () => {
+  const view = render(<Button aria-busy="true">Save</Button>);
+  expect(screen.getByRole('button')).toHaveAttribute('aria-busy', 'true');
+  expect(screen.getByRole('button')).toBeEnabled();
+  view.rerender(
+    <Button loading aria-busy="false">
+      Save
+    </Button>,
+  );
+  expect(screen.getByRole('button')).toHaveAttribute('aria-busy', 'true');
+});
+
+test('conditional icons leave no empty icon slot while a zero icon renders', () => {
+  const view = render(<Button icon={false}>Continue</Button>);
+  expect(view.container.querySelector('[data-tao-button-icon]')).toBeNull();
+  view.rerender(<Button icon={0}>Continue</Button>);
+  expect(
+    view.container.querySelector('[data-tao-button-icon-idle]'),
+  ).toHaveTextContent('0');
 });

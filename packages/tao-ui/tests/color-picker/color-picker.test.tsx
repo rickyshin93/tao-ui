@@ -1,7 +1,16 @@
-import { expect, test } from '@rstest/core';
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import { expect, rstest, test } from '@rstest/core';
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from '@testing-library/react';
+import { userEvent } from '@testing-library/user-event';
 import { Color } from '../../src/components/color-picker/color';
 import { ColorPicker } from '../../src/components/color-picker/color-picker';
+import { Modal } from '../../src/components/modal/modal';
 import { TaoProvider, zhCN } from '../../src/provider/tao-provider';
 
 test('provider messages localize color channels, mode, presets and live portal labels', async () => {
@@ -100,6 +109,122 @@ test('hex edits emit color objects and completion while controlled values remain
     screen.getByRole('button', { name: 'Choose color #ff0000' }),
   ).toBeTruthy();
 });
+test('an explicitly empty controlled color does not restore the default', async () => {
+  const onChange = rstest.fn();
+  const picker = (value: string | undefined) => (
+    <ColorPicker
+      value={value}
+      defaultValue="#112233"
+      showText
+      open
+      onChange={onChange}
+    />
+  );
+  const view = render(picker('#123456'));
+  view.rerender(picker(undefined));
+  expect(screen.getByText('Transparent')).toBeVisible();
+  fireEvent.change(screen.getByRole('textbox', { name: 'Hex color' }), {
+    target: { value: '#abcdef' },
+  });
+  expect(onChange).toHaveBeenCalledTimes(1);
+  expect(screen.getByText('Transparent')).toBeVisible();
+});
+
+test('a hover ColorPicker can be opened and dismissed with the keyboard', async () => {
+  render(
+    <ColorPicker trigger="hover">
+      <button type="button">Pick accent</button>
+    </ColorPicker>,
+  );
+  const user = userEvent.setup();
+  const trigger = screen.getByRole('button', { name: 'Pick accent' });
+  act(() => trigger.focus());
+  await user.keyboard('{Enter}');
+  const dialog = screen.getByRole('dialog', { name: 'Color picker' });
+  expect(dialog).toContainElement(document.activeElement as HTMLElement);
+  await user.keyboard('{Escape}');
+  await waitFor(() => expect(trigger).toHaveFocus());
+  expect(screen.queryByRole('dialog', { name: 'Color picker' })).toBeNull();
+});
+
+test('switching to a click trigger cancels a pending ColorPicker hover close', () => {
+  rstest.useFakeTimers();
+  try {
+    const onOpenChange = rstest.fn();
+    const picker = (trigger: 'hover' | 'click') => (
+      <ColorPicker trigger={trigger} onOpenChange={onOpenChange}>
+        <button type="button">Pick accent</button>
+      </ColorPicker>
+    );
+    const view = render(picker('hover'));
+    const button = screen.getByRole('button', { name: 'Pick accent' });
+    fireEvent.pointerEnter(button);
+    expect(screen.getByRole('dialog', { name: 'Color picker' })).toBeVisible();
+    onOpenChange.mockClear();
+    fireEvent.pointerLeave(button);
+    view.rerender(picker('click'));
+    act(() => rstest.advanceTimersByTime(200));
+
+    expect(onOpenChange).not.toHaveBeenCalled();
+    expect(screen.getByRole('dialog', { name: 'Color picker' })).toBeVisible();
+  } finally {
+    rstest.useRealTimers();
+  }
+});
+
+test('a retained closed ColorPicker releases Escape to its parent modal', async () => {
+  const onClose = rstest.fn();
+  render(
+    <Modal open title="Parent modal" onClose={onClose}>
+      <ColorPicker />
+    </Modal>,
+  );
+  const trigger = screen.getByRole('button', { name: 'Choose color #1677ff' });
+  const popup = document.querySelector('[data-tao-color-popup]');
+  const editor = popup?.querySelector('input');
+  expect(popup).toHaveAttribute('data-state', 'closed');
+  fireEvent.keyDown(trigger, { key: 'Escape' });
+  expect(onClose).toHaveBeenCalledTimes(1);
+
+  act(() => trigger.focus());
+  fireEvent.click(trigger);
+  expect(popup).toHaveAttribute('data-state', 'open');
+  expect(popup?.querySelector('input')).toBe(editor);
+  await userEvent.keyboard('{Escape}');
+  expect(onClose).toHaveBeenCalledTimes(1);
+  expect(popup).toHaveAttribute('data-state', 'closed');
+  await waitFor(() => expect(trigger).toHaveFocus());
+  fireEvent.keyDown(trigger, { key: 'Escape' });
+  expect(onClose).toHaveBeenCalledTimes(2);
+});
+
+test('editing a ColorPicker callback value cannot alter the stored color or completion', async () => {
+  const onChangeComplete = rstest.fn();
+  render(
+    <ColorPicker
+      open
+      showText
+      defaultValue="#ff0000"
+      presets={[{ label: 'Brand', colors: ['#00ff00'] }]}
+      onChange={(color) => {
+        color.cleared = true;
+      }}
+      onChangeComplete={(color) => {
+        onChangeComplete(color.cleared);
+        color.cleared = true;
+      }}
+    />,
+  );
+  fireEvent.click(
+    await screen.findByRole('button', { name: 'Preset #00ff00' }),
+  );
+
+  expect(onChangeComplete).toHaveBeenCalledExactlyOnceWith(false);
+  expect(
+    document.querySelector('[data-tao-color-description]'),
+  ).toHaveTextContent('#00ff00');
+});
+
 test('presets, format switching and clear preserve their public callback payloads', async () => {
   const values: Color[] = [],
     formats: (string | undefined)[] = [];
@@ -252,6 +377,44 @@ test('custom panel components render with semantic styles inside the requested c
   unmount();
   portal.remove();
 });
+test('disabling a ColorPicker disables its custom native button', async () => {
+  const onClick = rstest.fn();
+  const onOpenChange = rstest.fn();
+  render(
+    <ColorPicker disabled onOpenChange={onOpenChange}>
+      <button type="button" disabled={false} onClick={onClick}>
+        Pick accent
+      </button>
+    </ColorPicker>,
+  );
+  const trigger = screen.getByRole('button', { name: 'Pick accent' });
+
+  await userEvent.click(trigger);
+
+  expect(trigger).toBeDisabled();
+  expect(onClick).not.toHaveBeenCalled();
+  expect(onOpenChange).not.toHaveBeenCalled();
+});
+
+test('disabling an uncontrolled ColorPicker closes its interaction before reenable', async () => {
+  const picker = (disabled: boolean) => (
+    <ColorPicker disabled={disabled}>
+      <button type="button">Pick accent</button>
+    </ColorPicker>
+  );
+  const view = render(picker(false));
+  const trigger = screen.getByRole('button', { name: 'Pick accent' });
+  await userEvent.click(trigger);
+  expect(screen.getByRole('dialog', { name: 'Color picker' })).toBeVisible();
+  view.rerender(picker(true));
+  expect(screen.queryByRole('dialog', { name: 'Color picker' })).toBeNull();
+
+  view.rerender(picker(false));
+
+  expect(trigger).toHaveAttribute('aria-expanded', 'false');
+  expect(screen.queryByRole('dialog', { name: 'Color picker' })).toBeNull();
+});
+
 test('provider disabled state prevents opening and invalid hex input never emits a value', async () => {
   const { rerender } = render(
     <TaoProvider disabled>

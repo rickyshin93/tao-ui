@@ -78,14 +78,17 @@ export interface TimelineProps
         props: TimelineProps;
       }) => SemanticStyles<TimelineSemanticPart>);
 }
-function childItems(children: ReactNode): TimelineItemType[] {
-  return Children.toArray(children).flatMap((child) =>
-    isValidElement<TimelineItemType>(child)
-      ? child.type === Fragment
-        ? childItems(child.props.children)
-        : [{ ...child.props, key: child.key ?? undefined }]
-      : [],
-  );
+function childItems(
+  children: ReactNode,
+  parentKeys: (string | null)[] = [],
+): TimelineItemType[] {
+  return Children.toArray(children).flatMap((child) => {
+    if (!isValidElement<TimelineItemType>(child)) return [];
+    const keys = [...parentKeys, child.key];
+    return child.type === Fragment
+      ? childItems(child.props.children, keys)
+      : [{ ...child.props, key: JSON.stringify(keys) }];
+  });
 }
 const colors: Record<string, string> = {
   blue: 'var(--tao-color-primary)',
@@ -116,33 +119,36 @@ function TimelineRoot(props: TimelineProps) {
     ...rest
   } = props;
   const actualMode = mode === 'alternate' ? mode : normalizedPlacement(mode);
+  const defaultPlacement = (index: number): ItemPlacement =>
+    actualMode === 'alternate'
+      ? index % 2 === 0
+        ? 'start'
+        : 'end'
+      : actualMode;
   const resolved = (items ?? childItems(children)).map((item, index) => ({
     ...item,
+    renderKey: item.key === undefined ? `item:${index}` : `key:${item.key}`,
     title: item.title ?? item.label,
     content: item.content ?? item.children,
     icon: item.icon ?? item.dot,
     placement: normalizedPlacement(
-      item.placement ??
-        item.position ??
-        (actualMode === 'alternate'
-          ? index % 2 === 0
-            ? 'start'
-            : 'end'
-          : actualMode),
+      item.placement ?? item.position ?? defaultPlacement(index),
     ),
   }));
-  if (pending)
+  if (pending || pending === 0)
     resolved.push({
+      renderKey: 'pending',
       content: pending,
       icon: pendingDot,
       loading: true,
-      placement: 'start',
+      placement: defaultPlacement(resolved.length),
       title: undefined,
     });
   if (reverse) resolved.reverse();
   const split =
     actualMode === 'alternate' ||
-    (orientation === 'vertical' && resolved.some((item) => !!item.title));
+    (orientation === 'vertical' &&
+      resolved.some((item) => item.title || item.title === 0));
   const merged = {
     ...props,
     variant,
@@ -179,7 +185,7 @@ function TimelineRoot(props: TimelineProps) {
         } as CSSProperties
       }
     >
-      {resolved.map((item, index) => {
+      {resolved.map((item) => {
         function part(
           rootPart: TimelineSemanticPart,
           localPart: TimelineItemSemanticPart,
@@ -193,7 +199,7 @@ function TimelineRoot(props: TimelineProps) {
           item.icon ?? (item.loading ? <Spinner size="small" /> : null);
         return (
           <li
-            key={item.key ?? index}
+            key={item.renderKey}
             data-tao-timeline-item=""
             data-tao-placement={item.placement}
             data-tao-loading={item.loading || undefined}

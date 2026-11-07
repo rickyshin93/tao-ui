@@ -1,5 +1,12 @@
-import { afterEach, describe, expect, test } from '@rstest/core';
-import { act, render, screen, waitFor } from '@testing-library/react';
+import { afterEach, describe, expect, rstest, test } from '@rstest/core';
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { Sonner, toast } from '../../src/components/sonner';
 import { TaoProvider, zhCN } from '../../src/provider/tao-provider';
@@ -139,11 +146,14 @@ test('custom toast renders arbitrary react node', async () => {
 test('close button dismisses toast', async () => {
   render(<Sonner closeButton />);
   toast({ title: 'Closable' });
-  await screen.findByText('Closable');
-  const closeButton = screen.getAllByLabelText('Close notification').at(-1);
-  expect(closeButton).toBeTruthy();
-  expect(closeButton?.getAttribute('data-tao-sonner-close')).toBe('');
-  await userEvent.click(closeButton!);
+  const notification = (
+    await screen.findByText('Closable')
+  ).closest<HTMLElement>('[data-tao-sonner-toast]')!;
+  const closeButton = within(notification).getByRole('button', {
+    name: 'Close notification',
+  });
+  expect(closeButton).toHaveAttribute('data-tao-sonner-close', '');
+  await userEvent.click(closeButton);
   await waitFor(() => {
     expect(screen.queryByText('Closable')).toBeNull();
   });
@@ -166,6 +176,56 @@ test('action click triggers callback and dismisses', async () => {
   await waitFor(() => {
     expect(screen.queryByText('Undoable')).toBeNull();
   });
+});
+
+test.each(['action', 'cancel'] as const)(
+  'a same-id toast created by the %s handler stays active',
+  async (kind) => {
+    render(<Sonner />);
+    const id = `replace-on-${kind}`;
+    const updatedTitle = `Updated ${kind} notification`;
+    try {
+      act(() => {
+        toast({
+          id,
+          title: 'Original notification',
+          duration: 0,
+          [kind]: {
+            label: 'Update notification',
+            onClick: () =>
+              toast.success({ id, title: updatedTitle, duration: 0 }),
+          },
+        });
+      });
+      await userEvent.click(
+        screen.getByRole('button', { name: 'Update notification' }),
+      );
+      expect(
+        screen.getByText(updatedTitle).closest('[data-tao-sonner-toast]'),
+      ).toHaveAttribute('data-tao-removing', 'false');
+    } finally {
+      act(() => toast.dismiss(id));
+    }
+  },
+);
+
+test('dismissing an empty-string id only dismisses that toast', () => {
+  render(<Sonner />);
+  try {
+    act(() => {
+      toast({ id: '', title: 'Empty id', duration: 0 });
+      toast({ id: 'other-id', title: 'Other id', duration: 0 });
+      toast.dismiss('');
+    });
+    expect(
+      screen.getByText('Empty id').closest('[data-tao-sonner-toast]'),
+    ).toHaveAttribute('data-tao-removing', 'true');
+    expect(
+      screen.getByText('Other id').closest('[data-tao-sonner-toast]'),
+    ).toHaveAttribute('data-tao-removing', 'false');
+  } finally {
+    act(() => toast.dismiss());
+  }
 });
 
 test('promise toast resolves to success state', async () => {
@@ -200,6 +260,32 @@ test('promise toast rejects to error state', async () => {
   ).rejects.toThrow('boom');
   expect(await screen.findByText('boom')).toBeTruthy();
   toast.dismiss();
+});
+
+test('a success renderer error closes the loader without rendering a task failure', async () => {
+  const id = 'broken-success-renderer';
+  const error = rstest.fn(() => 'Task failed');
+  render(<Sonner />);
+
+  try {
+    await act(async () => {
+      await expect(
+        toast.promise(Promise.resolve('done'), {
+          loading: { id, title: 'Waiting for task' },
+          success: () => {
+            throw new Error('Broken success renderer');
+          },
+          error,
+        }),
+      ).rejects.toThrow('Broken success renderer');
+    });
+    expect(error).not.toHaveBeenCalled();
+    expect(
+      screen.getByText('Waiting for task').closest('[data-tao-sonner-toast]'),
+    ).toHaveAttribute('data-tao-removing', 'true');
+  } finally {
+    act(() => toast.dismiss(id));
+  }
 });
 
 describe('promise toast lifecycle', () => {
@@ -314,4 +400,189 @@ test('inherits provider token styles through portal scope', async () => {
     'rgb(1, 2, 3)',
   );
   toast.dismiss();
+});
+
+test('visibleToasts zero leaves queued notifications out of the viewport', () => {
+  const id = 'zero-visible';
+  const view = render(<Sonner visibleToasts={0} />);
+  try {
+    act(() => {
+      toast({ id, title: 'Queued notification', duration: 0 });
+    });
+    expect(screen.queryByText('Queued notification')).toBeNull();
+    view.rerender(<Sonner visibleToasts={1} />);
+    expect(screen.getByText('Queued notification')).toBeInTheDocument();
+  } finally {
+    act(() => toast.dismiss(id));
+  }
+});
+
+test('repeated dismiss keeps the original toast exit deadline', () => {
+  const id = 'repeat-dismiss';
+  rstest.useFakeTimers();
+  try {
+    render(<Sonner />);
+    act(() => {
+      toast({ id, title: 'Dismissed once', duration: 0 });
+    });
+    act(() => toast.dismiss(id));
+    act(() => rstest.advanceTimersByTime(150));
+    act(() => toast.dismiss(id));
+    act(() => rstest.advanceTimersByTime(100));
+    expect(screen.queryByText('Dismissed once')).toBeNull();
+  } finally {
+    act(() => {
+      toast.dismiss(id);
+      rstest.advanceTimersByTime(500);
+    });
+    rstest.useRealTimers();
+  }
+});
+
+test('an exiting toast stays in place when the stack gap changes', () => {
+  const back = 'exiting-offset';
+  const front = 'front-offset';
+  const { rerender } = render(<Sonner gap={12} />);
+
+  try {
+    act(() => {
+      toast({ id: back, title: 'Leaving notice', duration: 0 });
+      toast({ id: front, title: 'Front notice', duration: 0 });
+    });
+    const leaving = screen
+      .getByText('Leaving notice')
+      .closest<HTMLElement>('[data-tao-sonner-toast]')!;
+    const position = leaving.style.getPropertyValue('--tao-sonner-offset-y');
+
+    act(() => toast.dismiss(back));
+    rerender(<Sonner gap={32} />);
+
+    expect(leaving.style.getPropertyValue('--tao-sonner-offset-y')).toBe(
+      position,
+    );
+  } finally {
+    act(() => {
+      toast.dismiss(back);
+      toast.dismiss(front);
+    });
+  }
+});
+
+test('an exiting toast no longer runs action handlers', () => {
+  const id = 'repeat-action';
+  const onClick = rstest.fn();
+  render(<Sonner />);
+  try {
+    act(() => {
+      toast({
+        id,
+        title: 'Do once',
+        action: { label: 'Execute once', onClick },
+        duration: 0,
+      });
+    });
+    const action = screen.getByRole('button', { name: 'Execute once' });
+    fireEvent.click(action);
+    fireEvent.click(action);
+    expect(onClick).toHaveBeenCalledTimes(1);
+    expect(action).toBeDisabled();
+  } finally {
+    act(() => toast.dismiss(id));
+  }
+});
+
+test('renders numeric zero in regular, custom and promise notifications', async () => {
+  const ids = ['zero-body', 'zero-custom', 'zero-result'];
+  render(<Sonner />);
+  try {
+    await act(async () => {
+      toast({ id: ids[0], title: 0, description: 0, duration: 0 });
+      toast.custom(0, { id: ids[1], duration: 0 });
+      await toast.promise(Promise.resolve(0), {
+        loading: { id: ids[2], title: 'Counting' },
+        success: 0,
+      });
+    });
+    expect(screen.getAllByText('0')).toHaveLength(4);
+    expect(screen.queryByText('Counting')).toBeNull();
+  } finally {
+    act(() => {
+      for (const id of ids) toast.dismiss(id);
+    });
+  }
+});
+
+test('renders iterable React nodes passed directly as toast content', () => {
+  render(<Sonner />);
+  let id: string | undefined;
+  try {
+    act(() => {
+      id = toast(new Set(['Iterable notification']));
+    });
+    expect(screen.getByText('Iterable notification')).toBeVisible();
+  } finally {
+    if (id !== undefined) act(() => toast.dismiss(id));
+  }
+});
+
+test('an infinite toast duration remains open until explicitly dismissed', () => {
+  const id = 'infinite-duration';
+  rstest.useFakeTimers();
+  try {
+    render(<Sonner />);
+    act(() => {
+      toast({ id, title: 'Persistent task', duration: Infinity });
+    });
+    act(() => rstest.advanceTimersByTime(10_000));
+    expect(screen.getByText('Persistent task')).toBeInTheDocument();
+  } finally {
+    act(() => {
+      toast.dismiss(id);
+      rstest.advanceTimersByTime(250);
+    });
+    rstest.useRealTimers();
+  }
+});
+
+test('an obsolete promise skips its result renderer and keeps the original resolution', async () => {
+  const id = 'superseded-renderer';
+  const success = rstest.fn(() => {
+    throw new Error('Stale renderer');
+  });
+  render(<Sonner />);
+  try {
+    await act(async () => {
+      const task = toast.promise(Promise.resolve('finished'), {
+        loading: { id, title: 'Pending work' },
+        success,
+      });
+      toast({ id, title: 'Replacement', duration: 0 });
+      await expect(task).resolves.toBe('finished');
+    });
+    expect(success).not.toHaveBeenCalled();
+    expect(screen.getByText('Replacement')).toBeInTheDocument();
+  } finally {
+    act(() => toast.dismiss(id));
+  }
+});
+
+test('custom toasts honor their configured actions and close button', async () => {
+  const action = rstest.fn();
+  render(<Sonner />);
+  const id = toast.custom(<strong>Custom task</strong>, {
+    action: { label: 'Continue', onClick: action },
+    closable: true,
+    duration: 0,
+  });
+  try {
+    const notification = (await screen.findByText('Custom task')).closest(
+      '[data-tao-sonner-toast]',
+    )!;
+    expect(notification.querySelector('[data-tao-sonner-close]')).toBeEnabled();
+    await userEvent.click(screen.getByRole('button', { name: 'Continue' }));
+    expect(action).toHaveBeenCalledTimes(1);
+    expect(notification).toHaveAttribute('data-tao-removing', 'true');
+  } finally {
+    act(() => toast.dismiss(id));
+  }
 });

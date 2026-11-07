@@ -2,7 +2,7 @@
 
 title: Upload
 
-description: "选择、拖入并管理文件，支持真实请求、自定义上传和受控列表。"
+description: "选择并管理文件，连接上传接口，在受控文件列表中处理进度、失败和取消。"
 
 ---
 
@@ -258,7 +258,7 @@ export default function Demo() {
 
 ## 连接上传服务
 
-官网示例使用本地文件，不发送数据。实际上传需提供服务端接口：action 使用真实 URL，customRequest 可接入自己的 fetch、进度与中止逻辑。
+官网示例只使用本地文件。接入服务端时，将 `action` 设为上传接口地址，`name` 设为服务端接收文件的 multipart 字段名。
 
 ```tsx
 import { Upload, Button } from '@rockshin/tao-ui';
@@ -272,3 +272,7 @@ export function ServerUpload() {
   );
 }
 ```
+
+使用 `customRequest` 时，通过 `onProgress` 报告进度，每次请求结束时调用一次 `onSuccess` 或 `onError`。如果请求支持取消，返回带有 `abort()` 方法的对象。使用受控 `fileList` 时，把 `onChange` 传回的文件列表保存到状态，以显示每个文件的最新状态。
+
+从 [0.0.49](/zh/guide/changelog) 起，组件还会处理解析 `action` 或 `data` 时的失败，以及 `customRequest` 同步抛出的异常。出错文件显示失败状态，同批其他文件继续上传。

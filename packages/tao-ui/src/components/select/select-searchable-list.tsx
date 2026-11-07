@@ -11,6 +11,7 @@ interface SearchableSelectListProps {
   activeValue?: string;
   selectedValues: string[];
   multiple: boolean;
+  disabled?: boolean;
   maxCountReached: boolean;
   listHeight: number;
   notFoundContent: ReactNode;
@@ -30,6 +31,7 @@ export function SearchableSelectList({
   activeValue,
   selectedValues,
   multiple,
+  disabled,
   maxCountReached,
   listHeight,
   notFoundContent,
@@ -58,7 +60,8 @@ export function SearchableSelectList({
     const renderIndex = itemIndex++;
     const optionIndex = indexByValue.get(option.value);
     const isSelected = selectedValueSet.has(option.value);
-    const isDisabled = !!option.disabled || (maxCountReached && !isSelected);
+    const isDisabled =
+      disabled || option.disabled || (maxCountReached && !isSelected);
 
     return (
       <button
@@ -131,7 +134,6 @@ export function SearchableSelectList({
       option.options ? (
         <fieldset
           key={option.value}
-          aria-label={String(option.label)}
           data-tao-select-group=""
           className={cx(classNames?.group)}
           style={styles?.group}

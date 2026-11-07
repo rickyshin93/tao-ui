@@ -1,6 +1,7 @@
 import {
   Children,
   type CSSProperties,
+  cloneElement,
   createContext,
   Fragment,
   forwardRef,
@@ -113,10 +114,17 @@ const AvatarRoot = forwardRef<HTMLSpanElement, AvatarProps>((props, ref) => {
   const [failedSource, setFailedSource] = useState<{
     src: ReactNode;
     srcSet?: string;
+    crossOrigin?: AvatarProps['crossOrigin'];
   }>();
-  const failed = failedSource?.src === src && failedSource?.srcSet === srcSet;
-  const hasImage =
-    typeof src === 'string' ? !failed && src !== '' : isValidElement(src);
+  const failed =
+    failedSource?.src === src &&
+    failedSource?.srcSet === srcSet &&
+    failedSource?.crossOrigin === crossOrigin;
+  if (failedSource && !failed) setFailedSource(undefined);
+  const customImage = isValidElement(src) ? src : null;
+  const imageSrc = typeof src === 'string' && src !== '' ? src : undefined;
+  const hasNativeImage = !customImage && !failed && (!!imageSrc || !!srcSet);
+  const hasImage = hasNativeImage || customImage !== null;
   const hasIcon =
     icon !== null && icon !== undefined && typeof icon !== 'boolean';
   const [scale, setScale] = useState(1);
@@ -167,23 +175,23 @@ const AvatarRoot = forwardRef<HTMLSpanElement, AvatarProps>((props, ref) => {
       className={cx(prefixCls, classNames?.root, className, rootClassName)}
       style={{ ...dimensionsStyle, ...styles?.root, ...style }}
     >
-      {hasImage ? (
-        typeof src === 'string' ? (
-          <img
-            src={src}
-            srcSet={srcSet}
-            alt={alt ?? ''}
-            draggable={draggable}
-            crossOrigin={crossOrigin}
-            className={classNames?.image}
-            style={styles?.image}
-            onError={() => {
-              if (onError?.() !== false) setFailedSource({ src, srcSet });
-            }}
-          />
-        ) : (
-          src
-        )
+      {hasNativeImage ? (
+        <img
+          src={imageSrc}
+          srcSet={srcSet}
+          alt={alt ?? ''}
+          draggable={draggable}
+          crossOrigin={crossOrigin}
+          className={classNames?.image}
+          style={styles?.image}
+          onError={() => {
+            if (onError?.() !== false) {
+              setFailedSource({ src, srcSet, crossOrigin });
+            }
+          }}
+        />
+      ) : customImage ? (
+        customImage
       ) : hasIcon ? (
         <span
           data-tao-avatar-icon=""
@@ -207,12 +215,21 @@ const AvatarRoot = forwardRef<HTMLSpanElement, AvatarProps>((props, ref) => {
 });
 AvatarRoot.displayName = 'Avatar';
 
-function flattenChildren(children: ReactNode): ReactNode[] {
-  return Children.toArray(children).flatMap((child) =>
-    isValidElement<{ children?: ReactNode }>(child) && child.type === Fragment
-      ? flattenChildren(child.props.children)
-      : [child],
-  );
+function flattenChildren(
+  children: ReactNode,
+  fragmentKeys: (string | null)[] = [],
+): ReactNode[] {
+  return Children.toArray(children).flatMap((child) => {
+    if (!isValidElement<{ children?: ReactNode }>(child)) return [child];
+    const keyPath = [...fragmentKeys, child.key];
+    if (child.type === Fragment)
+      return flattenChildren(child.props.children, keyPath);
+    return [
+      fragmentKeys.length
+        ? cloneElement(child, { key: JSON.stringify(keyPath) })
+        : child,
+    ];
+  });
 }
 const AvatarGroup = forwardRef<AvatarGroupRef, AvatarGroupProps>(
   (props, ref) => {
@@ -266,7 +283,9 @@ const AvatarGroup = forwardRef<AvatarGroupRef, AvatarGroupProps>(
               placement={
                 max?.popover?.placement ?? maxPopoverPlacement ?? 'top'
               }
-              trigger={max?.popover?.trigger ?? maxPopoverTrigger ?? 'hover'}
+              trigger={
+                max?.popover?.trigger ?? maxPopoverTrigger ?? ['hover', 'focus']
+              }
             >
               <button
                 type="button"

@@ -76,12 +76,46 @@ test('keyboard navigation skips disabled options and Enter chooses the active me
   expect(input).toHaveValue('@bob ');
 });
 
+test('Enter confirms composition without inserting a mention', async () => {
+  const onSelect = rstest.fn();
+  render(<Mentions options={options} onSelect={onSelect} />);
+  const input = search('@');
+  await screen.findByText('Alice');
+  fireEvent.compositionStart(input);
+  expect(
+    fireEvent.keyDown(input, {
+      key: 'Enter',
+      keyCode: 13,
+      which: 13,
+      isComposing: true,
+    }),
+  ).toBe(true);
+  expect(onSelect).not.toHaveBeenCalled();
+  expect(input).toHaveValue('@');
+  fireEvent.compositionEnd(input);
+  fireEvent.keyDown(input, { key: 'Enter', keyCode: 13, which: 13 });
+  expect(onSelect).toHaveBeenCalledTimes(1);
+  expect(input).toHaveValue('@alice ');
+});
+
 test('controlled values are only updated by the owner', () => {
   const onChange = rstest.fn();
   render(<Mentions value="fixed" onChange={onChange} />);
   fireEvent.change(screen.getByRole('textbox'), { target: { value: 'edit' } });
   expect(onChange).toHaveBeenCalledWith('edit');
   expect(screen.getByRole('textbox')).toHaveValue('fixed');
+});
+
+test('an explicitly empty controlled value ignores the default and unaccepted edits', () => {
+  const onChange = rstest.fn();
+  render(
+    <Mentions value={undefined} defaultValue="default" onChange={onChange} />,
+  );
+  const input = screen.getByRole('textbox');
+  expect(input).toHaveValue('');
+  fireEvent.change(input, { target: { value: 'draft' } });
+  expect(onChange).toHaveBeenCalledExactlyOnceWith('draft');
+  expect(input).toHaveValue('');
 });
 
 test('loading replaces suggestions with an unselectable spinner', async () => {
@@ -128,6 +162,18 @@ test('clear has localized accessible text and emits an empty string', () => {
   expect(onChange).toHaveBeenCalledWith('');
 });
 
+test('readonly Mentions does not expose a clear action', () => {
+  const onChange = rstest.fn();
+  render(
+    <Mentions readOnly allowClear defaultValue="@alice" onChange={onChange} />,
+  );
+  expect(screen.getByRole('textbox')).toHaveValue('@alice');
+  expect(
+    screen.queryByRole('button', { name: 'Clear' }),
+  ).not.toBeInTheDocument();
+  expect(onChange).not.toHaveBeenCalled();
+});
+
 test('supports asynchronously replaced suggestion data', async () => {
   function Async() {
     const [data, setData] = useState<typeof options>();
@@ -155,6 +201,13 @@ test('getMentions matches prefixes and separators while ignoring empty values', 
     { prefix: '#', value: 'topic' },
   ]);
   expect(Mentions.getMentions('')).toEqual([]);
+});
+
+test('getMentions extracts mentions from pasted multiline text', () => {
+  expect(Mentions.getMentions('Hello\n@alice\r\n@bob\nThanks')).toEqual([
+    { prefix: '@', value: 'alice' },
+    { prefix: '@', value: 'bob' },
+  ]);
 });
 
 test('legacy Option children remain selectable', async () => {

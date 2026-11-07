@@ -5,6 +5,7 @@ import RcSlider, {
 } from '@rc-component/slider';
 import {
   type CSSProperties,
+  cloneElement,
   forwardRef,
   type ReactElement,
   type ReactNode,
@@ -160,6 +161,7 @@ function SliderTip({
         : 'center';
   const visible =
     title != null &&
+    typeof title !== 'boolean' &&
     title !== '' &&
     (open ?? (!disabled && (dragging || active)));
   return (
@@ -236,6 +238,12 @@ function SliderTip({
   );
 }
 
+const withValueSnapshot = (callback: RcSliderProps['onChange']) =>
+  callback
+    ? (value: number | number[]) =>
+        callback(Array.isArray(value) ? [...value] : value)
+    : undefined;
+
 export const Slider = forwardRef<SliderRef, SliderProps>((props, ref) => {
   const {
     prefixCls = 'tao-slider',
@@ -248,6 +256,7 @@ export const Slider = forwardRef<SliderRef, SliderProps>((props, ref) => {
     vertical = false,
     direction: directionProp,
     disabled,
+    keyboard,
     tooltip = {},
     handleRender,
     reverse,
@@ -271,6 +280,12 @@ export const Slider = forwardRef<SliderRef, SliderProps>((props, ref) => {
   const allDisabled = Array.isArray(resolvedDisabled)
     ? resolvedDisabled.every(Boolean)
     : resolvedDisabled;
+  const editableRange = typeof props.range === 'object' && props.range.editable;
+  const deletion = useRef<{ value?: number[] } | null>(null);
+  const engineProps = rest as RcSliderProps;
+  const onChange = withValueSnapshot(engineProps.onChange);
+  const onAfterChange = withValueSnapshot(engineProps.onAfterChange);
+  const onChangeComplete = withValueSnapshot(engineProps.onChangeComplete);
   return (
     <div
       ref={directionRef}
@@ -280,10 +295,23 @@ export const Slider = forwardRef<SliderRef, SliderProps>((props, ref) => {
       dir={direction}
     >
       <RcSliderComponent
-        {...(rest as RcSliderProps)}
+        {...engineProps}
         ref={ref}
         prefixCls={prefixCls}
         disabled={resolvedDisabled}
+        keyboard={keyboard}
+        onBeforeChange={withValueSnapshot(engineProps.onBeforeChange)}
+        onChange={
+          editableRange
+            ? (value) => {
+                if (deletion.current && Array.isArray(value))
+                  deletion.current.value = value;
+                onChange?.(value);
+              }
+            : onChange
+        }
+        onAfterChange={onAfterChange}
+        onChangeComplete={onChangeComplete}
         vertical={resolvedVertical}
         reverse={direction === 'rtl' && !resolvedVertical ? !reverse : reverse}
         className={cx(classes?.root, rootClassName, className)}
@@ -295,23 +323,50 @@ export const Slider = forwardRef<SliderRef, SliderProps>((props, ref) => {
           handle: cx('tao-slider-handle-slot', classes?.handle),
         }}
         styles={semanticStyles}
-        handleRender={(node, info) => (
-          <SliderTip
-            key={info.index}
-            value={info.value}
-            dragging={info.dragging}
-            disabled={
-              Array.isArray(resolvedDisabled)
-                ? !!resolvedDisabled[info.index]
-                : !!resolvedDisabled
-            }
-            vertical={resolvedVertical}
-            direction={direction}
-            options={tooltip}
-          >
-            {handleRender ? handleRender(node, info) : node}
-          </SliderTip>
-        )}
+        handleRender={(node, info) => {
+          const handleDisabled = Array.isArray(resolvedDisabled)
+            ? !!resolvedDisabled[info.index]
+            : !!resolvedDisabled;
+          // rc-slider completes on keyup even when it ignored the keydown.
+          let handle = node;
+          if (handleDisabled || keyboard === false)
+            handle = cloneElement(node, { onKeyUp: undefined });
+          else if (editableRange)
+            handle = cloneElement(node, {
+              onKeyDown: (event) => {
+                const keyCode = event.which || event.keyCode;
+                if (keyCode !== 8 && keyCode !== 46) {
+                  node.props.onKeyDown?.(event);
+                  return;
+                }
+                // Deleting a handle removes the keydown target before keyup.
+                const change: { value?: number[] } = {};
+                deletion.current = change;
+                try {
+                  node.props.onKeyDown?.(event);
+                } finally {
+                  deletion.current = null;
+                }
+                if (change.value) {
+                  onAfterChange?.(change.value);
+                  onChangeComplete?.(change.value);
+                }
+              },
+            });
+          return (
+            <SliderTip
+              key={info.index}
+              value={info.value}
+              dragging={info.dragging}
+              disabled={handleDisabled}
+              vertical={resolvedVertical}
+              direction={direction}
+              options={tooltip}
+            >
+              {handleRender ? handleRender(handle, info) : handle}
+            </SliderTip>
+          );
+        }}
       />
     </div>
   );

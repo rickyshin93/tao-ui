@@ -41,7 +41,8 @@
   border-radius: inherit;
   background: var(--tao-progress-color);
 }
-[data-tao-type="line"] [data-tao-progress-track][data-tao-success] {
+[data-tao-type="line"]
+  :is([data-tao-progress-track], [data-tao-progress-step])[data-tao-success] {
   background: var(--tao-color-success);
 }
 [data-tao-progress-indicator] {
@@ -130,7 +131,8 @@
 [data-tao-progress-circle] [data-tao-progress-step]:not([data-tao-active]) {
   stroke: var(--tao-progress-rail);
 }
-[data-tao-progress-circle] [data-tao-progress-track][data-tao-success] {
+[data-tao-progress-circle]
+  :is([data-tao-progress-track], [data-tao-progress-step])[data-tao-success] {
   stroke: var(--tao-color-success);
 }
 [data-tao-type="circle"] [data-tao-progress-indicator],

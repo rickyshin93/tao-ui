@@ -60,7 +60,7 @@ export function useSelectSelection(props: SelectionProps, disabled: boolean) {
               .map((item) => optionByValue.get(item))
               .filter((option) => option !== undefined)
           : optionByValue.get(next ?? '');
-      onChange?.(next ?? '', nextOptions);
+      onChange?.(Array.isArray(next) ? [...next] : (next ?? ''), nextOptions);
     },
     [controlled, optionByValue, onChange],
   );
@@ -104,7 +104,7 @@ export function useSelectSelection(props: SelectionProps, disabled: boolean) {
 
   const addTokens = useCallback(
     (input: string) => {
-      if (disabled) return;
+      if (disabled) return false;
       const tokens = (tokenSeparators ?? [])
         .reduce(
           (parts, separator) =>
@@ -123,15 +123,16 @@ export function useSelectSelection(props: SelectionProps, disabled: boolean) {
         seen.add(next);
         added.push(next);
       }
-      if (added.length === 0) return;
+      if (added.length === 0) return false;
       const nextArray = [...valueArray, ...added];
-      if (maxCount != null && nextArray.length > maxCount) return;
+      if (maxCount != null && nextArray.length > maxCount) return false;
 
       publish(nextArray);
       for (const next of added) {
         const option = optionByValue.get(next);
         if (option) onSelect?.(next, option);
       }
+      return true;
     },
     [
       disabled,

@@ -1,5 +1,11 @@
-import { expect, test } from '@rstest/core';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { expect, rs, test } from '@rstest/core';
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react';
 import { Fragment } from 'react';
 import { Tooltip } from '../../src/components/tooltip/tooltip';
 
@@ -197,6 +203,28 @@ for (const reason of ['Escape', 'blur']) {
   });
 }
 
+test('a delayed Tooltip close uses the latest open change callback', () => {
+  rs.useFakeTimers();
+  try {
+    const old = rs.fn();
+    const current = rs.fn();
+    const tooltip = (callback: (open: boolean) => void) => (
+      <Tooltip open title="Tip" onOpenChange={callback}>
+        <button type="button">Trigger</button>
+      </Tooltip>
+    );
+    const view = render(tooltip(old));
+    fireEvent.pointerLeave(screen.getByRole('button', { name: 'Trigger' }));
+    view.rerender(tooltip(current));
+    act(() => rs.advanceTimersByTime(200));
+
+    expect(old).not.toHaveBeenCalled();
+    expect(current).toHaveBeenCalledExactlyOnceWith(false);
+  } finally {
+    rs.useRealTimers();
+  }
+});
+
 test('pointer-leave close is deferred by mouseLeaveDelay', async () => {
   render(
     <Tooltip title="tip" mouseEnterDelay={0} mouseLeaveDelay={0.05}>
@@ -212,4 +240,98 @@ test('pointer-leave close is deferred by mouseLeaveDelay', async () => {
   await waitFor(() => expect(screen.queryByText('tip')).toBeNull(), {
     timeout: 1000,
   });
+});
+
+test('a touch pointer leaving a focused tooltip does not request a hover close', () => {
+  rs.useFakeTimers();
+  try {
+    const changed = rs.fn();
+    render(
+      <Tooltip title="Help" onOpenChange={changed}>
+        <button type="button">Trigger</button>
+      </Tooltip>,
+    );
+    const trigger = screen.getByRole('button', { name: 'Trigger' });
+    act(() => trigger.focus());
+    expect(screen.getByRole('tooltip')).toBeInTheDocument();
+    changed.mockClear();
+
+    fireEvent.pointerLeave(trigger, { pointerType: 'touch' });
+    act(() => rs.advanceTimersByTime(200));
+
+    expect(changed).not.toHaveBeenCalled();
+    expect(screen.getByRole('tooltip')).toBeInTheDocument();
+  } finally {
+    rs.useRealTimers();
+  }
+});
+
+test('leaving before the open delay expires does not report a close', () => {
+  rs.useFakeTimers();
+  try {
+    const changed = rs.fn();
+    render(
+      <Tooltip title="Help" mouseEnterDelay={0.5} onOpenChange={changed}>
+        <button type="button">Trigger</button>
+      </Tooltip>,
+    );
+    const trigger = screen.getByRole('button', { name: 'Trigger' });
+    fireEvent.pointerMove(trigger, { pointerType: 'mouse' });
+    fireEvent.pointerLeave(trigger, { pointerType: 'mouse' });
+    act(() => rs.advanceTimersByTime(600));
+    expect(changed).not.toHaveBeenCalled();
+  } finally {
+    rs.useRealTimers();
+  }
+});
+
+test('removing the title cancels a pending tooltip close and resets the hover session', () => {
+  rs.useFakeTimers();
+  try {
+    const changed = rs.fn();
+    const child = <button type="button">Trigger</button>;
+    const view = render(
+      <Tooltip title="Help" mouseEnterDelay={0} onOpenChange={changed}>
+        {child}
+      </Tooltip>,
+    );
+    const trigger = screen.getByRole('button', { name: 'Trigger' });
+    fireEvent.focus(trigger);
+    expect(changed.mock.calls).toEqual([[true]]);
+    fireEvent.pointerLeave(trigger, { pointerType: 'mouse' });
+    view.rerender(
+      <Tooltip title="" onOpenChange={changed}>
+        {child}
+      </Tooltip>,
+    );
+    view.rerender(
+      <Tooltip title="New help" onOpenChange={changed}>
+        {child}
+      </Tooltip>,
+    );
+    act(() => rs.advanceTimersByTime(200));
+    expect(changed.mock.calls).toEqual([[true]]);
+    expect(screen.queryByText('New help')).not.toBeInTheDocument();
+  } finally {
+    rs.useRealTimers();
+  }
+});
+
+test('conditional boolean titles leave the focused trigger without an empty tooltip', () => {
+  const onOpenChange = rs.fn();
+  const view = render(
+    <Tooltip title={false} onOpenChange={onOpenChange}>
+      <button type="button">Help</button>
+    </Tooltip>,
+  );
+  const trigger = screen.getByRole('button', { name: 'Help' });
+  fireEvent.focus(trigger);
+  expect(onOpenChange).not.toHaveBeenCalled();
+  expect(screen.queryByRole('tooltip')).toBeNull();
+  view.rerender(
+    <Tooltip title={0} open>
+      <button type="button">Help</button>
+    </Tooltip>,
+  );
+  expect(screen.getByRole('tooltip')).toHaveTextContent('0');
 });

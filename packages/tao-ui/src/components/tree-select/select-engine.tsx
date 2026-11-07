@@ -1,5 +1,5 @@
 import type { BaseSelectPropsWithoutPrivate } from '@rc-component/select';
-import type { CSSProperties, ReactNode } from 'react';
+import type { CSSProperties, ReactNode, Ref } from 'react';
 import { TaoPortalScope } from '../../provider/tao-provider';
 import { CloseIcon } from '../select/select-icons';
 
@@ -45,6 +45,7 @@ export function SelectEnginePopup({
   treeLine,
   size,
   style,
+  contentRef,
 }: {
   direction?: 'ltr' | 'rtl';
   children: ReactNode;
@@ -52,10 +53,12 @@ export function SelectEnginePopup({
   treeLine?: boolean;
   size: string;
   style?: CSSProperties;
+  contentRef?: Ref<HTMLDivElement>;
 }) {
   return (
     <TaoPortalScope asChild direction={direction}>
       <div
+        ref={contentRef}
         data-tao-select-engine-popup=""
         data-tao-size={size}
         data-tao-tree={tree ? '' : undefined}

@@ -94,7 +94,7 @@ export function TransferOperation({
             return;
           }
           element.props.onClick?.(event);
-          handler?.(event);
+          if (!event.defaultPrevented) handler?.(event);
         },
       });
     }

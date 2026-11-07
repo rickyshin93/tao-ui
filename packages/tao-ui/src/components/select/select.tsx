@@ -123,6 +123,8 @@ export const Select = forwardRef(function Select(
   const isOpenControlled = openProp !== undefined;
   const [openInternal, setOpenInternal] = useState(defaultOpen ?? false);
   const requestedOpen = isOpenControlled ? openProp : openInternal;
+  const latestRequestedOpen = useRef(requestedOpen);
+  latestRequestedOpen.current = requestedOpen;
   // Preserve the active editing surface until it closes, including its draft and focus.
   const [mobilePresentation, setMobilePresentation] = useState(requestedMobile);
   if (
@@ -177,7 +179,15 @@ export const Select = forwardRef(function Select(
   const isSearchControlled = searchValueProp !== undefined;
   const [searchInternal, setSearchInternal] = useState('');
   const search = isSearchControlled ? searchValueProp : searchInternal;
-  const [activeSearchIndex, setActiveSearchIndex] = useState(0);
+  const [previousOpen, setPreviousOpen] = useState(requestedOpen);
+  if (previousOpen !== requestedOpen) {
+    setPreviousOpen(requestedOpen);
+    if (!requestedOpen && !isSearchControlled) setSearchInternal('');
+  }
+  const [activeSearch, setActiveSearch] = useState<{
+    index: number;
+    value?: string;
+  }>({ index: 0 });
   const composingRef = useRef(false);
   const isComposingKey = useCallback(
     (event: KeyboardEvent) =>
@@ -197,17 +207,7 @@ export const Select = forwardRef(function Select(
   const handleValueChange = useCallback(
     (next: string) => {
       if (resolvedDisabled) return;
-      if (isMultiple) {
-        if (
-          tokenSeparators?.some(
-            (separator) => separator && next.includes(separator),
-          )
-        ) {
-          addTokens(next);
-          return;
-        }
-        if (!hasInlineSearch) suppressCloseRef.current = true;
-      }
+      if (isMultiple && !hasInlineSearch) suppressCloseRef.current = true;
       if (!selectValue(next)) return;
       if (isMultiple && autoClearSearchValue && !isSearchControlled)
         setSearchInternal('');
@@ -215,10 +215,8 @@ export const Select = forwardRef(function Select(
     [
       isMultiple,
       hasInlineSearch,
-      tokenSeparators,
       resolvedDisabled,
       selectValue,
-      addTokens,
       autoClearSearchValue,
       isSearchControlled,
     ],
@@ -234,9 +232,11 @@ export const Select = forwardRef(function Select(
       }
       suppressCloseRef.current = false;
       if (!isOpenControlled) setOpenInternal(next);
-      if (!next && !isSearchControlled) setSearchInternal('');
       if (!next && isMobile) {
-        setTimeout(() => (inputRef.current ?? triggerRef.current)?.focus(), 0);
+        setTimeout(() => {
+          if (!latestRequestedOpen.current)
+            (inputRef.current ?? triggerRef.current)?.focus();
+        }, 0);
       }
       // Focus the search input once the dropdown mounts.
       if (next && showSearch && !isMobile) {
@@ -248,7 +248,6 @@ export const Select = forwardRef(function Select(
       isMultiple,
       hasInlineSearch,
       isOpenControlled,
-      isSearchControlled,
       onOpenChange,
       resolvedDisabled,
       showSearch,
@@ -274,13 +273,12 @@ export const Select = forwardRef(function Select(
       const sep = tokenSeparators.find((s) => s && value.includes(s));
       if (!sep) return;
       e.preventDefault();
-      handleValueChange(value);
-      if (!isSearchControlled) setSearchInternal('');
+      if (addTokens(value) && !isSearchControlled) setSearchInternal('');
     },
     [
       isMultiple,
       tokenSeparators,
-      handleValueChange,
+      addTokens,
       isSearchControlled,
       isComposingKey,
     ],
@@ -495,6 +493,8 @@ export const Select = forwardRef(function Select(
           role="button"
           tabIndex={resolvedDisabled ? undefined : 0}
           {...ariaProps}
+          aria-haspopup="dialog"
+          aria-expanded={open}
           aria-disabled={resolvedDisabled || undefined}
           data-disabled={resolvedDisabled || undefined}
           className={cx(classNames?.root, className)}
@@ -544,11 +544,7 @@ export const Select = forwardRef(function Select(
                   {labelRender(selectedOption)}
                 </span>
               ) : selectedOption ? (
-                <span data-tao-select-value="">
-                  {typeof selectedOption.label === 'string'
-                    ? selectedOption.label
-                    : String(selectedOption.label)}
-                </span>
+                <span data-tao-select-value="">{selectedOption.label}</span>
               ) : (
                 <span
                   data-tao-select-placeholder=""
@@ -582,6 +578,7 @@ export const Select = forwardRef(function Select(
           notFoundContent={notFoundContent}
           optionRender={optionRender}
           multiple={isMultiple}
+          hideSelected={hideSelected}
           maxCount={maxCount}
           mode={mode}
           tokenSeparators={tokenSeparators}
@@ -613,7 +610,7 @@ export const Select = forwardRef(function Select(
   }
 
   // In multi mode, Radix doesn't manage our value — we render our own checkmarks.
-  const radixValue = isMultiple ? '' : (value as string) || undefined;
+  const radixValue = isMultiple ? '' : ((value as string | undefined) ?? '');
 
   const resultCount = filteredFlatOptions.length;
 
@@ -626,7 +623,8 @@ export const Select = forwardRef(function Select(
     const textLabel =
       typeof opt.label === 'string' ? opt.label : String(opt.label);
     const isSelected = selectedValueSet.has(opt.value);
-    const itemDisabled = opt.disabled || (!isSelected && overMaxCount);
+    const itemDisabled =
+      resolvedDisabled || opt.disabled || (!isSelected && overMaxCount);
 
     return (
       <RadixSelect.Item
@@ -706,7 +704,7 @@ export const Select = forwardRef(function Select(
           >
             {o.label}
           </RadixSelect.Label>
-          {o.options.map(renderItem)}
+          {renderTree(o.options)}
         </RadixSelect.Group>
       ) : (
         renderItem(o)
@@ -733,19 +731,32 @@ export const Select = forwardRef(function Select(
   );
 
   const isSearchableOptionDisabled = (option: SelectOption) =>
-    !!option.disabled || (overMaxCount && !selectedValueSet.has(option.value));
+    resolvedDisabled ||
+    option.disabled ||
+    (overMaxCount && !selectedValueSet.has(option.value));
   const searchableOptions = filteredFlatOptions.filter(
     (option) => !isSearchableOptionDisabled(option),
   );
   const lastSearchIndex = Math.max(searchableOptions.length - 1, 0);
-  const boundedSearchIndex = Math.min(
-    Math.max(activeSearchIndex, 0),
-    lastSearchIndex,
-  );
-  if (activeSearchIndex !== boundedSearchIndex) {
+  const previousSearchIndex =
+    searchableOptions[activeSearch.index]?.value === activeSearch.value
+      ? activeSearch.index
+      : searchableOptions.findIndex(
+          (option) => option.value === activeSearch.value,
+        );
+  const boundedSearchIndex =
+    previousSearchIndex < 0
+      ? Math.min(activeSearch.index, lastSearchIndex)
+      : previousSearchIndex;
+  const activeSearchOption = searchableOptions[boundedSearchIndex];
+  const setActiveSearchIndex = (index: number) =>
+    setActiveSearch({ index, value: searchableOptions[index]?.value });
+  if (
+    activeSearch.index !== boundedSearchIndex ||
+    activeSearch.value !== activeSearchOption?.value
+  ) {
     setActiveSearchIndex(boundedSearchIndex);
   }
-  const activeSearchOption = searchableOptions[boundedSearchIndex];
   const searchableMenuNode = (
     <SearchableSelectList
       id={searchListboxId}
@@ -755,6 +766,7 @@ export const Select = forwardRef(function Select(
       activeValue={activeSearchOption?.value}
       selectedValues={valueArray}
       multiple={isMultiple}
+      disabled={resolvedDisabled}
       maxCountReached={overMaxCount}
       listHeight={listHeight}
       notFoundContent={notFoundContent}
@@ -772,6 +784,11 @@ export const Select = forwardRef(function Select(
       ? getPopupContainer(triggerRef.current)
       : undefined;
 
+  const selectedLabel = selectedOption?.label;
+  const selectedLabelId =
+    selectedLabel != null && typeof selectedLabel === 'object'
+      ? `${searchListboxId}-selected-label`
+      : undefined;
   const inlineSearchInput = (
     <input
       ref={inputRef}
@@ -796,7 +813,15 @@ export const Select = forwardRef(function Select(
       }
       aria-label={
         props['aria-label'] ??
-        (selectedOption ? String(selectedOption.label) : placeholder)
+        (typeof selectedLabel === 'string' || typeof selectedLabel === 'number'
+          ? String(selectedLabel)
+          : selectedLabelId
+            ? undefined
+            : placeholder)
+      }
+      aria-labelledby={
+        props['aria-labelledby'] ??
+        (props['aria-label'] == null ? selectedLabelId : undefined)
       }
       // biome-ignore lint/a11y/noAutofocus: Select exposes autoFocus to match native input-like controls.
       autoFocus={autoFocus}
@@ -815,7 +840,7 @@ export const Select = forwardRef(function Select(
       }}
       onChange={(event) => {
         handleSearchChange(event.target.value);
-        setActiveSearchIndex(0);
+        setActiveSearch({ index: 0 });
         if (!open) handleOpenChange(true);
       }}
       onKeyDown={(event) => {
@@ -839,6 +864,11 @@ export const Select = forwardRef(function Select(
         if (event.key === 'ArrowUp') {
           event.preventDefault();
           setActiveSearchIndex(Math.max(boundedSearchIndex - 1, 0));
+          return;
+        }
+        if (event.key === 'Enter' && !requestedOpen) {
+          event.preventDefault();
+          handleOpenChange(true);
           return;
         }
         const nextValue =
@@ -911,8 +941,10 @@ export const Select = forwardRef(function Select(
                   style={styles?.search}
                 >
                   {inlineSearchInput}
-                  {!search && (
+                  {(!search || selectedLabelId) && (
                     <span
+                      id={selectedLabelId}
+                      hidden={!!search}
                       data-tao-select-trigger-value=""
                       data-tao-select-placeholder={
                         selectedOption ? undefined : ''
@@ -925,7 +957,7 @@ export const Select = forwardRef(function Select(
                       {selectedOption && labelRender
                         ? labelRender(selectedOption)
                         : selectedOption
-                          ? String(selectedOption.label)
+                          ? selectedOption.label
                           : placeholder}
                     </span>
                   )}
@@ -1039,11 +1071,7 @@ export const Select = forwardRef(function Select(
                   {labelRender(selectedOption)}
                 </span>
               ) : selectedOption ? (
-                <span data-tao-select-value="">
-                  {typeof selectedOption.label === 'string'
-                    ? selectedOption.label
-                    : String(selectedOption.label)}
-                </span>
+                <span data-tao-select-value="">{selectedOption.label}</span>
               ) : (
                 <span
                   data-tao-select-placeholder=""

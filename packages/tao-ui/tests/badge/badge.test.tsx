@@ -2,6 +2,17 @@ import { expect, test } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
 import { createRef } from 'react';
 import { Badge, type RibbonRef } from '../../src/components/badge/badge';
+import { TaoProvider } from '../../src/provider/tao-provider';
+
+test('an empty count leaves no blank pill and still permits a status dot', () => {
+  const { container, rerender } = render(<Badge count="" />);
+  expect(container.querySelector('[data-tao-badge-indicator]')).toBeNull();
+  rerender(<Badge count="" status="success" />);
+  expect(container.querySelector('[data-tao-badge-indicator]')).toHaveAttribute(
+    'data-tao-dot',
+    'true',
+  );
+});
 
 test('clips numeric counts but keeps the actual count in the native title', () => {
   const ref = createRef<HTMLSpanElement>();
@@ -44,6 +55,46 @@ test('status text and colors work without a wrapped child', () => {
     container.querySelector<HTMLElement>('[data-tao-badge-indicator]')?.style
       .background,
   ).toBe('purple');
+});
+test('a conditional count preserves the status indicator', () => {
+  const { container } = render(<Badge status="success" count={false} />);
+
+  expect(container.querySelector('[data-tao-badge-indicator]')).toBeTruthy();
+});
+
+test('a status without a count remains a dot when wrapping content', () => {
+  const { container } = render(
+    <Badge status="processing">
+      <span>Inbox</span>
+    </Badge>,
+  );
+
+  expect(container.querySelector('[data-tao-badge-indicator]')).toHaveAttribute(
+    'data-tao-dot',
+    'true',
+  );
+});
+
+test('a numeric zero child still anchors an overlay badge', () => {
+  const ref = createRef<HTMLSpanElement>();
+  render(
+    <Badge ref={ref} count={3}>
+      {0}
+    </Badge>,
+  );
+  expect(ref.current).toHaveAttribute('data-tao-wrapper', 'true');
+  expect(ref.current).toHaveTextContent('03');
+});
+
+test('a hidden zero count or text does not suppress the other badge content', () => {
+  const { rerender } = render(
+    <Badge status="success" count={0} text="Ready" />,
+  );
+  expect(screen.getByText('Ready')).toBeVisible();
+
+  rerender(<Badge count={3} text={0} />);
+  expect(screen.getByText('3')).toBeVisible();
+  expect(screen.queryByText('0')).toBeNull();
 });
 test('offset and legacy style target the indicator, semantic root remains separate', () => {
   render(
@@ -88,4 +139,26 @@ test('Ribbon ref points to its wrapper and styles target semantic parts', () => 
     'purple',
   );
   expect(screen.getByText('Featured').parentElement?.style.color).toBe('white');
+});
+
+test('Badge inherits small from TaoProvider and respects an explicit size', () => {
+  render(
+    <TaoProvider size="small">
+      <Badge count={4} />
+      <Badge count={8} size="medium" />
+    </TaoProvider>,
+  );
+  expect(screen.getByText('4')).toHaveAttribute('data-tao-size', 'small');
+  expect(screen.getByText('8')).toHaveAttribute('data-tao-size', 'medium');
+});
+
+test('string offsets preserve CSS units on both axes', () => {
+  render(
+    <Badge count={7} offset={['1rem', '2em']}>
+      <span>Inbox</span>
+    </Badge>,
+  );
+  const indicator = screen.getByText('7');
+  expect(indicator.style.insetInlineEnd).toContain('rem');
+  expect(indicator.style.marginTop).toBe('2em');
 });

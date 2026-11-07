@@ -4,6 +4,8 @@ import {
   type HTMLAttributes,
   type HTMLInputTypeAttribute,
   type ReactNode,
+  useContext,
+  useEffect,
   useImperativeHandle,
   useRef,
   useState,
@@ -18,6 +20,7 @@ import {
   type SemanticClassNames,
   type SemanticStyles,
 } from '../../utils/semantic';
+import { FormFieldChangeContext } from '../form/form-context';
 import { BaseInput } from './base-input';
 import type { InputSemanticValue, InputVariant } from './input-shared';
 
@@ -76,16 +79,37 @@ export const OTP = forwardRef<OTPRef, OTPProps>(function OTP(props, ref) {
   if (!Number.isInteger(length) || length < 1)
     throw new RangeError('Input.OTP length must be a positive integer');
   const ctx = useTaoConfig();
+  const fieldChange = useContext(FormFieldChangeContext);
   const format = (text: string) =>
     Array.from(formatter ? formatter(text) : text).slice(0, length);
-  const [innerValue, setInnerValue] = useState(() => format(defaultValue));
+  const formattedValue =
+    'value' in props ? format(value ?? '').join('') : undefined;
+  const [innerValue, setInnerValue] = useState(() =>
+    format('value' in props ? (value ?? '') : defaultValue),
+  );
+  const [previousValue, setPreviousValue] = useState({ value, formattedValue });
   const [draft, setDraft] = useState<{ index: number; value: string } | null>(
     null,
   );
-  const cells = value !== undefined ? format(value) : innerValue;
+  // Keep incomplete codes locally: onChange only publishes a complete code.
+  if (
+    previousValue.value !== value ||
+    previousValue.formattedValue !== formattedValue
+  ) {
+    setPreviousValue({ value, formattedValue });
+    setInnerValue(Array.from(formattedValue ?? ''));
+    setDraft(null);
+  }
+  const cells = innerValue.slice(0, length);
   const inputs = useRef<Array<HTMLInputElement | null>>([]);
   const root = useRef<HTMLDivElement>(null);
-  const composing = useRef(false);
+  const composing = useRef<number | null>(null);
+  useEffect(() => {
+    if (composing.current !== null && composing.current >= length) {
+      composing.current = null;
+      setDraft(null);
+    }
+  }, [length]);
   const classNames =
     typeof customClassNames === 'function'
       ? customClassNames({ props })
@@ -117,10 +141,18 @@ export const OTP = forwardRef<OTPRef, OTPProps>(function OTP(props, ref) {
       next.length !== cells.length ||
       next.some((char, i) => char !== cells[i])
     ) {
-      if (value === undefined) setInnerValue(next);
-      onInput?.(next);
-      if (next.length === length && next.every(Boolean))
+      setInnerValue(next);
+      onInput?.([...next]);
+      if (next.length === length && next.every(Boolean)) {
         onChange?.(next.join(''));
+      } else if (value && fieldChange && onChange === fieldChange.onChange) {
+        // Clear the committed form value while keeping the remaining cells editable.
+        setPreviousValue({
+          value: '',
+          formattedValue: format('').join(''),
+        });
+        fieldChange.collect('');
+      }
     }
     if (chars.length) focus(Math.min(index + chars.length, length - 1));
   };
@@ -167,15 +199,15 @@ export const OTP = forwardRef<OTPRef, OTPProps>(function OTP(props, ref) {
               styles={{ input: styles?.input }}
               onFocus={(event) => event.currentTarget.select()}
               onChange={(event) => {
-                if (composing.current)
+                if (composing.current === index)
                   setDraft({ index, value: event.target.value });
                 else update(index, event.target.value);
               }}
               onCompositionStart={() => {
-                composing.current = true;
+                composing.current = index;
               }}
               onCompositionEnd={(event) => {
-                composing.current = false;
+                composing.current = null;
                 setDraft(null);
                 update(index, event.currentTarget.value);
               }}
@@ -184,7 +216,12 @@ export const OTP = forwardRef<OTPRef, OTPProps>(function OTP(props, ref) {
                 update(index, event.clipboardData.getData('text'));
               }}
               onKeyDown={(event) => {
-                if (composing.current || event.nativeEvent.isComposing) return;
+                if (
+                  composing.current === index ||
+                  event.nativeEvent.isComposing ||
+                  event.keyCode === 229
+                )
+                  return;
                 if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
                   event.preventDefault();
                   const direction =

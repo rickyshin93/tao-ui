@@ -6,6 +6,45 @@ import {
   Calendar,
   type CalendarRef,
 } from '../../src/components/calendar/calendar';
+import { TaoProvider } from '../../src/provider/tao-provider';
+
+test('a disabled provider disables Calendar dates as well as its header', () => {
+  const values: string[] = [];
+  const { container } = render(
+    <TaoProvider disabled>
+      <Calendar
+        defaultValue={dayjs('2026-11-04')}
+        onChange={(value) => values.push(value.format('YYYY-MM-DD'))}
+      />
+    </TaoProvider>,
+  );
+  fireEvent.click(container.querySelector('[title="2026-11-05"]')!);
+  expect(values).toEqual([]);
+  expect(container.querySelector('[title="2026-11-04"]')?.className).toContain(
+    'selected',
+  );
+});
+
+test('a custom header is constrained to the same valid range as the default header', () => {
+  const dates: string[] = [];
+  const sources: string[] = [];
+  render(
+    <Calendar
+      defaultValue={dayjs('2026-11-04')}
+      validRange={[dayjs('2026-11-01'), dayjs('2026-12-20')]}
+      onChange={(value) => dates.push(value.format('YYYY-MM-DD'))}
+      onSelect={(_, info) => sources.push(info.source)}
+      headerRender={({ onChange }) => (
+        <button type="button" onClick={() => onChange(dayjs('2027-01-01'))}>
+          Next period
+        </button>
+      )}
+    />,
+  );
+  fireEvent.click(screen.getByRole('button', { name: 'Next period' }));
+  expect(dates).toEqual(['2026-12-20']);
+  expect(sources).toEqual(['customize']);
+});
 
 test('date selection reports its source and controlled state follows the parent', () => {
   const values: string[] = [];
@@ -90,6 +129,30 @@ test('disabled dates cannot select; custom cells and semantic parts render', () 
     padding: '7px',
   });
 });
+
+test.each(['month', 'year'] as const)(
+  'month selection in %s view keeps the date inside a partial last month',
+  async (mode) => {
+    const values: string[] = [];
+    render(
+      <Calendar
+        mode={mode}
+        defaultValue={dayjs('2026-01-30')}
+        validRange={[dayjs('2026-01-20'), dayjs('2026-02-15')]}
+        onChange={(date) => values.push(date.format('YYYY-MM-DD'))}
+      />,
+    );
+    if (mode === 'month') {
+      fireEvent.keyDown(screen.getByRole('combobox', { name: 'Month' }), {
+        key: 'ArrowDown',
+      });
+      fireEvent.click(await screen.findByRole('option', { name: 'Feb' }));
+    } else {
+      fireEvent.click(screen.getByText('Feb'));
+    }
+    expect(values).toEqual(['2026-02-15']);
+  },
+);
 
 test('Segmented mode switching supports keyboard input and controlled mode', () => {
   const panels: string[] = [];

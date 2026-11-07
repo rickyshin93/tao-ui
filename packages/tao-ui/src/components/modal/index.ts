@@ -34,10 +34,17 @@ Modal.warning = (config) => confirm(withWarn(config));
 Modal.warn = Modal.warning;
 Modal.useModal = useModal;
 Modal.destroyAll = () => {
-  while (destroyFns.length) {
-    const close = destroyFns.pop();
-    close?.();
+  const errors: unknown[] = [];
+  for (const close of [...destroyFns].reverse()) {
+    try {
+      close();
+    } catch (error) {
+      errors.push(error);
+    }
   }
+  if (errors.length === 1) throw errors[0];
+  if (errors.length > 1)
+    throw new AggregateError(errors, 'Modal cleanup failed');
 };
 
 export type { ModalFuncReturn } from './confirm';

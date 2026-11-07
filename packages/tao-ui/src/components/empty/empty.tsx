@@ -1,4 +1,5 @@
 import {
+  Children,
   type CSSProperties,
   forwardRef,
   type HTMLAttributes,
@@ -112,21 +113,23 @@ const EmptyRoot = forwardRef<EmptyRef, EmptyProps>(function Empty(props, ref) {
       className={cx(prefixCls, names?.root, className, rootClassName)}
       style={{ ...slots?.root, ...style }}
     >
-      <div
-        data-tao-empty-image=""
-        className={cx(`${prefixCls}-image`, names?.image)}
-        style={{ ...imageStyle, ...slots?.image }}
-      >
-        {typeof shownImage === 'string' ? (
-          <img
-            src={shownImage}
-            alt={typeof text === 'string' ? text : 'empty'}
-            draggable={false}
-          />
-        ) : (
-          shownImage
-        )}
-      </div>
+      {typeof shownImage !== 'boolean' && (
+        <div
+          data-tao-empty-image=""
+          className={cx(`${prefixCls}-image`, names?.image)}
+          style={{ ...imageStyle, ...slots?.image }}
+        >
+          {typeof shownImage === 'string' ? (
+            <img
+              src={shownImage}
+              alt={typeof text === 'string' ? text : 'empty'}
+              draggable={false}
+            />
+          ) : (
+            shownImage
+          )}
+        </div>
+      )}
       {text !== null && text !== undefined && typeof text !== 'boolean' && (
         <div
           data-tao-empty-description=""
@@ -136,17 +139,15 @@ const EmptyRoot = forwardRef<EmptyRef, EmptyProps>(function Empty(props, ref) {
           {text}
         </div>
       )}
-      {children !== null &&
-        children !== undefined &&
-        typeof children !== 'boolean' && (
-          <div
-            data-tao-empty-footer=""
-            className={cx(`${prefixCls}-footer`, names?.footer)}
-            style={slots?.footer}
-          >
-            {children}
-          </div>
-        )}
+      {Children.toArray(children).length > 0 && (
+        <div
+          data-tao-empty-footer=""
+          className={cx(`${prefixCls}-footer`, names?.footer)}
+          style={slots?.footer}
+        >
+          {children}
+        </div>
+      )}
     </div>
   );
 });

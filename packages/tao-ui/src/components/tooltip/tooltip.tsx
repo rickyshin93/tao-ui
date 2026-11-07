@@ -1,6 +1,7 @@
 import * as RadixTooltip from '@radix-ui/react-tooltip';
 import {
   type CSSProperties,
+  type PointerEvent,
   type ReactNode,
   useCallback,
   useEffect,
@@ -23,7 +24,7 @@ export type TooltipPlacement = 'top' | 'bottom' | 'left' | 'right';
 
 export interface TooltipProps {
   direction?: 'ltr' | 'rtl';
-  /** Tooltip content. Renders nothing (and disables the tooltip) when null/undefined/''. */
+  /** Tooltip content. Empty strings, booleans, null and undefined disable it. */
   title?: ReactNode;
   /** Popup side relative to the trigger. Defaults to 'top'. */
   placement?: TooltipPlacement;
@@ -52,7 +53,15 @@ export interface TooltipProps {
 
 // ---- Tooltip ----
 
-export function Tooltip({
+export function Tooltip(props: TooltipProps) {
+  const { title, children } = props;
+  if (title == null || title === '' || typeof title === 'boolean') {
+    return <>{children}</>;
+  }
+  return <ActiveTooltip {...props} />;
+}
+
+function ActiveTooltip({
   direction: directionProp,
   title,
   placement = 'top',
@@ -75,6 +84,8 @@ export function Tooltip({
     defaultOpen,
     onOpenChange,
   });
+  const latestSetOpen = useRef(setOpen);
+  latestSetOpen.current = setOpen;
 
   // Pointer-initiated closes are deferred by mouseLeaveDelay; the flag tells
   // them apart from Esc/blur closes, which Radix reports through the same
@@ -83,7 +94,13 @@ export function Tooltip({
     undefined,
   );
   const pointerDriven = useRef(false);
-  useEffect(() => () => clearTimeout(closeTimer.current), []);
+  useEffect(() => {
+    if (!realOpen) return;
+    return () => {
+      clearTimeout(closeTimer.current);
+      pointerDriven.current = false;
+    };
+  }, [realOpen]);
 
   const schedulePointerClose = useCallback(() => {
     clearTimeout(closeTimer.current);
@@ -93,7 +110,7 @@ export function Tooltip({
     }
     closeTimer.current = setTimeout(() => {
       pointerDriven.current = false;
-      setOpen(false);
+      latestSetOpen.current(false);
     }, mouseLeaveDelay * 1000);
   }, [mouseLeaveDelay, setOpen]);
 
@@ -113,11 +130,13 @@ export function Tooltip({
   );
 
   const hoverProps = {
-    onPointerEnter: () => {
+    onPointerEnter: (event: PointerEvent) => {
+      if (event.pointerType === 'touch') return;
       pointerDriven.current = false;
       clearTimeout(closeTimer.current);
     },
-    onPointerLeave: () => {
+    onPointerLeave: (event: PointerEvent) => {
+      if (!realOpen || event.pointerType === 'touch') return;
       pointerDriven.current = true;
       // Schedule the close ourselves: Radix only clears its open timer on
       // trigger leave and relies on grace-area tracking afterwards, which
@@ -125,11 +144,6 @@ export function Tooltip({
       schedulePointerClose();
     },
   };
-
-  // antd parity: an empty title disables the tooltip entirely (title={0} still shows).
-  if (title === null || title === undefined || title === '') {
-    return <>{children}</>;
-  }
 
   const colorStyle: CSSProperties | undefined = color
     ? { background: color }

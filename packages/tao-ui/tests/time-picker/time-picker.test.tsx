@@ -24,6 +24,24 @@ test('formats a controlled time and updates when the parent changes it', () => {
   expect(screen.getByRole('textbox')).toHaveValue('09:15');
 });
 
+test('an explicitly empty controlled time does not fall back to the default', () => {
+  const initial = dayjs('2026-11-04T13:30:45');
+  render(<TimePicker defaultValue={initial} value={undefined} />);
+  expect(screen.getByRole('textbox')).toHaveValue('');
+});
+
+test('an explicitly empty controlled time range does not fall back to the default', () => {
+  const initial = dayjs('2026-11-04T13:30:45');
+  render(
+    <TimePicker.RangePicker
+      defaultValue={[initial, initial.add(1, 'hour')]}
+      value={undefined}
+    />,
+  );
+  for (const input of screen.getAllByRole('textbox'))
+    expect(input).toHaveValue('');
+});
+
 test('clear emits the public null value and onClear', () => {
   const changes: (string | null)[] = [];
   let clears = 0;
@@ -42,6 +60,16 @@ test('clear emits the public null value and onClear', () => {
   fireEvent.click(clear);
   expect(changes).toEqual([null]);
   expect(clears).toBe(1);
+});
+
+test('TimePicker.RangePicker marks the root disabled when both endpoints are disabled', () => {
+  const { container, rerender } = render(
+    <TimePicker.RangePicker disabled={[true, true]} />,
+  );
+  const root = container.querySelector('[data-tao-time-picker="range"]');
+  expect(root).toHaveAttribute('data-disabled', 'true');
+  rerender(<TimePicker.RangePicker disabled={[true, false]} />);
+  expect(root).not.toHaveAttribute('data-disabled');
 });
 
 test('inherited disabled state prevents editing and clearing', () => {

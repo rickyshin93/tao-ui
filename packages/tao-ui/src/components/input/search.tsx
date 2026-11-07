@@ -72,25 +72,30 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(
       typeof customStyles === 'function'
         ? customStyles({ props })
         : customStyles;
+    const customButton =
+      isValidElement<ButtonProps>(enterButton) &&
+      (enterButton.type === 'button' || enterButton.type === Button);
+    const isLoading =
+      loading ||
+      (customButton &&
+        enterButton.type === Button &&
+        enterButton.props.loading);
     const search = (
       event: MouseEvent<HTMLElement> | KeyboardEvent<HTMLInputElement>,
     ) => {
-      if (!disabled && !loading && !event.defaultPrevented)
+      if (!disabled && !isLoading && !event.defaultPrevented)
         onSearch?.(inputRef.current!.value, event, { source: 'input' });
     };
     const buttonProps: ButtonProps = {
       type: 'button',
-      disabled: disabled || loading,
-      'aria-busy': loading || undefined,
+      disabled: disabled || isLoading,
+      'aria-busy': isLoading || undefined,
       'aria-label': ctx.locale.search ?? 'Search',
       className: classNames?.button,
       style: styles?.button,
       onMouseDown: (event) => event.preventDefault(),
       onClick: search,
     };
-    const customButton =
-      isValidElement<ButtonProps>(enterButton) &&
-      (enterButton.type === 'button' || enterButton.type === Button);
     const button = customButton ? (
       cloneElement(enterButton as ReactElement<ButtonProps>, {
         ...buttonProps,
@@ -100,7 +105,7 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(
           enterButton.props['aria-label'] ?? buttonProps['aria-label'],
         disabled: buttonProps.disabled || enterButton.props.disabled,
         ...(enterButton.type === Button
-          ? { loading, size: props.size ?? enterButton.props.size }
+          ? { loading: isLoading, size: props.size ?? enterButton.props.size }
           : {}),
         onMouseDown: (event) => {
           enterButton.props.onMouseDown?.(event);
@@ -114,7 +119,7 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(
     ) : (
       <Button
         {...buttonProps}
-        loading={loading}
+        loading={isLoading}
         size={props.size}
         variant={enterButton ? 'primary' : 'secondary'}
       >
@@ -136,7 +141,12 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(
           styles={{ ...styles, root: undefined }}
           onChange={(event) => {
             onChange?.(event);
-            if (event.type === 'click' && !disabled && !loading)
+            if (
+              event.type === 'click' &&
+              !event.defaultPrevented &&
+              !disabled &&
+              !isLoading
+            )
               onSearch?.('', event, { source: 'clear' });
           }}
           onPressEnter={(event) => {

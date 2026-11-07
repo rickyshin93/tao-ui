@@ -26,6 +26,16 @@ test('null description hides the description and false image removes the artwork
   const { container } = render(<Empty image={false} description={null} />);
   expect(container.querySelector('[data-tao-empty-description]')).toBeNull();
   expect(container.querySelector('svg')).toBeNull();
+  expect(container.querySelector('[data-tao-empty-image]')).toBeNull();
+});
+
+test('conditional empty children leave no Empty footer', () => {
+  const { container, rerender } = render(<Empty>{[false, null]}</Empty>);
+  expect(container.querySelector('[data-tao-empty-footer]')).toBeNull();
+  rerender(<Empty>{0}</Empty>);
+  expect(container.querySelector('[data-tao-empty-footer]')).toHaveTextContent(
+    '0',
+  );
 });
 
 test('renders numeric content and interactive footer without swallowing clicks', () => {

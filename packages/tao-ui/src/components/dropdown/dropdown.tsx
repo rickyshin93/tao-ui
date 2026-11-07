@@ -3,8 +3,8 @@ import {
   type CSSProperties,
   type ReactNode,
   useCallback,
+  useEffect,
   useRef,
-  useState,
 } from 'react';
 import {
   TaoPortalScope,
@@ -12,7 +12,7 @@ import {
   useTaoConfig,
   useTaoDirection,
 } from '../../provider/tao-provider';
-import { asTriggerChild } from '../../utils/overlay';
+import { asTriggerChild, useControlledOpen } from '../../utils/overlay';
 import {
   cx,
   type SemanticClassNames,
@@ -157,32 +157,52 @@ export function Dropdown(props: DropdownProps) {
 
   const isContext = trigger.includes('contextMenu');
   const hoverMode = !isContext && trigger.includes('hover');
-
-  // Open state (controlled / uncontrolled)
-  const isOpenControlled = open != null;
-  const [openInternal, setOpenInternal] = useState(defaultOpen ?? false);
-  const realOpen = isOpenControlled ? open : openInternal;
-  const setOpen = useCallback(
-    (next: boolean) => {
-      if (!isOpenControlled) setOpenInternal(next);
-      onOpenChange?.(next);
-    },
-    [isOpenControlled, onOpenChange],
-  );
-
-  // Hover open/close with a small close delay
+  const clickMode = trigger.includes('click');
   const closeTimer = useRef<ReturnType<typeof setTimeout> | undefined>(
     undefined,
   );
+  const hoverEnabled = hoverMode && !resolvedDisabled;
+  const [realOpen, updateOpen] = useControlledOpen({
+    open,
+    defaultOpen: !resolvedDisabled && defaultOpen,
+    onOpenChange,
+    canOpen: !resolvedDisabled,
+  });
+  const visible = realOpen && !resolvedDisabled;
+  const latestVisible = useRef(visible);
+  latestVisible.current = visible;
+  useEffect(() => {
+    if (hoverEnabled && realOpen) return () => clearTimeout(closeTimer.current);
+  }, [hoverEnabled, realOpen]);
+  const setOpen = useCallback(
+    (next: boolean) => {
+      clearTimeout(closeTimer.current);
+      updateOpen(next);
+    },
+    [updateOpen],
+  );
+  const latestSetOpen = useRef(setOpen);
+  latestSetOpen.current = setOpen;
+  useEffect(() => {
+    if (resolvedDisabled && realOpen && open == null) setOpen(false);
+  }, [open, realOpen, resolvedDisabled, setOpen]);
+
+  // Hover open/close with a small close delay
   const openOnHover = useCallback(() => {
     clearTimeout(closeTimer.current);
-    if (!resolvedDisabled) setOpen(true);
-  }, [resolvedDisabled, setOpen]);
+    if (!realOpen) setOpen(true);
+  }, [realOpen, setOpen]);
   const closeOnHover = useCallback(() => {
-    closeTimer.current = setTimeout(() => setOpen(false), 120);
-  }, [setOpen]);
+    if (!realOpen) return;
+    clearTimeout(closeTimer.current);
+    closeTimer.current = setTimeout(() => latestSetOpen.current(false), 120);
+  }, [realOpen]);
 
-  const content = useMenuController(menu, DD, { classNames, styles });
+  const { content, selectedKeys, commitSelection } = useMenuController(
+    menu,
+    DD,
+    { classNames, styles },
+  );
   const triggerChild = asTriggerChild(children);
 
   // Right-click → delegate to the standalone ContextMenu component.
@@ -190,9 +210,13 @@ export function Dropdown(props: DropdownProps) {
     return (
       <ContextMenu
         direction={props.direction}
-        menu={menu}
-        open={open}
-        onOpenChange={onOpenChange}
+        menu={{
+          ...menu,
+          selectedKeys,
+          onSelect: ({ key, selectedKeys: next }) => commitSelection(next, key),
+        }}
+        open={realOpen && !resolvedDisabled}
+        onOpenChange={setOpen}
         disabled={disabled}
         className={className}
         style={style}
@@ -213,14 +237,14 @@ export function Dropdown(props: DropdownProps) {
         ? 'end'
         : 'start'
       : physicalAlign;
-  const hoverProps = hoverMode
+  const hoverProps = hoverEnabled
     ? { onPointerEnter: openOnHover, onPointerLeave: closeOnHover }
     : undefined;
 
   return (
     <RD.Root
       dir={direction}
-      open={realOpen}
+      open={visible}
       onOpenChange={setOpen}
       modal={false}
     >
@@ -230,6 +254,9 @@ export function Dropdown(props: DropdownProps) {
         disabled={resolvedDisabled}
         data-tao-dropdown-trigger=""
         {...hoverProps}
+        onPointerDown={(event) => {
+          if (!clickMode) event.preventDefault();
+        }}
       >
         {triggerChild}
       </RD.Trigger>
@@ -244,6 +271,9 @@ export function Dropdown(props: DropdownProps) {
             side={side}
             align={align}
             sideOffset={4}
+            onCloseAutoFocus={(event) => {
+              if (latestVisible.current) event.preventDefault();
+            }}
             {...hoverProps}
           >
             {arrow && (
@@ -267,6 +297,7 @@ function DropdownButton({
   icon,
   variant = 'secondary',
   size,
+  disabled,
   menu,
   ...dropdownRest
 }: DropdownButtonProps) {
@@ -277,15 +308,17 @@ function DropdownButton({
       <Button
         variant={variant}
         size={resolvedSize}
+        disabled={disabled}
         onClick={onClick}
         data-tao-dropdown-button-main=""
       >
         {children}
       </Button>
-      <Dropdown menu={menu} {...dropdownRest}>
+      <Dropdown menu={menu} disabled={disabled} {...dropdownRest}>
         <Button
           variant={variant}
           size={resolvedSize}
+          disabled={disabled}
           aria-label={locale.messages.more}
           data-tao-dropdown-button-trigger=""
         >

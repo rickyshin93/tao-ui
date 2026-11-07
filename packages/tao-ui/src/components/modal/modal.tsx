@@ -8,11 +8,13 @@ import {
 import {
   type AriaAttributes,
   type CSSProperties,
+  createContext,
   type FC,
   type HTMLAttributes,
   type ReactElement,
   type ReactNode,
   useCallback,
+  useContext,
   useEffect,
   useRef,
 } from 'react';
@@ -62,6 +64,19 @@ export type ModalFooterRender = (
   originNode: ReactNode,
   extra: { OkBtn: FC; CancelBtn: FC },
 ) => ReactNode;
+
+const ModalActionContext = createContext<{
+  ok: ReactElement | null;
+  cancel: ReactElement | null;
+}>({ ok: null, cancel: null });
+
+function OkBtn() {
+  return useContext(ModalActionContext).ok;
+}
+
+function CancelBtn() {
+  return useContext(ModalActionContext).cancel;
+}
 
 export interface ModalProps
   extends Pick<
@@ -208,23 +223,29 @@ export function Modal({
     ...stylesProp?.container,
   };
 
-  const CancelBtn: FC = () => (
+  const cancelButton = (
     <Button
       variant="secondary"
-      onClick={onClose}
       data-tao-modal-action="cancel"
       {...cancelButtonProps}
+      onClick={(event) => {
+        cancelButtonProps?.onClick?.(event);
+        if (!event.defaultPrevented) onClose?.();
+      }}
     >
       {cancelText === undefined ? locale.cancel : cancelText}
     </Button>
   );
-  const OkBtn: FC = () => (
+  const okButton = (
     <Button
       variant="primary"
-      loading={confirmLoading}
-      onClick={onOk}
       data-tao-modal-action="ok"
       {...okButtonProps}
+      loading={confirmLoading || okButtonProps?.loading}
+      onClick={(event) => {
+        okButtonProps?.onClick?.(event);
+        if (!event.defaultPrevented) onOk?.();
+      }}
     >
       {okText === undefined ? locale.ok : okText}
     </Button>
@@ -269,10 +290,11 @@ export function Modal({
         : autoFocusButton;
     if (button === null) event.preventDefault();
     else if (button) {
-      event.preventDefault();
-      contentRef.current
-        ?.querySelector<HTMLElement>(`[data-tao-modal-action="${button}"]`)
-        ?.focus();
+      const target = contentRef.current?.querySelector<HTMLElement>(
+        `[data-tao-modal-action="${button}"]`,
+      );
+      target?.focus();
+      if (target && document.activeElement === target) event.preventDefault();
     }
   };
   const closeAutoFocus = (event: Event) => {
@@ -330,7 +352,11 @@ export function Modal({
           className={cx(classNames?.footer)}
           style={stylesProp?.footer}
         >
-          {footerContent}
+          <ModalActionContext.Provider
+            value={{ ok: okButton, cancel: cancelButton }}
+          >
+            {footerContent}
+          </ModalActionContext.Provider>
         </div>
       )}
     </>
@@ -417,7 +443,9 @@ export function Modal({
             ...stylesProp?.overlay,
             ...stylesProp?.mask,
           }}
-          onPointerDown={closeOnMask ? onClose : undefined}
+          onPointerDown={(event) => {
+            if (closeOnMask && event.button === 0) onClose?.();
+          }}
         />
       )}
       <div

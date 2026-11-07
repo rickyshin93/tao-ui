@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from 'react';
+import { type CSSProperties, type ReactNode, useId } from 'react';
 import {
   cx,
   type SemanticClassNames,
@@ -32,8 +32,10 @@ export function FormSection({
   classNames,
   styles,
 }: FormSectionProps) {
+  const titleId = useId();
   return (
     <section
+      aria-labelledby={title ? titleId : undefined}
       className={cx(classNames?.root, className)}
       style={{ ...styles?.root, ...style }}
       data-tao-form-section=""
@@ -46,6 +48,7 @@ export function FormSection({
         >
           {title && (
             <div
+              id={titleId}
               className={classNames?.title}
               style={styles?.title}
               data-tao-form-section-title=""

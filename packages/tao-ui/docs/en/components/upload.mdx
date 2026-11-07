@@ -2,7 +2,7 @@
 
 title: Upload
 
-description: "Select, drop and manage files with real requests, custom uploads and controlled lists."
+description: "Select and manage files, connect an upload endpoint, and handle progress, errors and cancellation in a controlled list."
 
 ---
 
@@ -258,7 +258,7 @@ export default function Demo() {
 
 ## Connect an upload service
 
-The live examples keep files locally and send no data. Real uploads need a server endpoint: set action to its URL, or use customRequest for your own request, progress and abort behavior.
+The live examples keep files locally. To send files to a server, set `action` to the upload endpoint and `name` to the multipart field the server expects.
 
 ```tsx
 import { Upload, Button } from '@rockshin/tao-ui';
@@ -272,3 +272,7 @@ export function ServerUpload() {
   );
 }
 ```
+
+If you supply `customRequest`, report progress with `onProgress` and finish each request once with `onSuccess` or `onError`. Return an object with an `abort()` method if your transport supports cancellation. With a controlled `fileList`, store the list from `onChange` to show the latest status for each file.
+
+Since [0.0.49](/guide/changelog), Upload also handles failures while resolving `action` or `data`, and synchronous exceptions from `customRequest`. The affected file shows an error and the other files in the batch continue.

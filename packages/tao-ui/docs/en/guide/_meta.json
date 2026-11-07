@@ -8,5 +8,10 @@
     "type": "file",
     "name": "agents",
     "label": "AI agents"
+  },
+  {
+    "type": "file",
+    "name": "changelog",
+    "label": "Changelog"
   }
 ]

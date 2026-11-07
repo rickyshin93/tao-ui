@@ -85,7 +85,9 @@ export const QRCode = forwardRef<QRCodeRef, QRCodeProps>(
     const config = useTaoInternalConfig();
     const root = useRef<HTMLDivElement>(null);
     const [themeColor, setThemeColor] = useState('#000000');
-    useImperativeHandle(ref, () => ({ nativeElement: root.current! }));
+    useImperativeHandle<QRCodeRef | null, QRCodeRef | null>(ref, () =>
+      root.current ? { nativeElement: root.current } : null,
+    );
     useLayoutEffect(() => {
       if (root.current) setThemeColor(getComputedStyle(root.current).color);
     });
@@ -126,6 +128,8 @@ export const QRCode = forwardRef<QRCodeRef, QRCodeProps>(
         : undefined,
       role: 'img',
       'aria-label': rest['aria-label'] ?? title ?? 'QR Code',
+      'aria-labelledby': rest['aria-labelledby'],
+      'aria-describedby': rest['aria-describedby'],
     };
     return (
       <div

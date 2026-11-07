@@ -3,7 +3,8 @@ import {
   type NotificationProps,
   useNotification,
 } from '@rc-component/notification';
-import { type Key, type ReactNode, useEffect, useMemo, useRef } from 'react';
+import { useLayoutEffect } from '@rc-component/util';
+import { type Key, type ReactNode, useMemo, useRef } from 'react';
 import {
   TaoPortalScope,
   useTaoConfig,
@@ -141,43 +142,64 @@ function useNoticeHolder(
 
 type Life = { onClose?: () => void; resolve: (() => void)[] };
 
+function messageResult(promise: Promise<boolean>, close: () => void) {
+  return Object.assign(close, {
+    // biome-ignore lint/suspicious/noThenProperty: Ant Design message instances are intentionally callable thenables.
+    then: promise.then.bind(promise),
+  });
+}
+
 export function useAppMessages(config: AppMessageConfig = {}) {
   const [notices, holder] = useNoticeHolder('message', config);
   const active = useRef(new Map<Key, Life>());
   const sequence = useRef(0);
+  const disposed = useRef(false);
   const latest = useRef(config);
   latest.current = config;
-  useEffect(
-    () => () => {
+  useLayoutEffect(() => {
+    disposed.current = false;
+    return () => {
+      disposed.current = true;
       for (const life of active.current.values())
         for (const resolve of life.resolve) resolve();
       active.current.clear();
-    },
-    [],
-  );
-  const api = useMemo<AppMessageInstance>(() => {
-    const finish = (key: Key) => {
-      const life = active.current.get(key);
-      if (!life) return;
-      active.current.delete(key);
-      life.onClose?.();
-      for (const resolve of life.resolve) resolve();
     };
-    const close = (key: Key) => {
+  }, []);
+  const api = useMemo<AppMessageInstance>(() => {
+    const finish = (key: Key, life: Life) => {
+      if (active.current.get(key) !== life) return;
+      active.current.delete(key);
+      try {
+        life.onClose?.();
+      } finally {
+        for (const resolve of life.resolve) resolve();
+      }
+    };
+    const close = (key: Key, life = active.current.get(key)) => {
+      if (!life || active.current.get(key) !== life) return;
       notices.close(key);
-      finish(key);
+      finish(key, life);
     };
     const open = (args: AppMessageArgs): AppMessageType => {
+      if (disposed.current)
+        return messageResult(Promise.resolve(true), () => {});
       const defaults = latest.current;
       const key = args.key ?? `tao-app-message-${sequence.current++}`;
-      const resolvers = active.current.get(key)?.resolve ?? [];
-      const promise = new Promise<boolean>((resolve) =>
-        resolvers.push(() => resolve(true)),
-      );
-      active.current.set(key, { onClose: args.onClose, resolve: resolvers });
-      if (defaults.maxCount && active.current.size > defaults.maxCount)
-        close(active.current.keys().next().value as Key);
       const merged = { ...defaults, ...args };
+      const classNames = noticeClasses(
+        resolveAppSemantic(defaults.classNames, merged),
+        resolveAppSemantic(args.classNames, merged),
+      );
+      const styles = noticeStyles(
+        resolveAppSemantic(defaults.styles, merged),
+        resolveAppSemantic(args.styles, merged),
+      );
+      const life: Life = active.current.get(key) ?? { resolve: [] };
+      life.onClose = args.onClose;
+      const promise = new Promise<boolean>((resolve) =>
+        life.resolve.push(() => resolve(true)),
+      );
+      active.current.set(key, life);
       notices.open({
         ...args,
         key,
@@ -188,20 +210,15 @@ export function useAppMessages(config: AppMessageConfig = {}) {
         closable: false,
         placement: 'top',
         icon: iconFor(args.type, args.icon),
-        classNames: noticeClasses(
-          resolveAppSemantic(defaults.classNames, merged),
-          resolveAppSemantic(args.classNames, merged),
-        ),
-        styles: noticeStyles(
-          resolveAppSemantic(defaults.styles, merged),
-          resolveAppSemantic(args.styles, merged),
-        ),
-        onClose: () => finish(key),
+        classNames,
+        styles,
+        onClose: () => finish(key, life),
       });
-      return Object.assign(() => close(key), {
-        // biome-ignore lint/suspicious/noThenProperty: Ant Design message instances are intentionally callable thenables.
-        then: promise.then.bind(promise),
-      });
+      const maxCount = defaults.maxCount ?? 0;
+      while (maxCount > 0 && active.current.size > maxCount) {
+        close(active.current.keys().next().value!);
+      }
+      return messageResult(promise, () => close(key, life));
     };
     const typed =
       (type: AppNoticeType): AppMessageInstance['info'] =>

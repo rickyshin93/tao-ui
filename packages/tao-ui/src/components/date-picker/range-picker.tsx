@@ -33,7 +33,11 @@ import {
   type SemanticStyles,
 } from '../../utils/semantic';
 import { Drawer } from '../drawer/drawer';
+import { Button } from '../button/button';
 import { CalendarGrid } from './calendar/calendar-grid';
+import { MonthGrid } from './calendar/month-grid';
+import { YearGrid } from './calendar/year-grid';
+import { TimePanel } from './calendar/time-panel';
 import './date-picker.css';
 import { Presets } from './presets';
 import { formatPickerDate, parsePickerDate } from './date-localization';
@@ -149,6 +153,7 @@ export const RangePicker = forwardRef(function RangePicker(
   const endDisabled =
     (Array.isArray(disabled) ? disabled[1] : disabled) ?? ctx.disabled;
   const resolvedDisabled = startDisabled && endDisabled;
+  const defaultActiveInput = startDisabled && !endDisabled ? 'end' : 'start';
   const autoMobile = useIsMobile();
   const isMobile = mobile ?? autoMobile;
   const mobileTriggerRef = useRef<HTMLButtonElement>(null);
@@ -183,6 +188,9 @@ export const RangePicker = forwardRef(function RangePicker(
   );
 
   const fmt = formatProp ?? getDefaultFormat(picker, showTime);
+  const withTime = picker === 'date' && !!showTime;
+  const granularity = picker === 'date' ? 'day' : picker;
+  const orderUnit = withTime ? undefined : granularity;
   const dayjsLocale = ctx.locale.dayjsLocale;
   const numberLocale = ctx.locale.numberLocale;
   const formatValue = useCallback(
@@ -194,21 +202,27 @@ export const RangePicker = forwardRef(function RangePicker(
     (date: Dayjs) =>
       !date.isValid() ||
       Boolean(disabledDate?.(date)) ||
-      (minDate != null && date.isBefore(minDate, 'day')) ||
-      (maxDate != null && date.isAfter(maxDate, 'day')),
-    [disabledDate, minDate, maxDate],
+      (minDate != null && date.isBefore(minDate, granularity)) ||
+      (maxDate != null && date.isAfter(maxDate, granularity)),
+    [disabledDate, minDate, maxDate, granularity],
   );
   const isValueControlled = 'value' in props;
   const [internalValue, setInternalValue] = useState<RangeValue>(
     defaultValue ?? null,
   );
   const resolvedValue = isValueControlled ? (value ?? null) : internalValue;
+  const [timeDraft, setTimeDraft] = useState<RangeValue | undefined>();
   const emitChange = useCallback(
     (dates: RangeValue) => {
       if (resolvedDisabled) return false;
       const start = (startDisabled ? resolvedValue?.[0] : dates?.[0]) ?? null;
       const end = (endDisabled ? resolvedValue?.[1] : dates?.[1]) ?? null;
-      if ((startDisabled || endDisabled) && start && end && start.isAfter(end))
+      if (
+        (startDisabled || endDisabled) &&
+        start &&
+        end &&
+        start.isAfter(end, orderUnit)
+      )
         return false;
       const nextValue: RangeValue = start || end ? [start, end] : null;
       if (!isValueControlled) setInternalValue(nextValue);
@@ -223,33 +237,45 @@ export const RangePicker = forwardRef(function RangePicker(
       resolvedDisabled,
       resolvedValue,
       formatValue,
+      orderUnit,
     ],
   );
 
   const [internalOpen, setInternalOpen] = useState(false);
   const isOpen = controlledOpen ?? internalOpen;
+  const workingValue =
+    withTime && isOpen && timeDraft !== undefined ? timeDraft : resolvedValue;
+  const changeRange = useCallback(
+    (dates: RangeValue) => {
+      if (withTime) setTimeDraft(dates);
+      else emitChange(dates);
+    },
+    [withTime, emitChange],
+  );
   const [interaction, setInteraction] = useState<RangeInteraction>({
     phase: 'idle',
-    activeInput: 'start',
+    activeInput: defaultActiveInput,
   });
   const controlledValueKey = isValueControlled
     ? `${resolvedValue?.[0]?.valueOf() ?? 'null'}:${resolvedValue?.[1]?.valueOf() ?? 'null'}`
     : undefined;
   const setOpen = useCallback(
     (v: boolean) => {
-      if (v && resolvedDisabled) return;
+      if (v === isOpen || (v && resolvedDisabled)) return;
       setInternalOpen(v);
       onOpenChange?.(v);
     },
-    [onOpenChange, resolvedDisabled],
+    [isOpen, onOpenChange, resolvedDisabled],
   );
   useEffect(() => {
     if (!isOpen) {
-      setInteraction({ phase: 'idle', activeInput: 'start' });
+      setInteraction({ phase: 'idle', activeInput: defaultActiveInput });
+      setTimeDraft(undefined);
     }
-  }, [isOpen]);
+  }, [isOpen, defaultActiveInput]);
   useEffect(() => {
     if (controlledValueKey !== undefined) {
+      setTimeDraft(undefined);
       setInteraction((current) => ({
         phase: 'idle',
         activeInput:
@@ -264,23 +290,33 @@ export const RangePicker = forwardRef(function RangePicker(
   const wasOpenRef = useRef(false);
   useEffect(() => {
     if (isOpen && !wasOpenRef.current) {
+      const openAtEnd =
+        !endDisabled && (startDisabled || interaction.activeInput === 'end');
       setViewDateStart(
-        resolvedValue?.[interaction.activeInput === 'end' ? 1 : 0] ??
+        resolvedValue?.[openAtEnd ? 1 : 0] ??
           resolvedValue?.[0] ??
           resolvedValue?.[1] ??
           dayjs(),
       );
     }
     wasOpenRef.current = isOpen;
-  }, [isOpen, resolvedValue, interaction.activeInput]);
-  const viewDateEnd = viewDateStart.add(1, 'month');
+  }, [
+    isOpen,
+    resolvedValue,
+    interaction.activeInput,
+    startDisabled,
+    endDisabled,
+  ]);
+  const panelStep = picker === 'year' ? 10 : 1;
+  const panelUnit = picker === 'date' ? 'month' : 'year';
+  const viewDateEnd = viewDateStart.add(panelStep, panelUnit);
 
   const rangeStart =
     interaction.phase === 'pickingEnd'
       ? interaction.start
-      : (resolvedValue?.[0] ?? null);
+      : (workingValue?.[0] ?? null);
   const rangeEnd =
-    interaction.phase === 'pickingEnd' ? null : (resolvedValue?.[1] ?? null);
+    interaction.phase === 'pickingEnd' ? null : (workingValue?.[1] ?? null);
   const hoverDate =
     interaction.phase === 'pickingEnd' ? interaction.hover : null;
   const setHoverDate = useCallback((hover: Dayjs | null) => {
@@ -291,17 +327,33 @@ export const RangePicker = forwardRef(function RangePicker(
 
   const handleDateSelect = useCallback(
     (date: Dayjs) => {
+      const position =
+        startDisabled || (!endDisabled && interaction.activeInput === 'end')
+          ? 1
+          : 0;
+      const previous = workingValue?.[position] ?? resolvedValue?.[position];
+      if (withTime && previous) {
+        date = date
+          .hour(previous.hour())
+          .minute(previous.minute())
+          .second(previous.second())
+          .millisecond(previous.millisecond());
+      }
       if (startDisabled || endDisabled) {
-        if (!emitChange(startDisabled ? [rangeStart, date] : [date, rangeEnd]))
-          return;
+        const next: [Dayjs | null, Dayjs | null] = startDisabled
+          ? [rangeStart, date]
+          : [date, rangeEnd];
+        if (next[0] && next[1] && next[0].isAfter(next[1], granularity)) return;
+        changeRange(next);
         setInteraction({
           phase: 'idle',
           activeInput: startDisabled ? 'end' : 'start',
         });
-        if (!showTime) setOpen(false);
+        if (!withTime) setOpen(false);
         return;
       }
       if (interaction.phase === 'idle' && interaction.activeInput === 'start') {
+        if (withTime) setTimeDraft([date, workingValue?.[1] ?? null]);
         setInteraction({
           phase: 'pickingEnd',
           activeInput: 'end',
@@ -312,23 +364,27 @@ export const RangePicker = forwardRef(function RangePicker(
         let start =
           interaction.phase === 'pickingEnd' ? interaction.start : rangeStart;
         let end = date;
-        if (start && date.isBefore(start)) {
+        if (start && date.isBefore(start, orderUnit)) {
           [start, end] = [date, start];
         }
-        emitChange([start, end]);
+        changeRange([start, end]);
         setInteraction({ phase: 'idle', activeInput: 'start' });
-        if (!showTime) setOpen(false);
+        if (!withTime) setOpen(false);
       }
     },
     [
       interaction,
       rangeStart,
       rangeEnd,
-      emitChange,
+      changeRange,
       startDisabled,
       endDisabled,
-      showTime,
+      withTime,
+      workingValue,
+      resolvedValue,
       setOpen,
+      granularity,
+      orderUnit,
     ],
   );
 
@@ -336,6 +392,7 @@ export const RangePicker = forwardRef(function RangePicker(
     (e: React.SyntheticEvent) => {
       e.stopPropagation();
       emitChange(null);
+      setTimeDraft(undefined);
       setInteraction({ phase: 'idle', activeInput: 'start' });
     },
     [emitChange],
@@ -347,14 +404,33 @@ export const RangePicker = forwardRef(function RangePicker(
       if (
         (!startDisabled && isDateBlocked(s)) ||
         (!endDisabled && isDateBlocked(e)) ||
-        (!startDisabled && !endDisabled && s.isAfter(e))
+        (!startDisabled && !endDisabled && s.isAfter(e, orderUnit))
       )
         return;
-      if (!emitChange([s, e])) return;
+      const next: [Dayjs | null, Dayjs | null] = [
+        startDisabled ? (resolvedValue?.[0] ?? null) : s,
+        endDisabled ? (resolvedValue?.[1] ?? null) : e,
+      ];
+      if (
+        resolvedDisabled ||
+        (next[0] && next[1] && next[0].isAfter(next[1], orderUnit))
+      )
+        return;
+      changeRange(next);
       setInteraction({ phase: 'idle', activeInput: 'start' });
-      setOpen(false);
+      if (!withTime) setOpen(false);
     },
-    [emitChange, setOpen, isDateBlocked, startDisabled, endDisabled],
+    [
+      changeRange,
+      setOpen,
+      isDateBlocked,
+      startDisabled,
+      endDisabled,
+      resolvedValue,
+      resolvedDisabled,
+      withTime,
+      orderUnit,
+    ],
   );
 
   const displayStart = formatValue(rangeStart);
@@ -364,6 +440,38 @@ export const RangePicker = forwardRef(function RangePicker(
 
   useEffect(() => setInputStart(displayStart), [displayStart]);
   useEffect(() => setInputEnd(displayEnd), [displayEnd]);
+
+  const editingStart = interaction.activeInput === 'start';
+  const typedText = (editingStart ? inputStart : inputEnd).trim();
+  const hasTypedEdit = typedText !== (editingStart ? displayStart : displayEnd);
+  const typedValue = useMemo(() => {
+    if (!typedText || !hasTypedEdit) return null;
+    const parsed = parsePickerDate(typedText, fmt, dayjsLocale, numberLocale);
+    if (
+      isDateBlocked(parsed) ||
+      (editingStart && rangeEnd && parsed.isAfter(rangeEnd, orderUnit)) ||
+      (!editingStart && rangeStart && parsed.isBefore(rangeStart, orderUnit))
+    )
+      return null;
+    return parsed;
+  }, [
+    editingStart,
+    typedText,
+    hasTypedEdit,
+    fmt,
+    dayjsLocale,
+    numberLocale,
+    isDateBlocked,
+    rangeStart,
+    rangeEnd,
+    orderUnit,
+  ]);
+  const panelStart = editingStart ? (typedValue ?? rangeStart) : rangeStart;
+  const panelEnd = editingStart ? rangeEnd : (typedValue ?? rangeEnd);
+
+  useEffect(() => {
+    if (typedValue) setViewDateStart(typedValue);
+  }, [typedValue]);
 
   const commitInputValue = useCallback(
     (position: 'start' | 'end', keepPopupOpen = false) => {
@@ -378,10 +486,10 @@ export const RangePicker = forwardRef(function RangePicker(
         (isDateBlocked(parsed) ||
           (position === 'start' &&
             rangeEnd != null &&
-            parsed.isAfter(rangeEnd)) ||
+            parsed.isAfter(rangeEnd, orderUnit)) ||
           (position === 'end' &&
             rangeStart != null &&
-            parsed.isBefore(rangeStart)));
+            parsed.isBefore(rangeStart, orderUnit)));
 
       if (isBlocked) {
         if (position === 'start') setInputStart(currentValue);
@@ -396,14 +504,20 @@ export const RangePicker = forwardRef(function RangePicker(
         formatValue(nextEnd),
       ];
       if (nextStrings[0] !== displayStart || nextStrings[1] !== displayEnd) {
-        emitChange(nextStart || nextEnd ? [nextStart, nextEnd] : null);
+        changeRange(nextStart || nextEnd ? [nextStart, nextEnd] : null);
+        if (withTime && !isOpen) setOpen(true);
       }
       setInteraction({ phase: 'idle', activeInput: position });
       if (parsed && !keepPopupOpen) setViewDateStart(parsed);
       if (position === 'start')
-        setInputStart(isValueControlled ? displayStart : nextStrings[0]);
-      else setInputEnd(isValueControlled ? displayEnd : nextStrings[1]);
-      if (nextStart && nextEnd && !keepPopupOpen) setOpen(false);
+        setInputStart(
+          isValueControlled && !withTime ? displayStart : nextStrings[0],
+        );
+      else
+        setInputEnd(
+          isValueControlled && !withTime ? displayEnd : nextStrings[1],
+        );
+      if (nextStart && nextEnd && !keepPopupOpen && !withTime) setOpen(false);
     },
     [
       isDateBlocked,
@@ -411,7 +525,9 @@ export const RangePicker = forwardRef(function RangePicker(
       endDisabled,
       displayEnd,
       displayStart,
-      emitChange,
+      changeRange,
+      withTime,
+      isOpen,
       fmt,
       dayjsLocale,
       numberLocale,
@@ -422,6 +538,7 @@ export const RangePicker = forwardRef(function RangePicker(
       rangeEnd,
       rangeStart,
       setOpen,
+      orderUnit,
     ],
   );
 
@@ -433,9 +550,36 @@ export const RangePicker = forwardRef(function RangePicker(
     Boolean(
       resolvedDisabled ||
         disabledDate?.(date) ||
-        (startDisabled && rangeStart && date.isBefore(rangeStart, 'day')) ||
-        (endDisabled && rangeEnd && date.isAfter(rangeEnd, 'day')),
+        (startDisabled &&
+          rangeStart &&
+          date.isBefore(rangeStart, granularity)) ||
+        (endDisabled && rangeEnd && date.isAfter(rangeEnd, granularity)),
     );
+
+  const periodTitle = (date: Dayjs) =>
+    picker === 'date'
+      ? ctx.locale.monthTitle(date.month(), date.year())
+      : picker === 'month'
+        ? date.format('YYYY')
+        : `${Math.floor(date.year() / 10) * 10} – ${Math.floor(date.year() / 10) * 10 + 9}`;
+
+  const canConfirm =
+    !resolvedDisabled &&
+    (!hasTypedEdit || typedValue !== null) &&
+    (startDisabled || (panelStart != null && !isDateBlocked(panelStart))) &&
+    (endDisabled || (panelEnd != null && !isDateBlocked(panelEnd))) &&
+    !(panelStart && panelEnd && panelStart.isAfter(panelEnd, orderUnit));
+
+  const confirmTimeRange = () => {
+    if (!canConfirm || !emitChange([panelStart, panelEnd])) return;
+    const committedStart = isValueControlled ? resolvedValue?.[0] : panelStart;
+    const committedEnd = isValueControlled ? resolvedValue?.[1] : panelEnd;
+    setInputStart(formatValue(committedStart));
+    setInputEnd(formatValue(committedEnd));
+    setTimeDraft(undefined);
+    setInteraction({ phase: 'idle', activeInput: 'start' });
+    setOpen(false);
+  };
 
   const panelContent = (
     <div
@@ -446,98 +590,156 @@ export const RangePicker = forwardRef(function RangePicker(
       {/* Shared header: << < [Left Month Year]  [Right Month Year] > >> */}
       <div data-tao-range-header="">
         <div data-tao-calendar-nav="">
+          {picker === 'date' && (
+            <button
+              type="button"
+              data-tao-calendar-nav-btn=""
+              onClick={() =>
+                setViewDateStart(viewDateStart.subtract(1, 'year'))
+              }
+              aria-label={ctx.locale.previousYear}
+            >
+              <DoubleLeftIcon />
+            </button>
+          )}
           <button
             type="button"
             data-tao-calendar-nav-btn=""
-            onClick={() => setViewDateStart(viewDateStart.subtract(1, 'year'))}
-            aria-label={ctx.locale.previousYear}
-          >
-            <DoubleLeftIcon />
-          </button>
-          <button
-            type="button"
-            data-tao-calendar-nav-btn=""
-            onClick={() => setViewDateStart(viewDateStart.subtract(1, 'month'))}
-            aria-label={ctx.locale.previousMonth}
+            onClick={() =>
+              setViewDateStart(viewDateStart.subtract(panelStep, panelUnit))
+            }
+            aria-label={
+              picker === 'date'
+                ? ctx.locale.previousMonth
+                : picker === 'month'
+                  ? ctx.locale.previousYear
+                  : ctx.locale.previous
+            }
           >
             <LeftIcon />
           </button>
         </div>
         <div data-tao-range-titles="">
-          <span data-tao-range-title="">
-            {ctx.locale.monthTitle(viewDateStart.month(), viewDateStart.year())}
-          </span>
-          <span data-tao-range-title="">
-            {ctx.locale.monthTitle(viewDateEnd.month(), viewDateEnd.year())}
-          </span>
+          <span data-tao-range-title="">{periodTitle(viewDateStart)}</span>
+          <span data-tao-range-title="">{periodTitle(viewDateEnd)}</span>
         </div>
         <div data-tao-calendar-nav="">
           <button
             type="button"
             data-tao-calendar-nav-btn=""
-            onClick={() => setViewDateStart(viewDateStart.add(1, 'month'))}
-            aria-label={ctx.locale.nextMonth}
+            onClick={() =>
+              setViewDateStart(viewDateStart.add(panelStep, panelUnit))
+            }
+            aria-label={
+              picker === 'date'
+                ? ctx.locale.nextMonth
+                : picker === 'month'
+                  ? ctx.locale.nextYear
+                  : ctx.locale.next
+            }
           >
             <RightIcon />
           </button>
-          <button
-            type="button"
-            data-tao-calendar-nav-btn=""
-            onClick={() => setViewDateStart(viewDateStart.add(1, 'year'))}
-            aria-label={ctx.locale.nextYear}
-          >
-            <DoubleRightIcon />
-          </button>
+          {picker === 'date' && (
+            <button
+              type="button"
+              data-tao-calendar-nav-btn=""
+              onClick={() => setViewDateStart(viewDateStart.add(1, 'year'))}
+              aria-label={ctx.locale.nextYear}
+            >
+              <DoubleRightIcon />
+            </button>
+          )}
         </div>
       </div>
       <div data-tao-range-panels="">
-        {/* Left panel */}
-        <div data-tao-picker-panel="">
-          <div data-tao-picker-body="">
-            <CalendarGrid
-              viewDate={viewDateStart}
-              rangeStart={rangeStart}
-              rangeEnd={rangeEnd}
-              hoverDate={hoverDate}
-              onSelect={handleDateSelect}
-              onViewDateChange={setViewDateStart}
-              onHover={setHoverDate}
-              disabledDate={isDateDisabled}
-              minDate={minDate}
-              maxDate={maxDate}
-              className={classNames?.calendar}
-              style={styles?.calendar}
-              cellClassName={classNames?.cell}
-              cellStyle={styles?.cell}
-            />
-          </div>
-        </div>
-        {/* Right panel */}
-        <div data-tao-picker-panel="">
-          <div data-tao-picker-body="">
-            <CalendarGrid
-              viewDate={viewDateEnd}
-              rangeStart={rangeStart}
-              rangeEnd={rangeEnd}
-              hoverDate={hoverDate}
-              onSelect={handleDateSelect}
-              onViewDateChange={(date) =>
-                setViewDateStart(date.subtract(1, 'month'))
-              }
-              onHover={setHoverDate}
-              disabledDate={isDateDisabled}
-              minDate={minDate}
-              maxDate={maxDate}
-              className={classNames?.calendar}
-              style={styles?.calendar}
-              cellClassName={classNames?.cell}
-              cellStyle={styles?.cell}
-            />
-          </div>
-        </div>
+        {[viewDateStart, viewDateEnd].map((date, index) => {
+          const shared = {
+            viewDate: date,
+            rangeStart: panelStart,
+            rangeEnd: panelEnd,
+            onSelect: handleDateSelect,
+            disabledDate: isDateDisabled,
+            minDate,
+            maxDate,
+            className: classNames?.calendar,
+            style: styles?.calendar,
+            cellClassName: classNames?.cell,
+            cellStyle: styles?.cell,
+          };
+          const endpoint = index === 0 ? panelStart : panelEnd;
+          const disabledEndpoint = index === 0 ? startDisabled : endDisabled;
+          return (
+            <div key={index === 0 ? 'start' : 'end'} data-tao-picker-panel="">
+              <div data-tao-picker-body="">
+                {picker === 'month' ? (
+                  <MonthGrid {...shared} />
+                ) : picker === 'year' ? (
+                  <YearGrid {...shared} />
+                ) : (
+                  <CalendarGrid
+                    {...shared}
+                    hoverDate={hoverDate}
+                    onViewDateChange={(next) =>
+                      setViewDateStart(
+                        index === 0
+                          ? next
+                          : next.subtract(panelStep, panelUnit),
+                      )
+                    }
+                    onHover={setHoverDate}
+                  />
+                )}
+              </div>
+              {withTime && (
+                <fieldset
+                  data-tao-range-time=""
+                  disabled={disabledEndpoint || !endpoint}
+                >
+                  <legend>{placeholder[index]}</legend>
+                  <TimePanel
+                    hour={endpoint?.hour() ?? 0}
+                    minute={endpoint?.minute() ?? 0}
+                    second={endpoint?.second() ?? 0}
+                    onChange={(hour, minute, second) => {
+                      if (!endpoint || disabledEndpoint) return;
+                      const next = endpoint
+                        .hour(hour)
+                        .minute(minute)
+                        .second(second);
+                      setTimeDraft(
+                        index === 0 ? [next, panelEnd] : [panelStart, next],
+                      );
+                      if (index === 0) setInputStart(formatValue(next));
+                      else setInputEnd(formatValue(next));
+                      if (index === 0 && interaction.phase === 'pickingEnd') {
+                        setInteraction({ ...interaction, start: next });
+                      }
+                    }}
+                  />
+                </fieldset>
+              )}
+            </div>
+          );
+        })}
       </div>
       {presets && presets.length > 0 && (
-        <Presets items={presets} onSelect={handlePresetSelect} />
+        <Presets
+          items={presets}
+          disabled={resolvedDisabled}
+          onSelect={handlePresetSelect}
+        />
+      )}
+      {withTime && (
+        <div data-tao-picker-footer="">
+          <Button
+            size="small"
+            disabled={!canConfirm}
+            onClick={confirmTimeRange}
+          >
+            {ctx.locale.ok}
+          </Button>
+        </div>
       )}
     </div>
   );
@@ -551,6 +753,7 @@ export const RangePicker = forwardRef(function RangePicker(
         // biome-ignore lint/a11y/useSemanticElements: shared by the mobile button trigger, where nesting a button would be invalid HTML.
         <span
           data-tao-picker-clear=""
+          onMouseDown={(event) => event.preventDefault()}
           onClick={(event) => {
             event.stopPropagation();
             handleClear(event);
@@ -591,30 +794,44 @@ export const RangePicker = forwardRef(function RangePicker(
     if (!popup) return;
     const selectedDate =
       activeDate && !isDateBlocked(activeDate) ? activeDate : null;
+    const periodKey = (date: Dayjs) =>
+      picker === 'year'
+        ? Math.floor(date.year() / 10)
+        : date.startOf(panelUnit).valueOf();
     if (
       selectedDate &&
-      !selectedDate.isSame(viewDateStart, 'month') &&
-      !selectedDate.isSame(viewDateStart.add(1, 'month'), 'month')
+      periodKey(selectedDate) !== periodKey(viewDateStart) &&
+      periodKey(selectedDate) !==
+        periodKey(viewDateStart.add(panelStep, panelUnit))
     ) {
       setViewDateStart(selectedDate);
       return;
     }
+    const cellFormat =
+      picker === 'month'
+        ? 'YYYY-MM'
+        : picker === 'year'
+          ? 'YYYY'
+          : 'YYYY-MM-DD';
     let target = selectedDate
       ? popup.querySelector<HTMLButtonElement>(
-          `[data-tao-calendar-cell-button][aria-label="${selectedDate.format('YYYY-MM-DD')}"]:not([data-tao-other-month]):not(:disabled)`,
+          `[data-tao-calendar-date="${selectedDate.format(cellFormat)}"]:not([data-tao-other-month]):not(:disabled)`,
         )
       : null;
     target ??=
       popup.querySelector<HTMLButtonElement>(
-        '[data-tao-calendar-cell-button][tabindex="0"]:not(:disabled)',
+        '[data-tao-calendar-date][tabindex="0"]:not(:disabled)',
       ) ??
       popup.querySelector<HTMLButtonElement>(
-        'button[aria-pressed="true"]:not(:disabled)',
+        '[data-tao-calendar-date][aria-pressed="true"]:not(:disabled)',
+      ) ??
+      popup.querySelector<HTMLButtonElement>(
+        '[data-tao-calendar-date]:not(:disabled)',
       ) ??
       popup.querySelector<HTMLButtonElement>('button:not(:disabled)');
     target?.focus();
     setKeyboardFocusRequested(false);
-  }, [activeDate, isDateBlocked, viewDateStart]);
+  }, [activeDate, isDateBlocked, panelStep, panelUnit, picker, viewDateStart]);
 
   useEffect(() => {
     if (isOpen && keyboardFocusRequested) focusCalendar();
@@ -686,7 +903,12 @@ export const RangePicker = forwardRef(function RangePicker(
       dir={direction}
       data-tao-control=""
       data-tao-range-trigger=""
-      onClick={() => !resolvedDisabled && setOpen(!isOpen)}
+      onClick={(event) => {
+        const clickedInput =
+          event.target === startInputRef.current ||
+          event.target === endInputRef.current;
+        if (!resolvedDisabled) setOpen(clickedInput || !isOpen);
+      }}
       data-tao-size={resolvedSize}
       data-tao-variant={resolvedVariant}
       data-tao-error={status === 'error' || undefined}
@@ -741,9 +963,14 @@ export const RangePicker = forwardRef(function RangePicker(
             !!popupRef.current?.contains(event.relatedTarget);
           // ArrowDown already committed before requesting calendar focus.
           if (enteringCalendar && keyboardFocusRequested) return;
-          commitInputValue('start', enteringCalendar);
+          setKeyboardFocusRequested(false);
+          commitInputValue(
+            'start',
+            enteringCalendar || event.relatedTarget === endInputRef.current,
+          );
         }}
         onKeyDown={(event) => {
+          if (event.nativeEvent.isComposing || event.keyCode === 229) return;
           if (event.key === 'ArrowDown') {
             event.preventDefault();
             openFromKeyboard();
@@ -803,9 +1030,14 @@ export const RangePicker = forwardRef(function RangePicker(
             event.relatedTarget instanceof HTMLElement &&
             !!popupRef.current?.contains(event.relatedTarget);
           if (enteringCalendar && keyboardFocusRequested) return;
-          commitInputValue('end', enteringCalendar);
+          setKeyboardFocusRequested(false);
+          commitInputValue(
+            'end',
+            enteringCalendar || event.relatedTarget === startInputRef.current,
+          );
         }}
         onKeyDown={(event) => {
+          if (event.nativeEvent.isComposing || event.keyCode === 229) return;
           if (event.key === 'ArrowDown') {
             event.preventDefault();
             openFromKeyboard();
@@ -854,6 +1086,15 @@ export const RangePicker = forwardRef(function RangePicker(
             align="start"
             className={classNames?.popup}
             style={styles?.popup}
+            onInteractOutside={(event) => {
+              if (
+                startInputRef.current?.parentElement?.contains(
+                  event.target as Node,
+                )
+              ) {
+                event.preventDefault();
+              }
+            }}
             onOpenAutoFocus={(event) => {
               event.preventDefault();
               if (keyboardFocusRequested) focusCalendar();

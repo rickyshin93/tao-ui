@@ -76,6 +76,30 @@ function assert(condition, message) {
   }
 }
 
+function readChangelogEntry(locale, repoRoot) {
+  const path = relative(
+    repoRoot,
+    join(packageDir, 'docs', locale, 'guide', 'changelog.md'),
+  );
+  const source = `HEAD:${path}`;
+  assert(
+    refExists(['cat-file', '-e', source], repoRoot),
+    `Commit ${path} before releasing.`,
+  );
+  const entry = read('git', ['show', source], { cwd: repoRoot })
+    .split(/^## /m)
+    .slice(1)
+    .filter((section) => section.split('\n', 1)[0].trim() === version);
+  const body = entry[0]?.split('\n').slice(1).join('\n').trim();
+  assert(
+    entry.length === 1 &&
+      /^\d{4}-\d{2}-\d{2}\n/.test(body ?? '') &&
+      /^- \S/m.test(body ?? ''),
+    `Commit one dated "## ${version}" section with change entries in ${path} before releasing.`,
+  );
+  return body;
+}
+
 if (!version) {
   usage();
   process.exit(1);
@@ -116,6 +140,11 @@ assert(
   branch === 'main',
   `Release must run from main, current branch is ${branch}`,
 );
+
+const englishNotes = readChangelogEntry('en', repoRoot);
+readChangelogEntry('zh', repoRoot);
+const docsUrl = 'https://rickyshin93.github.io/tao-ui';
+const releaseNotes = `${englishNotes.replace(/\]\(\/(?!\/)/g, `](${docsUrl}/`)}\n\n[简体中文更新日志](${docsUrl}/zh/guide/changelog)\n`;
 
 const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf8'));
 assert(
@@ -206,11 +235,11 @@ run('git', ['tag', tag], { cwd: repoRoot });
 run('git', ['push', 'origin', 'main'], { cwd: repoRoot });
 run('git', ['push', 'origin', tag], { cwd: repoRoot });
 
-run(
-  'gh',
-  ['release', 'create', tag, '--title', tag, '--notes', `Release ${tag}`],
-  { cwd: repoRoot },
-);
+run('gh', ['release', 'create', tag, '--title', tag, '--notes-file', '-'], {
+  cwd: repoRoot,
+  input: releaseNotes,
+  stdio: ['pipe', 'inherit', 'inherit'],
+});
 
 let runId;
 for (let attempt = 0; attempt < 20; attempt++) {

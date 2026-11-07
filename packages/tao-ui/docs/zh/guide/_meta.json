@@ -8,5 +8,10 @@
     "type": "file",
     "name": "agents",
     "label": "AI Agent 接入"
+  },
+  {
+    "type": "file",
+    "name": "changelog",
+    "label": "更新日志"
   }
 ]

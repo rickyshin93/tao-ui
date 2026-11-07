@@ -6,6 +6,10 @@ import RcCascader, {
   Panel as RcPanel,
   type SearchConfig,
 } from '@rc-component/cascader';
+import type { SingleValueType } from '@rc-component/cascader/es/Cascader';
+import { fillFieldNames } from '@rc-component/cascader/es/utils/commonUtil';
+import { toPathOptions } from '@rc-component/cascader/es/utils/treeUtil';
+import isEqual from '@rc-component/util/es/isEqual';
 import {
   type CSSProperties,
   forwardRef,
@@ -196,6 +200,7 @@ function InternalCascader<
     setMobilePresentation(requestedMobile);
   }
   const isMobile = (open ? mobilePresentation : requestedMobile) ?? false;
+  const mobileOpen = isMobile && !!open && !disabled;
   const title = useMobileTitle(mobileTitle, config.locale.select);
   const triggerRef = useRef<CascaderRef>(null);
   const [direction, directionRef] = useTaoDirection(props.direction);
@@ -208,16 +213,22 @@ function InternalCascader<
   );
   type ChangeArgs = Parameters<NonNullable<typeof onChange>>;
   const [internalValue, setInternalValue] = useState(defaultValue);
-  const value = valueProp !== undefined ? valueProp : internalValue;
-  const [draft, setDraft] = useState<ChangeArgs>();
-  const [previousOpen, setPreviousOpen] = useState(open);
-  if (previousOpen !== open) {
-    setPreviousOpen(open);
+  const value = 'value' in props ? valueProp : internalValue;
+  const [draft, setDraft] = useState<ChangeArgs[0]>();
+  const draftSource = mobileOpen && multiple ? (value ?? null) : undefined;
+  const [previousDraftSource, setPreviousDraftSource] = useState(draftSource);
+  if (!isEqual(previousDraftSource, draftSource)) {
+    setPreviousDraftSource(draftSource);
     setDraft(undefined);
   }
   const [mobileContainer, setMobileContainer] =
     useState<HTMLFieldSetElement | null>(null);
   const [internalSearch, setInternalSearch] = useState('');
+  const [previousMobileOpen, setPreviousMobileOpen] = useState(mobileOpen);
+  if (previousMobileOpen !== mobileOpen) {
+    setPreviousMobileOpen(mobileOpen);
+    if (!mobileOpen) setInternalSearch('');
+  }
   const searchConfig = typeof showSearch === 'object' ? showSearch : {};
   const searchValue =
     searchConfig.searchValue ?? searchValueProp ?? internalSearch;
@@ -226,11 +237,12 @@ function InternalCascader<
     (searchConfig.onSearch ?? onSearch)?.(next);
   };
   const changeOpen = (next: boolean) => {
-    setInternalOpen(next);
-    setDraft(undefined);
-    if (!next && isMobile) {
-      if (searchValue) changeSearch('');
-      triggerRef.current?.focus();
+    if (openProp === undefined) {
+      setInternalOpen(next);
+      if (!next && isMobile) {
+        if (searchValue) changeSearch('');
+        triggerRef.current?.focus();
+      }
     }
     (onOpenChange ?? onPopupVisibleChange ?? onDropdownVisibleChange)?.(next);
   };
@@ -239,12 +251,18 @@ function InternalCascader<
     onChange?.(...args);
   };
   const changeValue = (...args: ChangeArgs) => {
-    if (isMobile && open && multiple) {
-      setDraft(args);
+    if (mobileOpen && multiple) {
+      setDraft(args[0]);
+      if (
+        searchConfig.autoClearSearchValue ??
+        props.autoClearSearchValue ??
+        true
+      )
+        setInternalSearch('');
       return;
     }
     commit(...args);
-    if (isMobile && open) {
+    if (mobileOpen) {
       const selected = args[1] as OptionType[];
       const last = selected?.at(-1);
       const children = last?.[props.fieldNames?.children ?? 'children'];
@@ -260,11 +278,13 @@ function InternalCascader<
       return;
     const keyCode = NAVIGATION_KEYS[event.key];
     if (!keyCode) return;
-    event.preventDefault();
+    if (event.type === 'keydown') event.preventDefault();
     // Keep the engine's path navigation and disabled-option handling while
     // keyboard focus stays inside the drawer.
-    triggerRef.current?.nativeElement.querySelector('input')?.dispatchEvent(
-      new KeyboardEvent('keydown', {
+    const trigger = triggerRef.current?.nativeElement;
+    const target = props.children ? trigger : trigger?.querySelector('input');
+    target?.dispatchEvent(
+      new KeyboardEvent(event.type, {
         key: event.key,
         keyCode,
         which: keyCode,
@@ -281,7 +301,7 @@ function InternalCascader<
         direction={direction}
         {...{ dir: direction }}
         open={open}
-        value={(isMobile && open && multiple && draft ? draft[0] : value) ?? []}
+        value={(mobileOpen && multiple ? (draft ?? value) : value) ?? []}
         onChange={changeValue}
         showSearch={
           isMobile && showSearch
@@ -374,7 +394,7 @@ function InternalCascader<
       />
       {isMobile && (
         <Drawer
-          open={open && !disabled}
+          open={mobileOpen}
           onClose={() => changeOpen(false)}
           placement="bottom"
           title={title}
@@ -388,7 +408,36 @@ function InternalCascader<
                 style={{ width: '100%' }}
                 disabled={disabled}
                 onClick={() => {
-                  if (draft) commit(...draft);
+                  if (draft) {
+                    const fields = fillFieldNames(
+                      props.fieldNames as FieldNames,
+                    );
+                    const original = (value ?? []) as SingleValueType[];
+                    const available = (draft as SingleValueType[]).flatMap(
+                      (path) => {
+                        const selected = toPathOptions(
+                          path,
+                          props.options ?? [],
+                          fields,
+                        ).map(({ option }) => option);
+                        const selectable =
+                          selected.every(Boolean) && !selected.at(-1)?.disabled;
+                        return selectable ||
+                          original.some((committed) => isEqual(committed, path))
+                          ? [{ path, selected }]
+                          : [];
+                      },
+                    );
+                    const paths = available.map(({ path }) => path);
+                    if (!isEqual(paths, original)) {
+                      commit(
+                        paths as ChangeArgs[0],
+                        available.map(
+                          ({ selected }) => selected,
+                        ) as ChangeArgs[1],
+                      );
+                    }
+                  }
                   changeOpen(false);
                 }}
               >
@@ -407,6 +456,7 @@ function InternalCascader<
               disabled={disabled}
               onChange={(event) => changeSearch(event.target.value)}
               onKeyDown={navigateMobile}
+              onKeyUp={navigateMobile}
             />
           )}
           <fieldset
@@ -416,6 +466,7 @@ function InternalCascader<
             aria-label={config.locale.select}
             tabIndex={showSearch ? -1 : 0}
             onKeyDown={navigateMobile}
+            onKeyUp={navigateMobile}
           />
         </Drawer>
       )}
@@ -473,6 +524,7 @@ export function CascaderPanel<
     notFoundContent = config.locale.noResults,
     expandIcon = <ExpandIcon />,
     loadingIcon = <Spinner size="small" />,
+    value,
     ...rest
   } = props;
   const [direction, directionRef] = useTaoDirection(props.direction);
@@ -488,6 +540,7 @@ export function CascaderPanel<
       <RcPanel<OptionType, ValueField, Multiple>
         {...rest}
         direction={direction}
+        value={'value' in props ? (value ?? []) : undefined}
         prefixCls={prefixCls}
         checkable={multiple}
         disabled={disabled}

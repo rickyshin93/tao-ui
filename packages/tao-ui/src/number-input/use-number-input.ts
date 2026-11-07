@@ -180,6 +180,25 @@ export function useNumberInput(
     if (displayBuffer !== display) setDisplayBuffer(display);
   }, [value, isValueControlled]);
 
+  useEffect(() => {
+    if (isValueControlled) return;
+    const form = inputRef.current?.form;
+    const reset = (event: Event) => {
+      queueMicrotask(() => {
+        if (event.defaultPrevented) return;
+        pendingCursorRef.current = null;
+        const initial = defaultValue ?? '';
+        setBuffer({
+          display: format(isPercentage ? toPercent(initial) : initial, fmtOpts),
+          format: fmtOpts,
+          isPercentage,
+        });
+      });
+    };
+    form?.addEventListener('reset', reset);
+    return () => form?.removeEventListener('reset', reset);
+  }, [defaultValue, fmtOpts, isPercentage, isValueControlled]);
+
   // Apply pending cursor after buffer commit.
   useLayoutEffect(() => {
     const pending = pendingCursorRef.current;
@@ -219,8 +238,12 @@ export function useNumberInput(
       : (inputRef.current?.value ?? displayBuffer);
     let canonical = parse(raw, fmtOpts);
     canonical = padOnBlur(canonical, decimalPlaces, padMode);
-    let actual = isPercentage ? fromPercent(canonical) : canonical;
-    actual = clampToRange(actual, min, max);
+    const beforeClamp = isPercentage ? fromPercent(canonical) : canonical;
+    const bounded = clampToRange(beforeClamp, min, max);
+    const actual =
+      !isPercentage && decimalPlaces > 0 && bounded !== beforeClamp
+        ? padOnBlur(bounded, decimalPlaces, padMode)
+        : bounded;
     const canonicalAfter = isPercentage ? toPercent(actual) : actual;
     const newDisplay = format(canonicalAfter, fmtOpts);
     setDisplayBuffer(newDisplay);
@@ -233,12 +256,14 @@ export function useNumberInput(
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key !== 'Backspace') return;
+    if (e.key !== 'Backspace' || e.nativeEvent.isComposing || e.keyCode === 229)
+      return;
     const el = inputRef.current;
     if (!el) return;
     const cursor = el.selectionStart ?? 0;
     if (
       cursor > 0 &&
+      el.selectionEnd === cursor &&
       isThousandSepBeforeCursor(displayBuffer, cursor, thousandsSeparator)
     ) {
       el.setSelectionRange(cursor - 1, cursor - 1);

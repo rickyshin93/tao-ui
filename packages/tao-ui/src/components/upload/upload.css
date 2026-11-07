@@ -114,6 +114,13 @@
     height: 100%;
     object-fit: contain;
   }
+  [data-tao-upload-preview] img {
+    display: block;
+    max-width: 100%;
+    max-height: 70dvh;
+    margin-inline: auto;
+    object-fit: contain;
+  }
   [data-tao-upload][data-list-type="picture"] [data-tao-upload-item] {
     padding: var(--tao-padding-xs);
     border: 1px solid var(--tao-color-border-secondary);

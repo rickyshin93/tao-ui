@@ -16,6 +16,7 @@ import { flushSync } from 'react-dom';
 import { useTaoConfig } from '../../provider/tao-provider';
 import { cx } from '../../utils/semantic';
 import { Button } from '../button/button';
+import { Modal } from '../modal/modal';
 import { Progress } from '../progress/progress';
 import type {
   DraggerProps,
@@ -33,6 +34,16 @@ const RcUploaderComponent = /*#__PURE__*/ interopDefault(RcUploader);
 export type * from './upload-types';
 
 const LIST_IGNORE = '__TAO_UPLOAD_LIST_IGNORE__';
+type UploadPreparation = {
+  action?: string;
+  data?: Record<string, unknown>;
+  error?: Error;
+};
+
+function asError(reason: unknown) {
+  return reason instanceof Error ? reason : new Error(String(reason));
+}
+
 function toFile(file: BaseRcFile): UploadFile {
   return {
     uid: file.uid,
@@ -53,6 +64,14 @@ function readPreview(file: File | Blob, failureMessage: string) {
     reader.readAsDataURL(file);
   });
 }
+function sameUploadFile(file: UploadFile, candidate?: UploadFile) {
+  if (!candidate) return false;
+  if (file.originFileObj || candidate.originFileObj) {
+    return file.originFileObj === candidate.originFileObj;
+  }
+  return file.name === candidate.name && file.url === candidate.url;
+}
+
 function FilePreview({
   file,
   previewFile,
@@ -64,13 +83,15 @@ function FilePreview({
   const [preview, setPreview] = useState<string>();
   const [error, setError] = useState<string>();
   useEffect(() => {
+    setPreview(undefined);
+    setError(undefined);
     if (file.thumbUrl || file.url || !file.originFileObj) return;
     let active = true;
-    Promise.resolve(
+    const load = async (source: File) =>
       previewFile
-        ? previewFile(file.originFileObj)
-        : readPreview(file.originFileObj, locale.messages.readFileError),
-    ).then(
+        ? previewFile(source)
+        : readPreview(source, locale.messages.readFileError);
+    load(file.originFileObj).then(
       (value) => {
         if (active) setPreview(value);
       },
@@ -125,7 +146,7 @@ function FileIcon({ remove = false }: { remove?: boolean }) {
 const UploadRoot = forwardRef<UploadRef, UploadProps>((props, ref) => {
   const config = useTaoConfig();
   const [localFiles, setFiles] = useState(props.defaultFileList ?? []);
-  const files = props.fileList ?? localFiles;
+  const files = 'fileList' in props ? (props.fileList ?? []) : localFiles;
   const filesRef = useRef(files);
   filesRef.current = files;
   const propsRef = useRef(props);
@@ -133,9 +154,15 @@ const UploadRoot = forwardRef<UploadRef, UploadProps>((props, ref) => {
   const root = useRef<HTMLSpanElement>(null),
     uploader = useRef<RcUploader>(null);
   const ignored = useRef(new Set<string>());
+  const preparations = useRef(new WeakMap<object, UploadPreparation>());
+  const requestOrigins = useRef(new WeakMap<object, BaseRcFile>());
+  const settledRequests = useRef(new WeakSet<object>());
+  const pendingRemovals = useRef(new Map<string, UploadFile>());
   const [dragging, setDragging] = useState(false),
     [removeError, setRemoveError] = useState<string>();
+  const [previewFile, setPreviewFile] = useState<UploadFile>();
   const disabled = props.disabled ?? config.disabled;
+  if (disabled && dragging) setDragging(false);
   const listType = props.listType ?? 'text',
     type = props.type ?? 'select';
   const names =
@@ -153,17 +180,21 @@ const UploadRoot = forwardRef<UploadRef, UploadProps>((props, ref) => {
     uploadError: config.locale.messages.uploadError,
     ...props.locale,
   };
-  const current = () => propsRef.current.fileList ?? filesRef.current;
+  const current = () =>
+    'fileList' in propsRef.current
+      ? (propsRef.current.fileList ?? [])
+      : filesRef.current;
   const emit = (
     file: UploadFile,
     next: UploadFile[],
     event?: { percent: number },
   ) => {
+    if (!root.current) return;
     const max = propsRef.current.maxCount;
     const limited =
       max === 1 ? next.slice(-1) : max ? next.slice(0, max) : next;
     flushSync(() => {
-      if (propsRef.current.fileList === undefined) {
+      if (!('fileList' in propsRef.current)) {
         filesRef.current = limited;
         setFiles(limited);
       }
@@ -173,7 +204,7 @@ const UploadRoot = forwardRef<UploadRef, UploadProps>((props, ref) => {
       )
         propsRef.current.onChange?.({
           file,
-          fileList: limited,
+          fileList: [...limited],
           ...(event ? { event } : {}),
         });
     });
@@ -183,9 +214,16 @@ const UploadRoot = forwardRef<UploadRef, UploadProps>((props, ref) => {
     patch: Partial<UploadFile>,
     event?: { percent: number },
   ) => {
+    if (settledRequests.current.has(file)) return;
     const items = current(),
       found = items.find((item) => item.uid === file.uid);
     if (!found) return;
+    const origin = requestOrigins.current.get(file);
+    if (origin && found.originFileObj && found.originFileObj !== origin) {
+      return;
+    }
+    if (patch.status === 'done' || patch.status === 'error')
+      settledRequests.current.add(file);
     const changed = { ...found, ...patch };
     emit(
       changed,
@@ -202,15 +240,44 @@ const UploadRoot = forwardRef<UploadRef, UploadProps>((props, ref) => {
     update(file, { status: 'uploading', percent: event.percent }, event);
   const onError = (error: Error, response: unknown, file: BaseRcFile) =>
     update(file, { status: 'error', error, response });
+  const customRequest = props.customRequest as RcUploadProps['customRequest'];
+  const request: RcUploadProps['customRequest'] = customRequest
+    ? (options, info) => {
+        try {
+          return customRequest(options, info);
+        } catch (reason) {
+          if (
+            typeof options.file === 'object' &&
+            settledRequests.current.has(options.file)
+          ) {
+            throw reason;
+          }
+          options.onError?.(asError(reason));
+        }
+      }
+    : undefined;
   const onBatchStart: NonNullable<RcUploadProps['onBatchStart']> = (batch) => {
     const allowed = batch.filter(
       ({ file }) => !ignored.current.delete(file.uid),
     );
+    for (const { file, parsedFile } of allowed) {
+      if (parsedFile && typeof parsedFile === 'object') {
+        requestOrigins.current.set(parsedFile, file);
+        settledRequests.current.delete(parsedFile);
+      }
+    }
     let next = [...current()];
-    const additions = allowed.map(({ file, parsedFile }) => ({
-      ...toFile(file),
-      ...(parsedFile ? { status: 'uploading' as const } : {}),
-    }));
+    const additions = allowed.map(({ file, parsedFile }) => {
+      const error = preparations.current.get(file)?.error;
+      return {
+        ...toFile(file),
+        ...(error
+          ? { status: 'error' as const, error }
+          : parsedFile
+            ? { status: 'uploading' as const }
+            : {}),
+      };
+    });
     for (const item of additions)
       next = [...next.filter((old) => old.uid !== item.uid), item];
     for (const item of additions) emit(item, next);
@@ -225,22 +292,34 @@ const UploadRoot = forwardRef<UploadRef, UploadProps>((props, ref) => {
     nativeElement: root.current,
   }));
   const remove = async (file: UploadFile) => {
+    if (disabled) return;
+    const pending = pendingRemovals.current;
+    if (sameUploadFile(file, pending.get(file.uid))) return;
+    pending.set(file.uid, file);
+    const isCurrent = (candidate?: UploadFile) =>
+      root.current &&
+      pending.get(file.uid) === file &&
+      sameUploadFile(file, candidate);
     try {
       if ((await propsRef.current.onRemove?.(file)) === false) return;
       const items = current();
-      if (!items.some((item) => item.uid === file.uid)) return;
+      const latest = items.find((item) => item.uid === file.uid);
+      if (!latest || !isCurrent(latest)) return;
       uploader.current?.abort(file as RcFile);
       emit(
-        { ...file, status: 'removed' },
+        { ...latest, status: 'removed' },
         items.filter((item) => item.uid !== file.uid),
       );
       setRemoveError(undefined);
     } catch (error) {
+      if (!isCurrent(current().find((item) => item.uid === file.uid))) return;
       setRemoveError(
         error instanceof Error
           ? error.message
           : config.locale.messages.removeFileError,
       );
+    } finally {
+      if (pending.get(file.uid) === file) pending.delete(file.uid);
     }
   };
   const download = (file: UploadFile) => {
@@ -270,44 +349,74 @@ const UploadRoot = forwardRef<UploadRef, UploadProps>((props, ref) => {
       className={cx(names?.root, props.className, props.rootClassName)}
       style={{ ...styles?.root, ...props.style }}
     >
+      {/* biome-ignore lint/a11y/noStaticElementInteractions: This wrapper listens to drag events from the keyboard-accessible file trigger. */}
       <span
         data-tao-upload-trigger=""
         className={names?.trigger}
         style={triggerStyle}
+        onDragOver={disabled ? undefined : () => setDragging(true)}
+        onDragLeave={disabled ? undefined : () => setDragging(false)}
+        onDrop={
+          disabled
+            ? undefined
+            : (event) => {
+                setDragging(false);
+                props.onDrop?.(
+                  event as unknown as React.DragEvent<HTMLDivElement>,
+                );
+              }
+        }
       >
         <RcUploaderComponent
           onFocus={props.onFocus}
           ref={uploader}
           prefixCls={props.prefixCls ?? 'tao-upload-input'}
           component="span"
-          action={(props.action as RcUploadProps['action']) ?? ''}
+          action={(file) =>
+            preparations.current.get(file as BaseRcFile)?.action ?? ''
+          }
           name={props.name}
           method={props.method}
           headers={props.headers}
-          data={
-            (typeof props.data === 'function'
-              ? (file: BaseRcFile) =>
-                  (props.data as (value: UploadFile) => unknown)(toFile(file))
-              : props.data) as RcUploadProps['data']
+          data={(file) =>
+            preparations.current.get(file as BaseRcFile)?.data ?? {}
           }
-          customRequest={props.customRequest as RcUploadProps['customRequest']}
+          customRequest={request}
           withCredentials={props.withCredentials}
           disabled={disabled}
           multiple={props.multiple}
           accept={props.accept}
           directory={props.directory}
           capture={props.capture}
-          pastable={props.pastable}
+          pastable={props.pastable && !disabled}
           id={props.id}
           openFileDialogOnClick={props.openFileDialogOnClick}
           hasControlInside={props.hasControlInside ?? !!props.children}
           beforeUpload={async (file, list) => {
+            preparations.current.delete(file);
             const result = await props.beforeUpload?.(
               file as RcFile,
               list as RcFile[],
             );
             if (result === LIST_IGNORE) {
               ignored.current.add(file.uid);
+              return false;
+            }
+            if (result === false) return false;
+            const { action, data } = propsRef.current;
+            try {
+              preparations.current.set(file, {
+                action:
+                  typeof action === 'function'
+                    ? await action(file as RcFile)
+                    : action,
+                data:
+                  typeof data === 'function' ? await data(toFile(file)) : data,
+              });
+            } catch (reason) {
+              preparations.current.set(file, {
+                error: asError(reason),
+              });
               return false;
             }
             return result;
@@ -318,12 +427,6 @@ const UploadRoot = forwardRef<UploadRef, UploadProps>((props, ref) => {
           }
           onSuccess={onSuccess}
           onError={onError}
-          onDragOver={() => setDragging(true)}
-          onDragLeave={() => setDragging(false)}
-          onDrop={(event) => {
-            setDragging(false);
-            props.onDrop?.(event as unknown as React.DragEvent<HTMLDivElement>);
-          }}
         >
           {props.children ??
             (type === 'drag'
@@ -346,8 +449,15 @@ const UploadRoot = forwardRef<UploadRef, UploadProps>((props, ref) => {
                     file.url ?? file.name,
                   )
                 );
+            const localPreview = image && !!file.originFileObj;
+            const previewUrl = file.url ?? file.thumbUrl;
             const actions = {
-              preview: () => props.onPreview?.(file),
+              preview: () => {
+                if (props.onPreview) props.onPreview(file);
+                else if (previewUrl)
+                  window.open(previewUrl, '_blank', 'noopener,noreferrer');
+                else if (localPreview) setPreviewFile(file);
+              },
               download: () => download(file),
               remove: () => {
                 void remove(file);
@@ -375,7 +485,9 @@ const UploadRoot = forwardRef<UploadRef, UploadProps>((props, ref) => {
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={(event) => {
-                        if (props.onPreview) {
+                        const linkClick = file.linkProps?.onClick;
+                        if (typeof linkClick === 'function') linkClick(event);
+                        if (!event.defaultPrevented && props.onPreview) {
                           event.preventDefault();
                           actions.preview();
                         }
@@ -413,7 +525,9 @@ const UploadRoot = forwardRef<UploadRef, UploadProps>((props, ref) => {
                     <Button
                       variant="ghost"
                       size="small"
-                      disabled={false}
+                      disabled={
+                        !props.onPreview && !previewUrl && !localPreview
+                      }
                       type="button"
                       aria-label={`${locale.previewFile} ${file.name}`}
                       onClick={actions.preview}
@@ -425,7 +539,7 @@ const UploadRoot = forwardRef<UploadRef, UploadProps>((props, ref) => {
                     <Button
                       variant="ghost"
                       size="small"
-                      disabled={false}
+                      disabled={!props.onDownload && !file.url}
                       type="button"
                       aria-label={`${locale.downloadFile} ${file.name}`}
                       onClick={actions.download}
@@ -460,6 +574,18 @@ const UploadRoot = forwardRef<UploadRef, UploadProps>((props, ref) => {
             );
           })}
         </span>
+      )}
+      {previewFile && (
+        <Modal
+          open
+          title={previewFile.name}
+          footer={null}
+          onClose={() => setPreviewFile(undefined)}
+        >
+          <div data-tao-upload-preview="">
+            <FilePreview file={previewFile} previewFile={props.previewFile} />
+          </div>
+        </Modal>
       )}
       {removeError && <span role="alert">{removeError}</span>}
     </span>

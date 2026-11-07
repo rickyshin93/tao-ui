@@ -122,6 +122,65 @@ test('public updates coalesce and cancellation/unmount release pending work', ()
   fireEvent.scroll(window);
   expect(frames.size).toBe(0);
 });
+
+test('accepts an iframe window as the scroll target', () => {
+  const view = render(<iframe title="Preview" />);
+  const frame = screen.getByTitle<HTMLIFrameElement>('Preview').contentWindow!;
+  top = 5;
+  view.rerender(
+    <>
+      <iframe title="Preview" />
+      <Affix target={() => frame} offsetTop={10}>
+        Tools
+      </Affix>
+    </>,
+  );
+  flush();
+  expect(screen.getByText('Tools')).toHaveStyle({
+    position: 'fixed',
+    top: '10px',
+  });
+});
+
+test('a stable target getter follows a replaced scroll container', () => {
+  const original = document.createElement('div');
+  const replacement = document.createElement('div');
+  replacement.setAttribute('data-target', '');
+  let current = original;
+  const target = () => current;
+  const { rerender } = render(<Affix target={target}>Tools</Affix>);
+  flush();
+
+  current = replacement;
+  rerender(<Affix target={target}>Tools</Affix>);
+  flush();
+  top = 15;
+  fireEvent.scroll(original);
+  expect(frames.size).toBe(0);
+  fireEvent.scroll(replacement);
+  flush();
+  expect(screen.getByText('Tools')).toHaveStyle({ top: '20px' });
+});
+
+test('Affix merges its prefix and root classes onto the holder', () => {
+  const { container } = render(
+    <Affix
+      prefixCls="affix-prefix"
+      rootClassName="affix-outer"
+      className="affix-local"
+      classNames={{ root: 'affix-semantic' }}
+    >
+      Tools
+    </Affix>,
+  );
+  expect(container.querySelector('[data-tao-affix]')).toHaveClass(
+    'affix-prefix',
+    'affix-outer',
+    'affix-local',
+    'affix-semantic',
+  );
+});
+
 test('switching to an unavailable target releases the fixed content and applies semantic slots', () => {
   top = -20;
   const { rerender } = render(

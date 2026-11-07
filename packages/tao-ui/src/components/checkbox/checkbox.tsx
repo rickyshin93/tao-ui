@@ -9,6 +9,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
 } from 'react';
@@ -27,7 +28,9 @@ export type CheckboxSemanticPart = 'root' | 'indicator' | 'label';
 
 interface CheckboxGroupContextValue {
   value: string[];
+  resetValue: string[];
   disabled: boolean;
+  size: TaoSize;
   onChange: (itemValue: string, checked: boolean) => void;
 }
 
@@ -52,6 +55,8 @@ export interface CheckboxProps
   defaultChecked?: boolean;
   indeterminate?: boolean;
   disabled?: boolean;
+  /** Require a checked value when submitting a native form. */
+  required?: boolean;
   onChange?: (e: ChangeEvent<HTMLInputElement>) => void;
   value?: string;
   children?: ReactNode;
@@ -61,7 +66,10 @@ export interface CheckboxProps
 }
 
 export const Checkbox = forwardRef(function Checkbox(
-  {
+  props: CheckboxProps,
+  ref: ForwardedRef<HTMLInputElement>,
+) {
+  const {
     checked,
     defaultChecked,
     indeterminate,
@@ -72,18 +80,29 @@ export const Checkbox = forwardRef(function Checkbox(
     classNames,
     styles,
     ...ariaProps
-  }: CheckboxProps,
-  ref: ForwardedRef<HTMLInputElement>,
-) {
+  } = props;
   const ctx = useTaoConfig();
   const groupCtx = useContext(CheckboxGroupContext);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const resolvedDisabled =
     disabled ?? groupCtx?.disabled ?? ctx.disabled ?? false;
-  const resolvedChecked = groupCtx
-    ? groupCtx.value.includes(value ?? '')
-    : checked;
+  const grouped = groupCtx && value != null;
+  const resolvedChecked = grouped
+    ? groupCtx.value.includes(value)
+    : 'checked' in props
+      ? (checked ?? false)
+      : undefined;
+  const resetChecked = grouped
+    ? groupCtx.resetValue.includes(value)
+    : resolvedChecked;
+
+  useLayoutEffect(() => {
+    const input = inputRef.current;
+    if (input?.form && resetChecked !== undefined) {
+      input.defaultChecked = resetChecked;
+    }
+  }, [resetChecked]);
 
   useEffect(() => {
     if (inputRef.current) {
@@ -93,19 +112,22 @@ export const Checkbox = forwardRef(function Checkbox(
 
   const handleChange = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
-      if (groupCtx && value != null) {
-        groupCtx.onChange(value, e.target.checked);
-      } else {
-        onChange?.(e);
+      const nextChecked = e.currentTarget.checked;
+      // Native activation clears the indeterminate flag.
+      if (indeterminate) e.currentTarget.indeterminate = true;
+      onChange?.(e);
+      if (!e.defaultPrevented && groupCtx && value != null) {
+        groupCtx.onChange(value, nextChecked);
       }
     },
-    [groupCtx, value, onChange],
+    [groupCtx, value, indeterminate, onChange],
   );
 
   return (
     <label
       data-tao-checkbox-wrapper=""
       data-tao-disabled={resolvedDisabled || undefined}
+      data-tao-size={groupCtx?.size ?? ctx.size}
       className={cx(classNames?.root)}
       style={styles?.root}
     >
@@ -114,8 +136,11 @@ export const Checkbox = forwardRef(function Checkbox(
           {...ariaProps}
           ref={mergeRefs(inputRef, ref)}
           type="checkbox"
+          value={value}
           checked={resolvedChecked}
-          defaultChecked={defaultChecked}
+          defaultChecked={
+            resolvedChecked === undefined ? defaultChecked : undefined
+          }
           disabled={resolvedDisabled}
           onChange={handleChange}
           aria-checked={indeterminate ? 'mixed' : undefined}
@@ -178,6 +203,7 @@ export function CheckboxGroup(props: CheckboxGroupProps) {
     defaultValue,
     onChange,
     disabled,
+    size,
     direction = 'horizontal',
     children,
   } = props;
@@ -188,6 +214,20 @@ export function CheckboxGroup(props: CheckboxGroupProps) {
   ]);
   const isControlled = 'value' in props;
   const resolvedValue = isControlled ? (value ?? []) : internalValue;
+  const root = useRef<HTMLFieldSetElement>(null);
+  useEffect(() => {
+    if (isControlled) return;
+    const form = root.current?.form;
+    const reset = (event: Event) => {
+      queueMicrotask(() => {
+        if (!event.defaultPrevented) {
+          setInternalValue([...new Set(defaultValue ?? [])]);
+        }
+      });
+    };
+    form?.addEventListener('reset', reset);
+    return () => form?.removeEventListener('reset', reset);
+  }, [isControlled, defaultValue]);
 
   const handleItemChange = useCallback(
     (itemValue: string, checked: boolean) => {
@@ -199,14 +239,16 @@ export function CheckboxGroup(props: CheckboxGroupProps) {
         ),
       ];
       if (!isControlled) setInternalValue(next);
-      onChange?.(next);
+      onChange?.([...next]);
     },
     [resolvedValue, onChange, isControlled],
   );
 
   const groupCtxValue: CheckboxGroupContextValue = {
     value: resolvedValue,
+    resetValue: isControlled ? resolvedValue : (defaultValue ?? []),
     disabled: resolvedDisabled,
+    size: size ?? ctx.size,
     onChange: handleItemChange,
   };
 
@@ -217,6 +259,7 @@ export function CheckboxGroup(props: CheckboxGroupProps) {
   return (
     <CheckboxGroupContext.Provider value={groupCtxValue}>
       <fieldset
+        ref={root}
         data-tao-checkbox-group=""
         data-tao-direction={direction}
         id={props.id}

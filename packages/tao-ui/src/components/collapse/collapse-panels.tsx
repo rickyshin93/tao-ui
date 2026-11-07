@@ -13,39 +13,44 @@ function toKeys(value: CollapseProps['activeKey']): string[] {
     : (Array.isArray(value) ? value : [value]).map(String);
 }
 
-export function CollapsePanels({
-  items,
-  activeKey,
-  defaultActiveKey,
-  onChange,
-  accordion = false,
-  bordered = true,
-  ghost = false,
-  size,
-  disabled,
-  collapsible = 'header',
-  expandIconPlacement = 'start',
-  expandIcon,
-  destroyOnHidden = false,
-  className,
-  style,
-  classNames,
-  styles,
-}: CollapseProps & { items: CollapseItem[] }) {
+export function CollapsePanels(
+  props: CollapseProps & { items: CollapseItem[] },
+) {
+  const {
+    items,
+    activeKey,
+    defaultActiveKey,
+    onChange,
+    accordion = false,
+    bordered = true,
+    ghost = false,
+    size,
+    disabled,
+    collapsible = 'header',
+    expandIconPlacement = 'start',
+    expandIcon,
+    destroyOnHidden = false,
+    className,
+    style,
+    classNames,
+    styles,
+  } = props;
   const config = useTaoConfig();
   const [internalKeys, setInternalKeys] = useState(() =>
     toKeys(defaultActiveKey),
   );
-  const keys = activeKey === undefined ? internalKeys : toKeys(activeKey);
+  const controlled = 'activeKey' in props;
+  const keys = controlled ? toKeys(activeKey) : internalKeys;
   const activeKeys = accordion ? keys.slice(0, 1) : keys;
   const toggle = (key: string) => {
+    const presentKeys = new Set(items.map((item) => String(item.key)));
     const next = activeKeys.includes(key)
-      ? activeKeys.filter((active) => active !== key)
+      ? activeKeys.filter((active) => active !== key && presentKeys.has(active))
       : accordion
         ? [key]
-        : [...activeKeys, key];
-    if (activeKey === undefined) setInternalKeys(next);
-    onChange?.(next);
+        : [...activeKeys.filter((active) => presentKeys.has(active)), key];
+    if (!controlled) setInternalKeys(next);
+    onChange?.([...next]);
   };
 
   return (

@@ -138,12 +138,14 @@ export const Calendar = forwardRef<CalendarRef, CalendarProps>((props, ref) => {
     dayjsConfig.locale.getShortMonths?.(locale.locale) ??
     [];
   const disabled = (date: Dayjs) =>
+    config.disabled ||
     !!(
       validRange &&
       (date.isBefore(validRange[0], 'day') ||
         date.isAfter(validRange[1], 'day'))
     ) || !!props.disabledDate?.(date);
   const select = (date: Dayjs, source: CalendarSelectInfo['source']) => {
+    if (config.disabled) return;
     if (props.value === undefined) setValue(date);
     if (!date.isSame(value, 'day')) {
       if (!date.isSame(value, mode === 'month' ? 'month' : 'year'))
@@ -153,6 +155,7 @@ export const Calendar = forwardRef<CalendarRef, CalendarProps>((props, ref) => {
     props.onSelect?.(date, { source });
   };
   const changeMode = (next: CalendarMode) => {
+    if (config.disabled) return;
     if (props.mode === undefined) setMode(next);
     props.onPanelChange?.(value, next);
   };
@@ -222,7 +225,7 @@ export const Calendar = forwardRef<CalendarRef, CalendarProps>((props, ref) => {
         props.headerRender({
           value,
           type: mode,
-          onChange: (date) => select(date, 'customize'),
+          onChange: (date) => select(clamp(date), 'customize'),
           onTypeChange: changeMode,
         })
       ) : (
@@ -257,7 +260,9 @@ export const Calendar = forwardRef<CalendarRef, CalendarProps>((props, ref) => {
               size="medium"
               style={{ width: 'auto', minWidth: '6em' }}
               value={String(value.month())}
-              onChange={(month) => select(value.month(Number(month)), 'month')}
+              onChange={(month) =>
+                select(clamp(value.month(Number(month))), 'month')
+              }
               options={months
                 .map((month, index) => ({ label: month, value: String(index) }))
                 .slice(minMonth, maxMonth + 1)}
@@ -286,7 +291,9 @@ export const Calendar = forwardRef<CalendarRef, CalendarProps>((props, ref) => {
         hideHeader
         showWeek={props.showWeek}
         disabledDate={disabled}
-        onSelect={(date) => select(date, mode === 'year' ? 'month' : 'date')}
+        onSelect={(date) =>
+          mode === 'year' ? select(clamp(date), 'month') : select(date, 'date')
+        }
         cellRender={(date, info) => renderCell(date as Dayjs, info)}
         classNames={{
           body: names?.body,

@@ -12,6 +12,7 @@
 - none
 
 ## Done
+- 2026-11-07 Consolidated component fixes since 0.0.48 and synchronized the English and Chinese 0.0.49 changelogs and component guidance.
 - 2026-11-07 Published tao-icons 0.1.1 with 213 refined SVGs and deployed the bilingual catalog with 2,067 entries and searchable aliases. Verified the public npm archive, CI, Pages and both locales in Chrome.
 - 2026-11-07 Published tao-icons 0.1.0 (2,165 MIT-licensed icons) and deployed the bilingual catalog with 39 groups and six React examples. npm archive, Pages and local browser checks passed.
 - 2026-11-06 Released `@rockshin/tao-ui@0.0.48`: 24px Form feedback spacing with stable single-line validation and unchanged font size. Project gates, Release/CI/Pages, npm integrity and local ai-portal desktop/mobile/RTL acceptance passed; generated release outputs cleaned. See `.logs/release-0.0.48/verification.md`.

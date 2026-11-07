@@ -141,7 +141,11 @@ function clearRuntimeTimers(runtime: ToastRuntime) {
 
 function beginExit(id: string) {
   const runtime = runtimes.get(id);
-  if (!runtime || !state.toasts.some((toast) => toast.id === id)) return;
+  if (
+    !runtime ||
+    !state.toasts.some((toast) => toast.id === id && toast.phase === 'active')
+  )
+    return;
   clearRuntimeTimers(runtime);
   state = {
     toasts: state.toasts.map((toast) =>
@@ -160,7 +164,7 @@ function beginExit(id: string) {
 }
 
 function dismiss(id?: string) {
-  if (id) {
+  if (id !== undefined) {
     beginExit(id);
     return;
   }
@@ -171,7 +175,7 @@ function scheduleDismiss(id: string, duration: number | undefined) {
   const runtime = runtimes.get(id);
   if (!runtime) return;
   if (runtime.dismissTimer) clearTimeout(runtime.dismissTimer);
-  if (duration == null || duration <= 0) return;
+  if (duration == null || !Number.isFinite(duration) || duration <= 0) return;
   const generation = runtime.generation;
   runtime.dismissTimer = setTimeout(() => {
     if (runtimes.get(id)?.generation === generation) beginExit(id);
@@ -184,7 +188,7 @@ function isToastOptions(
   return (
     value != null &&
     typeof value === 'object' &&
-    !Array.isArray(value) &&
+    !(Symbol.iterator in value) &&
     !('$$typeof' in value)
   );
 }
@@ -229,14 +233,21 @@ function settlePromiseToast(
   id: string,
   generation: number | undefined,
   type: 'success' | 'error',
-  options: SonnerToastOptions | ReactNode,
+  renderOptions: () => SonnerToastOptions | ReactNode,
 ) {
-  if (
-    runtimes.get(id)?.generation !== generation ||
-    !state.toasts.some((toast) => toast.id === id && toast.phase === 'active')
-  )
-    return;
-  if (!options) {
+  const isActive = () =>
+    runtimes.get(id)?.generation === generation &&
+    state.toasts.some((toast) => toast.id === id && toast.phase === 'active');
+  if (!isActive()) return;
+  let options: SonnerToastOptions | ReactNode;
+  try {
+    options = renderOptions();
+  } catch (error) {
+    if (isActive()) dismiss(id);
+    throw error;
+  }
+  if (!isActive()) return;
+  if (!options && options !== 0) {
     dismiss(id);
     return;
   }
@@ -277,7 +288,7 @@ function renderPromiseState<T>(
     | undefined,
   payload: T | unknown,
 ) {
-  if (!stateValue) return undefined;
+  if (!stateValue && stateValue !== 0) return undefined;
   if (typeof stateValue === 'function') {
     return stateValue(payload as never);
   }
@@ -311,10 +322,9 @@ export function Sonner({
   }, [duration, snapshot.toasts]);
 
   const visible = useMemo(() => {
-    const toasts = snapshot.toasts;
-    const sliced = expand ? toasts : toasts.slice(-visibleToasts);
-    return sliced.slice(-visibleToasts).reverse();
-  }, [expand, snapshot.toasts, visibleToasts]);
+    const count = Math.floor(visibleToasts);
+    return count > 0 ? snapshot.toasts.slice(-count).reverse() : [];
+  }, [snapshot.toasts, visibleToasts]);
 
   const frontToastHeight = heights.get(visible[0]?.id ?? '') ?? 0;
   let nextOffset = 0;
@@ -394,7 +404,7 @@ function ToastView({
     locale: { messages },
   } = useTaoConfig();
   const [mounted, setMounted] = useState(false);
-  const [offsetBeforeRemove, setOffsetBeforeRemove] = useState(0);
+  const offsetBeforeRemove = useRef(offset);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -402,8 +412,8 @@ function ToastView({
     return () => cancelAnimationFrame(frame);
   }, []);
 
-  useEffect(() => {
-    if (toast.phase === 'exiting') setOffsetBeforeRemove(offset);
+  useLayoutEffect(() => {
+    if (toast.phase === 'active') offsetBeforeRemove.current = offset;
   }, [offset, toast.phase]);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: toast content changes can change its measured height.
@@ -411,15 +421,28 @@ function ToastView({
     const node = ref.current;
     if (!node) return;
 
-    const nextHeight = node.getBoundingClientRect().height;
-    setHeights((current) => {
-      if (current.get(toast.id) === nextHeight) return current;
-      const next = new Map(current);
-      next.set(toast.id, nextHeight);
-      return next;
-    });
+    const updateHeight = (nextHeight: number) => {
+      setHeights((current) => {
+        if (current.get(toast.id) === nextHeight) return current;
+        const next = new Map(current);
+        next.set(toast.id, nextHeight);
+        return next;
+      });
+    };
+    updateHeight(node.getBoundingClientRect().height);
+    const observer =
+      typeof ResizeObserver === 'undefined'
+        ? undefined
+        : new ResizeObserver(([entry]) => {
+            updateHeight(
+              entry.borderBoxSize?.[0]?.blockSize ??
+                node.getBoundingClientRect().height,
+            );
+          });
+    observer?.observe(node, { box: 'border-box' });
 
     return () => {
+      observer?.disconnect();
       setHeights((current) => {
         if (!current.has(toast.id)) return current;
         const next = new Map(current);
@@ -439,7 +462,16 @@ function ToastView({
 
   const isFront = index === 0;
   const isVisible = index < visibleToasts;
-  const activeOffset = toast.phase === 'exiting' ? offsetBeforeRemove : offset;
+  const exiting = toast.phase === 'exiting';
+  const activeOffset = exiting ? offsetBeforeRemove.current : offset;
+
+  function dismissAfterAction(action?: SonnerAction) {
+    if (exiting || !state.toasts.includes(toast)) return;
+    action?.onClick?.();
+    if (state.toasts.includes(toast)) {
+      dismiss(toast.id);
+    }
+  }
 
   return (
     <div
@@ -452,7 +484,7 @@ function ToastView({
       data-tao-type={resolveDataType(toast.type, richColors)}
       data-tao-mounted={mounted}
       data-tao-y-position={yPosition}
-      data-tao-removing={toast.phase === 'exiting' ? 'true' : 'false'}
+      data-tao-removing={exiting ? 'true' : 'false'}
       data-tao-front={isFront ? 'true' : 'false'}
       data-tao-expanded={expanded ? 'true' : 'false'}
       data-tao-visible={isVisible ? 'true' : 'false'}
@@ -464,86 +496,81 @@ function ToastView({
         ['--tao-sonner-z-index' as string]: String(visibleToasts - index),
       }}
     >
-      {toast.custom ? (
+      {toast.custom || toast.custom === 0 ? (
         toast.custom
       ) : (
-        <>
-          <div
-            className={cx(classNames?.content)}
-            style={styles?.content}
-            data-tao-sonner-content=""
-          >
-            {toast.title ? (
-              <div
-                className={cx(classNames?.title)}
-                style={styles?.title}
-                data-tao-sonner-title=""
-              >
-                {toast.title}
-              </div>
-            ) : null}
-            {toast.description ? (
-              <div
-                className={cx(classNames?.description)}
-                style={styles?.description}
-                data-tao-sonner-description=""
-              >
-                {toast.description}
-              </div>
-            ) : null}
-          </div>
-          {(toast.action || toast.cancel || showClose) && (
+        <div
+          className={cx(classNames?.content)}
+          style={styles?.content}
+          data-tao-sonner-content=""
+        >
+          {toast.title || toast.title === 0 ? (
             <div
-              className={cx(classNames?.actions)}
-              style={styles?.actions}
-              data-tao-sonner-actions=""
-              data-tao-close-only={
-                !toast.action && !toast.cancel && showClose ? '' : undefined
-              }
+              className={cx(classNames?.title)}
+              style={styles?.title}
+              data-tao-sonner-title=""
             >
-              {toast.cancel ? (
-                <Button
-                  variant="ghost"
-                  size="small"
-                  className={cx(classNames?.cancel)}
-                  style={styles?.cancel}
-                  onClick={() => {
-                    toast.cancel?.onClick?.();
-                    dismiss(toast.id);
-                  }}
-                >
-                  {toast.cancel.label}
-                </Button>
-              ) : null}
-              {toast.action ? (
-                <Button
-                  variant="secondary"
-                  size="small"
-                  className={cx(classNames?.action)}
-                  style={styles?.action}
-                  onClick={() => {
-                    toast.action?.onClick?.();
-                    dismiss(toast.id);
-                  }}
-                >
-                  {toast.action.label}
-                </Button>
-              ) : null}
-              {showClose ? (
-                <button
-                  type="button"
-                  aria-label={messages.closeNotification}
-                  className={cx(classNames?.close)}
-                  style={styles?.close}
-                  data-tao-sonner-close=""
-                  onClick={() => dismiss(toast.id)}
-                >
-                  ×
-                </button>
-              ) : null}
+              {toast.title}
             </div>
-          )}
-        </>
+          ) : null}
+          {toast.description || toast.description === 0 ? (
+            <div
+              className={cx(classNames?.description)}
+              style={styles?.description}
+              data-tao-sonner-description=""
+            >
+              {toast.description}
+            </div>
+          ) : null}
+        </div>
+      )}
+      {(toast.action || toast.cancel || showClose) && (
+        <div
+          className={cx(classNames?.actions)}
+          style={styles?.actions}
+          data-tao-sonner-actions=""
+          data-tao-close-only={
+            !toast.action && !toast.cancel && showClose ? '' : undefined
+          }
+        >
+          {toast.cancel ? (
+            <Button
+              variant="ghost"
+              size="small"
+              className={cx(classNames?.cancel)}
+              style={styles?.cancel}
+              disabled={exiting}
+              onClick={() => dismissAfterAction(toast.cancel)}
+            >
+              {toast.cancel.label}
+            </Button>
+          ) : null}
+          {toast.action ? (
+            <Button
+              variant="secondary"
+              size="small"
+              className={cx(classNames?.action)}
+              style={styles?.action}
+              disabled={exiting}
+              onClick={() => dismissAfterAction(toast.action)}
+            >
+              {toast.action.label}
+            </Button>
+          ) : null}
+          {showClose ? (
+            <button
+              type="button"
+              aria-label={messages.closeNotification}
+              className={cx(classNames?.close)}
+              style={styles?.close}
+              disabled={exiting}
+              data-tao-sonner-close=""
+              onClick={() => dismissAfterAction()}
+            >
+              ×
+            </button>
+          ) : null}
+        </div>
       )}
     </div>
   );
@@ -583,16 +610,19 @@ export const toast = Object.assign(baseToast, {
 
     const generation = runtimes.get(id)?.generation;
 
+    let value: T;
     try {
-      const value = await promise;
-      const success = renderPromiseState(messages.success, value);
-      settlePromiseToast(id, generation, 'success', success);
-      return value;
+      value = await promise;
     } catch (error) {
-      const failure = renderPromiseState(messages.error, error);
-      settlePromiseToast(id, generation, 'error', failure);
+      settlePromiseToast(id, generation, 'error', () =>
+        renderPromiseState(messages.error, error),
+      );
       throw error;
     }
+    settlePromiseToast(id, generation, 'success', () =>
+      renderPromiseState(messages.success, value),
+    );
+    return value;
   },
   dismiss,
 });

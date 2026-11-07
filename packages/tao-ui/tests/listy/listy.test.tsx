@@ -2,6 +2,7 @@ import { expect, rs, test } from '@rstest/core';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { createRef } from 'react';
 import { Listy, type ListyRef } from '../../src/components/listy/listy';
+import { TaoProvider } from '../../src/provider/tao-provider';
 
 const items = [
   { id: 'a', name: 'Ada', group: 'A' },
@@ -43,6 +44,25 @@ test('imperative scroll supports numeric and coordinate positions', () => {
   expect(holder.scrollTop).toBe(25);
   expect(holder.scrollLeft).toBe(12);
 });
+test('a positive horizontal scroll offset works in nonvirtual RTL lists', () => {
+  const ref = createRef<ListyRef>();
+  const { container } = render(
+    <Listy
+      ref={ref}
+      items={items}
+      rowKey="id"
+      height={100}
+      scrollWidth={700}
+      direction="rtl"
+      itemRender={(item) => item.name}
+    />,
+  );
+  const holder = container.querySelector<HTMLElement>('[data-tao-listy] > div')!;
+  ref.current?.scrollTo({ left: 35, top: 20 });
+  expect(holder.scrollLeft).toBe(-35);
+  expect(holder.scrollTop).toBe(20);
+});
+
 test('item and group scroll resolve stable keys and alignment', () => {
   const ref = createRef<ListyRef>();
   const scrollIntoView = rs
@@ -87,6 +107,62 @@ test('virtual rendering limits mounted items and preserves horizontal width', ()
     container.querySelector('[class*="-item"]')?.getAttribute('style'),
   ).toContain('700px');
 });
+
+test('a nonvirtual list reserves the requested horizontal scroll width', () => {
+  const { container } = render(
+    <Listy
+      items={items}
+      rowKey="id"
+      height={100}
+      scrollWidth={700}
+      itemRender={(item) => item.name}
+    />,
+  );
+  const holder = container.querySelector('[data-tao-listy] > div');
+  expect(holder).toHaveStyle({ overflowX: 'auto' });
+  expect(screen.getByText('Ada')).toHaveStyle({ minWidth: '700px' });
+});
+
+test('a nonvirtual Listy heading spans the same horizontal width as its rows', () => {
+  render(
+    <Listy
+      items={items}
+      rowKey="id"
+      height={100}
+      scrollWidth={700}
+      sticky
+      group={{ key: (item) => item.group, title: (key) => `Group ${key}` }}
+      itemRender={(item) => item.name}
+    />,
+  );
+  expect(screen.getByText('Group A')).toHaveStyle({ minWidth: '700px' });
+  expect(screen.getByText('Ada')).toHaveStyle({ minWidth: '700px' });
+});
+
+test.each([false, true])(
+  'Listy resolves inherited RTL into its engine (virtual=%s)',
+  (virtual) => {
+    const list = (direction?: 'ltr' | 'rtl') => (
+      <TaoProvider direction="rtl">
+        <div style={{ direction: 'rtl' }}>
+          <Listy
+            virtual={virtual}
+            items={items}
+            rowKey="id"
+            height={100}
+            itemRender={(item) => item.name}
+            direction={direction}
+          />
+        </div>
+      </TaoProvider>
+    );
+    const view = render(list());
+    const holder = view.container.querySelector('[data-tao-listy] > div');
+    expect(holder).toHaveAttribute('dir', 'rtl');
+    view.rerender(list('ltr'));
+    expect(holder).not.toHaveAttribute('dir', 'rtl');
+  },
+);
 test('semantic callbacks, root overrides, rowHoverable and scrolling callbacks work', () => {
   const onScroll = rs.fn();
   const { container } = render(

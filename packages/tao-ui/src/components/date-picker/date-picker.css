@@ -470,6 +470,11 @@ button[data-tao-year-cell]:hover:not(:disabled) {
   background: var(--tao-color-fill-tertiary);
 }
 
+button[data-tao-month-cell][data-tao-in-range],
+button[data-tao-year-cell][data-tao-in-range] {
+  background: color-mix(in oklab, var(--tao-primary) 12%, transparent);
+}
+
 button[data-tao-month-cell][data-tao-selected],
 button[data-tao-year-cell][data-tao-selected] {
   background: var(--tao-primary);
@@ -582,13 +587,18 @@ button[data-tao-time-cell] {
   transition: background-color var(--tao-motion-duration-fast) ease-out;
 }
 
-button[data-tao-time-cell]:hover {
+button[data-tao-time-cell]:not(:disabled):hover {
   background: var(--tao-color-fill-tertiary);
 }
 
 button[data-tao-time-cell][data-tao-selected] {
   background: var(--tao-primary-bg);
   font-weight: var(--tao-font-weight-medium);
+}
+
+button[data-tao-time-cell]:disabled {
+  color: var(--tao-color-text-disabled);
+  cursor: not-allowed;
 }
 
 /* ===========================
@@ -688,6 +698,20 @@ input[data-tao-range-input]::placeholder {
 }
 
 /* RangePicker dual panel layout */
+[data-tao-range-time] {
+  min-width: 0;
+  margin: 0;
+  padding: var(--tao-padding-xs) 0 0;
+  border: 0;
+  border-block-start: var(--tao-line-width) solid
+    var(--tao-color-border-secondary);
+}
+
+[data-tao-range-time] > legend {
+  font-size: var(--tao-font-size-sm);
+  color: var(--tao-color-text-secondary);
+}
+
 [data-tao-range-panels] {
   display: flex;
   gap: var(--tao-padding);

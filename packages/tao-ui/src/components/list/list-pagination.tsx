@@ -121,6 +121,14 @@ export function ListPaginationControl(props: ListPagination) {
           itemRender ??
           ((page, type) => (
             <button
+              // rc-pagination omits the simple Next tab stop on page one.
+              ref={
+                type === 'next' && props.simple && current === 1
+                  ? (button) => {
+                      if (button && !button.disabled) button.tabIndex = 0;
+                    }
+                  : undefined
+              }
               data-tao-list-page-button=""
               type="button"
               aria-label={

@@ -1,6 +1,6 @@
 ---
 title: Table
-description: 展示结构化数据，并支持排序、筛选、选择、分页与响应式列。页面涵盖适用场景、设计建议、多组可运行示例、交互状态与完整 API 参考。
+description: 展示结构化数据，支持排序、筛选、分页、响应式列和受控行选择。
 ---
 
 import Preview from '../../_components/demo-preview';
@@ -387,7 +387,9 @@ export default function TableFiltering() {
 
 ### 受控行选择
 
-维护选中的行键，处理选择变更时同时保留业务记录标识。
+用数据库 ID 等稳定标识作为 `rowKey`。将选中的行键存入 `rowSelection.selectedRowKeys`，再通过 `rowSelection.onChange` 更新。
+
+在 `rowSelection.getCheckboxProps(record)` 返回 `{ disabled: true }` 可禁止选择该行。表头复选框只处理当前页可选行，保留其他页的选择。从 [0.0.49](/zh/guide/changelog) 起，组件还会在行状态变化而回调引用保持不变时，按最新的禁用状态全选。
 
 ```tsx preview
 import { Stack, Table, type TableColumn } from '@rockshin/tao-ui';

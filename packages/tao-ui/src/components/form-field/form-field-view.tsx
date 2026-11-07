@@ -1,6 +1,7 @@
 import {
   type CSSProperties,
   cloneElement,
+  Fragment,
   isValidElement,
   type ReactElement,
   type ReactNode,
@@ -25,9 +26,11 @@ export interface FormFieldViewProps {
   htmlFor?: string;
   required?: boolean;
   error?: ReactNode;
+  invalid?: boolean;
   /** Render the message slot with warning styling instead of error. */
   warning?: boolean;
   description?: ReactNode;
+  extra?: ReactNode;
   layout?: FormFieldLayout;
   /**
    * Extra props cloned onto the single child control (e.g. Form.Item's
@@ -43,6 +46,9 @@ export interface FormFieldViewProps {
   styles?: SemanticStyles<'root' | 'label' | 'error' | 'description'>;
 }
 
+const hasContent = (value: ReactNode) =>
+  value != null && value !== '' && typeof value !== 'boolean';
+
 /**
  * Shared presentational view behind FormField (standalone) and Form.Item
  * (rc-form bound): label + required mark + control + error/description slots
@@ -56,8 +62,10 @@ export function FormFieldView({
   htmlFor,
   required,
   error,
+  invalid,
   warning,
   description,
+  extra,
   layout = 'vertical',
   controlProps,
   renderControl,
@@ -68,22 +76,30 @@ export function FormFieldView({
   styles,
 }: FormFieldViewProps) {
   const generatedId = useId();
-  const child = isValidElement<Record<string, unknown>>(children)
-    ? children
-    : null;
+  const child =
+    isValidElement<Record<string, unknown>>(children) &&
+    children.type !== Fragment
+      ? children
+      : null;
   const childId =
     typeof child?.props.id === 'string' ? child.props.id : undefined;
   const controlId = htmlFor ?? childId ?? `${generatedId}-control`;
   const labelId = `${generatedId}-label`;
   const descriptionId = `${generatedId}-description`;
   const errorId = `${generatedId}-error`;
+  const extraId = `${generatedId}-extra`;
+  const hasLabel = hasContent(label);
+  const hasError = hasContent(error);
+  const hasDescription = hasContent(description);
+  const hasExtra = hasContent(extra);
   const childDescribedBy =
     typeof child?.props['aria-describedby'] === 'string'
       ? child.props['aria-describedby']
       : undefined;
   const describedBy = [
     childDescribedBy,
-    error ? errorId : description ? descriptionId : undefined,
+    hasError ? errorId : hasDescription ? descriptionId : undefined,
+    hasExtra ? extraId : undefined,
   ]
     .filter(Boolean)
     .join(' ');
@@ -93,16 +109,29 @@ export function FormFieldView({
         id: controlId,
         'aria-labelledby':
           child.props['aria-labelledby'] ??
-          (label != null && !child.props['aria-label'] ? labelId : undefined),
+          (hasLabel && !child.props['aria-label'] ? labelId : undefined),
         'aria-describedby': describedBy || undefined,
         'aria-errormessage':
-          error && !warning ? errorId : child.props['aria-errormessage'],
-        'aria-invalid': error && !warning ? true : child.props['aria-invalid'],
+          hasError && !warning ? errorId : child.props['aria-errormessage'],
+        'aria-invalid':
+          invalid || (hasError && !warning)
+            ? true
+            : child.props['aria-invalid'],
         'aria-required': required ? true : child.props['aria-required'],
       })
     : children;
 
-  const message = error ? (
+  const descriptionMessage = (id: string, content: ReactNode) => (
+    <p
+      className={classNames?.description}
+      style={styles?.description}
+      data-tao-form-description=""
+      id={id}
+    >
+      {content}
+    </p>
+  );
+  const message = hasError ? (
     <p
       className={classNames?.error}
       style={styles?.error}
@@ -113,17 +142,11 @@ export function FormFieldView({
     >
       {error}
     </p>
-  ) : description ? (
-    <p
-      className={classNames?.description}
-      style={styles?.description}
-      data-tao-form-description=""
-      id={descriptionId}
-    >
-      {description}
-    </p>
+  ) : hasDescription ? (
+    descriptionMessage(descriptionId, description)
   ) : null;
-  const hasMessage = formItem && (reserveMessage || message !== null);
+  const hasMessage =
+    formItem && (reserveMessage || message !== null || hasExtra);
 
   return (
     <div
@@ -134,7 +157,7 @@ export function FormFieldView({
       data-tao-form-feedback={hasMessage ? '' : undefined}
       data-tao-layout={layout === 'horizontal' ? 'horizontal' : undefined}
     >
-      {label != null && (
+      {hasLabel && (
         <label
           id={labelId}
           htmlFor={controlId}
@@ -151,12 +174,21 @@ export function FormFieldView({
         </label>
       )}
       <div data-tao-form-control="">
-        <FieldLabelContext.Provider value={label}>
-          {renderControl && isValidElement<Record<string, unknown>>(control)
+        <FieldLabelContext.Provider value={hasLabel ? label : undefined}>
+          {renderControl &&
+          child &&
+          isValidElement<Record<string, unknown>>(control)
             ? renderControl(control)
             : control}
         </FieldLabelContext.Provider>
-        {hasMessage ? <div data-tao-form-message="">{message}</div> : message}
+        {hasMessage ? (
+          <div data-tao-form-message="">
+            {message}
+            {hasExtra && descriptionMessage(extraId, extra)}
+          </div>
+        ) : (
+          message
+        )}
       </div>
     </div>
   );

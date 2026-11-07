@@ -1,10 +1,13 @@
 import { Slot } from '@radix-ui/react-slot';
 import {
   type CSSProperties,
+  cloneElement,
   Fragment,
   isValidElement,
   type MouseEvent,
   type ReactNode,
+  useEffect,
+  useState,
 } from 'react';
 import { useTaoConfig } from '../../provider/tao-provider';
 import {
@@ -12,7 +15,8 @@ import {
   type SemanticClassNames,
   type SemanticStyles,
 } from '../../utils/semantic';
-import { Dropdown, type MenuItem } from '../dropdown/dropdown';
+import { Dropdown } from '../dropdown/dropdown';
+import { menuItemAsChild } from '../menu/menu-render';
 import './breadcrumb.css';
 
 // ---- Types ----
@@ -105,7 +109,9 @@ function EllipsisIcon() {
 // ---- Internal display entry ----
 
 const ELLIPSIS = Symbol('ellipsis');
-type DisplayEntry = BreadcrumbItemType | typeof ELLIPSIS;
+type DisplayEntry =
+  | { item: BreadcrumbItemType; index: number }
+  | typeof ELLIPSIS;
 
 // ---- Component ----
 
@@ -120,16 +126,22 @@ export function Breadcrumb({
   styles,
 }: BreadcrumbProps) {
   const { size, disabled: ctxDisabled, locale } = useTaoConfig();
+  const [ellipsisOpen, setEllipsisOpen] = useState(false);
 
-  const collapsed =
-    maxItems != null && maxItems >= 1 && items.length > maxItems;
-  const display: DisplayEntry[] = collapsed
-    ? [
-        items[0],
-        ELLIPSIS,
-        ...items.slice(items.length - Math.max(1, maxItems - 1)),
-      ]
-    : items;
+  const path = items.map((item, index) => ({ item, index }));
+  const tailCount = Math.max(1, (maxItems ?? 1) - 1);
+  const tailStart = Math.trunc(items.length - tailCount);
+  const hidden =
+    maxItems != null && maxItems >= 1 && items.length > maxItems
+      ? path.slice(1, tailStart)
+      : [];
+  const hasOverflow = hidden.length > 0;
+  useEffect(() => {
+    if (!hasOverflow || ctxDisabled) setEllipsisOpen(false);
+  }, [hasOverflow, ctxDisabled]);
+  const display: DisplayEntry[] = hasOverflow
+    ? [path[0], ELLIPSIS, ...path.slice(tailStart)]
+    : path;
 
   const sep = separator ?? <ChevronIcon />;
 
@@ -137,6 +149,7 @@ export function Breadcrumb({
     item: BreadcrumbItemType,
     index: number,
     isLast: boolean,
+    collapsed = false,
   ) => {
     const content = itemRender
       ? itemRender(item, { index, isLast, items })
@@ -160,18 +173,39 @@ export function Breadcrumb({
     const linkProps = {
       'data-tao-breadcrumb-link': '',
       'data-tao-disabled': disabled || undefined,
+      'aria-disabled': disabled || undefined,
       className: cx(classNames?.link),
       style: styles?.link,
-      onClick: disabled ? undefined : item.onClick,
+      onClick:
+        !disabled && (item.onClick || collapsed)
+          ? (event: MouseEvent<HTMLElement>) => {
+              item.onClick?.(event);
+              // Client-side link handlers can prevent the menu's default close.
+              if (collapsed && event.defaultPrevented) setEllipsisOpen(false);
+            }
+          : undefined,
     };
 
     // Custom element from itemRender → merge props onto it (asChild).
-    if (itemRender && isValidElement(content)) {
+    if (
+      itemRender &&
+      isValidElement<Record<string, unknown>>(content) &&
+      content.type !== Fragment
+    ) {
+      if (disabled) {
+        return cloneElement(content, {
+          ...linkProps,
+          tabIndex: -1,
+          ...(content.type === 'a' ? { href: undefined } : {}),
+          ...(content.type === 'button' ? { disabled: true } : {}),
+          onClick: (event: MouseEvent<HTMLElement>) => event.preventDefault(),
+        });
+      }
       return <Slot {...linkProps}>{content}</Slot>;
     }
     if (item.href != null) {
       return (
-        <a href={item.href} {...linkProps}>
+        <a href={disabled ? undefined : item.href} {...linkProps}>
           {content}
         </a>
       );
@@ -209,9 +243,11 @@ export function Breadcrumb({
         style={styles?.list}
       >
         {display.map((entry, i) => {
-          const isLast = i === display.length - 1;
           const isEllipsis = entry === ELLIPSIS;
-          const key = isEllipsis ? `ellipsis-${i}` : (entry.key ?? i);
+          const isLast = !isEllipsis && entry.index === items.length - 1;
+          const key = isEllipsis
+            ? `ellipsis-${i}`
+            : (entry.item.key ?? entry.index);
 
           return (
             <Fragment key={key}>
@@ -222,22 +258,18 @@ export function Breadcrumb({
               >
                 {isEllipsis ? (
                   <Dropdown
+                    open={ellipsisOpen}
+                    onOpenChange={setEllipsisOpen}
                     menu={{
-                      items: items
-                        .slice(
-                          1,
-                          items.length - Math.max(1, (maxItems ?? 1) - 1),
-                        )
-                        .map(
-                          (hidden, hi): MenuItem => ({
-                            key:
-                              hidden.key != null
-                                ? String(hidden.key)
-                                : `breadcrumb-hidden-${hi + 1}`,
-                            label: renderContent(hidden, hi + 1, false),
-                            disabled: hidden.disabled,
-                          }),
-                        ),
+                      items: hidden.map(({ item, index }) => ({
+                        key:
+                          item.key != null
+                            ? String(item.key)
+                            : `breadcrumb-hidden-${index}`,
+                        label: renderContent(item, index, false, true),
+                        disabled: item.disabled,
+                        [menuItemAsChild]: true,
+                      })),
                     }}
                   >
                     <button
@@ -251,10 +283,10 @@ export function Breadcrumb({
                     </button>
                   </Dropdown>
                 ) : (
-                  renderContent(entry, i, isLast)
+                  renderContent(entry.item, entry.index, isLast)
                 )}
               </li>
-              {!isLast && (
+              {!isLast && sep !== false && (
                 <li
                   data-tao-breadcrumb-separator=""
                   role="presentation"

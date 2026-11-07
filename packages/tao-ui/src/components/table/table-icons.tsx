@@ -105,9 +105,11 @@ export function CheckIcon() {
 
 export function ExpandIcon({
   expanded,
+  disabled,
   onClick,
 }: {
   expanded: boolean;
+  disabled?: boolean;
   onClick: (event: MouseEvent<HTMLButtonElement>) => void;
 }) {
   const { locale } = useTaoConfig();
@@ -116,6 +118,7 @@ export function ExpandIcon({
       type="button"
       data-tao-table-expand-icon=""
       data-tao-expanded={expanded || undefined}
+      disabled={disabled}
       aria-expanded={expanded}
       aria-label={
         expanded ? locale.messages.collapseRow : locale.messages.expandRow

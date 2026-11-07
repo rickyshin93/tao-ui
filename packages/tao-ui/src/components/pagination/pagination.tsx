@@ -154,15 +154,23 @@ export function Pagination({
       const ps = newPageSize ?? pageSize;
       const maxPage = Math.max(1, Math.ceil(total / ps));
       const safePage = Math.min(Math.max(1, page), maxPage);
+      if (safePage === current && ps === pageSize) return;
       if (!isCurrentControlled) setInternalCurrent(safePage);
       if (newPageSize != null && !isPageSizeControlled)
         setInternalPageSize(newPageSize);
       onChange?.(safePage, ps);
     },
-    [pageSize, total, isCurrentControlled, isPageSizeControlled, onChange],
+    [
+      current,
+      pageSize,
+      total,
+      isCurrentControlled,
+      isPageSizeControlled,
+      onChange,
+    ],
   );
 
-  const rangeStart = Math.min((current - 1) * pageSize + 1, total);
+  const rangeStart = (current - 1) * pageSize + 1;
   const rangeEnd = Math.min(current * pageSize, total);
 
   return (
@@ -180,7 +188,12 @@ export function Pagination({
           className={classNames?.total}
           style={styles?.total}
         >
-          {showTotal(total, [rangeStart, rangeEnd])}
+          {showTotal(
+            total,
+            current >= 1 && rangeStart <= rangeEnd
+              ? [rangeStart, rangeEnd]
+              : [0, 0],
+          )}
         </span>
       )}
 
@@ -236,9 +249,13 @@ export function Pagination({
 
       {showSizeChanger && (
         <Select
+          aria-label={ctx.locale.messages.pageSize}
           style={{ width: 'auto' }}
-          options={pageSizeOptions.map((opt) => ({
-            label: `${opt} / page`,
+          options={(pageSizeOptions.includes(pageSize)
+            ? pageSizeOptions
+            : [...pageSizeOptions, pageSize]
+          ).map((opt) => ({
+            label: `${opt} ${ctx.locale.messages.itemsPerPage}`,
             value: String(opt),
           }))}
           value={String(pageSize)}

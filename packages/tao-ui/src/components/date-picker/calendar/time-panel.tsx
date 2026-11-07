@@ -6,6 +6,7 @@ interface TimePanelProps {
   hour: number;
   minute: number;
   second: number;
+  disabled?: boolean;
   onChange: (h: number, m: number, s: number) => void;
   config?: TimeConfig;
   /** Increment to force scroll-to-selected even when the value hasn't changed */
@@ -16,6 +17,7 @@ export function TimePanel({
   hour,
   minute,
   second,
+  disabled,
   onChange,
   config,
   scrollKey,
@@ -56,6 +58,7 @@ export function TimePanel({
         selected={hour}
         onSelect={(v) => onChange(v, minute, second)}
         label={locale.hour}
+        disabled={disabled}
         scrollKey={scrollKey}
       />
       <TimeColumn
@@ -63,6 +66,7 @@ export function TimePanel({
         selected={minute}
         onSelect={(v) => onChange(hour, v, second)}
         label={locale.minute}
+        disabled={disabled}
         scrollKey={scrollKey}
       />
       <TimeColumn
@@ -70,6 +74,7 @@ export function TimePanel({
         selected={second}
         onSelect={(v) => onChange(hour, minute, v)}
         label={locale.second}
+        disabled={disabled}
         scrollKey={scrollKey}
       />
     </div>
@@ -81,7 +86,21 @@ interface TimeColumnProps {
   selected: number;
   onSelect: (value: number) => void;
   label: string;
+  disabled?: boolean;
   scrollKey?: number;
+}
+
+function centerSelected(list: HTMLDivElement, behavior: ScrollBehavior) {
+  const selected = list.querySelector<HTMLElement>('[data-tao-selected]');
+  if (!selected) return;
+  list.scrollTo({
+    top:
+      list.scrollTop +
+      selected.getBoundingClientRect().top -
+      list.getBoundingClientRect().top -
+      (list.clientHeight - selected.offsetHeight) / 2,
+    behavior,
+  });
 }
 
 function TimeColumn({
@@ -89,15 +108,15 @@ function TimeColumn({
   selected,
   onSelect,
   label,
+  disabled,
   scrollKey,
 }: TimeColumnProps) {
-  const listRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLDivElement | null>(null);
 
   // Scroll on mount (no animation)
   const initRef = useCallback((el: HTMLDivElement | null) => {
-    if (!el) return;
-    const selectedEl = el.querySelector('[data-tao-selected]');
-    selectedEl?.scrollIntoView({ block: 'center' });
+    listRef.current = el;
+    if (el) centerSelected(el, 'instant');
   }, []);
 
   useEffect(() => {
@@ -106,21 +125,13 @@ function TimeColumn({
     void scrollKey;
     const el = listRef.current;
     if (!el) return;
-    const selectedEl = el.querySelector('[data-tao-selected]');
-    selectedEl?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    centerSelected(el, 'smooth');
   }, [selected, scrollKey]);
 
   return (
-    <fieldset data-tao-time-column="" aria-label={label}>
+    <fieldset data-tao-time-column="" aria-label={label} disabled={disabled}>
       <div data-tao-time-column-title="">{label}</div>
-      <div
-        data-tao-time-column-list=""
-        ref={(el) => {
-          (listRef as React.MutableRefObject<HTMLDivElement | null>).current =
-            el;
-          initRef(el);
-        }}
-      >
+      <div data-tao-time-column-list="" ref={initRef}>
         {values.map((v) => (
           <button
             key={v}

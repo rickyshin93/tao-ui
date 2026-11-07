@@ -134,16 +134,24 @@ function TransferRoot<T extends TransferItem>(
     keys = side === 'right' ? sourceSelected : targetSelected,
   ) => {
     if (resolvedDisabled) return;
-    const moveKeys = keys.filter(
-      (key) => recordMap.has(key) && !recordMap.get(key)?.disabled,
-    );
+    const moveKeys = keys.filter((key) => {
+      const record = recordMap.get(key);
+      return (
+        record && !record.disabled && targetSet.has(key) === (side === 'left')
+      );
+    });
+    if (!moveKeys.length) return;
     const moveSet = new Set(moveKeys);
     const next =
       side === 'right'
         ? [...moveKeys, ...targetKeys]
         : targetKeys.filter((key) => !moveSet.has(key));
     const clearSide = side === 'right' ? 'left' : 'right';
-    updateSelection(clearSide, []);
+    const previousSelection = side === 'right' ? sourceSelected : targetSelected;
+    updateSelection(
+      clearSide,
+      previousSelection.filter((key) => !moveSet.has(key)),
+    );
     lastSelection.current[clearSide] = undefined;
     onChange?.(next, side, moveKeys);
   };
@@ -153,6 +161,10 @@ function TransferRoot<T extends TransferItem>(
     const sectionData = left ? source : target;
     const checked = left ? sourceSelected : targetSelected;
     const semanticSide = left ? 'source' : 'target';
+    const canSelect = (key: TransferKey) => {
+      const record = recordMap.get(key);
+      return record != null && !record.disabled && targetSet.has(key) === !left;
+    };
     return (
       <TransferList<T>
         {...text}
@@ -189,9 +201,12 @@ function TransferRoot<T extends TransferItem>(
           onSearch?.(side, '');
         }}
         onItemSelect={(key, check, event, filteredItems = sectionData) => {
-          if (resolvedDisabled || recordMap.get(key)?.disabled) return;
+          if (resolvedDisabled || !canSelect(key)) return;
           const enabled = filteredItems
-            .filter((record) => !record.disabled)
+            .filter(
+              (record) =>
+                !record.disabled && record.key != null && canSelect(record.key),
+            )
             .map((record) => record.key!);
           const previous = lastSelection.current[side];
           const selection = new Set(checked);
@@ -201,7 +216,7 @@ function TransferRoot<T extends TransferItem>(
           const start = previous ? enabled.indexOf(previous.key) : -1;
           const end = enabled.indexOf(key);
           const keys =
-            event?.shiftKey && sameData && start >= 0
+            event?.shiftKey && sameData && start >= 0 && end >= 0
               ? enabled.slice(Math.min(start, end), Math.max(start, end) + 1)
               : [key];
           for (const value of keys) {
@@ -213,11 +228,17 @@ function TransferRoot<T extends TransferItem>(
         }}
         onItemSelectAll={(keys, check) => {
           if (resolvedDisabled) return;
+          const previouslyChecked = new Set(checked);
           const selection =
-            check === 'replace' ? new Set<TransferKey>() : new Set(checked);
+            check === 'replace' ? new Set<TransferKey>() : previouslyChecked;
           for (const key of keys) {
-            if (check) selection.add(key);
-            else selection.delete(key);
+            if (!check) {
+              selection.delete(key);
+              continue;
+            }
+            if (previouslyChecked.has(key) || canSelect(key)) {
+              selection.add(key);
+            }
           }
           updateSelection(side, [...selection]);
           lastSelection.current[side] = undefined;
@@ -242,9 +263,11 @@ function TransferRoot<T extends TransferItem>(
         actions={actions ?? operations ?? []}
         moveToLeft={() => move('left')}
         moveToRight={() => move('right')}
-        leftActive={targetSelected.some((key) => !recordMap.get(key)?.disabled)}
+        leftActive={targetSelected.some(
+          (key) => recordMap.has(key) && !recordMap.get(key)?.disabled,
+        )}
         rightActive={sourceSelected.some(
-          (key) => !recordMap.get(key)?.disabled,
+          (key) => recordMap.has(key) && !recordMap.get(key)?.disabled,
         )}
         disabled={resolvedDisabled}
         oneWay={oneWay}

@@ -33,6 +33,57 @@ test('returning false prevents automatic image fallback', () => {
   expect(screen.getByAltText('Profile')).toBeTruthy();
   expect(screen.queryByText('AB')).toBeNull();
 });
+
+test('retries an earlier failed image after changing to another source', () => {
+  const { rerender } = render(
+    <Avatar src="first.png" alt="Profile">
+      AB
+    </Avatar>,
+  );
+  fireEvent.error(screen.getByAltText('Profile'));
+  expect(screen.getByText('AB')).toBeInTheDocument();
+  rerender(
+    <Avatar src="second.png" alt="Profile">
+      AB
+    </Avatar>,
+  );
+  expect(screen.getByAltText('Profile')).toHaveAttribute('src', 'second.png');
+  rerender(
+    <Avatar src="first.png" alt="Profile">
+      AB
+    </Avatar>,
+  );
+  expect(screen.getByAltText('Profile')).toHaveAttribute('src', 'first.png');
+});
+
+test('renders a native image when only srcSet supplies a source', () => {
+  render(
+    <Avatar srcSet="small.png 1x, large.png 2x" alt="Profile">
+      AB
+    </Avatar>,
+  );
+  const image = screen.getByAltText('Profile');
+  expect(image).toHaveAttribute('srcset', 'small.png 1x, large.png 2x');
+  fireEvent.error(image);
+  expect(screen.getByText('AB')).toBeInTheDocument();
+});
+
+test('retries a failed avatar when the image request mode changes', () => {
+  const { rerender } = render(
+    <Avatar src="profile.png" crossOrigin="anonymous" alt="Profile">
+      AB
+    </Avatar>,
+  );
+  fireEvent.error(screen.getByAltText('Profile'));
+  expect(screen.getByText('AB')).toBeVisible();
+
+  rerender(
+    <Avatar src="profile.png" alt="Profile">
+      AB
+    </Avatar>,
+  );
+  expect(screen.getByAltText('Profile')).not.toHaveAttribute('crossorigin');
+});
 test('forwards span refs, numeric sizes and native image attributes', () => {
   const ref = createRef<HTMLSpanElement>();
   render(
@@ -98,4 +149,36 @@ test('semantic slots style text and root independently', () => {
   expect(screen.getByText('AB').className).toBe('initials');
   expect(screen.getByText('AB').style.fontWeight).toBe('600');
   expect(screen.getByText('AB').parentElement?.style.color).toBe('red');
+});
+
+test('default group overflow can be revealed by keyboard focus', async () => {
+  render(
+    <Avatar.Group max={{ count: 1 }}>
+      <Avatar>Visible</Avatar>
+      <Avatar>Overflow user</Avatar>
+    </Avatar.Group>,
+  );
+  const overflow = screen.getByRole('button');
+  fireEvent.focus(overflow);
+  expect(await screen.findByRole('dialog')).toHaveTextContent('Overflow user');
+});
+
+test('Avatar.Group keeps distinct state for local keys in keyed fragments', () => {
+  const view = (labels: string[]) => (
+    <Avatar.Group>
+      {labels.map((label) => (
+        <Fragment key={label}>
+          <Avatar key="avatar" src={<input aria-label={label} />} />
+        </Fragment>
+      ))}
+    </Avatar.Group>
+  );
+  const { rerender } = render(view(['First', 'Second']));
+  const first = screen.getByRole('textbox', { name: 'First' });
+  fireEvent.change(first, { target: { value: 'Edited' } });
+
+  rerender(view(['Second', 'First']));
+
+  expect(screen.getByRole('textbox', { name: 'First' })).toBe(first);
+  expect(first).toHaveValue('Edited');
 });

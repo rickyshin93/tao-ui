@@ -86,7 +86,7 @@
    =========================== */
 [data-tao-tabs-ink] {
   position: absolute;
-  left: 0;
+  inset-inline-start: 0;
   bottom: 0;
   /* Grown by `scaleX(<target width>)`, so this element must stay 1px wide with
      no border-radius: a non-uniform scale stretches the rounded caps into long

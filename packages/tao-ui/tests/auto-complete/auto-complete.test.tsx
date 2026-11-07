@@ -61,6 +61,18 @@ test('controlled values stay owned by the caller and controlled open emits reque
   expect(screen.getByRole('combobox')).toHaveAttribute('aria-expanded', 'true');
 });
 
+test('an open AutoComplete can render a custom empty popup', () => {
+  render(
+    <AutoComplete
+      open
+      options={[]}
+      popupRender={() => <button type="button">Create entry</button>}
+    />,
+  );
+
+  expect(screen.getByRole('button', { name: 'Create entry' })).toBeVisible();
+});
+
 test('does not display an empty dropdown despite controlled open', () => {
   render(<AutoComplete options={[]} open />);
   expect(screen.getByRole('combobox')).toHaveAttribute(
@@ -68,6 +80,22 @@ test('does not display an empty dropdown despite controlled open', () => {
     'false',
   );
   expect(screen.queryByRole('listbox')).toBeNull();
+});
+
+test('an explicitly empty controlled value ignores the default and unaccepted edits', () => {
+  const onChange = rstest.fn();
+  render(
+    <AutoComplete
+      value={undefined}
+      defaultValue="default"
+      onChange={onChange}
+    />,
+  );
+  const input = screen.getByRole('combobox');
+  expect(input).toHaveValue('');
+  fireEvent.change(input, { target: { value: 'draft' } });
+  expect(onChange.mock.calls[0][0]).toBe('draft');
+  expect(input).toHaveValue('');
 });
 
 test('showSearch object filters options and supports grouped option data', async () => {
@@ -137,6 +165,18 @@ test('forwards custom textarea props and composes its event handlers', async () 
   expect(input).toHaveValue('alice@example.com');
 });
 
+test('disabled AutoComplete disables a custom input with a local false override', () => {
+  const onChange = rstest.fn();
+  render(
+    <AutoComplete disabled options={options} onChange={onChange}>
+      <Input aria-label="Custom input" disabled={false} />
+    </AutoComplete>,
+  );
+  const input = screen.getByRole('combobox', { name: 'Custom input' });
+  expect(input).toBeDisabled();
+  expect(onChange).not.toHaveBeenCalled();
+});
+
 test('custom tao Input preserves its native control wrapper', () => {
   render(
     <AutoComplete options={options}>
@@ -190,6 +230,36 @@ test('composition defers search until the committed text and controlled onChange
   fireEvent.compositionEnd(input, { data: '中' });
   expect(input).toHaveValue('中');
   expect(onSearch.mock.calls.at(-1)?.[0]).toBe('中');
+});
+
+test('Enter confirms composition without accepting an AutoComplete suggestion', async () => {
+  const onSelect = rstest.fn();
+  render(
+    <AutoComplete
+      defaultOpen
+      defaultActiveFirstOption
+      options={[{ value: '中文' }]}
+      onSelect={onSelect}
+    />,
+  );
+  const input = screen.getByRole('combobox');
+  await screen.findByText('中文', {
+    selector: '.tao-select-engine-item-option-content',
+  });
+  fireEvent.compositionStart(input);
+  expect(
+    fireEvent.keyDown(input, {
+      key: 'Enter',
+      keyCode: 13,
+      which: 13,
+      isComposing: true,
+    }),
+  ).toBe(true);
+  fireEvent.keyUp(input, { key: 'Enter', keyCode: 13, which: 13 });
+  expect(onSelect).not.toHaveBeenCalled();
+  fireEvent.compositionEnd(input);
+  fireEvent.keyDown(input, { key: 'Enter', keyCode: 13, which: 13 });
+  expect(onSelect).toHaveBeenCalledTimes(1);
 });
 
 test('inherits disabled and supports refs, semantic callbacks and themed portals', async () => {

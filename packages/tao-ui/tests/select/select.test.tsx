@@ -535,6 +535,177 @@ test('mobile: selecting a grouped item reports its value', async () => {
   expect(val).toBe('apple');
 });
 
+test.each([false, true])(
+  'nested Select groups only expose leaf choices (mobile=%s)',
+  async (mobile) => {
+    const onChange = rs.fn();
+    const leaf = { value: 'a', label: 'Alpha' };
+    render(
+      <Select
+        mobile={mobile}
+        defaultOpen
+        options={[
+          {
+            value: 'outer',
+            label: 'Outer',
+            options: [{ value: 'inner', label: 'Inner', options: [leaf] }],
+          },
+        ]}
+        onChange={onChange}
+      />,
+    );
+    const role = mobile ? 'button' : 'option';
+    expect(screen.getByText('Inner')).toBeVisible();
+    expect(screen.queryByRole(role, { name: 'Inner' })).toBeNull();
+    await userEvent.click(screen.getByRole(role, { name: 'Alpha' }));
+    expect(onChange).toHaveBeenCalledExactlyOnceWith('a', leaf);
+  },
+);
+
+test('mobile hideSelected hides committed selections and allows undoing a pending tap', async () => {
+  const onChange = rs.fn();
+  render(
+    <Select
+      mobile
+      defaultOpen
+      hideSelected
+      mode="multiple"
+      defaultValue={['a']}
+      options={[
+        { value: 'a', label: 'Alpha' },
+        { value: 'b', label: 'Beta' },
+      ]}
+      onChange={onChange}
+    />,
+  );
+  expect(
+    screen.queryByRole('button', { name: 'Alpha', exact: true }),
+  ).toBeNull();
+  const beta = screen.getByRole('button', { name: 'Beta' });
+  await userEvent.click(beta);
+  expect(beta).toHaveAttribute('aria-pressed', 'true');
+  await userEvent.click(beta);
+  expect(beta).toHaveAttribute('aria-pressed', 'false');
+  await userEvent.click(screen.getByRole('button', { name: 'Done' }));
+  expect(onChange.mock.calls[0][0]).toEqual(['a']);
+});
+
+test('desktop non-searchable Select clears its native form value after a selection', async () => {
+  const { container } = render(
+    <form>
+      <Select
+        mobile={false}
+        name="selection"
+        allowClear
+        placeholder="Pick"
+        options={[{ value: 'a', label: 'Alpha' }]}
+      />
+    </form>,
+  );
+  const form = container.querySelector('form')!;
+  fireEvent.keyDown(screen.getByRole('combobox'), { key: 'ArrowDown' });
+  await userEvent.click(await screen.findByRole('option', { name: 'Alpha' }));
+  expect(new FormData(form).get('selection')).toBe('a');
+  await userEvent.click(screen.getByRole('button', { name: 'Clear' }));
+  expect(new FormData(form).get('selection')).toBe('');
+});
+
+test('searchable Select groups use their rendered label as the accessible name', () => {
+  render(
+    <Select
+      mobile={false}
+      showSearch
+      defaultOpen
+      options={[
+        {
+          value: 'group',
+          label: <strong>Available</strong>,
+          options: [{ value: 'a', label: 'Alpha' }],
+        },
+      ]}
+    />,
+  );
+  expect(screen.getByRole('group', { name: 'Available' })).toBeInTheDocument();
+});
+
+test('mobile Select trigger exposes the drawer type and expanded state', async () => {
+  render(<Select mobile aria-label="Pick" options={[]} />);
+  const trigger = screen.getByRole('button', { name: 'Pick' });
+  expect(trigger).toHaveAttribute('aria-haspopup', 'dialog');
+  expect(trigger).toHaveAttribute('aria-expanded', 'false');
+  await userEvent.click(trigger);
+  expect(await screen.findByRole('dialog')).toBeInTheDocument();
+  expect(trigger).toHaveAttribute('aria-expanded', 'true');
+});
+
+test('an externally closed mobile Select starts a new search when reopened', async () => {
+  const props = {
+    mobile: true,
+    showSearch: true,
+    options: [
+      { value: 'a', label: 'Alpha' },
+      { value: 'b', label: 'Beta' },
+    ],
+  };
+  const view = render(<Select {...props} open />);
+  fireEvent.change(screen.getByRole('textbox'), { target: { value: 'Beta' } });
+  expect(screen.queryByRole('button', { name: 'Alpha' })).toBeNull();
+  view.rerender(<Select {...props} open={false} />);
+  await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+  view.rerender(<Select {...props} open />);
+  expect(await screen.findByRole('textbox')).toHaveValue('');
+  expect(screen.getByRole('button', { name: 'Alpha' })).toBeInTheDocument();
+});
+
+test('an ignored controlled close keeps the current Select search', async () => {
+  const onOpenChange = rs.fn();
+  render(
+    <Select
+      mobile
+      open
+      showSearch
+      onOpenChange={onOpenChange}
+      options={[
+        { value: 'a', label: 'Alpha' },
+        { value: 'b', label: 'Beta' },
+      ]}
+    />,
+  );
+  const search = screen.getByRole('textbox');
+  fireEvent.change(search, { target: { value: 'Beta' } });
+  await userEvent.keyboard('{Escape}');
+  expect(onOpenChange).toHaveBeenCalledWith(false);
+  expect(search).toHaveValue('Beta');
+  expect(screen.queryByRole('button', { name: 'Alpha' })).toBeNull();
+});
+
+test.each([true, false])(
+  'disabling an open desktop Select disables its options (search=%s)',
+  (showSearch) => {
+    const onChange = rs.fn();
+    const picker = (disabled: boolean) => (
+      <Select
+        open
+        mobile={false}
+        showSearch={showSearch}
+        disabled={disabled}
+        onChange={onChange}
+        options={[{ value: 'a', label: 'Alpha' }]}
+      />
+    );
+    const view = render(picker(false));
+    expect(screen.getByRole('option', { name: 'Alpha' })).not.toHaveAttribute(
+      'data-disabled',
+    );
+    view.rerender(picker(true));
+
+    const option = screen.getByRole('option', { name: 'Alpha' });
+    expect(option).toHaveAttribute('data-disabled');
+    fireEvent.click(option);
+    expect(onChange).not.toHaveBeenCalled();
+  },
+);
+
 // ---- Multi-select ----
 
 test('mode="multiple" shows placeholder when empty', () => {
@@ -995,6 +1166,62 @@ test('mobile search respects controlled text and reports edits', () => {
   expect(input).toHaveValue('Banana');
 });
 
+test('choosing a literal option keeps separator characters in its value', () => {
+  const onChange = rs.fn();
+  const option = { value: 'a,b', label: 'Alpha and Beta' };
+  render(
+    <Select
+      mobile={false}
+      open
+      mode="multiple"
+      showSearch
+      options={[option]}
+      tokenSeparators={[',']}
+      onChange={onChange}
+    />,
+  );
+  fireEvent.click(screen.getByRole('option', { name: 'Alpha and Beta' }));
+
+  expect(onChange).toHaveBeenCalledExactlyOnceWith(['a,b'], [option]);
+});
+
+test('desktop Select retains a query when a tag batch exceeds maxCount', () => {
+  render(
+    <Select
+      mobile={false}
+      mode="tags"
+      showSearch
+      maxCount={1}
+      options={[]}
+      tokenSeparators={[',']}
+    />,
+  );
+  const input = screen.getByRole('combobox');
+  fireEvent.change(input, { target: { value: 'Alpha,Beta' } });
+  fireEvent.keyDown(input, { key: 'Enter' });
+
+  expect(input).toHaveValue('Alpha,Beta');
+});
+
+test('mobile Select retains a query when a tag batch exceeds maxCount', () => {
+  render(
+    <Select
+      mobile
+      defaultOpen
+      mode="tags"
+      showSearch
+      maxCount={1}
+      options={[]}
+      tokenSeparators={[',']}
+    />,
+  );
+  const input = screen.getByRole('textbox', { name: 'Search options' });
+  fireEvent.change(input, { target: { value: 'Alpha,Beta' } });
+  fireEvent.keyDown(input, { key: 'Enter' });
+
+  expect(input).toHaveValue('Alpha,Beta');
+});
+
 test('mobile tags creates values and applies token separators before Done', async () => {
   const onChange = rs.fn();
   render(
@@ -1051,6 +1278,30 @@ test('an open mobile Select retains its draft and presentation across breakpoint
   expect(onChange).toHaveBeenCalledWith(['a'], options);
   await userEvent.click(screen.getByRole('combobox'));
   expect(screen.getByRole('listbox')).toBeInTheDocument();
+});
+
+test('a mobile Select close request does not focus the trigger if the drawer stays open', async () => {
+  const onOpenChange = rs.fn();
+  const picker = (mobile: boolean) => (
+    <Select
+      open
+      mobile={mobile}
+      aria-label="Choose"
+      onOpenChange={onOpenChange}
+      options={[{ value: 'a', label: 'Apple' }]}
+    />
+  );
+  const view = render(picker(true));
+  const trigger = document.querySelector<HTMLElement>('[data-tao-select]')!;
+  const focus = rs.spyOn(trigger, 'focus');
+  view.rerender(picker(false));
+  const dialog = screen.getByRole('dialog');
+  fireEvent.keyDown(dialog, { key: 'Escape' });
+  await new Promise((resolve) => setTimeout(resolve, 20));
+
+  expect(onOpenChange).toHaveBeenCalledWith(false);
+  expect(dialog).toBeVisible();
+  expect(focus).not.toHaveBeenCalled();
 });
 
 test('mobile popup forwards semantic parts and popupRender', () => {
@@ -1543,6 +1794,44 @@ test('Select defers token separators until composition ends and then accepts nor
   fireEvent.keyDown(input, { key: 'Enter' });
   expect(onChange).toHaveBeenCalledWith(['中文'], []);
   expect(input).toHaveValue('');
+});
+
+test('Enter opens a closed searchable Select before committing an option', () => {
+  const onChange = rs.fn();
+  const option = { value: 'a', label: 'Alpha' };
+  render(
+    <Select mobile={false} showSearch options={[option]} onChange={onChange} />,
+  );
+  const input = screen.getByRole('combobox');
+  fireEvent.keyDown(input, { key: 'Enter' });
+  expect(onChange).not.toHaveBeenCalled();
+  expect(input).toHaveAttribute('aria-expanded', 'true');
+  fireEvent.keyDown(input, { key: 'Enter' });
+  expect(onChange).toHaveBeenCalledExactlyOnceWith('a', option);
+});
+
+test('search highlight follows the same option when async results are inserted', () => {
+  const onChange = rs.fn();
+  const alpha = { value: 'a', label: 'Alpha' };
+  const beta = { value: 'b', label: 'Beta' };
+  const picker = (options: (typeof alpha)[]) => (
+    <Select
+      mobile={false}
+      defaultOpen
+      showSearch
+      options={options}
+      onChange={onChange}
+    />
+  );
+  const view = render(picker([alpha, beta]));
+  const input = screen.getByRole('combobox');
+  fireEvent.keyDown(input, { key: 'ArrowDown' });
+  const highlight = input.getAttribute('aria-activedescendant');
+  expect(document.getElementById(highlight!)).toHaveTextContent('Beta');
+  view.rerender(picker([{ value: 'n', label: 'New' }, alpha, beta]));
+  expect(input).toHaveAttribute('aria-activedescendant', highlight);
+  fireEvent.keyDown(input, { key: 'Enter' });
+  expect(onChange).toHaveBeenCalledExactlyOnceWith('b', beta);
 });
 
 test('search highlight uses the visible index when dynamic options shrink and grow', () => {

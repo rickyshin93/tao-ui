@@ -3,6 +3,7 @@ import {
   type HTMLAttributes,
   type ReactNode,
   type RefAttributes,
+  useEffect,
   useId,
   useImperativeHandle,
   useLayoutEffect,
@@ -100,8 +101,20 @@ function SegmentedInner<ValueType>(
       ),
     [options],
   );
-  const [internal, setInternal] = useState(defaultValue ?? resolved[0]?.value);
-  const selected = value !== undefined ? value : internal;
+  const firstEnabledValue = resolved.find((option) => !option.disabled)?.value;
+  const initialValue = resolved.some(
+    (option) => option.value === defaultValue && !option.disabled,
+  )
+    ? defaultValue
+    : firstEnabledValue;
+  const [internal, setInternal] = useState(initialValue);
+  const controlled = 'value' in props;
+  const internalAvailable = resolved.some(
+    (option) => option.value === internal && !option.disabled,
+  );
+  if (!controlled && !internalAvailable && internal !== initialValue)
+    setInternal(initialValue);
+  const selected = controlled ? value : internalAvailable ? internal : initialValue;
   const axis = orientation ?? (vertical ? 'vertical' : 'horizontal');
   const merged = {
     ...props,
@@ -129,6 +142,29 @@ function SegmentedInner<ValueType>(
     [directionRef],
   );
   useImperativeHandle(ref, () => root.current!);
+  const resetValue = controlled ? selected : initialValue;
+  useLayoutEffect(() => {
+    const container = root.current;
+    if (!container?.closest('form')) return;
+    const radios = container.querySelectorAll<HTMLInputElement>(
+      ':scope > [data-tao-segmented-item] > input',
+    );
+    // Native reset must use the current default or the value owned by the caller.
+    resolved.forEach((option, index) => {
+      radios[index].defaultChecked = option.value === resetValue;
+    });
+  }, [resetValue, resolved]);
+  useEffect(() => {
+    if (controlled) return;
+    const form = root.current?.closest('form');
+    const reset = (event: Event) => {
+      queueMicrotask(() => {
+        if (!event.defaultPrevented) setInternal(initialValue);
+      });
+    };
+    form?.addEventListener('reset', reset);
+    return () => form?.removeEventListener('reset', reset);
+  }, [controlled, initialValue]);
   const [thumb, setThumb] = useState<{
     x: number;
     y: number;
@@ -182,7 +218,7 @@ function SegmentedInner<ValueType>(
   }, [resolved, selected]);
   function select(next: ValueType) {
     if (next === selected) return;
-    if (value === undefined) setInternal(next);
+    if (!controlled) setInternal(next);
     onChange?.(next);
   }
   return (
@@ -212,6 +248,7 @@ function SegmentedInner<ValueType>(
           ),
         );
         const index = radios.indexOf(target);
+        if (index < 0) return;
         const rtl = getComputedStyle(event.currentTarget).direction === 'rtl';
         const previous =
           axis === 'vertical' ? 'ArrowUp' : rtl ? 'ArrowRight' : 'ArrowLeft';
@@ -280,7 +317,11 @@ function SegmentedInner<ValueType>(
               disabled={isDisabled}
               onChange={() => select(option.value)}
               aria-label={
-                option.label === undefined ? String(option.value) : undefined
+                option.label == null ||
+                option.label === '' ||
+                typeof option.label === 'boolean'
+                  ? String(option.value)
+                  : undefined
               }
             />
             <span

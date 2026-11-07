@@ -142,6 +142,23 @@ test('standalone placeholders inherit provider size and honor direct overrides',
   ).toBe('44px');
 });
 
+test('compound avatar applies its own root and content semantic slots', () => {
+  const { container } = render(
+    <Skeleton
+      avatar={{
+        classNames: { root: 'avatar-container', content: 'avatar-shape' },
+        styles: { root: { margin: 8 }, content: { width: 54, height: 54 } },
+      }}
+    />,
+  );
+  const header = container.querySelector('[data-tao-skeleton-header]');
+  const avatar = container.querySelector('[data-tao-kind="avatar"]');
+  expect(header).toHaveClass('avatar-container');
+  expect(header).toHaveStyle({ margin: '8px' });
+  expect(avatar).toHaveClass('avatar-shape');
+  expect(avatar).toHaveStyle({ width: '54px', height: '54px' });
+});
+
 test('standalone semantic root and content styles stay independently configurable', () => {
   const { container } = render(
     <Skeleton.Button

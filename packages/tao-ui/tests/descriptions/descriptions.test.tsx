@@ -1,5 +1,5 @@
 import { expect, test } from '@rstest/core';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { createRef, Fragment } from 'react';
 import {
   Descriptions,
@@ -87,6 +87,35 @@ test('legacy children flatten fragments and items take precedence', () => {
   expect(screen.queryByText('Old')).toBeNull();
   expect(screen.getByText('Current')).toBeTruthy();
 });
+
+test('fragment-local keys preserve the remaining field when a fragment is removed', () => {
+  const view = (includeFirst: boolean) => (
+    <Descriptions column={3}>
+      <Descriptions.Item key="context">Context</Descriptions.Item>
+      {includeFirst && (
+        <Fragment key="first">
+          <Descriptions.Item key="status">
+            <input aria-label="First status" defaultValue="First" />
+          </Descriptions.Item>
+        </Fragment>
+      )}
+      <Fragment key="second">
+        <Descriptions.Item key="status">
+          <input aria-label="Second status" defaultValue="Second" />
+        </Descriptions.Item>
+      </Fragment>
+    </Descriptions>
+  );
+  const { rerender } = render(view(true));
+  fireEvent.change(screen.getByRole('textbox', { name: 'Second status' }), {
+    target: { value: 'Draft status' },
+  });
+  rerender(view(false));
+  expect(screen.getByRole('textbox', { name: 'Second status' })).toHaveValue(
+    'Draft status',
+  );
+});
+
 test('semantic item styles override root slots on bordered cells and expose the ref', () => {
   const ref = createRef<DescriptionsRef>();
   render(

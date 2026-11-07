@@ -2,6 +2,7 @@
    Checkbox Wrapper (label)
    =========================== */
 [data-tao-checkbox-wrapper] {
+  --tao-checkbox-size: 16px;
   display: inline-flex;
   align-items: center;
   gap: var(--tao-padding-xs);
@@ -11,6 +12,16 @@
   color: var(--tao-color-text);
   user-select: none;
   line-height: var(--tao-line-height);
+}
+
+[data-tao-checkbox-wrapper][data-tao-size="small"] {
+  --tao-checkbox-size: 14px;
+  font-size: var(--tao-font-size-sm);
+}
+
+[data-tao-checkbox-wrapper][data-tao-size="large"] {
+  --tao-checkbox-size: 20px;
+  font-size: var(--tao-font-size-lg);
 }
 
 [data-tao-checkbox-wrapper][data-tao-disabled] {
@@ -41,8 +52,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 16px;
-  height: 16px;
+  width: var(--tao-checkbox-size);
+  height: var(--tao-checkbox-size);
   border: var(--tao-line-width) solid var(--tao-color-border);
   border-radius: var(--tao-radius-sm);
   background: var(--tao-color-bg-container);

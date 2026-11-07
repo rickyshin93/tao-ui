@@ -1,9 +1,21 @@
 import { readFileSync } from 'node:fs';
-import { expect, test } from '@rstest/core';
-import { render, screen } from '@testing-library/react';
+import { expect, rstest, test } from '@rstest/core';
+import { act, render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { Radio, RadioGroup } from '../../src/components/radio/radio';
 import { TaoProvider } from '../../src/provider/tao-provider';
+
+test('required radio groups participate in native form validation', async () => {
+  const { container } = render(
+    <form>
+      <RadioGroup name="required-choice" aria-required options={['A', 'B']} />
+    </form>,
+  );
+  const form = container.querySelector('form')!;
+  expect(form.checkValidity()).toBe(false);
+  await userEvent.click(screen.getByRole('radio', { name: 'B' }));
+  expect(form.checkValidity()).toBe(true);
+});
 
 // ---- Radio ----
 
@@ -161,6 +173,89 @@ test('RadioGroup preserves default selection and updates native form data', asyn
   expect(screen.getByRole('radio', { name: 'Pro' })).toBeChecked();
 });
 
+test('native form reset restores an uncontrolled RadioGroup default', async () => {
+  const onChange = rstest.fn();
+  const tree = (label: string) => (
+    <form>
+      <RadioGroup
+        aria-label={label}
+        name="plan"
+        options={['Free', 'Pro']}
+        defaultValue="Free"
+        onChange={onChange}
+      />
+    </form>
+  );
+  const { container, rerender } = render(tree('Plan'));
+  const form = container.querySelector('form')!;
+  await userEvent.click(screen.getByRole('radio', { name: 'Pro' }));
+  expect(new FormData(form).get('plan')).toBe('Pro');
+  await act(async () => form.reset());
+  rerender(tree('Current plan'));
+  expect(screen.getByRole('radio', { name: 'Free' })).toBeChecked();
+  expect(new FormData(form).get('plan')).toBe('Free');
+  expect(onChange).toHaveBeenCalledExactlyOnceWith('Pro');
+});
+
+test('native form reset leaves a controlled RadioGroup on its current value', () => {
+  const tree = (value: string) => (
+    <form>
+      <RadioGroup options={['Free', 'Pro']} value={value} />
+    </form>
+  );
+  const { container, rerender } = render(tree('Free'));
+  rerender(tree('Pro'));
+  act(() => container.querySelector('form')!.reset());
+  expect(screen.getByRole('radio', { name: 'Pro' })).toBeChecked();
+});
+
+test('canceling a grouped radio change keeps the selected value', async () => {
+  const onChange = rstest.fn();
+  render(
+    <RadioGroup defaultValue="a" onChange={onChange}>
+      <Radio value="a">Option A</Radio>
+      <Radio value="b" onChange={(event) => event.preventDefault()}>
+        Option B
+      </Radio>
+    </RadioGroup>,
+  );
+  await userEvent.click(screen.getByRole('radio', { name: 'Option B' }));
+  expect(onChange).not.toHaveBeenCalled();
+  expect(screen.getByRole('radio', { name: 'Option A' })).toBeChecked();
+});
+
+test('a grouped radio reports its native event as well as the selected value', async () => {
+  const onChange = rstest.fn();
+  const onGroupChange = rstest.fn();
+  render(
+    <RadioGroup onChange={onGroupChange}>
+      <Radio value="plan" onChange={onChange}>
+        Plan
+      </Radio>
+    </RadioGroup>,
+  );
+  await userEvent.click(screen.getByRole('radio', { name: 'Plan' }));
+  expect(onChange).toHaveBeenCalledTimes(1);
+  expect(onGroupChange).toHaveBeenCalledExactlyOnceWith('plan');
+});
+
+test('a valueless radio does not become a selected member of an empty group', () => {
+  const { container } = render(
+    <form>
+      <RadioGroup name="plan">
+        <Radio>No group value</Radio>
+        <Radio value="free">Free</Radio>
+      </RadioGroup>
+    </form>,
+  );
+  expect(
+    screen.getByRole('radio', { name: 'No group value' }),
+  ).not.toBeChecked();
+  expect(new FormData(container.querySelector('form')!).has('plan')).toBe(
+    false,
+  );
+});
+
 test('RadioGroup without a default value supports children and disabled options', async () => {
   render(
     <RadioGroup>
@@ -255,4 +350,42 @@ test('uncontrolled radios preserve default selection and native same-name mutual
   await userEvent.click(beta);
   expect(alpha).not.toBeChecked();
   expect(beta).toBeChecked();
+});
+
+test('RadioGroup size overrides its provider and applies to options and children', () => {
+  render(
+    <TaoProvider size="large">
+      <RadioGroup size="small" options={['Small']} />
+      <RadioGroup size="medium">
+        <Radio value="medium">Medium</Radio>
+      </RadioGroup>
+      <RadioGroup options={['Large']} />
+    </TaoProvider>,
+  );
+  for (const [name, size] of [
+    ['Small', 'small'],
+    ['Medium', 'medium'],
+    ['Large', 'large'],
+  ]) {
+    const label = screen.getByRole('radio', { name }).closest('label');
+    expect(label).toHaveAttribute('data-tao-size', size);
+  }
+});
+
+test('RadioGroup native reset preserves a selection matching an updated default', async () => {
+  const tree = (defaultValue: string) => (
+    <form>
+      <RadioGroup
+        name="radio-reset"
+        options={['A', 'B']}
+        defaultValue={defaultValue}
+      />
+    </form>
+  );
+  const view = render(tree('A'));
+  await userEvent.click(screen.getByRole('radio', { name: 'B' }));
+  view.rerender(tree('B'));
+  await act(async () => view.container.querySelector('form')!.reset());
+  expect(screen.getByRole('radio', { name: 'B' })).toBeChecked();
+  expect(screen.getByRole('radio', { name: 'A' })).not.toBeChecked();
 });

@@ -1,5 +1,5 @@
 import { beforeAll, expect, test } from '@rstest/core';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { ContextMenu } from '../../src/components/context-menu/context-menu';
 import type { MenuItem } from '../../src/components/menu/menu-render';
@@ -195,4 +195,35 @@ test('content carries size from TaoProvider', () => {
     '[data-tao-menu-content]',
   ) as HTMLElement;
   expect(content.dataset.taoSize).toBe('large');
+});
+
+test('a disabled context menu suppresses controlled open and respects it again when enabled', () => {
+  const menu = { items };
+  const view = render(
+    <ContextMenu open disabled menu={menu}>
+      <span>Context target</span>
+    </ContextMenu>,
+  );
+  expect(screen.queryByRole('menu')).toBeNull();
+  view.rerender(
+    <ContextMenu open disabled={false} menu={menu}>
+      <span>Context target</span>
+    </ContextMenu>,
+  );
+  expect(screen.getByRole('menu')).toBeInTheDocument();
+});
+
+test('disabling an uncontrolled context menu discards the open interaction', () => {
+  const viewFor = (disabled: boolean) => (
+    <ContextMenu disabled={disabled} menu={{ items }}>
+      <span>Context target</span>
+    </ContextMenu>
+  );
+  const view = render(viewFor(false));
+  fireEvent.contextMenu(screen.getByText('Context target'));
+  expect(screen.getByRole('menu')).toBeInTheDocument();
+  view.rerender(viewFor(true));
+  expect(screen.queryByRole('menu')).toBeNull();
+  view.rerender(viewFor(false));
+  expect(screen.queryByRole('menu')).toBeNull();
 });

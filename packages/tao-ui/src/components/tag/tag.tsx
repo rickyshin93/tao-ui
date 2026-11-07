@@ -82,13 +82,14 @@ export function Tag({
   icon,
   closeIcon,
   onClose,
-  disabled = false,
+  disabled: disabledProp,
   className,
   style,
   classNames,
   styles,
 }: TagProps) {
-  const { locale } = useTaoConfig();
+  const { locale, disabled: providerDisabled } = useTaoConfig();
+  const disabled = disabledProp ?? providerDisabled;
   const isPreset = [
     'default',
     'primary',
@@ -97,7 +98,9 @@ export function Tag({
     'error',
   ].includes(color);
   const showClose =
-    closeIcon !== false && closeIcon !== null && (closeIcon || onClose);
+    closeIcon !== false &&
+    closeIcon !== null &&
+    (closeIcon === 0 || Boolean(closeIcon || onClose));
 
   const handleClose = useCallback(
     (e: MouseEvent<HTMLElement>) => {
@@ -135,7 +138,7 @@ export function Tag({
       className={cx(classNames?.root, className)}
       style={{ ...customColorStyle, ...styles?.root, ...style }}
     >
-      {icon != null && (
+      {icon != null && typeof icon !== 'boolean' && icon !== '' && (
         <span
           data-tao-tag-icon=""
           className={cx(classNames?.icon)}
@@ -180,11 +183,13 @@ export function CheckableTag({
   children,
   checked = false,
   onChange,
-  disabled = false,
+  disabled: disabledProp,
   icon,
   className,
   style,
 }: CheckableTagProps) {
+  const { disabled: providerDisabled } = useTaoConfig();
+  const disabled = disabledProp ?? providerDisabled;
   return (
     // biome-ignore lint/a11y/useSemanticElements: CheckableTag intentionally keeps one inline tag element with checkbox semantics.
     <span
@@ -198,15 +203,30 @@ export function CheckableTag({
       tabIndex={disabled ? undefined : 0}
       className={className}
       style={style}
-      onClick={() => !disabled && onChange?.(!checked)}
-      onKeyDown={(e) => {
-        if (!disabled && (e.key === 'Enter' || e.key === ' ')) {
-          e.preventDefault();
+      onClick={(e) => {
+        if (
+          !disabled &&
+          !e.defaultPrevented &&
+          e.currentTarget.contains(e.target as Node)
+        ) {
           onChange?.(!checked);
         }
       }}
+      onKeyDown={(e) => {
+        if (
+          !disabled &&
+          !e.defaultPrevented &&
+          e.target === e.currentTarget &&
+          (e.key === 'Enter' || e.key === ' ')
+        ) {
+          e.preventDefault();
+          if (!e.repeat) onChange?.(!checked);
+        }
+      }}
     >
-      {icon != null && <span data-tao-tag-icon="">{icon}</span>}
+      {icon != null && typeof icon !== 'boolean' && icon !== '' && (
+        <span data-tao-tag-icon="">{icon}</span>
+      )}
       {children != null && <span data-tao-tag-content="">{children}</span>}
     </span>
   );

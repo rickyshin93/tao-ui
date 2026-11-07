@@ -41,8 +41,9 @@ type TreeKeyboardHandle = { onKeyDown: KeyboardEventHandler };
 export function treeKeyboardPopup(
   menu: ReactElement,
   direction: 'ltr' | 'rtl',
+  allowKeyDown?: (event: KeyboardEvent) => boolean,
 ): ReactElement {
-  if (direction !== 'rtl') return menu;
+  if (direction !== 'rtl' && !allowKeyDown) return menu;
   const forwardRef = mergeRefs(
     getNodeRef<TreeKeyboardHandle>(menu) ?? undefined,
   );
@@ -51,8 +52,10 @@ export function treeKeyboardPopup(
       forwardRef(
         handle && {
           ...handle,
-          onKeyDown: (event) =>
-            handle.onKeyDown(treeKeyboardEvent(event, direction)),
+          onKeyDown: (event) => {
+            if (allowKeyDown?.(event) !== false)
+              handle.onKeyDown(treeKeyboardEvent(event, direction));
+          },
         },
       ),
   });

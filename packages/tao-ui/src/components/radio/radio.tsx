@@ -1,3 +1,4 @@
+import useLayoutEffect from '@rc-component/util/es/hooks/useLayoutEffect';
 import {
   type AriaAttributes,
   type ForwardedRef,
@@ -8,6 +9,9 @@ import {
   type Ref,
   useCallback,
   useContext,
+  useEffect,
+  useId,
+  useRef,
   useState,
 } from 'react';
 import { type TaoSize, useTaoConfig } from '../../provider/tao-provider';
@@ -26,6 +30,8 @@ interface RadioGroupContextValue {
   name?: string;
   value?: string;
   disabled: boolean;
+  required: boolean;
+  size: TaoSize;
   onChange: (value: string) => void;
 }
 
@@ -79,24 +85,23 @@ export const Radio = forwardRef(function Radio(
 
   const resolvedDisabled =
     disabled ?? groupCtx?.disabled ?? ctx.disabled ?? false;
-  const resolvedChecked = groupCtx ? groupCtx.value === value : checked;
-  const resolvedName = groupCtx?.name ?? name;
+  const grouped = groupCtx != null && value != null;
+  const resolvedChecked = grouped ? groupCtx.value === value : checked;
+  const resolvedName = grouped ? (groupCtx.name ?? name) : name;
 
   const handleChange = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
-      if (groupCtx && value != null) {
-        groupCtx.onChange(value);
-      } else {
-        onChange?.(e);
-      }
+      onChange?.(e);
+      if (!e.defaultPrevented && grouped) groupCtx.onChange(value);
     },
-    [groupCtx, value, onChange],
+    [groupCtx, grouped, value, onChange],
   );
 
   return (
     <label
       data-tao-radio-wrapper=""
       data-tao-disabled={resolvedDisabled || undefined}
+      data-tao-size={groupCtx?.size ?? ctx.size}
       className={cx(classNames?.root)}
       style={styles?.root}
     >
@@ -104,7 +109,10 @@ export const Radio = forwardRef(function Radio(
         <input
           {...ariaProps}
           required={
-            required ?? (ariaRequired === true || ariaRequired === 'true')
+            required ??
+            (ariaRequired === undefined
+              ? grouped && groupCtx.required
+              : ariaRequired === true || ariaRequired === 'true')
           }
           ref={ref}
           type="radio"
@@ -160,32 +168,64 @@ export interface RadioGroupProps
   disabled?: boolean;
   size?: TaoSize;
   direction?: 'horizontal' | 'vertical';
+  /** Native group name; generated when omitted to isolate keyboard navigation. */
   name?: string;
   children?: ReactNode;
 }
 
-export function RadioGroup({
-  options,
-  value,
-  defaultValue,
-  onChange,
-  disabled,
-  direction = 'horizontal',
-  name,
-  children,
-  id,
-  'aria-label': ariaLabel,
-  'aria-labelledby': ariaLabelledBy,
-  'aria-describedby': ariaDescribedBy,
-  'aria-errormessage': ariaErrorMessage,
-  'aria-invalid': ariaInvalid,
-  'aria-required': ariaRequired,
-}: RadioGroupProps) {
+export function RadioGroup(props: RadioGroupProps) {
+  const generatedName = useId();
+  const {
+    options,
+    value,
+    defaultValue,
+    onChange,
+    disabled,
+    size,
+    direction = 'horizontal',
+    name,
+    children,
+    id,
+    'aria-label': ariaLabel,
+    'aria-labelledby': ariaLabelledBy,
+    'aria-describedby': ariaDescribedBy,
+    'aria-errormessage': ariaErrorMessage,
+    'aria-invalid': ariaInvalid,
+    'aria-required': ariaRequired,
+  } = props;
   const ctx = useTaoConfig();
   const resolvedDisabled = disabled ?? ctx.disabled ?? false;
   const [internalValue, setInternalValue] = useState(defaultValue);
-  const isControlled = value !== undefined;
+  const isControlled = 'value' in props;
   const resolvedValue = isControlled ? value : internalValue;
+  const root = useRef<HTMLDivElement>(null);
+  const groupName = name ?? generatedName;
+  useLayoutEffect(() => {
+    const container = root.current;
+    if (!container?.closest('form')) return;
+    // Match the native reset value to the current owner or default selection.
+    const radios = container.querySelectorAll<HTMLInputElement>(
+      '[data-tao-radio-input]',
+    );
+    for (const radio of radios) {
+      if (radio.name === groupName) {
+        radio.defaultChecked = isControlled
+          ? radio.checked
+          : radio.value === defaultValue;
+      }
+    }
+  });
+  useEffect(() => {
+    if (isControlled) return;
+    const form = root.current?.closest('form');
+    const reset = (event: Event) => {
+      queueMicrotask(() => {
+        if (!event.defaultPrevented) setInternalValue(defaultValue);
+      });
+    };
+    form?.addEventListener('reset', reset);
+    return () => form?.removeEventListener('reset', reset);
+  }, [isControlled, defaultValue]);
 
   const handleChange = useCallback(
     (itemValue: string) => {
@@ -196,9 +236,11 @@ export function RadioGroup({
   );
 
   const groupCtxValue: RadioGroupContextValue = {
-    name,
+    name: groupName,
     value: resolvedValue,
     disabled: resolvedDisabled,
+    required: ariaRequired === true || ariaRequired === 'true',
+    size: size ?? ctx.size,
     onChange: handleChange,
   };
 
@@ -209,6 +251,7 @@ export function RadioGroup({
   return (
     <RadioGroupContext.Provider value={groupCtxValue}>
       <div
+        ref={root}
         data-tao-radio-group=""
         data-tao-direction={direction}
         role="radiogroup"

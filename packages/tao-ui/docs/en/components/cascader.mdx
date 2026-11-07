@@ -1,6 +1,6 @@
 ---
 title: Cascader
-description: "Choose complete paths through hierarchical options with search, multiple selection and a standalone panel."
+description: "Choose paths through hierarchical options with search, a standalone panel and a mobile drawer with confirmation for multiple selections."
 ---
 
 import Preview from '../../_components/demo-preview';
@@ -430,6 +430,8 @@ export default function LocationPanel() {
 ### Mobile bottom drawer
 
 Choose a three-level path in a bottom drawer on phones. The columns scroll horizontally when the path exceeds the available width.
+
+Single selection applies as soon as the user picks a path. With `multiple`, changes in the drawer apply when the user taps Done. Since [0.0.49](/guide/changelog), Cascader skips newly chosen paths that are removed or disabled before confirmation, while keeping previously committed paths that the user has left selected.
 
 ```tsx preview="iframe-follow"
 import { Cascader } from '@rockshin/tao-ui';

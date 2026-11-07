@@ -66,6 +66,27 @@ interface Layout {
   positions: { key: Key; column: number; top: number }[];
 }
 const EMPTY_ITEMS: MasonryItemType<never>[] = [];
+function resolveColumn(column: number | undefined, count: number) {
+  return column !== undefined && Number.isFinite(column)
+    ? Math.max(0, Math.min(Math.floor(column), count - 1))
+    : undefined;
+}
+
+function measureHeight(element: HTMLDivElement) {
+  const style = getComputedStyle(element);
+  if (style.display === 'none') return 0;
+  if (!style.height.endsWith('px'))
+    return element.getBoundingClientRect().height;
+  const height = Number.parseFloat(style.height);
+  if (style.boxSizing !== 'content-box') return height;
+  return [
+    style.paddingTop,
+    style.paddingBottom,
+    style.borderTopWidth,
+    style.borderBottomWidth,
+  ].reduce((total, size) => total + (Number.parseFloat(size) || 0), height);
+}
+
 function MasonryInner<T>(
   props: MasonryProps<T>,
   ref: React.ForwardedRef<MasonryRef>,
@@ -89,12 +110,15 @@ function MasonryInner<T>(
     ...rest
   } = props;
   const screens = useBreakpoint();
-  const count =
+  const requestedCount =
     typeof columns === 'number'
       ? columns
       : columns
         ? (resolveResponsiveValue(columns, screens) ?? columns.xs ?? 1)
         : 3;
+  const count = Number.isFinite(requestedCount)
+    ? Math.max(1, Math.floor(requestedCount))
+    : 1;
   const gaps = Array.isArray(gutter) ? gutter : [gutter, gutter];
   const horizontal = resolveResponsiveValue(gaps[0] ?? 0, screens) ?? 0;
   const vertical = resolveResponsiveValue(gaps[1] ?? horizontal, screens) ?? 0;
@@ -112,15 +136,13 @@ function MasonryInner<T>(
     const gap = Number.parseFloat(getComputedStyle(element).rowGap) || 0;
     const heights = Array<number>(count).fill(0);
     const positions = items.map((item) => {
-      const column = Math.min(
-        item.column ?? heights.indexOf(Math.min(...heights)),
-        count - 1,
-      );
+      const column =
+        resolveColumn(item.column, count) ??
+        heights.indexOf(Math.min(...heights));
       const top = heights[column];
+      const node = refs.current.get(item.key);
       heights[column] +=
-        (refs.current.get(item.key)?.getBoundingClientRect().height ??
-          item.height ??
-          0) + gap;
+        (node ? measureHeight(node) : (item.height ?? 0)) + gap;
       return { key: item.key, column, top };
     });
     const next = {
@@ -139,17 +161,16 @@ function MasonryInner<T>(
         ? previous
         : next,
     );
-    const order = positions.map(({ key, column }) => ({ key, column }));
     if (
-      order.length !== previousColumns.current.length ||
-      order.some(
+      positions.length !== previousColumns.current.length ||
+      positions.some(
         (item, i) =>
           item.key !== previousColumns.current[i].key ||
           item.column !== previousColumns.current[i].column,
       )
     ) {
-      previousColumns.current = order;
-      callback.current?.(order);
+      previousColumns.current = positions;
+      callback.current?.(positions.map(({ key, column }) => ({ key, column })));
     }
   }, [count, items]);
   useLayoutEffect(() => {
@@ -200,7 +221,9 @@ function MasonryInner<T>(
             ? layout.positions[index]
             : undefined;
         const column =
-          position?.column ?? Math.min(item.column ?? index % count, count - 1);
+          position?.column ??
+          resolveColumn(item.column, count) ??
+          index % count;
         return (
           <div
             key={item.key}

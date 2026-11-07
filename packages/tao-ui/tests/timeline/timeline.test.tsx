@@ -112,3 +112,73 @@ test('horizontal loading states render real status indicators and honor a custom
   expect(screen.queryByRole('status')).toBeNull();
   expect(screen.getByText('Custom loading')).toBeTruthy();
 });
+
+test('keeps nested fragment items distinct when sibling fragments change', () => {
+  const { rerender } = render(
+    <Timeline>
+      <Fragment key="a">
+        <Timeline.Item key="same">A</Timeline.Item>
+      </Fragment>
+      <Fragment key="b">
+        <Timeline.Item key="same">B</Timeline.Item>
+      </Fragment>
+    </Timeline>,
+  );
+  const second = screen.getByText('B').closest('li');
+  rerender(
+    <Timeline>
+      <Fragment key="b">
+        <Timeline.Item key="same">B</Timeline.Item>
+      </Fragment>
+    </Timeline>,
+  );
+  expect(screen.getAllByRole('listitem')).toHaveLength(1);
+  expect(screen.getByText('B').closest('li')).toBe(second);
+});
+
+test('keeps unkeyed item content mounted when reverse changes', () => {
+  const items = [
+    { content: <input aria-label="First" defaultValue="First" /> },
+    { content: <input aria-label="Second" defaultValue="Second" /> },
+  ];
+  const { rerender } = render(<Timeline items={items} />);
+  const first = screen.getByRole<HTMLInputElement>('textbox', {
+    name: 'First',
+  });
+  first.value = 'Edited';
+  rerender(<Timeline items={items} reverse />);
+  expect(screen.getAllByRole('textbox')).toEqual([
+    screen.getByRole('textbox', { name: 'Second' }),
+    first,
+  ]);
+  expect(first).toHaveValue('Edited');
+});
+
+test('includes numeric zero as a title and as pending content on the end rail', () => {
+  render(
+    <Timeline
+      mode="end"
+      pending={0}
+      items={[{ title: 0, content: 'Event' }]}
+    />,
+  );
+  expect(screen.getByRole('list')).toHaveAttribute('data-tao-split');
+  const entries = screen.getAllByRole('listitem');
+  expect(entries).toHaveLength(2);
+  expect(entries[1]).toHaveAttribute('data-tao-placement', 'end');
+  expect(entries[1].textContent).toBe('0');
+});
+
+test('aligns a pending item with the configured end rail', () => {
+  render(
+    <Timeline
+      mode="end"
+      pending="Waiting"
+      items={[{ title: 'Today', content: 'Event' }]}
+    />,
+  );
+  expect(screen.getByText('Waiting').closest('li')).toHaveAttribute(
+    'data-tao-placement',
+    'end',
+  );
+});

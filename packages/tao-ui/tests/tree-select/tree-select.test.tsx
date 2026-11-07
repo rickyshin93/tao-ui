@@ -5,6 +5,7 @@ import {
   render,
   screen,
   waitFor,
+  within,
 } from '@testing-library/react';
 import { createRef, useState } from 'react';
 import {
@@ -72,6 +73,25 @@ test('controlled values stay unchanged until accepted and clear uses the public 
   expect(screen.getByTitle('Alice')).toBeInTheDocument();
   rerender(<TreeSelect value="bob" treeData={treeData} />);
   expect(screen.getByTitle('Bob')).toBeInTheDocument();
+});
+
+test('an explicitly empty controlled TreeSelect does not fall back to the default or a pending selection', async () => {
+  const onChange = rstest.fn();
+  const { container } = render(
+    <TreeSelect
+      defaultValue="alice"
+      value={undefined}
+      treeData={treeData}
+      defaultOpen
+      treeDefaultExpandAll
+      onChange={onChange}
+    />,
+  );
+  const trigger = within(container);
+  expect(trigger.queryByTitle('Alice')).not.toBeInTheDocument();
+  fireEvent.click(await screen.findByText('Bob'));
+  expect(onChange.mock.calls[0][0]).toBe('bob');
+  expect(trigger.queryByTitle('Bob')).not.toBeInTheDocument();
 });
 
 test('cascades checked parents and follows SHOW_PARENT while ignoring disabled children', async () => {
@@ -144,6 +164,89 @@ test('filters using showSearch object and selects with the keyboard', async () =
   fireEvent.keyDown(input, { key: 'ArrowDown', keyCode: 40, which: 40 });
   fireEvent.keyDown(input, { key: 'Enter', keyCode: 13, which: 13 });
   expect(onChange.mock.calls[0][0]).toBe('bob');
+});
+
+test('Enter confirms composition without selecting the active TreeSelect option', async () => {
+  const onChange = rstest.fn();
+  render(
+    <TreeSelect
+      defaultOpen
+      showSearch
+      treeData={[{ value: 'alpha', title: 'Alpha' }]}
+      onChange={onChange}
+    />,
+  );
+  const input = screen.getByRole('combobox');
+  await screen.findByText('Alpha');
+  fireEvent.compositionStart(input);
+  const confirmedComposition = fireEvent.keyDown(input, {
+    key: 'Enter',
+    keyCode: 13,
+    which: 13,
+    isComposing: true,
+  });
+  fireEvent.keyUp(input, { key: 'Enter', keyCode: 13, which: 13 });
+  expect(onChange).not.toHaveBeenCalled();
+  expect(confirmedComposition).toBe(true);
+  fireEvent.compositionEnd(input);
+  fireEvent.keyDown(input, { key: 'Enter', keyCode: 13, which: 13 });
+  expect(onChange).toHaveBeenCalledTimes(1);
+  expect(onChange.mock.calls[0][0]).toBe('alpha');
+});
+
+test('keyboard Enter cannot select an active node hidden by a tree data change', async () => {
+  const onChange = rstest.fn();
+  const tree = (alpha: string, beta: string) => (
+    <TreeSelect
+      open
+      treeData={[
+        { value: 'a', title: alpha },
+        { value: 'b', title: beta },
+      ]}
+      showSearch={{ searchValue: 'Match', treeNodeFilterProp: 'title' }}
+      onChange={onChange}
+    />
+  );
+  const view = render(tree('Match alpha', 'Other beta'));
+  await screen.findByText('Match alpha');
+  view.rerender(tree('Other alpha', 'Match beta'));
+  await screen.findByText('Match beta');
+  expect(screen.queryByText('Other alpha')).not.toBeInTheDocument();
+
+  const input = screen.getByRole('combobox');
+  fireEvent.keyDown(input, { key: 'Enter', keyCode: 13, which: 13 });
+  fireEvent.keyUp(input, { key: 'Enter', keyCode: 13, which: 13 });
+  expect(onChange).not.toHaveBeenCalled();
+  fireEvent.keyDown(input, { key: 'ArrowDown', keyCode: 40, which: 40 });
+  fireEvent.keyDown(input, { key: 'Enter', keyCode: 13, which: 13 });
+  expect(onChange).toHaveBeenCalledTimes(1);
+  expect(onChange.mock.calls[0][0]).toBe('b');
+});
+
+test('keyboard Enter cannot select a disabled TreeSelect checkbox', async () => {
+  const onChange = rstest.fn();
+  render(
+    <TreeSelect
+      treeData={[
+        { value: 'locked', title: 'Locked', disableCheckbox: true },
+        { value: 'enabled', title: 'Enabled' },
+      ]}
+      defaultOpen
+      treeCheckable
+      onChange={onChange}
+    />,
+  );
+  expect(
+    await screen.findByRole('checkbox', { name: 'Locked' }),
+  ).toHaveAttribute('aria-disabled', 'true');
+  const input = screen.getByRole('combobox');
+  fireEvent.keyDown(input, { key: 'Enter', keyCode: 13, which: 13 });
+  fireEvent.keyUp(input, { key: 'Enter', keyCode: 13, which: 13 });
+  expect(onChange).not.toHaveBeenCalled();
+  fireEvent.keyDown(input, { key: 'ArrowDown', keyCode: 40, which: 40 });
+  fireEvent.keyDown(input, { key: 'Enter', keyCode: 13, which: 13 });
+  expect(onChange).toHaveBeenCalledTimes(1);
+  expect(onChange.mock.calls[0][0]).toEqual(['enabled']);
 });
 
 test('supports simple tree data, field names and labeled selection', async () => {

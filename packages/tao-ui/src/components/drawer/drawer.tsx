@@ -119,12 +119,13 @@ export function Drawer({
   'aria-describedby': ariaDescribedBy,
 }: DrawerProps) {
   const { locale } = useTaoConfig();
-  const prevOpen = useRef(open);
+  const prevOpen = useRef(false);
+  const restoreFocus = useRef<HTMLElement | null>(null);
   useEffect(() => {
     if (prevOpen.current !== open) {
+      prevOpen.current = open;
       afterOpenChange?.(open);
       if (!open) afterClose?.();
-      prevOpen.current = open;
     }
   }, [open, afterOpenChange, afterClose]);
 
@@ -145,7 +146,31 @@ export function Drawer({
     },
     [watermarkRef],
   );
-  const dragRef = useRef<{ startPos: number; startSize: number } | null>(null);
+  const dragRef = useRef<{
+    pointerId: number;
+    target: HTMLDivElement;
+    placement: DrawerPlacement;
+    startPos: number;
+    startSize: number;
+  } | null>(null);
+  const resizeEnd = useRef(resizeCfg?.onResizeEnd);
+  if (isResizable) resizeEnd.current = resizeCfg?.onResizeEnd;
+  const endResize = useCallback((pointerId?: number) => {
+    const drag = dragRef.current;
+    if (!drag || (pointerId !== undefined && drag.pointerId !== pointerId))
+      return;
+    dragRef.current = null;
+    if (drag.target.hasPointerCapture(drag.pointerId)) {
+      drag.target.releasePointerCapture(drag.pointerId);
+    }
+    resizeEnd.current?.();
+  }, []);
+  useEffect(() => {
+    const active = dragRef.current;
+    if (active && (!open || !isResizable || active.placement !== placement))
+      endResize();
+  }, [open, isResizable, placement, endResize]);
+  useEffect(() => () => endResize(), [endResize]);
   const [drag, setDrag] = useState<{
     horizontal: boolean;
     size: number;
@@ -154,11 +179,14 @@ export function Drawer({
 
   const onDraggerPointerDown = (e: ReactPointerEvent<HTMLDivElement>) => {
     const el = contentRef.current;
-    if (!el) return;
+    if (!el || dragRef.current || e.button !== 0) return;
     e.preventDefault();
     e.currentTarget.setPointerCapture(e.pointerId);
     const rect = el.getBoundingClientRect();
     dragRef.current = {
+      pointerId: e.pointerId,
+      target: e.currentTarget,
+      placement,
       startPos: isHorizontal ? e.clientX : e.clientY,
       startSize: isHorizontal ? rect.width : rect.height,
     };
@@ -167,7 +195,7 @@ export function Drawer({
 
   const onDraggerPointerMove = (e: ReactPointerEvent<HTMLDivElement>) => {
     const dragStart = dragRef.current;
-    if (!dragStart) return;
+    if (!dragStart || dragStart.pointerId !== e.pointerId) return;
     const pos = isHorizontal ? e.clientX : e.clientY;
     let delta = pos - dragStart.startPos;
     // right/bottom are anchored at the far edge, so the handle moves opposite to growth.
@@ -181,11 +209,8 @@ export function Drawer({
     resizeCfg?.onResize?.(next);
   };
 
-  const onDraggerPointerUp = (e: ReactPointerEvent<HTMLDivElement>) => {
-    if (!dragRef.current) return;
-    dragRef.current = null;
-    e.currentTarget.releasePointerCapture?.(e.pointerId);
-    resizeCfg?.onResizeEnd?.();
+  const onDraggerPointerEnd = (e: ReactPointerEvent<HTMLDivElement>) => {
+    endResize(e.pointerId);
   };
 
   const contentStyle: CSSProperties = { ...stylesProp?.root };
@@ -200,7 +225,8 @@ export function Drawer({
   const keepAlive = !destroyOnHidden;
   const forceMount = keepAlive ? true : undefined;
 
-  const showHeader = title != null || extra != null || closable;
+  const showClose = closable && closeIcon !== false;
+  const showHeader = title != null || extra != null || showClose;
 
   return (
     <TaoProvider direction={direction}>
@@ -235,6 +261,23 @@ export function Drawer({
                 ? { 'aria-labelledby': ariaLabelledBy }
                 : {})}
               aria-describedby={ariaDescribedBy}
+              onOpenAutoFocus={() => {
+                const ownerDocument = contentRef.current?.ownerDocument;
+                const active = ownerDocument?.activeElement;
+                restoreFocus.current =
+                  active && active !== ownerDocument?.body
+                    ? (active as HTMLElement)
+                    : null;
+              }}
+              onCloseAutoFocus={(event) => {
+                event.preventDefault();
+                const target = restoreFocus.current;
+                if (
+                  target?.isConnected &&
+                  (!prevOpen.current || !contentRef.current)
+                )
+                  target.focus();
+              }}
               onEscapeKeyDown={(e) => {
                 if (!keyboard) e.preventDefault();
               }}
@@ -249,7 +292,9 @@ export function Drawer({
                   style={stylesProp?.dragger}
                   onPointerDown={onDraggerPointerDown}
                   onPointerMove={onDraggerPointerMove}
-                  onPointerUp={onDraggerPointerUp}
+                  onPointerUp={onDraggerPointerEnd}
+                  onPointerCancel={onDraggerPointerEnd}
+                  onLostPointerCapture={onDraggerPointerEnd}
                 />
               )}
               {showHeader && (
@@ -282,7 +327,7 @@ export function Drawer({
                         {extra}
                       </div>
                     )}
-                    {closable && (
+                    {showClose && (
                       <button
                         type="button"
                         data-tao-drawer-close=""

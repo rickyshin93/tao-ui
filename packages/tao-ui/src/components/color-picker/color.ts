@@ -16,7 +16,7 @@ export class Color {
 
   constructor(value: ColorGenInput<Color> | LineGradientType | null = '') {
     if (value instanceof Color) {
-      this.base = new BaseColor(value.toRgb());
+      this.base = new BaseColor(value.base);
       this.stops = value.stops?.map((stop) => ({
         percent: stop.percent,
         color: new Color(stop.color),

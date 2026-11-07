@@ -38,6 +38,30 @@ test('does not render icon by default', () => {
   expect(container.querySelector('[data-tao-alert-icon]')).toBeNull();
 });
 
+test('boolean conditional content leaves no empty alert slots', () => {
+  const { rerender } = render(
+    <Alert
+      title="Saved"
+      description={false}
+      action={false}
+      icon={false}
+      showIcon
+    />,
+  );
+  const alert = screen.getByRole('alert');
+  expect(alert).not.toHaveAttribute('data-tao-with-description');
+  for (const part of ['description', 'action', 'icon']) {
+    expect(alert.querySelector(`[data-tao-alert-${part}]`)).toBeNull();
+  }
+
+  rerender(<Alert title={0} description={0} action={0} icon={0} />);
+  for (const part of ['title', 'description', 'action', 'icon']) {
+    expect(alert.querySelector(`[data-tao-alert-${part}]`)).toHaveTextContent(
+      '0',
+    );
+  }
+});
+
 test('custom icon overrides the per-type default', () => {
   const { container } = render(
     <Alert
@@ -64,6 +88,18 @@ test('closable renders close button, click calls onClose and unmounts', () => {
 test('does not render close button by default', () => {
   render(<Alert title="Static" />);
   expect(screen.queryByLabelText('Close')).toBeNull();
+});
+
+test('a canceled close leaves the alert visible', () => {
+  render(
+    <Alert
+      title="Unsaved changes"
+      closable
+      onClose={(event) => event.preventDefault()}
+    />,
+  );
+  fireEvent.click(screen.getByRole('button', { name: 'Close' }));
+  expect(screen.getByRole('alert')).toHaveTextContent('Unsaved changes');
 });
 
 test('action slot renders', () => {

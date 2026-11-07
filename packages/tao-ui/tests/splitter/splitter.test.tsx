@@ -1,5 +1,6 @@
 import { expect, rstest, test } from '@rstest/core';
-import { act, fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen, within } from '@testing-library/react';
+import { StrictMode } from 'react';
 import { Splitter } from '../../src/components/splitter/splitter';
 
 const Panel = Splitter.Panel;
@@ -61,6 +62,84 @@ test('renders dragger between panels', () => {
   );
   const dragger = container.querySelector('[data-tao-splitter-dragger]');
   expect(dragger).toBeTruthy();
+});
+
+test('a secondary mouse button cannot resize splitter panels', () => {
+  const onResizeStart = rstest.fn();
+  const onResize = rstest.fn();
+  render(
+    <Splitter onResizeStart={onResizeStart} onResize={onResize}>
+      <Panel>Left</Panel>
+      <Panel>Right</Panel>
+    </Splitter>,
+  );
+  fireEvent.pointerDown(screen.getByRole('separator'), { button: 2, pointerId: 1, clientX: 100 });
+  fireEvent.pointerMove(document, { pointerId: 1, clientX: 120 });
+  fireEvent.pointerUp(document, { button: 2, pointerId: 1 });
+  expect(onResizeStart).not.toHaveBeenCalled();
+  expect(onResize).not.toHaveBeenCalled();
+});
+
+test('a splitter drag listens in the document where its handle is mounted', () => {
+  const frame = render(<iframe title="Preview" />);
+  const frameDocument =
+    screen.getByTitle<HTMLIFrameElement>('Preview').contentDocument!;
+  const container = frameDocument.createElement('div');
+  frameDocument.body.append(container);
+  const onResize = rstest.fn();
+  const view = render(
+    <Splitter onResize={onResize}>
+      <Panel>Left</Panel>
+      <Panel>Right</Panel>
+    </Splitter>,
+    { container },
+  );
+  try {
+    fireEvent.pointerDown(within(container).getByRole('separator'), {
+      pointerId: 1,
+      clientX: 100,
+    });
+    fireEvent.pointerMove(frameDocument, { pointerId: 1, clientX: 120 });
+    fireEvent.pointerUp(frameDocument, { pointerId: 1 });
+    expect(onResize).toHaveBeenCalledTimes(1);
+  } finally {
+    view.unmount();
+    frame.unmount();
+  }
+});
+
+test('a keyboard resize at its size limit emits no resize lifecycle callbacks', () => {
+  const onResizeStart = rstest.fn();
+  const onResize = rstest.fn();
+  const onResizeEnd = rstest.fn();
+  render(
+    <Splitter
+      onResizeStart={onResizeStart}
+      onResize={onResize}
+      onResizeEnd={onResizeEnd}
+    >
+      <Panel defaultSize={249} min={249}>Left</Panel>
+      <Panel>Right</Panel>
+    </Splitter>,
+  );
+  const separator = screen.getByRole('separator');
+  fireEvent.keyDown(separator, { key: 'ArrowLeft' });
+  expect(onResizeStart).not.toHaveBeenCalled();
+  expect(onResize).not.toHaveBeenCalled();
+  expect(onResizeEnd).not.toHaveBeenCalled();
+  fireEvent.keyDown(separator, { key: 'ArrowRight' });
+  expect(onResize).toHaveBeenCalledExactlyOnceWith([259, 340]);
+});
+
+test('separator minimum accounts for the adjacent maximum', () => {
+  render(
+    <Splitter>
+      <Panel min={100}>Left</Panel>
+      <Panel max={350}>Right</Panel>
+    </Splitter>,
+  );
+  const separator = screen.getByRole('separator');
+  expect(separator).toHaveAttribute('aria-valuemin', '249');
 });
 
 test('dragger exposes separator semantics and supports keyboard resize', () => {
@@ -191,6 +270,33 @@ test('vertical orientation', () => {
   expect(splitter.dataset.taoOrientation).toBe('vertical');
 });
 
+test('collapsing does not push the adjacent panel above its maximum', () => {
+  const onResize = rstest.fn();
+  render(
+    <Splitter onResize={onResize}>
+      <Panel collapsible defaultSize={250}>Left</Panel>
+      <Panel max={400}>Right</Panel>
+    </Splitter>,
+  );
+  fireEvent.click(screen.getByRole('button', { name: 'Collapse panel' }));
+  expect(onResize).not.toHaveBeenCalled();
+});
+
+test('restoring a collapsed panel respects its minimum', () => {
+  const onResize = rstest.fn();
+  render(
+    <Splitter onResize={onResize}>
+      <Panel collapsible defaultSize={150} min={200}>Left</Panel>
+      <Panel>Right</Panel>
+    </Splitter>,
+  );
+  const collapse = screen.getByRole('button', { name: 'Collapse panel' });
+  fireEvent.click(collapse);
+  expect(onResize).toHaveBeenLastCalledWith([0, 599]);
+  fireEvent.click(collapse);
+  expect(onResize).toHaveBeenLastCalledWith([200, 399]);
+});
+
 test('collapsible shows collapse button on dragger', () => {
   const { container } = render(
     <Splitter>
@@ -204,6 +310,87 @@ test('collapsible shows collapse button on dragger', () => {
   );
   const collapseBtn = container.querySelector('[data-tao-splitter-collapse]');
   expect(collapseBtn).toBeTruthy();
+});
+
+test('disabling the active Splitter separator cancels its drag', () => {
+  const onResize = rstest.fn();
+  const renderPanels = (resizable: boolean) => (
+    <Splitter onResize={onResize}>
+      <Panel resizable={resizable}>Left</Panel>
+      <Panel>Right</Panel>
+    </Splitter>
+  );
+  const view = render(renderPanels(true));
+  fireEvent.pointerDown(screen.getByRole('separator'), {
+    pointerId: 1,
+    clientX: 100,
+  });
+  view.rerender(renderPanels(false));
+  fireEvent.pointerMove(document, { pointerId: 1, clientX: 140 });
+  fireEvent.pointerUp(document, { pointerId: 1 });
+  expect(onResize).not.toHaveBeenCalled();
+});
+
+test('changing orientation interrupts a drag on the old axis', () => {
+  const onResize = rstest.fn();
+  const view = render(
+    <Splitter orientation="horizontal" onResize={onResize}>
+      <Panel>Left</Panel>
+      <Panel>Right</Panel>
+    </Splitter>,
+  );
+  fireEvent.pointerDown(screen.getByRole('separator'), {
+    pointerId: 1,
+    clientX: 100,
+  });
+  view.rerender(
+    <Splitter orientation="vertical" onResize={onResize}>
+      <Panel>Top</Panel>
+      <Panel>Bottom</Panel>
+    </Splitter>,
+  );
+  fireEvent.pointerMove(document, { pointerId: 1, clientX: 140 });
+  fireEvent.pointerUp(document, { pointerId: 1 });
+  expect(onResize).not.toHaveBeenCalled();
+});
+
+test('arrow keys on a collapse control do not resize the surrounding splitter', () => {
+  const onResize = rstest.fn();
+  render(
+    <Splitter onResize={onResize}>
+      <Panel collapsible>Left</Panel>
+      <Panel>Right</Panel>
+    </Splitter>,
+  );
+  const collapse = screen.getByRole('button', { name: 'Collapse panel' });
+  expect(fireEvent.keyDown(collapse, { key: 'ArrowRight' })).toBe(true);
+  expect(onResize).not.toHaveBeenCalled();
+});
+
+test('a collapse control click emits only one resize and does not start a drag', () => {
+  const onResizeStart = rstest.fn();
+  const onResize = rstest.fn();
+  const onResizeEnd = rstest.fn();
+  render(
+    <StrictMode>
+      <Splitter
+        onResizeStart={onResizeStart}
+        onResize={onResize}
+        onResizeEnd={onResizeEnd}
+      >
+        <Panel collapsible>Left</Panel>
+        <Panel>Right</Panel>
+      </Splitter>
+    </StrictMode>,
+  );
+  const collapse = screen.getByRole('button', { name: 'Collapse panel' });
+  fireEvent.pointerDown(collapse, { pointerId: 1 });
+  fireEvent.pointerUp(collapse, { pointerId: 1 });
+  fireEvent.click(collapse);
+
+  expect(onResize).toHaveBeenCalledExactlyOnceWith([0, 599]);
+  expect(onResizeStart).not.toHaveBeenCalled();
+  expect(onResizeEnd).toHaveBeenCalledExactlyOnceWith([0, 599]);
 });
 
 test('classNames applied to root', () => {

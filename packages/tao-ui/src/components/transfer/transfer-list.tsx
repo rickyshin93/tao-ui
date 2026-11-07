@@ -58,12 +58,18 @@ export function TransferList<T extends TransferItem>(
   const searchOptions = typeof showSearch === 'object' ? showSearch : {};
   const [search, setSearch] = useState(searchOptions.defaultValue ?? '');
   const [page, setPage] = useState(1);
-  const [internalPageSize, setPageSize] = useState(10);
   const paging = typeof pagination === 'object' ? pagination : {};
-  const pageSize = paging.pageSize ?? internalPageSize;
-  const renderedItems: RenderedItem<T>[] = dataSource
-    .map((item) => {
-      const rendered = render ? render(item) : null;
+  const configuredSize = paging.pageSize ?? 10;
+  const [pageSizing, setPageSizing] = useState({
+    configuredSize,
+    pageSize: configuredSize,
+  });
+  const sizeChanged = pageSizing.configuredSize !== configuredSize;
+  const pageSize = sizeChanged ? configuredSize : pageSizing.pageSize;
+  if (sizeChanged) setPageSizing({ configuredSize, pageSize });
+  const renderedItems = dataSource
+    .map((item): RenderedItem<T> & { labelText?: string } => {
+      const rendered = render ? render(item) : (item.title ?? String(item.key));
       if (
         rendered != null &&
         typeof rendered === 'object' &&
@@ -74,17 +80,20 @@ export function TransferList<T extends TransferItem>(
           renderedEl: rendered.label,
           renderedText: rendered.value,
         };
+      const renderedText =
+        typeof rendered === 'string'
+          ? rendered
+          : (item.title ?? String(item.key));
       return {
         item,
         renderedEl: rendered,
-        renderedText:
-          typeof rendered === 'string'
-            ? rendered
-            : (item.title ?? String(item.key)),
+        renderedText,
+        labelText: renderedText,
       };
     })
     .filter(
       ({ item, renderedText }) =>
+        !showSearch ||
         !search ||
         (filterOption
           ? filterOption(search, item, direction)
@@ -95,6 +104,7 @@ export function TransferList<T extends TransferItem>(
     1,
     Math.min(page, Math.ceil(renderedItems.length / pageSize)),
   );
+  if (pagination && page !== current) setPage(current);
   const pageItems = pagination
     ? renderedItems.slice((current - 1) * pageSize, current * pageSize)
     : renderedItems;
@@ -140,6 +150,7 @@ export function TransferList<T extends TransferItem>(
               {
                 key: 'removeCurrent',
                 label: removeCurrent,
+                disabled: !enabledPage.length,
                 onClick: () => onItemRemove?.(enabledPage),
               },
             ]
@@ -161,6 +172,7 @@ export function TransferList<T extends TransferItem>(
               {
                 key: 'selectCurrent',
                 label: selectCurrent,
+                disabled: !enabledPage.length,
                 onClick: () => onItemSelectAll(enabledPage, true),
               },
             ]
@@ -168,6 +180,7 @@ export function TransferList<T extends TransferItem>(
         {
           key: 'selectInvert',
           label: selectInvert,
+          disabled: !enabledPage.length,
           onClick: () => {
             const selected = new Set(checkedKeys);
             for (const key of enabledPage) {
@@ -235,14 +248,16 @@ export function TransferList<T extends TransferItem>(
             />
           </div>
         )}
-        {customBody || (
+        {renderList ? (
+          customBody
+        ) : (
           <ul
             data-tao-transfer-list=""
             {...semantic('list')}
             onScroll={onScroll}
           >
             {pageItems.length ? (
-              pageItems.map(({ item, renderedEl, renderedText }) => (
+              pageItems.map(({ item, renderedEl, renderedText, labelText }) => (
                 <li
                   key={item.key}
                   data-tao-transfer-item=""
@@ -273,7 +288,7 @@ export function TransferList<T extends TransferItem>(
                     </>
                   ) : (
                     <Checkbox
-                      aria-label={renderedText}
+                      aria-label={labelText}
                       checked={checkedKeys.includes(item.key!)}
                       disabled={disabled || item.disabled}
                       onChange={(event) =>
@@ -313,7 +328,7 @@ export function TransferList<T extends TransferItem>(
             )}
           </ul>
         )}
-        {pagination && !customBody && (
+        {pagination && !renderList && (
           <div data-tao-transfer-pagination="">
             <ListPaginationControl
               size="small"
@@ -326,7 +341,7 @@ export function TransferList<T extends TransferItem>(
               disabled={disabled}
               onChange={(next, nextSize) => {
                 setPage(next);
-                setPageSize(nextSize);
+                setPageSizing({ configuredSize, pageSize: nextSize });
               }}
             />
           </div>

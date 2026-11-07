@@ -6,6 +6,48 @@ import { TaoProvider, zhCN } from '../../src/provider/tao-provider';
 const source =
   'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="120" height="80"/>';
 
+test('closed image previews allocate a container only when first opened', async () => {
+  render(
+    <>
+      <Image src={source} alt="Photo" />
+      <Image.PreviewGroup preview={false}>
+        <Image src={source} alt="Disabled gallery photo" />
+      </Image.PreviewGroup>
+    </>,
+  );
+  expect(document.querySelector('[data-tao-image-popup]')).toBeNull();
+  fireEvent.click(screen.getByRole('button', { name: 'Photo' }));
+  expect(await screen.findByRole('dialog', { name: 'Photo' })).toBeVisible();
+  expect(document.querySelectorAll('[data-tao-image-popup]')).toHaveLength(1);
+});
+
+test.each(['image', 'group'] as const)(
+  'disabling an open %s preview removes its portal and resets uncontrolled visibility',
+  async (kind) => {
+    const view = (preview: boolean) =>
+      kind === 'image' ? (
+        <Image src={source} alt="Photo" preview={preview} />
+      ) : (
+        <Image.PreviewGroup preview={preview}>
+          <Image src={source} alt="Photo" />
+        </Image.PreviewGroup>
+      );
+    const { rerender } = render(view(true));
+    fireEvent.click(screen.getByRole('button', { name: 'Photo' }));
+    expect(await screen.findByRole('dialog')).toBeVisible();
+
+    rerender(view(false));
+    await waitFor(() =>
+      expect(document.querySelector('[data-tao-image-popup]')).toBeNull(),
+    );
+    rerender(view(true));
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(document.querySelector('[data-tao-image-popup]')).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Photo' }));
+    expect(await screen.findByRole('dialog')).toBeVisible();
+  },
+);
+
 test('localizes actual image action buttons before custom toolbar composition', async () => {
   const onTransform = rstest.fn();
   render(
@@ -138,6 +180,20 @@ test('opens a labeled preview with Enter and forwards transform and close events
   expect(onOpenChange).toHaveBeenLastCalledWith(false);
 });
 
+test('a progress placeholder names the image it is loading', () => {
+  const { rerender } = render(
+    <Image alt="Profile photo" placeholder={{ progress: { percent: 25 } }} />,
+  );
+  expect(
+    screen.getByRole('progressbar', { name: 'Profile photo' }),
+  ).toHaveAttribute('aria-valuenow', '25');
+  rerender(<Image alt="Profile photo" placeholder={{ progress: true }} />);
+  expect(screen.getByRole('status', { name: 'Profile photo' })).toHaveAttribute(
+    'aria-busy',
+    'true',
+  );
+});
+
 test('preview false renders an ordinary image without a preview trigger', () => {
   render(<Image src={source} alt="Thumbnail" preview={false} />);
   expect(screen.getByRole('img', { name: 'Thumbnail' })).toBeInTheDocument();
@@ -179,6 +235,49 @@ test('group previews navigate registered images and emit current indices', async
     `${source}#second`,
   );
   expect(screen.getByText('2 / 2')).toBeInTheDocument();
+});
+
+test('a preview group cannot revive its old open state after control is released', async () => {
+  const view = (open?: boolean) => (
+    <Image.PreviewGroup preview={open === undefined ? {} : { open }}>
+      <Image src={source} alt="Shared image" />
+    </Image.PreviewGroup>
+  );
+  const { rerender } = render(view());
+  fireEvent.click(screen.getByRole('button', { name: 'Shared image' }));
+  const dialog = await screen.findByRole('dialog');
+  rerender(view(false));
+  await waitFor(() =>
+    expect(dialog).toHaveClass('tao-image-preview-fade-leave-active'),
+  );
+  fireEvent.transitionEnd(dialog);
+  await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+  rerender(view());
+  expect(screen.queryByRole('dialog')).toBeNull();
+});
+
+test('preview false disables a group and its nested image triggers', async () => {
+  const view = (preview: boolean) => (
+    <Image.PreviewGroup preview={preview}>
+      <div>
+        <Image src={source} alt="Nested image" />
+      </div>
+    </Image.PreviewGroup>
+  );
+  const { rerender } = render(view(false));
+  const image = screen.getByRole('img', { name: 'Nested image' });
+  expect(screen.queryByRole('button', { name: 'Nested image' })).toBeNull();
+  fireEvent.click(image);
+  expect(screen.queryByRole('dialog')).toBeNull();
+
+  rerender(view(true));
+  fireEvent.click(screen.getByRole('button', { name: 'Nested image' }));
+  expect(await screen.findByRole('dialog')).toBeInTheDocument();
+
+  rerender(view(false));
+  await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+  rerender(view(true));
+  expect(screen.queryByRole('dialog')).toBeNull();
 });
 
 test('image load errors are forwarded', () => {
@@ -269,5 +368,73 @@ test('semantics, inline containers and portal theme are preserved', async () => 
   );
   await waitFor(() =>
     expect(inline.container.querySelector('[role="dialog"]')).not.toBeNull(),
+  );
+});
+
+test('progress placeholders retain the image accessible label and description references', () => {
+  render(
+    <>
+      <span id="image-title">Preview upload</span>
+      <span id="image-detail">A thumbnail is being generated</span>
+      <Image
+        placeholder={{ progress: { percent: 20 } }}
+        aria-labelledby="image-title"
+        aria-describedby="image-detail"
+      />
+    </>,
+  );
+  expect(
+    screen.getByRole('progressbar', { name: 'Preview upload' }),
+  ).toHaveAccessibleDescription('A thumbnail is being generated');
+});
+
+test('moving an open image preview leaves no unused portal in the old host', async () => {
+  const first = document.createElement('div');
+  const second = document.createElement('div');
+  document.body.append(first, second);
+  const view = (target: HTMLElement | false) => (
+    <Image
+      src={source}
+      alt="Photo"
+      preview={{ open: true, getContainer: target }}
+    />
+  );
+  const { rerender, unmount } = render(view(first));
+  try {
+    await waitFor(() =>
+      expect(first.querySelector('[role=dialog]')).not.toBeNull(),
+    );
+    rerender(view(second));
+    await waitFor(() =>
+      expect(second.querySelector('[role=dialog]')).not.toBeNull(),
+    );
+    expect(first.querySelector('[data-tao-image-popup]')).toBeNull();
+    rerender(view(false));
+    await waitFor(() =>
+      expect(second.querySelector('[data-tao-image-popup]')).toBeNull(),
+    );
+  } finally {
+    unmount();
+    first.remove();
+    second.remove();
+  }
+});
+
+test('numeric zero can be rendered as an image placeholder before a source arrives', () => {
+  render(<Image placeholder={0} />);
+  expect(screen.getByRole('status')).toHaveTextContent('0');
+});
+
+test('a numeric preview mask is used as the image cover', () => {
+  const { container } = render(<Image src={source} preview={{ mask: 0 }} />);
+  expect(container.querySelector('.tao-image-cover')).toHaveTextContent('0');
+});
+
+test('an iterable preview mask is used as the image cover', () => {
+  const { container } = render(
+    <Image src={source} preview={{ mask: new Set(['Preview image']) }} />,
+  );
+  expect(container.querySelector('.tao-image-cover')).toHaveTextContent(
+    'Preview image',
   );
 });

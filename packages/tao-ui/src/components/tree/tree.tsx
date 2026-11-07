@@ -18,10 +18,12 @@ import {
   type ReactElement,
   type ReactNode,
   type RefAttributes,
+  useMemo,
   useRef,
   useState,
 } from 'react';
 import { useTaoConfig, useTaoDirection } from '../../provider/tao-provider';
+import { mergeRefs } from '../../utils/refs';
 import {
   cx,
   type SemanticClassNames,
@@ -313,17 +315,11 @@ const DirectoryTreeBase = forwardRef<RcTree, DirectoryTreeProps>(
       defaultExpandParent = true,
     } = props;
     const data = props.treeData ?? convertTreeToData(props.children);
-    const ordered: { key: Key; node: DataNode; ancestors: Key[] }[] = [];
+    const ordered: { key: Key; node: DataNode }[] = [];
     const { keyEntities } = convertDataToEntities(data, {
       fieldNames: props.fieldNames,
       processEntity(entity) {
-        const ancestors: Key[] = [];
-        let parent = entity.parent;
-        while (parent) {
-          ancestors.push(parent.key);
-          parent = parent.parent;
-        }
-        ordered.push({ key: entity.key, node: entity.node, ancestors });
+        ordered.push({ key: entity.key, node: entity.node });
       },
     });
     const [internalExpanded, setExpanded] = useState<Key[]>(() =>
@@ -340,41 +336,57 @@ const DirectoryTreeBase = forwardRef<RcTree, DirectoryTreeProps>(
     const selectedKeys = props.selectedKeys ?? internalSelected;
     const anchor = useRef<Key | undefined>(undefined);
     const selectionBeforeRange = useRef<Key[]>([]);
+    const lastRequestedSelection = useRef<Key[]>([]);
+    const treeRef = useRef<RcTree>(null);
+    const mergedRef = useMemo(() => mergeRefs(treeRef, ref), [ref]);
 
     const onSelect: NonNullable<TreeProps['onSelect']> = (keys, info) => {
       const key = info.node.key;
       let selection = [key];
       if (
         props.multiple &&
-        (info.nativeEvent.ctrlKey || info.nativeEvent.metaKey)
+        (info.nativeEvent?.ctrlKey || info.nativeEvent?.metaKey)
       ) {
-        selection = keys;
+        selection = keys.filter((key) =>
+          Object.hasOwn(keyEntities, String(key)),
+        );
         anchor.current = key;
         selectionBeforeRange.current = selection;
-      } else if (props.multiple && info.nativeEvent.shiftKey) {
-        const visible = ordered.filter(({ ancestors }) =>
-          ancestors.every((parentKey) => expandedKeys.includes(parentKey)),
-        );
+      } else if (props.multiple && info.nativeEvent?.shiftKey) {
+        // The tree's flattened rows include parents expanded by defaultExpandParent or autoExpandParent.
+        const visible = treeRef.current?.state.flattenNodes ?? [];
         const start = visible.findIndex((node) => node.key === anchor.current);
         const end = visible.findIndex((node) => node.key === key);
-        const range =
-          start < 0
-            ? []
-            : visible
-                .slice(Math.min(start, end), Math.max(start, end) + 1)
-                .filter(
-                  ({ node }) => !node.disabled && node.selectable !== false,
-                )
-                .map((node) => node.key);
-        selection = [...new Set([...selectionBeforeRange.current, ...range])];
+        if (start < 0 || end < 0) {
+          anchor.current = key;
+          selectionBeforeRange.current = selection;
+        } else {
+          const lastRequest = lastRequestedSelection.current;
+          if (
+            props.selectedKeys !== undefined &&
+            (selectedKeys.length !== lastRequest.length ||
+              selectedKeys.some((key, index) => key !== lastRequest[index]))
+          ) {
+            selectionBeforeRange.current = selectedKeys;
+          }
+          const range = visible
+            .slice(Math.min(start, end), Math.max(start, end) + 1)
+            .filter(({ data }) => !data.disabled && data.selectable !== false)
+            .map((node) => node.key);
+          const existing = selectionBeforeRange.current.filter((key) =>
+            Object.hasOwn(keyEntities, String(key)),
+          );
+          selection = [...new Set([...existing, ...range])];
+        }
       } else {
         anchor.current = key;
         selectionBeforeRange.current = selection;
       }
+      lastRequestedSelection.current = selection;
       if (props.selectedKeys === undefined) setSelected(selection);
       props.onSelect?.(selection, {
         ...info,
-        selected: true,
+        selected: selection.includes(key),
         selectedNodes: ordered
           .filter((item) => selection.includes(item.key))
           .map((item) => item.node),
@@ -394,7 +406,7 @@ const DirectoryTreeBase = forwardRef<RcTree, DirectoryTreeProps>(
         showIcon
         expandAction="click"
         {...props}
-        ref={ref}
+        ref={mergedRef}
         defaultExpandParent={defaultExpandParent}
         expandedKeys={expandedKeys}
         selectedKeys={selectedKeys}

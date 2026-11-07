@@ -7,11 +7,14 @@ import {
   Children,
   type CSSProperties,
   cloneElement,
+  createContext,
   isValidElement,
   type ReactElement,
   type ReactNode,
+  useContext,
   useEffect,
   useRef,
+  useState,
 } from 'react';
 import { useTaoInternalConfig } from '../../provider/tao-provider';
 import { cx } from '../../utils/semantic';
@@ -20,6 +23,7 @@ import './image.css';
 import { interopDefault } from '../../utils/interop-default';
 
 const RcImageComponent = /*#__PURE__*/ interopDefault(RcImage);
+const PreviewDisabledContext = createContext(false);
 
 type RcPreviewConfig = Exclude<NonNullable<RcImageProps['preview']>, boolean>;
 export type ImageSemanticPart =
@@ -112,41 +116,54 @@ export interface PreviewGroupProps
     | ((info: { props: ImageProps }) => ImageSemanticType['styles']);
 }
 
-function usePreviewContainer(getContainer: RcPreviewConfig['getContainer']) {
+function usePreviewContainer(
+  getContainer: RcPreviewConfig['getContainer'],
+  allowCreate: boolean,
+  disabled: boolean,
+) {
   const { tokenStyle, mode, compact } = useTaoInternalConfig();
-  const containers = useRef<HTMLElement[]>([]);
+  const containerRef = useRef<HTMLElement | null>(null);
   useEffect(() => {
-    for (const container of containers.current) {
-      if (mode === 'light') delete container.dataset.taoTheme;
-      else container.dataset.taoTheme = mode;
-      if (compact) container.dataset.taoDensity = 'compact';
-      else delete container.dataset.taoDensity;
-      container.removeAttribute('style');
-      for (const [key, value] of Object.entries(tokenStyle ?? {}))
-        container.style.setProperty(key, String(value));
-    }
+    const container = containerRef.current;
+    if (!container) return;
+    if (mode === 'light') delete container.dataset.taoTheme;
+    else container.dataset.taoTheme = mode;
+    if (compact) container.dataset.taoDensity = 'compact';
+    else delete container.dataset.taoDensity;
+    container.removeAttribute('style');
+    for (const [key, value] of Object.entries(tokenStyle ?? {}))
+      container.style.setProperty(key, String(value));
   }, [tokenStyle, mode, compact]);
+  useEffect(() => {
+    if (!disabled && getContainer !== false) return;
+    containerRef.current?.remove();
+    containerRef.current = null;
+  }, [disabled, getContainer]);
   useEffect(
     () => () => {
-      for (const container of containers.current) container.remove();
-      containers.current = [];
+      containerRef.current?.remove();
+      containerRef.current = null;
     },
     [],
   );
+  if (disabled) return undefined;
   if (getContainer === false) return false;
   return () => {
+    if (!allowCreate && !containerRef.current) return null;
     const target =
       typeof getContainer === 'function'
         ? getContainer()
         : typeof getContainer === 'string'
           ? document.querySelector(getContainer)
           : (getContainer ?? document.body);
-    if (!target) return null;
-    const existing = containers.current.find(
-      (container) => container.parentNode === target,
-    );
-    if (existing) return existing;
-    const container = document.createElement('div');
+    const previous = containerRef.current;
+    if (previous && previous.parentNode === target) return previous;
+    if (previous) queueMicrotask(() => previous.remove());
+    if (!target) {
+      containerRef.current = null;
+      return null;
+    }
+    const container = target.ownerDocument.createElement('div');
     container.dataset.taoImagePopup = '';
     container.dataset.taoProvider = '';
     if (mode !== 'light') container.dataset.taoTheme = mode;
@@ -154,15 +171,17 @@ function usePreviewContainer(getContainer: RcPreviewConfig['getContainer']) {
     for (const [key, value] of Object.entries(tokenStyle ?? {}))
       container.style.setProperty(key, String(value));
     target.appendChild(container);
-    containers.current.push(container);
+    containerRef.current = container;
     return container;
   };
 }
 
 function usePreviewOptions(
   preview: ImageProps['preview'] | PreviewGroupProps['preview'],
+  internalOpen: boolean,
 ) {
   const { locale } = useTaoInternalConfig();
+  const groupDisabled = useContext(PreviewDisabledContext);
   const raw = typeof preview === 'object' ? preview : {};
   const {
     visible,
@@ -175,12 +194,25 @@ function usePreviewOptions(
     getContainer,
     ...rest
   } = raw;
-  const container = usePreviewContainer(getContainer);
+  const disabled = groupDisabled || preview === false;
+  const container = usePreviewContainer(
+    getContainer,
+    !disabled && (open ?? visible ?? internalOpen),
+    disabled,
+  );
+  const iterableMask =
+    mask !== null && typeof mask === 'object' && Symbol.iterator in mask
+      ? (mask as Iterable<ReactNode>)
+      : undefined;
+  const maskCover =
+    typeof mask === 'string' || typeof mask === 'number' || isValidElement(mask)
+      ? mask
+      : iterableMask;
   const maskConfig =
     typeof mask === 'object' &&
     mask !== null &&
     !isValidElement(mask) &&
-    !Array.isArray(mask)
+    !iterableMask
       ? (mask as Exclude<ImageMask, boolean>)
       : undefined;
   const icons: RcPreviewConfig['icons'] = {
@@ -240,8 +272,9 @@ function usePreviewOptions(
       : localized;
   };
   return {
-    disabled: preview === false,
+    disabled,
     raw,
+    maskCover,
     hiddenMask: mask === false || maskConfig?.enabled === false,
     blurMask: maskConfig?.blur,
     config: {
@@ -253,7 +286,6 @@ function usePreviewOptions(
       motionName: 'tao-image-preview-fade',
       maskClosable: maskConfig?.closable ?? true,
       actionsRender,
-      ...(isValidElement(mask) ? { cover: mask } : {}),
     },
   };
 }
@@ -284,19 +316,24 @@ function ImageProgress({
   const percentText = new Intl.NumberFormat(locale.numberLocale ?? 'en-US', {
     style: 'percent',
   }).format(percent / 100);
-  const progressAria = hasPercent
-    ? {
-        role: 'progressbar' as const,
-        'aria-valuemin': 0,
-        'aria-valuemax': 100,
-        'aria-valuenow': percent,
-        'aria-label': props['aria-label'] ?? percentText,
-      }
-    : {
-        role: 'status' as const,
-        'aria-label': props['aria-label'] ?? locale.messages.loading,
-        'aria-busy': true,
-      };
+  const progressAria = {
+    'aria-labelledby': props['aria-labelledby'],
+    'aria-describedby': props['aria-describedby'],
+    ...(hasPercent
+      ? {
+          role: 'progressbar' as const,
+          'aria-valuemin': 0,
+          'aria-valuemax': 100,
+          'aria-valuenow': percent,
+          'aria-label': props['aria-label'] ?? (props.alt || percentText),
+        }
+      : {
+          role: 'status' as const,
+          'aria-label':
+            props['aria-label'] ?? (props.alt || locale.messages.loading),
+          'aria-busy': true,
+        }),
+  };
   const bar = hasPercent ? (
     <div data-tao-image-progress-rail="" className={cn?.rail} style={st?.rail}>
       <span style={{ transform: `scaleX(${percent / 100})` }} />
@@ -347,6 +384,7 @@ function ImageProgress({
 
 function ImageBase(props: ImageProps) {
   const { tokenStyle } = useTaoInternalConfig();
+  const [internalOpen, setInternalOpen] = useState(false);
   const {
     preview,
     wrapperStyle,
@@ -359,7 +397,8 @@ function ImageBase(props: ImageProps) {
   const classes =
     typeof classNames === 'function' ? classNames({ props }) : classNames;
   const css = typeof styles === 'function' ? styles({ props }) : styles;
-  const { disabled, config, hiddenMask, blurMask } = usePreviewOptions(preview);
+  const { disabled, config, hiddenMask, blurMask, maskCover } =
+    usePreviewOptions(preview, internalOpen);
   const raw = typeof preview === 'object' ? preview : {};
   const isProgressConfig =
     placeholder !== null &&
@@ -367,7 +406,14 @@ function ImageBase(props: ImageProps) {
     !isValidElement(placeholder) &&
     'progress' in placeholder;
   const progress = isProgressConfig ? placeholder.progress : undefined;
-  if (progress || (!props.src && placeholder && !isProgressConfig))
+  const showPlaceholder =
+    !!progress ||
+    (!props.src && (!!placeholder || placeholder === 0) && !isProgressConfig);
+  useEffect(() => {
+    if (disabled || config.open !== undefined || showPlaceholder)
+      setInternalOpen(false);
+  }, [disabled, config.open, showPlaceholder]);
+  if (showPlaceholder)
     return (
       <ImageProgress
         props={props}
@@ -405,14 +451,15 @@ function ImageBase(props: ImageProps) {
             ? false
             : ({
                 ...config,
-                cover: raw.cover ?? config.cover ?? (
+                open: config.open ?? internalOpen,
+                cover: raw.cover ?? maskCover ?? (
                   <span aria-hidden="true">⌕</span>
                 ),
-                onOpenChange:
-                  raw.onOpenChange ??
-                  (raw.onVisibleChange
-                    ? (open) => raw.onVisibleChange!(open, !open)
-                    : undefined),
+                onOpenChange: (open) => {
+                  if (config.open === undefined) setInternalOpen(open);
+                  if (raw.onOpenChange) raw.onOpenChange(open);
+                  else raw.onVisibleChange?.(open, !open);
+                },
               } as RcPreviewConfig)
         }
       />
@@ -431,8 +478,15 @@ export function ImagePreviewGroup(props: PreviewGroupProps) {
     typeof styles === 'function'
       ? styles({ props: props as ImageProps })
       : styles;
-  const { disabled, config, hiddenMask, blurMask } = usePreviewOptions(preview);
+  const [internalOpen, setInternalOpen] = useState(false);
+  const { disabled, config, hiddenMask, blurMask } = usePreviewOptions(
+    preview,
+    internalOpen,
+  );
   const raw = typeof preview === 'object' ? preview : {};
+  useEffect(() => {
+    if (disabled || config.open !== undefined) setInternalOpen(false);
+  }, [disabled, config.open]);
   return (
     <span data-tao-image-group="">
       <RcImageComponent.PreviewGroup
@@ -452,20 +506,21 @@ export function ImagePreviewGroup(props: PreviewGroupProps) {
           },
         }}
         preview={
-          disabled
-            ? false
-            : ({
-                ...config,
-                onOpenChange:
-                  raw.onOpenChange ??
-                  (raw.onVisibleChange
-                    ? (open, info) =>
-                        raw.onVisibleChange!(open, !open, info.current)
-                    : undefined),
-              } as RcGroupPreviewConfig)
+          {
+            ...config,
+            open: !disabled && (config.open ?? internalOpen),
+            motionName: disabled ? '' : config.motionName,
+            onOpenChange: (open, info) => {
+              if (config.open === undefined) setInternalOpen(open);
+              if (raw.onOpenChange) raw.onOpenChange(open, info);
+              else raw.onVisibleChange?.(open, !open, info.current);
+            },
+          } as RcGroupPreviewConfig
         }
       >
-        {children}
+        <PreviewDisabledContext.Provider value={disabled}>
+          {children}
+        </PreviewDisabledContext.Provider>
       </RcImageComponent.PreviewGroup>
     </span>
   );

@@ -134,7 +134,7 @@ export function useDisplaySteps(
   }, [canApplyMaxCount, mappedCurrent, items, maxCount]);
 
   const found = displaySteps.findIndex(
-    (step) => step.originIndex === mappedCurrent,
+    (step) => !step.ellipsis && step.originIndex === mappedCurrent,
   );
 
   return {

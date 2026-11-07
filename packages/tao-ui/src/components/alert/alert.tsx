@@ -66,6 +66,10 @@ function CloseIcon() {
 
 // ---- Alert ----
 
+function hasContent(content: ReactNode) {
+  return content != null && typeof content !== 'boolean';
+}
+
 export function Alert({
   type = 'info',
   title,
@@ -85,16 +89,16 @@ export function Alert({
 
   const handleClose = useCallback(
     (e: MouseEvent<HTMLElement>) => {
-      setVisible(false);
       onClose?.(e);
+      if (!e.defaultPrevented) setVisible(false);
     },
     [onClose],
   );
 
   if (!visible) return null;
 
-  const hasDescription = description != null;
-  const renderIcon = showIcon || icon != null;
+  const hasDescription = hasContent(description);
+  const resolvedIcon = icon ?? (showIcon ? <StatusIcon type={type} /> : null);
 
   return (
     <div
@@ -105,17 +109,17 @@ export function Alert({
       className={cx(classNames?.root, className)}
       style={{ ...styles?.root, ...style }}
     >
-      {renderIcon && (
+      {hasContent(resolvedIcon) && (
         <span
           data-tao-alert-icon=""
           className={cx(classNames?.icon)}
           style={styles?.icon}
         >
-          {icon ?? <StatusIcon type={type} />}
+          {resolvedIcon}
         </span>
       )}
       <div data-tao-alert-content="">
-        {title != null && (
+        {hasContent(title) && (
           <div
             data-tao-alert-title=""
             className={cx(classNames?.title)}
@@ -134,7 +138,7 @@ export function Alert({
           </div>
         )}
       </div>
-      {action != null && (
+      {hasContent(action) && (
         <div
           data-tao-alert-action=""
           className={cx(classNames?.action)}

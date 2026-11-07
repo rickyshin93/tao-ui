@@ -1,8 +1,9 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { expect, test } from '@rstest/core';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { type CSSProperties, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import {
   TaoPortalScope,
   TaoProvider,
@@ -13,6 +14,33 @@ import {
 test('renders children', () => {
   render(<TaoProvider>hello</TaoProvider>);
   expect(screen.getByText('hello')).toBeTruthy();
+});
+
+test('a provider mounted in a shadow root tracks the host direction', async () => {
+  const host = document.createElement('div');
+  host.style.direction = 'rtl';
+  const shadow = host.attachShadow({ mode: 'open' });
+  document.body.append(host);
+  const { unmount } = render(
+    createPortal(
+      <TaoProvider>
+        <TaoPortalScope asChild>
+          <span data-test-direction="">Popup</span>
+        </TaoPortalScope>
+      </TaoProvider>,
+      shadow,
+    ),
+  );
+
+  try {
+    const scoped = shadow.querySelector('[data-test-direction]');
+    expect(scoped).toHaveAttribute('dir', 'rtl');
+    host.style.direction = 'ltr';
+    await waitFor(() => expect(scoped).toHaveAttribute('dir', 'ltr'));
+  } finally {
+    unmount();
+    host.remove();
+  }
 });
 
 test('theme.token.colorPrimary sets --tao-color-primary CSS variable', () => {
@@ -258,6 +286,143 @@ test('nested provider with inherit=false resets parent theme seeds', () => {
   );
 });
 
+test('an isolated dark compact provider lets its CSS algorithms supply defaults', () => {
+  render(
+    <TaoProvider theme={{ token: { colorPrimary: 'red', controlHeight: 50 } }}>
+      <TaoProvider theme={{ inherit: false, mode: 'dark', compact: true }}>
+        <span data-testid="local">Local</span>
+        <TaoPortalScope asChild>
+          <span data-testid="portal">Portal</span>
+        </TaoPortalScope>
+      </TaoProvider>
+    </TaoProvider>,
+  );
+  for (const scope of [
+    screen.getByTestId('local').parentElement!,
+    screen.getByTestId('portal'),
+  ]) {
+    expect(scope).toHaveAttribute('data-tao-theme', 'dark');
+    expect(scope).toHaveAttribute('data-tao-density', 'compact');
+    expect(scope.style.getPropertyValue('--tao-color-primary')).toBe('');
+    expect(scope.style.getPropertyValue('--tao-color-bg-base')).toBe('');
+    expect(scope.style.getPropertyValue('--tao-control-height')).toBe('');
+  }
+});
+
+test('dark and compact scopes inherit custom values that their CSS redeclares', () => {
+  const tree = (colorPrimary: string, controlHeight: number) => (
+    <TaoProvider
+      theme={{
+        mode: 'dark',
+        compact: true,
+        token: { colorPrimary, controlHeight },
+      }}
+    >
+      <TaoProvider>
+        <span data-testid="local">Local</span>
+        <TaoPortalScope asChild>
+          <span data-testid="portal">Portal</span>
+        </TaoPortalScope>
+      </TaoProvider>
+    </TaoProvider>
+  );
+  const { rerender } = render(tree('red', 25));
+  const local = screen.getByTestId('local').parentElement!;
+  const portal = screen.getByTestId('portal');
+  expect(local.style.getPropertyValue('--tao-color-primary')).toBe('red');
+  expect(local.style.getPropertyValue('--tao-control-height')).toBe('25px');
+  rerender(tree('blue', 26));
+  expect(local.style.getPropertyValue('--tao-color-primary')).toBe('blue');
+  expect(local.style.getPropertyValue('--tao-control-height')).toBe('26px');
+  expect(portal.style.getPropertyValue('--tao-color-primary')).toBe('blue');
+  expect(portal.style.getPropertyValue('--tao-control-height')).toBe('26px');
+});
+
+test('entering dark and compact mode inside a light isolation does not replay light defaults into a portal', () => {
+  render(
+    <TaoProvider theme={{ inherit: false }}>
+      <TaoProvider theme={{ mode: 'dark', compact: true }}>
+        {createPortal(
+          <TaoPortalScope asChild>
+            <span data-testid="portal">Portal</span>
+          </TaoPortalScope>,
+          document.body,
+        )}
+      </TaoProvider>
+    </TaoProvider>,
+  );
+  const portal = screen.getByTestId('portal');
+  expect(portal.style.getPropertyValue('--tao-color-primary')).toBe('');
+  expect(portal.style.getPropertyValue('--tao-control-height')).toBe('');
+});
+
+test('theme isolation clears inherited component overrides without clearing its own', () => {
+  render(
+    <TaoProvider
+      theme={{ components: { Button: { borderRadius: 2, fontWeight: 500 } } }}
+    >
+      <TaoProvider
+        theme={{ inherit: false, components: { Button: { fontWeight: 600 } } }}
+      >
+        <span data-testid="child">Child</span>
+      </TaoProvider>
+    </TaoProvider>,
+  );
+  const scope = screen.getByTestId('child').parentElement!;
+  expect(scope.style.getPropertyValue('--tao-button-border-radius')).toBe(
+    'initial',
+  );
+  expect(scope.style.getPropertyValue('--tao-button-font-weight')).toBe('600');
+});
+
+test('a noncompact provider resets its control height inside a compact scope', () => {
+  render(
+    <TaoProvider theme={{ compact: true }}>
+      <TaoProvider theme={{ compact: false }}>
+        <span data-testid="child">Child</span>
+      </TaoProvider>
+    </TaoProvider>,
+  );
+  expect(
+    screen
+      .getByTestId('child')
+      .parentElement!.style.getPropertyValue('--tao-control-height'),
+  ).toBe('32px');
+});
+
+test('undefined locale fields keep inherited text and formatter callbacks', () => {
+  function Probe() {
+    const { locale } = useTaoConfig();
+    return (
+      <span data-testid="locale">
+        {locale.done}|{locale.messages.loading}|{locale.remove?.('Item')}
+      </span>
+    );
+  }
+  render(
+    <TaoProvider
+      locale={{
+        done: 'Commit',
+        remove: (label) => `Delete ${label}`,
+        messages: { loading: 'Pending' },
+      }}
+    >
+      <TaoProvider
+        locale={{
+          done: undefined,
+          remove: undefined,
+          messages: { loading: undefined },
+        }}
+      >
+        <Probe />
+      </TaoProvider>
+    </TaoProvider>,
+  );
+  expect(screen.getByTestId('locale')).toHaveTextContent(
+    'Commit|Pending|Delete Item',
+  );
+});
+
 // Bug A regression: Provider must not collapse children into one grid/flex item.
 // Without display:contents, both spans would land in the same grid cell.
 test('provider wrapper is layout-transparent (display: contents)', () => {
@@ -398,6 +563,45 @@ test('nested provider inherits parent dark mode', () => {
   expect(screen.getByTestId('m').textContent).toBe('dark');
 });
 
+test('an explicit light scope resets dark seeds but preserves overrides', () => {
+  const { container } = render(
+    <TaoProvider theme={{ mode: 'dark', token: { colorPrimary: 'orange' } }}>
+      <TaoProvider theme={{ mode: 'light' }}>
+        <span>Light content</span>
+        <TaoPortalScope>
+          <span>Light popup</span>
+        </TaoPortalScope>
+      </TaoProvider>
+    </TaoProvider>,
+  );
+  const scope = screen.getByText('Light content').parentElement!;
+  const popup = screen.getByText('Light popup').parentElement!;
+  expect(container.firstElementChild).toHaveAttribute('data-tao-theme', 'dark');
+  for (const element of [scope, popup]) {
+    expect(element.style.getPropertyValue('--tao-color-bg-surface')).toBe(
+      'oklch(1 0 0)',
+    );
+    expect(element.style.getPropertyValue('--tao-color-primary')).toBe(
+      'orange',
+    );
+  }
+});
+
+test('an explicit light provider sets light seeds inside a CSS dark scope', () => {
+  render(
+    <div data-tao-theme="dark">
+      <TaoProvider theme={{ mode: 'light' }}>
+        <span>Light content</span>
+      </TaoProvider>
+    </div>,
+  );
+
+  const scope = screen.getByText('Light content').parentElement!;
+  expect(scope.style.getPropertyValue('--tao-color-bg-surface')).toBe(
+    'oklch(1 0 0)',
+  );
+});
+
 // Portaled layers (Modal/Drawer/Select dropdown) render outside the provider
 // subtree — TaoPortalScope must re-apply data-tao-theme so the dark CSS scope
 // reaches the popup.
@@ -421,9 +625,9 @@ test('portal scope asChild re-applies dark theme without wrapper', () => {
       </TaoPortalScope>
     </TaoProvider>,
   );
-  expect(screen.getByTestId('portal-child').getAttribute('data-tao-theme')).toBe(
-    'dark',
-  );
+  expect(
+    screen.getByTestId('portal-child').getAttribute('data-tao-theme'),
+  ).toBe('dark');
 });
 
 // Guard the CSS shape that makes dark mode work: the dark scope overrides
@@ -469,7 +673,9 @@ test('bg-surface seed is declared at :root, container/elevated derive from it', 
     /:root,\s*\n\s*\[data-tao-provider\],\s*\n\s*\[data-tao-theme\]\s*\{([\s\S]*?)^\s*\}/m,
   );
   const body = providerBlockMatch![1];
-  expect(body).toContain('--tao-color-bg-container: var(--tao-color-bg-surface)');
+  expect(body).toContain(
+    '--tao-color-bg-container: var(--tao-color-bg-surface)',
+  );
   expect(body).not.toMatch(/--tao-color-bg-container:\s*oklch\(1/);
 });
 
@@ -491,7 +697,8 @@ test('component CSS files contain no hardcoded color escapes', () => {
       const path = join(dir, file);
       const css = readFileSync(path, 'utf8');
       css.split('\n').forEach((line, i) => {
-        if (COLOR_LITERAL.test(line)) offenders.push(`${path}:${i + 1}: ${line.trim()}`);
+        if (COLOR_LITERAL.test(line))
+          offenders.push(`${path}:${i + 1}: ${line.trim()}`);
       });
     }
   }
@@ -521,12 +728,12 @@ test('theme.components serializes to kebab-case component CSS variables', () => 
   expect(provider.style.getPropertyValue('--tao-button-font-weight')).toBe(
     '600',
   );
-  expect(provider.style.getPropertyValue('--tao-button-padding-inline-sm')).toBe(
-    '10px',
-  );
   expect(
-    provider.style.getPropertyValue('--tao-form-field-label-color'),
-  ).toBe('oklch(0.5 0.1 260)');
+    provider.style.getPropertyValue('--tao-button-padding-inline-sm'),
+  ).toBe('10px');
+  expect(provider.style.getPropertyValue('--tao-form-field-label-color')).toBe(
+    'oklch(0.5 0.1 260)',
+  );
 });
 
 test('component tokens cascade to nested providers and merge with their own', () => {
@@ -552,9 +759,9 @@ test('theme.compact outputs data-tao-density="compact"', () => {
       <span data-testid="child">x</span>
     </TaoProvider>,
   );
-  expect(
-    screen.getByTestId('child').parentElement!.dataset.taoDensity,
-  ).toBe('compact');
+  expect(screen.getByTestId('child').parentElement!.dataset.taoDensity).toBe(
+    'compact',
+  );
 });
 
 test('compact cascades to nested providers by default', () => {
@@ -565,9 +772,9 @@ test('compact cascades to nested providers by default', () => {
       </TaoProvider>
     </TaoProvider>,
   );
-  expect(
-    screen.getByTestId('child').parentElement!.dataset.taoDensity,
-  ).toBe('compact');
+  expect(screen.getByTestId('child').parentElement!.dataset.taoDensity).toBe(
+    'compact',
+  );
 });
 
 test('TaoPortalScope re-applies the density attribute for portaled layers', () => {
@@ -599,4 +806,57 @@ test('useTaoToken exposes var() references for all design tokens', () => {
   expect(captured!['--tao-color-primary']).toBe('var(--tao-color-primary)');
   expect(captured!['--tao-radius-lg']).toBe('var(--tao-radius-lg)');
   expect(Object.keys(captured!).length).toBeGreaterThan(100);
+});
+
+test('undefined validation message overrides preserve inherited templates at every level', () => {
+  function Probe() {
+    const { locale } = useTaoConfig();
+    return (
+      <span>
+        {locale.form?.required}|{locale.form?.string?.min}|
+        {locale.form?.string?.max}
+      </span>
+    );
+  }
+  render(
+    <TaoProvider
+      locale={{
+        form: {
+          required: 'Required',
+          string: { min: 'Too short', max: 'Too long' },
+        },
+      }}
+    >
+      <TaoProvider
+        locale={{
+          form: {
+            required: undefined,
+            string: { min: undefined, max: 'Long override' },
+          },
+        }}
+      >
+        <Probe />
+      </TaoProvider>
+    </TaoProvider>,
+  );
+  expect(
+    screen.getByText('Required|Too short|Long override'),
+  ).toBeInTheDocument();
+});
+
+test('a nested provider can restore motion after an ancestor disables it', () => {
+  render(
+    <TaoProvider theme={{ token: { motion: false } }}>
+      <TaoProvider theme={{ token: { motion: true } }}>
+        <TaoPortalScope asChild>
+          <span data-testid="motion-scope">Motion</span>
+        </TaoPortalScope>
+      </TaoProvider>
+    </TaoProvider>,
+  );
+  const scope = screen.getByTestId('motion-scope');
+  expect(scope.style.getPropertyValue('--tao-motion-unit')).toBe('0.1s');
+  expect(scope.parentElement!.style.getPropertyValue('--tao-motion-unit')).toBe(
+    '0.1s',
+  );
 });

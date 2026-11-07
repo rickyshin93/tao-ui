@@ -146,7 +146,9 @@ interface TaoConfigContextValue extends TaoConfig {
    * Carried through context so portaled layers (Modal/Drawer/Select dropdown…)
    * — which render outside the provider's DOM subtree — can re-apply the theme.
    */
-  tokenStyle: CSSProperties;
+  tokenStyle: Record<string, string>;
+  /** Caller-provided tokens, excluding generated defaults used to isolate a scope. */
+  tokenOverrides: Record<string, string>;
 }
 
 const TaoConfigContext = createContext<TaoConfigContextValue>({
@@ -156,6 +158,7 @@ const TaoConfigContext = createContext<TaoConfigContextValue>({
   mode: 'light',
   compact: false,
   tokenStyle: {},
+  tokenOverrides: {},
   locale: enUS,
 });
 
@@ -173,6 +176,13 @@ export function useTaoInternalConfig(): TaoConfigContextValue {
   return useContext(TaoConfigContext);
 }
 
+function directionParent(element: Element): Element | null {
+  if (element.assignedSlot) return element.assignedSlot;
+  if (element.parentElement) return element.parentElement;
+  const root = element.getRootNode();
+  return 'host' in root ? (root as ShadowRoot).host : null;
+}
+
 /** Resolve DOM inheritance at a component's source, before it creates portals. */
 export function useTaoDirection(
   explicit?: TaoDirection | 'auto',
@@ -188,7 +198,7 @@ export function useTaoDirection(
     const target =
       source === 'self' || explicit === 'auto'
         ? element
-        : element.parentElement;
+        : directionParent(element);
     if (!target) return;
     const update = () => {
       const value =
@@ -197,11 +207,11 @@ export function useTaoDirection(
         contextDirection;
       setInherited(value === 'rtl' ? 'rtl' : 'ltr');
       for (
-        let ancestor: HTMLElement | null = target;
+        let ancestor: Element | null = target;
         ancestor;
-        ancestor = ancestor.parentElement
+        ancestor = directionParent(ancestor)
       ) {
-        const auto = ancestor.dir === 'auto';
+        const auto = ancestor.getAttribute('dir') === 'auto';
         observer.observe(ancestor, {
           attributes: true,
           attributeFilter: ['dir', 'style', 'class'],
@@ -341,6 +351,16 @@ const TOKEN_TO_VAR_NUMBER: Record<string, string> = {
   zIndexPopupBase: '--tao-z-index-popup-base',
 };
 
+const CONTROL_HEIGHT = '--tao-control-height';
+const MOTION_UNIT = '--tao-motion-unit';
+const DARK_SCOPE_SEEDS = [
+  '--tao-color-primary',
+  '--tao-color-bg-base',
+  '--tao-color-text-base',
+  '--tao-color-bg-surface',
+  '--tao-border-text-weight',
+] as const;
+
 const DEFAULT_TOKEN_STYLE = {
   '--tao-border-text-weight': '12%',
   '--tao-color-primary': 'oklch(0.205 0.01 70)',
@@ -353,7 +373,7 @@ const DEFAULT_TOKEN_STYLE = {
   '--tao-color-text-light-solid': 'oklch(0.985 0.004 70)',
   '--tao-radius': '6px',
   '--tao-font-size': '14px',
-  '--tao-control-height': '32px',
+  [CONTROL_HEIGHT]: '32px',
   '--tao-size-unit': '4px',
   '--tao-size-step': '4',
   '--tao-line-width': '1px',
@@ -361,10 +381,10 @@ const DEFAULT_TOKEN_STYLE = {
     '"Geist Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif',
   '--tao-font-family-code':
     '"Geist Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace',
-  '--tao-motion-unit': '0.1s',
+  [MOTION_UNIT]: '0.1s',
   '--tao-z-index-base': '0',
   '--tao-z-index-popup-base': '1000',
-} as CSSProperties;
+};
 
 /**
  * Stable memoization key for theme.token/components: users routinely inline
@@ -411,6 +431,11 @@ export function TaoProvider({
     [parentConfig.locale, localeProp],
   );
   const inherit = theme?.inherit ?? true;
+  const parentCompact = parentConfig.compact;
+  const mode = theme?.mode ?? (inherit ? parentConfig.mode : 'light');
+  const explicitLight = theme?.mode === 'light';
+  const compact = theme?.compact ?? (inherit ? parentCompact : false);
+  const motionEnabled = theme?.token?.motion === true;
   const themeKey = useStableThemeKey(theme?.token, theme?.components);
 
   const ownVars = useMemo(() => {
@@ -440,9 +465,9 @@ export function TaoProvider({
       }
 
       if (parsedToken.motion === false) {
-        vars['--tao-motion-unit'] = '0s';
+        vars[MOTION_UNIT] = '0s';
       } else if (parsedToken.motionUnit != null) {
-        vars['--tao-motion-unit'] = `${parsedToken.motionUnit}s`;
+        vars[MOTION_UNIT] = `${parsedToken.motionUnit}s`;
       }
     }
 
@@ -466,18 +491,74 @@ export function TaoProvider({
     return vars;
   }, [themeKey]);
 
-  const scopedVars = useMemo<CSSProperties>(
-    () => (inherit ? { ...ownVars } : { ...DEFAULT_TOKEN_STYLE, ...ownVars }),
-    [inherit, ownVars],
-  );
+  const { scopedVars, tokenStyle, tokenOverrides } = useMemo(() => {
+    const overrides = {
+      ...(inherit ? parentConfig.tokenOverrides : {}),
+      ...ownVars,
+    };
+    const scoped: Record<string, string> = inherit
+      ? {}
+      : { ...DEFAULT_TOKEN_STYLE };
+    if (!inherit) {
+      // Component variables otherwise keep cascading through the DOM.
+      for (const name of Object.keys(parentConfig.tokenStyle)) {
+        if (!Object.hasOwn(scoped, name)) scoped[name] = 'initial';
+      }
+    } else {
+      if (!compact && parentCompact) {
+        scoped[CONTROL_HEIGHT] =
+          overrides[CONTROL_HEIGHT] ?? DEFAULT_TOKEN_STYLE[CONTROL_HEIGHT];
+      }
+      if (explicitLight) {
+        for (const name of DARK_SCOPE_SEEDS) {
+          scoped[name] = overrides[name] ?? DEFAULT_TOKEN_STYLE[name];
+        }
+      }
+    }
+    Object.assign(scoped, ownVars);
+    if (
+      inherit &&
+      motionEnabled &&
+      parentConfig.tokenStyle[MOTION_UNIT] === '0s' &&
+      ownVars?.[MOTION_UNIT] === undefined
+    ) {
+      scoped[MOTION_UNIT] = overrides[MOTION_UNIT] =
+        DEFAULT_TOKEN_STYLE[MOTION_UNIT];
+    }
 
-  const tokenStyle = useMemo<CSSProperties>(
-    () =>
-      inherit
-        ? { ...parentConfig.tokenStyle, ...scopedVars }
-        : { ...scopedVars },
-    [inherit, parentConfig.tokenStyle, scopedVars],
-  );
+    // The CSS algorithms redeclare these seeds on every scope. Replay
+    // explicit overrides and let CSS supply the defaults for this scope.
+    const algorithmSeeds: string[] =
+      mode === 'dark' ? [...DARK_SCOPE_SEEDS] : [];
+    if (compact) algorithmSeeds.push(CONTROL_HEIGHT);
+    const portal: Record<string, string> = {
+      ...(inherit ? parentConfig.tokenStyle : {}),
+      ...scoped,
+    };
+    for (const name of algorithmSeeds) {
+      if (Object.hasOwn(overrides, name)) {
+        scoped[name] = portal[name] = overrides[name];
+      } else {
+        delete scoped[name];
+        delete portal[name];
+      }
+    }
+    return {
+      scopedVars: scoped,
+      tokenStyle: portal,
+      tokenOverrides: overrides,
+    };
+  }, [
+    inherit,
+    mode,
+    compact,
+    parentCompact,
+    motionEnabled,
+    explicitLight,
+    parentConfig.tokenStyle,
+    parentConfig.tokenOverrides,
+    ownVars,
+  ]);
 
   /**
    * `display: contents` makes this wrapper layout-transparent so a
@@ -493,11 +574,6 @@ export function TaoProvider({
   const parentSize = parentConfig.size;
   const parentDisabled = parentConfig.disabled;
   const parentVariant = parentConfig.variant;
-  const parentMode = parentConfig.mode;
-  const parentCompact = parentConfig.compact;
-  const mode = theme?.mode ?? (inherit ? parentMode : 'light');
-  const compact = theme?.compact ?? (inherit ? parentCompact : false);
-
   const config = useMemo<TaoConfigContextValue>(
     () => ({
       direction,
@@ -507,6 +583,7 @@ export function TaoProvider({
       mode,
       compact,
       tokenStyle,
+      tokenOverrides,
       locale,
     }),
     [
@@ -521,6 +598,7 @@ export function TaoProvider({
       mode,
       compact,
       tokenStyle,
+      tokenOverrides,
       locale,
     ],
   );

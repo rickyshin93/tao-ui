@@ -1,4 +1,4 @@
-import { type ReactNode, useCallback, useMemo, useRef } from 'react';
+import { type ReactNode, useCallback, useMemo, useRef, useState } from 'react';
 import { useTaoConfig } from '../../provider/tao-provider';
 import { useMobileTitle } from '../../utils/field-label';
 import { Button } from '../button/button';
@@ -32,6 +32,7 @@ interface MobileSelectContentProps
   onClose: () => void;
   /** Enable multi-select checkboxes + Done button flow. */
   multiple?: boolean;
+  hideSelected?: boolean;
   maxCount?: number;
   mode?: 'multiple' | 'tags';
   tokenSeparators?: string[];
@@ -51,6 +52,7 @@ function MobileSelectContentInner({
   optionRender,
   onClose,
   multiple,
+  hideSelected,
   maxCount,
   mode,
   tokenSeparators,
@@ -67,20 +69,36 @@ function MobileSelectContentInner({
     return value ? [value as string] : [];
   }, [multiple, value]);
 
+  const [draft, setDraft] = useState(valueArray);
+  const [previousValue, setPreviousValue] = useState(valueArray);
+  // External value changes supersede pending edits; equal arrays keep the draft.
+  if (
+    previousValue.length !== valueArray.length ||
+    previousValue.some((item, index) => item !== valueArray[index])
+  ) {
+    setPreviousValue(valueArray);
+    setDraft(valueArray);
+  }
+
   const {
-    valueArray: draft,
     selectedValueSet: draftSet,
     selectedOptions,
     select,
     addTokens,
   } = useSelectSelection(
-    { options, defaultValue: valueArray, mode, maxCount, tokenSeparators },
+    {
+      options,
+      value: draft,
+      onChange: (next) => setDraft(next as string[]),
+      mode,
+      maxCount,
+      tokenSeparators,
+    },
     !!disabled,
   );
   const composingRef = useRef(false);
   const createTag = () => {
-    addTokens(search);
-    onSearchClear();
+    if (addTokens(search)) onSearchClear();
   };
 
   const knownOptions = useMemo(() => flattenLeafOptions(options), [options]);
@@ -95,14 +113,27 @@ function MobileSelectContentInner({
             ),
           ]
         : options;
-    if (!showSearch || !search) return available;
-    const fn = filterOption ?? defaultFilter;
-    return filterTree(available, fn, search);
+    const committed =
+      hideSelected && multiple && valueArray.length
+        ? new Set(valueArray)
+        : undefined;
+    const searching = showSearch && !!search;
+    if (!committed && !searching) return available;
+    const filter = filterOption ?? defaultFilter;
+    return filterTree(
+      available,
+      (query, option) =>
+        !committed?.has(option.value) && (!searching || filter(query, option)),
+      search,
+    );
   }, [
     options,
     knownOptions,
     selectedOptions,
     mode,
+    multiple,
+    hideSelected,
+    valueArray,
     search,
     showSearch,
     filterOption,
@@ -213,7 +244,7 @@ function MobileSelectContentInner({
           >
             {o.label}
           </div>
-          {o.options.map(renderItem)}
+          {renderTree(o.options)}
         </div>
       ) : (
         renderItem(o)

@@ -1,4 +1,4 @@
-import { expect, test } from '@rstest/core';
+import { expect, rstest, test } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { Switch } from '../../src/components/switch/switch';
@@ -39,6 +39,20 @@ test('defaultChecked drives uncontrolled state', async () => {
   expect(control.getAttribute('aria-checked')).toBe('true');
   await userEvent.click(control);
   expect(control.getAttribute('aria-checked')).toBe('false');
+});
+
+test('explicit checked undefined clears a controlled Switch without adopting local edits', async () => {
+  const onChange = rstest.fn();
+  const { rerender } = render(
+    <Switch checked defaultChecked onChange={onChange} />,
+  );
+  const control = screen.getByRole('switch');
+  expect(control).toBeChecked();
+  rerender(<Switch checked={undefined} defaultChecked onChange={onChange} />);
+  expect(control).not.toBeChecked();
+  await userEvent.click(control);
+  expect(onChange).toHaveBeenCalledExactlyOnceWith(true);
+  expect(control).not.toBeChecked();
 });
 
 test('disabled prevents onChange', async () => {

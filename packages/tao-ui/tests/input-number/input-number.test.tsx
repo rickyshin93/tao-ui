@@ -1,48 +1,67 @@
 import { expect, rstest, test } from '@rstest/core';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { Form } from '../../src/components/form';
 import { InputNumber } from '../../src/components/input-number/input-number';
 import { TaoProvider } from '../../src/provider/tao-provider';
 
-test.each([
-  'typing',
-  'programmatic',
-] as const)('Form clears a numeric field with undefined after %s entry without remounting', async (entry) => {
-  function Demo() {
-    const [form] = Form.useForm();
-    return (
-      <>
-        <Form form={form}>
-          <Form.Item name="amount">
-            <InputNumber />
-          </Form.Item>
-        </Form>
-        <button
-          type="button"
-          onClick={() => form.setFieldsValue({ amount: '1234' })}
-        >
-          Fill field
-        </button>
-        <button
-          type="button"
-          onClick={() => form.setFieldsValue({ amount: undefined })}
-        >
-          Clear field
-        </button>
-      </>
-    );
-  }
-  render(<Demo />);
+test('native form reset restores an uncontrolled InputNumber default', async () => {
+  const onChange = rstest.fn();
+  render(
+    <form aria-label="Payment">
+      <InputNumber defaultValue="1234" onChange={onChange} />
+    </form>,
+  );
   const input = screen.getByRole('textbox');
-  if (entry === 'typing') await userEvent.type(input, '1234');
-  else
-    await userEvent.click(screen.getByRole('button', { name: 'Fill field' }));
+  fireEvent.change(input, { target: { value: '5678' } });
+  expect(input).toHaveValue('5,678');
+  onChange.mockClear();
+
+  const form = screen.getByRole<HTMLFormElement>('form', { name: 'Payment' });
+  await act(async () => form.reset());
+
   expect(input).toHaveValue('1,234');
-  await userEvent.click(screen.getByRole('button', { name: 'Clear field' }));
-  expect(screen.getByRole('textbox')).toBe(input);
-  expect(input).toHaveValue('');
+  expect(onChange).not.toHaveBeenCalled();
 });
+
+test.each(['typing', 'programmatic'] as const)(
+  'Form clears a numeric field with undefined after %s entry without remounting',
+  async (entry) => {
+    function Demo() {
+      const [form] = Form.useForm();
+      return (
+        <>
+          <Form form={form}>
+            <Form.Item name="amount">
+              <InputNumber />
+            </Form.Item>
+          </Form>
+          <button
+            type="button"
+            onClick={() => form.setFieldsValue({ amount: '1234' })}
+          >
+            Fill field
+          </button>
+          <button
+            type="button"
+            onClick={() => form.setFieldsValue({ amount: undefined })}
+          >
+            Clear field
+          </button>
+        </>
+      );
+    }
+    render(<Demo />);
+    const input = screen.getByRole('textbox');
+    if (entry === 'typing') await userEvent.type(input, '1234');
+    else
+      await userEvent.click(screen.getByRole('button', { name: 'Fill field' }));
+    expect(input).toHaveValue('1,234');
+    await userEvent.click(screen.getByRole('button', { name: 'Clear field' }));
+    expect(screen.getByRole('textbox')).toBe(input);
+    expect(input).toHaveValue('');
+  },
+);
 
 test('defaultValue remains editable when value is omitted', async () => {
   const { rerender } = render(<InputNumber defaultValue="12" />);

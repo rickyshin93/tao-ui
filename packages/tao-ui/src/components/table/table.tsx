@@ -4,6 +4,7 @@ import {
   type ReactNode,
   useCallback,
   useEffect,
+  useId,
   useMemo,
   useRef,
   useState,
@@ -19,7 +20,6 @@ import { TableFilterDropdown } from './table-filter';
 import { ExpandIcon, SortIcon, TableLoadingSpinner } from './table-icons';
 import {
   getCellValue,
-  getColKey,
   getRowKey,
   resolveRowClassName,
   resolveRowStyle,
@@ -63,9 +63,18 @@ export type {
 } from './table-types';
 
 type StickyPos = { left?: number; right?: number };
+const EXPAND_COLUMN_INDEX = -2;
+const SELECTION_COLUMN_INDEX = -1;
 
 function stickyStyle(pos: StickyPos | undefined, zIndex: number) {
   return pos ? { position: 'sticky' as const, ...pos, zIndex } : undefined;
+}
+
+function fixedColumnWidth(width: number | string | undefined) {
+  if (typeof width === 'number') return width;
+  return width?.trim().toLowerCase().endsWith('px')
+    ? Number.parseFloat(width) || 0
+    : 0;
 }
 
 // ---- Table ----
@@ -159,6 +168,7 @@ export function Table<T extends TableRecord = Record<string, unknown>>({
 
   const tableData = useTableData({
     columns,
+    configuredColumns: columnsProp,
     dataSource,
     pagination: paginationProp,
     onChange,
@@ -168,19 +178,26 @@ export function Table<T extends TableRecord = Record<string, unknown>>({
   // ---- Row selection ----
   const selectionColWidth = rowSelection?.columnWidth ?? 48;
   const selectionType = rowSelection?.type ?? 'checkbox';
-  const isSelectionControlled = rowSelection?.selectedRowKeys !== undefined;
+  const selectionName = useId();
+  const isSelectionControlled =
+    rowSelection != null && 'selectedRowKeys' in rowSelection;
   const [internalSelectedKeys, setInternalSelectedKeys] = useState<React.Key[]>(
     [],
   );
-  const selectedKeys = rowSelection?.selectedRowKeys ?? internalSelectedKeys;
+  const selectedKeys = isSelectionControlled
+    ? (rowSelection.selectedRowKeys ?? [])
+    : internalSelectedKeys;
   const selectedKeySet = useMemo(() => new Set(selectedKeys), [selectedKeys]);
-  const selectablePageKeys = useMemo(
-    () =>
-      paginatedData
-        .filter((record) => !rowSelection?.getCheckboxProps?.(record)?.disabled)
-        .map((record) => getRowKey(record, rowKey)),
-    [paginatedData, rowSelection, rowKey],
-  );
+  const disabledRows = rowSelection
+    ? paginatedData.map(
+        (record) => rowSelection.getCheckboxProps?.(record)?.disabled,
+      )
+    : [];
+  const selectablePageKeys = rowSelection
+    ? paginatedData
+        .filter((_, index) => !disabledRows[index])
+        .map((record) => getRowKey(record, rowKey))
+    : [];
 
   const handleSelectRow = useCallback(
     (key: React.Key) => {
@@ -198,7 +215,7 @@ export function Table<T extends TableRecord = Record<string, unknown>>({
       const nextRows = dataSource.filter((r) =>
         nextKeySet.has(getRowKey(r, rowKey)),
       );
-      rowSelection.onChange(nextKeys, nextRows);
+      rowSelection.onChange([...nextKeys], nextRows);
     },
     [
       rowSelection,
@@ -224,7 +241,7 @@ export function Table<T extends TableRecord = Record<string, unknown>>({
       const nextRows = dataSource.filter((record) =>
         nextKeySet.has(getRowKey(record, rowKey)),
       );
-      rowSelection.onChange(nextKeys, nextRows);
+      rowSelection.onChange([...nextKeys], nextRows);
     },
     [
       rowSelection,
@@ -241,7 +258,11 @@ export function Table<T extends TableRecord = Record<string, unknown>>({
   const [internalExpandedKeys, setInternalExpandedKeys] = useState<React.Key[]>(
     () => expandable?.defaultExpandedRowKeys ?? [],
   );
-  const expandedKeys = expandable?.expandedRowKeys ?? internalExpandedKeys;
+  const isExpansionControlled =
+    expandable != null && 'expandedRowKeys' in expandable;
+  const expandedKeys = isExpansionControlled
+    ? (expandable.expandedRowKeys ?? [])
+    : internalExpandedKeys;
   const expandedKeySet = useMemo(() => new Set(expandedKeys), [expandedKeys]);
 
   const toggleExpand = (record: T, key: React.Key) => {
@@ -249,7 +270,7 @@ export function Table<T extends TableRecord = Record<string, unknown>>({
     const nextKeys = expanded
       ? [...expandedKeys, key]
       : expandedKeys.filter((k) => k !== key);
-    if (expandable?.expandedRowKeys === undefined) {
+    if (!isExpansionControlled) {
       setInternalExpandedKeys(nextKeys);
     }
     expandable?.onExpand?.(expanded, record);
@@ -258,6 +279,8 @@ export function Table<T extends TableRecord = Record<string, unknown>>({
 
   // ---- Scroll + sticky columns ----
   const scrollRef = useRef<HTMLDivElement>(null);
+  const headerRowRef = useRef<HTMLTableRowElement>(null);
+  const [headerWidths, setHeaderWidths] = useState<number[]>([]);
   const [direction, directionRef] = useTaoDirection(undefined, 'self');
   // Expanded content is pinned to the visible width while scrolling sideways.
   const [viewportWidth, setViewportWidth] = useState<number>();
@@ -279,26 +302,16 @@ export function Table<T extends TableRecord = Record<string, unknown>>({
     else setScrollState('middle');
   }, [direction]);
 
-  // Container width / column widths change without a scroll event.
-  useEffect(() => {
-    const el = scrollRef.current;
-    if (!scroll?.x || !el) return;
-    handleScroll();
-    const observer = new ResizeObserver(handleScroll);
-    observer.observe(el);
-    if (el.firstElementChild) observer.observe(el.firstElementChild);
-    return () => observer.disconnect();
-  }, [scroll?.x, handleScroll]);
-
   // ---- Compute sticky positions ----
   const allColumns = useMemo(() => {
-    const cols: (TableColumn<T> & { _key: string; _index: number })[] = [];
+    const cols: (Pick<TableColumn<T>, 'fixed' | 'width'> & {
+      index: number;
+    })[] = [];
 
     // Expand column (antd puts it before the selection column)
     if (expandable) {
       cols.push({
-        _key: '__expand__',
-        _index: -2,
+        index: EXPAND_COLUMN_INDEX,
         width: expandColWidth,
         fixed: expandable.fixed ? 'left' : undefined,
       });
@@ -307,32 +320,56 @@ export function Table<T extends TableRecord = Record<string, unknown>>({
     // Selection column
     if (rowSelection) {
       cols.push({
-        _key: '__selection__',
-        _index: -1,
+        index: SELECTION_COLUMN_INDEX,
         width: selectionColWidth,
         fixed: rowSelection.fixed ? 'left' : undefined,
       });
     }
 
-    columns.forEach((col, i) => {
-      cols.push({ ...col, _key: getColKey(col, i), _index: i });
+    columns.forEach(({ fixed, width }, index) => {
+      cols.push({ fixed, width, index });
     });
 
     return cols;
   }, [columns, rowSelection, selectionColWidth, expandable, expandColWidth]);
 
+  // Column widths can change while the table's outer dimensions stay the same.
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!scroll?.x || !el) return;
+    const cells = allColumns.some(({ fixed }) => fixed)
+      ? Array.from(headerRowRef.current?.cells ?? [])
+      : [];
+    const measure = () => {
+      handleScroll();
+      const widths = cells.map((cell) => cell.offsetWidth);
+      setHeaderWidths((previous) =>
+        previous.length === widths.length &&
+        previous.every((width, index) => width === widths[index])
+          ? previous
+          : widths,
+      );
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(el);
+    if (el.firstElementChild) observer.observe(el.firstElementChild);
+    for (const cell of cells) observer.observe(cell);
+    return () => observer.disconnect();
+  }, [scroll?.x, handleScroll, allColumns]);
+
   const stickyPositions = useMemo(() => {
     if (!scroll?.x) return {};
-    const positions: Record<string, StickyPos> = {};
+    const positions: Partial<Record<number, StickyPos>> = {};
 
     // Left fixed
     let leftOffset = 0;
-    for (const col of allColumns) {
+    for (const [index, col] of allColumns.entries()) {
       if (col.fixed === 'left') {
-        positions[col._key] = {
+        positions[col.index] = {
           [direction === 'rtl' ? 'right' : 'left']: leftOffset,
         };
-        leftOffset += typeof col.width === 'number' ? col.width : 0;
+        leftOffset += headerWidths[index] || fixedColumnWidth(col.width);
       }
     }
 
@@ -341,25 +378,25 @@ export function Table<T extends TableRecord = Record<string, unknown>>({
     for (let i = allColumns.length - 1; i >= 0; i--) {
       const col = allColumns[i];
       if (col.fixed === 'right') {
-        positions[col._key] = {
+        positions[col.index] = {
           [direction === 'rtl' ? 'left' : 'right']: rightOffset,
         };
-        rightOffset += typeof col.width === 'number' ? col.width : 0;
+        rightOffset += headerWidths[i] || fixedColumnWidth(col.width);
       }
     }
 
     return positions;
-  }, [allColumns, scroll?.x, direction]);
+  }, [allColumns, scroll?.x, direction, headerWidths]);
 
   const summaryColumns = useMemo<TableSummaryColumn[]>(
     () =>
       allColumns.map((col) => ({
         fixed: col.fixed,
-        sticky: stickyPositions[col._key],
+        sticky: stickyPositions[col.index],
       })),
     [allColumns, stickyPositions],
   );
-  const summaryNode = summary?.(paginatedData);
+  const summaryNode = summary?.([...paginatedData]);
   const summaryFixed =
     isValidElement<TableSummaryProps>(summaryNode) &&
     summaryNode.type === TableSummary &&
@@ -416,6 +453,7 @@ export function Table<T extends TableRecord = Record<string, unknown>>({
               return (
                 <tr
                   {...headerRowProps}
+                  ref={headerRowRef}
                   className={cx(
                     resolvedClassNames['header.row'],
                     headerRowProps.className,
@@ -430,11 +468,13 @@ export function Table<T extends TableRecord = Record<string, unknown>>({
                       data-tao-table-cell=""
                       data-tao-table-expand-cell=""
                       data-tao-fixed={
-                        stickyPositions.__expand__ ? 'left' : undefined
+                        stickyPositions[EXPAND_COLUMN_INDEX]
+                          ? 'left'
+                          : undefined
                       }
                       style={{
                         width: expandColWidth,
-                        ...stickyStyle(stickyPositions.__expand__, 3),
+                        ...stickyStyle(stickyPositions[EXPAND_COLUMN_INDEX], 3),
                       }}
                     />
                   )}
@@ -443,12 +483,14 @@ export function Table<T extends TableRecord = Record<string, unknown>>({
                       data-tao-table-cell=""
                       data-tao-table-selection-cell=""
                       data-tao-fixed={
-                        stickyPositions.__selection__ ? 'left' : undefined
+                        stickyPositions[SELECTION_COLUMN_INDEX]
+                          ? 'left'
+                          : undefined
                       }
                       className={resolvedClassNames['selection.cell']}
                       style={{
                         width: selectionColWidth,
-                        ...stickyStyle(stickyPositions.__selection__, 3),
+                        ...stickyStyle(stickyPositions[SELECTION_COLUMN_INDEX], 3),
                         ...resolvedStyles['selection.cell'],
                       }}
                     >
@@ -456,7 +498,9 @@ export function Table<T extends TableRecord = Record<string, unknown>>({
                         <Checkbox
                           aria-label={ctx.locale.messages.selectAllRows}
                           checked={isAllSelected}
-                          disabled={selectablePageKeys.length === 0}
+                          disabled={
+                            ctx.disabled || selectablePageKeys.length === 0
+                          }
                           indeterminate={isIndeterminate}
                           onChange={(e) => handleSelectAll(e.target.checked)}
                         />
@@ -464,7 +508,7 @@ export function Table<T extends TableRecord = Record<string, unknown>>({
                     </th>
                   )}
                   {columns.map((col, i) => {
-                    const colKey = getColKey(col, i);
+                    const colKey = tableData.columnKeys[i];
                     const hasSorter = !!col.sorter;
                     const hasFilter = !!(col.filters && col.filters.length > 0);
                     const {
@@ -473,7 +517,7 @@ export function Table<T extends TableRecord = Record<string, unknown>>({
                       onSort,
                       onFilter,
                     } = tableData.getColumnState(i);
-                    const stickyPos = stickyPositions[colKey];
+                    const stickyPos = stickyPositions[i];
                     const isFixed = !!col.fixed && !!scroll?.x;
                     const headerCellProps = col.onHeaderCell?.(col) ?? {};
 
@@ -517,6 +561,7 @@ export function Table<T extends TableRecord = Record<string, unknown>>({
                               data-tao-sortable=""
                               className={resolvedClassNames['header.title']}
                               style={resolvedStyles['header.title']}
+                              disabled={ctx.disabled}
                               onClick={onSort}
                             >
                               {col.title}
@@ -563,7 +608,6 @@ export function Table<T extends TableRecord = Record<string, unknown>>({
               paginatedData.map((record, rowIdx) => {
                 const key = getRowKey(record, rowKey);
                 const isSelected = selectedKeySet.has(key);
-                const checkboxProps = rowSelection?.getCheckboxProps?.(record);
                 const rowProps = onRow?.(record, rowIdx) ?? {};
                 const rowExpandable =
                   !!expandable && (expandable.rowExpandable?.(record) ?? true);
@@ -584,7 +628,12 @@ export function Table<T extends TableRecord = Record<string, unknown>>({
                           return;
                         }
                         rowProps.onClick?.(event);
-                        if (rowExpandable && expandable?.expandRowByClick)
+                        if (
+                          !event.defaultPrevented &&
+                          !ctx.disabled &&
+                          rowExpandable &&
+                          expandable?.expandRowByClick
+                        )
                           toggleExpand(record, key);
                       }}
                       className={cx(
@@ -603,13 +652,19 @@ export function Table<T extends TableRecord = Record<string, unknown>>({
                           data-tao-table-cell=""
                           data-tao-table-expand-cell=""
                           data-tao-fixed={
-                            stickyPositions.__expand__ ? 'left' : undefined
+                            stickyPositions[EXPAND_COLUMN_INDEX]
+                              ? 'left'
+                              : undefined
                           }
-                          style={stickyStyle(stickyPositions.__expand__, 1)}
+                          style={stickyStyle(
+                            stickyPositions[EXPAND_COLUMN_INDEX],
+                            1,
+                          )}
                         >
                           {rowExpandable && (
                             <ExpandIcon
                               expanded={isExpanded}
+                              disabled={ctx.disabled}
                               onClick={(e) => {
                                 e.stopPropagation();
                                 toggleExpand(record, key);
@@ -623,21 +678,27 @@ export function Table<T extends TableRecord = Record<string, unknown>>({
                           data-tao-table-cell=""
                           data-tao-table-selection-cell=""
                           data-tao-fixed={
-                            stickyPositions.__selection__ ? 'left' : undefined
+                            stickyPositions[SELECTION_COLUMN_INDEX]
+                              ? 'left'
+                              : undefined
                           }
                           className={resolvedClassNames['selection.cell']}
                           style={{
-                            ...stickyStyle(stickyPositions.__selection__, 1),
+                            ...stickyStyle(
+                              stickyPositions[SELECTION_COLUMN_INDEX],
+                              1,
+                            ),
                             ...resolvedStyles['selection.cell'],
                           }}
                         >
                           {selectionType === 'radio' ? (
                             <Radio
+                              name={selectionName}
                               checked={isSelected}
                               aria-label={ctx.locale.messages.selectRow(
                                 String(key),
                               )}
-                              disabled={checkboxProps?.disabled ?? false}
+                              disabled={ctx.disabled || disabledRows[rowIdx]}
                               onChange={() => handleSelectRow(key)}
                             />
                           ) : (
@@ -646,16 +707,16 @@ export function Table<T extends TableRecord = Record<string, unknown>>({
                               aria-label={ctx.locale.messages.selectRow(
                                 String(key),
                               )}
-                              disabled={checkboxProps?.disabled ?? false}
+                              disabled={ctx.disabled || disabledRows[rowIdx]}
                               onChange={() => handleSelectRow(key)}
                             />
                           )}
                         </td>
                       )}
                       {columns.map((col, colIdx) => {
-                        const colKey = getColKey(col, colIdx);
+                        const colKey = tableData.columnKeys[colIdx];
                         const value = getCellValue(record, col.dataIndex);
-                        const stickyPos = stickyPositions[colKey];
+                        const stickyPos = stickyPositions[colIdx];
                         const isFixed = !!col.fixed && !!scroll?.x;
                         const cellProps = col.onCell?.(record, rowIdx) ?? {};
 

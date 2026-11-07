@@ -1,5 +1,6 @@
 import { afterEach, expect, test } from '@rstest/core';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { createPortal } from 'react-dom';
 import { type StepItem, Steps } from '../../src/components/steps/steps';
 import { TaoProvider } from '../../src/provider/tao-provider';
 import { restoreViewport, setViewportWidth } from '../utils/mock-viewport';
@@ -13,6 +14,24 @@ const items: StepItem[] = [
   { title: 'Second', content: 'Second content' },
   { title: 'Third', content: 'Third content' },
 ];
+
+test('clicking portaled step content does not select its parent step', () => {
+  const changes: number[] = [];
+  render(
+    <Steps
+      items={[
+        items[0],
+        {
+          ...items[1],
+          content: createPortal(<div>Popup content</div>, document.body),
+        },
+      ]}
+      onChange={(index) => changes.push(index)}
+    />,
+  );
+  fireEvent.click(screen.getByText('Popup content'));
+  expect(changes).toEqual([]);
+});
 
 function root(container: HTMLElement): HTMLElement {
   const node = container.querySelector<HTMLElement>('[data-tao-steps]');
@@ -102,18 +121,14 @@ test('renders an error glyph for failed steps', () => {
     <Steps items={items} current={1} status="error" />,
   );
   expect(
-    container
-      .querySelectorAll('[data-tao-step-icon]')[1]
-      .querySelector('svg'),
+    container.querySelectorAll('[data-tao-step-icon]')[1].querySelector('svg'),
   ).toBeTruthy();
 });
 
 // ---- initial ----
 
 test('initial offsets both numbering and status comparison', () => {
-  const { container } = render(
-    <Steps items={items} initial={2} current={2} />,
-  );
+  const { container } = render(<Steps items={items} initial={2} current={2} />);
   const numbers = Array.from(
     container.querySelectorAll('[data-tao-steps-icon-number]'),
   ).map((node) => node.textContent);
@@ -311,9 +326,9 @@ test('inline type renders a dot layout and exposes its offset', () => {
     <Steps items={items} type="inline" offset={2} />,
   );
   expect(root(container).getAttribute('data-tao-type')).toBe('inline');
-  expect(root(container).style.getPropertyValue('--tao-steps-items-offset')).toBe(
-    '2',
-  );
+  expect(
+    root(container).style.getPropertyValue('--tao-steps-items-offset'),
+  ).toBe('2');
 });
 
 // ---- Percent ----
@@ -362,9 +377,7 @@ test('maxCount collapses hidden ranges into an ellipsis step', () => {
     const rendered = Array.from(
       container.querySelectorAll('[data-tao-step]'),
     ).map((step) => {
-      const title = step.querySelector(
-        '[data-tao-step-title]',
-      )?.textContent;
+      const title = step.querySelector('[data-tao-step-title]')?.textContent;
       if (title) return Number(title.replace('Step ', '')) - 1;
       expect(step.hasAttribute('data-tao-ellipsis')).toBe(true);
       return null;
@@ -381,16 +394,16 @@ test('does not collapse when maxCount is below 3 or not exceeded', () => {
   }));
 
   const tooSmall = render(<Steps items={many} maxCount={2} />);
-  expect(tooSmall.container.querySelectorAll('[data-tao-step]')).toHaveLength(7);
+  expect(tooSmall.container.querySelectorAll('[data-tao-step]')).toHaveLength(
+    7,
+  );
   tooSmall.unmount();
 
   const notExceeded = render(<Steps items={many} maxCount={7} />);
   expect(
     notExceeded.container.querySelectorAll('[data-tao-step]'),
   ).toHaveLength(7);
-  expect(
-    notExceeded.container.querySelector('[data-tao-ellipsis]'),
-  ).toBeNull();
+  expect(notExceeded.container.querySelector('[data-tao-ellipsis]')).toBeNull();
 });
 
 // ---- Custom rendering ----
@@ -430,9 +443,17 @@ test('iconRender exposes the semantic icon component', () => {
 
   const hosts = screen.getAllByTestId('inside-icon');
   expect(hosts).toHaveLength(items.length);
-  expect(hosts[0].parentElement?.hasAttribute('data-tao-step-icon')).toBe(
-    true,
+  expect(hosts[0].parentElement?.hasAttribute('data-tao-step-icon')).toBe(true);
+});
+
+test('zero is rendered as a supplied step icon', () => {
+  const { container } = render(
+    <Steps items={[{ title: 'First', icon: 0 }]} />,
   );
+  expect(container.querySelector('[data-tao-step-icon]')).toHaveTextContent(
+    '0',
+  );
+  expect(container.querySelector('[data-tao-steps-icon-number]')).toBeNull();
 });
 
 test('custom icons replace the generated glyph', () => {
@@ -473,7 +494,9 @@ test('applies semantic classNames and styles to inner parts', () => {
   expect(node.className).toContain('root-cls');
   expect(node.style.margin).toBe('4px');
 
-  expect(container.querySelectorAll('[data-tao-step].item-cls')).toHaveLength(3);
+  expect(container.querySelectorAll('[data-tao-step].item-cls')).toHaveLength(
+    3,
+  );
   expect(
     container.querySelector('[data-tao-step-title].title-cls'),
   ).toBeTruthy();
@@ -531,6 +554,23 @@ test('a local size wins over the provider', () => {
   expect(root(container).getAttribute('data-tao-size')).toBe('small');
 });
 
+test('provider-disabled Steps do not activate per-step or global handlers', () => {
+  const calls: string[] = [];
+  const steps = (
+    <Steps
+      items={[items[0], { title: 'Second', onClick: () => calls.push('item') }]}
+      onChange={() => calls.push('change')}
+    />
+  );
+  const view = render(<TaoProvider disabled>{steps}</TaoProvider>);
+  fireEvent.click(screen.getByText('Second'));
+  expect(calls).toEqual([]);
+  expect(screen.queryByRole('button', { name: /Second/ })).toBeNull();
+  view.rerender(<TaoProvider disabled={false}>{steps}</TaoProvider>);
+  fireEvent.click(screen.getByRole('button', { name: /Second/ }));
+  expect(calls).toEqual(['item', 'change']);
+});
+
 // ---- Accessibility ----
 
 test('clickable steps are focusable buttons', () => {
@@ -540,4 +580,97 @@ test('clickable steps are focusable buttons', () => {
   buttons.forEach((button) => {
     expect(button.getAttribute('tabindex')).toBe('0');
   });
+});
+
+test('a current value before initial does not select an ellipsis', () => {
+  const many = Array.from({ length: 6 }, (_, i) => ({
+    title: `Step ${i + 1}`,
+  }));
+  const { container } = render(
+    <Steps items={many} current={2} initial={3} maxCount={3} />,
+  );
+  expect(container.querySelector('[data-tao-ellipsis]')).toBeInTheDocument();
+  expect(
+    container.querySelector('[aria-current="step"]'),
+  ).not.toBeInTheDocument();
+  expect(statuses(container).every((status) => status === 'wait')).toBe(true);
+});
+
+test('reordering keyed steps keeps draft state with its original step', () => {
+  const alpha = {
+    key: 'a',
+    title: 'Alpha',
+    content: <input aria-label="Alpha draft" defaultValue="Alpha" />,
+  };
+  const beta = {
+    key: 'b',
+    title: 'Beta',
+    content: <input aria-label="Beta draft" defaultValue="Beta" />,
+  };
+  const view = render(<Steps items={[alpha, beta]} />);
+  const field = screen.getByLabelText('Alpha draft');
+  fireEvent.change(field, { target: { value: 'My draft' } });
+  view.rerender(<Steps items={[beta, alpha]} />);
+  expect(screen.getByLabelText('Alpha draft')).toBe(field);
+  expect(field).toHaveValue('My draft');
+});
+
+test('keeps step activation on the step itself and ignores held keys', () => {
+  const calls: number[] = [];
+  render(
+    <Steps
+      items={[
+        items[0],
+        { title: 'Second', content: <input aria-label="Draft" /> },
+      ]}
+      onChange={(key) => calls.push(key)}
+    />,
+  );
+  const step = screen.getByRole('button', { name: /Second/ });
+  expect(fireEvent.keyDown(screen.getByLabelText('Draft'), { key: ' ' })).toBe(
+    true,
+  );
+  fireEvent.keyDown(step, { key: 'Enter' });
+  fireEvent.keyDown(step, { key: 'Enter', repeat: true });
+  expect(calls).toEqual([1]);
+});
+
+test('a step click can cancel the selection change', () => {
+  const calls: number[] = [];
+  render(
+    <Steps
+      items={[
+        items[0],
+        { title: 'Second', onClick: (event) => event.preventDefault() },
+      ]}
+      onChange={(key) => calls.push(key)}
+    />,
+  );
+  fireEvent.click(screen.getByRole('button', { name: /Second/ }));
+  expect(calls).toEqual([]);
+});
+
+test('clicking a control inside a step does not activate the step itself', () => {
+  const actions: string[] = [];
+  render(
+    <Steps
+      items={[
+        items[0],
+        {
+          title: 'Second',
+          content: (
+            <button type="button" onClick={() => actions.push('edit')}>
+              Edit draft
+            </button>
+          ),
+          onClick: () => actions.push('step'),
+        },
+      ]}
+      onChange={(index) => actions.push(`change:${index}`)}
+    />,
+  );
+  fireEvent.click(screen.getByRole('button', { name: 'Edit draft' }));
+  expect(actions).toEqual(['edit']);
+  fireEvent.click(screen.getByText('Second'));
+  expect(actions).toEqual(['edit', 'step', 'change:1']);
 });

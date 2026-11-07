@@ -1,7 +1,10 @@
 import * as RC from '@radix-ui/react-collapsible';
 import {
   type CSSProperties,
+  cloneElement,
   createContext,
+  isValidElement,
+  type MouseEvent,
   type ReactNode,
   useCallback,
   useContext,
@@ -107,6 +110,7 @@ export interface CollapseContentProps {
 interface CollapseCtx {
   classNames?: SemanticClassNames<CollapseSemanticPart>;
   styles?: SemanticStyles<CollapseSemanticPart>;
+  disabled?: boolean;
 }
 
 const Ctx = createContext<CollapseCtx>({});
@@ -150,7 +154,7 @@ function CollapseRoot(props: CollapseProps) {
   );
 
   return (
-    <Ctx.Provider value={{ classNames, styles }}>
+    <Ctx.Provider value={{ classNames, styles, disabled: resolvedDisabled }}>
       <RC.Root
         open={realOpen}
         onOpenChange={setOpen}
@@ -167,15 +171,44 @@ function CollapseRoot(props: CollapseProps) {
 
 function CollapseTrigger(props: CollapseTriggerProps) {
   const { children, asChild, className, style } = props;
-  const { classNames, styles } = useContext(Ctx);
+  const { classNames, styles, disabled } = useContext(Ctx);
+  const customDisabled = asChild && disabled;
+  const blockActivation = customDisabled
+    ? (event: MouseEvent) => {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+    : undefined;
+  const trigger =
+    customDisabled &&
+    isValidElement<{
+      href?: string;
+      role?: string;
+      tabIndex?: number;
+      disabled?: boolean;
+      'aria-disabled'?: boolean;
+    }>(children)
+      ? cloneElement(children, {
+          'aria-disabled': true,
+          tabIndex: -1,
+          ...(children.type === 'a'
+            ? { href: undefined, role: children.props.role ?? 'link' }
+            : {}),
+          ...(children.type === 'button' ? { disabled: true } : {}),
+        })
+      : children;
   return (
     <RC.Trigger
       asChild={asChild}
+      aria-disabled={customDisabled || undefined}
+      tabIndex={customDisabled ? -1 : undefined}
+      onClickCapture={blockActivation}
+      onAuxClickCapture={blockActivation}
       data-tao-collapse-trigger=""
       className={cx(classNames?.trigger, className)}
       style={{ ...styles?.trigger, ...style }}
     >
-      {children}
+      {trigger}
     </RC.Trigger>
   );
 }

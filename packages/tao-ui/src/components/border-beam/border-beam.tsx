@@ -131,7 +131,8 @@ function BeamEffect({
 >) {
   const root = useRef<HTMLDivElement>(null);
   const beam = useRef<HTMLSpanElement>(null);
-  const border = getComputedStyle(host);
+  const ownerWindow = host.ownerDocument.defaultView ?? window;
+  const border = ownerWindow.getComputedStyle(host);
   const inset =
     item.outset === undefined
       ? [
@@ -148,7 +149,8 @@ function BeamEffect({
   useEffect(() => {
     const overlay = root.current!;
     const light = beam.current!;
-    const motion = matchMedia('(prefers-reduced-motion: reduce)');
+    const view = host.ownerDocument.defaultView ?? window;
+    const motion = view.matchMedia('(prefers-reduced-motion: reduce)');
     let width = 0;
     let height = 0;
     let path: PathPoint[] = [];
@@ -159,7 +161,7 @@ function BeamEffect({
     const measure = () => {
       width = overlay.clientWidth;
       height = overlay.clientHeight;
-      path = borderPath(width, height, getComputedStyle(overlay));
+      path = borderPath(width, height, view.getComputedStyle(overlay));
       beamWidth = light.offsetWidth;
       beamHeight = light.offsetHeight;
     };
@@ -170,13 +172,13 @@ function BeamEffect({
         (((now - start) / (duration * 1000) + phase) % 1) * perimeter;
       const [x, y, angle] = perimeterPoint(distance, path);
       light.style.transform = `translate(${x - beamWidth * 0.9}px, ${y - beamHeight / 2}px) rotate(${angle}deg)`;
-      frame = requestAnimationFrame(tick);
+      frame = view.requestAnimationFrame(tick);
     };
     const updateMotion = () => {
-      cancelAnimationFrame(frame);
-      if (!motion.matches) frame = requestAnimationFrame(tick);
+      view.cancelAnimationFrame(frame);
+      if (!motion.matches) frame = view.requestAnimationFrame(tick);
     };
-    const observer = new ResizeObserver(measure);
+    const observer = new view.ResizeObserver(measure);
     observer.observe(overlay);
     observer.observe(light);
     measure();
@@ -184,10 +186,10 @@ function BeamEffect({
     motion.addEventListener('change', updateMotion);
     return () => {
       observer.disconnect();
-      cancelAnimationFrame(frame);
+      view.cancelAnimationFrame(frame);
       motion.removeEventListener('change', updateMotion);
     };
-  }, [duration, phase]);
+  }, [duration, host, phase]);
   return createPortal(
     <div
       ref={root}
@@ -228,24 +230,26 @@ export function BorderBeam({
   const [host, setHost] = useState<HTMLElement | null>(null);
   const assignHost = useCallback(
     (node: HTMLElement | { nativeElement: HTMLElement } | null) =>
-      setHost(
-        node instanceof HTMLElement ? node : (node?.nativeElement ?? null),
-      ),
+      setHost(node && 'nativeElement' in node ? node.nativeElement : node),
     [],
   );
-  useEffect(() => {
-    if (!host || getComputedStyle(host).position !== 'static') return;
-    const original = host.style.position;
-    host.style.position = 'relative';
-    return () => {
-      if (host.style.position === 'relative') host.style.position = original;
-    };
-  }, [host]);
   const total =
     items?.length ??
     (count !== undefined && Number.isFinite(count) && count >= 1
       ? Math.floor(count)
       : 1);
+  const activeHost = total ? host : null;
+  useEffect(() => {
+    if (!activeHost || getComputedStyle(activeHost).position !== 'static')
+      return;
+    const original = activeHost.style.position;
+    activeHost.style.position = 'relative';
+    return () => {
+      if (activeHost.style.position === 'relative') {
+        activeHost.style.position = original;
+      }
+    };
+  }, [activeHost]);
   const seconds = duration !== undefined && duration > 0 ? duration : 6;
   const child =
     isValidElement(children) && children.type !== Fragment ? (
@@ -256,14 +260,14 @@ export function BorderBeam({
   return (
     <>
       {child}
-      {host &&
+      {activeHost &&
         Array.from({ length: total }, (_, index) => ({
           phase: index / total,
           item: items?.[index],
         })).map(({ phase, item }) => (
           <BeamEffect
             key={`${total}-${phase}`}
-            host={host}
+            host={activeHost}
             item={{ color, lineWidth, outset, size, ...item }}
             phase={phase}
             duration={seconds}

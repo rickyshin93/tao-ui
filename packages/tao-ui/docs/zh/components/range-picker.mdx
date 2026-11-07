@@ -1,6 +1,6 @@
 ---
 title: RangePicker
-description: 选择开始与结束日期，并可包含时间和快捷预设。页面涵盖适用场景、设计建议、多组可运行示例、交互状态与完整 API 参考。
+description: 选择开始与结束日期，支持时间和快捷预设，并提供受控值、清空和本地化示例。
 ---
 
 import Preview from '../../_components/demo-preview';
@@ -290,7 +290,9 @@ export default function Example() {
 
 ### 受控值与清空
 
-在 onChange 中保存值；清空后将值设为 null。
+传入 `value` 控制范围，并在 `onChange` 中保存新值。应用需要重置范围时，将 `value` 设为 `null`。
+
+两端均可编辑时，内置清空按钮会触发 `onChange(null, ['', ''])`。从 [0.0.49](/zh/guide/changelog) 起，组件会直接丢弃正在编辑的文本，避免先把它作为已选范围发出。
 
 ```tsx preview
 import { useState } from 'react';

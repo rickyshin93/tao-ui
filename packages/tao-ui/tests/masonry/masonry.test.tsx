@@ -105,6 +105,16 @@ test('honors assigned columns, children precedence and key reordering', () => {
   expect(screen.queryByText('Item 3')).toBeNull();
   expect(screen.getByText('Item 0')).toHaveStyle({ top: '20px' });
 });
+
+test('editing a Masonry layout callback payload does not retrigger an unchanged layout', () => {
+  const onLayoutChange = rstest.fn((layout: { key: React.Key; column: number }[]) => {
+    layout.reverse();
+    layout[0].column = 42;
+  });
+  const view = render(<Masonry items={items} onLayoutChange={onLayoutChange} />);
+  view.rerender(<Masonry items={items} onLayoutChange={onLayoutChange} />);
+  expect(onLayoutChange).toHaveBeenCalledTimes(1);
+});
 test('fresh observes item content resizing and disconnects on unmount', () => {
   const { unmount } = render(
     <Masonry
@@ -144,4 +154,22 @@ test('resolves responsive columns and semantic callbacks against merged props', 
   expect(ref.current?.nativeElement).toHaveClass('custom', 'columns-2');
   expect(screen.getByText('Item 0:0:0')).toHaveClass('tile');
   expect(screen.getByText('Item 0:0:0')).toHaveStyle({ color: 'red' });
+});
+
+test('keeps the layout valid with fractional column counts and out-of-range assignments', () => {
+  const ref = createRef<MasonryRef>();
+  render(
+    <Masonry
+      ref={ref}
+      columns={2.5}
+      items={[
+        { ...items[0], column: -1 },
+        { ...items[1], column: 9 },
+      ]}
+      itemRender={({ data }) => data}
+    />,
+  );
+  expect(screen.getByText('Item 0')).toHaveAttribute('data-tao-column', '0');
+  expect(screen.getByText('Item 1')).toHaveAttribute('data-tao-column', '1');
+  expect(ref.current?.nativeElement).toHaveStyle({ height: '100px' });
 });

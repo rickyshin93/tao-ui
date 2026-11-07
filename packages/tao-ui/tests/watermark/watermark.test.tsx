@@ -35,6 +35,21 @@ beforeEach(() => {
 });
 afterEach(() => rstest.restoreAllMocks());
 
+test('Watermark mark styles preserve unitless values and numeric lengths', () => {
+  const { container } = render(
+    <Watermark
+      content="Private"
+      styles={{ mark: { lineHeight: 1.25, left: 4 } }}
+    >
+      Body
+    </Watermark>,
+  );
+  expect(container.querySelector('[data-tao-watermark-mark]')).toHaveStyle({
+    lineHeight: '1.25',
+    left: '4px',
+  });
+});
+
 test('draws multi-line text with per-line font settings and applies dimensions/offsets', async () => {
   const ref = createRef<WatermarkRef>();
   render(
@@ -161,6 +176,24 @@ test('inherit=false keeps portaled dialog content unmarked', () => {
     screen.getByRole('dialog').querySelector('[data-tao-watermark-mark]'),
   ).toBeNull();
 });
+
+test('nested inherit=false blocks the outer watermark from reaching the dialog', () => {
+  render(
+    <Watermark content="Outer">
+      <Watermark content="Inner" inherit={false}>
+        <Modal open title="Public">
+          Dialog
+        </Modal>
+      </Watermark>
+    </Watermark>,
+  );
+  expect(document.querySelectorAll('[data-tao-watermark-mark]')).toHaveLength(
+    2,
+  );
+  expect(
+    screen.getByRole('dialog').querySelector('[data-tao-watermark-mark]'),
+  ).toBeNull();
+});
 test('image load uses real drawing, failed image falls back to text and unmount cancels callbacks', () => {
   const images: HTMLImageElement[] = [];
   const OriginalImage = globalThis.Image;
@@ -175,7 +208,7 @@ test('image load uses real drawing, failed image falls back to text and unmount 
     }
   } as unknown as typeof Image;
   try {
-    const { rerender, unmount } = render(
+    const { container, rerender, unmount } = render(
       <Watermark image="one.png" content="Fallback" />,
     );
     act(() => images[0].onload?.(new Event('load')));
@@ -185,10 +218,43 @@ test('image load uses real drawing, failed image falls back to text and unmount 
     expect(images[0].onload).toBeNull();
     act(() => images[1].onerror?.(new Event('error')));
     expect(context.fillText).toHaveBeenCalledWith('Fallback', 0, -32);
+    const fallback = 'A fallback text that must fit in the tile';
+    rerender(
+      <Watermark
+        image="three.png"
+        content={fallback}
+        rotate={0}
+        gap={[0, 0]}
+      />,
+    );
+    act(() => images[2].onerror?.(new Event('error')));
+    expect(container.querySelector('[data-tao-watermark-mark]')).toHaveStyle({
+      backgroundSize: `${fallback.length * 8}px 64px`,
+    });
     unmount();
-    expect(images[1].onload).toBeNull();
-    expect(images[1].onerror).toBeNull();
+    expect(images[2].onload).toBeNull();
+    expect(images[2].onerror).toBeNull();
   } finally {
     globalThis.Image = OriginalImage;
   }
+});
+
+test('watermark repair restores the mark identity and accessibility attributes', async () => {
+  const { container } = render(<Watermark content="Private">Body</Watermark>);
+  const mark = container.querySelector('[data-tao-watermark-mark]')!;
+  act(() => {
+    mark.removeAttribute('data-tao-watermark-mark');
+    mark.setAttribute('aria-hidden', 'false');
+  });
+  await waitFor(() => expect(mark).toHaveAttribute('aria-hidden', 'true'));
+  expect(mark).toHaveAttribute('data-tao-watermark-mark');
+});
+
+test('watermark repair removes injected content from the mark', async () => {
+  const { container } = render(<Watermark content="Private">Body</Watermark>);
+  const mark = container.querySelector('[data-tao-watermark-mark]')!;
+  mark.append('Injected content');
+
+  await waitFor(() => expect(mark).toBeEmptyDOMElement());
+  expect(screen.getByText('Body')).toBeVisible();
 });
