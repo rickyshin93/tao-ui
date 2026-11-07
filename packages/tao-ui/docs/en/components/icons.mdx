@@ -4,23 +4,161 @@ description: Browse tao-icons, search by name or category, and copy React import
 ---
 
 import { withBase } from '@rspress/core/runtime';
+import Preview from '../../_components/demo-preview';
 import { IconGallery } from '../../_components/icon-gallery';
 
 # Icons
 
-Explore 2,165 rounded line icons for everyday interfaces and insurance workflows. Select an icon to copy its import.
+Explore 2,165 rounded line icons for everyday interfaces and insurance workflows. Browse by category or search by name or keyword. Select an icon to copy its import.
+
+## Installation
+
+The icons support React 18.2 and later and are available under the <a href={withBase("/tao-icons-LICENSE.txt")}>MIT License</a>.
+
+```sh
+npm install @rockshin/tao-icons
+```
+
+## Icon catalog
 
 <IconGallery locale="en" />
 
-## Usage
+## React examples
 
-Install V13 with `npm install @rockshin/tao-icons@0.1.0`. The icon artwork is licensed under the <a href={withBase("/tao-icons-LICENSE.txt")}>MIT License</a>. Existing import names remain valid. For the 39 names with new artwork, use the corresponding `original-*` entry to get the preserved variant, such as `OriginalChartBarIcon`. See `@rockshin/tao-icons/migration.json` for the full map.
+<div className="tao-demo-grid">
 
-```tsx
-import { SearchIcon } from '@rockshin/tao-icons';
-import { ArrowRightIcon } from '@rockshin/tao-icons/icons/arrow-right';
+<section className="tao-example" id="icons-example-1">
 
-<SearchIcon size={20} />
+### Basic usage
+
+Import named icons from the package. Icons render at 24px by default.
+
+```tsx preview
+import { HomeIcon, SearchIcon, SettingsIcon } from '@rockshin/tao-icons';
+
+export default function BasicIcons() {
+  return (
+    <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
+      <HomeIcon />
+      <SearchIcon />
+      <SettingsIcon />
+    </div>
+  );
+}
 ```
 
-Icons inherit text color and default to a 24px size and 1.8 stroke width. Decorative icons are hidden from assistive technology by default; provide a `title` or `aria-label` when an icon conveys meaning. Icon-only buttons also need an accessible name.
+</section>
+
+<section className="tao-example" id="icons-example-2">
+
+### Size and stroke
+
+Set size to change the dimensions and strokeWidth to adjust line weight.
+
+```tsx preview
+import { StarIcon } from '@rockshin/tao-icons';
+
+export default function IconSizing() {
+  return (
+    <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
+      <StarIcon size={16} />
+      <StarIcon size={24} />
+      <StarIcon size={32} strokeWidth={1.2} />
+      <StarIcon size={32} strokeWidth={2.4} />
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="icons-example-3">
+
+### Color
+
+Icons inherit the text color. Set color to override an individual icon.
+
+```tsx preview
+import { HeartIcon, CircleCheckIcon, TriangleAlertIcon } from '@rockshin/tao-icons';
+
+export default function IconColors() {
+  return (
+    <div style={{ display: 'flex', gap: 16, color: '#c24469' }}>
+      <HeartIcon />
+      <CircleCheckIcon color="#168255" />
+      <TriangleAlertIcon color="#ae6400" />
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="icons-example-4">
+
+### Buttons and accessibility
+
+Icons in labeled buttons can stay decorative. Give icon-only buttons an accessible name.
+
+```tsx preview
+import { DownloadIcon, SettingsIcon } from '@rockshin/tao-icons';
+import { Button } from '@rockshin/tao-ui';
+
+export default function IconButtons() {
+  return (
+    <div style={{ display: 'flex', gap: 12 }}>
+      <Button icon={<DownloadIcon size={16} />}>Download</Button>
+      <Button variant="secondary" aria-label="Settings" icon={<SettingsIcon size={16} />} />
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="icons-example-5">
+
+### State changes
+
+Use React state to switch icons. Try the button in the preview.
+
+```tsx preview
+import { useState } from 'react';
+import { VolumeIcon, VolumeOffIcon } from '@rockshin/tao-icons';
+import { Button } from '@rockshin/tao-ui';
+
+export default function VolumeToggle() {
+  const [muted, setMuted] = useState(false);
+
+  return (
+    <Button
+      variant="secondary"
+      aria-pressed={muted}
+      icon={muted ? <VolumeOffIcon size={18} /> : <VolumeIcon size={18} />}
+      onClick={() => setMuted((value) => !value)}
+    >
+      {muted ? 'Muted' : 'Sound on'}
+    </Button>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="icons-example-6">
+
+### Per-icon import
+
+Each icon has a dedicated import path. Use title to name a standalone icon.
+
+```tsx preview
+import { ArrowRightIcon } from '@rockshin/tao-icons/icons/arrow-right';
+
+export default function DirectImport() {
+  return <ArrowRightIcon size={24} title="Next step" />;
+}
+```
+
+</section>
+
+</div>

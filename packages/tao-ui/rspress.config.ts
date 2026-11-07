@@ -56,6 +56,12 @@ export default defineConfig({
     },
   },
   builderConfig: {
+    resolve: {
+      alias: {
+        '@rockshin/tao-icons$': path.join(__dirname, '../icons/src/index.ts'),
+        '@rockshin/tao-icons/icons': path.join(__dirname, '../icons/src/icons'),
+      },
+    },
     plugins: [
       pluginWorkspaceDev({
         startCurrent: true,

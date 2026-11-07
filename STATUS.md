@@ -1,7 +1,7 @@
 # STATUS
 
 ## Doing
-- 2026-11-07 Integrated the 2,165-icon V13 package and bilingual website gallery. Package, React/Next consumer, docs build and desktop interaction checks passed. MIT artwork license confirmed. npm and GitHub Pages release in progress.
+- 2026-11-07 Published tao-icons 0.1.0 with 2,165 MIT-licensed icons. The grouped bilingual catalog and six React examples are ready for GitHub Pages deployment.
 
 ## Next
 
