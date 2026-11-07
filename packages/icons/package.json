@@ -1,7 +1,7 @@
 {
   "name": "@rockshin/tao-icons",
-  "version": "0.0.1",
-  "description": "554 rounded 24px line icons for React, with per-icon entry points and accessible defaults.",
+  "version": "0.1.0",
+  "description": "2165 rounded 24px line icons for React, with per-icon entry points and accessible defaults.",
   "keywords": [
     "react",
     "icons",
@@ -35,12 +35,15 @@
     },
     "./svg/*": "./svg/*",
     "./manifest.json": "./data/manifest.json",
+    "./migration.json": "./data/migration.json",
     "./package.json": "./package.json"
   },
   "files": [
     "dist",
     "svg",
     "data/manifest.json",
+    "data/migration.json",
+    "ARTWORK-LICENSE",
     "README.md",
     "DESIGN.md",
     "LICENSE",

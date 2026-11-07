@@ -1,0 +1,26 @@
+---
+title: 图标
+description: 浏览 tao-icons 图标，按名称或分类搜索并复制 React 导入语句。
+---
+
+import { withBase } from '@rspress/core/runtime';
+import { IconGallery } from '../../_components/icon-gallery';
+
+# 图标
+
+探索 2,165 个圆角线性图标，包含通用界面与保险业务图标。点击图标复制其导入语句。
+
+<IconGallery locale="zh" />
+
+## 使用
+
+使用 `npm install @rockshin/tao-icons@0.1.0` 安装 V13。图标素材采用 <a href={withBase("/tao-icons-LICENSE.txt")}>MIT 许可</a>。旧导入名称仍可用，其中 39 个同名旧图移至 `original-*`，例如原来的柱状图可用 `OriginalChartBarIcon`。完整映射可从 `@rockshin/tao-icons/migration.json` 读取。
+
+```tsx
+import { SearchIcon } from '@rockshin/tao-icons';
+import { ArrowRightIcon } from '@rockshin/tao-icons/icons/arrow-right';
+
+<SearchIcon size={20} />
+```
+
+图标默认继承文字颜色，尺寸为 24，线宽为 1.8。纯装饰图标默认对辅助技术隐藏；独立传达含义时请设置 `title` 或 `aria-label`。图标按钮本身也需要可访问名称。

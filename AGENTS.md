@@ -5,7 +5,7 @@ Bun workspaces monorepo. Two publishable packages, each with its own build, docs
 ## Layout
 
 - `packages/tao-ui` — `@rockshin/tao-ui`. Rslib component library (React 18.2/19), Rstest tests, Rspress docs, Storybook, Biome. Package-level guide: `packages/tao-ui/CLAUDE.md`.
-- `packages/icons` — `@rockshin/tao-icons`. 554 generated React icon modules, canonical geometry in `data/`, frozen SHA-256 baselines, node:test harness, real-tgz consumer and Next checks. Package-level guide: `packages/icons/AGENTS.md` and `HARNESS.md`.
+- `packages/icons` — `@rockshin/tao-icons`. 2,165 generated React icon modules, canonical geometry in `data/`, frozen SHA-256 baselines, node:test harness, real-tgz consumer and Next checks. Package-level guide: `packages/icons/AGENTS.md` and `HARNESS.md`.
 - Root: workspace scripts, CI workflows, shared agent instructions. No runtime code.
 
 ## Commands (from the repository root)
@@ -19,7 +19,7 @@ Bun workspaces monorepo. Two publishable packages, each with its own build, docs
 
 ## Non-negotiables
 
-- **Generated icon sources are never hand-edited.** `packages/icons/src/icons/*.tsx` and `src/index.ts` come from `scripts/generate.mjs` over `data/icons.json`; `generate:check` fails on drift. Changing geometry means changing `data/` plus the frozen baselines.
+- **Generated icon sources are never hand-edited.** `packages/icons/src/icons/*.tsx` and `src/index.ts` come from `scripts/generate.mjs` over `data/icons.json`; `generate:check` fails on drift. New artwork gets its own integrity snapshot under `tests/fixtures/`.
 - **Icon baselines stay frozen.** Approved v1.2.0, v1.3.0-preview.2 and the generic-candidate baselines keep their SHA-256 values; do not refresh hashes to make a check pass.
 - **tao-ui package.json `sideEffects` whitelist stays.** Dropping `./dist/index.js` / `./src/index.tsx` from it silently removes the theme CSS under strict tree-shakers.
 - **React stays a peer dependency in both packages.** tao-ui supports React 18.2+; icons peers `^18.2.0 || ^19.0.0`.

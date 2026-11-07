@@ -1,7 +1,10 @@
 import { readFile } from 'node:fs/promises';
 const pkg = JSON.parse(await readFile(new URL('../package.json', import.meta.url), 'utf8'));
+const artworkLicense = await readFile(new URL('../ARTWORK-LICENSE', import.meta.url), 'utf8');
+const codeLicense = await readFile(new URL('../LICENSE', import.meta.url), 'utf8');
 const expectedName = '@rockshin/tao-icons';
 const blockers = [];
+if (artworkLicense !== codeLicense) blockers.push('V13 artwork does not have the confirmed MIT license required for publication');
 if (pkg.private) blockers.push('package.json private:true still prevents publication');
 if (pkg.license !== 'MIT') blockers.push('package.json license must be MIT');
 if (pkg.name !== expectedName) blockers.push(`package.json name must be ${expectedName}`);

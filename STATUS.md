@@ -1,12 +1,11 @@
 # STATUS
 
 ## Doing
-- 2026-10-20 Approve the staged `@rockshin/tao-icons@0.0.1` on npmjs.com: the registry currently shows the public `0.0.0-stage` placeholder, and the real version needs maintainer 2FA approval (Staged Packages -> Approve)
+- 2026-11-07 Integrated the 2,165-icon V13 package and bilingual website gallery. Package, React/Next consumer, docs build and desktop interaction checks passed. MIT artwork license confirmed. npm and GitHub Pages release in progress.
 
 ## Next
 
-- add an icon gallery to the Rspress docs (generated from `packages/icons/data/manifest.json`) and decide whether tao-ui components adopt `@rockshin/tao-icons` for app-level glyphs
-- publish `@rockshin/tao-icons` only after the owner confirms the license/public scope and the 224 generic candidates are design-confirmed
+- decide whether tao-ui components adopt `@rockshin/tao-icons` for app-level glyphs
 - refine animation/stacking behavior if more feedback patterns are added
 
 ## Backlog

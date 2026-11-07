@@ -23,7 +23,7 @@ test('generated-source drift is caught without silently regenerating it', async 
   } finally { await rm(fixture, { recursive: true, force: true }); }
 });
 
-test('release guard passes for the publishable @rockshin/tao-icons metadata', async () => {
+test('release guard verifies package identity and artwork license', async () => {
   const pkg = JSON.parse(await readFile(path.join(root, 'package.json'), 'utf8'));
   assert.equal(pkg.name, '@rockshin/tao-icons');
   assert.equal(pkg.license, 'MIT');
@@ -31,14 +31,27 @@ test('release guard passes for the publishable @rockshin/tao-icons metadata', as
   assert.doesNotMatch(pkg.name, /preview/);
   assert.doesNotMatch(pkg.version, /preview/);
   const result = spawnSync(process.execPath, ['scripts/release-guard.mjs'], { cwd: root, encoding: 'utf8' });
-  assert.equal(result.status, 0, result.stderr);
-  assert.match(result.stdout, /This does not authorize publication/);
+  const artworkLicense = await readFile(path.join(root, 'ARTWORK-LICENSE'), 'utf8');
+  const codeLicense = await readFile(path.join(root, 'LICENSE'), 'utf8');
+  if (artworkLicense === codeLicense) {
+    assert.equal(result.status, 0, result.stderr);
+    assert.match(result.stdout, /This does not authorize publication/);
+  } else {
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr, /V13 artwork does not have the confirmed MIT license/);
+  }
 });
 
 test('通用导入器可从本仓库数据重现合并结果且不改原批准基线', async () => {
   const fixture = await mkdtemp(path.join(tmpdir(), 'rounded-import-'));
   try {
     for (const directory of ['data', 'svg', 'scripts', 'tests/fixtures']) await cp(path.join(root, directory), path.join(fixture, directory), { recursive: true });
+    const legacyIcons = await readFile(path.join(fixture, 'tests/fixtures/v0.0.1-icons.json'), 'utf8');
+    await writeFile(path.join(fixture, 'data/icons.json'), legacyIcons);
+    await cp(path.join(fixture, 'tests/fixtures/v0.0.1-manifest.json'), path.join(fixture, 'data/manifest.json'));
+    const svgOpen = (await readFile(path.join(fixture, 'svg/search.svg'), 'utf8')).match(/^<svg[^>]*>/)[0];
+    await Promise.all(Object.entries(JSON.parse(legacyIcons).icons).map(([name, body]) =>
+      writeFile(path.join(fixture, 'svg', name + '.svg'), svgOpen + body + '</svg>\n')));
     const files = ['data/icons.json', 'data/manifest.json', 'tests/fixtures/geometry-golden.json', 'tests/fixtures/generic-candidates.json', 'tests/fixtures/approved-v1.3.0-preview.2-icons.json', 'tests/fixtures/approved-v1.3.0-preview.2-manifest.json', 'tests/fixtures/approved-v1.3.0-preview.2-golden.json'];
     const before = await Promise.all(files.map(file => readFile(path.join(fixture, file), 'utf8')));
     const result = spawnSync(process.execPath, ['scripts/integrate-generic.mjs'], { cwd: fixture, encoding: 'utf8' });

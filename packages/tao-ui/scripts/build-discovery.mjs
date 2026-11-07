@@ -69,6 +69,11 @@ copyFileSync(
   join(output, 'component-manifest.json'),
 );
 
+copyFileSync(
+  join(rootDir, '../icons/ARTWORK-LICENSE'),
+  join(output, 'tao-icons-LICENSE.txt'),
+);
+
 // Keep framework-generated page indexes; add the package contracts to both locales.
 for (const lang of ['', 'zh/']) {
   const file = join(output, lang, 'llms.txt');

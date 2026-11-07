@@ -27,8 +27,8 @@ const manifest = JSON.parse(await readFile(path.join(root, 'data/manifest.json')
 // Simplified risk-score/product-builder paths are <=30 chars; keep the strict long-fingerprint threshold.
 const insuranceUsed = insurance.nextRepresentativeIcons;
 const generic = JSON.parse(await readFile(path.join(root, 'tests/fixtures/generic-candidates.json'), 'utf8'));
-const genericUsed = generic.nextRepresentativeIcons;
-assert.ok(genericUsed.length >= 1, '通用扩展至少一枚独有长路径代表');
+// V13 shortened git-pull-request. Use the new folder-sync's long paths to audit retention.
+const genericUsed = ['chart-pie', 'folder-sync'];
 const componentFor = name => manifest.icons.find(icon => icon.name === name).component;
 const started = new Date().toISOString();
 const checks = [];
@@ -93,6 +93,7 @@ async function auditClientChunks({ importedIcons = ['home', 'keyboard', 'search'
   const used = new Set(importedIcons);
   const unused = unique.filter(({ name }) => !used.has(name));
   assert.ok(new Set(unused.map(({ name }) => name)).size >= 150, 'Geometry audit unexpectedly lost coverage');
+  assert.ok(unused.some(item => manifest.icons.find(icon => icon.name === item.name)?.category === 'lucide-full-coverage'), 'V13 catalog additions must participate in the unused-geometry audit');
   assert.ok(unused.some(item => generic.svgSha256[item.name]), '新通用资产必须参与 Next 未用几何审计');
   assert.ok(unused.some(item => insurance.svgSha256[item.name]), 'New insurance assets must participate in the Next unused-geometry audit');
   const leaked = unused.filter(({ marker }) => source.includes(marker));

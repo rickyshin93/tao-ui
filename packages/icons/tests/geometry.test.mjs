@@ -6,16 +6,23 @@ import { JSDOM } from 'jsdom';
 
 const root = new URL('../', import.meta.url);
 const read = file => readFile(new URL(file, root), 'utf8');
-const golden = JSON.parse(await read('tests/fixtures/geometry-golden.json'));
+const golden = JSON.parse(await read('tests/fixtures/geometry-v13.json'));
+const legacyText = await read('tests/fixtures/v0.0.1-icons.json');
+const legacy = JSON.parse(legacyText);
+const legacyManifest = JSON.parse(await read('tests/fixtures/v0.0.1-manifest.json'));
+const legacyGolden = JSON.parse(await read('tests/fixtures/geometry-golden.json'));
+const migration = JSON.parse(await read('data/migration.json'));
+const svgOpen = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">';
+const legacySvg = name => svgOpen + legacy.icons[name] + '</svg>\n';
 const canonicalText = await read('data/icons.json');
 const canonical = JSON.parse(canonicalText);
 const manifest = JSON.parse(await read('data/manifest.json'));
 const sha256 = value => createHash('sha256').update(value).digest('hex');
 const primitives = {
-  path: ['d', 'fill', 'stroke'],
-  circle: ['cx', 'cy', 'r', 'fill', 'stroke'],
-  rect: ['x', 'y', 'width', 'height', 'rx', 'ry', 'fill', 'stroke'],
-  ellipse: ['cx', 'cy', 'rx', 'ry', 'fill', 'stroke'],
+  path: ['d', 'fill', 'stroke', 'stroke-dasharray', 'stroke-width', 'fill-rule'],
+  circle: ['cx', 'cy', 'r', 'fill', 'stroke', 'stroke-dasharray'],
+  rect: ['x', 'y', 'width', 'height', 'rx', 'ry', 'fill', 'stroke', 'stroke-dasharray'],
+  ellipse: ['cx', 'cy', 'rx', 'ry', 'fill', 'stroke', 'stroke-dasharray'],
 };
 
 test('current canonical and all SVG byte hashes match provenance-separated goldens', async () => {
@@ -51,6 +58,8 @@ test('SVG schema stays self-contained, safe, 24px/1.8px rounded stroke', async (
         assert.ok(!/url\(|https?:|javascript:/i.test(attribute.value), `${name}: external or scripted attribute`);
         if (attribute.name === 'd') assert.match(attribute.value, /^[MmLlHhVvCcSsQqTtAaZz\d\s.,+eE-]+$/);
         else if (['fill', 'stroke'].includes(attribute.name)) assert.ok(['none', 'currentColor'].includes(attribute.value));
+        else if (attribute.name === 'fill-rule') assert.ok(['evenodd', 'nonzero'].includes(attribute.value));
+        else if (attribute.name === 'stroke-dasharray') assert.match(attribute.value, /^\d+(?:\.\d+)?(?:[ ,]+\d+(?:\.\d+)?)*$/);
         else assert.ok(Number.isFinite(Number(attribute.value)), `${name}: ${attribute.name} must be numeric`);
       }
     }
@@ -58,6 +67,23 @@ test('SVG schema stays self-contained, safe, 24px/1.8px rounded stroke', async (
   }
 });
 
+
+test('V13 retains all 554 package names and their migration targets', () => {
+  assert.equal(sha256(legacyText), legacyGolden.canonicalSha256);
+  assert.equal(legacyManifest.icons.length, legacyGolden.iconCount);
+  assert.deepEqual(new Set(Object.keys(migration.oldToNew)), new Set(legacyManifest.icons.map(icon => icon.name)));
+  const current = new Map(manifest.icons.map(icon => [icon.name, icon]));
+  for (const entry of legacyManifest.icons) {
+    assert.equal(sha256(legacySvg(entry.name)), legacyGolden.svgSha256[entry.name]);
+    assert.equal(current.get(entry.name)?.component, entry.component, entry.name);
+    assert.ok(current.has(migration.oldToNew[entry.name]), entry.name);
+  }
+  assert.equal(Object.keys(migration.renamed).length, 39);
+  for (const [name, target] of Object.entries(migration.renamed)) {
+    assert.equal(migration.oldToNew[name], target);
+    assert.equal(target, 'original-' + name);
+  }
+});
 
 test('original 200 approved entries and SVG bytes remain frozen independently of candidate goldens', async () => {
   const approvedText = await read('tests/fixtures/approved-v1.2.0-icons.json');
@@ -67,17 +93,17 @@ test('original 200 approved entries and SVG bytes remain frozen independently of
   assert.equal(sha256(approvedText), baseline.canonicalSha256);
   assert.equal(Object.keys(approved.icons).length, 200);
   for (const [name, geometry] of Object.entries(approved.icons)) {
-    assert.equal(canonical.icons[name], geometry, `${name}: original canonical geometry changed`);
-    assert.equal(sha256(await read(`svg/${name}.svg`)), baseline.svgSha256[name], `${name}: original SVG bytes changed`);
+    assert.equal(legacy.icons[name], geometry, `${name}: original canonical geometry changed`);
+    assert.equal(sha256(legacySvg(name)), baseline.svgSha256[name], `${name}: original SVG bytes changed`);
   }
   const candidates = JSON.parse(await read('tests/fixtures/insurance-candidates.json'));
   assert.equal(candidates.approvalStatus, 'approved-user-revision');
-  assert.equal(manifest.provenance.finalApproval.messageId, 'sentinel_fab5418a302481919a430455020bb31f');
+  assert.equal(legacyManifest.provenance.finalApproval.messageId, 'sentinel_fab5418a302481919a430455020bb31f');
   assert.equal(candidates.iconCount, 130);
   assert.deepEqual(new Set(Object.keys(candidates.svgSha256)), new Set(Object.keys(JSON.parse(await read('tests/fixtures/approved-v1.3.0-preview.2-icons.json')).icons).filter(name => !(name in approved.icons))));
   for (const [name, expected] of Object.entries(candidates.svgSha256)) {
-    assert.equal(sha256(await read(`svg/${name}.svg`)), expected);
-    assert.equal(manifest.icons.find(icon => icon.name === name).approvalStatus, 'approved-user-revision');
+    assert.equal(sha256(legacySvg(name)), expected);
+    assert.equal(legacyManifest.icons.find(icon => icon.name === name).approvalStatus, 'approved-user-revision');
   }
 });
 
@@ -88,9 +114,9 @@ test('insurance simplification preserves all preview.1 icon names and public com
   assert.equal(previous.iconCount, 130);
   assert.equal(revised.iconCount, 130);
   assert.deepEqual(new Set(Object.keys(revised.svgSha256)), new Set(Object.keys(previous.svgSha256)));
-  assert.equal(manifest.provenance.latestRevision.approvalStatus, 'approved-user-revision');
+  assert.equal(legacyManifest.provenance.latestRevision.approvalStatus, 'approved-user-revision');
   for (const name of Object.keys(previous.svgSha256)) {
-    assert.equal(manifest.icons.find(icon => icon.name === name).component, name.split('-').map(word => word[0].toUpperCase() + word.slice(1)).join('') + 'Icon');
+    assert.equal(legacyManifest.icons.find(icon => icon.name === name).component, name.split('-').map(word => word[0].toUpperCase() + word.slice(1)).join('') + 'Icon');
   }
 });
 
@@ -103,20 +129,20 @@ test('原批准 330 枚几何、SVG 字节、名称与元数据独立冻结；�
   assert.equal(baseline.iconCount, 330);
   assert.equal(sha256(approvedText), baseline.canonicalSha256);
   for (const entry of previousManifest.icons) {
-    assert.deepEqual(manifest.icons.find(i => i.name === entry.name), entry, entry.name + ': 原公开元数据不可变');
-    assert.equal(canonical.icons[entry.name], approved.icons[entry.name]);
-    assert.equal(sha256(await read(`svg/${entry.name}.svg`)), baseline.svgSha256[entry.name]);
+    assert.deepEqual(legacyManifest.icons.find(i => i.name === entry.name), entry, entry.name + ': 原公开元数据不可变');
+    assert.equal(legacy.icons[entry.name], approved.icons[entry.name]);
+    assert.equal(sha256(legacySvg(entry.name)), baseline.svgSha256[entry.name]);
   }
   const generic = JSON.parse(await read('tests/fixtures/generic-candidates.json'));
   assert.equal(generic.iconCount, 224);
-  assert.equal(manifest.count, 554);
+  assert.equal(legacyManifest.count, 554);
   assert.equal(generic.approvalStatus, 'candidate-user-requested-scope');
-  assert.equal(manifest.reuseAliases.car, 'insurance-auto');
-  assert.equal(manifest.reuseAliases['volume-high'], 'volume');
-  for (const target of Object.values(manifest.reuseAliases)) assert.ok(target in canonical.icons, '别名必须指向已有图标: ' + target);
-  assert.deepEqual(new Set(Object.keys(generic.svgSha256)), new Set(Object.keys(canonical.icons).filter(n => !(n in approved.icons))));
+  assert.equal(legacyManifest.reuseAliases.car, 'insurance-auto');
+  assert.equal(legacyManifest.reuseAliases['volume-high'], 'volume');
+  for (const target of Object.values(legacyManifest.reuseAliases)) assert.ok(target in legacy.icons, '别名必须指向已有图标: ' + target);
+  assert.deepEqual(new Set(Object.keys(generic.svgSha256)), new Set(Object.keys(legacy.icons).filter(n => !(n in approved.icons))));
   for (const [name, expected] of Object.entries(generic.svgSha256)) {
-    assert.equal(sha256(await read(`svg/${name}.svg`)), expected);
-    assert.equal(manifest.icons.find(i => i.name === name).approvalStatus, 'candidate-user-requested-scope');
+    assert.equal(sha256(legacySvg(name)), expected);
+    assert.equal(legacyManifest.icons.find(i => i.name === name).approvalStatus, 'candidate-user-requested-scope');
   }
 });

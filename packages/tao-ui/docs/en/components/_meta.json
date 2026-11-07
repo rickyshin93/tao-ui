@@ -15,6 +15,11 @@
   },
   {
     "type": "file",
+    "name": "icons",
+    "label": "Icons"
+  },
+  {
+    "type": "file",
     "name": "float-button",
     "label": "FloatButton"
   },

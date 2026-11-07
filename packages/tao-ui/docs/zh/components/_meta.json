@@ -15,6 +15,11 @@
   },
   {
     "type": "file",
+    "name": "icons",
+    "label": "Icons 图标"
+  },
+  {
+    "type": "file",
     "name": "float-button",
     "label": "FloatButton 悬浮按钮"
   },

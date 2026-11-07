@@ -1,18 +1,18 @@
 # Rounded Essentials · React + Rslib
 
-共 554 枚：原 200 枚通用图标 + 已确认的 130 枚保险图标 + 新增 224 枚高频通用 UI 候选。原批准 330 枚 SVG、名称、React API 与导入路径逐字节/字段保持不变，beneficiary 保留用户指定的原版人物＋爱心。此次扩大导航、表单、文件、排版、图表、媒体、设备、通信、无障碍与开发工具等常见语义覆盖；新 224 枚是原创候选，尚待用户最终设计确认。
+V13 包含 2,165 个圆角线性图标，覆盖通用界面、开发工具和保险业务。每个图标都有 React 组件、独立导入路径和原始 SVG。完整目录见 `@rockshin/tao-icons/manifest.json`。
 
-新增分类、语义、优先级与完整目录见 [GENERIC-COVERAGE.md](./GENERIC-COVERAGE.md)，保险范围见 [INSURANCE-COVERAGE.md](./INSURANCE-COVERAGE.md)。SVG 总览与可视目录随独立设计资产包提供；本包的 `data/manifest.json` 是程序可读目录，`svg/` 包含全部原始图标。
+旧版 554 个导入名称均可继续使用。V13 在 39 个同名条目上使用了新的规范图形，旧图位于 `original-*` 路径，例如 `@rockshin/tao-icons/icons/original-chart-bar`。完整迁移表见 `@rockshin/tao-icons/migration.json`。部分保险等图标也有 V13 的绘制修订。
 
-当前包名 `@rockshin/tao-icons`，版本 `0.0.1`，license 为 MIT。发布由 GitHub Release `icons-v<version>` 触发 `release-icons.yml`。新包首次发布会被 npm 转成 staged publish（registry 上是公开占位 `0.0.0-stage`），需要维护者在 npmjs.com 的 Staged Packages 里用 2FA 批准 `0.0.1` 之后才可安装；之后可在 npmjs 配置 trusted publisher 切到 OIDC。private 仓库暂不生成 provenance。发布前安装方式仍是本地构建的 tgz 或 monorepo workspace 引用。
+V13 素材采用 MIT 许可，见 [ARTWORK-LICENSE](./ARTWORK-LICENSE)。npm 发布使用 `icons-v<version>` GitHub Release 触发 `release-icons.yml`。
 
-## 安装本地构建包
+## 安装
 
 ```sh
-npm install ./rockshin-tao-icons-0.0.1.tgz
+npm install @rockshin/tao-icons@0.1.0
 ```
 
-在已有 React 18.3.1 或 React 19 项目里安装。React 是 peer dependency（`^18.2.0 || ^19.0.0`），不包含在图标 bundle 里。此版本输出 **ESM + TypeScript 声明**，不提供 CommonJS 入口。monorepo 内使用时可以直接通过 workspace 引用，无需安装 tgz。
+在已有 React 18.2+ 或 React 19 项目里安装。React 是 peer dependency（`^18.2.0 || ^19.0.0`），不包含在图标 bundle 里。此版本输出 **ESM + TypeScript 声明**，不提供 CommonJS 入口。monorepo 内使用时可以直接通过 workspace 引用，无需安装 tgz。
 
 ```tsx
 import { SearchIcon, HomeIcon } from '@rockshin/tao-icons';
@@ -164,8 +164,8 @@ Rslib 的职责是将 TSX 编译成独立 ESM 模块、生成声明和管理 Rea
 ## 正式发布前
 
 1. 包名已确定为 `@rockshin/tao-icons`（scope `@rockshin`），发布前确认账号拥有权与公开范围
-2. 图标与代码版权已按 MIT license 提供（见 LICENSE）；若版权归属变化需同步更新
-3. 确认发布版本（当前 `0.0.1`），同步包名示例与测试，再运行 `bun run release:check`
+2. 核对代码的 LICENSE 与素材的 ARTWORK-LICENSE，确认公开分发授权
+3. 确认发布版本（当前 `0.1.0`），同步包名示例与测试，再运行 `bun run release:check`
 4. `bun install && bun run check:extended`，检查 `npm pack --dry-run` 与实际 tgz 安装
 5. 在明确批准发布后，创建 GitHub Release `icons-v<version>` 触发 `release-icons.yml`；新包首次发布会进入 npm staged publishing，需维护者用 2FA 在 Staged Packages 批准，之后可在 npmjs 配置 trusted publisher 供后续版本使用
 

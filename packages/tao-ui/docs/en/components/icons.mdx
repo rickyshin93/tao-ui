@@ -1,0 +1,26 @@
+---
+title: Icons
+description: Browse tao-icons, search by name or category, and copy React imports.
+---
+
+import { withBase } from '@rspress/core/runtime';
+import { IconGallery } from '../../_components/icon-gallery';
+
+# Icons
+
+Explore 2,165 rounded line icons for everyday interfaces and insurance workflows. Select an icon to copy its import.
+
+<IconGallery locale="en" />
+
+## Usage
+
+Install V13 with `npm install @rockshin/tao-icons@0.1.0`. The icon artwork is licensed under the <a href={withBase("/tao-icons-LICENSE.txt")}>MIT License</a>. Existing import names remain valid. For the 39 names with new artwork, use the corresponding `original-*` entry to get the preserved variant, such as `OriginalChartBarIcon`. See `@rockshin/tao-icons/migration.json` for the full map.
+
+```tsx
+import { SearchIcon } from '@rockshin/tao-icons';
+import { ArrowRightIcon } from '@rockshin/tao-icons/icons/arrow-right';
+
+<SearchIcon size={20} />
+```
+
+Icons inherit text color and default to a 24px size and 1.8 stroke width. Decorative icons are hidden from assistive technology by default; provide a `title` or `aria-label` when an icon conveys meaning. Icon-only buttons also need an accessible name.
