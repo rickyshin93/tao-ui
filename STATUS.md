@@ -1,7 +1,7 @@
 # STATUS
 
 ## Doing
-- Release tao-ui 0.0.50: local gates passed; publication and remote verification pending.
+- Release tao-ui 0.0.51: 0.0.50 GitHub Release exists but npm publication failed because clean CI lacked built icon declarations; fixing the build prerequisite before retrying with a new patch tag.
 - Commerce bilingual switch and responsive fixes implemented; desktop/mobile browser checks and required gates passed. Fixed customer action icon color and checked light/dark themes. Real-device and complete interaction acceptance remain open.
 
 ## Next

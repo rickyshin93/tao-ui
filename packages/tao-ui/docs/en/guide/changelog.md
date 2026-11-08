@@ -7,6 +7,15 @@ description: Version history for @rockshin/tao-ui, including fixes for uploads, 
 
 User-facing changes for `@rockshin/tao-ui`, listed by release. Dates use UTC+8.
 
+## 0.0.51
+
+2026-11-08
+
+- Button sizes nested SVG icons consistently while respecting explicit dimensions; Input centers suffix content; Select maintains its intended single-row multiple-selection height; Transfer aligns its selection chevron and disabled state.
+- The documentation adds a bilingual Showcase and responsive commerce example. Clean builds now prepare the icon package used by the Showcase.
+
+[Compare changes](https://github.com/rickyshin93/tao-ui/compare/v0.0.49...v0.0.51)
+
 ## 0.0.50
 
 2026-11-08
