@@ -7,6 +7,17 @@ description: Version history for @rockshin/tao-ui, including fixes for uploads, 
 
 User-facing changes for `@rockshin/tao-ui`, listed by release. Dates use UTC+8.
 
+## 0.0.50
+
+2026-11-08
+
+- [Button](/components/button) sizes nested SVG icons consistently while respecting explicit dimensions.
+- [Input](/components/input) centers suffix content, and [Select](/components/select) maintains its intended height for a single row of multiple selections.
+- [Transfer](/components/transfer) aligns the selection menu chevron with Select and clarifies its disabled state.
+- The documentation adds a bilingual Showcase and a responsive commerce example, alongside refreshed component and home pages.
+
+[Compare changes](https://github.com/rickyshin93/tao-ui/compare/v0.0.49...v0.0.50)
+
 ## 0.0.49
 
 2026-11-07

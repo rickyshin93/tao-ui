@@ -4,6 +4,7 @@
 @import "@fontsource/geist-sans/600.css";
 @import "./home-page.css";
 @import "./reference-page.css";
+@import "./showcase.css";
 
 html:root {
   --rp-home-hero-title-color: var(--rp-c-brand-darker);

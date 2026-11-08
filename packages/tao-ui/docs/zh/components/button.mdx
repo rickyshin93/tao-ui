@@ -110,7 +110,7 @@ export default ButtonStates;
 
 ### 图标与自定义加载
 
-通过 `icon` 传入装饰性前置图标。只有内置 spinner 不符合周围视觉语言时才使用 `loadingIcon`。
+通过 `icon` 传入装饰性前置图标。SVG 的显式宽高会被保留；未指定的宽高默认为按钮字号。只有内置 spinner 不符合周围视觉语言时才使用 `loadingIcon`。
 
 ```tsx preview
 import { Button } from '@rockshin/tao-ui';

@@ -57,7 +57,7 @@ Icon geometry is canonical in `packages/icons/data/` and frozen by SHA-256 basel
 
 ## Releases
 
-- tao-ui: `bun run release <version>` (bumps, tests, creates the GitHub Release, waits for the release workflow)
+- tao-ui: Add and commit a `## <version>` section with the release date and user-facing changes to both [English](./packages/tao-ui/docs/en/guide/changelog.md) and [Chinese](./packages/tao-ui/docs/zh/guide/changelog.md). Then run `bun run release <version>` from main. The script checks both sections before bumping the version and uses the English section as the GitHub Release body.
 - icons: `bun run release:icons` runs the metadata guard; publishing is a separate, explicit decision
 
 ## Historical docs

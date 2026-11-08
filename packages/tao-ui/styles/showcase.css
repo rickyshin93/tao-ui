@@ -1,0 +1,1621 @@
+/* Showcase page: an operations console built only from tao-ui + tao-icons.
+   Page chrome reuses the home paper/ink language; everything inside the
+   frame is themed by TaoProvider tokens (--tao-*). */
+html:root:has(:is(.tao-showcase, .tao-showcase-app)) {
+  --sc-paper: oklch(0.985 0.002 250);
+  --sc-ink: oklch(0.2 0.01 260);
+  --sc-muted: oklch(0.47 0.012 260);
+  --sc-line: oklch(0.9 0.004 260);
+  --sc-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --rp-c-bg: var(--sc-paper);
+}
+html:root.rp-dark:has(:is(.tao-showcase, .tao-showcase-app)) {
+  --sc-paper: oklch(0.17 0.006 260);
+  --sc-ink: oklch(0.95 0.004 260);
+  --sc-muted: oklch(0.72 0.01 260);
+  --sc-line: oklch(0.3 0.008 260);
+}
+body:has(:is(.tao-showcase, .tao-showcase-app)) {
+  background: var(--sc-paper);
+}
+
+.tao-showcase-case {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(260px, 1fr);
+  overflow: hidden;
+  border: 1px solid var(--sc-line);
+  border-radius: 16px;
+}
+.tao-showcase-case-preview {
+  display: flex;
+  min-height: 300px;
+  padding: 30px 30px 0;
+  overflow: hidden;
+  background: color-mix(in oklab, var(--sc-line) 60%, var(--sc-paper));
+}
+.tao-showcase-preview-side {
+  display: grid;
+  align-content: start;
+  gap: 16px;
+  width: 22%;
+  padding: 24px 14px;
+  border-radius: 8px 0 0 0;
+  background: var(--sc-paper);
+}
+.tao-showcase-preview-side i,
+.tao-showcase-preview-bar i,
+.tao-showcase-preview-content > b,
+.tao-showcase-preview-content > span {
+  display: block;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--sc-line);
+}
+.tao-showcase-preview-side i:first-child {
+  background: var(--rp-c-brand);
+  width: 60%;
+  height: 14px;
+}
+.tao-showcase-preview-main {
+  flex: 1;
+  min-width: 0;
+  background: var(--sc-paper);
+}
+.tao-showcase-preview-bar {
+  display: flex;
+  justify-content: space-between;
+  padding: 16px;
+  border-bottom: 1px solid var(--sc-line);
+}
+.tao-showcase-preview-bar i {
+  width: 22%;
+}
+.tao-showcase-preview-content {
+  padding: 22px;
+  background: color-mix(in oklab, var(--sc-line) 35%, var(--sc-paper));
+  height: 100%;
+}
+.tao-showcase-preview-content > b {
+  width: 28%;
+  height: 12px;
+}
+.tao-showcase-preview-content > span {
+  width: 42%;
+  height: 6px;
+  margin-top: 10px;
+}
+.tao-showcase-preview-stats,
+.tao-showcase-preview-panels {
+  display: grid;
+  gap: 8px;
+  margin-top: 18px;
+}
+.tao-showcase-preview-stats {
+  grid-template-columns: repeat(4, 1fr);
+}
+.tao-showcase-preview-panels {
+  grid-template-columns: 2fr 1fr;
+}
+.tao-showcase-preview-stats i,
+.tao-showcase-preview-panels i {
+  display: block;
+  height: 52px;
+  border-radius: 4px;
+  background: var(--sc-paper);
+}
+.tao-showcase-preview-panels i {
+  height: 100px;
+}
+.tao-showcase-preview-stats i {
+  box-sizing: border-box;
+  padding: 22px 8px 0;
+  color: var(--sc-ink);
+  font: 500 10px / 1 var(--sc-mono);
+  white-space: nowrap;
+}
+.tao-showcase-preview-panels .tao-showcase-preview-chart {
+  background-image: linear-gradient(
+    160deg,
+    transparent 52%,
+    var(--rp-c-brand) 53%,
+    var(--rp-c-brand) 54%,
+    transparent 55%
+  );
+}
+.tao-showcase-preview-panels .tao-showcase-preview-channels {
+  background-image:
+    linear-gradient(var(--rp-c-brand), var(--rp-c-brand)),
+    linear-gradient(var(--rp-c-brand), var(--rp-c-brand)),
+    linear-gradient(var(--rp-c-brand), var(--rp-c-brand));
+  background-size:
+    65% 4px,
+    45% 4px,
+    30% 4px;
+  background-position:
+    12px 25px,
+    12px 45px,
+    12px 65px;
+  background-repeat: no-repeat;
+}
+.tao-showcase-case-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 16px;
+  padding: clamp(24px, 4vw, 56px);
+}
+.tao-showcase-case-category {
+  color: var(--sc-muted);
+  font-size: 13px;
+}
+.tao-showcase-case-copy h2 {
+  font-size: 28px;
+  font-weight: 500;
+}
+.tao-showcase-case-copy p {
+  color: var(--sc-muted);
+  line-height: 1.7;
+}
+.tao-showcase-case-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  color: var(--sc-paper);
+  background: var(--sc-ink);
+  border-radius: 6px;
+  padding: 10px 16px;
+  text-decoration: none;
+}
+.tao-showcase-case-link:focus-visible,
+.tao-showcase-back:focus-visible,
+.tao-showcase-language:focus-visible {
+  outline: 2px solid var(--rp-c-brand);
+  outline-offset: 3px;
+}
+
+.tao-showcase-app {
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: var(--sc-paper);
+  color: var(--sc-ink);
+}
+.tao-showcase-app-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 24px;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--sc-line);
+  flex-shrink: 0;
+}
+.tao-showcase-back,
+.tao-showcase-language {
+  color: var(--sc-ink);
+  text-decoration: none;
+  white-space: nowrap;
+  font-size: 14px;
+}
+.tao-showcase-language {
+  margin-inline-start: auto;
+}
+.tao-showcase-app-header .tao-showcase-controls {
+  margin: 0;
+}
+.tao-showcase-app-content {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+.tao-showcase-app .tao-console {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+.tao-showcase-app .tao-console-side {
+  width: 232px;
+  flex-shrink: 0;
+  min-height: 0;
+  box-sizing: border-box;
+}
+.tao-showcase-app .tao-console-main {
+  flex: 1;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+.tao-showcase-app .tao-console-bar {
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+.tao-showcase-app .tao-console-body {
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.tao-showcase {
+  max-width: 1360px;
+  margin: 0 auto;
+  padding: clamp(40px, 7vw, 88px) 40px 96px;
+  color: var(--sc-ink);
+}
+.tao-showcase h1,
+.tao-showcase h2,
+.tao-showcase h3,
+.tao-showcase h4,
+.tao-showcase p,
+.tao-showcase ul {
+  margin: 0;
+  padding: 0;
+}
+
+/* Head ------------------------------------------------------------- */
+.tao-showcase-head {
+  display: grid;
+  gap: 16px;
+  max-width: 880px;
+  margin-bottom: 40px;
+}
+.tao-showcase-eyebrow {
+  color: var(--sc-muted);
+  font-family: var(--sc-mono);
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.tao-showcase-head h1 {
+  font-size: clamp(34px, 4.6vw, 60px);
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  line-height: 1.06;
+  text-wrap: balance;
+}
+.tao-showcase-lead {
+  max-width: 62ch;
+  color: var(--sc-muted);
+  font-size: 17px;
+  line-height: 1.75;
+}
+.tao-showcase-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 16px;
+  margin-top: 12px;
+}
+.tao-showcase-dot {
+  box-shadow: inset 0 0 0 1px oklch(1 0 0 / 0.25);
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+.tao-showcase-accent {
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.tao-showcase-accent > * {
+  width: max-content;
+  white-space: nowrap;
+}
+.tao-showcase-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--tao-color-text-secondary);
+  font-size: var(--tao-font-size-sm);
+  cursor: pointer;
+}
+
+/* Frame ------------------------------------------------------------ */
+.tao-showcase-frame {
+  overflow: hidden;
+  border: 1px solid var(--sc-line);
+  border-radius: 16px;
+  background: var(--sc-paper);
+  box-shadow:
+    0 1px 2px oklch(0.2 0.01 260 / 0.04),
+    0 24px 64px -24px oklch(0.2 0.01 260 / 0.18);
+}
+.tao-showcase-chrome {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--sc-line);
+}
+.tao-showcase-chrome span {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--sc-line);
+}
+.tao-showcase-chrome code {
+  margin: 0 auto;
+  padding: 3px 14px;
+  border-radius: 6px;
+  background: color-mix(in oklab, var(--sc-line) 50%, transparent);
+  color: var(--sc-muted);
+  font-family: var(--sc-mono);
+  font-size: 12px;
+}
+.tao-showcase-viewport {
+  overflow-x: auto;
+}
+
+/* Console shell ---------------------------------------------------- */
+.tao-console {
+  --c-serif:
+    "Iowan Old Style", "Palatino Linotype", Palatino, "Songti SC",
+    "Noto Serif SC", "Source Han Serif SC", serif;
+  --c-hair: color-mix(
+    in oklab,
+    var(--tao-color-border-secondary) 80%,
+    transparent
+  );
+  --c-sheet-shadow:
+    0 0 0 1px var(--c-hair), 0 1px 2px oklch(0.2 0.01 260 / 0.04),
+    0 12px 32px -16px oklch(0.2 0.01 260 / 0.1);
+  display: grid;
+  grid-template-columns: 232px minmax(0, 1fr);
+  min-width: 0;
+  background: var(--tao-color-bg-layout);
+  color: var(--tao-color-text);
+  font-family: var(--tao-font-family);
+  font-size: var(--tao-font-size);
+}
+.tao-console h2,
+.tao-console h4,
+.tao-console p {
+  margin: 0;
+}
+
+/* Side rail sits on the layout tone; the main sheet floats above it. */
+.tao-console-side {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 18px 12px 12px;
+}
+.tao-console-brand,
+.tao-console-nav-item,
+.tao-console-me {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+.tao-console-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 6px 8px;
+  border-radius: var(--tao-radius-lg);
+  font-weight: var(--tao-font-weight-strong);
+  letter-spacing: 0.01em;
+  text-align: start;
+  transition: background-color var(--tao-motion-duration-fast);
+}
+.tao-console-brand > span:nth-child(2) {
+  flex: 1;
+}
+.tao-console-brand > svg {
+  color: var(--tao-color-text-quaternary);
+}
+.tao-console-brand:hover,
+.tao-console-nav-item:hover {
+  background: color-mix(in oklab, var(--tao-color-text) 5%, transparent);
+}
+.tao-console-logo {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: var(--tao-color-primary);
+  color: var(--tao-color-text-light-solid);
+  box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.18);
+}
+.tao-console-nav {
+  display: grid;
+  flex: 1;
+  align-content: start;
+  gap: 2px;
+  margin-top: 14px;
+}
+.tao-console-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  height: 36px;
+  padding: 0 10px;
+  border-radius: 9px;
+  color: var(--tao-color-text-secondary);
+  text-align: start;
+  transition:
+    background-color var(--tao-motion-duration-fast),
+    color var(--tao-motion-duration-fast);
+}
+.tao-console-nav-item > svg {
+  color: var(--tao-color-text-tertiary);
+  transition: color var(--tao-motion-duration-fast);
+}
+.tao-console-nav-item > span:first-of-type {
+  flex: 1;
+}
+.tao-console-nav-item[aria-current="page"] {
+  background: var(--tao-color-bg-container);
+  box-shadow: var(--c-sheet-shadow);
+  color: var(--tao-color-text);
+  font-weight: var(--tao-font-weight-medium);
+}
+.tao-console-nav-item[aria-current="page"] > svg {
+  color: var(--tao-color-primary);
+}
+.tao-console-nav-group {
+  margin: 20px 10px 6px !important;
+  color: var(--tao-color-text-quaternary);
+  font-family: var(--tao-font-family-code);
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.tao-console-plan {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border-radius: var(--tao-radius-lg);
+  background: var(--tao-color-bg-container);
+  box-shadow: var(--c-sheet-shadow);
+  font-size: var(--tao-font-size-sm);
+}
+.tao-console-plan-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: var(--tao-font-weight-medium);
+}
+.tao-console-plan-head svg {
+  color: var(--tao-color-primary);
+}
+
+.tao-console-main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  margin: 8px 8px 8px 0;
+  border-radius: 14px;
+  background: var(--tao-color-bg-container);
+  box-shadow: var(--c-sheet-shadow);
+}
+.tao-console-bar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  height: 56px;
+  padding: 0 28px;
+  border-bottom: 1px solid var(--c-hair);
+}
+.tao-console-search {
+  width: 300px;
+  max-width: 340px;
+  margin-inline-start: auto;
+}
+.tao-console-search kbd {
+  padding: 0 5px;
+  border: 1px solid var(--tao-color-border);
+  border-radius: 4px;
+  color: var(--tao-color-text-tertiary);
+  font-family: var(--tao-font-family-code);
+  font-size: 11px;
+}
+.tao-console-bar-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.tao-console-me {
+  margin-inline-start: 8px;
+  padding: 0;
+  border-radius: 50%;
+}
+.tao-console-body {
+  flex: 1;
+  padding: 40px clamp(20px, 3.4vw, 48px) 64px;
+}
+.tao-console-body > *,
+.tao-console-overview {
+  max-width: 1280px;
+  margin-inline: auto;
+}
+.tao-console-body > * + *,
+.tao-console-overview > * + * {
+  margin-top: 20px;
+}
+
+/* Shared page furniture -------------------------------------------- */
+.tao-console-title {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+.tao-console-title h2,
+.tao-console-hello h2 {
+  font-family: var(--c-serif);
+  font-size: clamp(28px, 2.6vw, 36px);
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+.tao-console-title p,
+.tao-console-muted {
+  margin-top: 6px !important;
+  color: var(--tao-color-text-tertiary);
+  font-size: var(--tao-font-size-sm);
+}
+.tao-console-muted {
+  margin-top: 0 !important;
+}
+.tao-console-title-actions {
+  display: flex;
+  gap: 8px;
+}
+.tao-console-eyebrow {
+  color: var(--tao-color-text-tertiary);
+  font-family: var(--tao-font-family-code);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.tao-console-body [data-tao-card] {
+  border: 0;
+  border-radius: 14px;
+  box-shadow: 0 0 0 1px var(--c-hair);
+}
+.tao-console-body [data-tao-card-header] {
+  min-height: 0;
+  padding: 20px 22px 0;
+  border-bottom: 0;
+}
+.tao-console-body [data-tao-card-body] {
+  padding: 18px 22px 22px;
+}
+.tao-console-body [data-tao-card-title] {
+  font-weight: 600;
+}
+.tao-console-kpi-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.tao-console-chip {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: color-mix(
+    in oklab,
+    var(--tao-color-primary) 9%,
+    var(--tao-color-bg-container)
+  );
+  color: var(--tao-color-primary);
+}
+.tao-console-num {
+  font-variant-numeric: tabular-nums;
+}
+.tao-console-mono {
+  font-family: var(--tao-font-family-code);
+  font-size: var(--tao-font-size-sm);
+}
+.tao-console-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.75fr) minmax(0, 1fr);
+  gap: 20px;
+}
+
+/* Overview --------------------------------------------------------- */
+.tao-console-hello {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  padding-bottom: 28px;
+}
+.tao-console-hello h2 {
+  margin-top: 14px;
+  font-size: clamp(32px, 3.4vw, 46px);
+}
+.tao-console-lead {
+  margin-top: 10px !important;
+  color: var(--tao-color-text-secondary);
+  font-size: 15px;
+}
+.tao-console-countdown {
+  display: grid;
+  gap: 6px;
+  padding-inline-start: 24px;
+  border-inline-start: 1px solid var(--c-hair);
+  text-align: start;
+}
+.tao-console-countdown [data-tao-statistic-content] {
+  font-size: 22px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+}
+
+.tao-console-lede {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 340px);
+  gap: 20px;
+}
+.tao-console-body .tao-console-sheet [data-tao-card-body] {
+  padding: 26px 28px 0;
+}
+.tao-console-sheet-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+.tao-console-hero-num {
+  display: flex;
+  align-items: baseline;
+  margin: 14px 0 12px;
+  font-size: clamp(44px, 5vw, 68px);
+  font-weight: 500;
+  line-height: 0.95;
+  letter-spacing: -0.018em;
+  font-variant-numeric: tabular-nums;
+}
+.tao-console-hero-num > span {
+  margin-inline-end: 0.12em;
+  color: var(--tao-color-text-tertiary);
+  font-size: 0.42em;
+  font-weight: 400;
+  letter-spacing: 0;
+  transform: translateY(-0.95em);
+}
+.tao-console-delta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--tao-color-text-tertiary);
+  font-size: var(--tao-font-size-sm);
+}
+.tao-console-delta [data-tao-tag] {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.tao-console-area {
+  margin: 28px -28px 0;
+  color: var(--tao-color-primary);
+}
+.tao-console-area-plot {
+  position: relative;
+  height: 220px;
+  margin: 0 28px;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0 calc(25% - 1px),
+    var(--c-hair) calc(25% - 1px) 25%
+  );
+}
+.tao-console-area-plot svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  transform-origin: bottom;
+  animation: tao-console-rise var(--tao-motion-duration-slow)
+    var(--tao-motion-ease-out) both;
+}
+@keyframes tao-console-rise {
+  from {
+    opacity: 0;
+    transform: scaleY(0.9);
+  }
+}
+.tao-console-area-rule {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: color-mix(in oklab, currentColor 35%, transparent);
+  pointer-events: none;
+}
+.tao-console-area-dot {
+  position: absolute;
+  width: 11px;
+  height: 11px;
+  margin: -5.5px 0 0 -5.5px;
+  border: 2px solid var(--tao-color-bg-container);
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 0 4px color-mix(in oklab, currentColor 18%, transparent);
+  pointer-events: none;
+}
+.tao-console-area-dot[data-idle] {
+  animation: tao-console-pulse 2.4s var(--tao-motion-ease-in-out) infinite;
+}
+@keyframes tao-console-pulse {
+  50% {
+    transform: scale(1.25);
+  }
+}
+.tao-console-area-hit {
+  position: absolute;
+  inset: 0;
+}
+.tao-console-area-hit button {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: crosshair;
+}
+.tao-console-area-hit button:focus-visible {
+  outline: 2px solid var(--tao-color-primary);
+  outline-offset: -2px;
+}
+.tao-console-axis {
+  position: relative;
+  height: 32px;
+  margin: 0 28px;
+}
+.tao-console-axis span {
+  position: absolute;
+  top: 10px;
+  color: var(--tao-color-text-tertiary);
+  font-family: var(--tao-font-family-code);
+  font-size: 11px;
+  white-space: nowrap;
+  transform: translateX(-50%);
+}
+.tao-console-axis span[data-edge="start"] {
+  transform: none;
+}
+.tao-console-axis span[data-edge="end"] {
+  transform: translateX(-100%);
+}
+
+.tao-console-strip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 8px -28px 0;
+  border-top: 1px solid var(--c-hair);
+}
+.tao-console-strip-cell {
+  display: grid;
+  gap: 10px;
+  padding: 20px 28px 22px;
+}
+.tao-console-strip-cell + .tao-console-strip-cell {
+  border-inline-start: 1px solid var(--c-hair);
+}
+.tao-console-strip dt {
+  color: var(--tao-color-text-tertiary);
+  font-size: var(--tao-font-size-sm);
+}
+.tao-console-strip dd {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 0;
+}
+.tao-console-strip [data-tao-statistic-content] {
+  font-size: clamp(22px, 2vw, 28px);
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+
+.tao-console-mixcard [data-tao-card-body] {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  box-sizing: border-box;
+}
+.tao-console-mix {
+  display: flex;
+  gap: 3px;
+  height: 56px;
+  margin: 20px 0 10px;
+}
+.tao-console-mix > span,
+.tao-console-ledger i {
+  background: color-mix(
+    in oklab,
+    var(--tao-color-primary) var(--mix),
+    var(--tao-color-bg-container)
+  );
+}
+.tao-console-mix > span {
+  flex-basis: 0;
+  border-radius: 4px;
+}
+.tao-console-mix > span:first-child {
+  border-start-start-radius: 9px;
+  border-end-start-radius: 9px;
+}
+.tao-console-mix > span:last-child {
+  border-start-end-radius: 9px;
+  border-end-end-radius: 9px;
+}
+.tao-console-ledger {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  margin: 0 0 18px;
+  padding: 0;
+  list-style: none;
+}
+.tao-console-ledger li {
+  display: grid;
+  grid-template-columns: 8px minmax(0, 1fr) auto 3.2em;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-height: 44px;
+  padding: 0;
+  border-bottom: 1px solid var(--c-hair);
+  font-size: var(--tao-font-size-sm);
+}
+.tao-console-ledger i {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+}
+.tao-console-ledger span + span {
+  color: var(--tao-color-text-tertiary);
+}
+.tao-console-ledger b {
+  font-weight: var(--tao-font-weight-medium);
+  text-align: end;
+}
+.tao-console-goal {
+  display: grid;
+  gap: 10px;
+  padding: 18px;
+  border-radius: 10px;
+  background: var(--tao-color-fill-quaternary);
+}
+.tao-console-goal-num {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+.tao-console-goal-num strong {
+  font-size: 34px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+.tao-console-goal-num span {
+  color: var(--tao-color-text-tertiary);
+  font-size: var(--tao-font-size-sm);
+}
+.tao-console-person div,
+.tao-console-stack,
+.tao-console-drawer-hero div {
+  display: grid;
+  gap: 2px;
+}
+.tao-console-person span,
+.tao-console-stack span + span,
+.tao-console-drawer-hero span {
+  color: var(--tao-color-text-tertiary);
+  font-size: var(--tao-font-size-sm);
+}
+
+.tao-console-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.tao-console-tab span {
+  min-width: 20px;
+  padding: 0 6px;
+  border-radius: 10px;
+  background: var(--tao-color-fill-secondary);
+  color: var(--tao-color-text-secondary);
+  font-size: var(--tao-font-size-xs);
+  line-height: 18px;
+  text-align: center;
+}
+.tao-console-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  margin: 12px 0;
+}
+.tao-console-person {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.tao-console-person strong {
+  font-weight: var(--tao-font-weight-medium);
+}
+.tao-console-blank {
+  display: grid;
+  place-items: center;
+  height: 100%;
+}
+
+/* Drawer & modal (portaled; still inside the provider's theme) ------ */
+.tao-console-drawer {
+  display: grid;
+  gap: 20px;
+}
+.tao-console-drawer h4 {
+  margin: 0;
+  font-size: var(--tao-font-size);
+  font-weight: var(--tao-font-weight-strong);
+}
+.tao-console-drawer-hero {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border-radius: var(--tao-radius-lg);
+  background: var(--tao-color-fill-quaternary);
+}
+.tao-console-drawer-hero strong {
+  font-weight: var(--tao-font-weight-strong);
+}
+.tao-console-drawer-amount {
+  margin-inline-start: auto;
+  font-size: 20px;
+  font-weight: var(--tao-font-weight-strong);
+}
+.tao-console-drawer-foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.tao-console-form-row {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: 12px;
+}
+
+/* Multi-page console --------------------------------------------- */
+.tao-console {
+  position: relative;
+}
+.tao-console-fab {
+  position: absolute !important;
+  inset-inline-end: 24px !important;
+  inset-block-end: 24px !important;
+}
+.tao-console-row--even {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.tao-console-row--three {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr) minmax(0, 1fr);
+}
+.tao-console-stack-gap {
+  display: grid;
+  align-content: start;
+  gap: 16px;
+}
+.tao-console-form-row--even {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.tao-console-overview [data-tao-card-title] {
+  color: var(--tao-color-text-tertiary);
+  font-family: var(--tao-font-family-code);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.tao-console-calendar [data-tao-calendar][data-fullscreen="false"] {
+  border: 0;
+}
+/* overview: announcements as the one inverse panel on the page */
+.tao-console-body .tao-console-news {
+  background: var(--tao-color-text);
+  color: var(--tao-color-bg-container);
+  box-shadow: none;
+}
+.tao-console-news .tao-console-eyebrow {
+  color: color-mix(in oklab, var(--tao-color-bg-container) 55%, transparent);
+}
+.tao-console-news [data-tao-card-body] {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  box-sizing: border-box;
+}
+.tao-console-news [data-tao-carousel] {
+  margin-top: auto;
+  color: var(--tao-color-bg-container);
+  --tao-primary: var(--tao-color-bg-container);
+}
+.tao-console-news [data-tao-button] {
+  border-color: transparent;
+  background: var(--tao-color-bg-container);
+  color: var(--tao-color-text);
+}
+.tao-console-news [data-tao-button]:hover {
+  background: color-mix(
+    in oklab,
+    var(--tao-color-bg-container) 86%,
+    var(--tao-color-text)
+  );
+}
+.tao-console-slide {
+  color: var(--tao-color-bg-container);
+  display: grid;
+  align-content: start;
+  justify-items: start;
+  gap: 12px;
+  min-height: 252px;
+  padding: 28px 0 40px;
+}
+.tao-console-slide > svg {
+  opacity: 0.7;
+}
+.tao-console-slide strong {
+  color: inherit;
+  margin-top: 8px;
+  font-family: var(--c-serif);
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 1.25;
+  text-wrap: balance;
+}
+.tao-console-slide p {
+  max-width: 30ch;
+  margin: 0 0 8px;
+  color: color-mix(in oklab, var(--tao-color-bg-container) 68%, transparent);
+  line-height: 1.6;
+  text-wrap: pretty;
+}
+.tao-console-report p {
+  margin: 0;
+  color: var(--tao-color-text-secondary);
+  line-height: 1.6;
+}
+.tao-console-cal-dot {
+  display: block;
+  width: 4px;
+  height: 4px;
+  margin: -2px auto 0;
+  border-radius: 50%;
+  background: var(--tao-color-primary);
+}
+
+/* notifications */
+.tao-console-notice-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.tao-console-notices {
+  width: 320px;
+}
+.tao-console-notice {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 4px;
+  font-size: var(--tao-font-size-sm);
+}
+.tao-console-notice > svg {
+  color: var(--tao-color-primary);
+}
+.tao-console-notice span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.tao-console-notice time {
+  color: var(--tao-color-text-tertiary);
+}
+
+/* product form */
+.tao-console-steps {
+  margin-bottom: 16px;
+}
+.tao-console-form-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 280px;
+  align-items: start;
+  gap: 16px;
+}
+.tao-console-upload {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  color: var(--tao-color-text-secondary);
+  font-size: var(--tao-font-size-sm);
+}
+.tao-console-affix {
+  margin: 0 -24px -24px;
+  padding: 0 24px 16px;
+  background: var(--tao-color-bg-container);
+}
+.tao-console-preview {
+  display: grid;
+  gap: 16px;
+}
+.tao-console-preview img {
+  display: block;
+  width: 100%;
+}
+.tao-console-preview-body {
+  display: grid;
+  gap: 4px;
+}
+.tao-console-preview-body span {
+  color: var(--tao-color-text-tertiary);
+  font-size: var(--tao-font-size-sm);
+}
+.tao-console-preview-body .tao-console-preview-price {
+  margin-top: 6px;
+  color: var(--tao-color-primary);
+  font-size: 20px;
+  font-weight: var(--tao-font-weight-strong);
+  font-variant-numeric: tabular-nums;
+}
+.tao-console-qr {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--tao-color-text-secondary);
+  font-size: var(--tao-font-size-sm);
+}
+
+/* customers */
+.tao-console-split {
+  height: 680px;
+  overflow: hidden;
+  border: 1px solid var(--tao-color-border-secondary);
+  border-radius: var(--tao-radius-lg);
+  background: var(--tao-color-bg-container);
+}
+.tao-console-split-list {
+  display: grid;
+  gap: 12px;
+  padding: 16px 12px;
+}
+.tao-console-customer {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: var(--tao-radius);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+  transition: background-color var(--tao-motion-duration-fast);
+}
+.tao-console-customer:hover {
+  background: var(--tao-color-fill-tertiary);
+}
+.tao-console-customer[aria-current] {
+  background: color-mix(
+    in oklab,
+    var(--tao-color-primary) 10%,
+    var(--tao-color-bg-container)
+  );
+}
+.tao-console-customer > span {
+  display: grid;
+  min-width: 0;
+}
+.tao-console-customer strong {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: var(--tao-font-weight-medium);
+}
+.tao-console-customer strong svg {
+  color: var(--tao-color-warning);
+}
+.tao-console-customer > span > span {
+  overflow: hidden;
+  color: var(--tao-color-text-tertiary);
+  font-size: var(--tao-font-size-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.tao-console-split-detail {
+  height: 100%;
+  overflow-y: auto;
+  padding: 24px;
+}
+.tao-console-customer-head {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.tao-console-customer-head > div:nth-child(2) {
+  display: grid;
+  flex: 1;
+  gap: 2px;
+}
+.tao-console-customer-head h3 {
+  margin: 0;
+  font-size: 18px;
+}
+.tao-console-customer-head > div:nth-child(2) > span {
+  color: var(--tao-color-text-tertiary);
+  font-size: var(--tao-font-size-sm);
+}
+.tao-console-customer-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin: 20px 0 8px;
+  padding: 16px;
+  border-radius: var(--tao-radius-lg);
+  background: var(--tao-color-fill-quaternary);
+}
+.tao-console-contact {
+  display: grid;
+  gap: 8px;
+  font-size: var(--tao-font-size-sm);
+}
+.tao-console-contact span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.tao-console-followup {
+  display: grid;
+  gap: 16px;
+}
+.tao-console-comment {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 8px;
+}
+.tao-console-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* team, settings, reports */
+.tao-console-invite {
+  display: flex;
+  gap: 8px;
+  width: 300px;
+}
+.tao-console-settings {
+  max-width: 640px;
+  padding-top: 8px;
+}
+.tao-console-security,
+.tao-console-notify {
+  display: grid;
+  gap: 16px;
+  padding-top: 8px;
+}
+.tao-console-2fa {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.tao-console-notify-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--tao-color-border-secondary);
+}
+.tao-console-notify-row strong {
+  font-weight: var(--tao-font-weight-medium);
+}
+.tao-console-report {
+  display: grid;
+  gap: 10px;
+}
+.tao-console-report .tao-console-kpi-head {
+  margin-bottom: 0;
+}
+
+/* Inventory -------------------------------------------------------- */
+.tao-showcase-inventory {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+  gap: 48px;
+  margin-top: 72px;
+}
+.tao-showcase-inventory h2 {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 20px;
+  font-size: 22px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+.tao-showcase-inventory h2 span {
+  color: var(--sc-muted);
+  font-family: var(--sc-mono);
+  font-size: 14px;
+}
+.tao-showcase-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  list-style: none;
+}
+.tao-showcase-chips a {
+  display: inline-block;
+  padding: 5px 12px;
+  border: 1px solid var(--sc-line);
+  border-radius: 999px;
+  color: var(--sc-ink);
+  font-size: 14px;
+  text-decoration: none;
+  transition: border-color 160ms;
+}
+.tao-showcase-chips a:hover {
+  border-color: var(--sc-muted);
+}
+.tao-showcase-icons {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 1px;
+  overflow: hidden;
+  border: 1px solid var(--sc-line);
+  border-radius: 12px;
+  background: var(--sc-line);
+  list-style: none;
+}
+.tao-showcase-icons li {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  padding: 16px 6px 12px;
+  background: var(--sc-paper);
+}
+.tao-showcase-icons span {
+  overflow: hidden;
+  max-width: 100%;
+  color: var(--sc-muted);
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.tao-showcase-more {
+  display: inline-block;
+  margin-top: 16px;
+  font-size: 14px;
+}
+
+@media (max-width: 900px) {
+  .tao-showcase-case {
+    grid-template-columns: 1fr;
+  }
+  .tao-showcase {
+    padding: 32px 16px 64px;
+  }
+  .tao-showcase-lead {
+    font-size: 16px;
+  }
+  .tao-showcase-frame {
+    border-radius: 12px;
+  }
+  .tao-showcase-inventory {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 40px;
+    margin-top: 48px;
+  }
+}
+@media (max-width: 1100px) {
+  .tao-showcase-app .tao-console-lede {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (min-width: 641px) and (max-width: 1100px) {
+  .tao-showcase-app .tao-console-row--three {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+@media (max-width: 640px) {
+  .tao-showcase-case-preview {
+    min-height: 220px;
+    padding: 20px 20px 0;
+  }
+  .tao-showcase-app-header {
+    gap: 8px;
+  }
+  .tao-showcase-app-header .tao-showcase-controls {
+    width: 100%;
+    min-width: 0;
+  }
+  .tao-showcase-app-header .tao-showcase-accent {
+    flex: 0 0 100%;
+  }
+  .tao-showcase-app-header .tao-showcase-accent > * {
+    min-width: max-content;
+  }
+  .tao-showcase-app .tao-console-side {
+    width: 56px;
+    padding: 12px 6px;
+  }
+  .tao-showcase-app .tao-console-brand {
+    justify-content: center;
+    padding: 4px;
+  }
+  .tao-showcase-app .tao-console-brand > span:nth-child(2),
+  .tao-showcase-app .tao-console-brand > svg,
+  .tao-showcase-app .tao-console-nav-item > span,
+  .tao-showcase-app .tao-console-nav-group,
+  .tao-showcase-app .tao-console-side > div:last-child {
+    display: none;
+  }
+  .tao-showcase-app .tao-console-nav-item {
+    justify-content: center;
+    padding: 0;
+  }
+  .tao-showcase-app .tao-console-bar {
+    padding: 0 12px;
+    gap: 8px;
+  }
+  .tao-showcase-app .tao-console-search {
+    display: none;
+  }
+  .tao-showcase-app .tao-console-bar-actions {
+    margin-inline-start: auto;
+  }
+  .tao-showcase-app .tao-console-main {
+    margin: 6px 6px 6px 0;
+  }
+  .tao-showcase-app .tao-console-body {
+    padding: 24px 16px 48px;
+  }
+  .tao-showcase-app .tao-console-hello {
+    flex-direction: column;
+    align-items: flex-start;
+    padding-bottom: 8px;
+  }
+  .tao-showcase-app .tao-console-countdown {
+    padding: 14px 0 0;
+    border-inline-start: 0;
+    border-top: 1px solid var(--c-hair);
+    align-self: stretch;
+  }
+  .tao-showcase-app .tao-console-sheet-head {
+    flex-direction: column;
+  }
+  .tao-showcase-app .tao-console-sheet-head [data-tao-segmented] {
+    max-width: 100%;
+    white-space: nowrap;
+  }
+  .tao-showcase-app .tao-console-hero-num {
+    font-size: clamp(30px, 9vw, 44px);
+  }
+  .tao-showcase-app .tao-console-body .tao-console-sheet [data-tao-card-body] {
+    padding: 22px 20px 0;
+  }
+  .tao-showcase-app .tao-console-area,
+  .tao-showcase-app .tao-console-strip {
+    margin-inline: -20px;
+  }
+  .tao-showcase-app .tao-console-area-plot,
+  .tao-showcase-app .tao-console-axis {
+    margin-inline: 20px;
+  }
+  .tao-showcase-app .tao-console-area-plot {
+    height: 180px;
+  }
+  .tao-showcase-app .tao-console-axis span[data-minor] {
+    display: none;
+  }
+  .tao-showcase-app .tao-console-strip {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .tao-showcase-app .tao-console-strip-cell {
+    padding: 16px 20px;
+  }
+  .tao-showcase-app .tao-console-strip-cell + .tao-console-strip-cell {
+    border-inline-start: 0;
+    border-top: 1px solid var(--c-hair);
+  }
+  .tao-showcase-app .tao-console-title {
+    flex-wrap: wrap;
+  }
+  .tao-showcase-app .tao-console-title-actions,
+  .tao-showcase-app .tao-console-toolbar {
+    flex-wrap: wrap;
+    max-width: 100%;
+  }
+  .tao-showcase-app .tao-console-orders [data-tao-tabs-nav] {
+    overflow-x: auto;
+  }
+  .tao-showcase-app .tao-console-orders,
+  .tao-showcase-app .tao-console-orders [data-tao-card-body] {
+    min-width: 0;
+  }
+  .tao-showcase-app .tao-console-split {
+    height: auto;
+    overflow: visible;
+  }
+  .tao-showcase-app .tao-console-split [data-tao-splitter] {
+    height: auto;
+    flex-direction: column;
+    overflow: visible;
+  }
+  .tao-showcase-app .tao-console-split [data-tao-splitter-panel] {
+    width: 100% !important;
+    overflow: visible;
+  }
+  .tao-showcase-app .tao-console-split [data-tao-splitter-dragger] {
+    display: none;
+  }
+  .tao-showcase-app .tao-console-split-list [data-tao-scroll-area] {
+    max-height: none !important;
+  }
+  .tao-showcase-app .tao-console-split-list [data-tao-scroll-viewport] {
+    overflow: visible !important;
+  }
+  .tao-showcase-app .tao-console-split-detail {
+    height: auto;
+    overflow: visible;
+    padding: 16px;
+    border-top: 1px solid var(--tao-color-border-secondary);
+  }
+  .tao-showcase-app .tao-console-customer-head {
+    flex-wrap: wrap;
+  }
+  .tao-showcase-app .tao-console-customer-stats {
+    grid-template-columns: 1fr;
+  }
+  .tao-showcase-app .tao-console-form-row,
+  .tao-showcase-app .tao-console-form-grid {
+    grid-template-columns: 1fr;
+  }
+  .tao-showcase-app .tao-console-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 420px) {
+  .tao-showcase-app .tao-console-bar [data-tao-breadcrumb] {
+    display: none;
+  }
+}

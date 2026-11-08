@@ -203,7 +203,12 @@
       var(--tao-motion-ease-out);
   }
 
-  [data-tao-button-icon-idle] > svg,
+  :where([data-tao-button-icon-idle] svg:not([width])) {
+    width: 1em;
+  }
+  :where([data-tao-button-icon-idle] svg:not([height])) {
+    height: 1em;
+  }
   [data-tao-button-spinner] {
     width: 1em;
     height: 1em;

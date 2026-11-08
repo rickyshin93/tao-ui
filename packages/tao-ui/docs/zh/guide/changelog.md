@@ -7,6 +7,17 @@ description: 查看 @rockshin/tao-ui 各版本的更新，包括上传、选择�
 
 按版本记录 `@rockshin/tao-ui` 的用户可见变更。日期使用 UTC+8。
 
+## 0.0.50
+
+2026-11-08
+
+- [Button](/zh/components/button) 统一嵌套 SVG 图标的尺寸，同时保留显式指定的宽高。
+- [Input](/zh/components/input) 的后缀内容居中；[Select](/zh/components/select) 多选内容为单行时保持预期高度。
+- [Transfer](/zh/components/transfer) 的选择菜单箭头与 Select 对齐，并明确禁用状态。
+- 文档新增中英文 Showcase 和响应式商城示例，并更新组件页与首页。
+
+[查看版本差异](https://github.com/rickyshin93/tao-ui/compare/v0.0.49...v0.0.50)
+
 ## 0.0.49
 
 2026-11-07

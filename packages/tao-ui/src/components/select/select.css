@@ -486,7 +486,10 @@ legend[data-tao-select-group-label] {
   height: auto;
   min-height: var(--tao-select-height);
   flex-wrap: wrap;
-  padding-block: 4px;
+  padding-block: max(
+    0px,
+    calc((var(--tao-select-height) - 24px) / 2 - var(--tao-line-width))
+  );
   padding-inline-start: 4px;
   padding-inline-end: var(--tao-select-padding-inline);
 }
@@ -499,7 +502,6 @@ legend[data-tao-select-group-label] {
   align-items: center;
   flex: 1;
   min-width: 0;
-  padding-block: 1px;
 }
 
 [data-tao-select][data-tao-inline-search][data-tao-multiple]
@@ -517,6 +519,7 @@ legend[data-tao-select-group-label] {
 
 /* Individual tag pill */
 [data-tao-select-tag] {
+  box-sizing: border-box;
   display: inline-flex;
   align-items: center;
   gap: 0;

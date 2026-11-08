@@ -4,6 +4,7 @@ import { Checkbox } from '../checkbox/checkbox';
 import { Dropdown } from '../dropdown/dropdown';
 import { Empty } from '../empty/empty';
 import { ListPaginationControl } from '../list/list-pagination';
+import { ChevronDownIcon } from '../select/select-icons';
 import { TransferSearch } from './transfer-parts';
 import type {
   RenderedItem,
@@ -221,7 +222,7 @@ export function TransferList<T extends TransferItem>(
                 aria-label={`${locale.messages.selectionActions} ${sectionName}`}
                 disabled={disabled || !enabled.length}
               >
-                {selectionsIcon ?? '⌄'}
+                {selectionsIcon ?? <ChevronDownIcon />}
               </button>
             </Dropdown>
           </>

@@ -7,8 +7,8 @@ html:root {
   --reference-ink: oklch(0.2 0.01 260);
   --reference-muted: oklch(0.47 0.012 260);
   --reference-line: oklch(0.9 0.004 260);
-  /* Jade: hue 170 keeps it clear of the 155 success green. */
-  --reference-seed: oklch(0.56 0.12 170);
+  /* Daybreak Blue (antd blue-6): matches the first home seed. */
+  --reference-seed: oklch(0.599 0.219 259);
   --rp-c-bg: var(--reference-paper);
   --rp-c-bg-soft: var(--reference-sheet);
   --rp-c-text-1: var(--reference-ink);
@@ -19,7 +19,11 @@ html:root {
   --rp-c-brand-dark: var(--reference-seed);
   --rp-c-brand-tint: color-mix(in oklab, var(--reference-seed) 8%, transparent);
   --rp-c-text-code: var(--reference-ink);
-  --rp-c-text-code-bg: color-mix(in oklab, var(--reference-ink) 5%, transparent);
+  --rp-c-text-code-bg: color-mix(
+    in oklab,
+    var(--reference-ink) 5%,
+    transparent
+  );
   --rp-c-text-code-border: transparent;
   --rp-font-family-mono:
     "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
@@ -31,7 +35,7 @@ html:root.rp-dark {
   --reference-ink: oklch(0.95 0.004 260);
   --reference-muted: oklch(0.72 0.01 260);
   --reference-line: oklch(0.3 0.008 260);
-  --reference-seed: oklch(0.8 0.11 170);
+  --reference-seed: oklch(0.72 0.15 259);
 }
 
 body {
@@ -160,7 +164,11 @@ html .rp-sidebar-section-header {
 
 html .rp-sidebar-item--active,
 html .rp-sidebar-item--active:hover {
-  background: color-mix(in oklab, var(--reference-seed) 10%, var(--reference-paper));
+  background: color-mix(
+    in oklab,
+    var(--reference-seed) 10%,
+    var(--reference-paper)
+  );
   color: var(--reference-seed);
   font-weight: 500;
 }
@@ -213,6 +221,4 @@ html .rp-toc-item--active::before {
   .rspress-doc:has(.tao-reference-heading) > p:first-of-type {
     font-size: 15px;
   }
-
-
 }

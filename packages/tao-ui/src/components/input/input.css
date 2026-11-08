@@ -142,6 +142,7 @@
   );
 }
 [data-tao-input] > [data-tao-suffix] {
+  padding-inline-start: var(--tao-input-affix-padding);
   padding-inline-end: var(--tao-input-affix-padding);
 }
 

@@ -40,41 +40,42 @@ type Part = 'root' | 'prefix' | 'input' | 'suffix';
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
+// Vivid seeds near the sRGB chroma limit plus neutral ink; dark = same hue lifted for dark backgrounds.
 const seeds = [
   {
-    id: 'jade',
-    zh: '玉绿',
-    en: 'Jade',
-    light: 'oklch(0.56 0.12 170)',
-    dark: 'oklch(0.8 0.11 170)',
+    id: 'daybreak-blue',
+    zh: '拂晓蓝',
+    en: 'Daybreak Blue',
+    light: 'oklch(0.599 0.219 259)',
+    dark: 'oklch(0.72 0.16 259)',
   },
   {
-    id: 'cobalt',
-    zh: '钴蓝',
-    en: 'Cobalt',
-    light: 'oklch(0.5 0.19 258)',
-    dark: 'oklch(0.74 0.13 255)',
+    id: 'verdant',
+    zh: '翠绿',
+    en: 'Verdant',
+    light: 'oklch(0.58 0.15 145)',
+    dark: 'oklch(0.78 0.16 145)',
+  },
+  {
+    id: 'magenta',
+    zh: '洋红',
+    en: 'Magenta',
+    light: 'oklch(0.6 0.238 350)',
+    dark: 'oklch(0.74 0.17 350)',
   },
   {
     id: 'vermilion',
-    zh: '朱砂',
+    zh: '朱红',
     en: 'Vermilion',
-    light: 'oklch(0.55 0.19 32)',
-    dark: 'oklch(0.74 0.14 34)',
+    light: 'oklch(0.6 0.231 25)',
+    dark: 'oklch(0.72 0.17 25)',
   },
   {
-    id: 'ochre',
-    zh: '赭石',
-    en: 'Ochre',
-    light: 'oklch(0.55 0.13 60)',
-    dark: 'oklch(0.8 0.12 70)',
-  },
-  {
-    id: 'moss',
-    zh: '苔绿',
-    en: 'Moss',
-    light: 'oklch(0.5 0.11 145)',
-    dark: 'oklch(0.79 0.13 145)',
+    id: 'tangerine',
+    zh: '活力橙',
+    en: 'Tangerine',
+    light: 'oklch(0.66 0.179 45)',
+    dark: 'oklch(0.78 0.15 50)',
   },
   {
     id: 'ink',
