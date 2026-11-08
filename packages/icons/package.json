@@ -1,7 +1,7 @@
 {
   "name": "@rockshin/tao-icons",
-  "version": "0.1.2",
-  "description": "2,165 rounded line icons for React, from everyday interfaces to insurance, with TypeScript and accessible defaults.",
+  "version": "0.1.3",
+  "description": "2,126 rounded line icons for React, from everyday interfaces to insurance, with TypeScript and accessible defaults.",
   "keywords": [
     "react",
     "icons",
@@ -35,14 +35,12 @@
     },
     "./svg/*": "./svg/*",
     "./manifest.json": "./data/manifest.json",
-    "./migration.json": "./data/migration.json",
     "./package.json": "./package.json"
   },
   "files": [
     "dist",
     "svg",
     "data/manifest.json",
-    "data/migration.json",
     "ARTWORK-LICENSE",
     "README.md",
     "DESIGN.md",

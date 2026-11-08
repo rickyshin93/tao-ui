@@ -7,6 +7,7 @@ import { JSDOM } from 'jsdom';
 const root = new URL('../', import.meta.url);
 const read = file => readFile(new URL(file, root), 'utf8');
 const v13 = JSON.parse(await read('tests/fixtures/geometry-v13.json'));
+const currentGolden = JSON.parse(await read('tests/fixtures/geometry-current.json'));
 const refinement = JSON.parse(await read('tests/fixtures/geometry-refinement.1.json'));
 assert.equal(refinement.baseVersion, v13.version);
 const golden = {
@@ -34,12 +35,13 @@ const primitives = {
 
 test('current canonical and all SVG byte hashes match provenance-separated goldens', async () => {
   assert.equal(canonical.version, golden.version);
-  assert.equal(sha256(canonicalText), golden.canonicalSha256, 'Recorded canonical data changed. Review the geometry diff; never refresh the golden merely to make CI pass. See HARNESS.md.');
-  assert.equal(Object.keys(canonical.icons).length, golden.iconCount);
-  assert.equal(manifest.count, golden.iconCount);
-  assert.equal(new Set(manifest.icons.map(i => i.name)).size, golden.iconCount);
-  assert.equal(new Set(manifest.icons.map(i => i.component)).size, golden.iconCount);
+  assert.equal(sha256(canonicalText), currentGolden.canonicalSha256, 'Recorded canonical data changed. Review the geometry diff; never refresh the golden merely to make CI pass. See HARNESS.md.');
+  assert.equal(Object.keys(canonical.icons).length, currentGolden.iconCount);
+  assert.equal(manifest.count, currentGolden.iconCount);
+  assert.equal(new Set(manifest.icons.map(i => i.name)).size, currentGolden.iconCount);
+  assert.equal(new Set(manifest.icons.map(i => i.component)).size, currentGolden.iconCount);
   assert.deepEqual(new Set(manifest.icons.map(i => i.name)), new Set(Object.keys(canonical.icons)));
+  assert.deepEqual(new Set(Object.keys(canonical.icons)), new Set(Object.keys(v13.svgSha256).filter(name => !currentGolden.removedLegacyNames.includes(name))));
   assert.deepEqual(new Set((await readdir(new URL('svg/', root))).map(x => x.replace(/\.svg$/, ''))), new Set(Object.keys(canonical.icons)));
   for (const [name, hash] of Object.entries(refinement.svgSha256)) {
     assert.ok(v13.svgSha256[name], name);
@@ -102,21 +104,16 @@ test('catalog aliases share geometry with a canonical entry and keep their publi
   }
 });
 
-test('V13 retains all 554 package names and their migration targets', () => {
+test('historical migration baseline is frozen and compatibility icons are excluded', () => {
   assert.equal(sha256(legacyText), legacyGolden.canonicalSha256);
   assert.equal(legacyManifest.icons.length, legacyGolden.iconCount);
   assert.deepEqual(new Set(Object.keys(migration.oldToNew)), new Set(legacyManifest.icons.map(icon => icon.name)));
-  const current = new Map(manifest.icons.map(icon => [icon.name, icon]));
   for (const entry of legacyManifest.icons) {
     assert.equal(sha256(legacySvg(entry.name)), legacyGolden.svgSha256[entry.name]);
-    assert.equal(current.get(entry.name)?.component, entry.component, entry.name);
-    assert.ok(current.has(migration.oldToNew[entry.name]), entry.name);
   }
-  assert.equal(Object.keys(migration.renamed).length, 39);
-  for (const [name, target] of Object.entries(migration.renamed)) {
-    assert.equal(migration.oldToNew[name], target);
-    assert.equal(target, 'original-' + name);
-  }
+  assert.deepEqual(new Set(currentGolden.removedLegacyNames), new Set(Object.values(migration.renamed)));
+  assert.equal(currentGolden.removedLegacyNames.length, 39);
+  for (const name of currentGolden.removedLegacyNames) assert.ok(!Object.hasOwn(canonical.icons, name), name);
 });
 
 test('original 200 approved entries and SVG bytes remain frozen independently of candidate goldens', async () => {

@@ -17,9 +17,11 @@ const packed = spawnSync('npm', ['pack', '--ignore-scripts', '--dry-run', '--jso
 assert.equal(packed.status, 0, packed.stderr);
 const result = JSON.parse(packed.stdout)[0];
 for (const pattern of [/^dist\/icons\/.*\.js$/, /^dist\/icons\/.*\.d\.ts$/, /^svg\/.*\.svg$/]) assert.equal(result.files.filter(f => pattern.test(f.path)).length, budgets.iconCount, String(pattern));
-const required = ['dist/index.js', 'dist/index.d.ts', 'dist/icon-props.js', 'dist/types.d.ts', 'data/manifest.json', 'data/migration.json', 'ARTWORK-LICENSE', 'package.json', 'README.md', 'INSURANCE-COVERAGE.md', 'GENERIC-COVERAGE.md', 'HARNESS.md', 'AGENTS.md', 'VERIFICATION.md', 'LICENSE'];
+const required = ['dist/index.js', 'dist/index.d.ts', 'dist/icon-props.js', 'dist/types.d.ts', 'data/manifest.json', 'ARTWORK-LICENSE', 'package.json', 'README.md', 'INSURANCE-COVERAGE.md', 'GENERIC-COVERAGE.md', 'HARNESS.md', 'AGENTS.md', 'VERIFICATION.md', 'LICENSE'];
+assert.ok(!Object.hasOwn(pkg.exports, './migration.json'), 'Legacy migration export must not be published');
+assert.ok(!result.files.some(f => /^(?:data\/migration\.json|(?:dist\/icons|svg)\/original-)/.test(f.path)), 'Legacy compatibility assets must not be published');
 for (const file of required) assert.ok(result.files.some(f => f.path === file), `Missing package file: ${file}`);
-for (const file of result.files) assert.ok(/^(?:dist\/|svg\/|data\/(?:manifest|migration)\.json$|ARTWORK-LICENSE$|package\.json$|README\.md$|INSURANCE-COVERAGE\.md$|GENERIC-COVERAGE\.md$|DESIGN\.md$|HARNESS\.md$|AGENTS\.md$|VERIFICATION\.md$|LICENSE$)/.test(file.path), `Unexpected package content: ${file.path}`);
+for (const file of result.files) assert.ok(/^(?:dist\/|svg\/|data\/manifest\.json$|ARTWORK-LICENSE$|package\.json$|README\.md$|INSURANCE-COVERAGE\.md$|GENERIC-COVERAGE\.md$|DESIGN\.md$|HARNESS\.md$|AGENTS\.md$|VERIFICATION\.md$|LICENSE$)/.test(file.path), `Unexpected package content: ${file.path}`);
 assert.ok(result.size <= budgets.maxPackedBytes, `Tarball ${result.size} bytes exceeds ${budgets.maxPackedBytes}`);
 assert.ok(result.unpackedSize <= budgets.maxUnpackedBytes, `Unpacked ${result.unpackedSize} bytes exceeds ${budgets.maxUnpackedBytes}`);
 assert.equal(pkg.name, '@rockshin/tao-icons', 'Package name must be the publishable @rockshin/tao-icons identity');

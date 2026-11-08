@@ -5,7 +5,7 @@ Bun workspaces monorepo. Two publishable packages, each with its own build, docs
 ## Layout
 
 - `packages/tao-ui` — `@rockshin/tao-ui`. Rslib component library (React 18.2/19), Rstest tests, Rspress docs, Storybook, Biome. Package-level guide: `packages/tao-ui/CLAUDE.md`.
-- `packages/icons` — `@rockshin/tao-icons`. 2,165 generated React icon modules, canonical geometry in `data/`, frozen SHA-256 baselines, node:test harness, real-tgz consumer and Next checks. Package-level guide: `packages/icons/AGENTS.md` and `HARNESS.md`.
+- `packages/icons` — `@rockshin/tao-icons`. 2,126 generated React icon modules, canonical geometry in `data/`, frozen SHA-256 baselines, node:test harness, real-tgz consumer and Next checks. Package-level guide: `packages/icons/AGENTS.md` and `HARNESS.md`.
 - Root: workspace scripts, CI workflows, shared agent instructions. No runtime code.
 
 ## Commands (from the repository root)

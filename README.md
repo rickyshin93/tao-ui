@@ -9,9 +9,9 @@ Agent access: [guide](https://rickyshin93.github.io/tao-ui/guide/agents) · [JSO
 | Package | Name | What it is |
 | --- | --- | --- |
 | [`packages/tao-ui`](./packages/tao-ui) | `@rockshin/tao-ui` | React 18.2/19 component library: semantic DOM customization, OKLCH theming, Storybook, Rspress docs |
-| [`packages/icons`](./packages/icons) | `@rockshin/tao-icons` | 2,165 rounded-line icons (24px grid, 1.8px stroke) with per-icon entry points, accessible defaults, frozen generation baselines |
+| [`packages/icons`](./packages/icons) | `@rockshin/tao-icons` | 2,126 rounded-line icons (24px grid, 1.8px stroke) with per-icon entry points, accessible defaults, frozen generation baselines |
 
-`@rockshin/tao-icons` is prepared for publication (MIT metadata, `icons-v` release workflow with npm OIDC provenance) but has **not been published to npm yet**; consume it from this workspace.
+`@rockshin/tao-icons` is available on [npm](https://www.npmjs.com/package/@rockshin/tao-icons) and can also be consumed from this workspace.
 
 ## Requirements
 

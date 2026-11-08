@@ -1,6 +1,6 @@
 # Rounded Essentials React 开发约束
 
-当前目录集成 V13 完整 SVG 素材。历史 554 枚快照保留用于独立校验和迁移。
+当前目录集成 V13 SVG 素材。历史 554 枚快照保留用于独立校验；兼容旧版的 original-* 图标不进入当前包。
 
 ## 事实来源与架构
 
@@ -14,7 +14,7 @@
 
 ## 不变量
 
-- 2,165 枚、24px viewBox、1.8px currentColor 圆角线条
+- 2,126 枚、24px viewBox、1.8px currentColor 圆角线条
 - 原 `approved-v1.2.0-*` 与 `approved-v1.3.0-preview.2-*` 独立冻结，不得为过测更新
 - 新 `generic-candidates.json` 单独记录请求范围与完整性；不伪称设计已获最终确认
 - 装饰性默认、显式可访问名、调用者负责 titleId 唯一性；不得随机 ID、全局计数或 useId

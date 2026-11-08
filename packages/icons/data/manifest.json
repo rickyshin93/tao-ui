@@ -1,7 +1,7 @@
 {
   "name": "Rounded essentials",
   "version": "svg-v13-refinement.1",
-  "count": 2165,
+  "count": 2126,
   "viewBox": "0 0 24 24",
   "strokeWidth": 1.8,
   "categories": [
@@ -9,37 +9,37 @@
       "id": "navigation",
       "label": "Navigation",
       "labelZh": "导航与方向",
-      "count": 44
+      "count": 42
     },
     {
       "id": "actions",
       "label": "Actions",
       "labelZh": "常用操作",
-      "count": 26
+      "count": 24
     },
     {
       "id": "files",
       "label": "Files & documents",
       "labelZh": "文件与文档",
-      "count": 40
+      "count": 39
     },
     {
       "id": "editing",
       "label": "Editing",
       "labelZh": "编辑与绘制",
-      "count": 38
+      "count": 37
     },
     {
       "id": "layout",
       "label": "Layout & typography",
       "labelZh": "布局与排版",
-      "count": 49
+      "count": 47
     },
     {
       "id": "users-security",
       "label": "People & security",
       "labelZh": "用户与安全",
-      "count": 28
+      "count": 19
     },
     {
       "id": "communication",
@@ -51,37 +51,37 @@
       "id": "media",
       "label": "Media",
       "labelZh": "音频与影像",
-      "count": 42
+      "count": 36
     },
     {
       "id": "time-status",
       "label": "Time & status",
       "labelZh": "时间与状态",
-      "count": 33
+      "count": 31
     },
     {
       "id": "devices",
       "label": "Devices",
       "labelZh": "设备与连接",
-      "count": 13
+      "count": 12
     },
     {
       "id": "developer",
       "label": "Developer tools",
       "labelZh": "开发工具",
-      "count": 20
+      "count": 17
     },
     {
       "id": "commerce-location",
       "label": "Commerce & places",
       "labelZh": "购物与地点",
-      "count": 37
+      "count": 35
     },
     {
       "id": "utility",
       "label": "Everyday utility",
       "labelZh": "收藏与常用工具",
-      "count": 9
+      "count": 8
     },
     {
       "id": "insurance-lines",
@@ -159,7 +159,7 @@
       "id": "action-controls",
       "label": "Actions & form controls",
       "labelZh": "操作与表单控件",
-      "count": 27
+      "count": 26
     },
     {
       "id": "data-charts",
@@ -177,13 +177,13 @@
       "id": "accessibility",
       "label": "Accessibility",
       "labelZh": "无障碍",
-      "count": 6
+      "count": 5
     },
     {
       "id": "developer-ai",
       "label": "Development & AI",
       "labelZh": "开发与人工智能",
-      "count": 24
+      "count": 19
     },
     {
       "id": "lucide-full-coverage",
@@ -32824,808 +32824,6 @@
       "symbol": "rounded-origami"
     },
     {
-      "name": "original-accessibility",
-      "label": "Accessibility",
-      "labelZh": "无障碍",
-      "category": "accessibility",
-      "tags": [
-        "accessibility",
-        "无障碍",
-        "Accessibility settings"
-      ],
-      "svg": "svg/original-accessibility.svg",
-      "latestRevision": "V3",
-      "revisionHistory": [
-        "V3"
-      ],
-      "lucideCanonical": false,
-      "sha256": "adb18a474f38abf3bd9e4df32c3e5241af6d38911b009bd232cce975509674d3",
-      "component": "OriginalAccessibilityIcon",
-      "symbol": "rounded-original-accessibility"
-    },
-    {
-      "name": "original-arrow-left-right",
-      "label": "Arrow left right",
-      "labelZh": "左右交换",
-      "category": "navigation",
-      "tags": [
-        "arrow left right",
-        "左右交换",
-        "Swap items or directions"
-      ],
-      "svg": "svg/original-arrow-left-right.svg",
-      "latestRevision": "V3",
-      "revisionHistory": [
-        "V3"
-      ],
-      "lucideCanonical": false,
-      "sha256": "86b28c438ba58f34936a52157ef35214d0cdb670b5ed7d30610477470e3fc837",
-      "component": "OriginalArrowLeftRightIcon",
-      "symbol": "rounded-original-arrow-left-right"
-    },
-    {
-      "name": "original-audio-waveform",
-      "label": "Audio waveform",
-      "labelZh": "音频波形",
-      "category": "media",
-      "tags": [
-        "audio waveform",
-        "音频波形",
-        "Audio playback or speech activity"
-      ],
-      "svg": "svg/original-audio-waveform.svg",
-      "latestRevision": "V3",
-      "revisionHistory": [
-        "V3"
-      ],
-      "lucideCanonical": false,
-      "sha256": "4af20b6832117d23dde40d97d1a4d5642e0035db2f02a058772359d31e63b29d",
-      "component": "OriginalAudioWaveformIcon",
-      "symbol": "rounded-original-audio-waveform"
-    },
-    {
-      "name": "original-battery",
-      "label": "Battery",
-      "labelZh": "电池",
-      "category": "devices",
-      "tags": [
-        "charge",
-        "power",
-        "energy",
-        "device"
-      ],
-      "svg": "svg/original-battery.svg",
-      "latestRevision": "V3",
-      "revisionHistory": [
-        "V3"
-      ],
-      "lucideCanonical": false,
-      "sha256": "48f0bda0c805d4ea5d1aa1acc5a7cdbf5e567a87ea462a3cb9a4e77efff3c1d8",
-      "component": "OriginalBatteryIcon",
-      "symbol": "rounded-original-battery"
-    },
-    {
-      "name": "original-book",
-      "label": "Book",
-      "labelZh": "书籍",
-      "category": "files",
-      "tags": [
-        "read",
-        "manual",
-        "guide",
-        "reference"
-      ],
-      "svg": "svg/original-book.svg",
-      "latestRevision": "V3",
-      "revisionHistory": [
-        "V3"
-      ],
-      "lucideCanonical": false,
-      "sha256": "e9ede6ed3643eacc185f0ac54e18ee64d530fde31f55c1bc2bffb492203b3f72",
-      "component": "OriginalBookIcon",
-      "symbol": "rounded-original-book"
-    },
-    {
-      "name": "original-briefcase",
-      "label": "Briefcase",
-      "labelZh": "公文包",
-      "category": "commerce-location",
-      "tags": [
-        "work",
-        "business",
-        "job",
-        "portfolio"
-      ],
-      "svg": "svg/original-briefcase.svg",
-      "latestRevision": "V3",
-      "revisionHistory": [
-        "V3"
-      ],
-      "lucideCanonical": false,
-      "sha256": "480bc15387a51373adb35c47eb0d49643ebb79573d62958114aece4887964d64",
-      "component": "OriginalBriefcaseIcon",
-      "symbol": "rounded-original-briefcase"
-    },
-    {
-      "name": "original-calendar",
-      "label": "Calendar",
-      "labelZh": "日历",
-      "category": "time-status",
-      "tags": [
-        "date",
-        "schedule",
-        "日期",
-        "日历"
-      ],
-      "svg": "svg/original-calendar.svg",
-      "latestRevision": "V3",
-      "revisionHistory": [
-        "V3"
-      ],
-      "lucideCanonical": false,
-      "sha256": "ad5cda348aedc92fe99baa1b006263eff740db314eec0b5194f9df49c9e739f7",
-      "component": "OriginalCalendarIcon",
-      "symbol": "rounded-original-calendar"
-    },
-    {
-      "name": "original-calendar-plus",
-      "label": "Calendar plus",
-      "labelZh": "新建日程",
-      "category": "time-status",
-      "tags": [
-        "calendar plus",
-        "新建日程",
-        "Add calendar event"
-      ],
-      "svg": "svg/original-calendar-plus.svg",
-      "latestRevision": "V3",
-      "revisionHistory": [
-        "V3"
-      ],
-      "lucideCanonical": false,
-      "sha256": "3d65597aff5bc4f238aa2d8b72daf1edbdee28c855e5a9fff2697a1ef8396165",
-      "component": "OriginalCalendarPlusIcon",
-      "symbol": "rounded-original-calendar-plus"
-    },
-    {
-      "name": "original-chart-bar",
-      "label": "Bar chart",
-      "labelZh": "柱状图",
-      "category": "utility",
-      "tags": [
-        "analytics",
-        "statistics",
-        "report",
-        "data"
-      ],
-      "svg": "svg/original-chart-bar.svg",
-      "latestRevision": "V3",
-      "revisionHistory": [
-        "V3"
-      ],
-      "lucideCanonical": false,
-      "sha256": "50015e42a67dd06fcc81bbb267a20387c69b1ac9fff512504ea05ed34a20df5b",
-      "component": "OriginalChartBarIcon",
-      "symbol": "rounded-original-chart-bar"
-    },
-    {
-      "name": "original-clipboard",
-      "label": "Clipboard",
-      "labelZh": "剪贴板",
-      "category": "actions",
-      "tags": [
-        "paste",
-        "copy",
-        "board",
-        "notes"
-      ],
-      "svg": "svg/original-clipboard.svg",
-      "latestRevision": "V3",
-      "revisionHistory": [
-        "V3"
-      ],
-      "lucideCanonical": false,
-      "sha256": "45a510ab2cf2d833683139ddd317d057a0164262bf45f56fb15b89293e91cb1f",
-      "component": "OriginalClipboardIcon",
-      "symbol": "rounded-original-clipboard"
-    },
-    {
-      "name": "original-clipboard-list",
-      "label": "Clipboard list",
-      "labelZh": "任务清单",
-      "category": "action-controls",
-      "tags": [
-        "clipboard list",
-        "任务清单",
-        "Review a list of tasks"
-      ],
-      "svg": "svg/original-clipboard-list.svg",
-      "latestRevision": "V3",
-      "revisionHistory": [
-        "V3"
-      ],
-      "lucideCanonical": false,
-      "sha256": "9a328efb144a41fb1a8588fcd89dfd6c67da880d7f4fc81683f4218cc9e51986",
-      "component": "OriginalClipboardListIcon",
-      "symbol": "rounded-original-clipboard-list"
-    },
-    {
-      "name": "original-code",
-      "label": "Code",
-      "labelZh": "代码",
-      "category": "developer",
-      "tags": [
-        "development",
-        "source",
-        "programming",
-        "html"
-      ],
-      "svg": "svg/original-code.svg",
-      "latestRevision": "V3",
-      "revisionHistory": [
-        "V3"
-      ],
-      "lucideCanonical": false,
-      "sha256": "cf45c49d6256ad4c02bb01db32738868f941994cd04b392b4788c8f1d5b9acfc",
-      "component": "OriginalCodeIcon",
-      "symbol": "rounded-original-code"
-    },
-    {
-      "name": "original-contact",
-      "label": "Contact",
-      "labelZh": "联系人",
-      "category": "users-security",
-      "tags": [
-        "contact",
-        "联系人",
-        "Address-book entry"
-      ],
-      "svg": "svg/original-contact.svg",
-      "latestRevision": "V3",
-      "revisionHistory": [
-        "V3"
-      ],
-      "lucideCanonical": false,
-      "sha256": "0685f7ab0cd152679bb4f4267ffaa191ff7fd84ee2dec62ebc37ee37ff2207cb",
-      "component": "OriginalContactIcon",
-      "symbol": "rounded-original-contact"
-    },
-    {
-      "name": "original-container",
-      "label": "Container",
-      "labelZh": "容器",
-      "category": "developer-ai",
-      "tags": [
-        "container",
-        "容器",
-        "Containerized service"
-      ],
-      "svg": "svg/original-container.svg",
-      "latestRevision": "V3",
-      "revisionHistory": [
-        "V3"
-      ],
-      "lucideCanonical": false,
-      "sha256": "bf4882e7dae1123b4f1159f6dcd0fe498cedcb5b8734e371d05e50ab08309e8e",
-      "component": "OriginalContainerIcon",
-      "symbol": "rounded-original-container"
-    },
-    {
-      "name": "original-database-backup",
-      "label": "Database backup",
-      "labelZh": "数据库备份",
-      "category": "developer-ai",
-      "tags": [
-        "database backup",
-        "数据库备份",
-        "Back up stored data"
-      ],
-      "svg": "svg/original-database-backup.svg",
-      "latestRevision": "V9",
-      "revisionHistory": [
-        "V3",
-        "V9"
-      ],
-      "lucideCanonical": false,
-      "sha256": "aa171f8d39e2ee809e33de23353cb5004abf384c14b918a33f8ee1cb42f86f8c",
-      "component": "OriginalDatabaseBackupIcon",
-      "symbol": "rounded-original-database-backup"
-    },
-    {
-      "name": "original-expand",
-      "label": "Expand",
-      "labelZh": "展开",
-      "category": "navigation",
-      "tags": [
-        "outward",
-        "resize",
-        "grow",
-        "diagonal"
-      ],
-      "svg": "svg/original-expand.svg",
-      "latestRevision": "V3",
-      "revisionHistory": [
-        "V3"
-      ],
-      "lucideCanonical": false,
-      "sha256": "2852dbd0834e93b07e066b3b8c17f7d4d6974adde6684d930e368581d724f00c",
-      "component": "OriginalExpandIcon",
-      "symbol": "rounded-original-expand"
-    },
-    {
-      "name": "original-git-compare",
-      "label": "Git compare",
-      "labelZh": "比较分支",
-      "category": "developer-ai",
-      "tags": [
-        "git compare",
-        "比较分支",
-        "Compare code branches"
-      ],
-      "svg": "svg/original-git-compare.svg",
-      "latestRevision": "V3",
-      "revisionHistory": [
-        "V3"
-      ],
-      "lucideCanonical": false,
-      "sha256": "e89ff12da4cd65c6af94dda5bbe623d7517f84d31e706c38145fe503342db270",
-      "component": "OriginalGitCompareIcon",
-      "symbol": "rounded-original-git-compare"
-    },
-    {
-      "name": "original-layout-list",
-      "label": "List layout",
-      "labelZh": "列表布局",
-      "category": "layout",
-      "tags": [
-        "list",
-        "bullets",
-        "rows",
-        "view"
-      ],
-      "svg": "svg/original-layout-list.svg",
-      "latestRevision": "V3",
-      "revisionHistory": [
-        "V3"
-      ],
-      "lucideCanonical": false,
-      "sha256": "63c0bb2725e732139a14bf39958e5011550f2ba3f99a617a4bc0025936ab970b",
-      "component": "OriginalLayoutListIcon",
-      "symbol": "rounded-original-layout-list"
-    },
-    {
-      "name": "original-lock",
-      "label": "Lock",
-      "labelZh": "锁定",
-      "category": "users-security",
-      "tags": [
-        "secure",
-        "password",
-        "private",
-        "locked"
-      ],
-      "svg": "svg/original-lock.svg",
-      "latestRevision": "V3",
-      "revisionHistory": [
-        "V3"
-      ],
-      "lucideCanonical": false,
-      "sha256": "a9385aeb40b227bbac29cf635d3373dc0dfa75ab7a77ed8b4716398f8db3b14c",
-      "component": "OriginalLockIcon",
-      "symbol": "rounded-original-lock"
-    },
-    {
-      "name": "original-network",
-      "label": "Network",
-      "labelZh": "网络拓扑",
-      "category": "developer-ai",
-      "tags": [
-        "network",
-        "网络拓扑",
-        "Connected system structure"
-      ],
-      "svg": "svg/original-network.svg",
-      "latestRevision": "V3",
-      "revisionHistory": [
-        "V3"
-      ],
-      "lucideCanonical": false,
-      "sha256": "3d661fbfce968e488df4baaf614a3edb2e308de5e5c77c867069c92c2db644db",
-      "component": "OriginalNetworkIcon",
-      "symbol": "rounded-original-network"
-    },
-    {
-      "name": "original-paintbrush",
-      "label": "Paintbrush",
-      "labelZh": "画笔",
-      "category": "editing",
-      "tags": [
-        "brush",
-        "paint",
-        "draw",
-        "style"
-      ],
-      "svg": "svg/original-paintbrush.svg",
-      "latestRevision": "V3",
-      "revisionHistory": [
-        "V3"
-      ],
-      "lucideCanonical": false,
-      "sha256": "3883c876fd124882a16bac67681dc886c7beefa9464f050fec91ad4c51507622",
-      "component": "OriginalPaintbrushIcon",
-      "symbol": "rounded-original-paintbrush"
-    },
-    {
-      "name": "original-picture-in-picture",
-      "label": "Picture in picture",
-      "labelZh": "画中画",
-      "category": "media",
-      "tags": [
-        "picture in picture",
-        "画中画",
-        "Float media above content"
-      ],
-      "svg": "svg/original-picture-in-picture.svg",
-      "latestRevision": "V3",
-      "revisionHistory": [
-        "V3"
-      ],
-      "lucideCanonical": false,
-      "sha256": "b8b6360f27d36e76a48a6647b6e30cd1018747500bf351b469e6e607a620b3a3",
-      "component": "OriginalPictureInPictureIcon",
-      "symbol": "rounded-original-picture-in-picture"
-    },
-    {
-      "name": "original-receipt",
-      "label": "Receipt",
-      "labelZh": "收据",
-      "category": "commerce-location",
-      "tags": [
-        "invoice",
-        "bill",
-        "purchase",
-        "payment"
-      ],
-      "svg": "svg/original-receipt.svg",
-      "latestRevision": "V3",
-      "revisionHistory": [
-        "V3"
-      ],
-      "lucideCanonical": false,
-      "sha256": "79e4a7008321b5e35a10068b5e8e81097c69de9d8aa42d503b012eb5b1ee4e3d",
-      "component": "OriginalReceiptIcon",
-      "symbol": "rounded-original-receipt"
-    },
-    {
-      "name": "original-screen-share",
-      "label": "Screen share",
-      "labelZh": "共享屏幕",
-      "category": "media",
-      "tags": [
-        "screen share",
-        "共享屏幕",
-        "Present screen contents"
-      ],
-      "svg": "svg/original-screen-share.svg",
-      "latestRevision": "V3",
-      "revisionHistory": [
-        "V3"
-      ],
-      "lucideCanonical": false,
-      "sha256": "3d48e41e49296ced1f1a71ad5938f873c01edd1086c37762c27dcde3efed8668",
-      "component": "OriginalScreenShareIcon",
-      "symbol": "rounded-original-screen-share"
-    },
-    {
-      "name": "original-share",
-      "label": "Share",
-      "labelZh": "分享",
-      "category": "actions",
-      "tags": [
-        "send",
-        "network",
-        "distribute",
-        "connect"
-      ],
-      "svg": "svg/original-share.svg",
-      "latestRevision": "V3",
-      "revisionHistory": [
-        "V3"
-      ],
-      "lucideCanonical": false,
-      "sha256": "875fa5c180ec915acbf1a40d1135b72c6c9e5093c901b37b46697151e7846cfc",
-      "component": "OriginalShareIcon",
-      "symbol": "rounded-original-share"
-    },
-    {
-      "name": "original-split",
-      "label": "Split",
-      "labelZh": "分屏",
-      "category": "layout",
-      "tags": [
-        "split",
-        "分屏",
-        "Split the current view"
-      ],
-      "svg": "svg/original-split.svg",
-      "latestRevision": "V3",
-      "revisionHistory": [
-        "V3"
-      ],
-      "lucideCanonical": false,
-      "sha256": "68be9d14d24a4e5222cf4437f8c44a1cb4fa37b3e3c6d1b2cae2f2ddf0f8d1aa",
-      "component": "OriginalSplitIcon",
-      "symbol": "rounded-original-split"
-    },
-    {
-      "name": "original-terminal",
-      "label": "Terminal",
-      "labelZh": "终端",
-      "category": "developer",
-      "tags": [
-        "command",
-        "console",
-        "shell",
-        "cli"
-      ],
-      "svg": "svg/original-terminal.svg",
-      "latestRevision": "V3",
-      "revisionHistory": [
-        "V3"
-      ],
-      "lucideCanonical": false,
-      "sha256": "b724314eb97e447ac0c80b943dc392cdf2d7e9539499f9b3ba99a58cbc7555f1",
-      "component": "OriginalTerminalIcon",
-      "symbol": "rounded-original-terminal"
-    },
-    {
-      "name": "original-user",
-      "label": "User",
-      "labelZh": "用户",
-      "category": "users-security",
-      "tags": [
-        "profile",
-        "person",
-        "account",
-        "用户"
-      ],
-      "svg": "svg/original-user.svg",
-      "latestRevision": "V3",
-      "revisionHistory": [
-        "V3"
-      ],
-      "lucideCanonical": false,
-      "sha256": "1f92da9b629c8a76235ee3a05173322361b2dce6f189f81e42e46cb3c9af39df",
-      "component": "OriginalUserIcon",
-      "symbol": "rounded-original-user"
-    },
-    {
-      "name": "original-user-check",
-      "label": "Verified user",
-      "labelZh": "已验证用户",
-      "category": "users-security",
-      "tags": [
-        "person",
-        "approved",
-        "verified",
-        "member"
-      ],
-      "svg": "svg/original-user-check.svg",
-      "latestRevision": "V3",
-      "revisionHistory": [
-        "V3"
-      ],
-      "lucideCanonical": false,
-      "sha256": "ea0dab9eb6448ebe888c840aa99d33ea9696b28b902cd4c3170fae0f8bfdc9d5",
-      "component": "OriginalUserCheckIcon",
-      "symbol": "rounded-original-user-check"
-    },
-    {
-      "name": "original-user-minus",
-      "label": "User minus",
-      "labelZh": "移除用户",
-      "category": "users-security",
-      "tags": [
-        "user minus",
-        "移除用户",
-        "Remove a member"
-      ],
-      "svg": "svg/original-user-minus.svg",
-      "latestRevision": "V3",
-      "revisionHistory": [
-        "V3"
-      ],
-      "lucideCanonical": false,
-      "sha256": "9e0db5323745ad95066c21fa2d8efaeb72cbfa8b989400cbac8df02dead47498",
-      "component": "OriginalUserMinusIcon",
-      "symbol": "rounded-original-user-minus"
-    },
-    {
-      "name": "original-user-plus",
-      "label": "Add user",
-      "labelZh": "添加用户",
-      "category": "users-security",
-      "tags": [
-        "person",
-        "invite",
-        "new",
-        "member"
-      ],
-      "svg": "svg/original-user-plus.svg",
-      "latestRevision": "V3",
-      "revisionHistory": [
-        "V3"
-      ],
-      "lucideCanonical": false,
-      "sha256": "c8a1fe176b951572498458b7ed95146e77a047a01eba9085af67368c1a86815d",
-      "component": "OriginalUserPlusIcon",
-      "symbol": "rounded-original-user-plus"
-    },
-    {
-      "name": "original-user-search",
-      "label": "User search",
-      "labelZh": "查找用户",
-      "category": "users-security",
-      "tags": [
-        "user search",
-        "查找用户",
-        "Find a person"
-      ],
-      "svg": "svg/original-user-search.svg",
-      "latestRevision": "V3",
-      "revisionHistory": [
-        "V3"
-      ],
-      "lucideCanonical": false,
-      "sha256": "b4995adddbcfeeb042b8856ea37381a9879e139f18db721f79c0e1f8705c099e",
-      "component": "OriginalUserSearchIcon",
-      "symbol": "rounded-original-user-search"
-    },
-    {
-      "name": "original-user-x",
-      "label": "User x",
-      "labelZh": "用户禁用",
-      "category": "users-security",
-      "tags": [
-        "user x",
-        "用户禁用",
-        "Blocked or rejected user"
-      ],
-      "svg": "svg/original-user-x.svg",
-      "latestRevision": "V3",
-      "revisionHistory": [
-        "V3"
-      ],
-      "lucideCanonical": false,
-      "sha256": "8524f1c2915d1bea0c9f7366d3f2029a5849466dfb5e06a80671c1c232c185c0",
-      "component": "OriginalUserXIcon",
-      "symbol": "rounded-original-user-x"
-    },
-    {
-      "name": "original-users",
-      "label": "Users",
-      "labelZh": "用户组",
-      "category": "users-security",
-      "tags": [
-        "people",
-        "team",
-        "group",
-        "members"
-      ],
-      "svg": "svg/original-users.svg",
-      "latestRevision": "V3",
-      "revisionHistory": [
-        "V3"
-      ],
-      "lucideCanonical": false,
-      "sha256": "fc659a268edb359d1a20813f67c04d19a139752a84ec99491e4e2a07b1447ac1",
-      "component": "OriginalUsersIcon",
-      "symbol": "rounded-original-users"
-    },
-    {
-      "name": "original-video",
-      "label": "Video",
-      "labelZh": "录像",
-      "category": "media",
-      "tags": [
-        "video",
-        "录像",
-        "Video content or camera control"
-      ],
-      "svg": "svg/original-video.svg",
-      "latestRevision": "V3",
-      "revisionHistory": [
-        "V3"
-      ],
-      "lucideCanonical": false,
-      "sha256": "7ce6b6396ef0e58ebb48c86104901ac3b26d712fbb4816f93e0cbb8257a4cfd7",
-      "component": "OriginalVideoIcon",
-      "symbol": "rounded-original-video"
-    },
-    {
-      "name": "original-volume",
-      "label": "Volume",
-      "labelZh": "音量",
-      "category": "media",
-      "tags": [
-        "sound",
-        "speaker",
-        "audio",
-        "loud"
-      ],
-      "svg": "svg/original-volume.svg",
-      "latestRevision": "V3",
-      "revisionHistory": [
-        "V3"
-      ],
-      "lucideCanonical": false,
-      "sha256": "0f78c1c01d337dde613d560355a712e3ba94f38c1417ff2c3c0454299db17896",
-      "component": "OriginalVolumeIcon",
-      "symbol": "rounded-original-volume"
-    },
-    {
-      "name": "original-volume-off",
-      "label": "Volume off",
-      "labelZh": "静音",
-      "category": "media",
-      "tags": [
-        "mute",
-        "speaker",
-        "sound",
-        "disabled"
-      ],
-      "svg": "svg/original-volume-off.svg",
-      "latestRevision": "V3",
-      "revisionHistory": [
-        "V3"
-      ],
-      "lucideCanonical": false,
-      "sha256": "e3eb23ef4d4b65c0f418ebec290e3fd01fb2ef304e62b5df70d32057b8d9d9d4",
-      "component": "OriginalVolumeOffIcon",
-      "symbol": "rounded-original-volume-off"
-    },
-    {
-      "name": "original-wand",
-      "label": "Wand",
-      "labelZh": "智能优化",
-      "category": "developer-ai",
-      "tags": [
-        "wand",
-        "智能优化",
-        "Automatic improvement or transformation"
-      ],
-      "svg": "svg/original-wand.svg",
-      "latestRevision": "V3",
-      "revisionHistory": [
-        "V3"
-      ],
-      "lucideCanonical": false,
-      "sha256": "e85de7034dbdc97df8cdee8de0924a91b4d4456927049784f1053044fedeb7a6",
-      "component": "OriginalWandIcon",
-      "symbol": "rounded-original-wand"
-    },
-    {
-      "name": "original-workflow",
-      "label": "Workflow",
-      "labelZh": "工作流",
-      "category": "developer",
-      "tags": [
-        "automation",
-        "process",
-        "nodes",
-        "pipeline"
-      ],
-      "svg": "svg/original-workflow.svg",
-      "latestRevision": "V3",
-      "revisionHistory": [
-        "V3"
-      ],
-      "lucideCanonical": false,
-      "sha256": "d8f7cbaccd6f1d755f3db7665c1309b9234f155c950181fb717a996a9380054f",
-      "component": "OriginalWorkflowIcon",
-      "symbol": "rounded-original-workflow"
-    },
-    {
       "name": "package",
       "label": "Package",
       "labelZh": "软件包",
@@ -53427,7 +52625,8 @@
     "refinement": {
       "revision": "svg-v13-refinement.1",
       "basedOn": "svg-v13-complete"
-    }
+    },
+    "removedLegacyCompatibility": 39
   },
   "catalogAliases": {
     "alarm": "alarm-clock",
@@ -53468,38 +52667,6 @@
     "message-typing": "message-square-more",
     "messages-square": "messages",
     "minus-circle": "circle-minus",
-    "original-accessibility": "person-standing",
-    "original-arrow-left-right": "arrow-right-left",
-    "original-audio-waveform": "audio-lines",
-    "original-battery": "battery-medium",
-    "original-briefcase": "briefcase-business",
-    "original-calendar-plus": "calendar-plus-2",
-    "original-chart-bar": "chart-column",
-    "original-code": "code-xml",
-    "original-contact": "contact-round",
-    "original-container": "container",
-    "original-database-backup": "database-backup",
-    "original-git-compare": "git-compare-arrows",
-    "original-layout-list": "list",
-    "original-lock": "lock-keyhole",
-    "original-network": "chart-network",
-    "original-paintbrush": "brush",
-    "original-picture-in-picture": "picture-in-picture-2",
-    "original-receipt": "receipt-text",
-    "original-share": "share-2",
-    "original-terminal": "square-terminal",
-    "original-user": "user",
-    "original-user-check": "user-check",
-    "original-user-minus": "user-minus",
-    "original-user-plus": "user-plus",
-    "original-user-search": "user-search",
-    "original-user-x": "user-x",
-    "original-users": "users",
-    "original-video": "clapperboard",
-    "original-volume": "volume-2",
-    "original-volume-off": "volume-x",
-    "original-wand": "wand-sparkles",
-    "original-workflow": "network",
     "pause-circle": "circle-pause",
     "pencil": "edit",
     "pilcrow": "paragraph",

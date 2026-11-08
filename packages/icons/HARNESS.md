@@ -14,7 +14,7 @@ bun run check:extended
 
 根目录 `bun install` 使用唯一的 `bun.lockb`，不要执行 `npm install` / `npm ci`。全量检查需要 npm 官方 registry 的网络访问；消费项目中的 React、类型、Next 及其传递依赖由 `tests/fixtures/*/package-lock.json` 冻结，先 `npm ci` 再安装本次 tgz，不把可变 tgz hash 写入依赖基线。需要完全离线时先准备这些 registry 依赖的 npm 缓存。新机器第一次安装/构建 Next 比快测慢。
 
-V13 使用独立的 geometry-v13.json 校验快照。几何修订使用 geometry-refinement.1.json 记录变更 SVG 的哈希，其余图标继续使用冻结的 V13 哈希。旧版 554 个图标的 canonical 和 manifest 保存在测试 fixture 内，旧版的冻结 SHA-256 及导入器复现检查继续有效。
+V13 使用独立的 geometry-v13.json 校验快照。几何修订使用 geometry-refinement.1.json 记录变更 SVG 的哈希，其余图标继续使用冻结的 V13 哈希。旧版 554 个图标的 canonical 和 manifest 保存在测试 fixture 内；39 个 original-* 兼容图标不属于当前包，其他图标继续使用冻结基线验证；`geometry-current.json` 记录当前集合及移除的名称。
 
 ## 测试分层
 
@@ -22,7 +22,7 @@ V13 使用独立的 geometry-v13.json 校验快照。几何修订使用 geometry
 | --- | --- | --- |
 | `bun run generate:check` | manifest.count 个独立 TSX 与 barrel 按 canonical 数据确定性生成，检测缺失、多余及手改文件 | 生成器或图标变更 |
 | `bun run check` / `check:fast` | 先检查漂移，再 Rslib 构建最新 dist；类型、冻结 SVG SHA-256、SVG schema、安全属性、SSR 几何、可访问名称、ref、事件、hydration、打包 allowlist/预算 | 每次改动 |
-| `bun run test:consumer` | 真实 npm pack 后在两个干净目录安装；React 18.3.1 / 19.3.1、全部 exports/subpaths、SSR、DOM ref/事件/hydration、TS Bundler/NodeNext；esbuild 检查 root/subpath 各只留下 1/总数 个图标；另测保险及新增通用代表图标；全部 2,165 枚分别做 ref/事件、完整树 hydration 与 root/subpath 严格类型消费 | API、依赖、输出配置变更 |
+| `bun run test:consumer` | 真实 npm pack 后在两个干净目录安装；React 18.3.1 / 19.3.1、全部 exports/subpaths、SSR、DOM ref/事件/hydration、TS Bundler/NodeNext；esbuild 检查 root/subpath 各只留下 1/总数 个图标；另测保险及新增通用代表图标；全部 2,126 枚分别做 ref/事件、完整树 hydration 与 root/subpath 严格类型消费 | API、依赖、输出配置变更 |
 | `bun run test:next` | 真实 tgz 安装进 Next 16.4.2；四种干净生产 webpack 构建（single root / consolidated root / separate root / subpaths）、类型、App Router 服务端页面引入 client 图标；启动生产 server，验证 HTTP 200 和 SVG 标题/尺寸 | boundary 或框架兼容变更 |
 | `bun run check:extended` / `verify` | 上面全部顺序执行，失败立即退出 | 提交合并前、交付和发版前 |
 | `bun run test:pack` | manifest.count 份 JS / DTS / SVG、入口映射、peer、发布身份（名称/license/非 private/非 preview 版本）、内容白名单、压缩包大小 | 打包配置改动 |
@@ -39,7 +39,7 @@ V13 使用独立的 geometry-v13.json 校验快照。几何修订使用 geometry
 - API 保持具名 `*Icon`、`IconProps`、root 和 kebab-case subpath；无全局动态图标注册表
 - `sideEffects:false`、forwardRef PURE 注解、React external 和 逐图标独立模块必须同时成立
 - esbuild 的输出 metafile 按 `bytesInOutput` 验证每次只有所选 SearchIcon、保险或新增通用代表图标贡献代码；并非仅看输入列表或包配置
-- 体积预算在 `tests/fixtures/budgets.json`：Search 示例 minified ≤1200 B / gzip ≤700 B，React external；2,165 枚 V13 tgz ≤1329000 B / unpacked ≤5667000 B；保险及新增通用单图标 minified ≤1600 B / gzip ≤850 B。Search 原预算保持不变
+- 体积预算在 `tests/fixtures/budgets.json`：Search 示例 minified ≤1200 B / gzip ≤700 B，React external；2,126 枚 V13 tgz ≤1329000 B / unpacked ≤5667000 B；保险及新增通用单图标 minified ≤1600 B / gzip ≤850 B。Search 原预算保持不变
 - 不把 SSR 等同于原生 RSC；Next 图标是 client boundary。根 barrel 也保留边界，Next 测试扫描客户端 chunks，检测未使用的独有几何指纹。Next 16.4.2 separate-root 两条独立导入确实会带入整套图标：该诊断情形单独报告 unusedExclusionPassed:false，不作为受支持按需导入的通过证据；single/consolidated root 与 subpath 三种情形仍严格断言零泄漏。推荐子路径或合并 root imports。Next 测试验证编译和服务端 HTML，客户端事件/hydration 由 React DOM 测试验证，没有冒称跑过浏览器端 Next E2E 或屏幕阅读器实机
 - 包自身和 React 18/19 消费声明检查使用 `skipLibCheck: false`。Next 16.4.2 的 fixture 使用框架默认的 `skipLibCheck: true`：TS 5.9.3 下，Next 自身 `url-pattern.d.ts` 引用了缺失的全局 `URLPatternInput` / `URLPatternOptions`。这项上游声明限制已记录，不能把 Next 结果说成所有依赖声明的严格类型检查
 

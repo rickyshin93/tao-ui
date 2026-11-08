@@ -1,6 +1,6 @@
 # Tao Icons
 
-**2,165 rounded line icons for React — made for polished products, from everyday interfaces to insurance workspaces.**
+**2,126 rounded line icons for React — made for polished products, from everyday interfaces to insurance workspaces.**
 
 Give your product a consistent visual language with a versatile library of 24px icons. Tao Icons pairs a clean, rounded style with practical React APIs, so you can move from idea to interface with confidence.
 
@@ -83,10 +83,6 @@ export default function Page() {
 
 In the tested Next.js 16.4.2 production webpack build, separate root import statements in one Server Component can include the entire icon set in the client chunk. Prefer per-icon paths, or combine root imports into one statement. This result does not establish behavior for every Next.js version or Turbopack. These components use a client boundary; they are not native server-only RSC icons.
 
-## Migration
-
-The 554 legacy import names remain available. For 39 names whose current artwork changed, the previous artwork is available under `original-*`, for example `@rockshin/tao-icons/icons/original-chart-bar`. See `@rockshin/tao-icons/migration.json` for the full mapping.
-
 ## Development and verification
 
 From the repository root, install dependencies with `bun install`. In `packages/icons`, run `bun run check` for generation, build, type, behavior and package checks, or `bun run check:extended` for real-tarball React 18/19 and Next.js consumer checks. See [HARNESS.md](./HARNESS.md) for the test matrix and known limitations. Code and artwork are covered by the [MIT license](./ARTWORK-LICENSE).
@@ -95,7 +91,7 @@ From the repository root, install dependencies with `bun install`. In `packages/
 
 ## 中文说明
 
-**Tao Icons 是一套为 React 产品打造的 2,165 枚圆角线性图标。** 从日常界面、数据和开发工具，到金融保险工作台，统一的视觉语言帮助团队更快构建清晰、一致的产品体验。
+**Tao Icons 是一套为 React 产品打造的 2,126 枚圆角线性图标。** 从日常界面、数据和开发工具，到金融保险工作台，统一的视觉语言帮助团队更快构建清晰、一致的产品体验。
 
 [浏览图标目录](https://rickyshin93.github.io/tao-ui/components/icons) · [npm](https://www.npmjs.com/package/@rockshin/tao-icons)
 
@@ -124,4 +120,4 @@ import { ArrowRightIcon } from '@rockshin/tao-icons/icons/arrow-right';
 
 本包输出 ESM 与 TypeScript 声明，不提供 CommonJS 入口。Next.js App Router 中图标带有 client boundary；在已测试的 Next.js 16.4.2 webpack 构建中，建议使用逐图标路径，或将根入口导入合并为一条语句，以避免引入整套图标。
 
-旧版 554 个导入名称仍可使用；其中 39 个图形的旧版可通过 `original-*` 路径访问，完整映射见 `@rockshin/tao-icons/migration.json`。开发和验证命令见 [HARNESS.md](./HARNESS.md)。
+开发和验证命令见 [HARNESS.md](./HARNESS.md)。

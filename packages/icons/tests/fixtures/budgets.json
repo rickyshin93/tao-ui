@@ -3,10 +3,10 @@
   "searchGzipBytes": 700,
   "maxPackedBytes": 1329000,
   "maxUnpackedBytes": 5667000,
-  "iconCount": 2165,
+  "iconCount": 2126,
   "insuranceMinifiedBytes": 1600,
   "insuranceGzipBytes": 850,
-  "rationale": "554 to 2165 SVGs, modules and declarations. Whole-package limits scale with the number of independent entries. Per-icon byte limits and the one-module contribution contract are unchanged.",
+  "rationale": "2,126 SVGs, modules and declarations after removing 39 legacy compatibility entries. Existing size budgets and single-icon contracts remain unchanged.",
   "genericMinifiedBytes": 1600,
   "genericGzipBytes": 850
 }
