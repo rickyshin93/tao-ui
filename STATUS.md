@@ -12,6 +12,7 @@
 - none
 
 ## Done
+- 2026-11-10 Corrected Textarea count and resize handle placement at the bottom corner. Required gates and local Chrome count, autosize and resize checks passed; not released. See `.logs/textarea-resize-corner-20261110/verification.md`.
 - 2026-11-10 Moved the Textarea character count inside the bottom corner without adding a row. Required gates and local Chrome layout, RTL, autosize and drag checks passed. See `.logs/textarea-count-fix-20261110/verification.md`.
 - 2026-11-10 Fixed Upload picture-card/circle action hover backgrounds to remain transparent on the image mask. Required gates and local desktop/mobile, light/dark, pressed/focus and preview checks passed; not committed or released. See `.logs/upload-hover-fix-20261110/verification.md`.
 - 2026-11-10 Fixed broken Upload demo images by using the site-hosted original in both locales and Storybook. Required gates, CI/Pages, live image loading and preview passed. See `.logs/upload-image-fix-20261110/verification.md`.

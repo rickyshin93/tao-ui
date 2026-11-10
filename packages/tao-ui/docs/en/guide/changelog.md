@@ -7,6 +7,14 @@ description: Version history for @rockshin/tao-ui, including fixes for uploads, 
 
 User-facing changes for `@rockshin/tao-ui`, listed by release. Dates use UTC+8.
 
+## 0.0.54
+
+2026-11-10
+
+- [Textarea](/components/textarea) aligns its character count beside the native resize handle at the bottom corner and reserves room for text.
+
+[Compare changes](https://github.com/rickyshin93/tao-ui/compare/v0.0.53...v0.0.54)
+
 ## 0.0.53
 
 2026-11-10

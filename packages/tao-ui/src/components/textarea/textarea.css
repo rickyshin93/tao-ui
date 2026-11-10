@@ -10,11 +10,6 @@
     font-family: var(--tao-font-family);
   }
 
-  [data-tao-textarea]:has(> [data-tao-input-count]) {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) max-content;
-  }
-
   /* Sizes — radius on wrapper; padding-block derived from
    (controlHeight - fontSize*lineHeight)/2 - border, so a single-row
    textarea equals the matching Input height. minHeight = controlHeight
@@ -116,16 +111,20 @@
 }
 [data-tao-textarea] > [data-tao-input-clear] {
   position: absolute;
-  grid-area: 1 / 1 / 2 / 2;
   inset-block-start: var(--tao-padding-xxs);
   inset-inline-end: var(--tao-padding-xxs);
 }
 :where([data-tao-textarea]:has([data-tao-input-clear]) textarea) {
   padding-inline-end: var(--tao-control-height);
 }
+:where([data-tao-textarea]:has(> [data-tao-input-count]) textarea) {
+  padding-inline-end: calc(
+    var(--tao-textarea-count-width, 0px) + var(--tao-padding-md) +
+    var(--tao-padding-xs)
+  );
+}
 [data-tao-textarea] > [data-tao-input-count] {
-  align-self: end;
-  text-align: end;
-  padding-inline: var(--tao-padding-xxs) var(--tao-padding-xs);
-  padding-block-end: var(--tao-padding-xxs);
+  position: absolute;
+  inset-block-end: var(--tao-padding-xxs);
+  inset-inline-end: var(--tao-padding-md);
 }

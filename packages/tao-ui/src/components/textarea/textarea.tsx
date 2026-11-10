@@ -101,7 +101,9 @@ export const Textarea = forwardRef(function Textarea(
   const resolvedDisabled = disabled ?? ctx.disabled;
   const innerRef = useRef<HTMLTextAreaElement>(null);
   const rootRef = useRef<HTMLDivElement>(null);
+  const countRef = useRef<HTMLSpanElement>(null);
   const field = useTextControl(props, innerRef);
+  const hasCount = field.counter != null;
   useTextControlRef(ref, innerRef, rootRef);
   const [measuredStyle, setMeasuredStyle] = useState<{
     height: number;
@@ -149,6 +151,23 @@ export const Textarea = forwardRef(function Textarea(
   useLayoutEffect(() => {
     resize();
   }, [resize, field.value]);
+
+  useLayoutEffect(() => {
+    if (!hasCount) return;
+    const count = countRef.current;
+    const root = rootRef.current;
+    if (!count || !root) return;
+    const update = () => {
+      root.style.setProperty('--tao-textarea-count-width', `${count.offsetWidth}px`);
+    };
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(count);
+    return () => {
+      observer.disconnect();
+      root.style.removeProperty('--tao-textarea-count-width');
+    };
+  }, [hasCount]);
 
   useLayoutEffect(() => {
     const el = innerRef.current;
@@ -224,8 +243,9 @@ export const Textarea = forwardRef(function Textarea(
           style={styles?.clear}
         />
       )}
-      {field.counter != null && (
+      {hasCount && (
         <span
+          ref={countRef}
           data-tao-input-count=""
           data-tao-exceeded={field.exceeded || undefined}
           className={classNames?.count}

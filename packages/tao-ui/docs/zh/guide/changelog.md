@@ -7,6 +7,14 @@ description: 查看 @rockshin/tao-ui 各版本的更新，包括上传、选择�
 
 按版本记录 `@rockshin/tao-ui` 的用户可见变更。日期使用 UTC+8。
 
+## 0.0.54
+
+2026-11-10
+
+- [Textarea](/zh/components/textarea) 将字符计数与拖拽手柄并排对齐在底角，并为输入文字预留空间。
+
+[查看版本差异](https://github.com/rickyshin93/tao-ui/compare/v0.0.53...v0.0.54)
+
 ## 0.0.53
 
 2026-11-10
