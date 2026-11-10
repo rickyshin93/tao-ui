@@ -1,7 +1,6 @@
 # STATUS
 
 ## Doing
-- Fix Upload demo images that fail to load from ImgBB; use the existing site-hosted original. Required gates, docs/Storybook builds and local bilingual image/preview checks passed; deployment and live browser acceptance pending.
 - Commerce bilingual switch and responsive fixes implemented; desktop/mobile browser checks and required gates passed. Fixed customer action icon color and checked light/dark themes. Real-device and complete interaction acceptance remain open.
 
 ## Next
@@ -13,6 +12,7 @@
 - none
 
 ## Done
+- 2026-11-10 Fixed broken Upload demo images by using the site-hosted original in both locales and Storybook. Required gates, CI/Pages, live image loading and preview passed. See `.logs/upload-image-fix-20261110/verification.md`.
 - 2026-11-10 Published tao-ui 0.0.52 with Upload alignment, Input password placeholder and Modal focus-ring fixes; local gates, release CI, npm integrity and Pages deployment passed. See `.logs/release-0-0-52-20261110/verification.md`.
 - 2026-11-10 Aligned Upload with local Ant Design; expanded bilingual demos/API, added original CDN artwork and a two-column layout. Required gates and local browser checks passed; released in 0.0.52. See `.logs/upload-original-image-20261110/verification.md` and `.logs/upload-alignment-20261110/verification.md`.
 - 2026-11-08 Published tao-ui 0.0.51 with control fixes and Showcase; clean CI, Pages and npm tarball integrity passed. The 0.0.50 GitHub Release remains, but its npm publication failed before the icon build prerequisite was fixed.
