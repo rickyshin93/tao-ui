@@ -139,9 +139,14 @@ button[data-tao-modal-close]:focus-visible {
 /* ===========================
    Body
    =========================== */
+/* The body is a scroll container, so paint outside its padding box is clipped.
+   Control focus rings (box-shadow rings, --tao-ring-width wide) are painted
+   outside the control's border box; flush content (e.g. a lone autofocused
+   Input) would lose the ring on the top and bottom edges. Reserve at least one
+   ring width vertically; padding-lg already covers the sides. */
 [data-tao-modal-body] {
   flex: 1;
-  padding: 0 var(--tao-padding-lg);
+  padding: max(var(--tao-padding-xxs), var(--tao-ring-width)) var(--tao-padding-lg);
   color: var(--tao-color-text);
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;

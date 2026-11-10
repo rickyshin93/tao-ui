@@ -7,6 +7,16 @@ description: 查看 @rockshin/tao-ui 各版本的更新，包括上传、选择�
 
 按版本记录 `@rockshin/tao-ui` 的用户可见变更。日期使用 UTC+8。
 
+## 0.0.52
+
+2026-11-10
+
+- [Upload](/zh/components/upload) 对齐图片卡片、圆形列表、缩略图及文件操作；卡片上传入口排列在文件列表末尾，并支持通过 `null` 或 `false` 隐藏。上传中的文件显示进度，下载操作仅对已完成文件展示；Dragger 高度单独作用于拖拽区域。
+- [Input](/zh/components/input) 切换密码可见性时保持占位符字体一致；[Modal](/zh/components/modal) 为内容区保留纵向空间，避免裁切控件焦点环。
+- Upload 文档扩充中英文示例与 API 说明，加入原创示例图片及响应式双列布局。
+
+[查看版本差异](https://github.com/rickyshin93/tao-ui/compare/v0.0.51...v0.0.52)
+
 ## 0.0.51
 
 2026-11-08

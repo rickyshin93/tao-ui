@@ -18,6 +18,7 @@ import { cx } from '../../utils/semantic';
 import { Button } from '../button/button';
 import { Modal } from '../modal/modal';
 import { Progress } from '../progress/progress';
+import { Spinner } from '../spinner/spinner';
 import type {
   DraggerProps,
   RcFile,
@@ -72,6 +73,21 @@ function sameUploadFile(file: UploadFile, candidate?: UploadFile) {
   return file.name === candidate.name && file.url === candidate.url;
 }
 
+function isImageFile(file: UploadFile) {
+  if (file.type && !file.thumbUrl) return file.type.startsWith('image/');
+  const url = file.thumbUrl || file.url || '';
+  const name = (url || file.name).split(/[?#]/)[0].split('/').pop() ?? '';
+  const extension = /\.[^./\\]*$/.exec(name)?.[0];
+  if (/^data:image\//i.test(url)) return true;
+  if (/^data:/i.test(url)) return false;
+  return (
+    !extension ||
+    /^\.(avif|bmp|dpg|gif|heic|heif|ico|jfif|jpe?g|png|svg|tiff?|webp)$/i.test(
+      extension,
+    )
+  );
+}
+
 function FilePreview({
   file,
   previewFile,
@@ -121,10 +137,14 @@ function FilePreview({
   ) : src ? (
     <img src={src} alt={file.name} crossOrigin={file.crossOrigin} />
   ) : (
-    <span aria-hidden="true">▧</span>
+    <FileIcon />
   );
 }
-function FileIcon({ remove = false }: { remove?: boolean }) {
+function FileIcon({
+  kind = 'file',
+}: {
+  kind?: 'file' | 'remove' | 'preview' | 'download' | 'plus' | 'upload';
+}) {
   return (
     <svg
       viewBox="0 0 24 24"
@@ -135,11 +155,21 @@ function FileIcon({ remove = false }: { remove?: boolean }) {
       strokeWidth="1.8"
       aria-hidden="true"
     >
-      {remove ? (
-        <path d="m6 6 12 12M18 6 6 18" />
-      ) : (
+      {kind === 'file' && (
         <path d="M7 3h7l4 4v14H7V3Zm7 0v5h4M10 12h5M10 16h5" />
       )}
+      {kind === 'remove' && (
+        <path d="M4 6h16M9 6V3h6v3M6 6l1 15h10l1-15M10 10v7M14 10v7" />
+      )}
+      {kind === 'preview' && (
+        <>
+          <path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z" />
+          <circle cx="12" cy="12" r="3" />
+        </>
+      )}
+      {kind === 'download' && <path d="M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5" />}
+      {kind === 'plus' && <path d="M12 4v16M4 12h16" />}
+      {kind === 'upload' && <path d="M12 16V3m-5 5 5-5 5 5M4 16v5h16v-5" />}
     </svg>
   );
 }
@@ -165,6 +195,7 @@ const UploadRoot = forwardRef<UploadRef, UploadProps>((props, ref) => {
   if (disabled && dragging) setDragging(false);
   const listType = props.listType ?? 'text',
     type = props.type ?? 'select';
+  const isCard = listType === 'picture-card' || listType === 'picture-circle';
   const names =
     typeof props.classNames === 'function'
       ? props.classNames({ props: { ...props, listType, type, disabled } })
@@ -174,6 +205,7 @@ const UploadRoot = forwardRef<UploadRef, UploadProps>((props, ref) => {
       ? props.styles({ props: { ...props, listType, type, disabled } })
       : props.styles;
   const locale = {
+    uploading: config.locale.messages.loading,
     removeFile: config.locale.messages.removeFile,
     previewFile: config.locale.messages.previewFile,
     downloadFile: config.locale.messages.downloadFile,
@@ -338,6 +370,115 @@ const UploadRoot = forwardRef<UploadRef, UploadProps>((props, ref) => {
     file: UploadFile,
   ) => (typeof option === 'function' ? option(file) : option);
   const triggerStyle: CSSProperties = { ...styles?.trigger };
+  const trigger = (
+    // biome-ignore lint/a11y/noStaticElementInteractions: Drag events bubble from the accessible file trigger.
+    <span
+      data-tao-upload-trigger=""
+      hidden={props.children === null || props.children === false}
+      className={names?.trigger}
+      style={triggerStyle}
+      onDragOver={disabled ? undefined : () => setDragging(true)}
+      onDragLeave={disabled ? undefined : () => setDragging(false)}
+      onDrop={
+        disabled
+          ? undefined
+          : (event) => {
+              setDragging(false);
+              props.onDrop?.(
+                event as unknown as React.DragEvent<HTMLDivElement>,
+              );
+            }
+      }
+    >
+      <RcUploaderComponent
+        onFocus={props.onFocus}
+        ref={uploader}
+        prefixCls={props.prefixCls ?? 'tao-upload-input'}
+        component="span"
+        action={(file) =>
+          preparations.current.get(file as BaseRcFile)?.action ?? ''
+        }
+        name={props.name}
+        method={props.method}
+        headers={props.headers}
+        data={(file) =>
+          preparations.current.get(file as BaseRcFile)?.data ?? {}
+        }
+        customRequest={request}
+        withCredentials={props.withCredentials}
+        disabled={disabled}
+        multiple={props.multiple}
+        accept={props.accept}
+        directory={props.directory}
+        capture={props.capture}
+        pastable={props.pastable && !disabled}
+        id={props.id}
+        openFileDialogOnClick={props.openFileDialogOnClick}
+        hasControlInside={
+          props.hasControlInside ??
+          (!!props.children || (!isCard && type !== 'drag'))
+        }
+        beforeUpload={async (file, list) => {
+          preparations.current.delete(file);
+          const result = await props.beforeUpload?.(
+            file as RcFile,
+            list as RcFile[],
+          );
+          if (result === LIST_IGNORE) {
+            ignored.current.add(file.uid);
+            return false;
+          }
+          if (result === false) return false;
+          const { action, data } = propsRef.current;
+          try {
+            preparations.current.set(file, {
+              action:
+                typeof action === 'function'
+                  ? await action(file as RcFile)
+                  : action,
+              data:
+                typeof data === 'function' ? await data(toFile(file)) : data,
+            });
+          } catch (reason) {
+            preparations.current.set(file, {
+              error: asError(reason),
+            });
+            return false;
+          }
+          return result;
+        }}
+        onBatchStart={onBatchStart}
+        onProgress={(event, file) =>
+          onProgress({ percent: event.percent ?? 0 }, file)
+        }
+        onSuccess={onSuccess}
+        onError={onError}
+      >
+        {props.children === undefined ? (
+          type === 'drag' ? (
+            <>
+              <span data-tao-upload-drag-icon="">
+                <FileIcon kind="upload" />
+              </span>
+              <span>{config.locale.messages.uploadDrop}</span>
+            </>
+          ) : isCard ? (
+            <>
+              <FileIcon kind="plus" />
+              <span>{config.locale.messages.uploadFile}</span>
+            </>
+          ) : (
+            <Button disabled={disabled}>
+              <FileIcon kind="upload" />
+              {config.locale.messages.uploadFile}
+            </Button>
+          )
+        ) : (
+          props.children
+        )}
+      </RcUploaderComponent>
+    </span>
+  );
   return (
     <span
       ref={root}
@@ -349,91 +490,7 @@ const UploadRoot = forwardRef<UploadRef, UploadProps>((props, ref) => {
       className={cx(names?.root, props.className, props.rootClassName)}
       style={{ ...styles?.root, ...props.style }}
     >
-      {/* biome-ignore lint/a11y/noStaticElementInteractions: This wrapper listens to drag events from the keyboard-accessible file trigger. */}
-      <span
-        data-tao-upload-trigger=""
-        className={names?.trigger}
-        style={triggerStyle}
-        onDragOver={disabled ? undefined : () => setDragging(true)}
-        onDragLeave={disabled ? undefined : () => setDragging(false)}
-        onDrop={
-          disabled
-            ? undefined
-            : (event) => {
-                setDragging(false);
-                props.onDrop?.(
-                  event as unknown as React.DragEvent<HTMLDivElement>,
-                );
-              }
-        }
-      >
-        <RcUploaderComponent
-          onFocus={props.onFocus}
-          ref={uploader}
-          prefixCls={props.prefixCls ?? 'tao-upload-input'}
-          component="span"
-          action={(file) =>
-            preparations.current.get(file as BaseRcFile)?.action ?? ''
-          }
-          name={props.name}
-          method={props.method}
-          headers={props.headers}
-          data={(file) =>
-            preparations.current.get(file as BaseRcFile)?.data ?? {}
-          }
-          customRequest={request}
-          withCredentials={props.withCredentials}
-          disabled={disabled}
-          multiple={props.multiple}
-          accept={props.accept}
-          directory={props.directory}
-          capture={props.capture}
-          pastable={props.pastable && !disabled}
-          id={props.id}
-          openFileDialogOnClick={props.openFileDialogOnClick}
-          hasControlInside={props.hasControlInside ?? !!props.children}
-          beforeUpload={async (file, list) => {
-            preparations.current.delete(file);
-            const result = await props.beforeUpload?.(
-              file as RcFile,
-              list as RcFile[],
-            );
-            if (result === LIST_IGNORE) {
-              ignored.current.add(file.uid);
-              return false;
-            }
-            if (result === false) return false;
-            const { action, data } = propsRef.current;
-            try {
-              preparations.current.set(file, {
-                action:
-                  typeof action === 'function'
-                    ? await action(file as RcFile)
-                    : action,
-                data:
-                  typeof data === 'function' ? await data(toFile(file)) : data,
-              });
-            } catch (reason) {
-              preparations.current.set(file, {
-                error: asError(reason),
-              });
-              return false;
-            }
-            return result;
-          }}
-          onBatchStart={onBatchStart}
-          onProgress={(event, file) =>
-            onProgress({ percent: event.percent ?? 0 }, file)
-          }
-          onSuccess={onSuccess}
-          onError={onError}
-        >
-          {props.children ??
-            (type === 'drag'
-              ? config.locale.messages.uploadDrop
-              : config.locale.messages.uploadFile)}
-        </RcUploaderComponent>
-      </span>
+      {(!isCard || props.showUploadList === false) && trigger}
       {props.showUploadList !== false && (
         <span
           data-tao-upload-list=""
@@ -441,14 +498,23 @@ const UploadRoot = forwardRef<UploadRef, UploadProps>((props, ref) => {
           style={styles?.list}
         >
           {files.map((file) => {
-            const image = props.isImageUrl
-              ? props.isImageUrl(file)
-              : !!(
-                  file.type?.startsWith('image/') ||
-                  /\.(png|jpe?g|gif|webp|svg|avif)(\?|$)/i.test(
-                    file.url ?? file.name,
-                  )
-                );
+            const image = (props.isImageUrl ?? isImageFile)(file);
+            const uploading = file.status === 'uploading';
+            const hasThumbnail =
+              image &&
+              !!(file.thumbUrl || file.url || file.originFileObj) &&
+              !uploading;
+            const icon =
+              props.iconRender?.(file, listType) ??
+              (uploading ? (
+                isCard ? (
+                  locale.uploading
+                ) : (
+                  <Spinner size="small" />
+                )
+              ) : (
+                <FileIcon />
+              ));
             const localPreview = image && !!file.originFileObj;
             const previewUrl = file.url ?? file.thumbUrl;
             const actions = {
@@ -467,19 +533,39 @@ const UploadRoot = forwardRef<UploadRef, UploadProps>((props, ref) => {
               <span
                 data-tao-upload-item=""
                 data-status={file.status}
+                data-thumbnail={hasThumbnail || undefined}
+                title={
+                  file.status === 'error'
+                    ? (file.error?.message ?? locale.uploadError)
+                    : file.name
+                }
                 className={names?.item}
                 style={styles?.item}
               >
-                {listType !== 'text' && image ? (
-                  <span data-tao-upload-thumbnail="">
-                    <FilePreview file={file} previewFile={props.previewFile} />
-                  </span>
+                {listType !== 'text' ? (
+                  hasThumbnail ? (
+                    <button
+                      type="button"
+                      data-tao-upload-thumbnail=""
+                      aria-label={file.name}
+                      onClick={actions.preview}
+                    >
+                      <FilePreview
+                        file={file}
+                        previewFile={props.previewFile}
+                      />
+                    </button>
+                  ) : (
+                    <span data-tao-upload-thumbnail="">{icon}</span>
+                  )
                 ) : (
-                  (props.iconRender?.(file, listType) ?? <FileIcon />)
+                  <span data-tao-upload-icon="">{icon}</span>
                 )}
                 <span data-tao-upload-details="">
                   {file.url ? (
                     <a
+                      data-tao-upload-name=""
+                      title={file.name}
                       {...file.linkProps}
                       href={file.url}
                       target="_blank"
@@ -495,8 +581,19 @@ const UploadRoot = forwardRef<UploadRef, UploadProps>((props, ref) => {
                     >
                       {file.name}
                     </a>
+                  ) : props.onPreview ? (
+                    <button
+                      type="button"
+                      data-tao-upload-name=""
+                      title={file.name}
+                      onClick={actions.preview}
+                    >
+                      {file.name}
+                    </button>
                   ) : (
-                    <span>{file.name}</span>
+                    <span data-tao-upload-name="" title={file.name}>
+                      {file.name}
+                    </span>
                   )}
                   {file.status === 'error' && (
                     <span data-tao-upload-error="" role="status">
@@ -506,6 +603,7 @@ const UploadRoot = forwardRef<UploadRef, UploadProps>((props, ref) => {
                   {file.status === 'uploading' && (
                     <Progress
                       size="small"
+                      strokeWidth={2}
                       showInfo={false}
                       {...props.progress}
                       percent={file.percent ?? 0}
@@ -513,56 +611,67 @@ const UploadRoot = forwardRef<UploadRef, UploadProps>((props, ref) => {
                       aria-labelledby={file['aria-labelledby']}
                     />
                   )}
-                  {renderOption(listConfig.extra, file)}
+                  {listConfig.extra != null && (
+                    <span data-tao-upload-extra="">
+                      {renderOption(listConfig.extra, file)}
+                    </span>
+                  )}
                 </span>
-                <span data-tao-upload-actions="">
-                  {visible(
-                    listConfig.showPreviewIcon,
-                    file,
-                    listType === 'picture-card' ||
-                      listType === 'picture-circle',
-                  ) && (
-                    <Button
-                      variant="ghost"
-                      size="small"
-                      disabled={
-                        !props.onPreview && !previewUrl && !localPreview
-                      }
-                      type="button"
-                      aria-label={`${locale.previewFile} ${file.name}`}
-                      onClick={actions.preview}
-                    >
-                      {renderOption(listConfig.previewIcon, file) ?? '↗'}
-                    </Button>
-                  )}
-                  {visible(listConfig.showDownloadIcon, file, false) && (
-                    <Button
-                      variant="ghost"
-                      size="small"
-                      disabled={!props.onDownload && !file.url}
-                      type="button"
-                      aria-label={`${locale.downloadFile} ${file.name}`}
-                      onClick={actions.download}
-                    >
-                      {renderOption(listConfig.downloadIcon, file) ?? '↓'}
-                    </Button>
-                  )}
-                  {visible(listConfig.showRemoveIcon, file, true) &&
-                    !disabled && (
+                {(!isCard || !uploading) && (
+                  <span data-tao-upload-actions="">
+                    {visible(
+                      listConfig.showPreviewIcon,
+                      file,
+                      listType === 'picture-card' ||
+                        listType === 'picture-circle',
+                    ) && (
                       <Button
                         variant="ghost"
                         size="small"
-                        disabled={false}
+                        disabled={
+                          !props.onPreview && !previewUrl && !localPreview
+                        }
                         type="button"
-                        aria-label={`${locale.removeFile} ${file.name}`}
-                        onClick={actions.remove}
+                        aria-label={`${locale.previewFile} ${file.name}`}
+                        onClick={actions.preview}
                       >
-                        {renderOption(listConfig.removeIcon, file) ?? (
-                          <FileIcon remove />
+                        {renderOption(listConfig.previewIcon, file) ?? (
+                          <FileIcon kind="preview" />
                         )}
                       </Button>
                     )}
-                </span>
+                    {file.status === 'done' &&
+                      visible(listConfig.showDownloadIcon, file, false) && (
+                        <Button
+                          variant="ghost"
+                          size="small"
+                          disabled={!props.onDownload && !file.url}
+                          type="button"
+                          aria-label={`${locale.downloadFile} ${file.name}`}
+                          onClick={actions.download}
+                        >
+                          {renderOption(listConfig.downloadIcon, file) ?? (
+                            <FileIcon kind="download" />
+                          )}
+                        </Button>
+                      )}
+                    {visible(listConfig.showRemoveIcon, file, true) &&
+                      !disabled && (
+                        <Button
+                          variant="ghost"
+                          size="small"
+                          disabled={false}
+                          type="button"
+                          aria-label={`${locale.removeFile} ${file.name}`}
+                          onClick={actions.remove}
+                        >
+                          {renderOption(listConfig.removeIcon, file) ?? (
+                            <FileIcon kind="remove" />
+                          )}
+                        </Button>
+                      )}
+                  </span>
+                )}
               </span>
             );
             return (
@@ -573,6 +682,7 @@ const UploadRoot = forwardRef<UploadRef, UploadProps>((props, ref) => {
               </span>
             );
           })}
+          {isCard && trigger}
         </span>
       )}
       {previewFile && (
@@ -593,8 +703,19 @@ const UploadRoot = forwardRef<UploadRef, UploadProps>((props, ref) => {
 });
 UploadRoot.displayName = 'Upload';
 const Dragger = forwardRef<UploadRef, DraggerProps>(
-  ({ height, style, ...props }, ref) => (
-    <UploadRoot {...props} ref={ref} type="drag" style={{ height, ...style }} />
+  ({ height, style, styles, ...props }, ref) => (
+    <UploadRoot
+      {...props}
+      ref={ref}
+      type="drag"
+      styles={(info) => {
+        const resolved = typeof styles === 'function' ? styles(info) : styles;
+        return {
+          ...resolved,
+          trigger: { height, ...style, ...resolved?.trigger },
+        };
+      }}
+    />
   ),
 );
 Dragger.displayName = 'Upload.Dragger';

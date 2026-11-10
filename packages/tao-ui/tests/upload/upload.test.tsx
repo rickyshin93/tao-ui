@@ -93,10 +93,9 @@ test('a custom request throwing synchronously does not stop later files', async 
   pick(container, ['bad.pdf', 'ready.pdf']);
   expect(await screen.findByText('Request setup failed')).toBeVisible();
   await waitFor(() =>
-    expect(screen.getByText('ready.pdf').closest('[data-tao-upload-item]')).toHaveAttribute(
-      'data-status',
-      'done',
-    ),
+    expect(
+      screen.getByText('ready.pdf').closest('[data-tao-upload-item]'),
+    ).toHaveAttribute('data-status', 'done'),
   );
 });
 
@@ -378,7 +377,7 @@ test('inherits disabled behavior and supports Dragger, semantic parts and custom
   expect(container.querySelector('[data-tao-upload-trigger]')).toHaveClass(
     'dropzone',
   );
-  expect(container.querySelector('[data-tao-upload]')).toHaveStyle({
+  expect(container.querySelector('[data-tao-upload-trigger]')).toHaveStyle({
     height: '140px',
   });
   expect(screen.getByText('document.txt').tagName).toBe('STRONG');
@@ -503,9 +502,13 @@ test('custom item removal respects the disabled state', async () => {
   expect(onRemove).not.toHaveBeenCalled();
 });
 
-test('a visible download action is disabled until it has a URL or handler', () => {
+test('a completed download action is disabled until it has a URL or handler', () => {
   const onDownload = rstest.fn();
-  const file: UploadFile = { uid: 'pending', name: 'Pending.txt' };
+  const file: UploadFile = {
+    uid: 'pending',
+    name: 'Pending.txt',
+    status: 'done',
+  };
   const { rerender } = render(
     <Upload fileList={[file]} showUploadList={{ showDownloadIcon: true }} />,
   );
@@ -521,4 +524,118 @@ test('a visible download action is disabled until it has a URL or handler', () =
   expect(download).toBeEnabled();
   fireEvent.click(download);
   expect(onDownload).toHaveBeenCalledWith(file);
+});
+
+test.each(['picture-card', 'picture-circle'] as const)(
+  '%s appends the trigger after files and supports hiding it with null',
+  (listType) => {
+    const file: UploadFile = {
+      uid: '1',
+      name: 'photo.png',
+      status: 'done',
+      url: '/photo.png',
+    };
+    const { container, rerender } = render(
+      <Upload listType={listType} fileList={[file]}>
+        Add image
+      </Upload>,
+    );
+    const list = container.querySelector('[data-tao-upload-list]')!;
+    expect(list.lastElementChild).toHaveAttribute('data-tao-upload-trigger');
+    rerender(
+      <Upload listType={listType} fileList={[file]}>
+        {null}
+      </Upload>,
+    );
+    expect(
+      container.querySelector('[data-tao-upload-trigger]'),
+    ).not.toBeVisible();
+    expect(screen.getByAltText('photo.png')).toBeVisible();
+  },
+);
+
+test('picture thumbnails and local file names invoke preview', () => {
+  const onPreview = rstest.fn();
+  const file: UploadFile = {
+    uid: '1',
+    name: 'photo.png',
+    status: 'done',
+    url: '/photo.png',
+  };
+  const { rerender } = render(
+    <Upload listType="picture" fileList={[file]} onPreview={onPreview} />,
+  );
+  fireEvent.click(screen.getByAltText('photo.png'));
+  expect(onPreview).toHaveBeenCalledWith(file);
+  const local = { ...file, url: undefined };
+  rerender(<Upload fileList={[local]} onPreview={onPreview} />);
+  fireEvent.click(screen.getByRole('button', { name: 'photo.png' }));
+  expect(onPreview).toHaveBeenLastCalledWith(local);
+});
+
+test('uploading cards show the uploading label and progress without completed actions', () => {
+  const file: UploadFile = {
+    uid: '1',
+    name: 'photo.png',
+    status: 'uploading',
+    url: '/photo.png',
+    percent: 32,
+  };
+  render(
+    <Upload
+      listType="picture-card"
+      fileList={[file]}
+      locale={{ uploading: 'Sending file' }}
+      showUploadList={{ showDownloadIcon: true }}
+    />,
+  );
+  expect(screen.getByText('Sending file')).toBeVisible();
+  expect(screen.getByRole('progressbar')).toHaveAttribute(
+    'aria-valuenow',
+    '32',
+  );
+  expect(
+    screen.queryByRole('button', { name: /Preview|Download|Remove/ }),
+  ).toBeNull();
+  expect(screen.queryByAltText('photo.png')).toBeNull();
+});
+
+test('download actions only appear for completed files', () => {
+  render(
+    <Upload
+      fileList={[
+        { uid: '1', name: 'Failed.txt', status: 'error', url: '/failed.txt' },
+      ]}
+      showUploadList={{ showDownloadIcon: true }}
+    />,
+  );
+  expect(screen.queryByRole('button', { name: /Download/ })).toBeNull();
+});
+
+test('Dragger height belongs to the drop zone, independently of its list', () => {
+  const { container } = render(
+    <Upload.Dragger height={200} fileList={[{ uid: '1', name: 'file.txt' }]} />,
+  );
+  expect(container.querySelector('[data-tao-upload-trigger]')).toHaveStyle({
+    height: '200px',
+  });
+  expect(
+    container.querySelector<HTMLElement>('[data-tao-upload]')?.style.height,
+  ).toBe('');
+});
+
+test.each([
+  {
+    name: 'report.pdf',
+    type: 'application/pdf',
+    thumbUrl: 'data:image/png;base64,aQ==',
+  },
+  { name: 'scan.tiff', url: '/scan.tiff#preview' },
+  { name: 'image', url: '/images/123' },
+])('recognizes image thumbnails for $name', (file) => {
+  render(<Upload listType="picture" fileList={[{ uid: '1', ...file }]} />);
+  expect(screen.getByAltText(file.name)).toHaveAttribute(
+    'src',
+    file.thumbUrl ?? file.url,
+  );
 });

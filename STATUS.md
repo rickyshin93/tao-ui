@@ -1,6 +1,7 @@
 # STATUS
 
 ## Doing
+- Release tao-ui 0.0.52 with all local Upload, Input and Modal changes; bilingual release notes and required local gates complete, publication pending.
 - Commerce bilingual switch and responsive fixes implemented; desktop/mobile browser checks and required gates passed. Fixed customer action icon color and checked light/dark themes. Real-device and complete interaction acceptance remain open.
 
 ## Next
@@ -12,6 +13,7 @@
 - none
 
 ## Done
+- 2026-11-10 Aligned Upload with local Ant Design; expanded bilingual demos/API, added original CDN artwork and a two-column layout. Required gates and local browser checks passed; package/site not released. See `.logs/upload-original-image-20261110/verification.md` and `.logs/upload-alignment-20261110/verification.md`.
 - 2026-11-08 Published tao-ui 0.0.51 with control fixes and Showcase; clean CI, Pages and npm tarball integrity passed. The 0.0.50 GitHub Release remains, but its npm publication failed before the icon build prerequisite was fixed.
 - 2026-11-08 Redesigned the commerce Showcase in an editorial style: inset sheet shell, serif headings, revenue hero with area chart, ruled KPI strip, channel ledger and Ink as the default accent. Required gates and Chrome desktop/tablet/390px/dark checks passed.
 - 2026-11-08 Added a bilingual Showcase catalog and standalone commerce example with responsive app shell. Required gates and Chrome navigation/layout checks passed; see `.logs/showcase-routes-20261108/verification.md`.

@@ -1,5 +1,6 @@
 @layer components {
   [data-tao-upload] {
+    --tao-upload-card-size: calc(var(--tao-control-height-lg) * 2.55);
     display: inline-flex;
     flex-direction: column;
     gap: var(--tao-margin-xs);
@@ -11,6 +12,11 @@
   [data-tao-upload-trigger] {
     display: inline-flex;
     align-items: center;
+    box-sizing: border-box;
+  }
+  [data-tao-upload-trigger][hidden],
+  [data-tao-upload-list]:empty {
+    display: none;
   }
   [data-tao-upload-trigger] > span {
     display: inline-flex;
@@ -22,28 +28,37 @@
   }
   [data-tao-upload][data-type="drag"] [data-tao-upload-trigger] {
     justify-content: center;
-    min-height: 140px;
-    padding: var(--tao-padding-lg);
+    height: 140px;
     border: 1px dashed var(--tao-color-border);
-    border-radius: var(--tao-radius);
+    border-radius: var(--tao-radius-lg);
     background: var(--tao-color-fill-quaternary);
     text-align: center;
   }
   [data-tao-upload][data-type="drag"] [data-tao-upload-trigger] > span {
+    box-sizing: border-box;
     align-self: stretch;
     flex: 1;
     justify-content: center;
     flex-direction: column;
+    padding: var(--tao-padding);
+    gap: var(--tao-margin-xs);
   }
+  [data-tao-upload-drag-icon] {
+    color: var(--tao-primary);
+    margin-bottom: var(--tao-margin-xs);
+  }
+  [data-tao-upload-drag-icon] svg {
+    width: 48px;
+    height: 48px;
+  }
+  [data-tao-upload]:not([data-disabled])[data-type="drag"]
+    [data-tao-upload-trigger]:hover,
   [data-tao-upload][data-dragging] [data-tao-upload-trigger] {
     border-color: var(--tao-primary);
-    background: var(--tao-primary-bg);
   }
-  [data-tao-upload][data-disabled] [data-tao-upload-trigger] {
-    color: var(--tao-color-text-disabled);
-    cursor: not-allowed;
-  }
+  [data-tao-upload][data-disabled] [data-tao-upload-trigger],
   [data-tao-upload][data-disabled] [data-tao-upload-trigger] > span {
+    color: var(--tao-color-text-disabled);
     cursor: not-allowed;
   }
   [data-tao-upload-list] {
@@ -52,18 +67,23 @@
     gap: var(--tao-margin-xs);
     min-width: 0;
   }
+  [data-tao-upload-row] {
+    min-width: 0;
+  }
   [data-tao-upload-item] {
+    position: relative;
     display: flex;
+    box-sizing: border-box;
     min-width: 0;
     align-items: center;
     gap: var(--tao-margin-xs);
-    padding: var(--tao-padding-xxs);
     border-radius: var(--tao-radius-sm);
   }
   [data-tao-upload-item]:hover {
     background: var(--tao-color-bg-text-hover);
   }
-  [data-tao-upload-item] > svg {
+  [data-tao-upload-icon] {
+    display: inline-flex;
     flex-shrink: 0;
     color: var(--tao-color-text-secondary);
   }
@@ -72,11 +92,32 @@
     flex: 1;
     min-width: 0;
     flex-direction: column;
-    overflow-wrap: anywhere;
   }
-  [data-tao-upload-details] a {
+  [data-tao-upload-name] {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: start;
+  }
+  button[data-tao-upload-name],
+  button[data-tao-upload-thumbnail] {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+  }
+  [data-tao-upload-details] a,
+  button[data-tao-upload-name] {
     color: var(--tao-primary);
     text-decoration: none;
+  }
+  [data-tao-upload-extra] {
+    color: var(--tao-color-text-secondary);
+    font-size: var(--tao-font-size-sm);
+    overflow-wrap: anywhere;
   }
   [data-tao-upload-actions] {
     display: inline-flex;
@@ -84,8 +125,8 @@
     gap: 2px;
   }
   [data-tao-upload-actions] button {
-    width: 28px;
-    height: 28px;
+    width: 22px;
+    height: 22px;
     padding: 0;
     color: var(--tao-color-text-secondary);
   }
@@ -94,11 +135,14 @@
     outline-offset: 2px;
   }
   [data-tao-upload-item][data-status="error"],
+  [data-tao-upload-item][data-status="error"]
+    :is([data-tao-upload-name], [data-tao-upload-icon]),
   [data-tao-upload-error] {
     color: var(--tao-error);
   }
   [data-tao-upload-error] {
     font-size: var(--tao-font-size-sm);
+    overflow-wrap: anywhere;
   }
   [data-tao-upload-thumbnail] {
     display: inline-flex;
@@ -108,8 +152,14 @@
     height: 48px;
     flex-shrink: 0;
     overflow: hidden;
+    color: var(--tao-primary);
+  }
+  [data-tao-upload-thumbnail] > svg {
+    width: 28px;
+    height: 28px;
   }
   [data-tao-upload-thumbnail] img {
+    display: block;
     width: 100%;
     height: 100%;
     object-fit: contain;
@@ -121,36 +171,149 @@
     margin-inline: auto;
     object-fit: contain;
   }
-  [data-tao-upload][data-list-type="picture"] [data-tao-upload-item] {
+  [data-tao-upload]:not([data-list-type="text"]) [data-tao-upload-item] {
     padding: var(--tao-padding-xs);
-    border: 1px solid var(--tao-color-border-secondary);
+    border: 1px solid var(--tao-color-border);
+    border-radius: var(--tao-radius-lg);
+  }
+  [data-tao-upload]:not([data-list-type="text"]) [data-tao-upload-item]:hover {
+    background: transparent;
+  }
+  [data-tao-upload]:not([data-list-type="text"])
+    [data-tao-upload-item][data-status="error"] {
+    border-color: var(--tao-error);
+  }
+  [data-tao-upload]:not([data-list-type="text"])
+    [data-tao-upload-item][data-status="uploading"] {
+    border-style: dashed;
   }
   [data-tao-upload]:is(
-      [data-list-type="picture-card"],
-      [data-list-type="picture-circle"]
-    )
+    [data-list-type="picture-card"],
+    [data-list-type="picture-circle"]
+  ) {
+    display: flex;
+
     [data-tao-upload-list] {
-    flex-direction: row;
-    flex-wrap: wrap;
-  }
-  [data-tao-upload]:is(
-      [data-list-type="picture-card"],
-      [data-list-type="picture-circle"]
-    )
+      flex-direction: row;
+      flex-wrap: wrap;
+    }
+    [data-tao-upload-row],
+    [data-tao-upload-trigger] {
+      width: var(--tao-upload-card-size);
+      height: var(--tao-upload-card-size);
+      flex: none;
+    }
+    [data-tao-upload-trigger] {
+      border: 1px dashed var(--tao-color-border);
+      border-radius: var(--tao-radius-lg);
+      background: var(--tao-color-fill-quaternary);
+    }
+    [data-tao-upload-trigger] > span {
+      box-sizing: border-box;
+      width: 100%;
+      height: 100%;
+      padding: var(--tao-padding-xs);
+      justify-content: center;
+      flex-direction: column;
+      gap: var(--tao-margin-xs);
+      text-align: center;
+    }
+    &:not([data-disabled]) [data-tao-upload-trigger]:hover {
+      border-color: var(--tao-primary);
+    }
     [data-tao-upload-item] {
-    width: 120px;
-    min-height: 144px;
-    flex-direction: column;
-    border: 1px solid var(--tao-color-border-secondary);
-    text-align: center;
+      width: 100%;
+      height: 100%;
+      flex-direction: column;
+      justify-content: center;
+      gap: var(--tao-margin-xxs);
+      text-align: center;
+    }
+    [data-tao-upload-thumbnail] {
+      width: 100%;
+      height: 100%;
+      flex: 1;
+      min-height: 0;
+      color: inherit;
+    }
+    [data-tao-upload-details] {
+      flex: none;
+      width: 100%;
+    }
+    [data-tao-upload-name] {
+      text-align: center;
+    }
+    [data-thumbnail] [data-tao-upload-name],
+    [data-status="uploading"] [data-tao-upload-name] {
+      display: none;
+    }
+    [data-thumbnail]
+      [data-tao-upload-details]:not(:has([data-tao-upload-extra])) {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+    }
+    [data-tao-upload-error] {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+    }
+    [data-status="uploading"] {
+      background: var(--tao-color-fill-quaternary);
+    }
+    [data-tao-upload-actions] {
+      position: absolute;
+      inset: var(--tao-padding-xs);
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      background: color(from var(--tao-color-bg-mask) srgb r g b / 65%);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--tao-motion-duration-fast);
+    }
+    [data-tao-upload-actions]:empty {
+      display: none;
+    }
+    [data-tao-upload-actions] button {
+      width: 26px;
+      height: 28px;
+      color: var(--tao-color-text-light-solid);
+    }
+    [data-tao-upload-actions] button:disabled {
+      opacity: 0.45;
+    }
+    [data-tao-upload-item]:is(:hover, :focus-within) [data-tao-upload-actions] {
+      opacity: 1;
+      pointer-events: auto;
+    }
   }
   [data-tao-upload][data-list-type="picture-circle"]
-    [data-tao-upload-thumbnail] {
+    :is(
+      [data-tao-upload-trigger],
+      [data-tao-upload-item],
+      [data-tao-upload-thumbnail],
+      [data-tao-upload-actions]
+    ) {
     border-radius: 50%;
+  }
+  @media (hover: none) {
+    [data-tao-upload]:is(
+        [data-list-type="picture-card"],
+        [data-list-type="picture-circle"]
+      )
+      [data-tao-upload-actions] {
+      opacity: 1;
+      pointer-events: auto;
+    }
   }
   @media (pointer: coarse) {
     [data-tao-upload-actions] button {
-      min-width: 44px;
+      min-width: 24px;
       min-height: 44px;
     }
   }

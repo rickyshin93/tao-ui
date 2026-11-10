@@ -86,8 +86,10 @@
 }
 
 /* Arial keeps password discs optically centered without shifting the native
-   line box, caret, or selection away from the control's geometric center. */
-[data-tao-input] input[type="password"] {
+   line box, caret, or selection away from the control's geometric center.
+   Apply it only once a value exists so the placeholder keeps the control's
+   own font instead of switching when the mask is toggled. */
+[data-tao-input] input[type="password"]:not(:placeholder-shown) {
   font-family: Arial, sans-serif;
 }
 

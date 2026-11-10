@@ -10,24 +10,37 @@ import Preview from '../../_components/demo-preview';
 
 Select, drop and manage files with real requests, custom uploads and controlled lists.
 
-The added API follows Ant Design 6.7.0; appearance, theming and Semantic DOM use tao-ui. Existing component APIs remain unchanged.
+Choose from text, picture, picture-card and picture-circle lists. The examples below demonstrate local selection and explicitly simulated requests; connect `action` or `customRequest` to your own service for real uploads.
 
 ## Examples
 
-<div className="tao-demo-grid tao-demo-grid-wide">
+<div className="tao-demo-grid tao-upload-examples">
 
 <section className="tao-example" id="upload-local">
 
-### Select without uploading
+### Click to select
 
-This example keeps files locally. Returning false from beforeUpload prevents requests.
+Start with completed and failed files. New selections stay local because beforeUpload returns false.
 
 ```tsx preview
 import { Upload, Button } from '@rockshin/tao-ui';
 export default function Demo() {
   return (
-    <Upload beforeUpload={() => false}>
-      <Button>Select document</Button>
+    <Upload
+      multiple
+      beforeUpload={() => false}
+      defaultFileList={[
+        { uid: '1', name: 'project-brief.pdf', status: 'done' },
+        { uid: '2', name: 'requirements.docx', status: 'done' },
+        {
+          uid: '3',
+          name: 'budget.xlsx',
+          status: 'error',
+          error: new Error('Example: the server rejected this file'),
+        },
+      ]}
+    >
+      <Button>Select files</Button>
     </Upload>
   );
 }
@@ -125,17 +138,36 @@ export default function Demo() {
 
 <section className="tao-example" id="upload-drag">
 
-### Drop zone
+### Drag and drop
 
-Drop files or click to select. This example makes no network request.
+Click anywhere in the drop zone or drop multiple files. Files stay local; no request is sent.
 
 ```tsx preview
 import { Upload } from '@rockshin/tao-ui';
 export default function Demo() {
   return (
-    <Upload.Dragger multiple beforeUpload={() => false}>
-      <p>Drop documents here</p>
-      <p>Or click to select from your device.</p>
+    <Upload.Dragger
+      multiple
+      beforeUpload={() => false}
+      height={200}
+      hasControlInside={false}
+    >
+      <svg
+        width="48"
+        height="48"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        aria-hidden="true"
+        style={{ color: 'var(--tao-primary)' }}
+      >
+        <path d="M12 16V3m-5 5 5-5 5 5M4 16v5h16v-5" />
+      </svg>
+      <strong>Click or drag files to this area</strong>
+      <span style={{ color: 'var(--tao-color-text-secondary)' }}>
+        Select a single file or multiple documents.
+      </span>
     </Upload.Dragger>
   );
 }
@@ -145,33 +177,324 @@ export default function Demo() {
 
 <section className="tao-example" id="upload-pictures">
 
-### Picture lists
+### Picture list
 
-Local images generate thumbnails. Card and circle lists suit image collections.
+A compact list with thumbnails, filenames and actions. Click a thumbnail to preview; new images stay local.
 
 ```tsx preview
-import { Upload, Button, Stack } from '@rockshin/tao-ui';
+import { Upload, Button } from '@rockshin/tao-ui';
 export default function Demo() {
   return (
-    <Stack gap="md">
-      <Upload listType="picture" accept="image/*" beforeUpload={() => false}>
-        <Button>Select picture</Button>
-      </Upload>
+    <Upload
+      listType="picture"
+      accept="image/*"
+      multiple
+      beforeUpload={() => false}
+      defaultFileList={[
+        {
+          uid: '1',
+          name: 'image-01.png',
+          status: 'done',
+          url: 'https://i.ibb.co/pkHFVVc/mountain-lake.png',
+        },
+        {
+          uid: '2',
+          name: 'image-02.png',
+          status: 'error',
+          url: 'https://i.ibb.co/pkHFVVc/mountain-lake.png',
+          error: new Error('Example upload error'),
+        },
+      ]}
+    >
+      <Button>Select images</Button>
+    </Upload>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="upload-picture-card">
+
+### Picture wall with preview
+
+Controlled picture-card list with completed, uploading and failed examples. Preview and remove images; the trigger hides at six files. Uploading progress is an initial display state, not a running request.
+
+```tsx preview
+import { Upload, Modal, type UploadFile } from '@rockshin/tao-ui';
+import { useState } from 'react';
+const imageUrl =
+  'https://i.ibb.co/pkHFVVc/mountain-lake.png';
+export default function Demo() {
+  const [files, setFiles] = useState<UploadFile[]>([
+    { uid: '1', name: 'image-01.png', status: 'done', url: imageUrl },
+    { uid: '2', name: 'image-02.png', status: 'done', url: imageUrl },
+    { uid: '3', name: 'image-03.png', status: 'uploading', percent: 48 },
+    {
+      uid: '4',
+      name: 'image-04.png',
+      status: 'error',
+      error: new Error('Example upload error'),
+    },
+  ]);
+  const [preview, setPreview] = useState({ name: '', url: '' });
+  const [error, setError] = useState('');
+  const showPreview = (file: UploadFile) => {
+    setError('');
+    if (file.url || file.thumbUrl) {
+      setPreview({ name: file.name, url: file.url || file.thumbUrl! });
+    } else if (file.originFileObj) {
+      const reader = new FileReader();
+      reader.onload = () =>
+        setPreview({ name: file.name, url: String(reader.result) });
+      reader.onerror = () => setError('Could not read this image.');
+      reader.readAsDataURL(file.originFileObj);
+    }
+  };
+  return (
+    <>
       <Upload
         listType="picture-card"
+        hasControlInside={false}
         accept="image/*"
+        multiple
+        maxCount={6}
+        fileList={files}
         beforeUpload={() => false}
+        onChange={({ fileList }) => setFiles(fileList)}
+        onPreview={showPreview}
+        showUploadList={{
+          showPreviewIcon: (file) =>
+            !!(file.url || file.thumbUrl || file.originFileObj),
+        }}
       >
-        Add image
+        {files.length >= 6 ? null : (
+          <>
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              aria-hidden="true"
+            >
+              <path d="M12 4v16M4 12h16" />
+            </svg>
+            <span>Add image</span>
+          </>
+        )}
       </Upload>
+      {error && <p role="alert">{error}</p>}
+      <Modal
+        open={!!preview.url}
+        title={preview.name}
+        footer={null}
+        onClose={() => setPreview({ name: '', url: '' })}
+      >
+        <img
+          src={preview.url || undefined}
+          alt={preview.name}
+          style={{ display: 'block', width: '100%' }}
+        />
+      </Modal>
+    </>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="upload-picture-circle">
+
+### Circular picture list
+
+The complete tile and its upload trigger are circular. Keyboard focus reveals the same actions as hover.
+
+```tsx preview
+import { Upload } from '@rockshin/tao-ui';
+export default function Demo() {
+  return (
+    <Upload
+      listType="picture-circle"
+      accept="image/*"
+      beforeUpload={() => false}
+      defaultFileList={[
+        {
+          uid: '1',
+          name: 'profile.png',
+          status: 'done',
+          url: 'https://i.ibb.co/pkHFVVc/mountain-lake.png',
+        },
+      ]}
+      hasControlInside={false}
+    >
+      <svg
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        aria-hidden="true"
+      >
+        <path d="M12 4v16M4 12h16" />
+      </svg>
+      <span>Add image</span>
+    </Upload>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="upload-avatar">
+
+### Avatar selection
+
+Replace a single image without a file list. Validate image type and a 2 MB size limit before reading the local preview. This does not save an avatar to a server.
+
+```tsx preview
+import { Upload } from '@rockshin/tao-ui';
+import { useState } from 'react';
+export default function Demo() {
+  const [avatar, setAvatar] = useState('');
+  const [error, setError] = useState('');
+  return (
+    <>
       <Upload
         listType="picture-circle"
+        showUploadList={false}
         accept="image/*"
-        beforeUpload={() => false}
+        maxCount={1}
+        hasControlInside={false}
+        beforeUpload={(file) => {
+          if (!file.type.startsWith('image/') || file.size > 2 * 1024 * 1024) {
+            setError('Choose an image smaller than 2 MB.');
+            return Upload.LIST_IGNORE;
+          }
+          setError('');
+          const reader = new FileReader();
+          reader.onload = () => setAvatar(String(reader.result));
+          reader.onerror = () => setError('Could not read this image.');
+          reader.readAsDataURL(file);
+          return false;
+        }}
       >
-        Add avatar
+        {avatar ? (
+          <img
+            src={avatar}
+            alt="Selected avatar"
+            style={{
+              width: '100%',
+              height: '100%',
+              borderRadius: '50%',
+              objectFit: 'cover',
+            }}
+          />
+        ) : (
+          <span>Select avatar</span>
+        )}
       </Upload>
-    </Stack>
+      {error && <p role="alert">{error}</p>}
+    </>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="upload-progress">
+
+### Custom request and progress
+
+An explicit simulation with no network traffic: choose files to see progress, completion and cancellation. Enable the switch to simulate a failed request. Replace this customRequest with your transport in production.
+
+```tsx preview
+import { Upload, Button, Switch, type UploadProps } from '@rockshin/tao-ui';
+import { useState } from 'react';
+export default function Demo() {
+  const [fail, setFail] = useState(false);
+  const customRequest: UploadProps['customRequest'] = ({
+    onProgress,
+    onSuccess,
+    onError,
+  }) => {
+    let percent = 0;
+    const timer = window.setInterval(() => {
+      percent += 20;
+      onProgress?.({ percent });
+      if (percent === 100) {
+        window.clearInterval(timer);
+        if (fail) onError?.(new Error('Simulated upload failure'));
+        else onSuccess?.({ simulated: true });
+      }
+    }, 300);
+    return { abort: () => window.clearInterval(timer) };
+  };
+  return (
+    <div style={{ display: 'grid', gap: 16 }}>
+      <label>
+        <Switch checked={fail} onChange={setFail} /> Simulate failure
+      </label>
+      <Upload
+        multiple
+        customRequest={customRequest}
+        progress={{ showInfo: true }}
+      >
+        <Button>Start simulated upload</Button>
+      </Upload>
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="upload-disabled">
+
+### Disabled upload
+
+Disable selection and removal while keeping completed files available for preview.
+
+```tsx preview
+import { Upload, Switch } from '@rockshin/tao-ui';
+import { useState } from 'react';
+export default function Demo() {
+  const [disabled, setDisabled] = useState(true);
+  return (
+    <div style={{ display: 'grid', gap: 16 }}>
+      <label>
+        <Switch checked={disabled} onChange={setDisabled} /> Disabled
+      </label>
+      <Upload
+        disabled={disabled}
+        listType="picture-card"
+        beforeUpload={() => false}
+        defaultFileList={[
+          {
+            uid: '1',
+            name: 'image.png',
+            status: 'done',
+            url: 'https://i.ibb.co/pkHFVVc/mountain-lake.png',
+          },
+        ]}
+        hasControlInside={false}
+      >
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          aria-hidden="true"
+        >
+          <path d="M12 4v16M4 12h16" />
+        </svg>
+        <span>Add image</span>
+      </Upload>
+    </div>
   );
 }
 ```
@@ -194,7 +517,13 @@ export default function Demo() {
       <label>
         <Switch checked={locked} onChange={setLocked} /> Protect files
       </label>
-      <Upload beforeUpload={() => false} onRemove={() => !locked}>
+      <Upload
+        beforeUpload={() => false}
+        onRemove={() => !locked}
+        defaultFileList={[
+          { uid: '1', name: 'protected-report.pdf', status: 'done' },
+        ]}
+      >
         <Button>Select file</Button>
       </Upload>
     </div>
@@ -216,6 +545,9 @@ export default function Demo() {
   return (
     <Upload
       beforeUpload={() => false}
+      defaultFileList={[
+        { uid: '1', name: 'design-notes.pdf', size: 245760, status: 'done' },
+      ]}
       showUploadList={{
         extra: (file) => (
           <small>{Math.ceil((file.size ?? 0) / 1024)} KB · local file</small>
@@ -254,11 +586,52 @@ export default function Demo() {
 
 ## API
 
-<API moduleName="upload" />
+| Property | Type | Default | Description |
+| --- | --- | --- | --- |
+| `fileList / defaultFileList` | `UploadFile[]` | — | Controlled list / initial uncontrolled list. |
+| `onChange` | `({ file, fileList, event? }) => void` | — | Called for selection, progress, completion, failure and removal. |
+| `action` | `string or (file) => string / PromiseLike<string>` | — | Upload URL; required for the default transport. |
+| `customRequest` | `(options, { defaultRequest }) => void / { abort() }` | — | Supply your transport; report progress, success or error through options. |
+| `beforeUpload` | `(file, files) => boolean / File / Blob / Promise` | — | false stops the request but keeps the file; Upload.LIST_IGNORE excludes it; return File/Blob to transform. |
+| `listType` | `'text' / 'picture' / 'picture-card' / 'picture-circle'` | 'text' | List appearance; card and circle triggers follow the file tiles. |
+| `showUploadList` | `boolean or ShowUploadListInterface` | true | Configure extra content and preview, download and remove actions per file. |
+| `maxCount` | `number` | — | Limit list length; 1 replaces the previous file. Hide the trigger yourself with children={null}. |
+| `multiple / directory / pastable` | `boolean` | false | Multiple selection / directory selection / clipboard file upload. |
+| `accept` | `string or AcceptConfig` | — | Selection hint, such as image/*. Validate files in beforeUpload. |
+| `capture` | `boolean / 'user' / 'environment'` | — | Pass the capture hint to the native file input. |
+| `name / method` | `string` | 'file' / 'post' | Multipart field name and HTTP method (POST, PUT or PATCH). |
+| `data` | `object or (file) => object / Promise<object>` | — | Additional multipart fields. |
+| `headers / withCredentials` | `object / boolean` | — / false | Request headers and credential handling. |
+| `onPreview / onDownload` | `(file) => void` | — | Override preview/download. Downloads appear only for done files; local images have a built-in preview. |
+| `onRemove` | `(file) => void / boolean / Promise` | — | Return false (or resolve false) to prevent removal. Accepted removal aborts the active request. |
+| `previewFile` | `(file: File or Blob) => PromiseLike<string>` | — | Generate a local thumbnail URL. |
+| `isImageUrl / iconRender` | `(file) => boolean / (file, listType) => ReactNode` | — | Customize image detection and the file/loading icon. |
+| `itemRender` | `(node, file, fileList, actions) => ReactNode` | — | Customize each row with preview, download and remove actions. |
+| `progress` | `UploadListProgressProps` | — | Customize the line progress indicator. |
+| `disabled` | `boolean` | TaoProvider | Disable selection and removal; preview remains available. |
+| `openFileDialogOnClick` | `boolean` | true | Open the file picker when the trigger is activated. |
+| `hasControlInside` | `boolean` | Automatic / 自动 | Set false for plain-text/custom non-interactive children so the wrapper is keyboard accessible. |
+| `onDrop / onFocus` | `event handler` | — | Receive drop and focus events. |
+| `locale` | `UploadLocale` | TaoProvider | Override uploading, preview, download, remove and error labels. |
+| `classNames / styles` | `object or ({ props }) => object` | — | Semantic parts: root, trigger, list, item. |
+| `className / rootClassName / style` | `string / string / CSSProperties` | — | Root styling. Dragger style configures the drop zone. |
+| `id / children` | `string / ReactNode` | — | Input identifier and trigger content. null or false hides the trigger. |
+
+### Upload.Dragger
+
+Inherits Upload props and adds `height?: number` for the drop zone, excluding the file list.
+
+### UploadFile
+
+Requires `uid` and `name`. Common fields are `status` (uploading / done / error / removed), `percent`, `url`, `thumbUrl`, `originFileObj`, `response`, `error`, `size` and `type`. Files stopped by beforeUpload have no status.
+
+### ShowUploadListInterface
+
+`showPreviewIcon`, `showDownloadIcon` and `showRemoveIcon` accept booleans or `(file) => boolean`. `previewIcon`, `downloadIcon`, `removeIcon` and `extra` accept ReactNode or `(file) => ReactNode`. Cards show preview and remove by default; download is opt-in.
 
 ## Connect an upload service
 
-The live examples keep files locally. To send files to a server, set `action` to the upload endpoint and `name` to the multipart field the server expects.
+The live examples use local selection or simulated requests. To send files to a server, set `action` to the upload endpoint and `name` to the multipart field the server expects.
 
 ```tsx
 import { Upload, Button } from '@rockshin/tao-ui';

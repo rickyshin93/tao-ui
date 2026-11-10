@@ -7,6 +7,16 @@ description: Version history for @rockshin/tao-ui, including fixes for uploads, 
 
 User-facing changes for `@rockshin/tao-ui`, listed by release. Dates use UTC+8.
 
+## 0.0.52
+
+2026-11-10
+
+- [Upload](/components/upload) aligns picture cards, circular tiles, thumbnails and file actions; card triggers follow the file list and can be hidden with `null` or `false`. Uploading files show progress, and download actions appear for completed files. Dragger height applies to the drop zone independently of the file list.
+- [Input](/components/input) preserves the password placeholder font when toggling visibility. [Modal](/components/modal) reserves vertical space around its body content so control focus rings remain visible.
+- Upload documentation adds expanded bilingual examples and API guidance, original demo artwork, and a responsive two-column layout.
+
+[Compare changes](https://github.com/rickyshin93/tao-ui/compare/v0.0.51...v0.0.52)
+
 ## 0.0.51
 
 2026-11-08

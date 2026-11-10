@@ -199,6 +199,11 @@ html.rp-dark .tao-brand {
   display: grid;
   grid-template-rows: subgrid;
 }
+.tao-upload-examples > .tao-example:has(.tao-device-preview) {
+  grid-column: auto;
+  display: grid;
+  grid-template-rows: subgrid;
+}
 .tao-example > h3 {
   grid-row: 1;
 }

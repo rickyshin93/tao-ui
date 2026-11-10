@@ -10,24 +10,44 @@ import Preview from '../../_components/demo-preview';
 
 选择、拖入并管理文件，支持真实请求、自定义上传和受控列表。
 
-新增 API 对齐 Ant Design 6.7.0，外观、主题与 Semantic DOM 使用 tao-ui。既有组件 API 保持原样。
+提供 text、picture、picture-card 和 picture-circle 四种列表。下方示例展示本地选择与明确标注的模拟请求；真实上传需通过 `action` 或 `customRequest` 连接自己的服务。
 
 ## 代码演示
 
-<div className="tao-demo-grid tao-demo-grid-wide">
+<div className="tao-demo-grid tao-upload-examples">
 
 <section className="tao-example" id="upload-local">
 
-### 选择文件但不上传
+### 点击选择文件
 
-此示例明确仅保留本地文件；beforeUpload 返回 false 阻止请求。
+初始列表展示已完成和失败文件；新选择的文件仅保存在本地，beforeUpload 返回 false 阻止请求。
 
 ```tsx preview
 import { Upload, Button } from '@rockshin/tao-ui';
 export default function Demo() {
   return (
-    <Upload beforeUpload={() => false}>
-      <Button>Select document</Button>
+    <Upload
+      locale={{
+        uploading: '上传中',
+        previewFile: '预览文件',
+        removeFile: '移除文件',
+        downloadFile: '下载文件',
+        uploadError: '上传失败',
+      }}
+      multiple
+      beforeUpload={() => false}
+      defaultFileList={[
+        { uid: '1', name: 'project-brief.pdf', status: 'done' },
+        { uid: '2', name: 'requirements.docx', status: 'done' },
+        {
+          uid: '3',
+          name: 'budget.xlsx',
+          status: 'error',
+          error: new Error('示例：服务器拒绝了此文件'),
+        },
+      ]}
+    >
+      <Button>选择文件</Button>
     </Upload>
   );
 }
@@ -49,14 +69,21 @@ export default function Demo() {
   return (
     <Stack gap="md">
       <Upload
+        locale={{
+          uploading: '上传中',
+          previewFile: '预览文件',
+          removeFile: '移除文件',
+          downloadFile: '下载文件',
+          uploadError: '上传失败',
+        }}
         fileList={files}
         beforeUpload={() => false}
         onChange={(info) => setFiles(info.fileList)}
       >
-        <Button>Select files</Button>
+        <Button>选择文件</Button>
       </Upload>
       <Button variant="secondary" onClick={() => setFiles([])}>
-        Clear list
+        清空列表
       </Button>
     </Stack>
   );
@@ -79,17 +106,24 @@ export default function Demo() {
   return (
     <div>
       <Upload
+        locale={{
+          uploading: '上传中',
+          previewFile: '预览文件',
+          removeFile: '移除文件',
+          downloadFile: '下载文件',
+          uploadError: '上传失败',
+        }}
         accept="image/*"
         beforeUpload={(file) => {
           if (!file.type.startsWith('image/')) {
-            setError('Choose an image file.');
+            setError('请选择图片文件。');
             return Upload.LIST_IGNORE;
           }
           setError('');
           return false;
         }}
       >
-        <Button>Select image</Button>
+        <Button>选择图片</Button>
       </Upload>
       <p role="status">{error}</p>
     </div>
@@ -110,11 +144,32 @@ import { Upload, Button, Stack } from '@rockshin/tao-ui';
 export default function Demo() {
   return (
     <Stack gap="md">
-      <Upload multiple maxCount={3} beforeUpload={() => false}>
-        <Button>Select up to three files</Button>
+      <Upload
+        locale={{
+          uploading: '上传中',
+          previewFile: '预览文件',
+          removeFile: '移除文件',
+          downloadFile: '下载文件',
+          uploadError: '上传失败',
+        }}
+        multiple
+        maxCount={3}
+        beforeUpload={() => false}
+      >
+        <Button>最多选择三个文件</Button>
       </Upload>
-      <Upload maxCount={1} beforeUpload={() => false}>
-        <Button variant="secondary">Replace single file</Button>
+      <Upload
+        locale={{
+          uploading: '上传中',
+          previewFile: '预览文件',
+          removeFile: '移除文件',
+          downloadFile: '下载文件',
+          uploadError: '上传失败',
+        }}
+        maxCount={1}
+        beforeUpload={() => false}
+      >
+        <Button variant="secondary">替换单个文件</Button>
       </Upload>
     </Stack>
   );
@@ -125,17 +180,43 @@ export default function Demo() {
 
 <section className="tao-example" id="upload-drag">
 
-### 拖拽区域
+### 拖拽上传
 
-拖入文件或点击选择。本例不发送网络请求。
+点击整个拖拽区域或拖入多个文件。本例仅本地选择，不发送请求。
 
 ```tsx preview
 import { Upload } from '@rockshin/tao-ui';
 export default function Demo() {
   return (
-    <Upload.Dragger multiple beforeUpload={() => false}>
-      <p>Drop documents here</p>
-      <p>Or click to select from your device.</p>
+    <Upload.Dragger
+      locale={{
+        uploading: '上传中',
+        previewFile: '预览文件',
+        removeFile: '移除文件',
+        downloadFile: '下载文件',
+        uploadError: '上传失败',
+      }}
+      multiple
+      beforeUpload={() => false}
+      height={200}
+      hasControlInside={false}
+    >
+      <svg
+        width="48"
+        height="48"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        aria-hidden="true"
+        style={{ color: 'var(--tao-primary)' }}
+      >
+        <path d="M12 16V3m-5 5 5-5 5 5M4 16v5h16v-5" />
+      </svg>
+      <strong>点击或将文件拖拽到这里</strong>
+      <span style={{ color: 'var(--tao-color-text-secondary)' }}>
+        支持单个或批量选择文件。
+      </span>
     </Upload.Dragger>
   );
 }
@@ -147,31 +228,364 @@ export default function Demo() {
 
 ### 图片列表
 
-本地图片生成缩略图；picture-card 与 picture-circle 适合图片墙。
+以紧凑列表展示缩略图、文件名和操作。点击缩略图可预览，新图片仅保存在本地。
 
 ```tsx preview
-import { Upload, Button, Stack } from '@rockshin/tao-ui';
+import { Upload, Button } from '@rockshin/tao-ui';
 export default function Demo() {
   return (
-    <Stack gap="md">
-      <Upload listType="picture" accept="image/*" beforeUpload={() => false}>
-        <Button>Select picture</Button>
-      </Upload>
+    <Upload
+      locale={{
+        uploading: '上传中',
+        previewFile: '预览文件',
+        removeFile: '移除文件',
+        downloadFile: '下载文件',
+        uploadError: '上传失败',
+      }}
+      listType="picture"
+      accept="image/*"
+      multiple
+      beforeUpload={() => false}
+      defaultFileList={[
+        {
+          uid: '1',
+          name: 'image-01.png',
+          status: 'done',
+          url: 'https://i.ibb.co/pkHFVVc/mountain-lake.png',
+        },
+        {
+          uid: '2',
+          name: 'image-02.png',
+          status: 'error',
+          url: 'https://i.ibb.co/pkHFVVc/mountain-lake.png',
+          error: new Error('示例上传错误'),
+        },
+      ]}
+    >
+      <Button>选择图片</Button>
+    </Upload>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="upload-picture-card">
+
+### 照片墙与预览
+
+受控 picture-card 列表展示已完成、上传中和失败状态。支持预览与移除，六张图片时隐藏入口。上传进度为初始展示状态，并非运行中的请求。
+
+```tsx preview
+import { Upload, Modal, type UploadFile } from '@rockshin/tao-ui';
+import { useState } from 'react';
+const imageUrl =
+  'https://i.ibb.co/pkHFVVc/mountain-lake.png';
+export default function Demo() {
+  const [files, setFiles] = useState<UploadFile[]>([
+    { uid: '1', name: 'image-01.png', status: 'done', url: imageUrl },
+    { uid: '2', name: 'image-02.png', status: 'done', url: imageUrl },
+    { uid: '3', name: 'image-03.png', status: 'uploading', percent: 48 },
+    {
+      uid: '4',
+      name: 'image-04.png',
+      status: 'error',
+      error: new Error('示例上传错误'),
+    },
+  ]);
+  const [preview, setPreview] = useState({ name: '', url: '' });
+  const [error, setError] = useState('');
+  const showPreview = (file: UploadFile) => {
+    setError('');
+    if (file.url || file.thumbUrl) {
+      setPreview({ name: file.name, url: file.url || file.thumbUrl! });
+    } else if (file.originFileObj) {
+      const reader = new FileReader();
+      reader.onload = () =>
+        setPreview({ name: file.name, url: String(reader.result) });
+      reader.onerror = () => setError('无法读取此图片。');
+      reader.readAsDataURL(file.originFileObj);
+    }
+  };
+  return (
+    <>
       <Upload
+        locale={{
+          uploading: '上传中',
+          previewFile: '预览文件',
+          removeFile: '移除文件',
+          downloadFile: '下载文件',
+          uploadError: '上传失败',
+        }}
         listType="picture-card"
+        hasControlInside={false}
         accept="image/*"
+        multiple
+        maxCount={6}
+        fileList={files}
         beforeUpload={() => false}
+        onChange={({ fileList }) => setFiles(fileList)}
+        onPreview={showPreview}
+        showUploadList={{
+          showPreviewIcon: (file) =>
+            !!(file.url || file.thumbUrl || file.originFileObj),
+        }}
       >
-        Add image
+        {files.length >= 6 ? null : (
+          <>
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              aria-hidden="true"
+            >
+              <path d="M12 4v16M4 12h16" />
+            </svg>
+            <span>添加图片</span>
+          </>
+        )}
       </Upload>
+      {error && <p role="alert">{error}</p>}
+      <Modal
+        open={!!preview.url}
+        title={preview.name}
+        footer={null}
+        onClose={() => setPreview({ name: '', url: '' })}
+      >
+        <img
+          src={preview.url || undefined}
+          alt={preview.name}
+          style={{ display: 'block', width: '100%' }}
+        />
+      </Modal>
+    </>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="upload-picture-circle">
+
+### 圆形图片列表
+
+文件卡片与上传入口均为圆形。键盘聚焦与鼠标悬停均可显示操作。
+
+```tsx preview
+import { Upload } from '@rockshin/tao-ui';
+export default function Demo() {
+  return (
+    <Upload
+      locale={{
+        uploading: '上传中',
+        previewFile: '预览文件',
+        removeFile: '移除文件',
+        downloadFile: '下载文件',
+        uploadError: '上传失败',
+      }}
+      listType="picture-circle"
+      accept="image/*"
+      beforeUpload={() => false}
+      defaultFileList={[
+        {
+          uid: '1',
+          name: 'profile.png',
+          status: 'done',
+          url: 'https://i.ibb.co/pkHFVVc/mountain-lake.png',
+        },
+      ]}
+      hasControlInside={false}
+    >
+      <svg
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        aria-hidden="true"
+      >
+        <path d="M12 4v16M4 12h16" />
+      </svg>
+      <span>添加图片</span>
+    </Upload>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="upload-avatar">
+
+### 头像选择
+
+隐藏文件列表并替换单张图片。生成本地预览前校验图片类型和 2 MB 大小限制；本例不会向服务器保存头像。
+
+```tsx preview
+import { Upload } from '@rockshin/tao-ui';
+import { useState } from 'react';
+export default function Demo() {
+  const [avatar, setAvatar] = useState('');
+  const [error, setError] = useState('');
+  return (
+    <>
       <Upload
+        locale={{
+          uploading: '上传中',
+          previewFile: '预览文件',
+          removeFile: '移除文件',
+          downloadFile: '下载文件',
+          uploadError: '上传失败',
+        }}
         listType="picture-circle"
+        showUploadList={false}
         accept="image/*"
-        beforeUpload={() => false}
+        maxCount={1}
+        hasControlInside={false}
+        beforeUpload={(file) => {
+          if (!file.type.startsWith('image/') || file.size > 2 * 1024 * 1024) {
+            setError('请选择小于 2 MB 的图片。');
+            return Upload.LIST_IGNORE;
+          }
+          setError('');
+          const reader = new FileReader();
+          reader.onload = () => setAvatar(String(reader.result));
+          reader.onerror = () => setError('无法读取此图片。');
+          reader.readAsDataURL(file);
+          return false;
+        }}
       >
-        Add avatar
+        {avatar ? (
+          <img
+            src={avatar}
+            alt="已选择的头像"
+            style={{
+              width: '100%',
+              height: '100%',
+              borderRadius: '50%',
+              objectFit: 'cover',
+            }}
+          />
+        ) : (
+          <span>选择头像</span>
+        )}
       </Upload>
-    </Stack>
+      {error && <p role="alert">{error}</p>}
+    </>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="upload-progress">
+
+### 自定义请求与进度
+
+此处为不访问网络的明确模拟：选择文件可观察进度、完成与取消。打开开关可模拟失败。实际项目请将 customRequest 替换为真实请求。
+
+```tsx preview
+import { Upload, Button, Switch, type UploadProps } from '@rockshin/tao-ui';
+import { useState } from 'react';
+export default function Demo() {
+  const [fail, setFail] = useState(false);
+  const customRequest: UploadProps['customRequest'] = ({
+    onProgress,
+    onSuccess,
+    onError,
+  }) => {
+    let percent = 0;
+    const timer = window.setInterval(() => {
+      percent += 20;
+      onProgress?.({ percent });
+      if (percent === 100) {
+        window.clearInterval(timer);
+        if (fail) onError?.(new Error('模拟上传失败'));
+        else onSuccess?.({ simulated: true });
+      }
+    }, 300);
+    return { abort: () => window.clearInterval(timer) };
+  };
+  return (
+    <div style={{ display: 'grid', gap: 16 }}>
+      <label>
+        <Switch checked={fail} onChange={setFail} /> 模拟失败
+      </label>
+      <Upload
+        locale={{
+          uploading: '上传中',
+          previewFile: '预览文件',
+          removeFile: '移除文件',
+          downloadFile: '下载文件',
+          uploadError: '上传失败',
+        }}
+        multiple
+        customRequest={customRequest}
+        progress={{ showInfo: true }}
+      >
+        <Button>开始模拟上传</Button>
+      </Upload>
+    </div>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="upload-disabled">
+
+### 禁用状态
+
+禁用选择和移除，保留已完成文件的预览能力。
+
+```tsx preview
+import { Upload, Switch } from '@rockshin/tao-ui';
+import { useState } from 'react';
+export default function Demo() {
+  const [disabled, setDisabled] = useState(true);
+  return (
+    <div style={{ display: 'grid', gap: 16 }}>
+      <label>
+        <Switch checked={disabled} onChange={setDisabled} /> 禁用
+      </label>
+      <Upload
+        locale={{
+          uploading: '上传中',
+          previewFile: '预览文件',
+          removeFile: '移除文件',
+          downloadFile: '下载文件',
+          uploadError: '上传失败',
+        }}
+        disabled={disabled}
+        listType="picture-card"
+        beforeUpload={() => false}
+        defaultFileList={[
+          {
+            uid: '1',
+            name: 'image.png',
+            status: 'done',
+            url: 'https://i.ibb.co/pkHFVVc/mountain-lake.png',
+          },
+        ]}
+        hasControlInside={false}
+      >
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          aria-hidden="true"
+        >
+          <path d="M12 4v16M4 12h16" />
+        </svg>
+        <span>添加图片</span>
+      </Upload>
+    </div>
   );
 }
 ```
@@ -192,10 +606,23 @@ export default function Demo() {
   return (
     <div>
       <label>
-        <Switch checked={locked} onChange={setLocked} /> Protect files
+        <Switch checked={locked} onChange={setLocked} /> 保护文件
       </label>
-      <Upload beforeUpload={() => false} onRemove={() => !locked}>
-        <Button>Select file</Button>
+      <Upload
+        locale={{
+          uploading: '上传中',
+          previewFile: '预览文件',
+          removeFile: '移除文件',
+          downloadFile: '下载文件',
+          uploadError: '上传失败',
+        }}
+        beforeUpload={() => false}
+        onRemove={() => !locked}
+        defaultFileList={[
+          { uid: '1', name: 'protected-report.pdf', status: 'done' },
+        ]}
+      >
+        <Button>选择文件</Button>
       </Upload>
     </div>
   );
@@ -215,15 +642,25 @@ import { Upload, Button } from '@rockshin/tao-ui';
 export default function Demo() {
   return (
     <Upload
+      locale={{
+        uploading: '上传中',
+        previewFile: '预览文件',
+        removeFile: '移除文件',
+        downloadFile: '下载文件',
+        uploadError: '上传失败',
+      }}
       beforeUpload={() => false}
+      defaultFileList={[
+        { uid: '1', name: 'design-notes.pdf', size: 245760, status: 'done' },
+      ]}
       showUploadList={{
         extra: (file) => (
-          <small>{Math.ceil((file.size ?? 0) / 1024)} KB · local file</small>
+          <small>{Math.ceil((file.size ?? 0) / 1024)} KB · 本地文件</small>
         ),
         showDownloadIcon: false,
       }}
     >
-      <Button>Select document</Button>
+      <Button>选择文档</Button>
     </Upload>
   );
 }
@@ -241,8 +678,20 @@ pastable 支持剪贴板文件；浏览器和设备决定可用的选择来源�
 import { Upload, Button } from '@rockshin/tao-ui';
 export default function Demo() {
   return (
-    <Upload pastable multiple beforeUpload={() => false} listType="picture">
-      <Button>Select or paste images</Button>
+    <Upload
+      locale={{
+        uploading: '上传中',
+        previewFile: '预览文件',
+        removeFile: '移除文件',
+        downloadFile: '下载文件',
+        uploadError: '上传失败',
+      }}
+      pastable
+      multiple
+      beforeUpload={() => false}
+      listType="picture"
+    >
+      <Button>选择或粘贴图片</Button>
     </Upload>
   );
 }
@@ -254,11 +703,52 @@ export default function Demo() {
 
 ## API
 
-<API moduleName="upload" />
+| 属性 | 类型 | 默认值 | 说明 |
+| --- | --- | --- | --- |
+| `fileList / defaultFileList` | `UploadFile[]` | — | 受控文件列表 / 非受控初始列表。 |
+| `onChange` | `({ file, fileList, event? }) => void` | — | 选择、进度、完成、失败与移除时回调。 |
+| `action` | `string or (file) => string / PromiseLike<string>` | — | 上传地址；默认请求需要提供此项。 |
+| `customRequest` | `(options, { defaultRequest }) => void / { abort() }` | — | 接管请求，通过 options 回调报告进度、成功或失败。 |
+| `beforeUpload` | `(file, files) => boolean / File / Blob / Promise` | — | false 阻止请求但保留列表项；Upload.LIST_IGNORE 忽略文件；返回 File/Blob 转换文件。 |
+| `listType` | `'text' / 'picture' / 'picture-card' / 'picture-circle'` | 'text' | 列表类型；卡片与圆形模式的选择入口排在文件后。 |
+| `showUploadList` | `boolean or ShowUploadListInterface` | true | 设置列表可见性、补充内容，以及每个文件的预览、下载、移除操作。 |
+| `maxCount` | `number` | — | 限制数量；1 表示替换已有文件。通过 children={null} 自行隐藏入口。 |
+| `multiple / directory / pastable` | `boolean` | false | 多选 / 目录选择 / 接收剪贴板文件。 |
+| `accept` | `string or AcceptConfig` | — | 文件选择提示，如 image/*；请在 beforeUpload 中校验文件。 |
+| `capture` | `boolean / 'user' / 'environment'` | — | 向原生文件选择器传递拍摄提示。 |
+| `name / method` | `string` | 'file' / 'post' | 文件字段名与 HTTP 方法（POST、PUT 或 PATCH）。 |
+| `data` | `object or (file) => object / Promise<object>` | — | 附加 multipart 字段。 |
+| `headers / withCredentials` | `object / boolean` | — / false | 请求头与是否携带凭据。 |
+| `onPreview / onDownload` | `(file) => void` | — | 接管预览/下载；下载操作仅针对 done 文件，本地图片支持内置预览。 |
+| `onRemove` | `(file) => void / boolean / Promise` | — | 返回 false（或 Promise 解析为 false）阻止移除；允许移除时中止正在进行的请求。 |
+| `previewFile` | `(file: File or Blob) => PromiseLike<string>` | — | 生成本地缩略图 URL。 |
+| `isImageUrl / iconRender` | `(file) => boolean / (file, listType) => ReactNode` | — | 自定义图片识别、文件与上传中图标。 |
+| `itemRender` | `(node, file, fileList, actions) => ReactNode` | — | 自定义文件项，actions 提供 preview、download、remove。 |
+| `progress` | `UploadListProgressProps` | — | 配置上传进度条。 |
+| `disabled` | `boolean` | TaoProvider | 禁用选择与移除，仍可预览。 |
+| `openFileDialogOnClick` | `boolean` | true | 激活入口时打开文件选择器。 |
+| `hasControlInside` | `boolean` | Automatic / 自动 | 纯文本或非交互自定义内容设为 false，使外层入口可通过键盘操作。 |
+| `onDrop / onFocus` | `event handler` | — | 接收拖放与聚焦事件。 |
+| `locale` | `UploadLocale` | TaoProvider | 覆盖上传中、预览、下载、移除和错误文案。 |
+| `classNames / styles` | `object or ({ props }) => object` | — | 语义部件：root、trigger、list、item。 |
+| `className / rootClassName / style` | `string / string / CSSProperties` | — | 根节点样式；Dragger 的 style 作用于拖拽区域。 |
+| `id / children` | `string / ReactNode` | — | 输入框标识与选择入口内容；null 或 false 隐藏入口。 |
+
+### Upload.Dragger
+
+继承 Upload 属性，额外提供 `height?: number` 设置拖拽区域高度，不包含文件列表。
+
+### UploadFile
+
+必填 `uid`、`name`；常用字段包括 `status`（uploading / done / error / removed）、`percent`、`url`、`thumbUrl`、`originFileObj`、`response`、`error`、`size` 与 `type`。被 beforeUpload 阻止的本地文件没有 status。
+
+### ShowUploadListInterface
+
+`showPreviewIcon`、`showDownloadIcon`、`showRemoveIcon` 支持布尔值或 `(file) => boolean`；`previewIcon`、`downloadIcon`、`removeIcon`、`extra` 支持 ReactNode 或 `(file) => ReactNode`。图片卡片默认显示预览与移除；下载默认隐藏。
 
 ## 连接上传服务
 
-官网示例只使用本地文件。接入服务端时，将 `action` 设为上传接口地址，`name` 设为服务端接收文件的 multipart 字段名。
+官网示例仅本地选择或模拟请求。接入服务端时，将 `action` 设为上传接口地址，`name` 设为服务端接收文件的 multipart 字段名。
 
 ```tsx
 import { Upload, Button } from '@rockshin/tao-ui';
@@ -266,7 +756,18 @@ import { Upload, Button } from '@rockshin/tao-ui';
 // The application must implement this endpoint.
 export function ServerUpload() {
   return (
-    <Upload action="/api/uploads" name="file" data={{ folder: 'documents' }}>
+    <Upload
+      locale={{
+        uploading: '上传中',
+        previewFile: '预览文件',
+        removeFile: '移除文件',
+        downloadFile: '下载文件',
+        uploadError: '上传失败',
+      }}
+      action="/api/uploads"
+      name="file"
+      data={{ folder: 'documents' }}
+    >
       <Button>Upload to server</Button>
     </Upload>
   );

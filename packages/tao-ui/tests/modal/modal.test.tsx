@@ -7,6 +7,7 @@ import {
   waitFor,
 } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
+import { readFileSync } from 'node:fs';
 import { createContext, StrictMode, useContext } from 'react';
 import { Modal } from '../../src/components/modal';
 import {
@@ -663,4 +664,16 @@ test('responsive width falls back to the 520px default without a match', async (
   const content = screen.getByRole('dialog');
   await new Promise((resolve) => setTimeout(resolve, 20));
   expect(content.style.width).toBe('520px');
+});
+
+test('body reserves vertical room for control focus rings', () => {
+  // The body is a scroll container; a bare `padding-block: 0` would clip the
+  // outward box-shadow ring of a flush control (e.g. a lone autofocused Input)
+  // on the top and bottom edges, leaving ring stubs on the sides.
+  const css = readFileSync('src/components/modal/modal.css', 'utf8');
+  const bodyRule = css.match(/\[data-tao-modal-body\] \{([^}]+)\}/)?.[1];
+
+  expect(bodyRule).toContain(
+    'padding: max(var(--tao-padding-xxs), var(--tao-ring-width)) var(--tao-padding-lg);',
+  );
 });

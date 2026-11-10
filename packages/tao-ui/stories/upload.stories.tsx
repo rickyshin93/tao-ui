@@ -37,3 +37,41 @@ export const FileStates: Story = {
     ],
   },
 };
+
+const pictureFiles = [
+  {
+    uid: 'image',
+    name: 'image.png',
+    status: 'done' as const,
+    url: 'https://i.ibb.co/pkHFVVc/mountain-lake.png',
+  },
+  {
+    uid: 'progress',
+    name: 'uploading.png',
+    status: 'uploading' as const,
+    percent: 48,
+  },
+  {
+    uid: 'error',
+    name: 'failed.png',
+    status: 'error' as const,
+    error: new Error('Example upload error'),
+  },
+];
+
+export const PictureList: Story = {
+  args: {
+    listType: 'picture',
+    defaultFileList: pictureFiles,
+    beforeUpload: () => false,
+  },
+};
+export const PictureCard: Story = {
+  args: { ...PictureList.args, listType: 'picture-card' },
+};
+export const PictureCircle: Story = {
+  args: { ...PictureList.args, listType: 'picture-circle' },
+};
+export const DisabledPictures: Story = {
+  args: { ...PictureCard.args, disabled: true },
+};
