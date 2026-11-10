@@ -7,6 +7,15 @@ description: 查看 @rockshin/tao-ui 各版本的更新，包括上传、选择�
 
 按版本记录 `@rockshin/tao-ui` 的用户可见变更。日期使用 UTC+8。
 
+## 0.0.53
+
+2026-11-10
+
+- [Textarea](/zh/components/textarea) 将字符计数放在输入框内，不再额外占一行。
+- [Upload](/zh/components/upload) 图片卡片操作按钮在遮罩上保持透明背景。
+
+[查看版本差异](https://github.com/rickyshin93/tao-ui/compare/v0.0.52...v0.0.53)
+
 ## 0.0.52
 
 2026-11-10

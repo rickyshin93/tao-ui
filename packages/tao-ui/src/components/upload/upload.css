@@ -282,6 +282,7 @@
     [data-tao-upload-actions] button {
       width: 26px;
       height: 28px;
+      background: transparent;
       color: var(--tao-color-text-light-solid);
     }
     [data-tao-upload-actions] button:disabled {

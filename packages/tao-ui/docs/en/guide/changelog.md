@@ -7,6 +7,15 @@ description: Version history for @rockshin/tao-ui, including fixes for uploads, 
 
 User-facing changes for `@rockshin/tao-ui`, listed by release. Dates use UTC+8.
 
+## 0.0.53
+
+2026-11-10
+
+- [Textarea](/components/textarea) places the character count inside the control without adding a separate row.
+- [Upload](/components/upload) keeps picture-card action backgrounds transparent over the image mask.
+
+[Compare changes](https://github.com/rickyshin93/tao-ui/compare/v0.0.52...v0.0.53)
+
 ## 0.0.52
 
 2026-11-10

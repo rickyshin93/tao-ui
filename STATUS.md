@@ -12,6 +12,8 @@
 - none
 
 ## Done
+- 2026-11-10 Moved the Textarea character count inside the bottom corner without adding a row. Required gates and local Chrome layout, RTL, autosize and drag checks passed. See `.logs/textarea-count-fix-20261110/verification.md`.
+- 2026-11-10 Fixed Upload picture-card/circle action hover backgrounds to remain transparent on the image mask. Required gates and local desktop/mobile, light/dark, pressed/focus and preview checks passed; not committed or released. See `.logs/upload-hover-fix-20261110/verification.md`.
 - 2026-11-10 Fixed broken Upload demo images by using the site-hosted original in both locales and Storybook. Required gates, CI/Pages, live image loading and preview passed. See `.logs/upload-image-fix-20261110/verification.md`.
 - 2026-11-10 Published tao-ui 0.0.52 with Upload alignment, Input password placeholder and Modal focus-ring fixes; local gates, release CI, npm integrity and Pages deployment passed. See `.logs/release-0-0-52-20261110/verification.md`.
 - 2026-11-10 Aligned Upload with local Ant Design; expanded bilingual demos/API, added original CDN artwork and a two-column layout. Required gates and local browser checks passed; released in 0.0.52. See `.logs/upload-original-image-20261110/verification.md` and `.logs/upload-alignment-20261110/verification.md`.
