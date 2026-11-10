@@ -43,7 +43,7 @@ const pictureFiles = [
     uid: 'image',
     name: 'image.png',
     status: 'done' as const,
-    url: 'https://i.ibb.co/pkHFVVc/mountain-lake.png',
+    url: 'https://rickyshin93.github.io/tao-ui/demos/upload/mountain-lake.png',
   },
   {
     uid: 'progress',

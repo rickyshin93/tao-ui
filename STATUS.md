@@ -1,6 +1,7 @@
 # STATUS
 
 ## Doing
+- Fix Upload demo images that fail to load from ImgBB; use the existing site-hosted original. Required gates, docs/Storybook builds and local bilingual image/preview checks passed; deployment and live browser acceptance pending.
 - Commerce bilingual switch and responsive fixes implemented; desktop/mobile browser checks and required gates passed. Fixed customer action icon color and checked light/dark themes. Real-device and complete interaction acceptance remain open.
 
 ## Next

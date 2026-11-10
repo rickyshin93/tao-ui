@@ -2,9 +2,11 @@
 
 - Asset: `mountain-lake.png`, generated for tao-ui on 2026-11-10.
 - Tool: built-in `image_gen` (not the CLI/API fallback).
-- Public image: https://i.ibb.co/pkHFVVc/mountain-lake.png
+- Demo image: https://rickyshin93.github.io/tao-ui/demos/upload/mountain-lake.png (served with the documentation site).
+- Original ImgBB upload: https://i.ibb.co/pkHFVVc/mountain-lake.png
 - Hosting page: https://ibb.co/2pz4VVx
 - Uploaded to ImgBB with automatic deletion disabled. The original remains here for future hosting changes.
+- Demos use the site-hosted original because the ImgBB URL failed to load in the browser on 2026-11-10.
 
 ## Generation prompt
 
