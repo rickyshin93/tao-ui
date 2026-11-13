@@ -128,6 +128,26 @@
   white-space: nowrap;
 }
 
+[data-tao-sheet-item][data-tao-label-wrap] {
+  align-items: flex-start;
+  padding-block: var(--tao-padding-xs);
+  line-height: var(--tao-line-height);
+}
+
+[data-tao-sheet-item][data-tao-label-wrap] [data-tao-sheet-item-label] {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+[data-tao-sheet-item][data-tao-label-wrap] [data-tao-sheet-item-check] {
+  height: 1lh;
+}
+
+[data-tao-sheet-item][data-tao-label-wrap]:not([data-tao-selected])
+  [data-tao-sheet-item-check] {
+  visibility: hidden;
+}
+
 /* Description */
 [data-tao-sheet-item-desc] {
   margin-block-start: 2px;

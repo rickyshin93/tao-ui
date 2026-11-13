@@ -1,6 +1,6 @@
 ---
 title: Select
-description: Runnable examples for single and multiple selection, tags, token separators, filtering, groups, dependent choices, async loading, rendering, popup controls, mobile drawers, and forms.
+description: Runnable examples for wrapping long option labels, single and multiple selection, tags, token separators, filtering, groups, dependent choices, async loading, rendering, popup controls, mobile drawers, and forms.
 ---
 
 import Preview from '../../_components/demo-preview';
@@ -1191,6 +1191,39 @@ export default function PopupDimensions() {
         />
       </FormField>
     </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="select-long-labels">
+
+### Long filenames
+
+Enable `optionLabelWrap` to show built-in option labels in full, including filenames without spaces. Labels wrap without a line limit, and the checkmark keeps its own column aligned with the first line. Desktop popup widths stay within the available viewport; use `popupMatchSelectWidth` for a wider menu. Mobile drawers also wrap. Selected tags stay compact; custom `optionRender` content controls its own wrapping.
+
+```tsx preview
+import { Select } from '@rockshin/tao-ui';
+
+export default function LongFilenameSelect() {
+  const files = [
+    'case2_03_estimated_cost_list.pdf',
+    'case2_02_cardiology_investigation_report.pdf',
+    'case2_01_admission_medical_report.pdf',
+  ];
+  return (
+    <Select
+      aria-label="Supporting reports"
+      mode="multiple"
+      showSearch
+      optionLabelWrap
+      popupMatchSelectWidth={440}
+      maxTagCount={1}
+      defaultValue={files}
+      options={files.map((label) => ({ label, value: label }))}
+      style={{ width: '100%', maxWidth: 320 }}
+    />
   );
 }
 ```

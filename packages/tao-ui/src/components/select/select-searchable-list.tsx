@@ -16,6 +16,7 @@ interface SearchableSelectListProps {
   listHeight: number;
   notFoundContent: ReactNode;
   optionRender?: SelectProps['optionRender'];
+  optionLabelWrap?: boolean;
   classNames?: SelectProps['classNames'];
   styles?: SelectProps['styles'];
   onActiveIndexChange: (index: number) => void;
@@ -36,6 +37,7 @@ export function SearchableSelectList({
   listHeight,
   notFoundContent,
   optionRender,
+  optionLabelWrap,
   classNames,
   styles,
   onActiveIndexChange,
@@ -73,6 +75,7 @@ export function SearchableSelectList({
         disabled={isDisabled}
         data-disabled={isDisabled || undefined}
         data-tao-select-item=""
+        data-tao-label-wrap={optionLabelWrap || undefined}
         data-tao-selected={multiple && isSelected ? '' : undefined}
         data-tao-has-desc={option.description != null || undefined}
         data-state={isSelected ? 'checked' : 'unchecked'}
@@ -107,7 +110,7 @@ export function SearchableSelectList({
               className={cx(classNames?.itemLabel)}
               style={styles?.itemLabel}
             >
-              <span>{option.label}</span>
+              <span data-tao-select-item-label="">{option.label}</span>
               {option.description != null && (
                 <span
                   data-tao-select-item-desc=""
@@ -120,7 +123,7 @@ export function SearchableSelectList({
             </span>
           </>
         )}
-        {isSelected && (
+        {(isSelected || optionLabelWrap) && (
           <span data-tao-select-check="">
             <CheckIcon />
           </span>

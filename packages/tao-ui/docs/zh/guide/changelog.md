@@ -7,6 +7,12 @@ description: 查看 @rockshin/tao-ui 各版本的更新，包括上传、选择�
 
 按版本记录 `@rockshin/tao-ui` 的用户可见变更。日期使用 UTC+8。
 
+## 0.0.55
+
+2026-11-13
+
+- [Select](/zh/components/select) 支持长选项完整换行，并修复已选标签挤占输入框的问题。
+
 ## 0.0.54
 
 2026-11-10

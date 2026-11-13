@@ -29,6 +29,7 @@ interface MobileSelectContentProps
   filterOption?: (input: string, option: SelectOption) => boolean;
   notFoundContent?: ReactNode;
   optionRender?: (option: SelectOption, info: { index: number }) => ReactNode;
+  optionLabelWrap?: boolean;
   onClose: () => void;
   /** Enable multi-select checkboxes + Done button flow. */
   multiple?: boolean;
@@ -50,6 +51,7 @@ function MobileSelectContentInner({
   filterOption,
   notFoundContent: notFoundContentProp,
   optionRender,
+  optionLabelWrap,
   onClose,
   multiple,
   hideSelected,
@@ -175,6 +177,7 @@ function MobileSelectContentInner({
         type="button"
         key={opt.value}
         data-tao-sheet-item=""
+        data-tao-label-wrap={optionLabelWrap || undefined}
         className={classNames?.item}
         style={styles?.item}
         data-tao-selected={isSelected || undefined}
@@ -219,7 +222,7 @@ function MobileSelectContentInner({
             </span>
           </>
         )}
-        {isSelected && (
+        {(isSelected || optionLabelWrap) && (
           <span data-tao-sheet-item-check="">
             <CheckIcon />
           </span>

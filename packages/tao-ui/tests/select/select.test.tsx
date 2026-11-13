@@ -25,6 +25,42 @@ test('renders with placeholder', () => {
   expect(screen.getByText('Pick one')).toBeTruthy();
 });
 
+test.each([
+  { name: 'single', mobile: false, showSearch: false, multiple: false },
+  { name: 'searchable', mobile: false, showSearch: true, multiple: false },
+  { name: 'multiple', mobile: false, showSearch: true, multiple: true },
+  { name: 'mobile', mobile: true, showSearch: false, multiple: true },
+])(
+  'wrapped $name options retain complete labels and selection behavior',
+  async ({ mobile, showSearch, multiple }) => {
+    const label = 'case2_02_cardiology_investigation_report.pdf';
+    const onChange = rs.fn();
+    render(
+      <Select
+        mobile={mobile}
+        showSearch={showSearch}
+        mode={multiple ? 'multiple' : undefined}
+        optionLabelWrap
+        defaultOpen
+        options={[{ label, value: 'report' }]}
+        onChange={onChange}
+      />,
+    );
+    const option = await screen.findByRole(mobile ? 'button' : 'option', {
+      name: label,
+    });
+    expect(option).toHaveAttribute('data-tao-label-wrap', 'true');
+    expect(option.textContent).toBe(label);
+    await userEvent.click(option);
+    if (mobile)
+      await userEvent.click(screen.getByRole('button', { name: 'Done' }));
+    expect(onChange).toHaveBeenCalledWith(
+      multiple ? ['report'] : 'report',
+      multiple ? [{ label, value: 'report' }] : { label, value: 'report' },
+    );
+  },
+);
+
 test('desktop trigger is keyboard focusable and disabled triggers leave the tab order', async () => {
   const user = userEvent.setup();
   render(

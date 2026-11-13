@@ -7,6 +7,12 @@ description: Version history for @rockshin/tao-ui, including fixes for uploads, 
 
 User-facing changes for `@rockshin/tao-ui`, listed by release. Dates use UTC+8.
 
+## 0.0.55
+
+2026-11-13
+
+- [Select](/components/select) wraps long option labels on request and keeps selected tags within the control.
+
 ## 0.0.54
 
 2026-11-10

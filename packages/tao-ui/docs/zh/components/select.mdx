@@ -1,6 +1,6 @@
 ---
 title: Select 选择器
-description: 单选、多选、标签输入、自动分词、自定义搜索、分组联动、异步加载、渲染定制、弹层控制、移动抽屉与表单提交，附可运行示例和完整 API。
+description: 长选项完整换行、单选、多选、标签输入、自动分词、自定义搜索、分组联动、异步加载、渲染定制、弹层控制、移动抽屉与表单提交，附可运行示例和完整 API。
 ---
 
 import Preview from '../../_components/demo-preview';
@@ -1191,6 +1191,39 @@ export default function PopupDimensions() {
         />
       </FormField>
     </Stack>
+  );
+}
+```
+
+</section>
+
+<section className="tao-example" id="select-long-labels">
+
+### 完整显示长文件名
+
+开启 `optionLabelWrap` 后，内置选项标签完整换行，连续无空格的文件名也能断行，不限制行数。勾选图标独占一列，与首行对齐。桌面弹层宽度不超过视口可用空间，可配合 `popupMatchSelectWidth` 加宽菜单；手机抽屉同样换行。输入框中的已选标签保持紧凑；自定义 `optionRender` 内容自行控制换行。
+
+```tsx preview
+import { Select } from '@rockshin/tao-ui';
+
+export default function LongFilenameSelect() {
+  const files = [
+    'case2_03_estimated_cost_list.pdf',
+    'case2_02_cardiology_investigation_report.pdf',
+    'case2_01_admission_medical_report.pdf',
+  ];
+  return (
+    <Select
+      aria-label="Supporting reports"
+      mode="multiple"
+      showSearch
+      optionLabelWrap
+      popupMatchSelectWidth={440}
+      maxTagCount={1}
+      defaultValue={files}
+      options={files.map((label) => ({ label, value: label }))}
+      style={{ width: '100%', maxWidth: 320 }}
+    />
   );
 }
 ```

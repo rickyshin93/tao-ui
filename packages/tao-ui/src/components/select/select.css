@@ -271,6 +271,10 @@ button[data-tao-select-clear] {
    Dropdown Content
    =========================== */
 [data-tao-select-content] {
+  --tao-select-available-width: var(
+    --radix-popover-content-available-width,
+    var(--radix-select-content-available-width)
+  );
   --tao-select-height: var(--tao-control-height);
   --tao-select-font-size: var(--tao-font-size-base);
   font-size: var(--tao-select-font-size);
@@ -458,8 +462,41 @@ legend[data-tao-select-group-label] {
   white-space: nowrap;
 }
 
+[data-tao-select-item-label] {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+[data-tao-select-item][data-tao-label-wrap] {
+  align-items: flex-start;
+  padding-block: var(--tao-padding-xs);
+  line-height: var(--tao-line-height);
+}
+
+[data-tao-select-item][data-tao-label-wrap] [data-tao-select-item-main] {
+  line-height: inherit;
+}
+
+[data-tao-select-item][data-tao-label-wrap] [data-tao-select-item-label] {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+[data-tao-select-item][data-tao-label-wrap] [data-tao-select-check] {
+  height: 1lh;
+}
+
+[data-tao-select-item][data-tao-label-wrap][data-state="unchecked"]:not(
+    [data-tao-selected]
+  )
+  [data-tao-select-check] {
+  visibility: hidden;
+}
+
 /* Check icon */
 [data-tao-select-check] {
+  flex-shrink: 0;
   margin-inline-start: auto;
   padding-inline-start: var(--tao-padding-xs);
   color: var(--tao-primary);
@@ -523,6 +560,7 @@ legend[data-tao-select-group-label] {
   display: inline-flex;
   align-items: center;
   gap: 0;
+  min-width: 0;
   max-width: 160px;
   padding-inline: 6px;
   padding-block: 0;
@@ -571,6 +609,7 @@ legend[data-tao-select-group-label] {
 
 /* "+N" rest tag */
 [data-tao-select-tag-rest] {
+  flex-shrink: 0;
   cursor: default;
   color: var(--tao-color-text-tertiary);
 }

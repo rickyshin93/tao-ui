@@ -141,6 +141,8 @@ export interface SelectProps
   getPopupContainer?: (trigger: HTMLElement) => HTMLElement;
   /** Customize each option's content. */
   optionRender?: (option: SelectOption, info: { index: number }) => ReactNode;
+  /** Wrap built-in option labels without truncation on desktop and mobile. Defaults to false; custom optionRender controls its own content. */
+  optionLabelWrap?: boolean;
   /** Customize the selected option's label. */
   labelRender?: (option: SelectOption) => ReactNode;
   /** Wrap or extend the desktop menu or mobile drawer content. */

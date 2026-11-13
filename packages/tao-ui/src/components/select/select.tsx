@@ -93,6 +93,7 @@ export const Select = forwardRef(function Select(
     listHeight = 256,
     getPopupContainer,
     optionRender,
+    optionLabelWrap = false,
     labelRender,
     popupRender,
     tagRender,
@@ -577,6 +578,7 @@ export const Select = forwardRef(function Select(
           filterOption={filterOption}
           notFoundContent={notFoundContent}
           optionRender={optionRender}
+          optionLabelWrap={optionLabelWrap}
           multiple={isMultiple}
           hideSelected={hideSelected}
           maxCount={maxCount}
@@ -608,6 +610,15 @@ export const Select = forwardRef(function Select(
   if (typeof popupMatchSelectWidth === 'number') {
     contentStyle.width = popupMatchSelectWidth;
   }
+  if (optionLabelWrap) {
+    contentStyle.maxWidth = 'var(--tao-select-available-width)';
+    contentStyle.minWidth =
+      'min(var(--radix-select-trigger-width), var(--tao-select-available-width))';
+    if (popupMatchSelectWidth === false) {
+      contentStyle.minWidth = 0;
+      contentStyle.width = 'max-content';
+    }
+  }
 
   // In multi mode, Radix doesn't manage our value — we render our own checkmarks.
   const radixValue = isMultiple ? '' : ((value as string | undefined) ?? '');
@@ -632,6 +643,7 @@ export const Select = forwardRef(function Select(
         value={opt.value}
         disabled={itemDisabled}
         data-tao-select-item=""
+        data-tao-label-wrap={optionLabelWrap || undefined}
         data-tao-has-desc={opt.description != null || undefined}
         data-tao-selected={isMultiple && isSelected ? '' : undefined}
         className={cx(classNames?.item)}
@@ -660,7 +672,9 @@ export const Select = forwardRef(function Select(
               className={cx(classNames?.itemLabel)}
               style={styles?.itemLabel}
             >
-              <RadixSelect.ItemText>{opt.label}</RadixSelect.ItemText>
+              <RadixSelect.ItemText data-tao-select-item-label="">
+                {opt.label}
+              </RadixSelect.ItemText>
               {opt.description != null && (
                 <span
                   data-tao-select-item-desc=""
@@ -673,8 +687,8 @@ export const Select = forwardRef(function Select(
             </span>
           </>
         )}
-        {isMultiple ? (
-          isSelected && (
+        {isMultiple || optionLabelWrap ? (
+          (isSelected || optionLabelWrap) && (
             <span data-tao-select-check="">
               <CheckIcon />
             </span>
@@ -771,6 +785,7 @@ export const Select = forwardRef(function Select(
       listHeight={listHeight}
       notFoundContent={notFoundContent}
       optionRender={optionRender}
+      optionLabelWrap={optionLabelWrap}
       classNames={classNames}
       styles={styles}
       onActiveIndexChange={setActiveSearchIndex}
@@ -886,8 +901,10 @@ export const Select = forwardRef(function Select(
   if (hasInlineSearch) {
     const searchableContentStyle: CSSProperties = { ...contentStyle };
     if (popupMatchSelectWidth === true) {
-      searchableContentStyle.minWidth = 'var(--radix-popover-trigger-width)';
-    } else if (popupMatchSelectWidth === false) {
+      searchableContentStyle.minWidth = optionLabelWrap
+        ? 'min(var(--radix-popover-trigger-width), var(--tao-select-available-width))'
+        : 'var(--radix-popover-trigger-width)';
+    } else if (popupMatchSelectWidth === false && !optionLabelWrap) {
       searchableContentStyle.minWidth = 'max-content';
     }
 
