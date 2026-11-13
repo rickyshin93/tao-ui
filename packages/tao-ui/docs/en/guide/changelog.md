@@ -7,6 +7,12 @@ description: Version history for @rockshin/tao-ui, including fixes for uploads, 
 
 User-facing changes for `@rockshin/tao-ui`, listed by release. Dates use UTC+8.
 
+## 0.0.56
+
+2026-11-13
+
+- [Select](/components/select) prevents option text from being clipped vertically with consumer fonts.
+
 ## 0.0.55
 
 2026-11-13

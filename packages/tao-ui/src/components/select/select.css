@@ -391,7 +391,7 @@ legend[data-tao-select-group-label] {
   padding-inline: var(--tao-padding-sm);
   font-size: var(--tao-select-font-size);
   font-family: var(--tao-font-family);
-  line-height: 1;
+  line-height: var(--tao-line-height);
   color: var(--tao-color-text);
   border: 0;
   background: transparent;
@@ -449,7 +449,7 @@ legend[data-tao-select-group-label] {
   justify-content: center;
   min-width: 0;
   flex: 1;
-  line-height: 1;
+  line-height: inherit;
 }
 
 [data-tao-select-item-desc] {
