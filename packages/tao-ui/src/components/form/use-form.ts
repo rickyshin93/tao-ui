@@ -1,8 +1,9 @@
 import {
-  type FormInstance as RcFormInstance,
   type NamePath,
+  type FormInstance as RcFormInstance,
   useForm as useRcForm,
 } from '@rc-component/form';
+import { isEqual } from '@rc-component/util';
 import { getDOM } from '@rc-component/util/es/Dom/findDOMNode';
 import { useMemo } from 'react';
 import scrollIntoView, { type Options } from 'scroll-into-view-if-needed';
@@ -17,6 +18,14 @@ export interface FormInstance<Values = any> extends RcFormInstance<Values> {
   /** Scroll a mounted field into view; optionally focus its control. */
   scrollToField: (name: NamePath<Values>, options?: FormScrollOptions) => void;
 }
+
+/** Validation state keys; a plain value write must not drop these. */
+const VALIDATION_STATE_KEYS = [
+  'errors',
+  'warnings',
+  'touched',
+  'validating',
+] as const;
 
 export interface FieldTarget {
   id: string;
@@ -45,6 +54,27 @@ export function useForm<Values = any>(
     const fields: FieldRegistry = new Map();
     const instance: FormInstance<Values> = {
       ...rcForm,
+      setFields(nextFields) {
+        // Upstream keeps previous validation errors when a `setField` write only
+        // updates the value, so a value written through `setFields` — e.g. the
+        // controlled `fields` prop — leaves errors from the old value rendered.
+        // Mirror `setFieldsValue`: clear those stale errors before the value
+        // lands, unless the caller also supplies fresh validation state.
+        const stale = nextFields.filter(
+          (field) =>
+            'value' in field &&
+            VALIDATION_STATE_KEYS.every((key) => !(key in field)) &&
+            !isEqual(field.value, rcForm.getFieldValue(field.name)),
+        );
+        rcForm.setFields(
+          stale.length
+            ? [
+                ...stale.map((field) => ({ name: field.name, errors: [] })),
+                ...nextFields,
+              ]
+            : nextFields,
+        );
+      },
       scrollToField(name, options = {}) {
         const targets = fields.get(fieldKey(name));
         const target = targets && Array.from(targets).at(-1);

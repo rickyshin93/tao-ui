@@ -22,6 +22,9 @@ Form.Item reserves one feedback line when it has validation rules or an explicit
 - Declare validation as rules on Form.Item; the required mark is inferred from rules.
 - Use dependencies for cross-field rules such as password confirmation.
 - Use Form.useForm() for imperative control (setFieldsValue, resetFields, submit).
+- Values written through `setFields` — including the controlled `fields` prop —
+  clear stale validation errors for fields whose value changed; include
+  `errors`/`warnings` in the same entry to provide fresh validation state.
 - Set size or disabled on Form to cascade them to every control inside.
 
 **Avoid**
