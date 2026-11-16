@@ -116,6 +116,30 @@ test('renders a check glyph for finished steps and a number otherwise', () => {
   ).toBe('3');
 });
 
+test('passes finished icon colors to the Steps styles', () => {
+  const { container, rerender } = render(
+    <Steps
+      items={items}
+      current={1}
+      finishIconBackground="#e5f4e8"
+      finishIconColor="#16a34a"
+    />,
+  );
+  const node = root(container);
+  expect(
+    node.style.getPropertyValue('--tao-steps-finish-icon-background'),
+  ).toBe('#e5f4e8');
+  expect(node.style.getPropertyValue('--tao-steps-finish-icon-color')).toBe(
+    '#16a34a',
+  );
+  expect(node.hasAttribute('data-tao-finish-icon-background')).toBe(true);
+  expect(node.hasAttribute('data-tao-finish-icon-color')).toBe(true);
+
+  rerender(<Steps items={items} current={1} />);
+  expect(node.hasAttribute('data-tao-finish-icon-background')).toBe(false);
+  expect(node.hasAttribute('data-tao-finish-icon-color')).toBe(false);
+});
+
 test('renders an error glyph for failed steps', () => {
   const { container } = render(
     <Steps items={items} current={1} status="error" />,

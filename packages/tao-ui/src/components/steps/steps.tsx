@@ -120,6 +120,10 @@ export interface StepsProps {
   ellipsis?: boolean;
   /** Replace the icon node of every step. */
   iconRender?: StepsIconRender;
+  /** Background of the built-in finished-step circle. */
+  finishIconBackground?: CSSProperties['backgroundColor'];
+  /** Color of the built-in finished-step check mark. */
+  finishIconColor?: CSSProperties['color'];
   /** Fires with the absolute step index when a non-current step is activated. */
   onChange?: (current: number) => void;
   className?: string;
@@ -243,6 +247,8 @@ export function Steps({
   offset = 0,
   ellipsis = false,
   iconRender,
+  finishIconBackground,
+  finishIconColor,
   onChange,
   className,
   style,
@@ -317,6 +323,8 @@ export function Steps({
   // consumer's `style` / `styles.root` can still override it.
   const rootStyle = {
     '--tao-steps-items-offset': String(isInline ? offset : 0),
+    '--tao-steps-finish-icon-background': finishIconBackground,
+    '--tao-steps-finish-icon-color': finishIconColor,
     ...styles?.root,
     ...style,
   } as CSSProperties;
@@ -324,6 +332,10 @@ export function Steps({
   return (
     <div
       data-tao-steps=""
+      data-tao-finish-icon-background={
+        finishIconBackground !== undefined || undefined
+      }
+      data-tao-finish-icon-color={finishIconColor !== undefined || undefined}
       data-tao-orientation={mergedOrientation}
       data-tao-title-placement={mergedTitlePlacement}
       data-tao-type={mergedType}

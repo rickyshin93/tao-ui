@@ -544,6 +544,27 @@
   color: var(--tao-steps-icon-text-active);
 }
 
+/* Finished icon colors apply across normal, hover and active states. */
+[data-tao-steps][data-tao-finish-icon-background]:is(
+    [data-tao-type="default"],
+    [data-tao-type="navigation"],
+    [data-tao-type="panel"]
+  )
+  [data-tao-step][data-tao-status="finish"]:not([data-tao-custom])
+  [data-tao-step-icon] {
+  background: var(--tao-steps-finish-icon-background);
+}
+
+[data-tao-steps][data-tao-finish-icon-color]:is(
+    [data-tao-type="default"],
+    [data-tao-type="navigation"],
+    [data-tao-type="panel"]
+  )
+  [data-tao-step][data-tao-status="finish"]:not([data-tao-custom])
+  [data-tao-step-icon] {
+  color: var(--tao-steps-finish-icon-color);
+}
+
 /* Dot / inline frame: the icon box is the dot itself. */
 [data-tao-steps][data-tao-type="dot"]
   [data-tao-step]:not([data-tao-custom])

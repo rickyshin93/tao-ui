@@ -300,6 +300,7 @@ export default CustomIconSteps;
 ### Semantic DOM styling
 
 Every part of a step is addressable through `classNames` and `styles`, and each item can override its own parts.
+Use `finishIconBackground` and `finishIconColor` to set the built-in finished circle background and check color independently for default, navigation, and panel steps. Dot steps and custom icons are unaffected.
 
 ```tsx preview
 import { Steps } from '@rockshin/tao-ui';
@@ -308,6 +309,8 @@ function StyledSteps() {
   return (
     <Steps
       current={1}
+      finishIconBackground="#e5f4e8"
+      finishIconColor="#16a34a"
       items={[
         { title: 'Finished', content: 'This step is done.' },
         { title: 'In Progress', content: 'Working on it now.' },

@@ -300,6 +300,7 @@ export default CustomIconSteps;
 ### 语义化 DOM 定制
 
 每个部件都可以通过 `classNames` 与 `styles` 定位，单个步骤也能覆盖自己的部件。
+使用 `finishIconBackground` 和 `finishIconColor` 可分别设置已完成步骤的内置圆形背景和对勾颜色，适用于默认、导航和面板类型；点状步骤和自定义图标不受影响。
 
 ```tsx preview
 import { Steps } from '@rockshin/tao-ui';
@@ -308,6 +309,8 @@ function StyledSteps() {
   return (
     <Steps
       current={1}
+      finishIconBackground="#e5f4e8"
+      finishIconColor="#16a34a"
       items={[
         { title: '已完成', content: '这一步已经完成。' },
         { title: '进行中', content: '正在处理。' },
