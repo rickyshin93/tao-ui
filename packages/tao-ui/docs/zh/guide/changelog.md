@@ -7,6 +7,17 @@ description: 查看 @rockshin/tao-ui 各版本的更新，包括上传、选择�
 
 按版本记录 `@rockshin/tao-ui` 的用户可见变更。日期使用 UTC+8。
 
+## 0.0.57
+
+2026-11-16
+
+- [Form](/zh/components/form) 通过 `setFields` 或受控 `fields` 属性写入新值时，清除旧值残留的校验错误；同一条目显式传入 `errors`/`warnings` 时以调用方为准。
+- [Modal](/zh/components/modal) 每次打开都会聚焦配置的按钮，关闭后把焦点归还触发元素，内容在多次打开间保留时同样生效。
+- [Select](/zh/components/select) 多选标签中的节点标签保持富文本内容，文本与数字标签仍按 `maxTagTextLength` 截断。
+- [Steps](/zh/components/steps) 新增 `finishIconBackground` 与 `finishIconColor`，可自定义完成步骤圆形底色与对勾颜色。
+
+[查看版本差异](https://github.com/rickyshin93/tao-ui/compare/v0.0.56...v0.0.57)
+
 ## 0.0.56
 
 2026-11-13

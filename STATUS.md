@@ -1,6 +1,7 @@
 # STATUS
 
 ## Doing
+- 0.0.55 released through GitHub CI and verified on npm; Portal dependency upgraded, authenticated page acceptance pending.
 - Commerce bilingual switch and responsive fixes implemented; desktop/mobile browser checks and required gates passed. Fixed customer action icon color and checked light/dark themes. Real-device and complete interaction acceptance remain open.
 
 ## Next
@@ -12,6 +13,12 @@
 - none
 
 ## Done
+- 2026-11-16 Fixed Form stale validation errors surviving controlled `fields`/`setFields` value writes; value-only writes now clear errors like `setFieldsValue`, caller-provided `errors`/`warnings` still win. Form tests, full suite and typecheck passed.
+- 2026-11-14 Fixed Select rich labels with tag truncation and retained Modal autofocus and focus restoration. Required gates and desktop Chromium checks passed on React 18/19. See `.logs/component-review-20261114/verification.md`.
+- 2026-11-13 Released tao-ui 0.0.56 with Select option glyph clipping fix; local gates, Portal checks with injected CSS, GitHub release CI and npm version verification passed. Portal remains on 0.0.55.
+- 2026-11-13 Fixed Select long selected tags overflowing the trigger and crowding search/suffix controls; preserved overflow-count space. Required gates and browser layout/typing/removal checks passed; not released.
+- 2026-11-13 Added Select `optionLabelWrap` for full long labels, fixed check spacing and viewport-bounded popups. Required gates, bilingual docs build and desktop/mobile/RTL browser checks passed; not released.
+- 2026-11-12 Added Steps finished circle background and check color props; required gates and local docs rendering passed.
 - 2026-11-10 Corrected Textarea count and resize handle placement at the bottom corner. Required gates and local Chrome count, autosize and resize checks passed; not released. See `.logs/textarea-resize-corner-20261110/verification.md`.
 - 2026-11-10 Moved the Textarea character count inside the bottom corner without adding a row. Required gates and local Chrome layout, RTL, autosize and drag checks passed. See `.logs/textarea-count-fix-20261110/verification.md`.
 - 2026-11-10 Fixed Upload picture-card/circle action hover backgrounds to remain transparent on the image mask. Required gates and local desktop/mobile, light/dark, pressed/focus and preview checks passed; not committed or released. See `.logs/upload-hover-fix-20261110/verification.md`.

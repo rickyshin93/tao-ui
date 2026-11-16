@@ -7,6 +7,17 @@ description: Version history for @rockshin/tao-ui, including fixes for uploads, 
 
 User-facing changes for `@rockshin/tao-ui`, listed by release. Dates use UTC+8.
 
+## 0.0.57
+
+2026-11-16
+
+- [Form](/components/form) clears stale validation errors when values are written through `setFields` or the controlled `fields` prop; entries that carry `errors` or `warnings` still apply their own validation state.
+- [Modal](/components/modal) focuses the configured button on every open cycle and restores focus to the trigger on close, including when content is retained between opens.
+- [Select](/components/select) keeps rich node labels intact in multiple-mode tags while text and number labels are still truncated by `maxTagTextLength`.
+- [Steps](/components/steps) adds `finishIconBackground` and `finishIconColor` to style the built-in finished-step circle and check mark.
+
+[Compare changes](https://github.com/rickyshin93/tao-ui/compare/v0.0.56...v0.0.57)
+
 ## 0.0.56
 
 2026-11-13
