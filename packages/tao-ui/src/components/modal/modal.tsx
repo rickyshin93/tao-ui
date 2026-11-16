@@ -7,16 +7,22 @@ import {
 } from '@radix-ui/react-focus-scope';
 import {
   type AriaAttributes,
+  type ComponentPropsWithoutRef,
   type CSSProperties,
   createContext,
   type FC,
+  forwardRef,
   type HTMLAttributes,
+  memo,
   type ReactElement,
   type ReactNode,
   useCallback,
   useContext,
   useEffect,
+  useImperativeHandle,
+  useLayoutEffect,
   useRef,
+  useState,
 } from 'react';
 import { RemoveScroll } from 'react-remove-scroll';
 import {
@@ -532,26 +538,59 @@ function ModalInteractionScope({
   onCloseAutoFocus: (event: Event) => void;
   children: ReactNode;
 }) {
+  const [node, setNode] = useState<HTMLElement | null>(null);
+  const [scopeProps, setScopeProps] = useState<ComponentPropsWithoutRef<'div'>>(
+    {},
+  );
   return (
-    <RemoveScroll
-      enabled={open && scrollLock}
-      allowPinchZoom
-      shards={branches}
-      forwardProps
-    >
-      <FocusScope
-        loop={trapFocus}
-        trapped={open && trapFocus}
-        branches={branches}
-        onMountAutoFocus={onOpenAutoFocus}
-        onUnmountAutoFocus={onCloseAutoFocus}
-        style={{ display: 'contents' }}
+    <>
+      <RemoveScroll
+        ref={setNode}
+        enabled={open && scrollLock}
+        allowPinchZoom
+        shards={branches}
+        forwardProps
       >
-        {children}
-      </FocusScope>
-    </RemoveScroll>
+        <div
+          {...(open ? scopeProps : undefined)}
+          style={{ display: 'contents' }}
+        >
+          {children}
+        </div>
+      </RemoveScroll>
+      {open && node && (
+        <FocusScope
+          asChild
+          loop={trapFocus}
+          trapped={trapFocus}
+          branches={branches}
+          onMountAutoFocus={onOpenAutoFocus}
+          onUnmountAutoFocus={onCloseAutoFocus}
+        >
+          <ModalScopeHost node={node} onPropsChange={setScopeProps} />
+        </FocusScope>
+      )}
+    </>
   );
 }
+
+// Mount the focus lifecycle per open cycle without remounting retained content.
+// The scope follows DialogContent so its trap owns the active scope stack.
+const ModalScopeHost = memo(
+  forwardRef<
+    HTMLElement,
+    ComponentPropsWithoutRef<'div'> & {
+      node: HTMLElement;
+      onPropsChange: (props: ComponentPropsWithoutRef<'div'>) => void;
+    }
+  >(function ModalScopeHost({ node, onPropsChange, ...props }, ref) {
+    useImperativeHandle(ref, () => node, [node]);
+    useLayoutEffect(() => {
+      onPropsChange(props);
+    });
+    return null;
+  }),
+);
 
 function CloseIcon() {
   return (
