@@ -112,6 +112,29 @@ test.each([
   },
 );
 
+test.each([false, true])(
+  'multiple Select preserves rich labels with maxTagTextLength (mobile=%s)',
+  (mobile) => {
+    render(
+      <Select
+        mobile={mobile}
+        mode="multiple"
+        value={['rich', 'text', 'number']}
+        maxTagTextLength={4}
+        options={[
+          { value: 'rich', label: <strong>Alpha</strong> },
+          { value: 'text', label: 'Bravo' },
+          { value: 'number', label: 12345 },
+        ]}
+      />,
+    );
+    expect(screen.getByText('Alpha').tagName).toBe('STRONG');
+    expect(screen.getByText('Brav…')).toBeVisible();
+    expect(screen.getByText('1234…')).toBeVisible();
+    expect(screen.queryByText('[obj…')).not.toBeInTheDocument();
+  },
+);
+
 test('Select with JSX option labels does not name its search input [object Object]', () => {
   render(
     <Select

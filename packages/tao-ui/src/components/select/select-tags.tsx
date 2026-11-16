@@ -94,8 +94,9 @@ export function SelectTags({
   if (options.length === 0) return null;
 
   const label = (option: SelectOption): ReactNode => {
-    const text =
-      typeof option.label === 'string' ? option.label : String(option.label);
+    if (typeof option.label !== 'string' && typeof option.label !== 'number')
+      return option.label;
+    const text = String(option.label);
     return maxTagTextLength != null && text.length > maxTagTextLength
       ? `${text.slice(0, maxTagTextLength)}…`
       : option.label;
