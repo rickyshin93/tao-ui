@@ -81,7 +81,7 @@ export default function Page() {
 }
 ```
 
-In the tested Next.js 16.4.2 production webpack build, separate root import statements in one Server Component can include the entire icon set in the client chunk. Prefer per-icon paths, or combine root imports into one statement. This result does not establish behavior for every Next.js version or Turbopack. These components use a client boundary; they are not native server-only RSC icons.
+In the tested Next.js 16.4.5 production webpack build, separate root import statements in a Server Component bundled unused icons in the client chunk. Use per-icon paths or combine root imports into one statement. The test covers icons imported across the client boundary and rendered on the server with webpack.
 
 ## Development and verification
 
@@ -118,6 +118,6 @@ import { ArrowRightIcon } from '@rockshin/tao-icons/icons/arrow-right';
 
 `size` 默认 24，`strokeWidth` 默认 1.8；可使用 `color`、CSS、`className` 和 SVG 属性定制。图标单独表达含义时，请设置 `title`、`aria-label` 或 `aria-labelledby`；按钮已有文字或无障碍名称时，图标保持默认的装饰状态即可。详细 API 和无障碍说明见上方英文部分。
 
-本包输出 ESM 与 TypeScript 声明，不提供 CommonJS 入口。Next.js App Router 中图标带有 client boundary；在已测试的 Next.js 16.4.2 webpack 构建中，建议使用逐图标路径，或将根入口导入合并为一条语句，以避免引入整套图标。
+本包输出 ESM 与 TypeScript 声明，不提供 CommonJS 入口。Next.js App Router 中图标带有 client boundary。Next.js 16.4.5 的 webpack 验证中，逐图标子路径和合并根入口导入均排除了未使用的图标。
 
 开发和验证命令见 [HARNESS.md](./HARNESS.md)。

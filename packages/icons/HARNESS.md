@@ -23,7 +23,7 @@ V13 使用独立的 geometry-v13.json 校验快照。几何修订使用 geometry
 | `bun run generate:check` | manifest.count 个独立 TSX 与 barrel 按 canonical 数据确定性生成，检测缺失、多余及手改文件 | 生成器或图标变更 |
 | `bun run check` / `check:fast` | 先检查漂移，再 Rslib 构建最新 dist；类型、冻结 SVG SHA-256、SVG schema、安全属性、SSR 几何、可访问名称、ref、事件、hydration、打包 allowlist/预算 | 每次改动 |
 | `bun run test:consumer` | 真实 npm pack 后在两个干净目录安装；React 18.3.1 / 19.3.1、全部 exports/subpaths、SSR、DOM ref/事件/hydration、TS Bundler/NodeNext；esbuild 检查 root/subpath 各只留下 1/总数 个图标；另测保险及新增通用代表图标；全部 2,126 枚分别做 ref/事件、完整树 hydration 与 root/subpath 严格类型消费 | API、依赖、输出配置变更 |
-| `bun run test:next` | 真实 tgz 安装进 Next 16.4.2；四种干净生产 webpack 构建（single root / consolidated root / separate root / subpaths）、类型、App Router 服务端页面引入 client 图标；启动生产 server，验证 HTTP 200 和 SVG 标题/尺寸 | boundary 或框架兼容变更 |
+| `bun run test:next` | 真实 tgz 安装进 Next 16.4.5；四种干净生产 webpack 构建（single root / consolidated root / separate root / subpaths）、类型、App Router 服务端页面引入 client 图标；启动生产 server，验证 HTTP 200 和 SVG 标题/尺寸 | boundary 或框架兼容变更 |
 | `bun run check:extended` / `verify` | 上面全部顺序执行，失败立即退出 | 提交合并前、交付和发版前 |
 | `bun run test:pack` | manifest.count 份 JS / DTS / SVG、入口映射、peer、发布身份（名称/license/非 private/非 preview 版本）、内容白名单、压缩包大小 | 打包配置改动 |
 | `bun run release:check` | 名称、代码及素材许可、private、preview 版本检查 | 正式发布决策后，素材许可确认前会拒绝发布 |
@@ -40,8 +40,8 @@ V13 使用独立的 geometry-v13.json 校验快照。几何修订使用 geometry
 - `sideEffects:false`、forwardRef PURE 注解、React external 和 逐图标独立模块必须同时成立
 - esbuild 的输出 metafile 按 `bytesInOutput` 验证每次只有所选 SearchIcon、保险或新增通用代表图标贡献代码；并非仅看输入列表或包配置
 - 体积预算在 `tests/fixtures/budgets.json`：Search 示例 minified ≤1200 B / gzip ≤700 B，React external；2,126 枚 V13 tgz ≤1329000 B / unpacked ≤5667000 B；保险及新增通用单图标 minified ≤1600 B / gzip ≤850 B。Search 原预算保持不变
-- 不把 SSR 等同于原生 RSC；Next 图标是 client boundary。根 barrel 也保留边界，Next 测试扫描客户端 chunks，检测未使用的独有几何指纹。Next 16.4.2 separate-root 两条独立导入确实会带入整套图标：该诊断情形单独报告 unusedExclusionPassed:false，不作为受支持按需导入的通过证据；single/consolidated root 与 subpath 三种情形仍严格断言零泄漏。推荐子路径或合并 root imports。Next 测试验证编译和服务端 HTML，客户端事件/hydration 由 React DOM 测试验证，没有冒称跑过浏览器端 Next E2E 或屏幕阅读器实机
-- 包自身和 React 18/19 消费声明检查使用 `skipLibCheck: false`。Next 16.4.2 的 fixture 使用框架默认的 `skipLibCheck: true`：TS 5.9.3 下，Next 自身 `url-pattern.d.ts` 引用了缺失的全局 `URLPatternInput` / `URLPatternOptions`。这项上游声明限制已记录，不能把 Next 结果说成所有依赖声明的严格类型检查
+- Next 图标是 client boundary，测试覆盖生产编译和服务端 HTML。根入口同样保留 client boundary。测试扫描客户端 chunk 中未使用图标的独有几何指纹。Next 16.4.5 的两条独立根导入检出 1,292 个未使用图标指纹，报告为 `unusedExclusionPassed: false`。单条根导入、合并根导入和逐图标子路径严格断言零泄漏。客户端事件和 hydration 由 React DOM 消费测试覆盖。
+- 包自身和 React 18/19 消费声明检查使用 `skipLibCheck: false`。Next fixture 沿用框架默认的 `skipLibCheck: true`，因此其类型检查覆盖应用代码和包的使用方式。
 
 ## 输出与故障定位
 

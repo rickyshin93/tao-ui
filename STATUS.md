@@ -2,6 +2,7 @@
 
 ## Doing
 - tao-ui 0.0.58 patch release includes the two component repair batches and is pending release CI and npm verification.
+- tao-icons 0.1.4 patch release includes the SVG size fallback fix and is pending release CI and npm verification.
 - Commerce bilingual switch and responsive fixes implemented; desktop/mobile browser checks and required gates passed. Fixed customer action icon color and checked light/dark themes. Real-device and complete interaction acceptance remain open.
 
 ## Next

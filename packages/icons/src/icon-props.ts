@@ -1,7 +1,7 @@
 import type { IconProps } from './types.js';
 
 /** Pure and hook-free: no global counter, generated ID, or hydration-dependent state. */
-export function resolveIconProps({ size = 24, title, titleId, children, ...props }: IconProps) {
+export function resolveIconProps({ size = 24, width = size, height = size, title, titleId, children, ...props }: IconProps) {
   const labelledBy = props['aria-labelledby'] || undefined;
   const label = props['aria-label'] || undefined;
   const resolvedTitleId = titleId || undefined;
@@ -14,8 +14,8 @@ export function resolveIconProps({ size = 24, title, titleId, children, ...props
     children,
     svgProps: {
       xmlns: 'http://www.w3.org/2000/svg',
-      width: size,
-      height: size,
+      width,
+      height,
       viewBox: '0 0 24 24',
       fill: 'none',
       stroke: 'currentColor',

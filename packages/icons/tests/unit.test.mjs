@@ -107,3 +107,13 @@ test('root and every component retain client boundaries; React stays external', 
     assert.match(file, /(?:@|#)__PURE__/);
   }
 });
+
+test('absent optional dimensions fall back to the configured icon size', () => {
+  const element = svg(renderToStaticMarkup(React.createElement(icons.SearchIcon, {
+    size: '1em',
+    width: undefined,
+    height: undefined,
+  })));
+  assert.equal(element.getAttribute('width'), '1em');
+  assert.equal(element.getAttribute('height'), '1em');
+});

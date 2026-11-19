@@ -191,7 +191,7 @@ export default function ClientExample() {
     assert.match(js, /^['"]use client['"];?/);
   }
   checks.push('Packaged component entry modules preserve use client');
-  // Keep the separate-root-import case: Next 16.4.2 can over-include its client barrel.
+  // Keep the separate-root-import case to measure client barrel over-inclusion.
   // Exercise vanilla single/consolidated imports as well as the recommended per-icon subpaths.
   const separatePage = await readFile(path.join(work, 'app/page.tsx'), 'utf8');
   const vanillaConfig = await readFile(path.join(work, 'next.config.mjs'), 'utf8');
@@ -265,9 +265,9 @@ export default function ClientExample() {
   checks.push('Production server returned 200 with baseline and generic SSR SVGs using per-icon subpaths (consolidated-root imports tested in a separate production build), title naming, decorative defaults, and custom size/class');
   const report = { passed: true, started, finished: new Date().toISOString(), versions,
     package: `${installed.name}@${installed.version}`, archive: packed.filename, integrity: packed.integrity,
-    checks, bundleAudit, importScenarios: scenarios, limitations: ['Next 16.4.2 vanilla separate statements importing the root barrel may include all icons. Use per-icon subpaths, consolidate root imports, and do not repeat separate root imports. The final server probe uses the subpath scenario; all four scenarios are recorded.', 'Icons are Client Components with SSR and server import support; this is not a native RSC claim.',
+    checks, bundleAudit, importScenarios: scenarios, limitations: ['Separate root imports previously included the icon barrel under Next webpack. The current result is recorded in the separate-root scenario. The final server probe uses per-icon subpaths.', 'Icons are Client Components with SSR and server import support; this is not a native RSC claim.',
       'Next test compiles client ref/event code and checks SSR; browser hydration and event behavior are covered separately by consumer DOM tests.',
-      'Next fixture uses its default skipLibCheck:true because Next 16.4.2 references unavailable URLPatternInput/URLPatternOptions globals under TypeScript 5.9.3. React 18/19 consumer tests separately check package declarations with skipLibCheck:false.'],
+      'Next fixture uses the framework default skipLibCheck:true. React 18/19 consumer tests separately check package declarations with skipLibCheck:false.'],
     logs: ['pack.log', 'install.log', 'install-package.log', ...scenarios.map(item => `${item.mode}-build.log`), 'server.log', 'response.html'].map(name => path.join(work, name)),
   };
   await writeFile(path.join(results, 'next-results.json'), JSON.stringify(report, null, 2) + '\n');
