@@ -1,8 +1,6 @@
 # STATUS
 
 ## Doing
-- tao-ui 0.0.58 patch release includes the two component repair batches and is pending release CI and npm verification.
-- tao-icons 0.1.4 patch release includes the SVG size fallback fix and is pending release CI and npm verification.
 - Commerce bilingual switch and responsive fixes implemented; desktop/mobile browser checks and required gates passed. Fixed customer action icon color and checked light/dark themes. Real-device and complete interaction acceptance remain open.
 
 ## Next
@@ -14,6 +12,8 @@
 - none
 
 ## Done
+- 2026-11-20 Published tao-icons 0.1.4 with the SVG size fallback fix. The React 18/19 and Next.js consumer matrix, release CI, and npm tarball integrity passed. See `.logs/release-0.0.58/verification.md`.
+- 2026-11-20 Published tao-ui 0.0.58 with 32 component fixes. Release workflows, live bilingual changelogs, and npm tarball integrity passed. See `.logs/release-0.0.58/verification.md`.
 - 2026-11-20 Completed 100 component contract checks and fixed 13 reproduced defects. Required gates and targeted Chromium checks passed on React 18 and 19. See `.logs/bug-review-100-20261119/verification.md`.
 - 2026-11-19 Fixed 20 reproduced defects across tao-ui and tao-icons. Required gates, React 18/19 regression tests, Chromium ScrollArea checks and the Next 16.4.5 consumer matrix passed. See `.logs/bug-review-20261119/verification.md`.
 - 2026-11-16 Published tao-ui 0.0.57 with Form stale-error clearing on `setFields`/`fields` writes, Modal per-open focus with retained content, Select rich label tags, and Steps finish icon color props; local gates, GitHub release CI and npm version verification passed.
