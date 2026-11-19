@@ -639,3 +639,15 @@ test.each([
     file.thumbUrl ?? file.url,
   );
 });
+
+test('Upload forwards the progress label supplied by the caller', () => {
+  render(
+    <Upload
+      fileList={[{ uid: '1', name: 'report.pdf', status: 'uploading' }]}
+      progress={{ 'aria-label': 'Sending report' }}
+    />,
+  );
+  expect(
+    screen.getByRole('progressbar', { name: 'Sending report' }),
+  ).toBeInTheDocument();
+});

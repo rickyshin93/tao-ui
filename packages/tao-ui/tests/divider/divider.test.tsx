@@ -81,3 +81,11 @@ test('applies rail customizations to an untitled divider and renders zero titles
   rerender(<Divider>{0}</Divider>);
   expect(screen.getByText('0')).toBeTruthy();
 });
+
+test('an empty string does not interrupt the divider rail', () => {
+  const { container } = render(<Divider>{''}</Divider>);
+  expect(screen.getByRole('separator')).not.toHaveAttribute(
+    'data-tao-has-title',
+  );
+  expect(container.querySelector('[data-tao-divider-content]')).toBeNull();
+});

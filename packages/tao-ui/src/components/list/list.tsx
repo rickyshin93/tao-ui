@@ -319,7 +319,7 @@ function ListRoot<T>(
     setPage(current);
   const start = (current - 1) * resolvedPageSize;
   const data =
-    pagination && dataSource.length > start
+    pagination && total <= dataSource.length
       ? dataSource.slice(start, start + resolvedPageSize)
       : dataSource;
   const spinner =

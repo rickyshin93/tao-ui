@@ -250,3 +250,20 @@ test('nested panel interaction leaves the parent panel expanded', async () => {
   );
   expect(screen.getByText('Account details')).toBeVisible();
 });
+
+test('Collapse only points aria-controls at a mounted panel', async () => {
+  render(
+    <Collapse
+      destroyOnHidden
+      items={[{ key: 'profile', label: 'Profile', children: 'Details' }]}
+    />,
+  );
+  const trigger = screen.getByRole('button', { name: 'Profile' });
+  expect(trigger).not.toHaveAttribute('aria-controls');
+  await userEvent.click(trigger);
+  expect(
+    document.getElementById(trigger.getAttribute('aria-controls')!),
+  ).toContainElement(screen.getByText('Details'));
+  await userEvent.click(trigger);
+  expect(trigger).not.toHaveAttribute('aria-controls');
+});

@@ -128,13 +128,19 @@
   opacity: 1;
 }
 
-/* type="scroll" — show only during scroll (via JS class, fallback to hover) */
+/* type="scroll" — show during scroll or hover */
 [data-tao-scroll-area][data-tao-scroll-type="scroll"] [data-tao-scrollbar] {
   opacity: 0;
 }
 
 [data-tao-scroll-area][data-tao-scroll-type="scroll"]:hover
   [data-tao-scrollbar] {
+  opacity: 1;
+}
+
+[data-tao-scroll-area]:is([data-tao-scroll-type="auto"], [data-tao-scroll-type="scroll"])[data-tao-scrolling]
+  [data-tao-scrollbar],
+[data-tao-scroll-area][data-tao-scroll-type] [data-tao-scrollbar]:focus-visible {
   opacity: 1;
 }
 

@@ -1,4 +1,4 @@
-import { expect, test } from '@rstest/core';
+import { expect, rstest, test } from '@rstest/core';
 import { fireEvent, render, screen } from '@testing-library/react';
 import dayjs from 'dayjs';
 import { createRef } from 'react';
@@ -201,4 +201,27 @@ test('custom header sends customize events, ref exposes root, and full rendering
     'false',
   );
   expect(screen.getAllByText('Day 5').length).toBeGreaterThan(0);
+});
+
+test('custom headers cannot select a disabled date', () => {
+  const initial = dayjs('2026-11-04');
+  const disabled = initial.add(1, 'day');
+  const onSelect = rstest.fn();
+  const onChange = rstest.fn();
+  render(
+    <Calendar
+      defaultValue={initial}
+      disabledDate={(date) => date.isSame(disabled, 'day')}
+      onSelect={onSelect}
+      onChange={onChange}
+      headerRender={({ onChange: select }) => (
+        <button type="button" onClick={() => select(disabled)}>
+          Advance
+        </button>
+      )}
+    />,
+  );
+  fireEvent.click(screen.getByRole('button', { name: 'Advance' }));
+  expect(onSelect).not.toHaveBeenCalled();
+  expect(onChange).not.toHaveBeenCalled();
 });

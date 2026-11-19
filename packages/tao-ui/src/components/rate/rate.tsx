@@ -94,6 +94,11 @@ export const Rate = forwardRef<RateRef, RateProps>((props, ref) => {
     () => new Intl.NumberFormat(numberLocale),
     [numberLocale],
   );
+  const handleChange = (next: number) => {
+    const bounded = Math.min(count, Math.max(0, next));
+    if (!controlled) setInternalValue(bounded);
+    onChange?.(bounded);
+  };
   return (
     <span ref={directionRef} dir={direction} style={{ display: 'contents' }}>
       <RcRateComponent
@@ -112,11 +117,7 @@ export const Rate = forwardRef<RateRef, RateProps>((props, ref) => {
         count={count}
         keyboard={keyboard}
         value={selectedValue}
-        onChange={(next) => {
-          const bounded = Math.min(count, Math.max(0, next));
-          if (!controlled) setInternalValue(bounded);
-          onChange?.(bounded);
-        }}
+        onChange={handleChange}
         character={character}
         className={cx(classNames?.root, rootClassName, className)}
         style={{ ...styles?.root, ...style }}
@@ -149,7 +150,22 @@ export const Rate = forwardRef<RateRef, RateProps>((props, ref) => {
             children: cloneElement(radio, {
               'aria-checked': checked,
               'aria-label': `${score} / ${numberFormat.format(count)}`,
-              onKeyDown: keyboard === false ? undefined : radio.props.onKeyDown,
+              onKeyDown:
+                keyboard === false || !radio.props.onKeyDown
+                  ? undefined
+                  : (event) => {
+                      if (event.key !== ' ') {
+                        radio.props.onKeyDown?.(event);
+                        return;
+                      }
+                      event.preventDefault();
+                      if (!event.repeat) {
+                        const starValue = index + 1;
+                        const clear =
+                          (rest.allowClear ?? true) && selectedValue === starValue;
+                        handleChange(clear ? 0 : starValue);
+                      }
+                    },
             }),
           });
           const rendered = characterRender

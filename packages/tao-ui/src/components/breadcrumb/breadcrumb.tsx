@@ -199,6 +199,7 @@ export function Breadcrumb({
           ...(content.type === 'a' ? { href: undefined } : {}),
           ...(content.type === 'button' ? { disabled: true } : {}),
           onClick: (event: MouseEvent<HTMLElement>) => event.preventDefault(),
+          onAuxClick: (event: MouseEvent<HTMLElement>) => event.preventDefault(),
         });
       }
       return <Slot {...linkProps}>{content}</Slot>;

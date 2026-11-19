@@ -1,5 +1,6 @@
 import {
   type CSSProperties,
+  type KeyboardEvent,
   type ReactNode,
   type UIEvent,
   useCallback,
@@ -15,6 +16,9 @@ import {
   type SemanticStyles,
 } from '../../utils/semantic';
 import './scroll-area.css';
+
+const scrollIdleDelay = 600;
+const keyboardScrollStep = 40;
 
 // ---- Types ----
 
@@ -74,6 +78,8 @@ export function ScrollArea({
   styles,
 }: ScrollAreaProps) {
   const viewportRef = useRef<HTMLDivElement>(null);
+  const showVertical = direction !== 'horizontal';
+  const showHorizontal = direction !== 'vertical';
 
   // ---- Scrollbar state ----
   const [scrollState, setScrollState] = useState({
@@ -93,6 +99,11 @@ export function ScrollArea({
   const { locale } = useTaoConfig();
   const firedScrollEnd = useRef(false);
   const lastScrollTop = useRef(0);
+  const [scrolling, setScrolling] = useState(false);
+  const scrollTimer = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined,
+  );
+  useEffect(() => () => clearTimeout(scrollTimer.current), []);
   const updateScrollState = useCallback(() => {
     const el = viewportRef.current;
     if (!el) return;
@@ -104,8 +115,8 @@ export function ScrollArea({
       el,
       getComputedStyle(el).direction || textDirection,
     );
-    const hasV = scrollHeight > clientHeight + 1;
-    const hasH = scrollWidth > clientWidth + 1;
+    const hasV = showVertical && scrollHeight > clientHeight + 1;
+    const hasH = showHorizontal && scrollWidth > clientWidth + 1;
 
     setScrollState({
       hasVertical: hasV,
@@ -124,12 +135,12 @@ export function ScrollArea({
       atRight: scrollLeft + clientWidth >= scrollWidth - 1,
     });
     const nearBottom =
-      direction !== 'horizontal' &&
+      showVertical &&
       scrollHeight > clientHeight &&
       scrollTop + clientHeight >= scrollHeight - scrollEndThreshold;
     if (!nearBottom) firedScrollEnd.current = false;
     return nearBottom;
-  }, [direction, textDirection, scrollEndThreshold]);
+  }, [showVertical, showHorizontal, textDirection, scrollEndThreshold]);
 
   // Observe content size changes
   useEffect(() => {
@@ -158,6 +169,14 @@ export function ScrollArea({
       const movedVertically = scrollTop !== lastScrollTop.current;
       lastScrollTop.current = scrollTop;
       const nearBottom = updateScrollState();
+      if (type === 'auto' || type === 'scroll') {
+        setScrolling(true);
+        clearTimeout(scrollTimer.current);
+        scrollTimer.current = setTimeout(
+          () => setScrolling(false),
+          scrollIdleDelay,
+        );
+      }
       onScrollProp?.(e);
 
       if (
@@ -170,8 +189,48 @@ export function ScrollArea({
         onScrollEnd();
       }
     },
-    [updateScrollState, onScrollProp, onScrollEnd],
+    [updateScrollState, onScrollProp, onScrollEnd, type],
   );
+
+  const handleTrackKeyDown = (axis: 'x' | 'y', event: KeyboardEvent) => {
+    const viewport = viewportRef.current;
+    if (!viewport || event.defaultPrevented) return;
+    const vertical = axis === 'y';
+    const current = vertical ? viewport.scrollTop : getScrollLeft(viewport);
+    const page = vertical ? viewport.clientHeight : viewport.clientWidth;
+    const limit = (vertical ? viewport.scrollHeight : viewport.scrollWidth) - page;
+    const previous = vertical ? 'ArrowUp' : 'ArrowLeft';
+    const next = vertical ? 'ArrowDown' : 'ArrowRight';
+    let position: number;
+    switch (event.key) {
+      case previous:
+        position = current - keyboardScrollStep;
+        break;
+      case next:
+        position = current + keyboardScrollStep;
+        break;
+      case 'PageUp':
+        position = current - page;
+        break;
+      case 'PageDown':
+      case 'Enter':
+      case ' ':
+        position = current + page;
+        break;
+      case 'Home':
+        position = 0;
+        break;
+      case 'End':
+        position = limit;
+        break;
+      default:
+        return;
+    }
+    event.preventDefault();
+    const offset = Math.max(0, Math.min(limit, position));
+    if (vertical) viewport.scrollTop = offset;
+    else setScrollLeft(viewport, offset);
+  };
 
   // ---- Thumb drag ----
   const activeDrag = useRef<{ thumb: Element; cleanup: () => void } | null>(
@@ -270,9 +329,6 @@ export function ScrollArea({
   );
 
   // ---- Compute styles ----
-  const showVertical = direction === 'vertical' || direction === 'both';
-  const showHorizontal = direction === 'horizontal' || direction === 'both';
-
   const rootStyle: CSSProperties = {
     maxHeight: maxHeight ?? undefined,
     maxWidth: maxWidth ?? undefined,
@@ -294,6 +350,7 @@ export function ScrollArea({
       ref={directionRef}
       data-tao-scroll-area=""
       data-tao-scroll-type={type}
+      data-tao-scrolling={scrolling || undefined}
       data-tao-has-v={scrollState.hasVertical || undefined}
       data-tao-has-h={scrollState.hasHorizontal || undefined}
       className={cx(classNames?.root, className)}
@@ -345,6 +402,7 @@ export function ScrollArea({
           className={cx(classNames?.scrollbar)}
           style={styles?.scrollbar}
           onClick={(e) => handleTrackClick('y', e)}
+          onKeyDown={(e) => handleTrackKeyDown('y', e)}
         >
           <div
             data-tao-scroll-thumb=""
@@ -371,6 +429,7 @@ export function ScrollArea({
           className={cx(classNames?.scrollbar)}
           style={styles?.scrollbar}
           onClick={(e) => handleTrackClick('x', e)}
+          onKeyDown={(e) => handleTrackKeyDown('x', e)}
         >
           <div
             data-tao-scroll-thumb=""

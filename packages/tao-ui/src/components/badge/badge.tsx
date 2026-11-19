@@ -1,4 +1,5 @@
 import {
+  Children,
   type CSSProperties,
   forwardRef,
   type HTMLAttributes,
@@ -117,7 +118,7 @@ const BadgeRoot = forwardRef<HTMLSpanElement, BadgeProps>((props, ref) => {
   const statusMode =
     (status !== undefined || color !== undefined) &&
     (!renderable(label) || (zero && !showZero));
-  const hasChildren = Boolean(children) || children === 0;
+  const hasChildren = Children.toArray(children).some(renderable);
   const statusDot = statusMode && (!!text || status !== undefined || !zero);
   const standaloneStatus = !hasChildren && statusDot;
   const asDot = statusDot || (dot && !zero);

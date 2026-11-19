@@ -698,3 +698,15 @@ test('clicking a control inside a step does not activate the step itself', () =>
   fireEvent.click(screen.getByText('Second'));
   expect(actions).toEqual(['edit', 'step', 'change:1']);
 });
+
+test('out-of-range step progress stays within its accessible bounds', () => {
+  const { rerender } = render(
+    <Steps items={[{ title: 'Upload' }]} percent={125} />,
+  );
+  expect(screen.getByRole('progressbar')).toHaveAttribute(
+    'aria-valuenow',
+    '100',
+  );
+  rerender(<Steps items={[{ title: 'Upload' }]} percent={-5} />);
+  expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '0');
+});

@@ -163,3 +163,16 @@ test('Form does not submit an old complete OTP after a digit is deleted', async 
   });
   expect(onFinish).toHaveBeenCalledWith({ code: '1534' });
 });
+
+test('OTP accepts an edit after an interrupted composition loses focus', () => {
+  const changed = rs.fn();
+  render(<Input.OTP defaultValue="12" length={2} onChange={changed} />);
+  const first = screen.getAllByRole('textbox')[0]!;
+  fireEvent.focus(first);
+  fireEvent.compositionStart(first);
+  fireEvent.change(first, { target: { value: 'draft' } });
+  fireEvent.blur(first);
+  fireEvent.focus(first);
+  fireEvent.change(first, { target: { value: '9' } });
+  expect(changed).toHaveBeenCalledExactlyOnceWith('92');
+});

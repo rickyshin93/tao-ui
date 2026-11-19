@@ -607,8 +607,14 @@ const UploadRoot = forwardRef<UploadRef, UploadProps>((props, ref) => {
                       showInfo={false}
                       {...props.progress}
                       percent={file.percent ?? 0}
-                      aria-label={file['aria-label'] ?? file.name}
-                      aria-labelledby={file['aria-labelledby']}
+                      aria-label={
+                        file['aria-label'] ??
+                        props.progress?.['aria-label'] ??
+                        file.name
+                      }
+                      aria-labelledby={
+                        file['aria-labelledby'] ?? props.progress?.['aria-labelledby']
+                      }
                     />
                   )}
                   {listConfig.extra != null && (

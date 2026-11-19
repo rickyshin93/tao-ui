@@ -225,7 +225,10 @@ export const Calendar = forwardRef<CalendarRef, CalendarProps>((props, ref) => {
         props.headerRender({
           value,
           type: mode,
-          onChange: (date) => select(clamp(date), 'customize'),
+          onChange: (date) => {
+            const next = clamp(date);
+            if (!props.disabledDate?.(next)) select(next, 'customize');
+          },
           onTypeChange: changeMode,
         })
       ) : (

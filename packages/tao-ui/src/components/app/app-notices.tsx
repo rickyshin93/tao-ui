@@ -246,8 +246,21 @@ export function useAppMessages(config: AppMessageConfig = {}) {
       error: typed('error'),
       loading: typed('loading'),
       destroy: (key) => {
-        if (key !== undefined) close(key);
-        else for (const current of [...active.current.keys()]) close(current);
+        if (key !== undefined) {
+          close(key);
+          return;
+        }
+        const failures: unknown[] = [];
+        for (const current of [...active.current.keys()]) {
+          try {
+            close(current);
+          } catch (error) {
+            failures.push(error);
+          }
+        }
+        if (failures.length === 1) throw failures[0];
+        if (failures.length > 1)
+          throw new AggregateError(failures, 'Message cleanup failed');
       },
     };
   }, [notices]);

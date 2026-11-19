@@ -126,7 +126,7 @@ const AvatarRoot = forwardRef<HTMLSpanElement, AvatarProps>((props, ref) => {
   const hasNativeImage = !customImage && !failed && (!!imageSrc || !!srcSet);
   const hasImage = hasNativeImage || customImage !== null;
   const hasIcon =
-    icon !== null && icon !== undefined && typeof icon !== 'boolean';
+    icon != null && icon !== '' && typeof icon !== 'boolean';
   const [scale, setScale] = useState(1);
   useLayoutEffect(() => {
     if (hasImage || hasIcon) return;

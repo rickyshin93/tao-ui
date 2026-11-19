@@ -231,3 +231,15 @@ test('pagination supports quick jumping, simple mode and custom size changer cal
   expect(onSize).toHaveBeenCalledTimes(1);
   expect(screen.getByText('Row 30')).toBeTruthy();
 });
+
+test('a server page stays intact after the requested page size changes', () => {
+  render(
+    <List
+      dataSource={items}
+      renderItem={item}
+      pagination={{ current: 2, pageSize: 2, total: 100 }}
+    />,
+  );
+  expect(screen.getByText('One')).toBeInTheDocument();
+  expect(screen.getByText('Three')).toBeInTheDocument();
+});

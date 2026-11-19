@@ -94,3 +94,14 @@ test('a localized weekday must agree with the parsed date', () => {
     ).isValid(),
   ).toBe(false);
 });
+
+test('a literal month name does not override the parsed localized month', () => {
+  const value = dayjs('2026-05-12');
+  const format = '[tháng 11 thống kê] DD MMMM YYYY';
+  const text = formatPickerDate(value, format, viVN.dayjsLocale);
+  expect(
+    parsePickerDate(text, format, viVN.dayjsLocale, viVN.numberLocale).format(
+      'YYYY-MM-DD',
+    ),
+  ).toBe('2026-05-12');
+});

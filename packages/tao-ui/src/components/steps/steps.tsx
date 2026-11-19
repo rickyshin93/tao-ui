@@ -289,7 +289,10 @@ export function Steps({
         : (titlePlacement ?? 'horizontal');
 
   // Inline steps surface content in a tooltip, so the ring has nowhere to go.
-  const mergedPercent = isInline ? undefined : percent;
+  const mergedPercent =
+    isInline || percent === undefined
+      ? undefined
+      : Math.min(100, Math.max(0, percent || 0));
 
   // ============================== Data ==============================
   const { canApplyMaxCount, displaySteps, displayCurrent } = useDisplaySteps(

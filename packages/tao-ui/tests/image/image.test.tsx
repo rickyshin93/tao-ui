@@ -438,3 +438,23 @@ test('an iterable preview mask is used as the image cover', () => {
     'Preview image',
   );
 });
+
+test('switching an open Image to a progress placeholder releases its preview container', async () => {
+  const { rerender } = render(
+    <Image src={source} alt="Profile" preview={{ open: true }} />,
+  );
+  await screen.findByRole('dialog');
+  expect(document.querySelector('[data-tao-image-popup]')).not.toBeNull();
+  rerender(
+    <Image
+      src={source}
+      alt="Profile"
+      placeholder={{ progress: true }}
+      preview={{ open: true }}
+    />,
+  );
+  expect(screen.getByRole('status', { name: 'Profile' })).toBeInTheDocument();
+  await waitFor(() =>
+    expect(document.querySelector('[data-tao-image-popup]')).toBeNull(),
+  );
+});

@@ -2,6 +2,7 @@ import { expect, rs, test } from '@rstest/core';
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { createRef, useState } from 'react';
+import { flushSync } from 'react-dom';
 import { Button } from '../../src/components/button/button';
 import { Input, type InputRef } from '../../src/components/input/input';
 import { Textarea } from '../../src/components/textarea/textarea';
@@ -425,4 +426,65 @@ test('a custom loading Search button blocks pointer and Enter searches', async (
   view.rerender(control(false));
   await userEvent.click(button);
   expect(searches).toEqual(['record']);
+});
+
+test('Search renders a numeric zero as custom button content', () => {
+  render(<Input.Search enterButton={0} />);
+  expect(screen.getByRole('button', { name: 'Search' })).toHaveTextContent('0');
+});
+
+test('Search skips submission when a custom button removes the input synchronously', () => {
+  const onSearch = rs.fn();
+  function Search() {
+    const [visible, setVisible] = useState(true);
+    return visible ? (
+      <Input.Search
+        defaultValue="query"
+        onSearch={onSearch}
+        enterButton={
+          <button
+            type="button"
+            onClick={() => flushSync(() => setVisible(false))}
+          >
+            Dismiss
+          </button>
+        }
+      />
+    ) : (
+      <p>Dismissed</p>
+    );
+  }
+  render(<Search />);
+  const errors: unknown[] = [];
+  const onError = (event: ErrorEvent) => {
+    event.preventDefault();
+    errors.push(event.error);
+  };
+  window.addEventListener('error', onError);
+  try {
+    fireEvent.click(screen.getByRole('button', { name: 'Search' }));
+  } finally {
+    window.removeEventListener('error', onError);
+  }
+  expect(screen.getByText('Dismissed')).toBeInTheDocument();
+  expect(onSearch).not.toHaveBeenCalled();
+  expect(errors).toEqual([]);
+});
+test('a disabled custom Search submit button also blocks Enter while leaving the input editable', () => {
+  const onSearch = rs.fn();
+  render(
+    <Input.Search
+      enterButton={
+        <button type="button" disabled>
+          Search now
+        </button>
+      }
+      onSearch={onSearch}
+    />,
+  );
+  const input = screen.getByRole('textbox');
+  fireEvent.change(input, { target: { value: 'Query' } });
+  fireEvent.keyDown(input, { key: 'Enter' });
+  expect(input).toHaveValue('Query');
+  expect(onSearch).not.toHaveBeenCalled();
 });

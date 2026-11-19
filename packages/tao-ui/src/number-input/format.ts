@@ -41,15 +41,20 @@ export function parse(display: string, opts: NumberFormatOptions): string {
 
   let cleaned = '';
   let seenDecimal = false;
-  for (const ch of body) {
-    if (ch >= '0' && ch <= '9') {
+  const { decimalSeparator } = opts;
+  for (let index = 0; index < body.length; index++) {
+    const ch = body[index];
+    if (decimalSeparator && body.startsWith(decimalSeparator, index)) {
+      if (!seenDecimal) cleaned += '.';
+      seenDecimal = true;
+      index += decimalSeparator.length - 1;
+    } else if (ch >= '0' && ch <= '9') {
       cleaned += ch;
     } else if (
       !seenDecimal &&
-      (ch === opts.decimalSeparator ||
-        (opts.allowAsciiDecimal &&
-          ch === '.' &&
-          opts.thousandsSeparator !== '.'))
+      opts.allowAsciiDecimal &&
+      ch === '.' &&
+      opts.thousandsSeparator !== '.'
     ) {
       cleaned += '.';
       seenDecimal = true;

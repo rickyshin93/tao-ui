@@ -342,3 +342,31 @@ test('BackTop follows a replacement element returned by the same target callback
   fireEvent.scroll(second);
   expect(screen.getByRole('button', { name: 'Back to top' })).toBeVisible();
 });
+
+test('an explicit empty href retains native link behavior', () => {
+  render(<FloatButton content="Current page" href="" />);
+  expect(screen.getByText('Current page').closest('a')).toHaveAttribute(
+    'href',
+    '',
+  );
+});
+
+test('disabled FloatButton links block auxiliary activation callbacks', () => {
+  const onAuxClick = rstest.fn();
+  render(
+    <FloatButton
+      content="External"
+      href="#external"
+      disabled
+      onAuxClick={onAuxClick}
+    />,
+  );
+  const anchor = screen.getByText('External').closest('a')!;
+  const event = new MouseEvent('auxclick', {
+    bubbles: true,
+    cancelable: true,
+    button: 1,
+  });
+  expect(fireEvent(anchor, event)).toBe(false);
+  expect(onAuxClick).not.toHaveBeenCalled();
+});

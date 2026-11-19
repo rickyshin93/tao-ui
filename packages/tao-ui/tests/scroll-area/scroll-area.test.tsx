@@ -499,3 +499,49 @@ test('clicking a zero-length track leaves the scroll offset alone', () => {
   fireEvent.click(track, { clientY: 10 });
   expect(write).not.toHaveBeenCalled();
 });
+
+test.each(['auto', 'scroll'] as const)(
+  '%s scrollbar becomes visible after scrolling and hides after inactivity',
+  (type) => {
+    rstest.useFakeTimers();
+    try {
+      const { container, rerender, viewport } = renderScrollableArea('y');
+      rerender(
+        <ScrollArea type={type} direction="both">
+          <div>Content</div>
+        </ScrollArea>,
+      );
+      const root = container.querySelector('[data-tao-scroll-area]');
+      expect(root).not.toHaveAttribute('data-tao-scrolling');
+      viewport.scrollTop = 100;
+      fireEvent.scroll(viewport);
+      expect(root).toHaveAttribute('data-tao-scrolling');
+      act(() => rstest.runOnlyPendingTimers());
+      expect(root).not.toHaveAttribute('data-tao-scrolling');
+    } finally {
+      rstest.useRealTimers();
+    }
+  },
+);
+
+test('keyboard scrolling on a focused track moves by a page and reaches the end', () => {
+  const { track, viewport } = renderScrollableArea('y');
+  track.focus();
+  expect(fireEvent.keyDown(track, { key: 'PageDown' })).toBe(false);
+  expect(viewport.scrollTop).toBe(100);
+  expect(fireEvent.keyDown(track, { key: 'End' })).toBe(false);
+  expect(viewport.scrollTop).toBe(900);
+});
+
+test('overflow on a disabled scroll axis does not reserve a scrollbar corner', () => {
+  const { container, rerender, viewport } = renderScrollableArea('y');
+  rerender(
+    <ScrollArea direction="vertical">
+      <div>Content</div>
+    </ScrollArea>,
+  );
+  fireEvent.scroll(viewport);
+  const root = container.querySelector('[data-tao-scroll-area]');
+  expect(root).toHaveAttribute('data-tao-has-v');
+  expect(root).not.toHaveAttribute('data-tao-has-h');
+});

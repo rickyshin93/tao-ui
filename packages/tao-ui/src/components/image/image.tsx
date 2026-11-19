@@ -397,8 +397,6 @@ function ImageBase(props: ImageProps) {
   const classes =
     typeof classNames === 'function' ? classNames({ props }) : classNames;
   const css = typeof styles === 'function' ? styles({ props }) : styles;
-  const { disabled, config, hiddenMask, blurMask, maskCover } =
-    usePreviewOptions(preview, internalOpen);
   const raw = typeof preview === 'object' ? preview : {};
   const isProgressConfig =
     placeholder !== null &&
@@ -409,10 +407,11 @@ function ImageBase(props: ImageProps) {
   const showPlaceholder =
     !!progress ||
     (!props.src && (!!placeholder || placeholder === 0) && !isProgressConfig);
+  const { disabled, config, hiddenMask, blurMask, maskCover } =
+    usePreviewOptions(showPlaceholder ? false : preview, internalOpen);
   useEffect(() => {
-    if (disabled || config.open !== undefined || showPlaceholder)
-      setInternalOpen(false);
-  }, [disabled, config.open, showPlaceholder]);
+    if (disabled || config.open !== undefined) setInternalOpen(false);
+  }, [disabled, config.open]);
   if (showPlaceholder)
     return (
       <ImageProgress

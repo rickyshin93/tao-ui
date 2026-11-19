@@ -267,3 +267,32 @@ test('itemRender uses the original path index for entries after the ellipsis', (
   );
   expect(screen.getByText('3 Current')).toBeVisible();
 });
+
+test('disabled custom breadcrumb links block middle-click activation', () => {
+  const onAuxClick = rs.fn();
+  function RouterLink(props: React.ComponentProps<'a'>) {
+    return <a {...props} />;
+  }
+  render(
+    <Breadcrumb
+      items={[{ title: 'Archive', disabled: true }, { title: 'Current' }]}
+      itemRender={(item, { isLast }) =>
+        isLast ? (
+          item.title
+        ) : (
+          <RouterLink href="#archive" onAuxClick={onAuxClick}>
+            {item.title}
+          </RouterLink>
+        )
+      }
+    />,
+  );
+  const link = screen.getByRole('link', { name: 'Archive' });
+  const event = new MouseEvent('auxclick', {
+    bubbles: true,
+    cancelable: true,
+    button: 1,
+  });
+  expect(fireEvent(link, event)).toBe(false);
+  expect(onAuxClick).not.toHaveBeenCalled();
+});

@@ -239,7 +239,7 @@ function MasonryInner<T>(
                 ...slots?.item,
                 position: 'absolute',
                 width,
-                height: item.height,
+                height: item.height ?? slots?.item?.height,
                 insetInlineStart: `calc((${width} + ${gap}) * ${column})`,
                 top: position?.top ?? 0,
               } as CSSProperties

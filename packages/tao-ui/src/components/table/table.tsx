@@ -274,7 +274,7 @@ export function Table<T extends TableRecord = Record<string, unknown>>({
       setInternalExpandedKeys(nextKeys);
     }
     expandable?.onExpand?.(expanded, record);
-    expandable?.onExpandedRowsChange?.(nextKeys);
+    expandable?.onExpandedRowsChange?.([...nextKeys]);
   };
 
   // ---- Scroll + sticky columns ----
@@ -620,6 +620,8 @@ export function Table<T extends TableRecord = Record<string, unknown>>({
                       data-tao-table-row=""
                       data-tao-selected={isSelected || undefined}
                       onClick={(event) => {
+                        if (!event.currentTarget.contains(event.target as Node))
+                          return;
                         const selectionCell = (event.target as Element).closest(
                           '[data-tao-table-selection-cell]',
                         );

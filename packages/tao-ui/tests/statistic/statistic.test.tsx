@@ -188,3 +188,27 @@ test('countup callbacks and display both remain at zero before the start time', 
   act(() => rstest.advanceTimersByTime(2000));
   expect(onChange.mock.lastCall?.[0]).toBeGreaterThan(0);
 });
+
+test('passes the resolved format configuration to a custom Statistic formatter', () => {
+  render(
+    <Statistic
+      locale="en-US"
+      value={12.5}
+      precision={1}
+      decimalSeparator=":"
+      formatter={(value, config) =>
+        `${value}: ${config?.locale}, ${config?.precision}, ${config?.decimalSeparator}`
+      }
+    />,
+  );
+  expect(screen.getByText('12.5: en-US, 1, :')).toBeInTheDocument();
+});
+
+test('an explicitly empty Statistic value does not render a numeric zero', () => {
+  const { container, rerender } = render(<Statistic value="" />);
+  expect(
+    container.querySelector('[data-tao-statistic-value]'),
+  ).toBeEmptyDOMElement();
+  rerender(<Statistic value={0} />);
+  expect(screen.getByText('0')).toBeInTheDocument();
+});

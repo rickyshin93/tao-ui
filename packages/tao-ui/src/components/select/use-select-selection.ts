@@ -159,8 +159,14 @@ export function useSelectSelection(props: SelectionProps, disabled: boolean) {
   );
 
   const commit = useCallback(
-    (nextArray: string[]) => {
-      if (disabled || (maxCount != null && nextArray.length > maxCount)) return;
+    (draft: string[]) => {
+      if (disabled) return;
+      const nextArray = draft.filter((item) => {
+        if (selectedValueSet.has(item)) return true;
+        const option = optionByValue.get(item);
+        return option ? !option.disabled : mode === 'tags';
+      });
+      if (maxCount != null && nextArray.length > maxCount) return;
       publish(nextArray);
       const nextSet = new Set(nextArray);
       for (const next of nextArray) {
@@ -178,6 +184,7 @@ export function useSelectSelection(props: SelectionProps, disabled: boolean) {
     },
     [
       disabled,
+      mode,
       maxCount,
       valueArray,
       selectedValueSet,

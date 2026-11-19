@@ -80,15 +80,18 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(
       (customButton &&
         enterButton.type === Button &&
         enterButton.props.loading);
+    const submitDisabled =
+      disabled || isLoading || (customButton && enterButton.props.disabled);
     const search = (
       event: MouseEvent<HTMLElement> | KeyboardEvent<HTMLInputElement>,
     ) => {
-      if (!disabled && !isLoading && !event.defaultPrevented)
-        onSearch?.(inputRef.current!.value, event, { source: 'input' });
+      const input = inputRef.current;
+      if (input && !submitDisabled && !event.defaultPrevented)
+        onSearch?.(input.value, event, { source: 'input' });
     };
     const buttonProps: ButtonProps = {
       type: 'button',
-      disabled: disabled || isLoading,
+      disabled: submitDisabled,
       'aria-busy': isLoading || undefined,
       'aria-label': ctx.locale.search ?? 'Search',
       className: classNames?.button,
@@ -96,6 +99,7 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(
       onMouseDown: (event) => event.preventDefault(),
       onClick: search,
     };
+    const hasButtonContent = enterButton === 0 || Boolean(enterButton);
     const button = customButton ? (
       cloneElement(enterButton as ReactElement<ButtonProps>, {
         ...buttonProps,
@@ -103,7 +107,6 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(
         style: { ...enterButton.props.style, ...styles?.button },
         'aria-label':
           enterButton.props['aria-label'] ?? buttonProps['aria-label'],
-        disabled: buttonProps.disabled || enterButton.props.disabled,
         ...(enterButton.type === Button
           ? { loading: isLoading, size: props.size ?? enterButton.props.size }
           : {}),
@@ -121,9 +124,9 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(
         {...buttonProps}
         loading={isLoading}
         size={props.size}
-        variant={enterButton ? 'primary' : 'secondary'}
+        variant={hasButtonContent ? 'primary' : 'secondary'}
       >
-        {enterButton === true || !enterButton
+        {enterButton === true || !hasButtonContent
           ? (searchIcon ?? <SearchIcon />)
           : enterButton}
       </Button>

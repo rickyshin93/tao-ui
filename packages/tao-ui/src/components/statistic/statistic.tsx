@@ -85,7 +85,7 @@ function formattedNumber(
       ? plainNumber.format(value)
       : String(value);
   const match = /^(-?)(\d*)(?:\.(\d+))?$/.exec(text);
-  if (!match || text === '-') return text;
+  if (!match || text === '' || text === '-') return text;
   const integer = localizeDigits(
     groupInteger(match[2] || '0', options),
     options,
@@ -167,7 +167,12 @@ const StatisticRoot = forwardRef<StatisticRef, StatisticProps>((props, ref) => {
       style={slots?.value}
     >
       {typeof formatter === 'function'
-        ? formatter(value)
+        ? formatter(value, {
+            locale,
+            precision,
+            decimalSeparator: numberFormat.decimalSeparator,
+            groupSeparator: numberFormat.thousandsSeparator,
+          })
         : formatter === false
           ? value
           : formattedNumber(value, precision, numberFormat)}

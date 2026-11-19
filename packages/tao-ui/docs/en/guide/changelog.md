@@ -7,6 +7,20 @@ description: Version history for @rockshin/tao-ui, including fixes for uploads, 
 
 User-facing changes for `@rockshin/tao-ui`, listed by release. Dates use UTC+8.
 
+## 0.0.58
+
+2026-11-20
+
+- Input.Search handles zero-valued button content and respects a disabled custom submit button on Enter. OTP cells accept edits after an interrupted IME composition. See [Input](/components/input).
+- Mobile Select preserves committed choices and drops newly drafted options that become unavailable. Calendar custom headers respect disabled dates, and localized date parsing distinguishes literal text from the selected month. See [Select](/components/select), [Calendar](/components/calendar), and [DatePicker](/components/date-picker).
+- Number inputs support multi-character decimal and grouping separators during editing. Statistic passes the resolved formatting options to custom formatters and preserves explicitly blank values. See [InputNumber](/components/input-number) and [Statistic](/components/statistic).
+- Table isolates expanded-row callback data and ignores row clicks from portaled cell actions. List keeps server-provided pages intact, and Pagination rejects invalid page counts and sizes. See [Table](/components/table), [List](/components/list), and [Pagination](/components/pagination).
+- Image releases preview containers when switching to a progress placeholder. App closes all active messages even when a close callback throws, and Upload forwards custom progress labels. See [Image](/components/image), [App](/components/app), and [Upload](/components/upload).
+- ScrollArea reveals scrollbars during scrolling and supports keyboard navigation. Rate accepts Space to choose a star, and Collapse links its controls to mounted panels. See [ScrollArea](/components/scroll-area), [Rate](/components/rate), and [Collapse](/components/collapse).
+- Carousel renders text and numeric slides, Masonry measures custom item heights, and several display components handle empty values more consistently. See [Carousel](/components/carousel), [Masonry](/components/masonry), [Avatar](/components/avatar), [Badge](/components/badge), and [Divider](/components/divider).
+
+[Compare changes](https://github.com/rickyshin93/tao-ui/compare/v0.0.57...v0.0.58)
+
 ## 0.0.57
 
 2026-11-16

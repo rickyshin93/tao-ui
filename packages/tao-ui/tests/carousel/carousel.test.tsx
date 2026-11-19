@@ -321,3 +321,11 @@ test('inactive carousel slides and their clones are inert until visible', async 
     expectSlideInertness();
   });
 });
+
+test('renders numeric and text children as slides', () => {
+  render(
+    <Carousel infinite={false}>{[0, 'Text slide', '   ', false]}</Carousel>,
+  );
+  expect(screen.getByText('0')).toBeInTheDocument();
+  expect(screen.getByText('Text slide')).toBeInTheDocument();
+});

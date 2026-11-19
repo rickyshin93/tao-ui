@@ -6,8 +6,13 @@ export function countAnchored(
   const limit = Math.min(upTo, display.length);
   if (!thousandsSeparator) return Math.max(0, limit);
   let count = 0;
-  for (let i = 0; i < limit; i++) {
-    if (display[i] !== thousandsSeparator) count++;
+  for (let i = 0; i < limit; ) {
+    if (display.startsWith(thousandsSeparator, i)) {
+      i += thousandsSeparator.length;
+    } else {
+      count++;
+      i++;
+    }
   }
   return count;
 }
@@ -20,9 +25,14 @@ export function findCursorAt(
   if (anchorCount <= 0) return 0;
   if (!thousandsSeparator) return Math.min(anchorCount, display.length);
   let count = 0;
-  for (let i = 0; i < display.length; i++) {
-    if (display[i] !== thousandsSeparator) count++;
-    if (count === anchorCount) return i + 1;
+  for (let i = 0; i < display.length; ) {
+    if (display.startsWith(thousandsSeparator, i)) {
+      i += thousandsSeparator.length;
+    } else {
+      count++;
+      i++;
+      if (count === anchorCount) return i;
+    }
   }
   return display.length;
 }
@@ -37,8 +47,13 @@ function countAnchoredFromEnd(
   if (fromPos >= display.length) return 0;
   if (!thousandsSeparator) return display.length - Math.max(0, fromPos);
   let count = 0;
-  for (let i = Math.max(0, fromPos); i < display.length; i++) {
-    if (display[i] !== thousandsSeparator) count++;
+  for (let i = display.length; i > Math.max(0, fromPos); ) {
+    if (display.endsWith(thousandsSeparator, i)) {
+      i -= thousandsSeparator.length;
+    } else {
+      count++;
+      i--;
+    }
   }
   return count;
 }
@@ -51,9 +66,14 @@ function findCursorFromEnd(
   if (anchoredFromEnd <= 0) return display.length;
   if (!thousandsSeparator) return Math.max(0, display.length - anchoredFromEnd);
   let count = 0;
-  for (let i = display.length - 1; i >= 0; i--) {
-    if (display[i] !== thousandsSeparator) count++;
-    if (count === anchoredFromEnd) return i;
+  for (let i = display.length; i > 0; ) {
+    if (display.endsWith(thousandsSeparator, i)) {
+      i -= thousandsSeparator.length;
+    } else {
+      count++;
+      i--;
+      if (count === anchoredFromEnd) return i;
+    }
   }
   return 0;
 }
@@ -79,5 +99,5 @@ export function isThousandSepBeforeCursor(
   thousandsSeparator: string,
 ): boolean {
   if (!thousandsSeparator || cursor <= 0) return false;
-  return display[cursor - 1] === thousandsSeparator;
+  return display.endsWith(thousandsSeparator, cursor);
 }

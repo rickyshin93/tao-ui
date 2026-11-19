@@ -162,3 +162,14 @@ test('string offsets preserve CSS units on both axes', () => {
   expect(indicator.style.insetInlineEnd).toContain('rem');
   expect(indicator.style.marginTop).toBe('2em');
 });
+
+test('empty children keep a status badge in standalone mode', () => {
+  const { container } = render(
+    <Badge status="success" text="Ready">
+      {[]}
+    </Badge>,
+  );
+  expect(container.querySelector('[data-tao-badge]')).toHaveAttribute(
+    'data-tao-status-only',
+  );
+});

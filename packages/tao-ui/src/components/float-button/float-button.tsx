@@ -130,7 +130,8 @@ const FloatButtonRoot = forwardRef<FloatButtonElement, FloatButtonProps>(
         : classNames;
     const slots =
       typeof styles === 'function' ? styles({ props: merged }) : styles;
-    const Tag = href ? 'a' : 'button';
+    const isLink = href != null;
+    const Tag = isLink ? 'a' : 'button';
     const node = useRef<FloatButtonElement | null>(null);
     useImperativeHandle(ref, () => node.current!);
     const hasLabel =
@@ -144,10 +145,10 @@ const FloatButtonRoot = forwardRef<FloatButtonElement, FloatButtonProps>(
         }}
         href={disabled ? undefined : href}
         target={target}
-        type={href ? undefined : htmlType}
-        disabled={href ? undefined : disabled}
-        aria-disabled={(href && disabled) || undefined}
-        tabIndex={href && disabled ? -1 : rest.tabIndex}
+        type={isLink ? undefined : htmlType}
+        disabled={isLink ? undefined : disabled}
+        aria-disabled={(isLink && disabled) || undefined}
+        tabIndex={isLink && disabled ? -1 : rest.tabIndex}
         aria-label={
           props['aria-label'] ??
           (!hasLabel
@@ -175,6 +176,9 @@ const FloatButtonRoot = forwardRef<FloatButtonElement, FloatButtonProps>(
           }
           rest.onClick?.(event as ReactMouseEvent<FloatButtonElement>);
         }}
+        onAuxClick={
+          disabled ? (event) => event.preventDefault() : rest.onAuxClick
+        }
       >
         {glyph !== null && (
           <span

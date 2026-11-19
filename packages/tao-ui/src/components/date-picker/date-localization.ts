@@ -101,28 +101,30 @@ export function parsePickerDate(
     const date = reference.month(month);
     return [date.format(token), date.format(`D ${token}`).slice(2)];
   };
-  const selected = Array.from({ length: 12 }, (_, month) =>
-    monthNames(month, monthTokens[0]).map((name) => ({ month, name })),
-  )
-    .flat()
-    .sort((left, right) => right.name.length - left.name.length)
-    .find(({ name }) => normalized.includes(name));
-  if (!selected) return dayjs(NaN);
-  const numericFormat = namedFormat.replace(
-    /(\[[^\]]*])|(MMMM|MMM)/g,
-    (token, literal: string | undefined) => {
-      if (literal) return literal;
-      const name = monthNames(selected.month, token)
-        .sort((left, right) => right.length - left.length)
-        .find((candidate) => normalized.includes(candidate));
-      return `[${name}]`;
-    },
-  );
-  const parsedMonth = dayjs(
-    `${normalized} ${String(selected.month + 1).padStart(2, '0')}`,
-    `${numericFormat} MM`,
-    locale,
-    true,
-  );
-  return exactResult(parsedMonth);
+  for (let month = 0; month < 12; month++) {
+    const matchesMonth = monthNames(month, monthTokens[0]).some((name) =>
+      normalized.includes(name),
+    );
+    if (!matchesMonth) continue;
+    const numericFormat = namedFormat.replace(
+      /(\[[^\]]*])|(MMMM|MMM)/g,
+      (token, literal: string | undefined) => {
+        if (literal) return literal;
+        const name = monthNames(month, token)
+          .sort((left, right) => right.length - left.length)
+          .find((candidate) => normalized.includes(candidate));
+        return `[${name}]`;
+      },
+    );
+    const parsed = exactResult(
+      dayjs(
+        `${normalized} ${String(month + 1).padStart(2, '0')}`,
+        `${numericFormat} MM`,
+        locale,
+        true,
+      ),
+    );
+    if (parsed.isValid()) return parsed;
+  }
+  return dayjs(NaN);
 }

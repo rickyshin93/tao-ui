@@ -710,3 +710,42 @@ test('modal scroll locking and focus trapping can be configured independently', 
   );
   act(() => result.destroy());
 });
+
+test('destroying all messages closes later messages even if a close callback throws', async () => {
+  let api!: AppInstance;
+  const closed = rstest.fn();
+  render(
+    <App>
+      <Capture
+        capture={(value) => {
+          api = value;
+        }}
+      />
+    </App>,
+  );
+  act(() => {
+    api.message.info('First', 0, () => {
+      throw new Error('Close failed');
+    });
+    api.message.info('Second', 0, closed);
+  });
+  act(() => {
+    expect(() => api.message.destroy()).toThrow('Close failed');
+  });
+  expect(closed).toHaveBeenCalledTimes(1);
+  await waitFor(() => expect(screen.queryByText('Second')).toBeNull());
+
+  const failures = [new Error('First error'), new Error('Second error')];
+  act(() => {
+    for (const failure of failures) {
+      api.message.info(failure.message, 0, () => {
+        throw failure;
+      });
+    }
+  });
+  act(() => {
+    expect(() => api.message.destroy()).toThrow(
+      new AggregateError(failures, 'Message cleanup failed'),
+    );
+  });
+});

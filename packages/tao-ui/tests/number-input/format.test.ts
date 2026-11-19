@@ -9,6 +9,11 @@ import type { FormatOptions } from '../../src/number-input/types';
 
 const opts: FormatOptions = { decimalSeparator: '.', thousandsSeparator: ',' };
 
+test('a custom multi-character decimal separator round-trips', () => {
+  const options = { ...opts, decimalSeparator: '::' };
+  expect(parse(format('1234.50', options), options)).toBe('1234.50');
+});
+
 test('format: empty string', () => {
   expect(format('', opts)).toBe('');
 });

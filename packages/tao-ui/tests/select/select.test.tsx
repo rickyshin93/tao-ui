@@ -2106,3 +2106,33 @@ test('searchable-list highlight updates keep lookup work linear as options doubl
   }
   expect(measure(400)).toBeLessThanOrEqual(measure(200) * 2.5);
 });
+
+test('mobile Select discards a new draft item that becomes disabled before Done', async () => {
+  const onChange = rs.fn();
+  const onSelect = rs.fn();
+  const view = (disabled: boolean) => (
+    <Select
+      mobile
+      mode="multiple"
+      defaultValue={['a']}
+      options={[
+        { label: 'Alpha', value: 'a', disabled },
+        { label: 'Beta', value: 'b', disabled },
+        { label: 'Gamma', value: 'c' },
+      ]}
+      onChange={onChange}
+      onSelect={onSelect}
+    />
+  );
+  const { container, rerender } = render(view(false));
+  await userEvent.click(container.querySelector('[data-tao-select]')!);
+  await userEvent.click(screen.getByRole('button', { name: 'Beta' }));
+  await userEvent.click(screen.getByRole('button', { name: 'Gamma' }));
+  rerender(view(true));
+  await userEvent.click(screen.getByRole('button', { name: 'Done' }));
+  expect(onChange.mock.calls[0]?.[0]).toEqual(['a', 'c']);
+  expect(onSelect).toHaveBeenCalledExactlyOnceWith('c', {
+    label: 'Gamma',
+    value: 'c',
+  });
+});

@@ -173,3 +173,18 @@ test('keeps the layout valid with fractional column counts and out-of-range assi
   expect(screen.getByText('Item 1')).toHaveAttribute('data-tao-column', '1');
   expect(ref.current?.nativeElement).toHaveStyle({ height: '100px' });
 });
+
+test('Masonry positions subsequent items using the configured semantic item height', () => {
+  render(
+    <Masonry
+      columns={1}
+      styles={{ item: { height: 40 } }}
+      items={[
+        { key: 1, children: 'First' },
+        { key: 2, children: 'Second' },
+      ]}
+    />,
+  );
+  expect(screen.getByText('First')).toHaveStyle({ height: '40px' });
+  expect(screen.getByText('Second')).toHaveStyle({ top: '40px' });
+});

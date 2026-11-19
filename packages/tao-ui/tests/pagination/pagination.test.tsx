@@ -210,3 +210,15 @@ test('shows an empty range while the requested controlled page has no data', () 
   );
   expect(screen.getByText('0–0')).toBeInTheDocument();
 });
+
+test('an invalid page size fails before calculating page controls', () => {
+  expect(() => render(<Pagination total={25} pageSize={0} />)).toThrow(
+    'Pagination pageSize must be a positive integer',
+  );
+  expect(() => render(<Pagination total={Infinity} />)).toThrow(
+    'Pagination total must be a non-negative safe integer',
+  );
+  expect(() =>
+    render(<Pagination total={25} showSizeChanger pageSizeOptions={[0, 10]} />),
+  ).toThrow('Pagination pageSizeOptions must contain positive integers');
+});

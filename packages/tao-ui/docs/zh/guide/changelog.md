@@ -7,6 +7,20 @@ description: 查看 @rockshin/tao-ui 各版本的更新，包括上传、选择�
 
 按版本记录 `@rockshin/tao-ui` 的用户可见变更。日期使用 UTC+8。
 
+## 0.0.58
+
+2026-11-20
+
+- Input.Search 支持以数字 0 作为按钮内容，自定义提交按钮禁用时按 Enter 也会阻止提交。OTP 在输入法组合输入中断后可以继续编辑。详见 [Input](/zh/components/input)。
+- 移动端 Select 保留已提交的选项，并过滤变为不可选的新增草稿项。Calendar 自定义表头遵守禁用日期设置，本地化日期解析可区分固定文案与实际月份。详见 [Select](/zh/components/select)、[Calendar](/zh/components/calendar) 和 [DatePicker](/zh/components/date-picker)。
+- 数字输入在编辑时支持多字符小数和千分位分隔符。Statistic 向自定义格式化函数传递解析后的配置，并保留显式空值。详见 [InputNumber](/zh/components/input-number) 和 [Statistic](/zh/components/statistic)。
+- Table 展开回调收到独立的行键数组，浮层中的操作也不会误触发行点击。List 保留服务端返回的当前页数据，Pagination 提前拒绝无效的总数和页大小。详见 [Table](/zh/components/table)、[List](/zh/components/list) 和 [Pagination](/zh/components/pagination)。
+- Image 切换到进度占位时释放预览容器。App 即使遇到关闭回调抛错，也会处理其余消息。Upload 支持自定义上传进度条的无障碍名称。详见 [Image](/zh/components/image)、[App](/zh/components/app) 和 [Upload](/zh/components/upload)。
+- ScrollArea 在滚动时显示滚动条并支持键盘导航。Rate 支持空格选星，Collapse 的无障碍关联指向已挂载的面板。详见 [ScrollArea](/zh/components/scroll-area)、[Rate](/zh/components/rate) 和 [Collapse](/zh/components/collapse)。
+- Carousel 支持文本和数字幻灯片，Masonry 使用自定义项目高度布局，若干展示组件修正了空值渲染。详见 [Carousel](/zh/components/carousel)、[Masonry](/zh/components/masonry)、[Avatar](/zh/components/avatar)、[Badge](/zh/components/badge) 和 [Divider](/zh/components/divider)。
+
+[查看版本差异](https://github.com/rickyshin93/tao-ui/compare/v0.0.57...v0.0.58)
+
 ## 0.0.57
 
 2026-11-16

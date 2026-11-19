@@ -198,6 +198,12 @@ export const OTP = forwardRef<OTPRef, OTPProps>(function OTP(props, ref) {
               classNames={{ input: classNames?.input }}
               styles={{ input: styles?.input }}
               onFocus={(event) => event.currentTarget.select()}
+              onBlur={() => {
+                if (composing.current === index) {
+                  composing.current = null;
+                  setDraft(null);
+                }
+              }}
               onChange={(event) => {
                 if (composing.current === index)
                   setDraft({ index, value: event.target.value });

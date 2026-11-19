@@ -266,7 +266,8 @@ export function useNumberInput(
       el.selectionEnd === cursor &&
       isThousandSepBeforeCursor(displayBuffer, cursor, thousandsSeparator)
     ) {
-      el.setSelectionRange(cursor - 1, cursor - 1);
+      const beforeSeparator = cursor - thousandsSeparator.length;
+      el.setSelectionRange(beforeSeparator, beforeSeparator);
     }
   };
 

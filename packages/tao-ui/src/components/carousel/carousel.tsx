@@ -174,9 +174,13 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
       () => mergeRefs(rootRef, directionRef),
       [directionRef],
     );
-    const childCount = Children.toArray(children).filter((child) =>
-      typeof child === 'string' ? Boolean(child.trim()) : Boolean(child),
-    ).length;
+    const slides = Children.map(children, (child) => {
+      if (typeof child === 'string' && !child.trim()) return null;
+      return typeof child === 'string' || typeof child === 'number'
+        ? <span>{child}</span>
+        : child;
+    });
+    const childCount = slides?.length ?? 0;
     const itemsPerSlide = (rest.rows ?? 1) * (rest.slidesPerRow ?? 1);
     const count = Math.ceil(childCount / itemsPerSlide);
     const ready = count > 0 && !unslick && responsiveSettings !== null;
@@ -310,7 +314,7 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
             autoplaySpeed={autoplaySpeed}
             waitForAnimate={waitForAnimate}
           >
-            {children}
+            {slides}
           </SlickCarouselComponent>
         )}
       </div>

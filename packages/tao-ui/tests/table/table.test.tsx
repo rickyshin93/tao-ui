@@ -1,6 +1,7 @@
 import { afterEach, expect, rstest, test } from '@rstest/core';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
+import { createPortal } from 'react-dom';
 import {
   type SorterResult,
   Table,
@@ -1904,4 +1905,53 @@ test('summary without Table.Summary fixed is not pinned', () => {
   const tfoot = container.querySelector('tfoot[data-tao-table-summary]');
   expect(tfoot?.hasAttribute('data-tao-summary-fixed')).toBe(false);
   expect(tfoot?.querySelector('td')?.getAttribute('colspan')).toBe('3');
+});
+
+test('a portaled cell action does not click or expand its parent row', () => {
+  const onRowClick = rstest.fn();
+  const onAction = rstest.fn();
+  render(
+    <Table
+      rowKey="id"
+      dataSource={data.slice(0, 1)}
+      columns={[
+        {
+          ...columns[0],
+          render: () =>
+            createPortal(
+              <button type="button" onClick={onAction}>
+                Portaled action
+              </button>,
+              document.body,
+            ),
+        },
+      ]}
+      onRow={() => ({ onClick: onRowClick })}
+      expandable={{
+        expandRowByClick: true,
+        expandedRowRender: () => 'Expanded row',
+      }}
+    />,
+  );
+  fireEvent.click(screen.getByRole('button', { name: 'Portaled action' }));
+  expect(onAction).toHaveBeenCalledTimes(1);
+  expect(onRowClick).not.toHaveBeenCalled();
+  expect(screen.queryByText('Expanded row')).toBeNull();
+});
+
+test('mutating expanded-row callback keys does not collapse the opened row', () => {
+  const onExpandedRowsChange = rstest.fn((keys: React.Key[]) => {
+    keys.length = 0;
+  });
+  render(
+    <Table
+      columns={columns}
+      dataSource={data.slice(0, 1)}
+      rowKey="id"
+      expandable={{ expandedRowRender: () => 'Details', onExpandedRowsChange }}
+    />,
+  );
+  fireEvent.click(screen.getByRole('button', { name: 'Expand row' }));
+  expect(onExpandedRowsChange).toHaveBeenCalledTimes(1);
+  expect(screen.getByText('Details')).toBeInTheDocument();
 });

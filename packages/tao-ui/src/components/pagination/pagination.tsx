@@ -15,8 +15,10 @@ export type PaginationSemanticPart = 'root' | 'item' | 'total';
 export interface PaginationProps {
   current?: number;
   defaultCurrent?: number;
+  /** A positive integer. */
   pageSize?: number;
   defaultPageSize?: number;
+  /** Total record count, as a non-negative safe integer. */
   total: number;
   onChange?: (page: number, pageSize: number) => void;
   showSizeChanger?: boolean;
@@ -30,6 +32,8 @@ export interface PaginationProps {
 }
 
 // ---- Helpers ----
+
+const isValidPageSize = (size: number) => Number.isSafeInteger(size) && size > 0;
 
 function range(start: number, end: number): number[] {
   const result: number[] = [];
@@ -138,6 +142,14 @@ export function Pagination({
   const isPageSizeControlled = pageSizeProp !== undefined;
   const [internalPageSize, setInternalPageSize] = useState(defaultPageSize);
   const pageSize = isPageSizeControlled ? pageSizeProp : internalPageSize;
+  if (!Number.isSafeInteger(total) || total < 0)
+    throw new RangeError('Pagination total must be a non-negative safe integer');
+  if (!isValidPageSize(pageSize))
+    throw new RangeError('Pagination pageSize must be a positive integer');
+  if (showSizeChanger && !pageSizeOptions.every(isValidPageSize))
+    throw new RangeError(
+      'Pagination pageSizeOptions must contain positive integers',
+    );
 
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
   const boundedCurrent = Math.min(Math.max(1, internalCurrent), totalPages);

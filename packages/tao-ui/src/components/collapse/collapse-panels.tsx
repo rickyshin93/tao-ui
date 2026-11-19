@@ -187,7 +187,7 @@ function CollapsePanel({
           data-disabled={disabled || undefined}
           disabled={disabled}
           aria-expanded={open}
-          aria-controls={bodyId}
+          aria-controls={renderBody ? bodyId : undefined}
           aria-labelledby={titleId}
           onClick={onToggle}
           className={classNames?.trigger}

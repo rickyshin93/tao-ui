@@ -97,6 +97,7 @@ export const Divider = forwardRef<DividerRef, DividerProps>((props, ref) => {
     direction === 'horizontal' &&
     children !== null &&
     children !== undefined &&
+    children !== '' &&
     typeof children !== 'boolean';
   const margin =
     typeof orientationMargin === 'string' &&

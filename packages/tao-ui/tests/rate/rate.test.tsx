@@ -178,3 +178,12 @@ test('ref focuses and blurs the rating and semantic customization survives toolt
     'star',
   );
 });
+
+test('Space activates a focused star without scrolling the page', () => {
+  const onChange = rs.fn();
+  render(<Rate onChange={onChange} />);
+  const star = screen.getAllByRole('radio')[2]!;
+  star.focus();
+  expect(fireEvent.keyDown(star, { key: ' ' })).toBe(false);
+  expect(onChange).toHaveBeenCalledExactlyOnceWith(3);
+});

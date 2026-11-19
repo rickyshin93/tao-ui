@@ -182,3 +182,8 @@ test('Avatar.Group keeps distinct state for local keys in keyed fragments', () =
   expect(screen.getByRole('textbox', { name: 'First' })).toBe(first);
   expect(first).toHaveValue('Edited');
 });
+
+test('an empty Avatar icon does not suppress its text fallback', () => {
+  render(<Avatar icon="">Initials</Avatar>);
+  expect(screen.getByText('Initials')).toBeInTheDocument();
+});

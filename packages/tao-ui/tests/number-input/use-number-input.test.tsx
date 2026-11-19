@@ -503,3 +503,14 @@ test('separator changes preserve a selected digit range', () => {
   );
   expect(document.activeElement).toBe(input);
 });
+
+test('Backspace skips the entire multi-character grouping separator', () => {
+  const { getByRole } = render(
+    <Harness opts={{ defaultValue: '1234', thousandsSeparator: '::' }} />,
+  );
+  const input = getByRole<HTMLInputElement>('textbox');
+  expect(input).toHaveValue('1::234');
+  input.setSelectionRange(3, 3);
+  fireEvent.keyDown(input, { key: 'Backspace' });
+  expect(input.selectionStart).toBe(1);
+});
