@@ -4,6 +4,7 @@ import RcSlider, {
   type SliderRef,
 } from '@rc-component/slider';
 import {
+  type AriaAttributes,
   type CSSProperties,
   cloneElement,
   forwardRef,
@@ -18,6 +19,7 @@ import {
   useTaoConfig,
   useTaoDirection,
 } from '../../provider/tao-provider';
+import { useCommittedRef } from '../../utils/refs';
 import {
   cx,
   type SemanticClassNames,
@@ -61,16 +63,20 @@ export interface SliderTooltipProps
 }
 export interface SliderBaseProps
   extends Omit<
-    RcSliderProps,
-    | 'value'
-    | 'defaultValue'
-    | 'onChange'
-    | 'onAfterChange'
-    | 'onChangeComplete'
-    | 'range'
-    | 'classNames'
-    | 'styles'
-  > {
+      RcSliderProps,
+      | 'value'
+      | 'defaultValue'
+      | 'onChange'
+      | 'onAfterChange'
+      | 'onChangeComplete'
+      | 'range'
+      | 'classNames'
+      | 'styles'
+    >,
+    Pick<
+      AriaAttributes,
+      'aria-label' | 'aria-labelledby' | 'aria-describedby'
+    > {
   rootClassName?: string;
   orientation?: 'horizontal' | 'vertical';
   direction?: 'ltr' | 'rtl';
@@ -144,6 +150,7 @@ function SliderTip({
     onOpenChange,
     defaultOpen,
   } = options;
+  const latestOpenChange = useCommittedRef(onOpenChange);
   const title =
     formatter === null ? null : formatter ? formatter(value) : String(value);
   const side = placement.startsWith('top')
@@ -173,7 +180,7 @@ function SliderTip({
           clearTimeout(closeTimer.current);
           const update = () => {
             setActive(next);
-            onOpenChange?.(next);
+            latestOpenChange.current?.(next);
           };
           if (!next && pointerDriven.current && mouseLeaveDelay > 0)
             closeTimer.current = setTimeout(update, mouseLeaveDelay * 1000);
@@ -208,6 +215,12 @@ function SliderTip({
               sideOffset={8}
               avoidCollisions={autoAdjustOverflow}
               updatePositionStrategy="always"
+              onEscapeKeyDown={() => {
+                pointerDriven.current = false;
+              }}
+              onPointerDownOutside={() => {
+                pointerDriven.current = false;
+              }}
               className={cx(prefixCls, classNames?.content, className)}
               style={{
                 ...(color ? { backgroundColor: color } : {}),
@@ -260,6 +273,10 @@ export const Slider = forwardRef<SliderRef, SliderProps>((props, ref) => {
     tooltip = {},
     handleRender,
     reverse,
+    // Applied to every handle; the root is not focusable.
+    'aria-label': ariaLabel,
+    'aria-labelledby': ariaLabelledBy,
+    'aria-describedby': ariaDescribedBy,
     ...rest
   } = props;
   const [direction, directionRef] = useTaoDirection(directionProp);
@@ -298,6 +315,13 @@ export const Slider = forwardRef<SliderRef, SliderProps>((props, ref) => {
         {...engineProps}
         ref={ref}
         prefixCls={prefixCls}
+        ariaLabelForHandle={engineProps.ariaLabelForHandle ?? ariaLabel}
+        ariaLabelledByForHandle={
+          engineProps.ariaLabelledByForHandle ?? ariaLabelledBy
+        }
+        ariaDescribedByForHandle={
+          engineProps.ariaDescribedByForHandle ?? ariaDescribedBy
+        }
         disabled={resolvedDisabled}
         keyboard={keyboard}
         onBeforeChange={withValueSnapshot(engineProps.onBeforeChange)}

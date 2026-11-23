@@ -9,6 +9,7 @@ interface MonthGridProps {
   value?: Dayjs | null;
   rangeStart?: Dayjs | null;
   rangeEnd?: Dayjs | null;
+  committedRange?: [Dayjs | null, Dayjs | null] | null;
   onSelect: (date: Dayjs) => void;
   disabledDate?: (date: Dayjs) => boolean;
   minDate?: Dayjs;
@@ -24,6 +25,7 @@ export function MonthGrid({
   value,
   rangeStart,
   rangeEnd,
+  committedRange,
   onSelect,
   disabledDate,
   minDate,
@@ -35,6 +37,10 @@ export function MonthGrid({
 }: MonthGridProps) {
   const { locale } = useTaoConfig();
   const months = getMonths(viewDate.year());
+  const accessibleSelection =
+    committedRange === undefined
+      ? [value, rangeStart, rangeEnd]
+      : (committedRange ?? []);
 
   return (
     <div data-tao-month-grid="" className={className} style={style}>
@@ -61,7 +67,9 @@ export function MonthGrid({
             style={cellStyle}
             data-tao-in-range={inRange || undefined}
             data-tao-selected={isSelected || undefined}
-            aria-pressed={!!isSelected}
+            aria-pressed={accessibleSelection.some((date) =>
+              date?.isSame(m, 'month'),
+            )}
             data-tao-disabled={disabled || undefined}
             disabled={disabled}
             onClick={() => onSelect(m)}

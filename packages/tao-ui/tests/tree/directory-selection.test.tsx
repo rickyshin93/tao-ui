@@ -1,12 +1,43 @@
 import { expect, rs, test } from '@rstest/core';
 import { fireEvent, render, screen } from '@testing-library/react';
-import { Tree } from '../../src/components/tree/tree';
+import { type DirectoryTreeProps, Tree } from '../../src/components/tree/tree';
 
 const data = [
   { key: 'a', title: 'Alpha', isLeaf: true },
   { key: 'b', title: 'Beta', isLeaf: true },
   { key: 'c', title: 'Gamma', isLeaf: true },
 ];
+
+test('DirectoryTree selection callbacks cannot alter selection or its shift range', () => {
+  const onSelect = rs.fn<NonNullable<DirectoryTreeProps['onSelect']>>();
+  onSelect.mockImplementationOnce((keys) => {
+    keys.length = 0;
+  });
+  render(<Tree.DirectoryTree treeData={data} multiple onSelect={onSelect} />);
+
+  fireEvent.click(screen.getByText('Alpha'));
+  expect(
+    screen.getByText('Alpha').closest('[role="treeitem"]'),
+  ).toHaveAttribute('aria-selected', 'true');
+  fireEvent.click(screen.getByText('Gamma'), { shiftKey: true });
+  expect(onSelect).toHaveBeenLastCalledWith(
+    ['a', 'b', 'c'],
+    expect.objectContaining({ selected: true }),
+  );
+});
+
+test('DirectoryTree expansion callbacks cannot clear expanded children', () => {
+  render(
+    <Tree.DirectoryTree
+      treeData={[{ key: 'folder', title: 'Folder', children: data }]}
+      onExpand={(keys) => {
+        keys.length = 0;
+      }}
+    />,
+  );
+  fireEvent.click(screen.getByText('Folder'));
+  expect(screen.getByText('Alpha')).toBeVisible();
+});
 
 test.each(['ctrlKey', 'metaKey'] as const)(
   'DirectoryTree reports deselection with %s',

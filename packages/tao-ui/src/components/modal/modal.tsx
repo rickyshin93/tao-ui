@@ -36,7 +36,10 @@ import {
   useBreakpoint,
 } from '../../utils/breakpoint';
 import { DialogContent } from '../../utils/dialog-content';
-import { preventParentOutsideDismiss } from '../../utils/portal';
+import {
+  isEscapeForOpenCombobox,
+  preventParentOutsideDismiss,
+} from '../../utils/portal';
 import {
   cx,
   type SemanticClassNames,
@@ -234,6 +237,7 @@ export function Modal({
       variant="secondary"
       data-tao-modal-action="cancel"
       {...cancelButtonProps}
+      disabled={cancelButtonProps?.disabled ?? false}
       onClick={(event) => {
         cancelButtonProps?.onClick?.(event);
         if (!event.defaultPrevented) onClose?.();
@@ -389,7 +393,7 @@ export function Modal({
         customInteraction ? (event) => event.preventDefault() : closeAutoFocus
       }
       onEscapeKeyDown={(event) => {
-        if (!keyboard) event.preventDefault();
+        if (!keyboard || isEscapeForOpenCombobox(event)) event.preventDefault();
       }}
       onPointerDownOutside={preventParentOutsideDismiss}
       onInteractOutside={preventParentOutsideDismiss}
@@ -487,19 +491,22 @@ export function Modal({
       </div>
     </TaoPortalScope>
   );
-  let container: HTMLElement | undefined;
-  if (getContainer && typeof document !== 'undefined') {
-    container =
+  // Resolve after commit so a ref-based container is attached (antd parity).
+  const [container, setContainer] = useState<HTMLElement>();
+  useLayoutEffect(() => {
+    if (!getContainer) return;
+    const next =
       typeof getContainer === 'string'
-        ? (document.querySelector<HTMLElement>(getContainer) ?? undefined)
+        ? document.querySelector<HTMLElement>(getContainer)
         : typeof getContainer === 'function'
           ? getContainer()
           : getContainer;
-    if (!container)
+    if (!next)
       throw new Error(
         `Modal getContainer did not resolve an element: ${getContainer}`,
       );
-  }
+    setContainer(next);
+  });
   return (
     <TaoProvider direction={direction}>
       <Dialog.Root
@@ -511,8 +518,11 @@ export function Modal({
       >
         {getContainer === false ? (
           layer
-        ) : (
-          <Dialog.Portal forceMount={forceMount} container={container}>
+        ) : getContainer && !container ? null : (
+          <Dialog.Portal
+            forceMount={forceMount}
+            container={getContainer ? container : undefined}
+          >
             {layer}
           </Dialog.Portal>
         )}

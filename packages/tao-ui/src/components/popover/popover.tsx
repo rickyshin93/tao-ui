@@ -15,6 +15,7 @@ import {
 } from 'react';
 import { TaoPortalScope, useTaoDirection } from '../../provider/tao-provider';
 import { asTriggerChild, useControlledOpen } from '../../utils/overlay';
+import { useCommittedRef } from '../../utils/refs';
 import {
   cx,
   type SemanticClassNames,
@@ -46,6 +47,16 @@ export type PopoverPlacement =
   | 'rightBottom';
 
 type PopoverRender = ReactNode | (() => ReactNode);
+
+function hasFocusWithin(element: HTMLElement | null) {
+  if (!element) return false;
+  const root = element.getRootNode();
+  const activeElement =
+    'activeElement' in root
+      ? (root as Document | ShadowRoot).activeElement
+      : element.ownerDocument.activeElement;
+  return element.contains(activeElement);
+}
 
 export interface PopoverProps
   extends Pick<
@@ -170,6 +181,7 @@ export function Popover({
     onOpenChange,
     canOpen: hasPopup,
   });
+  const hoverState = useCommittedRef({ setOpen, focusMode });
 
   const openTimer = useRef<ReturnType<typeof setTimeout> | undefined>(
     undefined,
@@ -188,6 +200,8 @@ export function Popover({
     },
     [directionRef],
   );
+  const containsTrigger = (target: EventTarget | null) =>
+    target instanceof Node && !!triggerRef.current?.contains(target);
   const containsFocusTarget = useCallback(
     (target: EventTarget | null) =>
       target instanceof Node &&
@@ -221,18 +235,27 @@ export function Popover({
 
   const scheduleOpen = useCallback(() => {
     cancelTimers();
+    if (realOpen) return;
     if (mouseEnterDelay <= 0) {
       setOpen(true);
       return;
     }
-    openTimer.current = setTimeout(() => setOpen(true), mouseEnterDelay * 1000);
-  }, [cancelTimers, mouseEnterDelay, setOpen]);
+    openTimer.current = setTimeout(
+      () => hoverState.current.setOpen(true),
+      mouseEnterDelay * 1000,
+    );
+  }, [cancelTimers, hoverState, mouseEnterDelay, realOpen, setOpen]);
 
   const scheduleClose = useCallback(() => {
     cancelTimers();
     if (!realOpen) return;
     const close = () => {
-      if (!focusMode || !containsFocusTarget(document.activeElement))
+      const { focusMode, setOpen } = hoverState.current;
+      if (
+        !focusMode ||
+        (!hasFocusWithin(triggerRef.current) &&
+          !hasFocusWithin(popupRef.current))
+      )
         setOpen(false);
     };
     if (mouseLeaveDelay <= 0) {
@@ -240,14 +263,7 @@ export function Popover({
       return;
     }
     closeTimer.current = setTimeout(close, mouseLeaveDelay * 1000);
-  }, [
-    cancelTimers,
-    containsFocusTarget,
-    focusMode,
-    mouseLeaveDelay,
-    realOpen,
-    setOpen,
-  ]);
+  }, [cancelTimers, hoverState, mouseLeaveDelay, realOpen]);
 
   const handleBlur = useCallback(
     (event: FocusEvent<HTMLElement>) => {
@@ -339,6 +355,10 @@ export function Popover({
             }}
             onFocusCapture={focusMode ? cancelTimers : undefined}
             onBlurCapture={focusMode ? handleBlur : undefined}
+            onInteractOutside={(event) => {
+              // Radix only exempts Popover.Trigger; hover/focus use an Anchor.
+              if (containsTrigger(event.target)) event.preventDefault();
+            }}
             onFocusOutside={(event) => {
               // Focus mode owns the close request in handleBlur.
               if (focusMode) event.preventDefault();

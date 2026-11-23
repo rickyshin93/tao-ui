@@ -33,6 +33,8 @@ export const trTR = createLocale({
   dateRange: 'Tarih aralığı seç',
   startDate: 'Başlangıç tarihi',
   endDate: 'Bitiş tarihi',
+  selectStartDate: 'Başlangıç tarihi seçin.',
+  selectEndDate: 'Bitiş tarihi seçin.',
   now: 'Şimdi',
   ok: 'Tamam',
   cancel: 'İptal',

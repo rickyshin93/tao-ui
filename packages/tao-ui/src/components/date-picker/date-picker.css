@@ -1,6 +1,15 @@
 /* ===========================
    Trigger (shared with Input/Select)
    =========================== */
+[data-tao-range-announcement] {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 [data-tao-picker-trigger] {
   display: flex;
   width: 100%; /* antd DatePicker 对齐：默认撑满父容器 */

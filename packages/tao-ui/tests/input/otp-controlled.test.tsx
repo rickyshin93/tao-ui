@@ -176,3 +176,17 @@ test('OTP accepts an edit after an interrupted composition loses focus', () => {
   fireEvent.change(first, { target: { value: '9' } });
   expect(changed).toHaveBeenCalledExactlyOnceWith('92');
 });
+
+test('a required Form.Item marks every OTP cell required instead of the group', () => {
+  render(
+    <Form>
+      <Form.Item name="code" label="Code" rules={[{ required: true }]}>
+        <Input.OTP length={2} />
+      </Form.Item>
+    </Form>,
+  );
+  expect(screen.getByRole('group')).not.toHaveAttribute('aria-required');
+  for (const cell of screen.getAllByRole('textbox')) {
+    expect(cell).toHaveAttribute('aria-required', 'true');
+  }
+});

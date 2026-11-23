@@ -403,6 +403,10 @@ export default function Example() {
 
 </div>
 
+## Incomplete ranges
+
+RangePicker keeps the first date as a draft until both editable endpoints have values, even when the end date is entered first. Use `allowEmpty={[true, false]}` for an open start or `allowEmpty={[false, true]}` for an open end. A disabled endpoint retains its existing value.
+
 ## API
 
 <API moduleName="range-picker" />

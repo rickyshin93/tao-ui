@@ -6,6 +6,7 @@ import {
   Checkbox,
   CheckboxGroup,
 } from '../../src/components/checkbox/checkbox';
+import { Form } from '../../src/components/form';
 import { TaoProvider } from '../../src/provider/tao-provider';
 
 const checkboxStyle = document.createElement('style');
@@ -463,4 +464,22 @@ test('an ARIA-only checkbox requirement leaves native submission available', () 
       .getByRole<HTMLFormElement>('form', { name: 'Custom validation' })
       .checkValidity(),
   ).toBe(true);
+});
+
+test('CheckboxGroup in Form.Item validates on blur', async () => {
+  render(
+    <Form>
+      <Form.Item
+        name="tags"
+        label="Tags"
+        validateTrigger="onBlur"
+        rules={[{ required: true, message: 'Pick a tag' }]}
+      >
+        <CheckboxGroup options={['A', 'B']} />
+      </Form.Item>
+    </Form>,
+  );
+  act(() => screen.getByRole('checkbox', { name: 'A' }).focus());
+  act(() => screen.getByRole('checkbox', { name: 'A' }).blur());
+  expect((await screen.findByRole('alert')).textContent).toBe('Pick a tag');
 });

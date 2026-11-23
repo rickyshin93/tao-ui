@@ -6,6 +6,7 @@ import {
   forwardRef,
   type ReactNode,
   useCallback,
+  useEffect,
   useId,
   useImperativeHandle,
   useMemo,
@@ -148,6 +149,13 @@ export const Select = forwardRef(function Select(
 
   const isMultiple = mode === 'multiple' || mode === 'tags';
   const hasInlineSearch = !!showSearch && !isMobile;
+  // React auto-focuses only native controls, not the div triggers.
+  const autoFocusTrigger = useRef(
+    autoFocus && !hasInlineSearch && !resolvedDisabled,
+  );
+  useEffect(() => {
+    if (autoFocusTrigger.current) triggerRef.current?.focus();
+  }, []);
 
   useImperativeHandle(
     ref,
@@ -180,15 +188,24 @@ export const Select = forwardRef(function Select(
   const isSearchControlled = searchValueProp !== undefined;
   const [searchInternal, setSearchInternal] = useState('');
   const search = isSearchControlled ? searchValueProp : searchInternal;
-  const [previousOpen, setPreviousOpen] = useState(requestedOpen);
-  if (previousOpen !== requestedOpen) {
-    setPreviousOpen(requestedOpen);
-    if (!requestedOpen && !isSearchControlled) setSearchInternal('');
-  }
   const [activeSearch, setActiveSearch] = useState<{
     index: number;
     value?: string;
-  }>({ index: 0 });
+  }>(() => ({ index: 0, value: isMultiple ? undefined : (value as string) }));
+  const [previousOpen, setPreviousOpen] = useState(requestedOpen);
+  const [previousValue, setPreviousValue] = useState(value);
+  if (
+    previousOpen !== requestedOpen ||
+    (!isMultiple && previousValue !== value)
+  ) {
+    if (previousOpen !== requestedOpen && !requestedOpen && !isSearchControlled)
+      setSearchInternal('');
+    setPreviousOpen(requestedOpen);
+    setPreviousValue(value);
+    // The next session starts on the current single value.
+    if (!requestedOpen && !isMultiple && value)
+      setActiveSearch({ index: 0, value: value as string });
+  }
   const composingRef = useRef(false);
   const isComposingKey = useCallback(
     (event: KeyboardEvent) =>
@@ -204,6 +221,7 @@ export const Select = forwardRef(function Select(
 
   // Prevents Radix from auto-closing the dropdown after a multi-select toggle.
   const suppressCloseRef = useRef(false);
+  const repeatedOptionRef = useRef<string | undefined>(undefined);
 
   const handleValueChange = useCallback(
     (next: string) => {
@@ -226,6 +244,11 @@ export const Select = forwardRef(function Select(
   const handleOpenChange = useCallback(
     (next: boolean) => {
       if (next && resolvedDisabled) return;
+      if (!next && repeatedOptionRef.current !== undefined) {
+        const selected = repeatedOptionRef.current;
+        repeatedOptionRef.current = undefined;
+        handleValueChange(selected);
+      }
       // In multi mode, suppress the auto-close that Radix fires after selection.
       if (isMultiple && !hasInlineSearch && !next && suppressCloseRef.current) {
         suppressCloseRef.current = false;
@@ -246,6 +269,7 @@ export const Select = forwardRef(function Select(
       onOpenChange?.(next);
     },
     [
+      handleValueChange,
       isMultiple,
       hasInlineSearch,
       isOpenControlled,
@@ -271,10 +295,17 @@ export const Select = forwardRef(function Select(
       if (!isMultiple || !tokenSeparators || tokenSeparators.length === 0)
         return;
       const value = (e.target as HTMLInputElement).value;
-      const sep = tokenSeparators.find((s) => s && value.includes(s));
-      if (!sep) return;
-      e.preventDefault();
-      if (addTokens(value) && !isSearchControlled) setSearchInternal('');
+      // Only Enter or a typed separator commits; other keys must keep editing.
+      const separatorKey = tokenSeparators.includes(e.key);
+      if (
+        !separatorKey &&
+        (e.key !== 'Enter' ||
+          !tokenSeparators.some((s) => s && value.includes(s)))
+      )
+        return;
+      const added = addTokens(value);
+      if (added || !separatorKey) e.preventDefault();
+      if (added && !isSearchControlled) setSearchInternal('');
     },
     [
       isMultiple,
@@ -299,6 +330,9 @@ export const Select = forwardRef(function Select(
       e.stopPropagation();
       e.preventDefault();
       removeValue(removedValue);
+      // The focused remove control unmounts; keep keyboard focus in the Select.
+      if (e.type === 'keydown')
+        (inputRef.current ?? triggerRef.current)?.focus();
     },
     [removeValue],
   );
@@ -473,6 +507,27 @@ export const Select = forwardRef(function Select(
     </span>
   );
 
+  const hiddenInputs =
+    name &&
+    (isMultiple ? (
+      valueArray.map((item) => (
+        <input
+          key={item}
+          type="hidden"
+          name={name}
+          value={item}
+          disabled={resolvedDisabled}
+        />
+      ))
+    ) : (
+      <input
+        type="hidden"
+        name={name}
+        value={(value as string) ?? ''}
+        disabled={resolvedDisabled}
+      />
+    ));
+
   // ---- Mobile: custom trigger + Drawer ----
   if (isMobile) {
     return (
@@ -489,8 +544,6 @@ export const Select = forwardRef(function Select(
           data-tao-variant={resolvedVariant}
           data-tao-disabled={resolvedDisabled || undefined}
           {...statusProps}
-          // biome-ignore lint/a11y/noAutofocus: Select exposes autoFocus to match native input-like controls.
-          autoFocus={autoFocus}
           role="button"
           tabIndex={resolvedDisabled ? undefined : 0}
           {...ariaProps}
@@ -559,6 +612,7 @@ export const Select = forwardRef(function Select(
           )}
           {trailingIcons}
         </div>
+        {hiddenInputs}
         <MobileSelectDrawer
           direction={direction}
           mobileTitle={props.mobileTitle}
@@ -636,12 +690,31 @@ export const Select = forwardRef(function Select(
     const isSelected = selectedValueSet.has(opt.value);
     const itemDisabled =
       resolvedDisabled || opt.disabled || (!isSelected && overMaxCount);
+    // Radix closes on activation but skips onValueChange for its current value.
+    // Keep its own pointer/keyboard rules, including Space during typeahead.
+    const markReselection = () => {
+      repeatedOptionRef.current = opt.value;
+      queueMicrotask(() => {
+        repeatedOptionRef.current = undefined;
+      });
+    };
+    const reselectable = !isMultiple && isSelected && !itemDisabled;
 
     return (
       <RadixSelect.Item
         key={opt.value}
         value={opt.value}
         disabled={itemDisabled}
+        onPointerUp={reselectable ? markReselection : undefined}
+        onClick={reselectable ? markReselection : undefined}
+        onKeyDown={
+          reselectable
+            ? (event) => {
+                if (event.key === 'Enter' || event.key === ' ')
+                  markReselection();
+              }
+            : undefined
+        }
         data-tao-select-item=""
         data-tao-label-wrap={optionLabelWrap || undefined}
         data-tao-has-desc={opt.description != null || undefined}
@@ -855,7 +928,8 @@ export const Select = forwardRef(function Select(
       }}
       onChange={(event) => {
         handleSearchChange(event.target.value);
-        setActiveSearch({ index: 0 });
+        // In tags mode Enter creates the typed text until a suggestion is chosen.
+        setActiveSearch({ index: mode === 'tags' ? -1 : 0 });
         if (!open) handleOpenChange(true);
       }}
       onKeyDown={(event) => {
@@ -985,14 +1059,7 @@ export const Select = forwardRef(function Select(
           </div>
         </Popover.Trigger>
 
-        {name && !isMultiple && (
-          <input
-            type="hidden"
-            name={name}
-            value={(value as string) ?? ''}
-            disabled={resolvedDisabled}
-          />
-        )}
+        {hiddenInputs}
 
         <Popover.Portal container={container}>
           <TaoPortalScope asChild direction={direction}>
@@ -1103,6 +1170,7 @@ export const Select = forwardRef(function Select(
           {trailingIcons}
         </div>
       </RadixSelect.Trigger>
+      {isMultiple && hiddenInputs}
 
       <RadixSelect.Portal container={container}>
         <TaoPortalScope asChild direction={direction}>

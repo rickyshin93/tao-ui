@@ -191,7 +191,8 @@ function InternalCascader<
   const screens = useBreakpoint();
   const requestedMobile = mobile ?? screens.xs;
   const [internalOpen, setInternalOpen] = useState(defaultOpen);
-  const open = openProp ?? internalOpen;
+  if (disabled && internalOpen) setInternalOpen(false);
+  const open = openProp ?? (!disabled && internalOpen);
   const [mobilePresentation, setMobilePresentation] = useState(requestedMobile);
   if (
     (!open || mobilePresentation === undefined) &&
@@ -247,8 +248,16 @@ function InternalCascader<
     (onOpenChange ?? onPopupVisibleChange ?? onDropdownVisibleChange)?.(next);
   };
   const commit = (...args: ChangeArgs) => {
-    setInternalValue(args[0]);
-    onChange?.(...args);
+    const [next, selected] = args;
+    setInternalValue(next);
+    onChange?.(
+      (next == null
+        ? next
+        : next.map((value) =>
+            Array.isArray(value) ? [...value] : value,
+          )) as ChangeArgs[0],
+      selected,
+    );
   };
   const changeValue = (...args: ChangeArgs) => {
     if (mobileOpen && multiple) {
@@ -261,13 +270,14 @@ function InternalCascader<
         setInternalSearch('');
       return;
     }
+    const last = mobileOpen
+      ? (args[1] as OptionType[] | undefined)?.at(-1)
+      : undefined;
+    const children = last?.[props.fieldNames?.children ?? 'children'];
+    const selectionFinished =
+      mobileOpen && (!last || (last.isLeaf ?? !children?.length));
     commit(...args);
-    if (mobileOpen) {
-      const selected = args[1] as OptionType[];
-      const last = selected?.at(-1);
-      const children = last?.[props.fieldNames?.children ?? 'children'];
-      if (!last || (last.isLeaf ?? !children?.length)) changeOpen(false);
-    }
+    if (selectionFinished) changeOpen(false);
   };
   const navigateMobile = (event: ReactKeyboardEvent<HTMLElement>) => {
     if (event.nativeEvent.isComposing || event.keyCode === 229) return;
@@ -525,9 +535,11 @@ export function CascaderPanel<
     expandIcon = <ExpandIcon />,
     loadingIcon = <Spinner size="small" />,
     value,
+    onChange,
     ...rest
   } = props;
   const [direction, directionRef] = useTaoDirection(props.direction);
+  type ChangeArgs = Parameters<NonNullable<typeof onChange>>;
   return (
     <div
       ref={directionRef}
@@ -541,6 +553,19 @@ export function CascaderPanel<
         {...rest}
         direction={direction}
         value={'value' in props ? (value ?? []) : undefined}
+        onChange={
+          onChange &&
+          ((next, selected) =>
+            // The engine keeps the emitted paths as its uncontrolled state.
+            onChange(
+              (next == null
+                ? next
+                : next.map((path) =>
+                    Array.isArray(path) ? [...path] : path,
+                  )) as ChangeArgs[0],
+              selected,
+            ))
+        }
         prefixCls={prefixCls}
         checkable={multiple}
         disabled={disabled}

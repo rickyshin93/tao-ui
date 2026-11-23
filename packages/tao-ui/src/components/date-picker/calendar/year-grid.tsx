@@ -7,6 +7,7 @@ interface YearGridProps {
   value?: Dayjs | null;
   rangeStart?: Dayjs | null;
   rangeEnd?: Dayjs | null;
+  committedRange?: [Dayjs | null, Dayjs | null] | null;
   onSelect: (date: Dayjs) => void;
   disabledDate?: (date: Dayjs) => boolean;
   minDate?: Dayjs;
@@ -22,6 +23,7 @@ export function YearGrid({
   value,
   rangeStart,
   rangeEnd,
+  committedRange,
   onSelect,
   disabledDate,
   minDate,
@@ -33,6 +35,10 @@ export function YearGrid({
 }: YearGridProps) {
   const years = getYears(viewDate.year());
   const decadeStart = Math.floor(viewDate.year() / 10) * 10;
+  const accessibleSelection =
+    committedRange === undefined
+      ? [value, rangeStart, rangeEnd]
+      : (committedRange ?? []);
 
   return (
     <div data-tao-year-grid="" className={className} style={style}>
@@ -61,7 +67,9 @@ export function YearGrid({
             style={cellStyle}
             data-tao-in-range={inRange || undefined}
             data-tao-selected={isSelected || undefined}
-            aria-pressed={!!isSelected}
+            aria-pressed={accessibleSelection.some((date) =>
+              date?.isSame(y, 'year'),
+            )}
             data-tao-other-month={isOutside || undefined}
             data-tao-disabled={disabled || undefined}
             disabled={disabled}

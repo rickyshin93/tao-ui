@@ -33,6 +33,8 @@ export const ruRU = createLocale({
   dateRange: 'Выбрать диапазон дат',
   startDate: 'Дата начала',
   endDate: 'Дата окончания',
+  selectStartDate: 'Выберите дату начала.',
+  selectEndDate: 'Выберите дату окончания.',
   now: 'Сейчас',
   ok: 'ОК',
   cancel: 'Отмена',

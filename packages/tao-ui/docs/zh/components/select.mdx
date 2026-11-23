@@ -435,7 +435,7 @@ export default function HideSelected() {
 
 ### 选择与清除事件
 
-`onChange` 提供完整值与已有选项对象；`onSelect`、`onDeselect`、`onClear` 描述具体操作。新创建标签没有对应的已有选项对象。
+`onChange` 提供完整值与已有选项对象。单选重复选中当前项时触发 `onSelect`，只有值变化才触发 `onChange`。要处理重复点选，请使用 `onSelect`。新创建标签没有对应的已有选项对象。
 
 ```tsx preview
 import { FormField, Select, Stack } from '@rockshin/tao-ui';

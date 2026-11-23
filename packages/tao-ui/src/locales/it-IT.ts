@@ -33,6 +33,8 @@ export const itIT = createLocale({
   dateRange: 'Seleziona intervallo di date',
   startDate: 'Data di inizio',
   endDate: 'Data di fine',
+  selectStartDate: 'Seleziona una data di inizio.',
+  selectEndDate: 'Seleziona una data di fine.',
   now: 'Adesso',
   ok: 'OK',
   cancel: 'Annulla',

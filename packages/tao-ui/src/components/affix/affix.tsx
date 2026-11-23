@@ -10,6 +10,7 @@ import {
   useRef,
   useState,
 } from 'react';
+import { getComposedParent } from '../../utils/composed-parent';
 import {
   cx,
   type SemanticClassNames,
@@ -143,7 +144,45 @@ export const Affix = forwardRef<AffixRef, AffixProps>((props, ref) => {
     events.forEach((event) => {
       scrollTarget?.addEventListener(event, updatePosition, { passive: true });
     });
-    if (scrollTarget !== view) view.addEventListener('resize', updatePosition);
+    if (scrollTarget !== view) {
+      view.addEventListener('resize', updatePosition);
+      view.addEventListener('scroll', updatePosition, { passive: true });
+    }
+    const targetElement =
+      scrollTarget && 'getBoundingClientRect' in scrollTarget
+        ? scrollTarget
+        : null;
+    const sources = [holder.current, targetElement];
+    function* ancestors() {
+      for (const source of sources) {
+        for (
+          let node: Element | null = source;
+          node;
+          node = getComposedParent(node)
+        )
+          yield node;
+      }
+    }
+    const scrollRoots = new Set<EventTarget>([view]);
+    for (const node of ancestors()) {
+      const root = node.getRootNode();
+      if ('host' in root) scrollRoots.add(root);
+    }
+    const onAncestorScroll = (event: Event) => {
+      if (event.target === scrollTarget) return;
+      for (const node of ancestors()) {
+        if (node === event.target) {
+          updatePosition();
+          return;
+        }
+      }
+    };
+    for (const root of scrollRoots) {
+      root.addEventListener('scroll', onAncestorScroll, {
+        capture: true,
+        passive: true,
+      });
+    }
     const observer = new ResizeObserver(updatePosition);
     if (holder.current) observer.observe(holder.current);
     if (content.current) observer.observe(content.current);
@@ -155,6 +194,9 @@ export const Affix = forwardRef<AffixRef, AffixProps>((props, ref) => {
         scrollTarget?.removeEventListener(event, updatePosition);
       });
       view.removeEventListener('resize', updatePosition);
+      view.removeEventListener('scroll', updatePosition);
+      for (const root of scrollRoots)
+        root.removeEventListener('scroll', onAncestorScroll, true);
       observer.disconnect();
       updatePosition.cancel();
     };
@@ -167,7 +209,13 @@ export const Affix = forwardRef<AffixRef, AffixProps>((props, ref) => {
     updatePosition();
   });
   const fixedStyle: CSSProperties = position
-    ? { position: 'fixed', ...position }
+    ? {
+        position: 'fixed',
+        top: position.top,
+        bottom: position.bottom,
+        left: position.left,
+        width: position.width,
+      }
     : {};
   return (
     <div

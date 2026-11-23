@@ -2,6 +2,7 @@ import {
   type AriaAttributes,
   type ChangeEvent,
   createContext,
+  type FocusEventHandler,
   type ForwardedRef,
   forwardRef,
   type ReactNode,
@@ -190,6 +191,8 @@ export interface CheckboxGroupProps
   value?: string[];
   defaultValue?: string[];
   onChange?: (values: string[]) => void;
+  /** Fires when focus leaves any checkbox in the group (Form validateTrigger). */
+  onBlur?: FocusEventHandler<HTMLFieldSetElement>;
   disabled?: boolean;
   size?: TaoSize;
   direction?: 'horizontal' | 'vertical';
@@ -202,6 +205,7 @@ export function CheckboxGroup(props: CheckboxGroupProps) {
     value,
     defaultValue,
     onChange,
+    onBlur,
     disabled,
     size,
     direction = 'horizontal',
@@ -268,6 +272,7 @@ export function CheckboxGroup(props: CheckboxGroupProps) {
         aria-describedby={props['aria-describedby']}
         aria-errormessage={props['aria-errormessage']}
         aria-invalid={props['aria-invalid']}
+        onBlur={onBlur}
       >
         {normalizedOptions
           ? normalizedOptions.map((opt) => (

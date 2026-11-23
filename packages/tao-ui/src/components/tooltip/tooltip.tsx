@@ -9,6 +9,7 @@ import {
 } from 'react';
 import { TaoPortalScope, useTaoDirection } from '../../provider/tao-provider';
 import { asTriggerChild, useControlledOpen } from '../../utils/overlay';
+import { useCommittedRef } from '../../utils/refs';
 import {
   cx,
   type SemanticClassNames,
@@ -84,8 +85,7 @@ function ActiveTooltip({
     defaultOpen,
     onOpenChange,
   });
-  const latestSetOpen = useRef(setOpen);
-  latestSetOpen.current = setOpen;
+  const latestSetOpen = useCommittedRef(setOpen);
 
   // Pointer-initiated closes are deferred by mouseLeaveDelay; the flag tells
   // them apart from Esc/blur closes, which Radix reports through the same
@@ -112,7 +112,7 @@ function ActiveTooltip({
       pointerDriven.current = false;
       latestSetOpen.current(false);
     }, mouseLeaveDelay * 1000);
-  }, [mouseLeaveDelay, setOpen]);
+  }, [latestSetOpen, mouseLeaveDelay, setOpen]);
 
   const handleOpenChange = useCallback(
     (next: boolean) => {

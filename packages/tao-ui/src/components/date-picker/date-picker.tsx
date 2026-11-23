@@ -37,7 +37,7 @@ import { Drawer } from '../drawer/drawer';
 import { CalendarGrid } from './calendar/calendar-grid';
 import { CalendarHeader } from './calendar/calendar-header';
 import { MonthGrid } from './calendar/month-grid';
-import { TimePanel } from './calendar/time-panel';
+import { getTimeUnits, TimePanel } from './calendar/time-panel';
 import { YearGrid } from './calendar/year-grid';
 import './date-picker.css';
 import { Presets } from './presets';
@@ -211,7 +211,8 @@ export const DatePicker = forwardRef(function DatePicker(
   );
 
   const [internalOpen, setInternalOpen] = useState(false);
-  const isOpen = controlledOpen ?? internalOpen;
+  if (resolvedDisabled && internalOpen) setInternalOpen(false);
+  const isOpen = controlledOpen ?? (!resolvedDisabled && internalOpen);
   const setOpen = useCallback(
     (v: boolean) => {
       if (v === isOpen) return;
@@ -244,15 +245,17 @@ export const DatePicker = forwardRef(function DatePicker(
   }, [inputValue, displayValue, fmt, dayjsLocale, numberLocale, isDateBlocked]);
   const panelValue = typedValue ?? resolvedValue;
 
-  // Reset panel state when opening
+  // Reset panel state when opening, not on value updates while open.
+  const wasOpenRef = useRef(false);
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && !wasOpenRef.current) {
       setViewDate(resolvedValue ?? dayjs());
       setPanelMode(
         picker === 'year' ? 'year' : picker === 'month' ? 'month' : 'date',
       );
       setTimeScrollKey((k) => k + 1);
     }
+    wasOpenRef.current = isOpen;
   }, [isOpen, picker, resolvedValue]);
 
   useEffect(() => {
@@ -314,7 +317,7 @@ export const DatePicker = forwardRef(function DatePicker(
         emitChange(date, formatValue(date));
         setOpen(false);
       } else {
-        setViewDate(date);
+        setViewDate((current) => current.year(date.year()));
         setPanelMode(picker === 'month' ? 'month' : 'date');
       }
     },
@@ -395,12 +398,25 @@ export const DatePicker = forwardRef(function DatePicker(
   ]);
 
   const showTimePanel = !!(showTime && panelMode === 'date');
+  const timeUnits = getTimeUnits(fmt);
   const today = isOpen && showTimePanel ? dayjs() : null;
   const nowBlocked = today != null && isDateBlocked(today);
   const timeBlocked =
     today != null && (panelValue ? isDateBlocked(panelValue) : nowBlocked);
   const isPanelDateDisabled = (date: Dayjs) =>
     resolvedDisabled || Boolean(disabledDate?.(date));
+  // Navigation panels stay usable while the period has any selectable value.
+  const isPeriodDisabled = (period: Dayjs, unit: 'month' | 'year') => {
+    if (resolvedDisabled) return true;
+    const step = picker === 'date' ? 'day' : 'month';
+    for (
+      let d = period.startOf(unit);
+      d.isSame(period, unit);
+      d = d.add(1, step)
+    )
+      if (!isDateBlocked(d)) return false;
+    return true;
+  };
 
   const datePanel = (
     <>
@@ -431,7 +447,11 @@ export const DatePicker = forwardRef(function DatePicker(
             viewDate={viewDate}
             value={panelValue}
             onSelect={handleMonthSelect}
-            disabledDate={isPanelDateDisabled}
+            disabledDate={
+              picker === 'month'
+                ? isPanelDateDisabled
+                : (date) => isPeriodDisabled(date, 'month')
+            }
             minDate={minDate}
             maxDate={maxDate}
           />
@@ -441,7 +461,11 @@ export const DatePicker = forwardRef(function DatePicker(
             viewDate={viewDate}
             value={panelValue}
             onSelect={handleYearSelect}
-            disabledDate={isPanelDateDisabled}
+            disabledDate={
+              picker === 'year'
+                ? isPanelDateDisabled
+                : (date) => isPeriodDisabled(date, 'year')
+            }
             minDate={minDate}
             maxDate={maxDate}
           />
@@ -463,9 +487,10 @@ export const DatePicker = forwardRef(function DatePicker(
           <div data-tao-picker-date-side="">{datePanel}</div>
           <div data-tao-picker-time="">
             <div data-tao-time-header="">
-              {String(timeValue.hour).padStart(2, '0')}:
-              {String(timeValue.minute).padStart(2, '0')}:
-              {String(timeValue.second).padStart(2, '0')}
+              {(['hour', 'minute', 'second'] as const)
+                .filter((unit) => timeUnits[unit])
+                .map((unit) => String(timeValue[unit]).padStart(2, '0'))
+                .join(':')}
             </div>
             <TimePanel
               hour={timeValue.hour}
@@ -474,6 +499,7 @@ export const DatePicker = forwardRef(function DatePicker(
               disabled={resolvedDisabled || timeBlocked}
               onChange={handleTimeChange}
               config={typeof showTime === 'object' ? showTime : undefined}
+              format={fmt}
               scrollKey={timeScrollKey}
             />
           </div>

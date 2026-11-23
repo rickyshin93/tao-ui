@@ -33,6 +33,8 @@ export const thTH = createLocale({
   dateRange: 'เลือกช่วงวันที่',
   startDate: 'วันที่เริ่มต้น',
   endDate: 'วันที่สิ้นสุด',
+  selectStartDate: 'เลือกวันที่เริ่มต้น',
+  selectEndDate: 'เลือกวันที่สิ้นสุด',
   now: 'ขณะนี้',
   ok: 'ตกลง',
   cancel: 'ยกเลิก',

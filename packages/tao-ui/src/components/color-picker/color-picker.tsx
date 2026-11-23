@@ -6,13 +6,16 @@ import {
   createContext,
   forwardRef,
   isValidElement,
+  type PointerEvent,
   useContext,
   useEffect,
   useId,
+  useLayoutEffect,
   useRef,
   useState,
 } from 'react';
 import { TaoPortalScope, useTaoConfig } from '../../provider/tao-provider';
+import { asTriggerChild } from '../../utils/overlay';
 import { cx } from '../../utils/semantic';
 import { Button } from '../button/button';
 import { Collapse } from '../collapse/collapse';
@@ -421,6 +424,7 @@ export function ColorPicker(props: ColorPickerProps) {
   const cachedGradient = useRef<Color | null>(null),
     hoverTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const keyboardOpening = useRef(false);
+  const touchPointer = useRef(false);
   const configuredModes = props.mode
     ? Array.isArray(props.mode)
       ? props.mode
@@ -481,17 +485,25 @@ export function ColorPicker(props: ColorPickerProps) {
     if (props.open === undefined) setOpen(next);
     props.onOpenChange?.(next);
   };
-  const enter = () => {
+  const latestOpenChange = useRef(openChange);
+  useLayoutEffect(() => {
+    latestOpenChange.current = openChange;
+  });
+  const enter = (event: PointerEvent) => {
+    if (event.pointerType === 'touch') return;
     clearTimeout(hoverTimer.current);
-    if (props.trigger === 'hover') {
+    if (props.trigger === 'hover' && !open) {
       keyboardOpening.current = false;
       openChange(true);
     }
   };
-  const leave = () => {
-    if (hoverEnabled) {
+  const leave = (event: PointerEvent) => {
+    if (hoverEnabled && event.pointerType !== 'touch') {
       clearTimeout(hoverTimer.current);
-      hoverTimer.current = setTimeout(() => openChange(false), 100);
+      hoverTimer.current = setTimeout(
+        () => latestOpenChange.current(false),
+        100,
+      );
     }
   };
   const panelState: PanelState = {
@@ -589,11 +601,13 @@ export function ColorPicker(props: ColorPickerProps) {
       )}
     </button>
   );
-  const customTrigger = props.children;
+  const customTrigger = isValidElement(props.children)
+    ? asTriggerChild(props.children)
+    : props.children;
   const trigger =
     disabled &&
     isValidElement<{ disabled?: boolean }>(customTrigger) &&
-    customTrigger.type === 'button'
+    (customTrigger.type === 'button' || customTrigger.type === Button)
       ? cloneElement(customTrigger, { disabled: true })
       : customTrigger;
   return (
@@ -613,15 +627,23 @@ export function ColorPicker(props: ColorPickerProps) {
           asChild
           onPointerEnter={enter}
           onPointerLeave={leave}
+          onPointerDown={(event) => {
+            touchPointer.current = event.pointerType === 'touch';
+          }}
           onClick={(event) => {
-            if (disabled || (props.trigger === 'hover' && event.detail !== 0))
+            const touch = touchPointer.current;
+            touchPointer.current = false;
+            if (
+              disabled ||
+              (props.trigger === 'hover' && event.detail !== 0 && !touch)
+            )
               event.preventDefault();
             else if (!open) keyboardOpening.current = event.detail === 0;
           }}
         >
           {isValidElement(trigger) ? (
             trigger
-          ) : trigger ? (
+          ) : trigger || trigger === 0 ? (
             <button type="button" disabled={disabled}>
               {trigger}
             </button>

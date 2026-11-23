@@ -6,7 +6,7 @@ import {
   screen,
   waitFor,
 } from '@testing-library/react';
-import { createRef } from 'react';
+import { createRef, Suspense, startTransition, useState } from 'react';
 import {
   Upload,
   type UploadFile,
@@ -24,6 +24,134 @@ function pick(container: HTMLElement, names: string[]) {
     },
   });
 }
+
+test('Upload progress uses committed props while a new render is suspended', async () => {
+  const committed = rstest.fn();
+  const suspended = rstest.fn();
+  const request = rstest.fn<NonNullable<UploadProps['customRequest']>>();
+  const pending = new Promise<never>(() => {});
+  function Blocker({ active }: { active: boolean }) {
+    if (active) throw pending;
+    return null;
+  }
+  function Fixture() {
+    const [next, setNext] = useState(false);
+    return (
+      <>
+        <button
+          type="button"
+          onClick={() => startTransition(() => setNext(true))}
+        >
+          Change upload handler
+        </button>
+        <Suspense fallback="Waiting">
+          <Upload
+            customRequest={request}
+            onChange={next ? suspended : committed}
+          />
+          <Blocker active={next} />
+        </Suspense>
+      </>
+    );
+  }
+  const { container } = render(<Fixture />);
+  pick(container, ['new.txt']);
+  await waitFor(() => expect(request).toHaveBeenCalledTimes(1));
+  committed.mockClear();
+  fireEvent.click(
+    screen.getByRole('button', { name: 'Change upload handler' }),
+  );
+  expect(screen.queryByText('Waiting')).toBeNull();
+  act(() => request.mock.calls[0][0].onProgress?.({ percent: 43 }));
+  expect(suspended).not.toHaveBeenCalled();
+  expect(committed).toHaveBeenCalledWith(
+    expect.objectContaining({ file: expect.objectContaining({ percent: 43 }) }),
+  );
+});
+
+test('Upload provides the documented lastModifiedDate on files and their batch', async () => {
+  const first = new File(['first'], 'first.txt', {
+    lastModified: 1600000000000,
+  });
+  const second = new File(['second'], 'second.txt', {
+    lastModified: 1700000000000,
+  });
+  const beforeUpload = rstest.fn<NonNullable<UploadProps['beforeUpload']>>(
+    () => false,
+  );
+  const onChange = rstest.fn<NonNullable<UploadProps['onChange']>>();
+  const { container } = render(
+    <Upload multiple beforeUpload={beforeUpload} onChange={onChange} />,
+  );
+  fireEvent.change(container.querySelector('input[type=file]')!, {
+    target: { files: [first, second] },
+  });
+  await waitFor(() => expect(onChange).toHaveBeenCalledTimes(2));
+  expect(beforeUpload.mock.calls[0][0]).toBe(first);
+  expect(beforeUpload.mock.calls[0][0].lastModifiedDate).toEqual(
+    new Date(first.lastModified),
+  );
+  expect(beforeUpload.mock.calls[0][1][1].lastModifiedDate).toEqual(
+    new Date(second.lastModified),
+  );
+  expect(
+    onChange.mock.calls[0][0].file.originFileObj?.lastModifiedDate,
+  ).toEqual(new Date(first.lastModified));
+});
+
+test.each(['success', 'error'] as const)(
+  'Upload does not abort a request that reports %s synchronously',
+  async (result) => {
+    const abort = rstest.fn();
+    const changes: unknown[] = [];
+    const { container, unmount } = render(
+      <Upload
+        customRequest={(options) => {
+          if (result === 'success') options.onSuccess?.({});
+          else options.onError?.(new Error('Upload failed'));
+          return { abort };
+        }}
+        onChange={({ file }) => changes.push(file.status)}
+      />,
+    );
+    pick(container, ['new.txt']);
+    await waitFor(() =>
+      expect(changes).toEqual([
+        'uploading',
+        result === 'success' ? 'done' : 'error',
+      ]),
+    );
+    unmount();
+    expect(abort).not.toHaveBeenCalled();
+  },
+);
+
+test('editing an Upload change payload cannot alter the uncontrolled list', async () => {
+  const previous: UploadFile = {
+    uid: 'prev',
+    name: 'existing.txt',
+    status: 'done',
+  };
+  const onChange = rstest.fn<NonNullable<UploadProps['onChange']>>(
+    ({ file, fileList }) => {
+      expect(fileList.find((item) => item.uid === file.uid)).toBe(file);
+      file.name = 'edited new file';
+      fileList[0].name = 'edited existing file';
+    },
+  );
+  const { container } = render(
+    <Upload
+      defaultFileList={[previous]}
+      beforeUpload={() => false}
+      onChange={onChange}
+    />,
+  );
+  pick(container, ['new.txt']);
+  await waitFor(() => expect(onChange).toHaveBeenCalledTimes(1));
+  expect(screen.getByText('new.txt')).toBeVisible();
+  expect(screen.getByText('existing.txt')).toBeVisible();
+  expect(previous.name).toBe('existing.txt');
+});
 
 test.each(['action', 'data'] as const)(
   'an upload %s failure stays with its file and lets the batch continue',

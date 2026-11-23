@@ -39,6 +39,8 @@ export interface TaoLocale {
   dateRange: string;
   startDate: string;
   endDate: string;
+  selectStartDate?: string;
+  selectEndDate?: string;
   now: string;
   ok: string;
   /** Cancel text. Omitted custom locales use the built-in English text. */

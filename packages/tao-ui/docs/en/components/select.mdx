@@ -435,7 +435,7 @@ export default function HideSelected() {
 
 ### Selection and clear events
 
-`onChange` provides the full value and matching existing options. `onSelect`, `onDeselect`, and `onClear` describe individual actions. Newly created tags have no existing option object.
+`onChange` provides the full value and matching existing options. In single mode, selecting the current option calls `onSelect` while `onChange` fires only when the value changes. Use `onSelect` to handle repeated selections. Newly created tags have no existing option object.
 
 ```tsx preview
 import { FormField, Select, Stack } from '@rockshin/tao-ui';

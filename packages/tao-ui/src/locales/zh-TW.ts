@@ -33,6 +33,8 @@ export const zhTW = createLocale({
   dateRange: '選擇日期範圍',
   startDate: '開始日期',
   endDate: '結束日期',
+  selectStartDate: '請選擇開始日期。',
+  selectEndDate: '請選擇結束日期。',
   now: '此刻',
   ok: '確定',
   cancel: '取消',

@@ -2,7 +2,7 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { expect, test } from '@rstest/core';
 import { render, screen, waitFor } from '@testing-library/react';
-import { type CSSProperties, useEffect, useRef } from 'react';
+import { createRef, type CSSProperties, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import {
   TaoPortalScope,
@@ -14,6 +14,24 @@ import {
 test('renders children', () => {
   render(<TaoProvider>hello</TaoProvider>);
   expect(screen.getByText('hello')).toBeTruthy();
+});
+
+test('a slotted TaoPortalScope attaches the portal ref to the child element', () => {
+  const ref = createRef<HTMLElement>();
+  const scopeProps = { ref, asChild: true };
+  render(
+    <TaoPortalScope {...scopeProps}>
+      <section>Scoped panel</section>
+    </TaoPortalScope>,
+  );
+  expect(ref.current).toBe(screen.getByText('Scoped panel'));
+});
+
+test('a wrapping TaoPortalScope attaches the portal ref to its wrapper', () => {
+  const ref = createRef<HTMLElement>();
+  const scopeProps = { ref };
+  render(<TaoPortalScope {...scopeProps}>Scoped panel</TaoPortalScope>);
+  expect(ref.current).toBe(screen.getByText('Scoped panel'));
 });
 
 test('a provider mounted in a shadow root tracks the host direction', async () => {

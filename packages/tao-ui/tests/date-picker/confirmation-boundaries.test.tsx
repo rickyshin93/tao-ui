@@ -105,7 +105,17 @@ test.each([DatePicker, RangePicker])(
   'IME Enter keeps date input pending',
   (Picker) => {
     const changed = rs.fn();
-    render(<Picker mobile={false} onChange={changed} />);
+    render(
+      Picker === RangePicker ? (
+        <RangePicker
+          mobile={false}
+          allowEmpty={[false, true]}
+          onChange={changed}
+        />
+      ) : (
+        <DatePicker mobile={false} onChange={changed} />
+      ),
+    );
     const input = screen.getAllByRole('combobox')[0];
     act(() => input.focus());
     fireEvent.change(input, { target: { value: '2026-06-15' } });

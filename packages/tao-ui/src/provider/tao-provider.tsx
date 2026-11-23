@@ -2,6 +2,8 @@ import { Slot } from '@radix-ui/react-slot';
 import {
   type CSSProperties,
   createContext,
+  type ForwardedRef,
+  forwardRef,
   type ReactNode,
   useContext,
   useLayoutEffect,
@@ -10,6 +12,7 @@ import {
   useState,
 } from 'react';
 import { type TaoTokenName, taoTokenVars } from '../theme/tokens';
+import { getComposedParent } from '../utils/composed-parent';
 import { enUS, type TaoLocale } from './locale';
 import { mergeLocale, type ResolvedTaoLocale } from './merge-locale';
 
@@ -176,13 +179,6 @@ export function useTaoInternalConfig(): TaoConfigContextValue {
   return useContext(TaoConfigContext);
 }
 
-function directionParent(element: Element): Element | null {
-  if (element.assignedSlot) return element.assignedSlot;
-  if (element.parentElement) return element.parentElement;
-  const root = element.getRootNode();
-  return 'host' in root ? (root as ShadowRoot).host : null;
-}
-
 /** Resolve DOM inheritance at a component's source, before it creates portals. */
 export function useTaoDirection(
   explicit?: TaoDirection | 'auto',
@@ -198,7 +194,7 @@ export function useTaoDirection(
     const target =
       source === 'self' || explicit === 'auto'
         ? element
-        : directionParent(element);
+        : getComposedParent(element);
     if (!target) return;
     const update = () => {
       const value =
@@ -209,7 +205,7 @@ export function useTaoDirection(
       for (
         let ancestor: Element | null = target;
         ancestor;
-        ancestor = directionParent(ancestor)
+        ancestor = getComposedParent(ancestor)
       ) {
         const auto = ancestor.getAttribute('dir') === 'auto';
         observer.observe(ancestor, {
@@ -262,17 +258,18 @@ export function useTaoToken(): { token: Record<TaoTokenName, string> } {
  * div would otherwise render even while the popup is closed, leaving a ghost
  * `<div data-tao-provider>` in the body for every mounted-but-closed Select.
  */
-export function TaoPortalScope({
-  children,
-  style,
-  asChild,
-  direction: directionProp,
-}: {
-  children: ReactNode;
-  style?: CSSProperties;
-  asChild?: boolean;
-  direction?: TaoDirection;
-}) {
+export const TaoPortalScope = forwardRef<
+  HTMLElement,
+  {
+    children: ReactNode;
+    style?: CSSProperties;
+    asChild?: boolean;
+    direction?: TaoDirection;
+  }
+>(function TaoPortalScope(
+  { children, style, asChild, direction: directionProp },
+  ref,
+) {
   const config = useTaoInternalConfig();
   const { tokenStyle, mode, compact } = config;
   const direction = directionProp ?? config.direction;
@@ -286,6 +283,7 @@ export function TaoPortalScope({
     return (
       <TaoConfigContext.Provider value={portalConfig}>
         <Slot
+          ref={ref}
           dir={direction}
           data-tao-provider=""
           {...themeAttr}
@@ -300,6 +298,7 @@ export function TaoPortalScope({
   return (
     <TaoConfigContext.Provider value={portalConfig}>
       <div
+        ref={ref as ForwardedRef<HTMLDivElement>}
         dir={direction}
         data-tao-provider=""
         {...themeAttr}
@@ -310,7 +309,7 @@ export function TaoPortalScope({
       </div>
     </TaoConfigContext.Provider>
   );
-}
+});
 
 // ---- Provider ----
 

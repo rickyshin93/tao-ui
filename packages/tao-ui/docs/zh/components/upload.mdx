@@ -721,7 +721,7 @@ export default function Demo() {
 | `headers / withCredentials` | `object / boolean` | — / false | 请求头与是否携带凭据。 |
 | `onPreview / onDownload` | `(file) => void` | — | 接管预览/下载；下载操作仅针对 done 文件，本地图片支持内置预览。 |
 | `onRemove` | `(file) => void / boolean / Promise` | — | 返回 false（或 Promise 解析为 false）阻止移除；允许移除时中止正在进行的请求。 |
-| `previewFile` | `(file: File or Blob) => PromiseLike<string>` | — | 生成本地缩略图 URL。 |
+| `previewFile` | `(file: File or Blob) => PromiseLike<string>` | — | 生成本地缩略图 URL。函数引用变化时重新生成。 |
 | `isImageUrl / iconRender` | `(file) => boolean / (file, listType) => ReactNode` | — | 自定义图片识别、文件与上传中图标。 |
 | `itemRender` | `(node, file, fileList, actions) => ReactNode` | — | 自定义文件项，actions 提供 preview、download、remove。 |
 | `progress` | `UploadListProgressProps` | — | 配置上传进度条。 |
@@ -775,5 +775,7 @@ export function ServerUpload() {
 ```
 
 使用 `customRequest` 时，通过 `onProgress` 报告进度，每次请求结束时调用一次 `onSuccess` 或 `onError`。如果请求支持取消，返回带有 `abort()` 方法的对象。使用受控 `fileList` 时，把 `onChange` 传回的文件列表保存到状态，以显示每个文件的最新状态。
+
+使用 `<Upload previewFile={generateThumbnail} />` 时，可以在组件外定义 `generateThumbnail`。如果函数依赖 props 或 state，用 React 的 `useCallback` 稳定引用。更换函数时，同一个文件的旧缩略图会在新图加载期间继续显示。
 
 从 [0.0.49](/zh/guide/changelog) 起，组件还会处理解析 `action` 或 `data` 时的失败，以及 `customRequest` 同步抛出的异常。出错文件显示失败状态，同批其他文件继续上传。

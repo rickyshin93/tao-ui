@@ -308,6 +308,8 @@ export function renderMenuItems(items: MenuItem[], ctx: RenderCtx): ReactNode {
             disabled={item.disabled}
             textValue={textValue}
             checked={ctx.selectedKeys.includes(item.key)}
+            // Keep the menu open so several items can be checked in one visit.
+            onSelect={(event: Event) => event.preventDefault()}
             onCheckedChange={() => {
               ctx.onToggle(item.key);
               ctx.onAction(item);

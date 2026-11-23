@@ -33,6 +33,8 @@ export const idID = createLocale({
   dateRange: 'Pilih rentang tanggal',
   startDate: 'Tanggal mulai',
   endDate: 'Tanggal selesai',
+  selectStartDate: 'Pilih tanggal mulai.',
+  selectEndDate: 'Pilih tanggal selesai.',
   now: 'Sekarang',
   ok: 'OK',
   cancel: 'Batal',

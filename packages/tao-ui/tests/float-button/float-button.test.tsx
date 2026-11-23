@@ -53,6 +53,11 @@ test('zero renders as a FloatButton tooltip', async () => {
   expect(await screen.findByRole('tooltip')).toHaveTextContent('0');
 });
 
+test('an icon-only FloatButton is named by its configured tooltip title', () => {
+  render(<FloatButton tooltip={{ title: 'Help', placement: 'left' }} />);
+  expect(screen.getByRole('button', { name: 'Help' })).toBeInTheDocument();
+});
+
 test('renders native button and anchor semantics with provider disabled behavior', () => {
   const click = rstest.fn();
   const ref = createRef<FloatButtonElement>();

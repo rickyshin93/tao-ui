@@ -33,6 +33,8 @@ export const koKR = createLocale({
   dateRange: '날짜 범위 선택',
   startDate: '시작일',
   endDate: '종료일',
+  selectStartDate: '시작일을 선택하세요.',
+  selectEndDate: '종료일을 선택하세요.',
   now: '현재',
   ok: '확인',
   cancel: '취소',

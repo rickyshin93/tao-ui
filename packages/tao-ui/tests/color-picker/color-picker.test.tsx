@@ -8,6 +8,8 @@ import {
   within,
 } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
+import { startTransition, Suspense, useState } from 'react';
+import { Button } from '../../src/components/button/button';
 import { Color } from '../../src/components/color-picker/color';
 import { ColorPicker } from '../../src/components/color-picker/color-picker';
 import { Modal } from '../../src/components/modal/modal';
@@ -147,6 +149,107 @@ test('a hover ColorPicker can be opened and dismissed with the keyboard', async 
   expect(screen.queryByRole('dialog', { name: 'Color picker' })).toBeNull();
 });
 
+test('ColorPicker opens and restores focus through a single Fragment trigger', async () => {
+  const user = userEvent.setup();
+  render(
+    <ColorPicker>
+      <>
+        <button type="button">Fragment trigger</button>
+      </>
+    </ColorPicker>,
+  );
+  const trigger = screen.getByRole('button', { name: 'Fragment trigger' });
+  await user.click(trigger);
+  expect(screen.getByRole('dialog', { name: 'Color picker' })).toBeVisible();
+  await user.keyboard('{Escape}');
+  await waitFor(() => expect(trigger).toHaveFocus());
+});
+
+test('ColorPicker renders a numeric zero as custom trigger content', () => {
+  render(<ColorPicker>{0}</ColorPicker>);
+  const trigger = screen.getByRole('button', { name: '0' });
+  fireEvent.click(trigger);
+  expect(screen.getByRole('dialog', { name: 'Color picker' })).toBeVisible();
+});
+
+test('a touch tap keeps a hover ColorPicker open after the pointer leaves', () => {
+  rstest.useFakeTimers();
+  try {
+    const onOpenChange = rstest.fn();
+    render(<ColorPicker trigger="hover" onOpenChange={onOpenChange} />);
+    const trigger = screen.getByRole('button', { name: /Choose color/ });
+    fireEvent.pointerOver(trigger, { pointerType: 'touch' });
+    expect(onOpenChange).not.toHaveBeenCalled();
+    fireEvent.pointerDown(trigger, { pointerType: 'touch' });
+    fireEvent.pointerUp(trigger, { pointerType: 'touch' });
+    fireEvent.click(trigger, { detail: 1 });
+    fireEvent.pointerOut(trigger, { pointerType: 'touch' });
+    act(() => rstest.advanceTimersByTime(150));
+    expect(onOpenChange.mock.calls).toEqual([[true]]);
+    expect(screen.getByRole('dialog', { name: 'Color picker' })).toBeVisible();
+  } finally {
+    rstest.useRealTimers();
+  }
+});
+
+test('a disabled ColorPicker disables a Tao Button used as its custom trigger', () => {
+  const onClick = rstest.fn();
+  render(
+    <ColorPicker disabled>
+      <Button onClick={onClick}>Choose accent</Button>
+    </ColorPicker>,
+  );
+  const trigger = screen.getByRole('button', { name: 'Choose accent' });
+  expect(trigger).toBeDisabled();
+  fireEvent.click(trigger);
+  expect(onClick).not.toHaveBeenCalled();
+});
+
+test('a delayed ColorPicker close uses the committed callback during a suspended transition', async () => {
+  rstest.useFakeTimers();
+  try {
+    const committed = rstest.fn();
+    const suspended = rstest.fn();
+    const pending = new Promise<never>(() => {});
+    function Blocker({ active }: { active: boolean }) {
+      if (active) throw pending;
+      return null;
+    }
+    function Fixture() {
+      const [next, setNext] = useState(false);
+      return (
+        <>
+          <button
+            type="button"
+            onClick={() => startTransition(() => setNext(true))}
+          >
+            Update callback
+          </button>
+          <Suspense fallback="Waiting">
+            <ColorPicker
+              trigger="hover"
+              onOpenChange={next ? suspended : committed}
+            />
+            <Blocker active={next} />
+          </Suspense>
+        </>
+      );
+    }
+    render(<Fixture />);
+    const trigger = screen.getByRole('button', { name: /Choose color/ });
+    fireEvent.pointerEnter(trigger);
+    fireEvent.pointerLeave(trigger);
+    fireEvent.click(screen.getByRole('button', { name: 'Update callback' }));
+    expect(screen.queryByText('Waiting')).toBeNull();
+    expect(screen.getByRole('dialog', { name: 'Color picker' })).toBeVisible();
+    await act(async () => rstest.advanceTimersByTime(100));
+    expect(committed.mock.calls).toEqual([[true], [false]]);
+    expect(suspended).not.toHaveBeenCalled();
+  } finally {
+    rstest.useRealTimers();
+  }
+});
+
 test('switching to a click trigger cancels a pending ColorPicker hover close', () => {
   rstest.useFakeTimers();
   try {
@@ -167,6 +270,37 @@ test('switching to a click trigger cancels a pending ColorPicker hover close', (
 
     expect(onOpenChange).not.toHaveBeenCalled();
     expect(screen.getByRole('dialog', { name: 'Color picker' })).toBeVisible();
+  } finally {
+    rstest.useRealTimers();
+  }
+});
+
+test('entering an open ColorPicker panel cancels close without reporting a second open', () => {
+  const onOpenChange = rstest.fn();
+  render(<ColorPicker trigger="hover" onOpenChange={onOpenChange} />);
+  const trigger = screen.getByRole('button', { name: /Choose color/ });
+  fireEvent.pointerEnter(trigger);
+  fireEvent.pointerLeave(trigger);
+  fireEvent.pointerEnter(screen.getByRole('dialog', { name: 'Color picker' }));
+  expect(onOpenChange.mock.calls).toEqual([[true]]);
+});
+
+test('a delayed ColorPicker hover close uses the latest callback', () => {
+  rstest.useFakeTimers();
+  try {
+    const previous = rstest.fn();
+    const current = rstest.fn();
+    const view = render(
+      <ColorPicker trigger="hover" onOpenChange={previous} />,
+    );
+    const trigger = screen.getByRole('button', { name: /Choose color/ });
+    fireEvent.pointerEnter(trigger);
+    fireEvent.pointerLeave(trigger);
+    view.rerender(<ColorPicker trigger="hover" onOpenChange={current} />);
+    act(() => rstest.advanceTimersByTime(100));
+    expect(previous.mock.calls).toEqual([[true]]);
+    expect(current.mock.calls).toEqual([[false]]);
+    expect(screen.queryByRole('dialog', { name: 'Color picker' })).toBeNull();
   } finally {
     rstest.useRealTimers();
   }

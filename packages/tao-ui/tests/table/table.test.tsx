@@ -244,6 +244,47 @@ test('supports column cell and header cell props', () => {
   expect(container.querySelector('.first-name-cell')).toBeTruthy();
 });
 
+test('cells merged away by a zero colSpan or rowSpan are not rendered', () => {
+  render(
+    <Table
+      columns={[
+        {
+          key: 'name',
+          dataIndex: 'name',
+          title: 'Name',
+          onCell: (record) => (record.id === 1 ? { colSpan: 2 } : {}),
+        },
+        {
+          key: 'age',
+          dataIndex: 'age',
+          title: 'Age',
+          onCell: (record) => (record.id === 1 ? { colSpan: 0 } : {}),
+        },
+        {
+          key: 'role',
+          dataIndex: 'role',
+          title: 'Role',
+          onCell: (record) =>
+            record.id === 1
+              ? { rowSpan: 2 }
+              : record.id === 2
+                ? { rowSpan: 0 }
+                : {},
+        },
+      ]}
+      dataSource={data}
+      rowKey="id"
+      pagination={false}
+    />,
+  );
+  const [, first, second, third] = screen.getAllByRole('row');
+  expect(first.querySelectorAll('td')).toHaveLength(2);
+  expect(first).not.toHaveTextContent('30');
+  expect(second.querySelectorAll('td')).toHaveLength(2);
+  expect(second).not.toHaveTextContent('user');
+  expect(third.querySelectorAll('td')).toHaveLength(3);
+});
+
 // ---- Size ----
 
 test('inherits size from TaoProvider', () => {
@@ -731,6 +772,42 @@ test('filter callbacks include an own property for a __proto__ data field', asyn
   expect(
     Object.getOwnPropertyDescriptor(filterValues, '__proto__')?.value,
   ).toEqual(['A']);
+});
+
+test('filter callbacks are keyed by column key so columns sharing a dataIndex stay distinct', async () => {
+  const onChange = rstest.fn();
+  render(
+    <Table
+      dataSource={data}
+      rowKey="id"
+      pagination={false}
+      columns={[
+        {
+          key: 'primaryRole',
+          dataIndex: 'role',
+          title: 'Primary',
+          filters: [{ text: 'Admin', value: 'admin' }],
+          onFilter: (value, record) => record.role === value,
+        },
+        {
+          key: 'secondaryRole',
+          dataIndex: 'role',
+          title: 'Secondary',
+          filters: [{ text: 'User', value: 'user' }],
+          onFilter: (value, record) => record.role === value,
+        },
+      ]}
+      onChange={onChange}
+    />,
+  );
+  await userEvent.click(screen.getAllByRole('button', { name: 'Filter' })[0]);
+  await userEvent.click(
+    screen.getByRole('menuitemcheckbox', { name: 'Admin' }),
+  );
+  expect(onChange.mock.calls.at(-1)?.[1]).toEqual({
+    primaryRole: ['admin'],
+    secondaryRole: null,
+  });
 });
 
 test('filter menu exposes keyboard menu semantics', async () => {
@@ -1537,6 +1614,21 @@ test('uncontrolled local pagination clamps after data shrinks without reviving t
     />,
   );
   expect(screen.queryByText('Row 11')).toBeNull();
+});
+
+test('a total that matches the local data still paginates locally', () => {
+  render(
+    <Table
+      columns={columns}
+      dataSource={data}
+      rowKey="id"
+      pagination={{ total: data.length, pageSize: 2 }}
+    />,
+  );
+  expect(screen.getAllByRole('row')).toHaveLength(3);
+  fireEvent.click(screen.getByLabelText('Page 3'));
+  expect(screen.getAllByRole('row')).toHaveLength(2);
+  expect(screen.getByText('Eve')).toBeTruthy();
 });
 
 test('remote pagination clamps by total rather than the current page row count', () => {

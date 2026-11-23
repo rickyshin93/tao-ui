@@ -10,6 +10,7 @@ import {
   useTaoConfig,
   useTaoInternalConfig,
 } from '../../provider/tao-provider';
+import { useCommittedRef } from '../../utils/refs';
 import {
   cx,
   type SemanticClassNames,
@@ -149,13 +150,16 @@ function messageResult(promise: Promise<boolean>, close: () => void) {
   });
 }
 
+function explicitMessageKey(key: Key) {
+  return `tao-app-explicit:${typeof key}:${key}`;
+}
+
 export function useAppMessages(config: AppMessageConfig = {}) {
   const [notices, holder] = useNoticeHolder('message', config);
   const active = useRef(new Map<Key, Life>());
   const sequence = useRef(0);
   const disposed = useRef(false);
-  const latest = useRef(config);
-  latest.current = config;
+  const latest = useCommittedRef(config);
   useLayoutEffect(() => {
     disposed.current = false;
     return () => {
@@ -184,7 +188,10 @@ export function useAppMessages(config: AppMessageConfig = {}) {
       if (disposed.current)
         return messageResult(Promise.resolve(true), () => {});
       const defaults = latest.current;
-      const key = args.key ?? `tao-app-message-${sequence.current++}`;
+      const key =
+        args.key == null
+          ? `tao-app-message-${sequence.current++}`
+          : explicitMessageKey(args.key);
       const merged = { ...defaults, ...args };
       const classNames = noticeClasses(
         resolveAppSemantic(defaults.classNames, merged),
@@ -247,13 +254,13 @@ export function useAppMessages(config: AppMessageConfig = {}) {
       loading: typed('loading'),
       destroy: (key) => {
         if (key !== undefined) {
-          close(key);
+          close(explicitMessageKey(key));
           return;
         }
         const failures: unknown[] = [];
-        for (const current of [...active.current.keys()]) {
+        for (const [key, life] of [...active.current]) {
           try {
-            close(current);
+            close(key, life);
           } catch (error) {
             failures.push(error);
           }
@@ -263,17 +270,15 @@ export function useAppMessages(config: AppMessageConfig = {}) {
           throw new AggregateError(failures, 'Message cleanup failed');
       },
     };
-  }, [notices]);
+  }, [latest, notices]);
   return [api, holder] as const;
 }
 
 export function useAppNotifications(config: AppNotificationConfig = {}) {
   const { locale } = useTaoConfig();
-  const closeLabel = useRef(locale.close);
-  closeLabel.current = locale.close;
+  const closeLabel = useCommittedRef(locale.close);
   const [notices, holder] = useNoticeHolder('notification', config);
-  const latest = useRef(config);
-  latest.current = config;
+  const latest = useCommittedRef(config);
   const api = useMemo<AppNotificationInstance>(() => {
     const open = (args: AppNotificationArgs) => {
       const defaults = latest.current;
@@ -344,6 +349,6 @@ export function useAppNotifications(config: AppNotificationConfig = {}) {
       destroy: (key) =>
         key === undefined ? notices.destroy() : notices.close(key),
     };
-  }, [notices]);
+  }, [closeLabel, latest, notices]);
   return [api, holder] as const;
 }

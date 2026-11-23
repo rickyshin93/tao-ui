@@ -33,6 +33,8 @@ export const frFR = createLocale({
   dateRange: 'Sélectionner une période',
   startDate: 'Date de début',
   endDate: 'Date de fin',
+  selectStartDate: 'Sélectionnez une date de début.',
+  selectEndDate: 'Sélectionnez une date de fin.',
   now: 'Maintenant',
   ok: 'OK',
   cancel: 'Annuler',

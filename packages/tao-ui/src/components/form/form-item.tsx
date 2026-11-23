@@ -2,10 +2,16 @@ import { Field, type Meta, type NamePath, type Rule } from '@rc-component/form';
 import {
   type CSSProperties,
   cloneElement,
+  createContext,
   Fragment,
   isValidElement,
   type ReactElement,
   type ReactNode,
+  useCallback,
+  useContext,
+  useId,
+  useMemo,
+  useState,
 } from 'react';
 import type { TaoStatus } from '../../provider/tao-provider';
 import type { SemanticClassNames, SemanticStyles } from '../../utils/semantic';
@@ -17,6 +23,11 @@ import type { FormInstance } from './use-form';
 export type FormItemSemanticPart = 'root' | 'label' | 'error' | 'description';
 
 export type FormItemValidateStatus = TaoStatus;
+
+const NoStyleFeedbackContext = createContext<{
+  visible: boolean;
+  report: (id: string, errors: string[]) => void;
+} | null>(null);
 
 export type FormItemChildren<Values = Record<string, unknown>> =
   | ReactNode
@@ -108,8 +119,27 @@ export function FormItem<Values = Record<string, unknown>>({
   classNames,
   styles,
   children,
+  ...shellProps
 }: FormItemProps<Values>): ReactNode {
   const { layout, form: formInstance } = useFormLayout();
+  const parentFeedback = useContext(NoStyleFeedbackContext);
+  const feedbackId = `${useId()}-nostyle-error`;
+  const [nestedErrors, setNestedErrors] = useState<Record<string, string[]>>(
+    {},
+  );
+  const report = useCallback((id: string, errors: string[]) => {
+    setNestedErrors((current) => {
+      if (!errors.length && !current[id]) return current;
+      if (errors.length) return { ...current, [id]: errors };
+      const next = { ...current };
+      delete next[id];
+      return next;
+    });
+  }, []);
+  const feedback = useMemo(
+    () => ({ visible: help == null, report }),
+    [help, report],
+  );
 
   const renderShell = (
     content: ReactNode,
@@ -118,11 +148,13 @@ export function FormItem<Values = Record<string, unknown>>({
   ) => {
     const requiredMark =
       required ??
-      rules?.some((rule) =>
-        typeof rule === 'function'
-          ? !!(formInstance && rule(formInstance).required)
-          : !!rule?.required,
-      ) ??
+      rules?.some((rule) => {
+        const entity =
+          typeof rule === 'function'
+            ? formInstance && rule(formInstance)
+            : rule;
+        return !!entity?.required && !entity.warningOnly;
+      }) ??
       false;
     const status: FormItemValidateStatus | undefined =
       validateStatus ??
@@ -212,9 +244,30 @@ export function FormItem<Values = Record<string, unknown>>({
 
     if (noStyle) {
       if (!element) return content;
-      const child = controlProps
-        ? cloneElement(element, controlProps)
-        : element;
+      // A labelled parent Form.Item clones its id/aria wiring onto this item.
+      const inherited = Object.fromEntries(
+        Object.entries(shellProps).filter(
+          ([key]) =>
+            element.props[key] == null &&
+            !(key === 'aria-labelledby' && element.props['aria-label']),
+        ),
+      );
+      const errors = meta?.errors ?? [];
+      const describedBy = [
+        element.props['aria-describedby'] ?? inherited['aria-describedby'],
+        parentFeedback?.visible && errors.length ? feedbackId : undefined,
+      ]
+        .filter(Boolean)
+        .join(' ');
+      const child = cloneElement(element, {
+        ...inherited,
+        ...controlProps,
+        'aria-describedby': describedBy || undefined,
+        'aria-invalid':
+          errors.length > 0
+            ? true
+            : (element.props['aria-invalid'] ?? inherited['aria-invalid']),
+      });
       return name != null && meta ? (
         <FieldControl name={meta.name} valueChange={valueChange}>
           {child}
@@ -225,40 +278,43 @@ export function FormItem<Values = Record<string, unknown>>({
     }
 
     return (
-      <FormFieldView
-        formItem
-        reserveMessage={
-          Boolean(rules?.length) ||
-          help != null ||
-          extra != null ||
-          validateStatus != null
-        }
-        label={label}
-        htmlFor={htmlFor}
-        required={requiredMark}
-        error={errorSlot}
-        invalid={status === 'error'}
-        warning={status === 'warning'}
-        description={descriptionSlot}
-        extra={extra}
-        layout={layout}
-        controlProps={controlProps}
-        renderControl={
-          name != null && meta
-            ? (child: ReactElement<Record<string, unknown>>) => (
-                <FieldControl name={meta.name} valueChange={valueChange}>
-                  {child}
-                </FieldControl>
-              )
-            : undefined
-        }
-        className={className}
-        style={style}
-        classNames={classNames}
-        styles={styles}
-      >
-        {content}
-      </FormFieldView>
+      <NoStyleFeedbackContext.Provider value={feedback}>
+        <FormFieldView
+          formItem
+          reserveMessage={
+            Boolean(rules?.length) ||
+            help != null ||
+            extra != null ||
+            validateStatus != null
+          }
+          label={label}
+          htmlFor={htmlFor}
+          required={requiredMark}
+          error={errorSlot}
+          nestedErrors={help == null ? nestedErrors : undefined}
+          invalid={status === 'error'}
+          warning={status === 'warning'}
+          description={descriptionSlot}
+          extra={extra}
+          layout={layout}
+          controlProps={controlProps}
+          renderControl={
+            name != null && meta
+              ? (child: ReactElement<Record<string, unknown>>) => (
+                  <FieldControl name={meta.name} valueChange={valueChange}>
+                    {child}
+                  </FieldControl>
+                )
+              : undefined
+          }
+          className={className}
+          style={style}
+          classNames={classNames}
+          styles={styles}
+        >
+          {content}
+        </FormFieldView>
+      </NoStyleFeedbackContext.Provider>
     );
   };
 
@@ -282,6 +338,12 @@ export function FormItem<Values = Record<string, unknown>>({
       preserve={preserve}
       messageVariables={messageVariables}
       validateFirst={validateFirst}
+      onMetaChange={
+        noStyle && parentFeedback
+          ? ({ errors, destroy }) =>
+              parentFeedback.report(feedbackId, destroy ? [] : errors)
+          : undefined
+      }
     >
       {(control, meta) => {
         const content =

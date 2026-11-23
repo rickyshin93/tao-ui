@@ -114,3 +114,22 @@ test('semantic callbacks see defaults and the ref resolves the native bordered r
   rerender(<QRCode ref={ref} type="svg" value="ref restored" />);
   expect(ref.current?.nativeElement).toHaveAttribute('data-tao-qr-code', '');
 });
+
+test('ARIA naming lives only on the QR image, not also on its wrapper', () => {
+  const { container } = render(
+    <>
+      <p id="qr-hint">Scan with your camera</p>
+      <QRCode
+        value="tao-ui"
+        aria-label="Open tao-ui"
+        aria-describedby="qr-hint"
+      />
+    </>,
+  );
+  expect(container.querySelectorAll('[aria-label="Open tao-ui"]')).toHaveLength(
+    1,
+  );
+  expect(
+    container.querySelectorAll('[aria-describedby="qr-hint"]'),
+  ).toHaveLength(1);
+});

@@ -162,6 +162,11 @@ test('clear has localized accessible text and emits an empty string', () => {
   expect(onChange).toHaveBeenCalledWith('');
 });
 
+test('an error status marks the Mentions textarea invalid', () => {
+  render(<Mentions status="error" />);
+  expect(screen.getByRole('textbox')).toHaveAttribute('aria-invalid', 'true');
+});
+
 test('readonly Mentions does not expose a clear action', () => {
   const onChange = rstest.fn();
   render(

@@ -33,6 +33,8 @@ export const viVN = createLocale({
   dateRange: 'Chọn khoảng ngày',
   startDate: 'Ngày bắt đầu',
   endDate: 'Ngày kết thúc',
+  selectStartDate: 'Chọn ngày bắt đầu.',
+  selectEndDate: 'Chọn ngày kết thúc.',
   now: 'Bây giờ',
   ok: 'OK',
   cancel: 'Hủy',

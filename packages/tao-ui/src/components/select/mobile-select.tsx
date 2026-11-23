@@ -100,7 +100,9 @@ function MobileSelectContentInner({
   );
   const composingRef = useRef(false);
   const createTag = () => {
-    if (addTokens(search)) onSearchClear();
+    const added = addTokens(search);
+    if (added) onSearchClear();
+    return added;
   };
 
   const knownOptions = useMemo(() => flattenLeafOptions(options), [options]);
@@ -283,15 +285,12 @@ function MobileSelectContentInner({
                 e.keyCode === 229
               )
                 return;
-              if (
-                multiple &&
-                (e.key === 'Enter' ||
-                  tokenSeparators?.some(
-                    (separator) => separator && search.includes(separator),
-                  ))
-              ) {
+              if (!multiple) return;
+              if (e.key === 'Enter') {
                 e.preventDefault();
                 createTag();
+              } else if (tokenSeparators?.includes(e.key) && createTag()) {
+                e.preventDefault();
               }
             }}
             placeholder={locale.searchPlaceholder}

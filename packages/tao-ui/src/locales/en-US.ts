@@ -32,6 +32,8 @@ export const enUS = createLocale({
   dateRange: 'Select date range',
   startDate: 'Start date',
   endDate: 'End date',
+  selectStartDate: 'Select a start date.',
+  selectEndDate: 'Select an end date.',
   now: 'Now',
   ok: 'OK',
   cancel: 'Cancel',

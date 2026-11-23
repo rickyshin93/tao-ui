@@ -12,6 +12,10 @@
 - none
 
 ## Done
+- 2026-11-23 Fixed eight component behaviors covering InputNumber blur and full-width digits, RangePicker drafts and announcements, Upload thumbnails, Form feedback, Modal exits, Select reselection and Search button names. React 18/19 tests, required gates and the bilingual docs build passed. See `.logs/component-contract-fixes-20261123/final-exits.log`.
+- 2026-11-23 Fixed InputNumber rendering with numeric Form initial values. Edits still emit strings. The regression and required gates passed on React 18/19. See `.logs/input-number-form-initial-value-20261123/`.
+- 2026-11-22 Completed review rounds 11–30 and fixed 21 defects across Form controls, InputNumber, Select, date pickers, Carousel RTL, Modal, Popover, App, Sonner and Splitter. Required gates passed with 4,448 tests, and the Chromium Carousel RTL check passed on React 18/19. See `.logs/bug-review-20-rounds-20261122/verification.md`.
+- 2026-11-22 Completed ten bug review rounds and fixed 27 defects across Form, inputs, Select, pickers, Table, Menu, Drawer and Modal, including Escape inside dialogs. Required gates passed with 4,380 tests, and Chromium Escape checks passed on React 18/19. See `.logs/bug-review-10-rounds-20261122/verification.md`.
 - 2026-11-20 Published tao-icons 0.1.4 with the SVG size fallback fix. The React 18/19 and Next.js consumer matrix, release CI, and npm tarball integrity passed. See `.logs/release-0.0.58/verification.md`.
 - 2026-11-20 Published tao-ui 0.0.58 with 32 component fixes. Release workflows, live bilingual changelogs, and npm tarball integrity passed. See `.logs/release-0.0.58/verification.md`.
 - 2026-11-20 Completed 100 component contract checks and fixed 13 reproduced defects. Required gates and targeted Chromium checks passed on React 18 and 19. See `.logs/bug-review-100-20261119/verification.md`.

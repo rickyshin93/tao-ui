@@ -419,6 +419,8 @@ export default function InputNumberClampedRange() {
 
 地区分组、小数符号和数字字符继承 `TaoProvider.locale.numberLocale`，也可用组件 `locale="fr-FR"` 覆盖。显式分隔符优先；数字输入在本地化显示的同时保留规范 ASCII 字符串及精度。
 
+支持键入和粘贴全角数字。失焦时，只有截断、补零或限幅等校正改变了值，`onChange` 才返回新的规范字符串。监听失焦使用 `onBlur`，表单失焦校验在 Form.Item 上配置 `validateTrigger="onBlur"`。
+
 ## API
 
 <API moduleName="input-number" />

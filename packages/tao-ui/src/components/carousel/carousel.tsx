@@ -5,7 +5,11 @@ import SlickCarousel, {
 import {
   Children,
   type CSSProperties,
+  cloneElement,
   forwardRef,
+  isValidElement,
+  type MouseEventHandler,
+  type ReactElement,
   type ReactNode,
   useEffect,
   useImperativeHandle,
@@ -85,6 +89,10 @@ export interface CarouselRef {
 type InnerSlider = NonNullable<SlickCarousel['innerSlider']> & {
   autoPlay: CarouselRef['autoPlay'];
 };
+type DotProps = { onClick?: MouseEventHandler<HTMLElement> };
+const defaultPaging = (index: number) => (
+  <button type="button">{index + 1}</button>
+);
 function Arrow({
   currentSlide: _current,
   slideCount: _count,
@@ -152,6 +160,8 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
       styles,
       appendDots,
       customPaging,
+      beforeChange,
+      afterChange,
       ...rest
     } = { ...baseProps, ...(unslick ? {} : responsiveSettings) };
     const placement =
@@ -184,6 +194,9 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
     const itemsPerSlide = (rest.rows ?? 1) * (rest.slidesPerRow ?? 1);
     const count = Math.ceil(childCount / itemsPerSlide);
     const ready = count > 0 && !unslick && responsiveSettings !== null;
+    // Slick numbers RTL slides from the visual left; the public API counts
+    // from the first child, so indexes cross this mirror in both directions.
+    const mirror = (index: number) => (isRtl ? count - 1 - index : index);
     const previousPosition = useRef<{
       ready: boolean;
       isRtl: boolean;
@@ -195,9 +208,18 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
       () => ({
         nativeElement: rootRef.current!,
         goTo: (slide, dontAnimate = false) =>
-          sliderRef.current?.slickGoTo(slide, dontAnimate),
-        next: () => sliderRef.current?.slickNext(),
-        prev: () => sliderRef.current?.slickPrev(),
+          sliderRef.current?.slickGoTo(
+            isRtl ? count - 1 - slide : slide,
+            dontAnimate,
+          ),
+        next: () =>
+          isRtl
+            ? sliderRef.current?.slickPrev()
+            : sliderRef.current?.slickNext(),
+        prev: () =>
+          isRtl
+            ? sliderRef.current?.slickNext()
+            : sliderRef.current?.slickPrev(),
         autoPlay: (playType) =>
           (sliderRef.current?.innerSlider as InnerSlider | undefined)?.autoPlay(
             playType,
@@ -206,7 +228,7 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
           return sliderRef.current?.innerSlider;
         },
       }),
-      [],
+      [count, isRtl],
     );
     useEffect(() => {
       const root = rootRef.current;
@@ -239,8 +261,14 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
       previousPosition.current = { ready, isRtl, initialSlide, slickGoTo };
       if (!ready) return;
       if (slickGoTo !== undefined) {
-        if (!previous?.ready || previous.slickGoTo !== slickGoTo) {
-          sliderRef.current?.slickGoTo(slickGoTo);
+        if (
+          !previous?.ready ||
+          previous.isRtl !== isRtl ||
+          previous.slickGoTo !== slickGoTo
+        ) {
+          sliderRef.current?.slickGoTo(
+            isRtl ? count - slickGoTo - 1 : slickGoTo,
+          );
         }
       } else if (
         !previous?.ready ||
@@ -288,12 +316,35 @@ export const Carousel = forwardRef<CarouselRef, CarouselProps>(
               typeof dots === 'object' && dots.className,
               classNames?.dots,
             )}
-            appendDots={
-              appendDots ?? ((items) => <ul style={styles?.dots}>{items}</ul>)
+            appendDots={(items) => {
+              // Slick hands RTL dots over in visual-left order; present them,
+              // and their indexes, in slide order.
+              const dotItems = Children.toArray(items);
+              const ordered = (isRtl ? dotItems.reverse() : dotItems).map(
+                (item, index) =>
+                  isValidElement<{ children: ReactElement<DotProps> }>(item)
+                    ? cloneElement(
+                        item,
+                        undefined,
+                        cloneElement((customPaging ?? defaultPaging)(index), {
+                          onClick: item.props.children.props.onClick,
+                        }),
+                      )
+                    : item,
+              );
+              return appendDots ? (
+                appendDots(ordered)
+              ) : (
+                <ul style={styles?.dots}>{ordered}</ul>
+              );
+            }}
+            customPaging={() => <span />}
+            beforeChange={
+              beforeChange &&
+              ((current, next) => beforeChange(mirror(current), mirror(next)))
             }
-            customPaging={
-              customPaging ??
-              ((index) => <button type="button">{index + 1}</button>)
+            afterChange={
+              afterChange && ((current) => afterChange(mirror(current)))
             }
             arrows={arrows}
             prevArrow={

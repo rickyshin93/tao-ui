@@ -2,7 +2,7 @@ import { shiftDecimal } from './percentage';
 
 const CANONICAL_REGEX = /^-?\d*\.?\d*$/;
 
-function toCanonical(value: number): string {
+export function toCanonical(value: number): string {
   const [coefficient, exponent] = String(value).split('e');
   return exponent === undefined
     ? coefficient

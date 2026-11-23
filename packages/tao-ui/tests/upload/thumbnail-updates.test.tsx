@@ -16,6 +16,33 @@ const file: UploadFile = {
   ) as RcFile,
 };
 
+test('Upload uses the image URL when an optional thumbnail URL is empty', () => {
+  render(
+    <Upload
+      listType="picture"
+      fileList={[{ ...file, url: '/image.png', thumbUrl: '' }]}
+    />,
+  );
+  expect(screen.getByRole('img', { name: 'photo.png' })).toHaveAttribute(
+    'src',
+    '/image.png',
+  );
+});
+
+test('Upload uses a generated thumbnail when its optional file URL is empty', async () => {
+  render(
+    <Upload
+      listType="picture"
+      fileList={[{ ...file, url: '' }]}
+      previewFile={async () => '/generated.png'}
+    />,
+  );
+  expect(await screen.findByRole('img', { name: 'photo.png' })).toHaveAttribute(
+    'src',
+    '/generated.png',
+  );
+});
+
 test.each(['url', 'thumbUrl'] as const)(
   'Upload recovers from preview failure when %s is provided',
   async (field) => {
@@ -60,6 +87,37 @@ test('Upload clears an old preview error when a replacement preview succeeds', a
     '/generated.png',
   );
   expect(screen.queryByText('Preview failed')).not.toBeInTheDocument();
+});
+
+test('Upload keeps the same file visible while a new preview generator runs', async () => {
+  let resolve!: (url: string) => void;
+  const pending = new Promise<string>((done) => {
+    resolve = done;
+  });
+  const previewFile = rs.fn().mockReturnValue(pending);
+  const view = render(
+    <Upload
+      listType="picture-card"
+      fileList={[file]}
+      previewFile={async () => '/old.png'}
+    />,
+  );
+  expect(await screen.findByRole('img')).toHaveAttribute('src', '/old.png');
+
+  view.rerender(
+    <Upload
+      listType="picture-card"
+      fileList={[file]}
+      previewFile={previewFile}
+    />,
+  );
+  expect(previewFile).toHaveBeenCalledExactlyOnceWith(file.originFileObj);
+  expect(screen.getByRole('img')).toHaveAttribute('src', '/old.png');
+  await act(async () => {
+    resolve('/new.png');
+    await pending;
+  });
+  expect(screen.getByRole('img')).toHaveAttribute('src', '/new.png');
 });
 
 test('Upload clears a stale thumbnail while the replacement file preview is pending', async () => {

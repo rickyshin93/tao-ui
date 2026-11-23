@@ -26,6 +26,7 @@ export interface FormFieldViewProps {
   htmlFor?: string;
   required?: boolean;
   error?: ReactNode;
+  nestedErrors?: Record<string, string[]>;
   invalid?: boolean;
   /** Render the message slot with warning styling instead of error. */
   warning?: boolean;
@@ -62,6 +63,7 @@ export function FormFieldView({
   htmlFor,
   required,
   error,
+  nestedErrors,
   invalid,
   warning,
   description,
@@ -145,8 +147,10 @@ export function FormFieldView({
   ) : hasDescription ? (
     descriptionMessage(descriptionId, description)
   ) : null;
+  const childErrors = Object.entries(nestedErrors ?? {});
   const hasMessage =
-    formItem && (reserveMessage || message !== null || hasExtra);
+    formItem &&
+    (reserveMessage || message !== null || hasExtra || childErrors.length > 0);
 
   return (
     <div
@@ -184,6 +188,20 @@ export function FormFieldView({
         {hasMessage ? (
           <div data-tao-form-message="">
             {message}
+            {childErrors.map(([id, errors]) => (
+              <div
+                key={id}
+                id={id}
+                role="alert"
+                className={classNames?.error}
+                style={styles?.error}
+                data-tao-form-error=""
+              >
+                {errors.map((error) => (
+                  <div key={error}>{error}</div>
+                ))}
+              </div>
+            ))}
             {hasExtra && descriptionMessage(extraId, extra)}
           </div>
         ) : (

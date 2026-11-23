@@ -186,6 +186,15 @@ test('a false close icon hides the Drawer close control', () => {
   expect(dialog.querySelector('[data-tao-drawer-header]')).toBeNull();
 });
 
+test('a null close icon hides the Drawer close control like Modal', () => {
+  render(
+    <Drawer open closeIcon={null}>
+      Drawer body
+    </Drawer>,
+  );
+  expect(screen.queryByRole('button', { name: 'Close' })).toBeNull();
+});
+
 test('custom closeIcon renders', () => {
   render(
     <Drawer open closeIcon={<span>x-icon</span>}>
@@ -435,3 +444,59 @@ test.each(['pointerCancel', 'lostPointerCapture'] as const)(
     expect(dialog).toHaveStyle({ width: '350px' });
   },
 );
+
+test('mask=false leaves the page behind the drawer interactive', async () => {
+  const user = userEvent.setup();
+  const outside = rstest.fn();
+  const onClose = rstest.fn();
+  render(
+    <>
+      <button type="button" onClick={outside}>
+        Page action
+      </button>
+      <Drawer open mask={false} onClose={onClose}>
+        body
+      </Drawer>
+    </>,
+  );
+  const page = screen.getByRole('button', {
+    name: 'Page action',
+    hidden: true,
+  });
+  await user.click(page);
+  expect(outside).toHaveBeenCalledTimes(1);
+  expect(onClose).not.toHaveBeenCalled();
+  expect(screen.getByRole('dialog')).toBeTruthy();
+  expect(page.closest('[aria-hidden="true"]')).toBeNull();
+});
+
+test('Escape closes an expanded combobox before the Drawer that contains it', async () => {
+  const user = userEvent.setup();
+  const onClose = rstest.fn();
+  function Combobox() {
+    const [expanded, setExpanded] = useState(true);
+    return (
+      <input
+        role="combobox"
+        aria-controls="options"
+        aria-expanded={expanded}
+        aria-label="Region"
+        onKeyDown={(event) => {
+          if (event.key === 'Escape') setExpanded(false);
+        }}
+      />
+    );
+  }
+  render(
+    <Drawer open onClose={onClose} title="Region">
+      <Combobox />
+    </Drawer>,
+  );
+  const combobox = screen.getByRole('combobox', { name: 'Region' });
+  await user.click(combobox);
+  await user.keyboard('{Escape}');
+  expect(combobox).toHaveAttribute('aria-expanded', 'false');
+  expect(onClose).not.toHaveBeenCalled();
+  await user.keyboard('{Escape}');
+  expect(onClose).toHaveBeenCalledTimes(1);
+});

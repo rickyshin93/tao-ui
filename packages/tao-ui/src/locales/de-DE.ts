@@ -33,6 +33,8 @@ export const deDE = createLocale({
   dateRange: 'Zeitraum auswählen',
   startDate: 'Startdatum',
   endDate: 'Enddatum',
+  selectStartDate: 'Wählen Sie ein Startdatum.',
+  selectEndDate: 'Wählen Sie ein Enddatum.',
   now: 'Jetzt',
   ok: 'OK',
   cancel: 'Abbrechen',

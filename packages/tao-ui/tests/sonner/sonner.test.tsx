@@ -586,3 +586,19 @@ test('custom toasts honor their configured actions and close button', async () =
     act(() => toast.dismiss(id));
   }
 });
+
+test('updating a toast by id keeps its place in the stack', async () => {
+  render(<Sonner />);
+  act(() => {
+    toast({ id: 'upload', title: 'Uploading', duration: 0 });
+    toast({ id: 'saved', title: 'Saved', duration: 0 });
+    toast({ id: 'upload', title: 'Uploaded', duration: 0 });
+  });
+  try {
+    const front = document.querySelector('[data-tao-front="true"]')!;
+    expect(front).toHaveTextContent('Saved');
+  } finally {
+    act(() => toast.dismiss());
+    await new Promise((resolve) => setTimeout(resolve, 240));
+  }
+});

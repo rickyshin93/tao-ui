@@ -70,7 +70,7 @@ export function useSelectSelection(props: SelectionProps, disabled: boolean) {
       if (disabled) return false;
       const option = optionByValue.get(next);
       if (!multiple) {
-        publish(next);
+        if (next !== value) publish(next);
         if (option) onSelect?.(next, option);
         return true;
       }
@@ -92,6 +92,7 @@ export function useSelectSelection(props: SelectionProps, disabled: boolean) {
     [
       disabled,
       multiple,
+      value,
       selectedValueSet,
       valueArray,
       maxCount,
@@ -201,21 +202,23 @@ export function useSelectSelection(props: SelectionProps, disabled: boolean) {
   }, [multiple, publish, onClear]);
 
   const selectedOption = useMemo(
-    () => (!multiple && value ? optionByValue.get(value as string) : undefined),
+    () =>
+      !multiple && value
+        ? (optionByValue.get(value as string) ?? {
+            label: value as string,
+            value: value as string,
+          })
+        : undefined,
     [multiple, value, optionByValue],
   );
   const selectedOptions = useMemo(
     () =>
       multiple
-        ? valueArray
-            .map(
-              (item) =>
-                optionByValue.get(item) ??
-                (mode === 'tags' ? { label: item, value: item } : undefined),
-            )
-            .filter((option) => option !== undefined)
+        ? valueArray.map(
+            (item) => optionByValue.get(item) ?? { label: item, value: item },
+          )
         : [],
-    [multiple, valueArray, optionByValue, mode],
+    [multiple, valueArray, optionByValue],
   );
 
   return {

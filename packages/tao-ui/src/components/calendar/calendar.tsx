@@ -144,6 +144,16 @@ export const Calendar = forwardRef<CalendarRef, CalendarProps>((props, ref) => {
       (date.isBefore(validRange[0], 'day') ||
         date.isAfter(validRange[1], 'day'))
     ) || !!props.disabledDate?.(date);
+  // The engine only probes a month's first and last days; check every day.
+  const monthDisabled = (date: Dayjs) => {
+    for (
+      let day = date.startOf('month');
+      day.isSame(date, 'month');
+      day = day.add(1, 'day')
+    )
+      if (!disabled(day)) return false;
+    return true;
+  };
   const select = (date: Dayjs, source: CalendarSelectInfo['source']) => {
     if (config.disabled) return;
     if (props.value === undefined) setValue(date);
@@ -293,7 +303,7 @@ export const Calendar = forwardRef<CalendarRef, CalendarProps>((props, ref) => {
         picker={mode === 'year' ? 'month' : 'date'}
         hideHeader
         showWeek={props.showWeek}
-        disabledDate={disabled}
+        disabledDate={mode === 'year' ? monthDisabled : disabled}
         onSelect={(date) =>
           mode === 'year' ? select(clamp(date), 'month') : select(date, 'date')
         }

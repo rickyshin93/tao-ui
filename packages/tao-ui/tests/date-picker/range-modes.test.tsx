@@ -59,6 +59,7 @@ test.each([
       mobile={false}
       picker={picker}
       minDate={dayjs('2026-06-15')}
+      allowEmpty={[false, true]}
       onChange={onChange}
     />,
   );

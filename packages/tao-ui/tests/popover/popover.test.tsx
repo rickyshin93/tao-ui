@@ -709,3 +709,33 @@ test.each([false, true])(
     }
   },
 );
+
+test('pressing the trigger of an open hover Popover keeps it open', async () => {
+  const user = userEvent.setup();
+  render(
+    <Popover mouseEnterDelay={0} content="Hover body">
+      <button type="button">Hover me</button>
+    </Popover>,
+  );
+  const triggerEl = screen.getByRole('button', { name: 'Hover me' });
+  await user.hover(triggerEl);
+  const popup = document.querySelector('[data-tao-popover]') as HTMLElement;
+  expect(popup.dataset.state).toBe('open');
+  await user.click(triggerEl);
+  expect(popup.dataset.state).toBe('open');
+});
+
+test('clicking the focused input of a focus Popover keeps it open', async () => {
+  const user = userEvent.setup();
+  render(
+    <Popover trigger="focus" content="Focus body">
+      <input aria-label="field" />
+    </Popover>,
+  );
+  const input = screen.getByRole('textbox', { name: 'field' });
+  await user.click(input);
+  const popup = document.querySelector('[data-tao-popover]') as HTMLElement;
+  expect(popup.dataset.state).toBe('open');
+  await user.click(input);
+  expect(popup.dataset.state).toBe('open');
+});

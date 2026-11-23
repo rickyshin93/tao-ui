@@ -15,7 +15,10 @@ import {
   useTaoConfig,
 } from '../../provider/tao-provider';
 import { DialogContent } from '../../utils/dialog-content';
-import { preventParentOutsideDismiss } from '../../utils/portal';
+import {
+  isEscapeForOpenCombobox,
+  preventParentOutsideDismiss,
+} from '../../utils/portal';
 import {
   cx,
   type SemanticClassNames,
@@ -67,7 +70,7 @@ export interface DrawerProps
   height?: number | string;
   /** Show the close (×) button. Defaults to true. */
   closable?: boolean;
-  /** Custom close icon. */
+  /** Custom close icon. `null` or `false` hides the close button. */
   closeIcon?: ReactNode;
   /** Close when clicking the mask. Defaults to true. */
   maskClosable?: boolean;
@@ -225,13 +228,15 @@ export function Drawer({
   const keepAlive = !destroyOnHidden;
   const forceMount = keepAlive ? true : undefined;
 
-  const showClose = closable && closeIcon !== false;
+  const showClose = closable && closeIcon !== false && closeIcon !== null;
   const showHeader = title != null || extra != null || showClose;
 
   return (
     <TaoProvider direction={direction}>
       <Dialog.Root
         open={open}
+        // Without a mask the page stays visible, so it must stay interactive.
+        modal={mask}
         onOpenChange={(v) => {
           if (!v) onClose?.();
         }}
@@ -279,7 +284,7 @@ export function Drawer({
                   target.focus();
               }}
               onEscapeKeyDown={(e) => {
-                if (!keyboard) e.preventDefault();
+                if (!keyboard || isEscapeForOpenCombobox(e)) e.preventDefault();
               }}
               onPointerDownOutside={preventParentOutsideDismiss}
               onInteractOutside={preventParentOutsideDismiss}

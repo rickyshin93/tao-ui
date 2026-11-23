@@ -407,6 +407,13 @@ test('disabling the password visibility toggle masks an exposed value', async ()
   expect(input).toHaveAttribute('type', 'password');
 });
 
+test('a Password without a visibility toggle or suffix renders no empty suffix slot', () => {
+  const { container } = render(
+    <Input.Password aria-label="Password" visibilityToggle={false} />,
+  );
+  expect(container.querySelector('[data-tao-suffix]')).toBeNull();
+});
+
 test('a custom loading Search button blocks pointer and Enter searches', async () => {
   const searches: string[] = [];
   const control = (loading: boolean) => (
@@ -417,7 +424,7 @@ test('a custom loading Search button blocks pointer and Enter searches', async (
     />
   );
   const view = render(control(true));
-  const button = screen.getByRole('button', { name: 'Search' });
+  const button = screen.getByRole('button', { name: 'Go' });
   expect(button).toBeDisabled();
   expect(button).toHaveAttribute('aria-busy', 'true');
   await userEvent.click(button);
@@ -428,9 +435,36 @@ test('a custom loading Search button blocks pointer and Enter searches', async (
   expect(searches).toEqual(['record']);
 });
 
+test.each([
+  'Find orders',
+  <span key="label">Find orders</span>,
+  <button key="button" type="button">
+    Find orders
+  </button>,
+])(
+  'Search names its submit button from visible content (%#)',
+  (enterButton) => {
+    render(<Input.Search enterButton={enterButton} />);
+    expect(screen.getByRole('button', { name: 'Find orders' })).toBeVisible();
+  },
+);
+
+test('Search names an icon-only custom button with the search label', () => {
+  render(
+    <Input.Search
+      enterButton={
+        <button type="button">
+          <svg aria-hidden="true" />
+        </button>
+      }
+    />,
+  );
+  expect(screen.getByRole('button', { name: 'Search' })).toBeVisible();
+});
+
 test('Search renders a numeric zero as custom button content', () => {
   render(<Input.Search enterButton={0} />);
-  expect(screen.getByRole('button', { name: 'Search' })).toHaveTextContent('0');
+  expect(screen.getByRole('button', { name: '0' })).toBeVisible();
 });
 
 test('Search skips submission when a custom button removes the input synchronously', () => {
@@ -462,7 +496,7 @@ test('Search skips submission when a custom button removes the input synchronous
   };
   window.addEventListener('error', onError);
   try {
-    fireEvent.click(screen.getByRole('button', { name: 'Search' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Dismiss' }));
   } finally {
     window.removeEventListener('error', onError);
   }

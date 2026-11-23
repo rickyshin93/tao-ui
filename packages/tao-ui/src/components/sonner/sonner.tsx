@@ -221,8 +221,11 @@ function create(
     phase: 'active',
   };
 
+  // An existing id is updated in place, keeping its stack position.
   state = {
-    toasts: [...state.toasts.filter((toast) => toast.id !== id), next],
+    toasts: state.toasts.some((toast) => toast.id === id)
+      ? state.toasts.map((toast) => (toast.id === id ? next : toast))
+      : [...state.toasts, next],
   };
   emit();
   scheduleDismiss(id, normalized.duration);

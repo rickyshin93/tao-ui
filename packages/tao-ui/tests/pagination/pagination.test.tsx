@@ -222,3 +222,15 @@ test('an invalid page size fails before calculating page controls', () => {
     render(<Pagination total={25} showSizeChanger pageSizeOptions={[0, 10]} />),
   ).toThrow('Pagination pageSizeOptions must contain positive integers');
 });
+
+test('Pagination rejects a non-finite default page without re-rendering indefinitely', () => {
+  expect(() => render(<Pagination total={100} defaultCurrent={NaN} />)).toThrow(
+    'Pagination current page must be a safe integer',
+  );
+});
+
+test('Pagination rejects a fractional controlled page before rendering fractional page buttons', () => {
+  expect(() => render(<Pagination total={100} current={5.5} />)).toThrow(
+    'Pagination current page must be a safe integer',
+  );
+});

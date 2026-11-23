@@ -31,10 +31,9 @@ export function format(canonical: string, opts: NumberFormatOptions): string {
 export function parse(display: string, opts: NumberFormatOptions): string {
   if (!display) return '';
 
-  const text = normalizeDigits(display, opts).replace(
-    /[\u061c\u200e\u200f\u202a-\u202e\u2066-\u2069]/g,
-    '',
-  );
+  const text = normalizeDigits(display, opts)
+    .replace(/[０-９]/g, (digit) => String(digit.charCodeAt(0) - 0xff10))
+    .replace(/[\u061c\u200e\u200f\u202a-\u202e\u2066-\u2069]/g, '');
   const negative =
     text.startsWith('-') || text.startsWith(opts.minusSign ?? '-');
   const body = negative ? text.slice(1) : text;

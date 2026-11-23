@@ -1,7 +1,8 @@
 import { readFileSync } from 'node:fs';
 import { expect, rstest, test } from '@rstest/core';
-import { act, render, screen } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
+import { Form } from '../../src/components/form';
 import { Radio, RadioGroup } from '../../src/components/radio/radio';
 import { TaoProvider } from '../../src/provider/tao-provider';
 
@@ -388,4 +389,44 @@ test('RadioGroup native reset preserves a selection matching an updated default'
   await act(async () => view.container.querySelector('form')!.reset());
   expect(screen.getByRole('radio', { name: 'B' })).toBeChecked();
   expect(screen.getByRole('radio', { name: 'A' })).not.toBeChecked();
+});
+
+test('a required RadioGroup in Form.Item leaves submit validation to the Form', async () => {
+  const onFinishFailed = rstest.fn();
+  render(
+    <Form onFinishFailed={onFinishFailed}>
+      <Form.Item
+        name="plan"
+        label="Plan"
+        rules={[{ required: true, message: 'Pick a plan' }]}
+      >
+        <RadioGroup options={['A', 'B']} />
+      </Form.Item>
+      <button type="submit">Save</button>
+    </Form>,
+  );
+  await userEvent.click(screen.getByRole('button', { name: 'Save' }));
+  await waitFor(() => expect(onFinishFailed).toHaveBeenCalled());
+  expect(screen.getByRole('alert').textContent).toBe('Pick a plan');
+  expect(screen.getByRole('radiogroup').getAttribute('aria-required')).toBe(
+    'true',
+  );
+});
+
+test('RadioGroup in Form.Item validates on blur', async () => {
+  render(
+    <Form>
+      <Form.Item
+        name="plan"
+        label="Plan"
+        validateTrigger="onBlur"
+        rules={[{ required: true, message: 'Pick a plan' }]}
+      >
+        <RadioGroup options={['A', 'B']} />
+      </Form.Item>
+    </Form>,
+  );
+  act(() => screen.getByRole('radio', { name: 'A' }).focus());
+  act(() => screen.getByRole('radio', { name: 'A' }).blur());
+  expect((await screen.findByRole('alert')).textContent).toBe('Pick a plan');
 });

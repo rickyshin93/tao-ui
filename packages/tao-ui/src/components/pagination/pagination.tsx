@@ -13,6 +13,7 @@ import './pagination.css';
 export type PaginationSemanticPart = 'root' | 'item' | 'total';
 
 export interface PaginationProps {
+  /** Current page as a safe integer. */
   current?: number;
   defaultCurrent?: number;
   /** A positive integer. */
@@ -144,6 +145,8 @@ export function Pagination({
   const pageSize = isPageSizeControlled ? pageSizeProp : internalPageSize;
   if (!Number.isSafeInteger(total) || total < 0)
     throw new RangeError('Pagination total must be a non-negative safe integer');
+  if (!Number.isSafeInteger(current))
+    throw new RangeError('Pagination current page must be a safe integer');
   if (!isValidPageSize(pageSize))
     throw new RangeError('Pagination pageSize must be a positive integer');
   if (showSizeChanger && !pageSizeOptions.every(isValidPageSize))

@@ -74,6 +74,7 @@ export const OTP = forwardRef<OTPRef, OTPProps>(function OTP(props, ref) {
     style,
     autoFocus,
     inputMode,
+    'aria-required': ariaRequired,
     ...rest
   } = props;
   if (!Number.isInteger(length) || length < 1)
@@ -195,6 +196,7 @@ export const OTP = forwardRef<OTPRef, OTPProps>(function OTP(props, ref) {
               }
               aria-describedby={rest['aria-describedby']}
               aria-invalid={rest['aria-invalid']}
+              aria-required={ariaRequired}
               classNames={{ input: classNames?.input }}
               styles={{ input: styles?.input }}
               onFocus={(event) => event.currentTarget.select()}

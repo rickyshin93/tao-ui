@@ -27,6 +27,87 @@ const nodes: DataNode[] = [
   },
 ];
 
+test('plain Tree keeps its selection when onSelect edits the key payload', () => {
+  render(
+    <Tree
+      treeData={nodes}
+      onSelect={(keys) => {
+        keys.length = 0;
+      }}
+    />,
+  );
+  const node = screen.getByText('Project');
+  fireEvent.click(node);
+  expect(node.closest('[role="treeitem"]')).toHaveAttribute(
+    'aria-selected',
+    'true',
+  );
+});
+
+test('plain Tree keeps its expansion when onExpand edits the key payload', () => {
+  const { container } = render(
+    <Tree
+      treeData={nodes}
+      onExpand={(keys) => {
+        keys.length = 0;
+      }}
+    />,
+  );
+  fireEvent.click(container.querySelector('[data-tao-tree-switcher]')!);
+  expect(
+    screen.getByText('Project').closest('[role="treeitem"]'),
+  ).toHaveAttribute('aria-expanded', 'true');
+  expect(screen.getByText('Draft')).toBeVisible();
+});
+
+test.each([false, true])(
+  'Tree keeps checked keys when onCheck edits its payload (strict=%s)',
+  (checkStrictly) => {
+    render(
+      <Tree
+        treeData={nodes}
+        defaultExpandAll
+        checkable
+        checkStrictly={checkStrictly}
+        onCheck={(keys, info) => {
+          if (Array.isArray(keys)) keys.length = 0;
+          else keys.checked.length = 0;
+          if (info.halfCheckedKeys) info.halfCheckedKeys.length = 0;
+        }}
+      />,
+    );
+    const draft = screen.getByRole('checkbox', { name: 'Draft' });
+    fireEvent.click(draft);
+    expect(draft).toHaveAttribute('aria-checked', 'true');
+    expect(screen.getByRole('checkbox', { name: 'Project' })).toHaveAttribute(
+      'aria-checked',
+      checkStrictly ? 'false' : 'mixed',
+    );
+  },
+);
+
+test('Tree keeps a successful load cached when onLoad edits the key payload', async () => {
+  const loadData = rstest.fn().mockResolvedValue(undefined);
+  const onLoad = rstest
+    .fn<NonNullable<TreeProps['onLoad']>>()
+    .mockImplementation((keys) => {
+      keys.length = 0;
+    });
+  const { container } = render(
+    <Tree
+      treeData={[{ key: 'folder', title: 'Unloaded folder' }]}
+      loadData={loadData}
+      onLoad={onLoad}
+    />,
+  );
+  const switcher = container.querySelector('[data-tao-tree-switcher]')!;
+  fireEvent.click(switcher);
+  await waitFor(() => expect(onLoad).toHaveBeenCalledTimes(1));
+  fireEvent.click(switcher);
+  fireEvent.click(switcher);
+  expect(loadData).toHaveBeenCalledTimes(1);
+});
+
 test('expands parents for default descendant keys and forwards expand events', () => {
   const onExpand = rstest.fn();
   render(

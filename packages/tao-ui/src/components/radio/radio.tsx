@@ -5,6 +5,7 @@ import {
   forwardRef,
   type ChangeEvent,
   createContext,
+  type FocusEventHandler,
   type ReactNode,
   type Ref,
   useCallback,
@@ -20,6 +21,7 @@ import {
   type SemanticClassNames,
   type SemanticStyles,
 } from '../../utils/semantic';
+import { useFormLayout } from '../form/form-context';
 import './radio.css';
 
 export type RadioSemanticPart = 'root' | 'indicator' | 'label';
@@ -82,6 +84,8 @@ export const Radio = forwardRef(function Radio(
 ) {
   const ctx = useTaoConfig();
   const groupCtx = useContext(RadioGroupContext);
+  // A tao Form validates on submit itself; native required would block it.
+  const inForm = useFormLayout().form != null;
 
   const resolvedDisabled =
     disabled ?? groupCtx?.disabled ?? ctx.disabled ?? false;
@@ -110,9 +114,10 @@ export const Radio = forwardRef(function Radio(
           {...ariaProps}
           required={
             required ??
-            (ariaRequired === undefined
-              ? grouped && groupCtx.required
-              : ariaRequired === true || ariaRequired === 'true')
+            (!inForm &&
+              (ariaRequired === undefined
+                ? grouped && groupCtx.required
+                : ariaRequired === true || ariaRequired === 'true'))
           }
           ref={ref}
           type="radio"
@@ -165,6 +170,8 @@ export interface RadioGroupProps
   value?: string;
   defaultValue?: string;
   onChange?: (value: string) => void;
+  /** Fires when focus leaves any radio in the group (Form validateTrigger). */
+  onBlur?: FocusEventHandler<HTMLDivElement>;
   disabled?: boolean;
   size?: TaoSize;
   direction?: 'horizontal' | 'vertical';
@@ -180,6 +187,7 @@ export function RadioGroup(props: RadioGroupProps) {
     value,
     defaultValue,
     onChange,
+    onBlur,
     disabled,
     size,
     direction = 'horizontal',
@@ -262,6 +270,7 @@ export function RadioGroup(props: RadioGroupProps) {
         aria-errormessage={ariaErrorMessage}
         aria-invalid={ariaInvalid}
         aria-required={ariaRequired}
+        onBlur={onBlur}
       >
         {normalizedOptions
           ? normalizedOptions.map((opt) => (

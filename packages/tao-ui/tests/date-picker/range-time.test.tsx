@@ -174,3 +174,17 @@ test('RangePicker allows choosing a later time on the same day as a locked start
     ['2026-06-15 09:00:00', '2026-06-15 12:00:00'],
   ]);
 });
+
+test('range time columns follow the time units shown by the format', () => {
+  render(
+    <RangePicker
+      mobile={false}
+      open
+      showTime
+      format="YYYY-MM-DD HH:mm"
+      defaultValue={original}
+    />,
+  );
+  expect(screen.getAllByRole('group', { name: 'Minute' })).toHaveLength(2);
+  expect(screen.queryByRole('group', { name: 'Second' })).toBeNull();
+});

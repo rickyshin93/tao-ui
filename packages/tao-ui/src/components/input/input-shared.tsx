@@ -59,8 +59,10 @@ export function useTextControlRef<
 ) {
   useImperativeHandle(mergeRefs(ref), () => {
     const node = nodeRef.current!;
-    const nativeFocus =
-      Object.getPrototypeOf(node).focus ?? HTMLElement.prototype.focus;
+    const nativeFocus = Object.getPrototypeOf(node).focus as
+      | HTMLInputElement['focus']
+      | undefined;
+    if (!nativeFocus) return node;
     return Object.assign(node, {
       input: node,
       textArea: node,
@@ -69,7 +71,7 @@ export function useTextControlRef<
         nativeFocus.call(node, options);
         if (
           options?.cursor &&
-          (node instanceof HTMLTextAreaElement ||
+          (node.localName === 'textarea' ||
             ['text', 'search', 'password', 'tel', 'url'].includes(node.type))
         ) {
           const end = node.value.length;

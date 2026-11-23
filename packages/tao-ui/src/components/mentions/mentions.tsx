@@ -144,6 +144,7 @@ const MentionsComponent = forwardRef<MentionsRef, MentionsProps>(
           ref={ref}
           prefixCls={prefixCls}
           disabled={disabled}
+          aria-invalid={status === 'error' ? true : props['aria-invalid']}
           onKeyDownCapture={(event) => {
             props.onKeyDownCapture?.(event);
             if (

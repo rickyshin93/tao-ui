@@ -8,7 +8,7 @@ import dayjsConfig from '@rc-component/picker/generate/dayjs';
 import type { Locale, RangePickerRef } from '@rc-component/picker/interface';
 import enLocale from '@rc-component/picker/locale/en_US';
 import type { Dayjs } from 'dayjs';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import {
   type TaoDirection,
   useTaoDirection,
@@ -54,6 +54,22 @@ export interface TimePickerLocaleConfig {
     rangePlaceholder?: [string, string];
   };
   timePickerLocale?: TimePickerLocale;
+}
+
+/** Exposes the popup state so dialogs can leave Escape to an open picker. */
+function usePopupState(
+  open: boolean | undefined,
+  onOpenChange: ((open: boolean) => void) | undefined,
+) {
+  const [innerOpen, setInnerOpen] = useState(false);
+  return {
+    'aria-haspopup': 'dialog' as const,
+    'aria-expanded': open ?? innerOpen,
+    onOpenChange: (next: boolean) => {
+      setInnerOpen(next);
+      onOpenChange?.(next);
+    },
+  };
 }
 
 type PickerClassNames = NonNullable<RcPickerProps<Dayjs>['classNames']>;
@@ -272,6 +288,7 @@ const SingleTimePicker = forwardRef<TimePickerRef, TimePickerProps>(
         ? props.styles({ props })
         : props.styles;
     const appearance = useAppearance(props, names, semanticStyles);
+    const popupState = usePopupState(props.open, props.onOpenChange);
     const {
       locale,
       size,
@@ -337,6 +354,7 @@ const SingleTimePicker = forwardRef<TimePickerRef, TimePickerProps>(
       >
         <RcPicker<Dayjs>
           {...rest}
+          {...popupState}
           ref={pickerRef}
           direction={direction}
           picker="time"
@@ -413,6 +431,7 @@ export const TimeRangePicker = forwardRef<
   const semanticStyles =
     typeof props.styles === 'function' ? props.styles({ props }) : props.styles;
   const appearance = useAppearance(props, names, semanticStyles);
+  const popupState = usePopupState(props.open, props.onOpenChange);
   const {
     locale,
     size,
@@ -475,6 +494,7 @@ export const TimeRangePicker = forwardRef<
     >
       <RcRangePicker<Dayjs>
         {...rest}
+        {...popupState}
         ref={pickerRef}
         direction={direction}
         picker="time"

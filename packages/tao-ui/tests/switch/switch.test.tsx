@@ -118,3 +118,11 @@ test('defaults to size=medium', () => {
   render(<Switch />);
   expect(screen.getByRole('switch').dataset.taoSize).toBe('medium');
 });
+
+test('only the visible inner text names the switch', async () => {
+  render(
+    <Switch defaultChecked checkedChildren="ON" unCheckedChildren="OFF" />,
+  );
+  await userEvent.click(screen.getByRole('switch', { name: 'ON' }));
+  expect(screen.getByRole('switch', { name: 'OFF' })).toBeTruthy();
+});

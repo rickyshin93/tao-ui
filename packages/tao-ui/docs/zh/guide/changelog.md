@@ -7,6 +7,20 @@ description: 查看 @rockshin/tao-ui 各版本的更新，包括上传、选择�
 
 按版本记录 `@rockshin/tao-ui` 的用户可见变更。日期使用 UTC+8。
 
+## 0.0.59
+
+2026-11-23
+
+- [InputNumber](/zh/components/input-number) 支持 Form 的数字初值和全角数字。按 Enter 时先校正值再提交表单。失焦照常触发 `onBlur`，校正改变值才通过 `onChange` 返回字符串。需要失焦校验时使用 `validateTrigger="onBlur"`。
+- [RangePicker](/zh/components/range-picker) 把先选的一端保留为草稿，并播报还需要选择哪一端。默认补齐两个可编辑端点再提交，业务需要开放区间时可设置 `allowEmpty`。[DatePicker](/zh/components/date-picker) 在修改时间或受控值时保留正在查看的月份。
+- [Select](/zh/components/select) 显示选项列表中缺失的已选值，支持原生表单提交多选值，键盘删除标签后保留焦点。单选重复点选当前项请使用 `onSelect`，`onChange` 在选值变化时触发。
+- [Form](/zh/components/form) 显示嵌套字段错误并关联控件，RadioGroup 和 CheckboxGroup 支持失焦校验。[Input.Search](/zh/components/input)、[Slider](/zh/components/slider)、[Switch](/zh/components/switch) 和 [QRCode](/zh/components/qr-code) 修正无障碍名称。
+- [Modal](/zh/components/modal) 支持从 ref 解析挂载容器，弹窗内下拉控件可先处理 Escape，Provider 禁用时默认仍可退出。[Popover](/zh/components/popover) 在悬停和聚焦模式下点击触发器时保持打开。[App](/zh/components/app) 确认弹窗提供可读的正文描述。
+- [Upload](/zh/components/upload) 为同一文件重生成预览期间保留旧缩略图。[Carousel](/zh/components/carousel) 在 RTL 下报告逻辑索引。[Sonner](/zh/components/sonner) 原位更新提示，[Splitter](/zh/components/splitter) 支持通过 `map()` 生成面板。
+- 此版本还修复了选择器状态、表格数据与分页、菜单交互、树选择和弹层定时器相关问题。
+
+[查看版本差异](https://github.com/rickyshin93/tao-ui/compare/v0.0.58...v0.0.59)
+
 ## 0.0.58
 
 2026-11-20

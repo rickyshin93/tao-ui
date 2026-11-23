@@ -30,9 +30,9 @@ export const Password = forwardRef<HTMLInputElement, PasswordProps>(
         ref={ref}
         type={visible ? 'text' : 'password'}
         suffix={
-          <>
-            {suffix}
-            {visibilityToggle && (
+          visibilityToggle ? (
+            <>
+              {suffix}
               <button
                 type="button"
                 data-tao-input-action=""
@@ -66,8 +66,10 @@ export const Password = forwardRef<HTMLInputElement, PasswordProps>(
                   </svg>
                 )}
               </button>
-            )}
-          </>
+            </>
+          ) : (
+            suffix
+          )
         }
       />
     );

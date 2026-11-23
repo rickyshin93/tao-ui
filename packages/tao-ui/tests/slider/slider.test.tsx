@@ -1,5 +1,5 @@
 import { expect, rs, test } from '@rstest/core';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import { createRef } from 'react';
 import { Slider, type SliderRef } from '../../src/components/slider/slider';
 import { TaoProvider } from '../../src/provider/tao-provider';
@@ -271,6 +271,67 @@ test('a false Slider tooltip formatter result suppresses the empty popup', () =>
     <Slider value={35} tooltip={{ open: true, formatter: () => false }} />,
   );
   expect(screen.queryByRole('tooltip')).toBeNull();
+});
+
+test.each(['Escape', 'outside press'] as const)(
+  'a hovered Slider tooltip closes immediately on %s',
+  (reason) => {
+    rs.useFakeTimers();
+    try {
+      const onOpenChange = rs.fn();
+      render(
+        <Slider
+          defaultValue={35}
+          tooltip={{ defaultOpen: true, mouseLeaveDelay: 30, onOpenChange }}
+        />,
+      );
+      // Radix registers its document pointer listener in the next task.
+      act(() => rs.advanceTimersByTime(1));
+      fireEvent.pointerEnter(screen.getByRole('slider'));
+      expect(screen.getByRole('tooltip')).toBeVisible();
+      if (reason === 'Escape')
+        fireEvent.keyDown(document.body, { key: 'Escape' });
+      else fireEvent.pointerDown(document.body, { pointerType: 'mouse' });
+      expect(onOpenChange).toHaveBeenCalledExactlyOnceWith(false);
+      expect(screen.queryByRole('tooltip')).toBeNull();
+    } finally {
+      rs.useRealTimers();
+    }
+  },
+);
+
+test('a Slider tooltip hover close uses the callback committed during its delay', () => {
+  rs.useFakeTimers();
+  try {
+    const previous = rs.fn();
+    const latest = rs.fn();
+    const fixture = (onOpenChange: (open: boolean) => void) => (
+      <Slider
+        defaultValue={35}
+        tooltip={{ defaultOpen: true, mouseLeaveDelay: 0.1, onOpenChange }}
+      />
+    );
+    const view = render(fixture(previous));
+    const handle = screen.getByRole('slider');
+    fireEvent.pointerEnter(handle, { pointerType: 'mouse' });
+    fireEvent.pointerLeave(handle, {
+      clientX: 5,
+      clientY: 5,
+      pointerType: 'mouse',
+    });
+    fireEvent.pointerMove(document.body, {
+      clientX: 100,
+      clientY: 100,
+      pointerType: 'mouse',
+    });
+    expect(previous).not.toHaveBeenCalled();
+    view.rerender(fixture(latest));
+    act(() => rs.advanceTimersByTime(100));
+    expect(previous).not.toHaveBeenCalled();
+    expect(latest).toHaveBeenCalledExactlyOnceWith(false);
+  } finally {
+    rs.useRealTimers();
+  }
 });
 
 test('tooltip formatter supports controlled visibility, null suppression and custom container', async () => {

@@ -6,6 +6,16 @@ import dayjs from 'dayjs';
 import { RangePicker } from '../../src/components/date-picker/range-picker';
 import { TaoProvider, zhCN } from '../../src/provider/tao-provider';
 
+test('disabling an uncontrolled RangePicker closes its calendar and discards the open session', () => {
+  const { rerender } = render(<RangePicker mobile={false} />);
+  fireEvent.click(screen.getAllByRole('combobox')[0]);
+  expect(screen.getAllByRole('grid')).toHaveLength(2);
+  rerender(<RangePicker mobile={false} disabled />);
+  expect(screen.queryAllByRole('grid')).toHaveLength(0);
+  rerender(<RangePicker mobile={false} />);
+  expect(screen.queryAllByRole('grid')).toHaveLength(0);
+});
+
 test('range calendar uses provider language in its drawer and navigation', () => {
   render(
     <TaoProvider locale={zhCN}>
@@ -44,6 +54,99 @@ test('displays formatted range values', () => {
   const inputs = screen.getAllByRole('combobox');
   expect(inputs[0]).toHaveValue('2026-06-01');
   expect(inputs[1]).toHaveValue('2026-06-15');
+});
+
+test('RangePicker change callbacks cannot overwrite the committed endpoints', () => {
+  render(
+    <RangePicker
+      mobile={false}
+      open
+      presets={[
+        {
+          label: 'Audit range',
+          value: [dayjs('2026-06-01'), dayjs('2026-06-15')],
+        },
+      ]}
+      onChange={(dates) => {
+        if (dates) dates[0] = null;
+      }}
+    />,
+  );
+  fireEvent.click(screen.getByText('Audit range'));
+  const [start, end] = screen.getAllByRole('combobox');
+  expect(start).toHaveValue('2026-06-01');
+  expect(end).toHaveValue('2026-06-15');
+});
+
+test('RangePicker restarts selection when the draft start becomes disabled', () => {
+  const onChange = rstest.fn();
+  const picker = (blockStart: boolean) => (
+    <RangePicker
+      mobile={false}
+      open
+      defaultValue={[dayjs('2026-06-10'), dayjs('2026-06-20')]}
+      disabledDate={(date) =>
+        blockStart && date.isSame(dayjs('2026-06-12'), 'day')
+      }
+      onChange={onChange}
+    />
+  );
+  const view = render(picker(false));
+  fireEvent.click(screen.getByRole('button', { name: '2026-06-12' }));
+  view.rerender(picker(true));
+  expect(screen.getByRole('button', { name: '2026-06-12' })).toBeDisabled();
+  fireEvent.click(screen.getByRole('button', { name: '2026-06-15' }));
+  expect(onChange).not.toHaveBeenCalled();
+  fireEvent.click(screen.getByRole('button', { name: '2026-06-18' }));
+  expect(onChange).toHaveBeenCalledWith(expect.any(Array), [
+    '2026-06-15',
+    '2026-06-18',
+  ]);
+});
+
+test('a newly locked RangePicker start bounds edits by the committed date', () => {
+  const onChange = rstest.fn();
+  const picker = (lockStart: boolean) => (
+    <RangePicker
+      mobile={false}
+      open
+      defaultValue={[dayjs('2026-06-10'), dayjs('2026-06-20')]}
+      disabled={[lockStart, false]}
+      onChange={onChange}
+    />
+  );
+  const view = render(picker(false));
+  fireEvent.click(screen.getByRole('button', { name: '2026-06-18' }));
+  view.rerender(picker(true));
+  const june15 = screen.getByRole('button', { name: '2026-06-15' });
+  expect(june15).toBeEnabled();
+  fireEvent.click(june15);
+  expect(onChange).toHaveBeenCalledWith(expect.any(Array), [
+    '2026-06-10',
+    '2026-06-15',
+  ]);
+});
+
+test('a newly locked RangePicker end keeps calendar bounds while a start was pending', () => {
+  const onChange = rstest.fn();
+  const picker = (lockEnd: boolean) => (
+    <RangePicker
+      mobile={false}
+      open
+      defaultValue={[dayjs('2026-06-10'), dayjs('2026-06-20')]}
+      disabled={[false, lockEnd]}
+      onChange={onChange}
+    />
+  );
+  const view = render(picker(false));
+  fireEvent.click(screen.getByRole('button', { name: '2026-06-18' }));
+  view.rerender(picker(true));
+  expect(screen.getByRole('button', { name: '2026-06-22' })).toBeDisabled();
+  fireEvent.click(screen.getByRole('button', { name: '2026-06-17' }));
+  expect(onChange).toHaveBeenCalledWith(expect.any(Array), [
+    '2026-06-17',
+    '2026-06-20',
+  ]);
 });
 
 test.each([
@@ -383,6 +486,7 @@ test.each([
       <RangePicker
         mobile={false}
         value={[dayjs('2026-06-01'), dayjs('2026-06-15')]}
+        allowEmpty={[true, true]}
         onChange={onChange}
       />,
     );
@@ -725,4 +829,113 @@ test('range value updates and parent rerenders do not interrupt navigation while
   );
   expect(screen.getByText('Feb 2026')).toBeTruthy();
   expect(onChange).not.toHaveBeenCalled();
+});
+
+test('a chosen range start is marked before any other cell is hovered', async () => {
+  render(
+    <RangePicker
+      mobile={false}
+      open
+      defaultValue={[dayjs('2026-06-10'), dayjs('2026-06-20')]}
+    />,
+  );
+  const start = screen.getAllByRole('button', { name: '2026-06-05' })[0];
+  await userEvent.click(start);
+  expect(start).toHaveAttribute('data-tao-range-start');
+});
+
+test('RangePicker announces a draft start and prompts for the end', async () => {
+  const onChange = rstest.fn();
+  render(<RangePicker mobile={false} open onChange={onChange} />);
+  const date = dayjs().date(5).format('YYYY-MM-DD');
+  await userEvent.click(screen.getAllByRole('button', { name: date })[0]);
+  expect(screen.getByRole('status')).toHaveTextContent(
+    `Start date: ${date}. Select an end date.`,
+  );
+  expect(onChange).not.toHaveBeenCalled();
+});
+
+test('desktop RangePicker keeps its announcement region mounted before opening', async () => {
+  render(<RangePicker mobile={false} />);
+  const status = screen.getByRole('status');
+  expect(status).toBeEmptyDOMElement();
+
+  const start = screen.getByRole('combobox', { name: 'Start date' });
+  await userEvent.click(start);
+  const date = dayjs().date(5).format('YYYY-MM-DD');
+  await userEvent.click(screen.getAllByRole('button', { name: date })[0]);
+  expect(screen.getByRole('status')).toBe(status);
+  expect(status).toHaveTextContent('Select an end date.');
+});
+
+test('RangePicker keeps the end as a draft until the start is picked', async () => {
+  const onChange = rstest.fn();
+  render(
+    <RangePicker
+      mobile={false}
+      defaultValue={[null, dayjs('2026-06-20')]}
+      onChange={onChange}
+    />,
+  );
+  const [start, end] = screen.getAllByRole('combobox');
+  await userEvent.click(end);
+  await userEvent.click(
+    screen.getAllByRole('button', { name: '2026-06-25' })[0],
+  );
+  expect(onChange).not.toHaveBeenCalled();
+  expect(start).toHaveAttribute('aria-expanded', 'true');
+  expect(end).toHaveValue('2026-06-25');
+  expect(screen.getByRole('status')).toHaveTextContent('Select a start date.');
+
+  await userEvent.click(
+    screen.getAllByRole('button', { name: '2026-06-05' })[0],
+  );
+  expect(onChange).toHaveBeenCalledExactlyOnceWith(
+    [expect.anything(), expect.anything()],
+    ['2026-06-05', '2026-06-25'],
+  );
+  expect(start).toHaveAttribute('aria-expanded', 'false');
+});
+
+test('RangePicker keeps a typed end as a draft until the start is typed', async () => {
+  const onChange = rstest.fn();
+  render(<RangePicker mobile={false} onChange={onChange} />);
+  const [start, end] = screen.getAllByRole('combobox');
+  await userEvent.type(end, '2026-06-25{Enter}');
+  expect(onChange).not.toHaveBeenCalled();
+  expect(end).toHaveValue('2026-06-25');
+  await userEvent.type(start, '2026-06-05{Enter}');
+  expect(onChange).toHaveBeenCalledExactlyOnceWith(
+    [expect.anything(), expect.anything()],
+    ['2026-06-05', '2026-06-25'],
+  );
+});
+
+test('RangePicker can explicitly allow an empty end', async () => {
+  const onChange = rstest.fn();
+  render(
+    <RangePicker
+      mobile={false}
+      allowEmpty={[false, true]}
+      onChange={onChange}
+    />,
+  );
+  const [start] = screen.getAllByRole('combobox');
+  await userEvent.click(start);
+  const first = dayjs().date(5).format('YYYY-MM-DD');
+  await userEvent.click(screen.getAllByRole('button', { name: first })[0]);
+  expect(onChange).toHaveBeenCalledExactlyOnceWith(
+    [expect.anything(), null],
+    [first, ''],
+  );
+  expect(start).toHaveAttribute('aria-expanded', 'false');
+});
+
+test('RangePicker only exposes committed dates as selected while editing a time range', async () => {
+  render(<RangePicker mobile={false} open showTime />);
+  const start = dayjs().date(5).format('YYYY-MM-DD');
+  const end = dayjs().date(10).format('YYYY-MM-DD');
+  await userEvent.click(screen.getAllByRole('button', { name: start })[0]);
+  await userEvent.click(screen.getAllByRole('button', { name: end })[0]);
+  expect(screen.queryAllByRole('gridcell', { selected: true })).toHaveLength(0);
 });

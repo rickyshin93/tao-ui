@@ -1,6 +1,7 @@
 import * as RD from '@radix-ui/react-dropdown-menu';
 import {
   type CSSProperties,
+  type PointerEvent,
   type ReactNode,
   useCallback,
   useEffect,
@@ -13,6 +14,7 @@ import {
   useTaoDirection,
 } from '../../provider/tao-provider';
 import { asTriggerChild, useControlledOpen } from '../../utils/overlay';
+import { useCommittedRef } from '../../utils/refs';
 import {
   cx,
   type SemanticClassNames,
@@ -181,22 +183,28 @@ export function Dropdown(props: DropdownProps) {
     },
     [updateOpen],
   );
-  const latestSetOpen = useRef(setOpen);
-  latestSetOpen.current = setOpen;
+  const latestSetOpen = useCommittedRef(setOpen);
   useEffect(() => {
     if (resolvedDisabled && realOpen && open == null) setOpen(false);
   }, [open, realOpen, resolvedDisabled, setOpen]);
 
   // Hover open/close with a small close delay
-  const openOnHover = useCallback(() => {
-    clearTimeout(closeTimer.current);
-    if (!realOpen) setOpen(true);
-  }, [realOpen, setOpen]);
-  const closeOnHover = useCallback(() => {
-    if (!realOpen) return;
-    clearTimeout(closeTimer.current);
-    closeTimer.current = setTimeout(() => latestSetOpen.current(false), 120);
-  }, [realOpen]);
+  const openOnHover = useCallback(
+    (event: PointerEvent) => {
+      if (event.pointerType === 'touch') return;
+      clearTimeout(closeTimer.current);
+      if (!realOpen) setOpen(true);
+    },
+    [realOpen, setOpen],
+  );
+  const closeOnHover = useCallback(
+    (event: PointerEvent) => {
+      if (!realOpen || event.pointerType === 'touch') return;
+      clearTimeout(closeTimer.current);
+      closeTimer.current = setTimeout(() => latestSetOpen.current(false), 120);
+    },
+    [latestSetOpen, realOpen],
+  );
 
   const { content, selectedKeys, commitSelection } = useMenuController(
     menu,
@@ -255,7 +263,8 @@ export function Dropdown(props: DropdownProps) {
         data-tao-dropdown-trigger=""
         {...hoverProps}
         onPointerDown={(event) => {
-          if (!clickMode) event.preventDefault();
+          if (!clickMode && event.pointerType !== 'touch')
+            event.preventDefault();
         }}
       >
         {triggerChild}

@@ -721,6 +721,9 @@ export function Table<T extends TableRecord = Record<string, unknown>>({
                         const stickyPos = stickyPositions[colIdx];
                         const isFixed = !!col.fixed && !!scroll?.x;
                         const cellProps = col.onCell?.(record, rowIdx) ?? {};
+                        // A zero span marks a cell covered by a neighbour's span.
+                        if (cellProps.colSpan === 0 || cellProps.rowSpan === 0)
+                          return null;
 
                         return (
                           <td

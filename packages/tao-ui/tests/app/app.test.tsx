@@ -6,7 +6,15 @@ import {
   screen,
   waitFor,
 } from '@testing-library/react';
-import { createContext, createRef, useContext } from 'react';
+import {
+  createContext,
+  createRef,
+  Suspense,
+  startTransition,
+  useContext,
+  useLayoutEffect,
+  useState,
+} from 'react';
 import {
   App,
   type AppInstance,
@@ -19,6 +27,103 @@ function Capture({ capture }: { capture: (value: AppInstance) => void }) {
   capture(App.useApp());
   return null;
 }
+
+test.each(['explicit-first', 'automatic-first'] as const)(
+  'automatic App messages stay distinct from explicit keys (%s)',
+  async (order) => {
+    let api!: AppInstance;
+    render(
+      <App>
+        <Capture
+          capture={(value) => {
+            api = value;
+          }}
+        />
+      </App>,
+    );
+    const closeExplicit = rstest.fn();
+    const explicit = () =>
+      api.message.open({
+        key: 'tao-app-message-0',
+        content: 'Explicit notice',
+        duration: 0,
+        onClose: closeExplicit,
+      });
+    const automatic = () => api.message.info('Automatic notice', 0);
+    act(() => {
+      if (order === 'explicit-first') {
+        explicit();
+        automatic();
+      } else {
+        automatic();
+        explicit();
+      }
+    });
+    expect(await screen.findByText('Explicit notice')).toBeVisible();
+    expect(await screen.findByText('Automatic notice')).toBeVisible();
+    act(() => api.message.destroy('tao-app-message-0'));
+    expect(closeExplicit).toHaveBeenCalledTimes(1);
+    expect(screen.getByText('Automatic notice')).toBeVisible();
+  },
+);
+
+test('App feedback uses committed defaults during a suspended transition', async () => {
+  let api!: AppInstance;
+  const pending = new Promise<never>(() => {});
+  const attempted = rstest.fn();
+  function ReadApi() {
+    const value = App.useApp();
+    useLayoutEffect(() => {
+      api = value;
+    }, [value]);
+    return null;
+  }
+  function Blocker({ active }: { active: boolean }) {
+    if (active) {
+      attempted();
+      throw pending;
+    }
+    return <div>Committed UI</div>;
+  }
+  function Fixture() {
+    const [next, setNext] = useState(false);
+    const config = {
+      classNames: { root: next ? 'pending-default' : 'committed-default' },
+    };
+    return (
+      <>
+        <button
+          type="button"
+          onClick={() => startTransition(() => setNext(true))}
+        >
+          Update defaults
+        </button>
+        <Suspense fallback="Waiting">
+          <App message={config} notification={config}>
+            <ReadApi />
+            <Blocker active={next} />
+          </App>
+        </Suspense>
+      </>
+    );
+  }
+  render(<Fixture />);
+  fireEvent.click(screen.getByRole('button', { name: 'Update defaults' }));
+  expect(attempted).toHaveBeenCalled();
+  expect(screen.getByText('Committed UI')).toBeVisible();
+  expect(screen.queryByText('Waiting')).toBeNull();
+  act(() => {
+    api.message.info('Message defaults', 0);
+    api.notification.info({ title: 'Notification defaults', duration: 0 });
+  });
+  for (const message of ['Message defaults', 'Notification defaults']) {
+    const notice = (await screen.findByText(message)).closest(
+      '.tao-app-notice-root',
+    );
+    expect(notice).toHaveClass('committed-default');
+    expect(notice).not.toHaveClass('pending-default');
+  }
+});
 
 test('message APIs are scoped, update by key, and return a callable thenable', async () => {
   let first!: AppInstance;
@@ -272,10 +377,16 @@ test('nested App configuration merges and maxCount limits each instance', () => 
 
 test('modal hooks await confirmation, keep async failures open, then resolve after successful retry', async () => {
   let api!: AppInstance;
+  let reject!: (reason: Error) => void;
   let resolve!: () => void;
   const onOk = rstest
     .fn()
-    .mockImplementationOnce(() => Promise.reject(new Error('Retry')))
+    .mockImplementationOnce(
+      () =>
+        new Promise<void>((_, fail) => {
+          reject = fail;
+        }),
+    )
     .mockImplementationOnce(
       () =>
         new Promise<void>((done) => {
@@ -299,13 +410,16 @@ test('modal hooks await confirmation, keep async failures open, then resolve aft
       onOk,
     });
   });
-  fireEvent.click(screen.getByRole('button', { name: 'OK' }));
-  await waitFor(() => expect(onOk).toHaveBeenCalledTimes(1));
-  expect(screen.getByRole('dialog')).toBeTruthy();
+  const ok = screen.getByRole('button', { name: 'OK' });
+  fireEvent.click(ok);
+  expect(onOk).toHaveBeenCalledTimes(1);
+  expect(ok).toBeDisabled();
   await act(async () => {
-    await Promise.resolve();
+    reject(new Error('Retry'));
   });
-  fireEvent.click(screen.getByRole('button', { name: 'OK' }));
+  expect(screen.getByRole('dialog')).toBeVisible();
+  expect(ok).toBeEnabled();
+  fireEvent.click(ok);
   await waitFor(() => expect(onOk).toHaveBeenCalledTimes(2));
   await act(async () => {
     resolve();
@@ -748,4 +862,33 @@ test('destroying all messages closes later messages even if a close callback thr
       new AggregateError(failures, 'Message cleanup failed'),
     );
   });
+});
+
+test('destroying all messages preserves replacements opened by a close callback', async () => {
+  let api!: AppInstance;
+  const replacementClosed = rstest.fn();
+  render(
+    <App>
+      <Capture
+        capture={(value) => {
+          api = value;
+        }}
+      />
+    </App>,
+  );
+  act(() => {
+    api.message.info('First', 0, () => {
+      api.message.destroy('replace');
+      api.message.open({
+        key: 'replace',
+        content: 'Replacement',
+        duration: 0,
+        onClose: replacementClosed,
+      });
+    });
+    api.message.open({ key: 'replace', content: 'Original', duration: 0 });
+  });
+  act(() => api.message.destroy());
+  expect(replacementClosed).not.toHaveBeenCalled();
+  expect(await screen.findByText('Replacement')).toBeVisible();
 });

@@ -6,6 +6,16 @@ import { DatePicker } from '../../src/components/date-picker/date-picker';
 import { Form } from '../../src/components/form';
 import { TaoProvider, zhCN } from '../../src/provider/tao-provider';
 
+test('disabling an uncontrolled DatePicker closes its calendar and discards the open session', () => {
+  const { rerender } = render(<DatePicker mobile={false} />);
+  fireEvent.click(screen.getByRole('combobox'));
+  expect(screen.getByRole('grid')).toBeVisible();
+  rerender(<DatePicker mobile={false} disabled />);
+  expect(screen.queryByRole('grid')).toBeNull();
+  rerender(<DatePicker mobile={false} />);
+  expect(screen.queryByRole('grid')).toBeNull();
+});
+
 test('date and time controls use provider language', async () => {
   render(
     <TaoProvider locale={zhCN}>
@@ -456,7 +466,7 @@ test('date picker can navigate through a partially allowed month and year', asyn
   expect(year).not.toBeDisabled();
   await userEvent.click(year);
   await userEvent.click(
-    screen.getByRole('button', { name: 'Jan', exact: true }),
+    screen.getByRole('button', { name: 'Jun', exact: true }),
   );
   await userEvent.click(
     screen.getByRole('button', { name: 'Jun', exact: true }),
@@ -581,4 +591,121 @@ test('DatePicker confirms a valid typed date and time when clicking OK', () => {
   expect(input).toHaveValue(typed);
   expect(input).toHaveAttribute('aria-expanded', 'false');
   expect(changed.mock.calls.map(([, text]) => text)).toEqual([typed]);
+});
+
+test('date picker navigation panels keep months and years with selectable days enabled', async () => {
+  const onChange = rstest.fn();
+  // 2026-02-01 and 2023-01-01 are Sundays; both periods still have weekdays.
+  render(
+    <DatePicker
+      open
+      defaultValue={dayjs('2026-06-18')}
+      disabledDate={(date) => date.day() === 0 || date.day() === 6}
+      onChange={onChange}
+    />,
+  );
+  await userEvent.click(
+    screen.getByRole('button', { name: 'Jun', exact: true }),
+  );
+  await userEvent.click(
+    screen.getByRole('button', { name: '2026', exact: true }),
+  );
+  const year = screen.getByRole('button', { name: '2023', exact: true });
+  expect(year).not.toBeDisabled();
+  await userEvent.click(year);
+  await userEvent.click(
+    screen.getByRole('button', { name: 'Jun', exact: true }),
+  );
+  const month = screen.getByRole('button', { name: 'Feb', exact: true });
+  expect(month).not.toBeDisabled();
+  await userEvent.click(month);
+  await userEvent.click(screen.getByRole('button', { name: '2023-02-01' }));
+  expect(onChange).toHaveBeenLastCalledWith(expect.anything(), '2023-02-01');
+});
+
+test('showTime.format sets the default date-time display format', async () => {
+  const onChange = rstest.fn();
+  render(
+    <DatePicker
+      mobile={false}
+      open
+      showTime={{ format: 'HH:mm' }}
+      defaultValue={dayjs('2026-06-10 09:30:15')}
+      onChange={onChange}
+    />,
+  );
+  expect(screen.getByRole('combobox')).toHaveValue('2026-06-10 09:30');
+  expect(screen.getByRole('combobox')).toHaveAttribute(
+    'placeholder',
+    'YYYY-MM-DD HH:mm',
+  );
+  await userEvent.click(screen.getByRole('button', { name: '2026-06-11' }));
+  expect(onChange).toHaveBeenLastCalledWith(
+    expect.anything(),
+    '2026-06-11 09:30',
+  );
+});
+
+test('choosing a year from the date panel keeps the viewed month', async () => {
+  render(<DatePicker open defaultValue={dayjs('2024-02-29')} />);
+  await userEvent.click(
+    screen.getByRole('button', { name: '2024', exact: true }),
+  );
+  await userEvent.click(
+    screen.getByRole('button', { name: '2027', exact: true }),
+  );
+  expect(
+    screen.getByRole('button', { name: 'Feb', exact: true }),
+  ).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: '2027-02-28' })).toBeEnabled();
+});
+
+test('time columns follow the time units shown by the format', () => {
+  render(
+    <DatePicker
+      mobile={false}
+      open
+      showTime
+      format="YYYY-MM-DD HH:mm"
+      defaultValue={dayjs('2026-06-10 09:30:15')}
+    />,
+  );
+  expect(screen.getByRole('group', { name: 'Hour' })).toBeInTheDocument();
+  expect(screen.getByRole('group', { name: 'Minute' })).toBeInTheDocument();
+  expect(screen.queryByRole('group', { name: 'Second' })).toBeNull();
+  expect(document.querySelector('[data-tao-time-header]')?.textContent).toBe(
+    '09:30',
+  );
+});
+
+test('time edits and recreated controlled values keep the navigated month', async () => {
+  const title = () =>
+    document.querySelector('[data-tao-calendar-title]')?.textContent;
+  const { unmount } = render(
+    <DatePicker
+      mobile={false}
+      open
+      showTime
+      defaultValue={dayjs('2026-01-15 10:00:00')}
+    />,
+  );
+  await userEvent.click(
+    screen.getByRole('button', { name: 'Next', exact: true }),
+  );
+  await userEvent.click(
+    within(screen.getByRole('group', { name: 'Hour' })).getByRole('button', {
+      name: '11',
+    }),
+  );
+  expect(title()).toBe('Feb2026');
+  unmount();
+
+  const { rerender } = render(
+    <DatePicker mobile={false} open value={dayjs('2026-01-15')} />,
+  );
+  await userEvent.click(
+    screen.getByRole('button', { name: 'Next', exact: true }),
+  );
+  rerender(<DatePicker mobile={false} open value={dayjs('2026-01-15')} />);
+  expect(title()).toBe('Feb2026');
 });

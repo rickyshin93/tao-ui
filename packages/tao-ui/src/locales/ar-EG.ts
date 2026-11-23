@@ -33,6 +33,8 @@ export const arEG = createLocale({
   dateRange: 'اختيار نطاق التاريخ',
   startDate: 'تاريخ البدء',
   endDate: 'تاريخ الانتهاء',
+  selectStartDate: 'اختر تاريخ البدء.',
+  selectEndDate: 'اختر تاريخ الانتهاء.',
   now: 'الآن',
   ok: 'موافق',
   cancel: 'إلغاء',

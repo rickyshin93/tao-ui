@@ -6,6 +6,28 @@ import { Dropdown } from '../../src/components/dropdown/dropdown';
 afterEach(() => rs.useRealTimers());
 const menu = { items: [{ key: 'edit', label: 'Edit' }] };
 
+test('a touch tap opens a hover Dropdown and touch leave keeps the menu usable', () => {
+  rs.useFakeTimers();
+  const onOpenChange = rs.fn();
+  render(
+    <Dropdown trigger={['hover']} menu={menu} onOpenChange={onOpenChange}>
+      <button type="button">Trigger</button>
+    </Dropdown>,
+  );
+  const trigger = screen.getByRole('button', { name: 'Trigger' });
+  fireEvent.pointerEnter(trigger, { pointerType: 'touch' });
+  expect(onOpenChange).not.toHaveBeenCalled();
+  fireEvent.pointerDown(trigger, {
+    button: 0,
+    ctrlKey: false,
+    pointerType: 'touch',
+  });
+  fireEvent.pointerLeave(trigger, { pointerType: 'touch' });
+  act(() => rs.advanceTimersByTime(200));
+  expect(onOpenChange).toHaveBeenCalledExactlyOnceWith(true);
+  expect(screen.getByRole('menuitem', { name: 'Edit' })).toBeVisible();
+});
+
 test('hover-only Dropdown does not toggle when its trigger is clicked', () => {
   const onOpenChange = rs.fn();
   render(

@@ -1,4 +1,5 @@
 import {
+  Children,
   type CSSProperties,
   type ReactNode,
   useCallback,
@@ -7,6 +8,7 @@ import {
   useRef,
   useState,
 } from 'react';
+import { useCommittedRef } from '../../utils/refs';
 import {
   cx,
   type SemanticClassNames,
@@ -189,7 +191,7 @@ export function Splitter({
   const { panels, panelChildren } = useMemo(() => {
     const nextPanels: SplitterPanelProps[] = [];
     const nextPanelChildren: ReactNode[] = [];
-    const childArray = Array.isArray(children) ? children : [children];
+    const childArray = Children.toArray(children);
 
     for (const child of childArray) {
       if (child && typeof child === 'object' && 'type' in child) {
@@ -284,6 +286,7 @@ export function Splitter({
     },
     [containerSize, panelCount, panels],
   );
+  const dragSettings = useCommittedRef({ resizePanels, onResize, onResizeEnd });
 
   const handleDragStart = useCallback(
     (index: number, e: React.PointerEvent) => {
@@ -305,11 +308,15 @@ export function Splitter({
         if (ev.pointerId !== pointerId) return;
         const delta = ((isHorizontal ? ev.clientX : ev.clientY) - pos) * sign;
 
-        const next = resizePanels(index, delta, startSizes);
+        const next = dragSettings.current.resizePanels(
+          index,
+          delta,
+          startSizes,
+        );
         currentSizes = next;
 
         setSizes(next);
-        onResize?.(next);
+        dragSettings.current.onResize?.([...next]);
       };
 
       const cleanup = () => {
@@ -321,16 +328,16 @@ export function Splitter({
       const handleEnd = (ev: PointerEvent) => {
         if (ev.pointerId !== pointerId) return;
         cleanup();
-        onResizeEnd?.(currentSizes);
+        dragSettings.current.onResizeEnd?.([...currentSizes]);
       };
       activeDrag.current = { index, cleanup };
 
       ownerDocument.addEventListener('pointermove', handleMove);
       ownerDocument.addEventListener('pointerup', handleEnd);
       ownerDocument.addEventListener('pointercancel', handleEnd);
-      onResizeStart?.(sizes);
+      onResizeStart?.([...sizes]);
     },
-    [isHorizontal, sizes, onResize, onResizeEnd, onResizeStart, resizePanels],
+    [dragSettings, isHorizontal, onResizeStart, sizes],
   );
 
   const handleDraggerKeyDown = useCallback(
@@ -354,10 +361,10 @@ export function Splitter({
       const next = resizePanels(index, delta, sizes);
       if (next[index] === sizes[index] && next[index + 1] === sizes[index + 1])
         return;
-      onResizeStart?.(sizes);
+      onResizeStart?.([...sizes]);
       setSizes(next);
-      onResize?.(next);
-      onResizeEnd?.(next);
+      onResize?.([...next]);
+      onResizeEnd?.([...next]);
     },
     [isHorizontal, onResize, onResizeEnd, onResizeStart, resizePanels, sizes],
   );
@@ -409,8 +416,8 @@ export function Splitter({
 
   const handleCollapse = (next: number[]) => {
     setSizes(next);
-    onResize?.(next);
-    onResizeEnd?.(next);
+    onResize?.([...next]);
+    onResizeEnd?.([...next]);
   };
 
   // ---- Collapsible config for each dragger ----

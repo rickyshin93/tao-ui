@@ -55,6 +55,11 @@ type RangeInteraction =
       activeInput: 'end';
       start: Dayjs;
       hover: Dayjs | null;
+    }
+  | {
+      phase: 'pickingStart';
+      activeInput: 'start';
+      end: Dayjs;
     };
 
 export type RangePickerSemanticPart =
@@ -92,6 +97,8 @@ export interface RangePickerProps
   size?: TaoSize;
   variant?: TaoVariant;
   disabled?: boolean | [boolean, boolean];
+  /** Permit an open start or end when both endpoints are editable. */
+  allowEmpty?: [boolean, boolean];
   allowClear?: boolean;
   status?: TaoStatus;
   ref?: Ref<PickerRef>;
@@ -126,6 +133,7 @@ export const RangePicker = forwardRef(function RangePicker(
     size,
     variant,
     disabled,
+    allowEmpty,
     allowClear = true,
     status,
     mobile,
@@ -153,6 +161,7 @@ export const RangePicker = forwardRef(function RangePicker(
   const endDisabled =
     (Array.isArray(disabled) ? disabled[1] : disabled) ?? ctx.disabled;
   const resolvedDisabled = startDisabled && endDisabled;
+  const [allowEmptyStart = false, allowEmptyEnd = false] = allowEmpty ?? [];
   const defaultActiveInput = startDisabled && !endDisabled ? 'end' : 'start';
   const autoMobile = useIsMobile();
   const isMobile = mobile ?? autoMobile;
@@ -226,7 +235,10 @@ export const RangePicker = forwardRef(function RangePicker(
         return false;
       const nextValue: RangeValue = start || end ? [start, end] : null;
       if (!isValueControlled) setInternalValue(nextValue);
-      onChange?.(nextValue, [formatValue(start), formatValue(end)]);
+      onChange?.(nextValue && [start, end], [
+        formatValue(start),
+        formatValue(end),
+      ]);
       return true;
     },
     [
@@ -242,7 +254,8 @@ export const RangePicker = forwardRef(function RangePicker(
   );
 
   const [internalOpen, setInternalOpen] = useState(false);
-  const isOpen = controlledOpen ?? internalOpen;
+  if (resolvedDisabled && internalOpen) setInternalOpen(false);
+  const isOpen = controlledOpen ?? (!resolvedDisabled && internalOpen);
   const workingValue =
     withTime && isOpen && timeDraft !== undefined ? timeDraft : resolvedValue;
   const changeRange = useCallback(
@@ -256,6 +269,10 @@ export const RangePicker = forwardRef(function RangePicker(
     phase: 'idle',
     activeInput: defaultActiveInput,
   });
+  if (interaction.phase !== 'idle' && (startDisabled || endDisabled)) {
+    setInteraction({ phase: 'idle', activeInput: defaultActiveInput });
+    setTimeDraft(undefined);
+  }
   const controlledValueKey = isValueControlled
     ? `${resolvedValue?.[0]?.valueOf() ?? 'null'}:${resolvedValue?.[1]?.valueOf() ?? 'null'}`
     : undefined;
@@ -278,8 +295,7 @@ export const RangePicker = forwardRef(function RangePicker(
       setTimeDraft(undefined);
       setInteraction((current) => ({
         phase: 'idle',
-        activeInput:
-          current.phase === 'pickingEnd' ? 'start' : current.activeInput,
+        activeInput: current.phase === 'idle' ? current.activeInput : 'start',
       }));
     }
   }, [controlledValueKey]);
@@ -311,12 +327,20 @@ export const RangePicker = forwardRef(function RangePicker(
   const panelUnit = picker === 'date' ? 'month' : 'year';
   const viewDateEnd = viewDateStart.add(panelStep, panelUnit);
 
-  const rangeStart =
-    interaction.phase === 'pickingEnd'
-      ? interaction.start
-      : (workingValue?.[0] ?? null);
-  const rangeEnd =
-    interaction.phase === 'pickingEnd' ? null : (workingValue?.[1] ?? null);
+  const rangeStart = startDisabled
+    ? (resolvedValue?.[0] ?? null)
+    : interaction.phase === 'pickingStart'
+      ? null
+      : interaction.phase === 'pickingEnd'
+        ? interaction.start
+        : (workingValue?.[0] ?? null);
+  const rangeEnd = endDisabled
+    ? (resolvedValue?.[1] ?? null)
+    : interaction.phase === 'pickingEnd'
+      ? null
+      : interaction.phase === 'pickingStart'
+        ? interaction.end
+        : (workingValue?.[1] ?? null);
   const hoverDate =
     interaction.phase === 'pickingEnd' ? interaction.hover : null;
   const setHoverDate = useCallback((hover: Dayjs | null) => {
@@ -325,12 +349,38 @@ export const RangePicker = forwardRef(function RangePicker(
     );
   }, []);
 
+  const pickOtherEndpoint = useCallback(
+    (position: 'start' | 'end', date: Dayjs) => {
+      setInteraction(
+        position === 'start'
+          ? {
+              phase: 'pickingEnd',
+              activeInput: 'end',
+              start: date,
+              hover: null,
+            }
+          : { phase: 'pickingStart', activeInput: 'start', end: date },
+      );
+    },
+    [],
+  );
+
   const handleDateSelect = useCallback(
     (date: Dayjs) => {
-      const position =
-        startDisabled || (!endDisabled && interaction.activeInput === 'end')
-          ? 1
-          : 0;
+      const startsRange =
+        !startDisabled &&
+        !endDisabled &&
+        interaction.phase !== 'pickingStart' &&
+        (interaction.phase === 'pickingEnd'
+          ? isDateBlocked(interaction.start)
+          : interaction.activeInput === 'start');
+      const selectsEnd =
+        startDisabled ||
+        (!endDisabled &&
+          (interaction.phase === 'pickingStart'
+            ? isDateBlocked(interaction.end)
+            : !startsRange && interaction.activeInput === 'end'));
+      const position = selectsEnd ? 1 : 0;
       const previous = workingValue?.[position] ?? resolvedValue?.[position];
       if (withTime && previous) {
         date = date
@@ -352,28 +402,29 @@ export const RangePicker = forwardRef(function RangePicker(
         if (!withTime) setOpen(false);
         return;
       }
-      if (interaction.phase === 'idle' && interaction.activeInput === 'start') {
-        if (withTime) setTimeDraft([date, workingValue?.[1] ?? null]);
-        setInteraction({
-          phase: 'pickingEnd',
-          activeInput: 'end',
-          start: date,
-          hover: null,
-        });
-      } else {
-        let start =
-          interaction.phase === 'pickingEnd' ? interaction.start : rangeStart;
-        let end = date;
-        if (start && date.isBefore(start, orderUnit)) {
-          [start, end] = [date, start];
-        }
-        changeRange([start, end]);
-        setInteraction({ phase: 'idle', activeInput: 'start' });
-        if (!withTime) setOpen(false);
+      if (startsRange && (!allowEmptyEnd || rangeEnd)) {
+        pickOtherEndpoint('start', date);
+        return;
       }
+      if (position === 1 && !rangeStart && !allowEmptyStart) {
+        pickOtherEndpoint('end', date);
+        return;
+      }
+      let start = position === 0 ? date : rangeStart;
+      let end = startsRange ? null : position === 1 ? date : rangeEnd;
+      if (start && end?.isBefore(start, orderUnit)) {
+        [start, end] = [end, start];
+      }
+      changeRange([start, end]);
+      setInteraction({ phase: 'idle', activeInput: 'start' });
+      if (!withTime) setOpen(false);
     },
     [
       interaction,
+      isDateBlocked,
+      allowEmptyStart,
+      allowEmptyEnd,
+      pickOtherEndpoint,
       rangeStart,
       rangeEnd,
       changeRange,
@@ -474,10 +525,14 @@ export const RangePicker = forwardRef(function RangePicker(
   }, [typedValue]);
 
   const commitInputValue = useCallback(
-    (position: 'start' | 'end', keepPopupOpen = false) => {
+    (
+      position: 'start' | 'end',
+      { keepPopupOpen = false, openIncomplete = false } = {},
+    ) => {
       if (position === 'start' ? startDisabled : endDisabled) return;
       const text = (position === 'start' ? inputStart : inputEnd).trim();
       const currentValue = position === 'start' ? displayStart : displayEnd;
+      if (text === currentValue) return;
       const parsed = text
         ? parsePickerDate(text, fmt, dayjsLocale, numberLocale)
         : null;
@@ -499,6 +554,21 @@ export const RangePicker = forwardRef(function RangePicker(
 
       const nextStart = position === 'start' ? parsed : rangeStart;
       const nextEnd = position === 'end' ? parsed : rangeEnd;
+      const needsStart =
+        nextEnd && !nextStart && !startDisabled && !allowEmptyStart;
+      const needsEnd = nextStart && !nextEnd && !endDisabled && !allowEmptyEnd;
+      if (needsStart || needsEnd) {
+        if (parsed) {
+          pickOtherEndpoint(position, parsed);
+          setViewDateStart(parsed);
+          if (!isOpen && openIncomplete) setOpen(true);
+        } else if (position === 'start') {
+          setInputStart(currentValue);
+        } else {
+          setInputEnd(currentValue);
+        }
+        return;
+      }
       const nextStrings: [string, string] = [
         formatValue(nextStart),
         formatValue(nextEnd),
@@ -523,6 +593,9 @@ export const RangePicker = forwardRef(function RangePicker(
       isDateBlocked,
       startDisabled,
       endDisabled,
+      allowEmptyStart,
+      allowEmptyEnd,
+      pickOtherEndpoint,
       displayEnd,
       displayStart,
       changeRange,
@@ -565,9 +638,11 @@ export const RangePicker = forwardRef(function RangePicker(
 
   const canConfirm =
     !resolvedDisabled &&
+    !!(panelStart || panelEnd) &&
     (!hasTypedEdit || typedValue !== null) &&
-    (startDisabled || (panelStart != null && !isDateBlocked(panelStart))) &&
-    (endDisabled || (panelEnd != null && !isDateBlocked(panelEnd))) &&
+    (startDisabled ||
+      (panelStart ? !isDateBlocked(panelStart) : allowEmptyStart)) &&
+    (endDisabled || (panelEnd ? !isDateBlocked(panelEnd) : allowEmptyEnd)) &&
     !(panelStart && panelEnd && panelStart.isAfter(panelEnd, orderUnit));
 
   const confirmTimeRange = () => {
@@ -581,12 +656,23 @@ export const RangePicker = forwardRef(function RangePicker(
     setOpen(false);
   };
 
+  const announcement = (
+    <span role="status" data-tao-range-announcement="">
+      {isOpen && interaction.phase === 'pickingEnd'
+        ? `${ctx.locale.startDate}: ${formatValue(interaction.start)}. ${ctx.locale.selectEndDate ?? 'Select an end date.'}`
+        : isOpen && interaction.phase === 'pickingStart'
+          ? `${ctx.locale.endDate}: ${formatValue(interaction.end)}. ${ctx.locale.selectStartDate ?? 'Select a start date.'}`
+          : ''}
+    </span>
+  );
+
   const panelContent = (
     <div
       data-tao-range-panel=""
       className={isMobile ? classNames?.popup : undefined}
       style={isMobile ? styles?.popup : undefined}
     >
+      {isMobile && announcement}
       {/* Shared header: << < [Left Month Year]  [Right Month Year] > >> */}
       <div data-tao-range-header="">
         <div data-tao-calendar-nav="">
@@ -658,6 +744,7 @@ export const RangePicker = forwardRef(function RangePicker(
             viewDate: date,
             rangeStart: panelStart,
             rangeEnd: panelEnd,
+            committedRange: resolvedValue,
             onSelect: handleDateSelect,
             disabledDate: isDateDisabled,
             minDate,
@@ -701,6 +788,7 @@ export const RangePicker = forwardRef(function RangePicker(
                     hour={endpoint?.hour() ?? 0}
                     minute={endpoint?.minute() ?? 0}
                     second={endpoint?.second() ?? 0}
+                    format={fmt}
                     onChange={(hour, minute, second) => {
                       if (!endpoint || disabledEndpoint) return;
                       const next = endpoint
@@ -714,6 +802,9 @@ export const RangePicker = forwardRef(function RangePicker(
                       else setInputEnd(formatValue(next));
                       if (index === 0 && interaction.phase === 'pickingEnd') {
                         setInteraction({ ...interaction, start: next });
+                      }
+                      if (index === 1 && interaction.phase === 'pickingStart') {
+                        setInteraction({ ...interaction, end: next });
                       }
                     }}
                   />
@@ -823,7 +914,7 @@ export const RangePicker = forwardRef(function RangePicker(
         '[data-tao-calendar-date][tabindex="0"]:not(:disabled)',
       ) ??
       popup.querySelector<HTMLButtonElement>(
-        '[data-tao-calendar-date][aria-pressed="true"]:not(:disabled)',
+        '[data-tao-calendar-date][data-tao-selected]:not(:disabled)',
       ) ??
       popup.querySelector<HTMLButtonElement>(
         '[data-tao-calendar-date]:not(:disabled)',
@@ -838,7 +929,7 @@ export const RangePicker = forwardRef(function RangePicker(
   }, [isOpen, keyboardFocusRequested, focusCalendar]);
 
   const openFromKeyboard = () => {
-    commitInputValue(interaction.activeInput, true);
+    commitInputValue(interaction.activeInput, { keepPopupOpen: true });
     setKeyboardFocusRequested(true);
     if (!isOpen) setOpen(true);
   };
@@ -954,7 +1045,11 @@ export const RangePicker = forwardRef(function RangePicker(
         disabled={startDisabled}
         onFocus={() => {
           returnFocusRef.current = startInputRef.current;
-          setInteraction({ phase: 'idle', activeInput: 'start' });
+          setInteraction((current) =>
+            current.phase === 'pickingStart'
+              ? current
+              : { phase: 'idle', activeInput: 'start' },
+          );
         }}
         onChange={(event) => setInputStart(event.target.value)}
         onBlur={(event) => {
@@ -964,10 +1059,10 @@ export const RangePicker = forwardRef(function RangePicker(
           // ArrowDown already committed before requesting calendar focus.
           if (enteringCalendar && keyboardFocusRequested) return;
           setKeyboardFocusRequested(false);
-          commitInputValue(
-            'start',
-            enteringCalendar || event.relatedTarget === endInputRef.current,
-          );
+          commitInputValue('start', {
+            keepPopupOpen:
+              enteringCalendar || event.relatedTarget === endInputRef.current,
+          });
         }}
         onKeyDown={(event) => {
           if (event.nativeEvent.isComposing || event.keyCode === 229) return;
@@ -976,7 +1071,7 @@ export const RangePicker = forwardRef(function RangePicker(
             openFromKeyboard();
           } else if (event.key === 'Enter') {
             event.preventDefault();
-            commitInputValue('start');
+            commitInputValue('start', { openIncomplete: true });
           } else if (event.key === 'Escape') {
             setInputStart(displayStart);
             setOpen(false);
@@ -1022,7 +1117,11 @@ export const RangePicker = forwardRef(function RangePicker(
         disabled={endDisabled}
         onFocus={() => {
           returnFocusRef.current = endInputRef.current;
-          setInteraction({ phase: 'idle', activeInput: 'end' });
+          setInteraction((current) =>
+            current.phase === 'pickingEnd'
+              ? current
+              : { phase: 'idle', activeInput: 'end' },
+          );
         }}
         onChange={(event) => setInputEnd(event.target.value)}
         onBlur={(event) => {
@@ -1031,10 +1130,10 @@ export const RangePicker = forwardRef(function RangePicker(
             !!popupRef.current?.contains(event.relatedTarget);
           if (enteringCalendar && keyboardFocusRequested) return;
           setKeyboardFocusRequested(false);
-          commitInputValue(
-            'end',
-            enteringCalendar || event.relatedTarget === startInputRef.current,
-          );
+          commitInputValue('end', {
+            keepPopupOpen:
+              enteringCalendar || event.relatedTarget === startInputRef.current,
+          });
         }}
         onKeyDown={(event) => {
           if (event.nativeEvent.isComposing || event.keyCode === 229) return;
@@ -1043,7 +1142,7 @@ export const RangePicker = forwardRef(function RangePicker(
             openFromKeyboard();
           } else if (event.key === 'Enter') {
             event.preventDefault();
-            commitInputValue('end');
+            commitInputValue('end', { openIncomplete: true });
           } else if (event.key === 'Escape') {
             setInputEnd(displayEnd);
             setOpen(false);
@@ -1075,6 +1174,7 @@ export const RangePicker = forwardRef(function RangePicker(
   return (
     <Popover.Root open={isOpen} onOpenChange={setOpen}>
       <Popover.Anchor asChild>{desktopTrigger}</Popover.Anchor>
+      {announcement}
       <Popover.Portal>
         <TaoPortalScope asChild direction={direction}>
           <Popover.Content

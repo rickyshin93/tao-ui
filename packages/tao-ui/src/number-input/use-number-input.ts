@@ -24,6 +24,7 @@ import {
   clampToRange,
   isValidCanonical,
   stripDisallowedSign,
+  toCanonical,
 } from './validate';
 
 export interface UseNumberInputOptions {
@@ -61,7 +62,7 @@ export function useNumberInput(
   opts: UseNumberInputOptions,
 ): UseNumberInputReturn {
   const {
-    value,
+    value: externalValue,
     defaultValue,
     onChange,
     onBlur,
@@ -75,6 +76,12 @@ export function useNumberInput(
     min,
     max,
   } = opts;
+
+  // Form can supply a number from initialValues or setFieldsValue.
+  const value =
+    typeof externalValue === 'number'
+      ? toCanonical(externalValue)
+      : externalValue;
 
   const config = useTaoConfig();
   const locale = localeProp ?? config.locale.numberLocale;
@@ -231,12 +238,13 @@ export function useNumberInput(
     onChange?.(actual);
   };
 
-  const handleBlur = () => {
-    isFocusedRef.current = false;
+  // Blur and Enter turn the edit into the padded, clamped committed value.
+  const commit = () => {
     const raw = isValueControlled
       ? canonicalToDisplay(value ?? '')
       : (inputRef.current?.value ?? displayBuffer);
-    let canonical = parse(raw, fmtOpts);
+    // decimalPlaces may have been lowered since the value was set.
+    let canonical = truncateDecimals(parse(raw, fmtOpts), decimalPlaces);
     canonical = padOnBlur(canonical, decimalPlaces, padMode);
     const beforeClamp = isPercentage ? fromPercent(canonical) : canonical;
     const bounded = clampToRange(beforeClamp, min, max);
@@ -247,7 +255,14 @@ export function useNumberInput(
     const canonicalAfter = isPercentage ? toPercent(actual) : actual;
     const newDisplay = format(canonicalAfter, fmtOpts);
     setDisplayBuffer(newDisplay);
-    onChange?.(actual);
+    return actual;
+  };
+
+  const handleBlur = () => {
+    isFocusedRef.current = false;
+    const previous = isValueControlled ? (value ?? '') : derivedActual;
+    const actual = commit();
+    if (actual !== previous) onChange?.(actual);
     onBlur?.(actual);
   };
 
@@ -256,8 +271,15 @@ export function useNumberInput(
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key !== 'Backspace' || e.nativeEvent.isComposing || e.keyCode === 229)
+    if (e.nativeEvent.isComposing || e.keyCode === 229) return;
+    if (e.key === 'Enter') {
+      // Commit before an Enter-triggered form submission reads the value.
+      const previous = isValueControlled ? (value ?? '') : derivedActual;
+      const actual = commit();
+      if (actual !== previous) onChange?.(actual);
       return;
+    }
+    if (e.key !== 'Backspace') return;
     const el = inputRef.current;
     if (!el) return;
     const cursor = el.selectionStart ?? 0;

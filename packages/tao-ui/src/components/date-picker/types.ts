@@ -55,6 +55,7 @@ export function getDefaultFormat(
 ): string {
   if (picker === 'year') return 'YYYY';
   if (picker === 'month') return 'YYYY-MM';
-  if (showTime) return 'YYYY-MM-DD HH:mm:ss';
+  if (showTime)
+    return `YYYY-MM-DD ${(typeof showTime === 'object' && showTime.format) || 'HH:mm:ss'}`;
   return 'YYYY-MM-DD';
 }

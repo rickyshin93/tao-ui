@@ -5,6 +5,89 @@ import { Splitter } from '../../src/components/splitter/splitter';
 
 const Panel = Splitter.Panel;
 
+test('an active Splitter drag uses newly committed sizing constraints and callbacks', () => {
+  const previous = rstest.fn();
+  const current = rstest.fn();
+  const previousEnd = rstest.fn();
+  const currentEnd = rstest.fn();
+  const fixture = (
+    max: number,
+    onResize: (sizes: number[]) => void,
+    onResizeEnd: (sizes: number[]) => void,
+  ) => (
+    <Splitter onResize={onResize} onResizeEnd={onResizeEnd}>
+      <Panel defaultSize={200} max={max}>
+        Left
+      </Panel>
+      <Panel>Right</Panel>
+    </Splitter>
+  );
+  const view = render(fixture(400, previous, previousEnd));
+  const handle = screen.getByRole('separator');
+  fireEvent.pointerDown(handle, { button: 0, pointerId: 1, clientX: 200 });
+  view.rerender(fixture(220, current, currentEnd));
+  fireEvent.pointerMove(document, { pointerId: 1, clientX: 250 });
+  fireEvent.pointerUp(document, { pointerId: 1 });
+  expect(previous).not.toHaveBeenCalled();
+  expect(previousEnd).not.toHaveBeenCalled();
+  expect(current).toHaveBeenCalledExactlyOnceWith([220, 379]);
+  expect(currentEnd).toHaveBeenCalledExactlyOnceWith([220, 379]);
+});
+
+test('mutating Splitter drag payloads leaves the measured size and end payload intact', () => {
+  const onResizeEnd = rstest.fn();
+  render(
+    <Splitter
+      onResize={(sizes) => {
+        sizes[0] = 0;
+      }}
+      onResizeEnd={onResizeEnd}
+    >
+      <Panel defaultSize={200}>Left</Panel>
+      <Panel>Right</Panel>
+    </Splitter>,
+  );
+  const handle = screen.getByRole('separator');
+  fireEvent.pointerDown(handle, { button: 0, pointerId: 1, clientX: 200 });
+  fireEvent.pointerMove(document, { pointerId: 1, clientX: 230 });
+  fireEvent.pointerUp(document, { pointerId: 1 });
+  expect(handle).toHaveAttribute('aria-valuenow', '230');
+  expect(onResizeEnd).toHaveBeenCalledExactlyOnceWith([230, 369]);
+});
+
+test('editing the Splitter completion payload cannot overwrite a keyboard resize', () => {
+  render(
+    <Splitter
+      onResizeEnd={(sizes) => {
+        sizes[0] = 0;
+      }}
+    >
+      <Panel defaultSize={200}>Left</Panel>
+      <Panel>Right</Panel>
+    </Splitter>,
+  );
+  const handle = screen.getByRole('separator');
+  fireEvent.keyDown(handle, { key: 'ArrowRight' });
+  expect(handle).toHaveAttribute('aria-valuenow', '210');
+});
+
+test('changing a Splitter collapse payload does not reopen the collapsed panel', () => {
+  render(
+    <Splitter
+      onResize={(sizes) => {
+        sizes[0] = 100;
+      }}
+    >
+      <Panel defaultSize={200} collapsible>
+        Left
+      </Panel>
+      <Panel>Right</Panel>
+    </Splitter>,
+  );
+  fireEvent.click(screen.getByRole('button', { name: 'Collapse panel' }));
+  expect(screen.getByRole('separator')).toHaveAttribute('aria-valuenow', '0');
+});
+
 // Mock ResizeObserver
 class MockResizeObserver {
   static current: MockResizeObserver;
@@ -660,4 +743,17 @@ test('RTL horizontal drag and arrow keys move the separator in the requested dir
   expect(onResize).toHaveBeenLastCalledWith([269.5, 329.5]);
   fireEvent.keyDown(separator, { key: 'ArrowRight' });
   expect(onResize).toHaveBeenLastCalledWith([259.5, 339.5]);
+});
+
+test('Splitter renders mapped panels next to static ones', () => {
+  render(
+    <Splitter>
+      <Panel>Nav</Panel>
+      {['One', 'Two'].map((name) => (
+        <Panel key={name}>{name}</Panel>
+      ))}
+    </Splitter>,
+  );
+  expect(screen.getByText('Two')).toBeTruthy();
+  expect(screen.getAllByRole('separator')).toHaveLength(2);
 });

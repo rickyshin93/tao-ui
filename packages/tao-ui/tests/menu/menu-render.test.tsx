@@ -1,5 +1,6 @@
 import { expect, rstest, test } from '@rstest/core';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { userEvent } from '@testing-library/user-event';
 import { Dropdown } from '../../src/components/dropdown/dropdown';
 
 test.each([true, false])(
@@ -155,4 +156,35 @@ test('menu typeahead searches the item label before its icon text', async () => 
   await waitFor(() =>
     expect(screen.getByRole('menuitem', { name: 'Rename' })).toHaveFocus(),
   );
+});
+
+test('a multiple-selection menu stays open while the user checks several items', async () => {
+  const onOpenChange = rstest.fn();
+  render(
+    <Dropdown
+      onOpenChange={onOpenChange}
+      menu={{
+        selectable: true,
+        multiple: true,
+        items: [
+          { key: 'a', label: 'Alpha' },
+          { key: 'b', label: 'Beta' },
+        ],
+      }}
+    >
+      <button type="button">Menu</button>
+    </Dropdown>,
+  );
+  await userEvent.click(screen.getByRole('button', { name: 'Menu' }));
+  await userEvent.click(
+    screen.getByRole('menuitemcheckbox', { name: 'Alpha' }),
+  );
+  await userEvent.click(screen.getByRole('menuitemcheckbox', { name: 'Beta' }));
+  expect(onOpenChange).not.toHaveBeenCalledWith(false);
+  expect(
+    screen.getByRole('menuitemcheckbox', { name: 'Alpha' }),
+  ).toHaveAttribute('aria-checked', 'true');
+  expect(
+    screen.getByRole('menuitemcheckbox', { name: 'Beta' }),
+  ).toHaveAttribute('aria-checked', 'true');
 });

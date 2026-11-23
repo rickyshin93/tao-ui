@@ -33,6 +33,8 @@ export const zhCN = createLocale({
   dateRange: '选择日期范围',
   startDate: '开始日期',
   endDate: '结束日期',
+  selectStartDate: '请选择开始日期。',
+  selectEndDate: '请选择结束日期。',
   now: '此刻',
   ok: '确定',
   cancel: '取消',

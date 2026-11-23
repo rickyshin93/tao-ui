@@ -168,6 +168,10 @@ const TreeBase = forwardRef<RcTree, TreeProps>((props, ref) => {
     dropIndicatorRender,
     direction: directionProp,
     onKeyDown,
+    onSelect,
+    onCheck,
+    onExpand,
+    onLoad,
     ...rest
   } = props;
   const [direction, directionRef] = useTaoDirection(directionProp);
@@ -270,6 +274,24 @@ const TreeBase = forwardRef<RcTree, TreeProps>((props, ref) => {
         prefixCls={prefixCls}
         direction={direction}
         onKeyDown={(event) => onKeyDown?.(originalTreeKeyboardEvent(event))}
+        onSelect={onSelect && ((keys, info) => onSelect([...keys], info))}
+        onCheck={
+          onCheck &&
+          ((keys, info) =>
+            onCheck(
+              Array.isArray(keys)
+                ? [...keys]
+                : {
+                    checked: [...keys.checked],
+                    halfChecked: [...keys.halfChecked],
+                  },
+              info.halfCheckedKeys
+                ? { ...info, halfCheckedKeys: [...info.halfCheckedKeys] }
+                : info,
+            ))
+        }
+        onExpand={onExpand && ((keys, info) => onExpand([...keys], info))}
+        onLoad={onLoad && ((keys, info) => onLoad([...keys], info))}
         showLine={Boolean(showLine)}
         showIcon={showIcon}
         disabled={disabled}
@@ -384,7 +406,7 @@ const DirectoryTreeBase = forwardRef<RcTree, DirectoryTreeProps>(
       }
       lastRequestedSelection.current = selection;
       if (props.selectedKeys === undefined) setSelected(selection);
-      props.onSelect?.(selection, {
+      props.onSelect?.([...selection], {
         ...info,
         selected: selection.includes(key),
         selectedNodes: ordered
@@ -413,7 +435,7 @@ const DirectoryTreeBase = forwardRef<RcTree, DirectoryTreeProps>(
         onSelect={onSelect}
         onExpand={(keys, info) => {
           if (props.expandedKeys === undefined) setExpanded(keys);
-          props.onExpand?.(keys, info);
+          props.onExpand?.([...keys], info);
         }}
       />
     );

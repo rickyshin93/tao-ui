@@ -225,3 +225,21 @@ test('custom headers cannot select a disabled date', () => {
   expect(onSelect).not.toHaveBeenCalled();
   expect(onChange).not.toHaveBeenCalled();
 });
+
+test('year view keeps a month selectable when only its first and last days are disabled', () => {
+  const values: string[] = [];
+  // February 2026 starts on a Sunday and ends on a Saturday.
+  const { container } = render(
+    <Calendar
+      mode="year"
+      defaultValue={dayjs('2026-06-10')}
+      disabledDate={(date) => date.day() === 0 || date.day() === 6}
+      onChange={(date) => values.push(date.format('YYYY-MM'))}
+    />,
+  );
+  const february = container.querySelector('[title="2026-02"]')!;
+  expect(february).not.toHaveAttribute('aria-disabled', 'true');
+  expect(february.className).not.toContain('cell-disabled');
+  fireEvent.click(february);
+  expect(values).toEqual(['2026-02']);
+});

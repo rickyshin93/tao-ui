@@ -80,6 +80,9 @@ export const QRCode = forwardRef<QRCodeRef, QRCodeProps>(
       classNames,
       styles,
       style,
+      'aria-label': ariaLabel,
+      'aria-labelledby': ariaLabelledBy,
+      'aria-describedby': ariaDescribedBy,
       ...rest
     } = props;
     const config = useTaoInternalConfig();
@@ -127,9 +130,9 @@ export const QRCode = forwardRef<QRCodeRef, QRCodeProps>(
           }
         : undefined,
       role: 'img',
-      'aria-label': rest['aria-label'] ?? title ?? 'QR Code',
-      'aria-labelledby': rest['aria-labelledby'],
-      'aria-describedby': rest['aria-describedby'],
+      'aria-label': ariaLabel ?? title ?? 'QR Code',
+      'aria-labelledby': ariaLabelledBy,
+      'aria-describedby': ariaDescribedBy,
     };
     return (
       <div

@@ -419,6 +419,8 @@ export default function InputNumberClampedRange() {
 
 Regional grouping, decimal symbols and digits inherit `TaoProvider.locale.numberLocale`; set `locale="fr-FR"` on this component to override it. Explicit separators take precedence. Numeric input keeps canonical ASCII strings and precision while displaying localized digits.
 
+Full-width digits are accepted when typed or pasted. When focus leaves the field, `onChange` emits a canonical string only if normalization changes the value. Use `onBlur` for blur notifications and `validateTrigger="onBlur"` on Form.Item for blur validation.
+
 ## API
 
 <API moduleName="input-number" />

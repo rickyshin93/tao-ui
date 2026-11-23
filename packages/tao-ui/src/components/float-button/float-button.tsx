@@ -137,6 +137,13 @@ const FloatButtonRoot = forwardRef<FloatButtonElement, FloatButtonProps>(
     const hasLabel =
       label !== null && label !== undefined && typeof label !== 'boolean';
     const glyph = icon ?? (!hasLabel ? <ActionIcon /> : null);
+    const tooltipProps =
+      tooltip &&
+      typeof tooltip === 'object' &&
+      !Array.isArray(tooltip) &&
+      !('$$typeof' in tooltip)
+        ? (tooltip as Omit<TooltipProps, 'children'>)
+        : { title: tooltip as ReactNode };
     const button = (
       <Tag
         {...rest}
@@ -152,8 +159,8 @@ const FloatButtonRoot = forwardRef<FloatButtonElement, FloatButtonProps>(
         aria-label={
           props['aria-label'] ??
           (!hasLabel
-            ? typeof tooltip === 'string'
-              ? tooltip
+            ? typeof tooltipProps.title === 'string'
+              ? tooltipProps.title
               : 'Action'
             : undefined)
         }
@@ -205,13 +212,6 @@ const FloatButtonRoot = forwardRef<FloatButtonElement, FloatButtonProps>(
         )}
       </Tag>
     );
-    const tooltipProps =
-      tooltip &&
-      typeof tooltip === 'object' &&
-      !Array.isArray(tooltip) &&
-      !('$$typeof' in tooltip)
-        ? (tooltip as Omit<TooltipProps, 'children'>)
-        : { title: tooltip as ReactNode };
     return tooltip == null ? (
       button
     ) : (

@@ -2,6 +2,17 @@ import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useTaoConfig } from '../../../provider/tao-provider';
 import type { TimeConfig } from '../types';
 
+/** Time units displayed by a format; formats without time tokens show all. */
+export function getTimeUnits(format = '') {
+  const tokens = format.replace(/\[[^\]]*]/g, '');
+  const any = /[Hhms]/.test(tokens);
+  return {
+    hour: !any || /[Hh]/.test(tokens),
+    minute: !any || tokens.includes('m'),
+    second: !any || tokens.includes('s'),
+  };
+}
+
 interface TimePanelProps {
   hour: number;
   minute: number;
@@ -9,6 +20,7 @@ interface TimePanelProps {
   disabled?: boolean;
   onChange: (h: number, m: number, s: number) => void;
   config?: TimeConfig;
+  format?: string;
   /** Increment to force scroll-to-selected even when the value hasn't changed */
   scrollKey?: number;
 }
@@ -20,9 +32,11 @@ export function TimePanel({
   disabled,
   onChange,
   config,
+  format,
   scrollKey,
 }: TimePanelProps) {
   const { locale } = useTaoConfig();
+  const units = getTimeUnits(format);
   const hourStep = config?.hourStep ?? 1;
   const minuteStep = config?.minuteStep ?? 1;
   const secondStep = config?.secondStep ?? 1;
@@ -53,30 +67,36 @@ export function TimePanel({
 
   return (
     <div data-tao-time-panel="">
-      <TimeColumn
-        values={hours}
-        selected={hour}
-        onSelect={(v) => onChange(v, minute, second)}
-        label={locale.hour}
-        disabled={disabled}
-        scrollKey={scrollKey}
-      />
-      <TimeColumn
-        values={minutes}
-        selected={minute}
-        onSelect={(v) => onChange(hour, v, second)}
-        label={locale.minute}
-        disabled={disabled}
-        scrollKey={scrollKey}
-      />
-      <TimeColumn
-        values={seconds}
-        selected={second}
-        onSelect={(v) => onChange(hour, minute, v)}
-        label={locale.second}
-        disabled={disabled}
-        scrollKey={scrollKey}
-      />
+      {units.hour && (
+        <TimeColumn
+          values={hours}
+          selected={hour}
+          onSelect={(v) => onChange(v, minute, second)}
+          label={locale.hour}
+          disabled={disabled}
+          scrollKey={scrollKey}
+        />
+      )}
+      {units.minute && (
+        <TimeColumn
+          values={minutes}
+          selected={minute}
+          onSelect={(v) => onChange(hour, v, second)}
+          label={locale.minute}
+          disabled={disabled}
+          scrollKey={scrollKey}
+        />
+      )}
+      {units.second && (
+        <TimeColumn
+          values={seconds}
+          selected={second}
+          onSelect={(v) => onChange(hour, minute, v)}
+          label={locale.second}
+          disabled={disabled}
+          scrollKey={scrollKey}
+        />
+      )}
     </div>
   );
 }

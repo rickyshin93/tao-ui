@@ -14,10 +14,12 @@ import { getCalendarWeeks } from './use-calendar';
 interface CalendarGridProps {
   viewDate: Dayjs;
   value?: Dayjs | null;
-  /** Range mode: start of confirmed range */
+  /** Range mode: start of the displayed range */
   rangeStart?: Dayjs | null;
-  /** Range mode: end of confirmed range */
+  /** Range mode: end of the displayed range */
   rangeEnd?: Dayjs | null;
+  /** Committed selection when the displayed range is still being edited. */
+  committedRange?: [Dayjs | null, Dayjs | null] | null;
   /** Range mode: date currently being hovered */
   hoverDate?: Dayjs | null;
   onSelect: (date: Dayjs) => void;
@@ -37,6 +39,7 @@ export function CalendarGrid({
   value,
   rangeStart,
   rangeEnd,
+  committedRange,
   hoverDate,
   onSelect,
   onViewDateChange,
@@ -60,6 +63,11 @@ export function CalendarGrid({
   const today = dayjs();
   const currentMonth = viewDate.month();
   const isRangeMode = rangeStart !== undefined; // distinguish from single picker
+  const [selectedStart, selectedEnd] =
+    committedRange === undefined
+      ? [rangeStart, rangeEnd]
+      : (committedRange ?? []);
+  const selectedEndpoint = selectedStart ?? selectedEnd;
 
   const isDisabled = (date: Dayjs): boolean => {
     if (disabledDate?.(date)) return true;
@@ -72,7 +80,9 @@ export function CalendarGrid({
     [value, rangeStart, today]
       .filter((candidate) => candidate != null)
       .map((candidate) =>
-        dates.find((date) => date.isSame(candidate, 'day') && !isDisabled(date)),
+        dates.find(
+          (date) => date.isSame(candidate, 'day') && !isDisabled(date),
+        ),
       )
       .find((date) => date != null) ??
     dates.find((date) => date.month() === currentMonth && !isDisabled(date)) ??
@@ -153,8 +163,9 @@ export function CalendarGrid({
   // Compute effective range (confirmed or hover preview)
   const getEffectiveRange = (): [Dayjs, Dayjs] | null => {
     if (!isRangeMode) return null;
-    const s = rangeStart;
-    const e = rangeEnd ?? hoverDate;
+    // A lone endpoint (e.g. a just-picked start) still marks its own cell.
+    const s = rangeStart ?? rangeEnd;
+    const e = rangeEnd ?? hoverDate ?? s;
     if (!s || !e) return null;
     return s.isBefore(e, 'day') ? [s, e] : [e, s];
   };
@@ -219,13 +230,12 @@ export function CalendarGrid({
                   data-tao-calendar-cell=""
                   aria-selected={
                     isRangeMode
-                      ? !!(
-                          rangeStart &&
-                          rangeEnd &&
-                          !isOtherMonth &&
-                          !date.isBefore(rangeStart, 'day') &&
-                          !date.isAfter(rangeEnd, 'day')
-                        )
+                      ? !isOtherMonth &&
+                        (selectedStart && selectedEnd
+                          ? !date.isBefore(selectedStart, 'day') &&
+                            !date.isAfter(selectedEnd, 'day')
+                          : !!committedRange &&
+                            !!selectedEndpoint?.isSame(date, 'day'))
                       : !!isSelected
                   }
                 >

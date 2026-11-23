@@ -1,4 +1,18 @@
-import type { MutableRefObject, Ref } from 'react';
+import {
+  type MutableRefObject,
+  type Ref,
+  useLayoutEffect,
+  useRef,
+} from 'react';
+
+/** Timers and document listeners only see values from committed renders. */
+export function useCommittedRef<T>(value: T) {
+  const ref = useRef(value);
+  useLayoutEffect(() => {
+    ref.current = value;
+  }, [value]);
+  return ref;
+}
 
 export function mergeRefs<T>(
   ...refs: Array<Ref<T> | undefined>

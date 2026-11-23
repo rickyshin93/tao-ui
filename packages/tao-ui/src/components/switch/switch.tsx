@@ -103,10 +103,21 @@ export const Switch = forwardRef(function Switch(
           {loading && <LoadingIcon />}
         </span>
       </span>
-      {/* Inner: two stacked lines, slide via margin */}
+      {/* Inner: two stacked lines, slide via margin; the off-screen one is
+          hidden from assistive technology. */}
       <span data-tao-switch-inner="">
-        <span data-tao-switch-inner-checked="">{checkedChildren}</span>
-        <span data-tao-switch-inner-unchecked="">{unCheckedChildren}</span>
+        <span
+          data-tao-switch-inner-checked=""
+          aria-hidden={!resolvedChecked || undefined}
+        >
+          {checkedChildren}
+        </span>
+        <span
+          data-tao-switch-inner-unchecked=""
+          aria-hidden={resolvedChecked || undefined}
+        >
+          {unCheckedChildren}
+        </span>
       </span>
     </button>
   );

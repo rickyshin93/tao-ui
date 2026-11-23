@@ -8,13 +8,14 @@ import {
 } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { readFileSync } from 'node:fs';
-import { createContext, StrictMode, useContext } from 'react';
+import { createContext, StrictMode, useContext, useState } from 'react';
 import { Modal } from '../../src/components/modal';
 import {
   destroyFns,
   type ModalFuncReturn,
 } from '../../src/components/modal/confirm';
 import type { ModalHookApi } from '../../src/components/modal/use-modal';
+import { TaoProvider } from '../../src/provider/tao-provider';
 import { restoreViewport, setViewportWidth } from '../utils/mock-viewport';
 
 afterEach(() => {
@@ -25,6 +26,20 @@ afterEach(() => {
 test('renders children when open', () => {
   render(<Modal open>hello modal</Modal>);
   expect(screen.getByText('hello modal')).toBeTruthy();
+});
+
+test('Modal keeps Cancel available under a disabled TaoProvider', async () => {
+  const onClose = rstest.fn();
+  render(
+    <TaoProvider disabled>
+      <Modal open closable={false} title="Review" onClose={onClose} />
+    </TaoProvider>,
+  );
+  expect(screen.getByRole('button', { name: 'OK' })).toBeDisabled();
+  const cancel = screen.getByRole('button', { name: 'Cancel' });
+  expect(cancel).toBeEnabled();
+  await userEvent.click(cancel);
+  expect(onClose).toHaveBeenCalledTimes(1);
 });
 
 test.each(['missing', 'disabled'] as const)(
@@ -340,6 +355,12 @@ test('Modal.confirm renders title/content and OK+Cancel', async () => {
   expect(screen.getByText('OK')).toBeTruthy();
   expect(screen.getByText('Cancel')).toBeTruthy();
   Modal.destroyAll();
+});
+
+test('Modal.confirm names and describes its dialog with the title and content', async () => {
+  Modal.confirm({ title: 'Delete item?', content: 'Cannot be undone.' });
+  const dialog = await screen.findByRole('dialog', { name: 'Delete item?' });
+  expect(dialog).toHaveAccessibleDescription('Cannot be undone.');
 });
 
 test('Modal.info shows only OK button', async () => {
@@ -676,4 +697,35 @@ test('body reserves vertical room for control focus rings', () => {
   expect(bodyRule).toContain(
     'padding: max(var(--tao-padding-xxs), var(--tao-ring-width)) var(--tao-padding-lg);',
   );
+});
+
+test('Escape closes an expanded combobox before the Modal that contains it', async () => {
+  const user = userEvent.setup();
+  const onClose = rstest.fn();
+  function Combobox() {
+    const [expanded, setExpanded] = useState(true);
+    return (
+      <input
+        role="combobox"
+        aria-controls="options"
+        aria-expanded={expanded}
+        aria-label="Region"
+        onKeyDown={(event) => {
+          if (event.key === 'Escape') setExpanded(false);
+        }}
+      />
+    );
+  }
+  render(
+    <Modal open onClose={onClose} title="Region">
+      <Combobox />
+    </Modal>,
+  );
+  const combobox = screen.getByRole('combobox', { name: 'Region' });
+  await user.click(combobox);
+  await user.keyboard('{Escape}');
+  expect(combobox).toHaveAttribute('aria-expanded', 'false');
+  expect(onClose).not.toHaveBeenCalled();
+  await user.keyboard('{Escape}');
+  expect(onClose).toHaveBeenCalledTimes(1);
 });

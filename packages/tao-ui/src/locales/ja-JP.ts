@@ -33,6 +33,8 @@ export const jaJP = createLocale({
   dateRange: '日付範囲を選択',
   startDate: '開始日',
   endDate: '終了日',
+  selectStartDate: '開始日を選択してください。',
+  selectEndDate: '終了日を選択してください。',
   now: '現在',
   ok: 'OK',
   cancel: 'キャンセル',

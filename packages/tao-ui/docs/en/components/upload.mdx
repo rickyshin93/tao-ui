@@ -604,7 +604,7 @@ export default function Demo() {
 | `headers / withCredentials` | `object / boolean` | — / false | Request headers and credential handling. |
 | `onPreview / onDownload` | `(file) => void` | — | Override preview/download. Downloads appear only for done files; local images have a built-in preview. |
 | `onRemove` | `(file) => void / boolean / Promise` | — | Return false (or resolve false) to prevent removal. Accepted removal aborts the active request. |
-| `previewFile` | `(file: File or Blob) => PromiseLike<string>` | — | Generate a local thumbnail URL. |
+| `previewFile` | `(file: File or Blob) => PromiseLike<string>` | — | Generate a local thumbnail URL. A new function reference regenerates the thumbnail. |
 | `isImageUrl / iconRender` | `(file) => boolean / (file, listType) => ReactNode` | — | Customize image detection and the file/loading icon. |
 | `itemRender` | `(node, file, fileList, actions) => ReactNode` | — | Customize each row with preview, download and remove actions. |
 | `progress` | `UploadListProgressProps` | — | Customize the line progress indicator. |
@@ -647,5 +647,7 @@ export function ServerUpload() {
 ```
 
 If you supply `customRequest`, report progress with `onProgress` and finish each request once with `onSuccess` or `onError`. Return an object with an `abort()` method if your transport supports cancellation. With a controlled `fileList`, store the list from `onChange` to show the latest status for each file.
+
+Pass a stable generator such as `<Upload previewFile={generateThumbnail} />` with `generateThumbnail` defined outside the component. Use React's `useCallback` when the generator depends on props or state. When the generator changes, Upload keeps the current thumbnail visible for the same file while the replacement loads.
 
 Since [0.0.49](/guide/changelog), Upload also handles failures while resolving `action` or `data`, and synchronous exceptions from `customRequest`. The affected file shows an error and the other files in the batch continue.

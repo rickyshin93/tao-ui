@@ -14,6 +14,7 @@ import {
 } from 'react';
 import { flushSync } from 'react-dom';
 import { useTaoConfig } from '../../provider/tao-provider';
+import { useCommittedRef } from '../../utils/refs';
 import { cx } from '../../utils/semantic';
 import { Button } from '../button/button';
 import { Modal } from '../modal/modal';
@@ -96,20 +97,23 @@ function FilePreview({
   previewFile?: UploadProps['previewFile'];
 }) {
   const { locale } = useTaoConfig();
-  const [preview, setPreview] = useState<string>();
+  const source = file.originFileObj;
+  const [preview, setPreview] = useState<{ source: RcFile; url: string }>();
   const [error, setError] = useState<string>();
   useEffect(() => {
-    setPreview(undefined);
     setError(undefined);
-    if (file.thumbUrl || file.url || !file.originFileObj) return;
+    if (file.thumbUrl || file.url || !source) {
+      setPreview(undefined);
+      return;
+    }
     let active = true;
     const load = async (source: File) =>
       previewFile
         ? previewFile(source)
         : readPreview(source, locale.messages.readFileError);
-    load(file.originFileObj).then(
+    load(source).then(
       (value) => {
-        if (active) setPreview(value);
+        if (active) setPreview({ source, url: value });
       },
       (reason) => {
         if (active)
@@ -124,14 +128,15 @@ function FilePreview({
       active = false;
     };
   }, [
-    file.originFileObj,
+    source,
     file.thumbUrl,
     file.url,
     previewFile,
     locale.messages.readFileError,
     locale.messages.previewUnavailable,
   ]);
-  const src = file.thumbUrl ?? file.url ?? preview;
+  const src =
+    file.thumbUrl || file.url || (preview?.source === source && preview?.url);
   return error ? (
     <span role="status">{error}</span>
   ) : src ? (
@@ -177,13 +182,12 @@ const UploadRoot = forwardRef<UploadRef, UploadProps>((props, ref) => {
   const config = useTaoConfig();
   const [localFiles, setFiles] = useState(props.defaultFileList ?? []);
   const files = 'fileList' in props ? (props.fileList ?? []) : localFiles;
-  const filesRef = useRef(files);
-  filesRef.current = files;
-  const propsRef = useRef(props);
-  propsRef.current = props;
+  const filesRef = useCommittedRef(files);
+  const propsRef = useCommittedRef(props);
   const root = useRef<HTMLSpanElement>(null),
     uploader = useRef<RcUploader>(null);
   const ignored = useRef(new Set<string>());
+  const normalizedBatches = useRef(new WeakSet<BaseRcFile[]>());
   const preparations = useRef(new WeakMap<object, UploadPreparation>());
   const requestOrigins = useRef(new WeakMap<object, BaseRcFile>());
   const settledRequests = useRef(new WeakSet<object>());
@@ -230,15 +234,21 @@ const UploadRoot = forwardRef<UploadRef, UploadProps>((props, ref) => {
         filesRef.current = limited;
         setFiles(limited);
       }
+      const onChange = propsRef.current.onChange;
       if (
-        file.status === 'removed' ||
-        limited.some((item) => item.uid === file.uid)
-      )
-        propsRef.current.onChange?.({
-          file,
-          fileList: [...limited],
+        onChange &&
+        (file.status === 'removed' ||
+          limited.some((item) => item.uid === file.uid))
+      ) {
+        const changed = { ...file };
+        onChange({
+          file: changed,
+          fileList: limited.map((item) =>
+            item === file ? changed : { ...item },
+          ),
           ...(event ? { event } : {}),
         });
+      }
     });
   };
   const update = (
@@ -275,15 +285,26 @@ const UploadRoot = forwardRef<UploadRef, UploadProps>((props, ref) => {
   const customRequest = props.customRequest as RcUploadProps['customRequest'];
   const request: RcUploadProps['customRequest'] = customRequest
     ? (options, info) => {
+        let finished = false;
         try {
-          return customRequest(options, info);
+          const handle = customRequest(
+            {
+              ...options,
+              onSuccess: (...args) => {
+                finished = true;
+                options.onSuccess?.(...args);
+              },
+              onError: (...args) => {
+                finished = true;
+                options.onError?.(...args);
+              },
+            },
+            info,
+          );
+          // rc-upload registers the returned handle after the request returns.
+          return finished ? undefined : handle;
         } catch (reason) {
-          if (
-            typeof options.file === 'object' &&
-            settledRequests.current.has(options.file)
-          ) {
-            throw reason;
-          }
+          if (finished) throw reason;
           options.onError?.(asError(reason));
         }
       }
@@ -419,6 +440,16 @@ const UploadRoot = forwardRef<UploadRef, UploadProps>((props, ref) => {
           (!!props.children || (!isCard && type !== 'drag'))
         }
         beforeUpload={async (file, list) => {
+          if (!normalizedBatches.current.has(list)) {
+            for (const item of list) {
+              if (!('lastModifiedDate' in item)) {
+                Object.assign(item, {
+                  lastModifiedDate: new Date(item.lastModified),
+                });
+              }
+            }
+            normalizedBatches.current.add(list);
+          }
           preparations.current.delete(file);
           const result = await props.beforeUpload?.(
             file as RcFile,
@@ -516,7 +547,7 @@ const UploadRoot = forwardRef<UploadRef, UploadProps>((props, ref) => {
                 <FileIcon />
               ));
             const localPreview = image && !!file.originFileObj;
-            const previewUrl = file.url ?? file.thumbUrl;
+            const previewUrl = file.url || file.thumbUrl;
             const actions = {
               preview: () => {
                 if (props.onPreview) props.onPreview(file);
@@ -613,7 +644,8 @@ const UploadRoot = forwardRef<UploadRef, UploadProps>((props, ref) => {
                         file.name
                       }
                       aria-labelledby={
-                        file['aria-labelledby'] ?? props.progress?.['aria-labelledby']
+                        file['aria-labelledby'] ??
+                        props.progress?.['aria-labelledby']
                       }
                     />
                   )}

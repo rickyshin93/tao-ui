@@ -234,7 +234,9 @@ function InternalTreeSelect<
       classNames={classes}
       styles={semanticStyles}
       multiple={!!(treeCheckable || multiple)}
-      treeCheckable={treeCheckable ? <TreeCheck /> : false}
+      treeCheckable={
+        treeCheckable || props.treeCheckStrictly ? <TreeCheck /> : false
+      }
       treeLine={!!treeLine}
       treeIcon={treeIcon}
       showTreeIcon={!!treeIcon}

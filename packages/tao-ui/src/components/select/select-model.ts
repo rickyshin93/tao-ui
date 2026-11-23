@@ -52,9 +52,12 @@ export function countLeafOptions(options: SelectOption[]): number {
 }
 
 export function defaultFilter(input: string, option: SelectOption): boolean {
-  const label =
-    typeof option.label === 'string' ? option.label : String(option.label);
-  return label.toLowerCase().includes(input.toLowerCase());
+  // A ReactNode label has no searchable text; match its value instead.
+  const text =
+    typeof option.label === 'string' || typeof option.label === 'number'
+      ? String(option.label)
+      : option.value;
+  return text.toLowerCase().includes(input.toLowerCase());
 }
 
 export function filterTree(

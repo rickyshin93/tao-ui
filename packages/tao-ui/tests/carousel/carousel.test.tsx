@@ -7,7 +7,7 @@ import {
   waitFor,
 } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { createRef } from 'react';
+import { createRef, useState } from 'react';
 import {
   Carousel,
   type CarouselRef,
@@ -271,17 +271,29 @@ test('RTL initialSlide indexes grouped slides rather than the raw records', asyn
   await act(async () => {
     await new Promise((resolve) => setTimeout(resolve, 25));
   });
-  expect(container.querySelector('.slick-current')).toHaveTextContent('FirstSecond');
+  expect(container.querySelector('.slick-current')).toHaveTextContent(
+    'FirstSecond',
+  );
 });
 
 test('default dots navigate without submitting an enclosing form', async () => {
-  const onSubmit = rstest.fn((event: { preventDefault: () => void }) => event.preventDefault());
-  const { container } = render(<form onSubmit={onSubmit}><Carousel speed={0}>{slides}</Carousel></form>);
+  const onSubmit = rstest.fn((event: { preventDefault: () => void }) =>
+    event.preventDefault(),
+  );
+  const { container } = render(
+    <form onSubmit={onSubmit}>
+      <Carousel speed={0}>{slides}</Carousel>
+    </form>,
+  );
   const dot = screen.getByRole('button', { name: '2' });
   expect(dot).toHaveAttribute('type', 'button');
   await userEvent.click(dot);
   expect(onSubmit).not.toHaveBeenCalled();
-  await waitFor(() => expect(container.querySelector('.slick-current')).toHaveTextContent('Second'));
+  await waitFor(() =>
+    expect(container.querySelector('.slick-current')).toHaveTextContent(
+      'Second',
+    ),
+  );
 });
 
 test('finite carousel arrows expose their disabled navigation boundaries', async () => {
@@ -293,7 +305,9 @@ test('finite carousel arrows expose their disabled navigation boundaries', async
   expect(screen.getByRole('button', { name: 'Previous' })).toBeDisabled();
   fireEvent.click(screen.getByRole('button', { name: '3' }));
   await waitFor(() => {
-    expect(container.querySelector('.slick-current')).toHaveTextContent('Third');
+    expect(container.querySelector('.slick-current')).toHaveTextContent(
+      'Third',
+    );
     expect(screen.getByRole('button', { name: 'Next' })).toBeDisabled();
     expect(screen.getByRole('button', { name: 'Previous' })).toBeEnabled();
   });
@@ -302,13 +316,21 @@ test('finite carousel arrows expose their disabled navigation boundaries', async
 test('inactive carousel slides and their clones are inert until visible', async () => {
   const { container } = render(
     <Carousel speed={0}>
-      <div><button type="button">First action</button></div>
-      <div><button type="button">Second action</button></div>
+      <div>
+        <button type="button">First action</button>
+      </div>
+      <div>
+        <button type="button">Second action</button>
+      </div>
     </Carousel>,
   );
   const expectSlideInertness = () => {
-    const inactive = container.querySelectorAll('.slick-slide[aria-hidden="true"]');
-    const active = container.querySelectorAll('.slick-slide[aria-hidden="false"]');
+    const inactive = container.querySelectorAll(
+      '.slick-slide[aria-hidden="true"]',
+    );
+    const active = container.querySelectorAll(
+      '.slick-slide[aria-hidden="false"]',
+    );
     expect(inactive.length).toBeGreaterThan(0);
     expect(active.length).toBeGreaterThan(0);
     for (const slide of inactive) expect(slide).toHaveAttribute('inert');
@@ -317,7 +339,9 @@ test('inactive carousel slides and their clones are inert until visible', async 
   expectSlideInertness();
   fireEvent.click(screen.getByRole('button', { name: '2' }));
   await waitFor(() => {
-    expect(container.querySelector('.slick-current')).toHaveTextContent('Second action');
+    expect(container.querySelector('.slick-current')).toHaveTextContent(
+      'Second action',
+    );
     expectSlideInertness();
   });
 });
@@ -328,4 +352,104 @@ test('renders numeric and text children as slides', () => {
   );
   expect(screen.getByText('0')).toBeInTheDocument();
   expect(screen.getByText('Text slide')).toBeInTheDocument();
+});
+
+const settle = () =>
+  act(async () => {
+    await new Promise((resolve) => setTimeout(resolve, 25));
+  });
+const fourSlides = ['A', 'B', 'C', 'D'].map((name) => (
+  <div key={name}>{name}</div>
+));
+
+test('RTL index APIs, callbacks and dots use the logical slide order', async () => {
+  const ref = createRef<CarouselRef>();
+  const afterChange = rstest.fn();
+  const beforeChange = rstest.fn();
+  const { container } = render(
+    <Carousel
+      ref={ref}
+      rtl
+      speed={0}
+      afterChange={afterChange}
+      beforeChange={beforeChange}
+    >
+      {fourSlides}
+    </Carousel>,
+  );
+  await settle();
+  const current = () => container.querySelector('.slick-current');
+  const activeDot = () => container.querySelector('.slick-dots .slick-active');
+  expect(current()).toHaveTextContent('A');
+  expect(activeDot()).toHaveTextContent('1');
+
+  act(() => ref.current!.goTo(1));
+  await settle();
+  expect(current()).toHaveTextContent('B');
+  expect(activeDot()).toHaveTextContent('2');
+  expect(beforeChange).toHaveBeenLastCalledWith(0, 1);
+
+  act(() => ref.current!.next());
+  await settle();
+  expect(current()).toHaveTextContent('C');
+  expect(beforeChange).toHaveBeenLastCalledWith(1, 2);
+
+  act(() => ref.current!.prev());
+  await settle();
+  expect(current()).toHaveTextContent('B');
+
+  fireEvent.click(screen.getByRole('button', { name: '4' }));
+  await settle();
+  expect(current()).toHaveTextContent('D');
+  await waitFor(() => expect(afterChange).toHaveBeenLastCalledWith(3));
+});
+
+test('RTL custom dots receive logical indexes in logical order', async () => {
+  const { container } = render(
+    <Carousel
+      rtl
+      speed={0}
+      customPaging={(index) => <button type="button">{`go ${index}`}</button>}
+    >
+      {fourSlides}
+    </Carousel>,
+  );
+  await settle();
+  expect(
+    [...container.querySelectorAll('.slick-dots button')].map(
+      (dot) => dot.textContent,
+    ),
+  ).toEqual(['go 0', 'go 1', 'go 2', 'go 3']);
+  expect(
+    container.querySelector('.slick-dots .slick-active'),
+  ).toHaveTextContent('go 0');
+});
+
+test('RTL afterChange and slickGoTo round trip keeps the chosen slide', async () => {
+  function Controlled() {
+    const [slide, setSlide] = useState(0);
+    return (
+      <>
+        <Carousel rtl speed={0} arrows slickGoTo={slide} afterChange={setSlide}>
+          {fourSlides}
+        </Carousel>
+        <output>{slide}</output>
+        <button type="button" onClick={() => setSlide(3)}>
+          Last
+        </button>
+      </>
+    );
+  }
+  const { container } = render(<Controlled />);
+  await settle();
+  const current = () => container.querySelector('.slick-current');
+  expect(current()).toHaveTextContent('A');
+  fireEvent.click(screen.getByRole('button', { name: 'Next' }));
+  await settle();
+  expect(current()).toHaveTextContent('B');
+  expect(screen.getByRole('status')).toHaveTextContent('1');
+  fireEvent.click(screen.getByRole('button', { name: 'Last' }));
+  await settle();
+  expect(current()).toHaveTextContent('D');
+  expect(screen.getByRole('status')).toHaveTextContent('3');
 });

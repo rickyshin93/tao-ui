@@ -1,4 +1,10 @@
-import { type ReactNode, useLayoutEffect, useRef, useState } from 'react';
+import {
+  type ReactNode,
+  useId,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
 import {
   cx,
   type SemanticClassNames,
@@ -68,13 +74,15 @@ export function ConfirmDialog({
   centered = true,
   width = 416,
   maskClosable = false,
-  closable = false,
+  closable,
   keyboard = true,
   className,
   classNames,
   styles,
 }: ConfirmDialogProps) {
-  const { locale } = useTaoConfig();
+  const { locale, disabled } = useTaoConfig();
+  const titleId = useId();
+  const contentId = useId();
   const [loading, setLoading] = useState(false);
   const [cancelLoading, setCancelLoading] = useState(false);
   const cancelPending = useRef(false);
@@ -128,11 +136,17 @@ export function ConfirmDialog({
     <Modal
       open={open}
       title={null}
+      aria-labelledby={title != null ? titleId : undefined}
+      aria-describedby={content != null ? contentId : undefined}
       onClose={handleCancel}
       afterClose={afterClose}
       width={width}
       centered={centered}
-      closable={closable}
+      closable={
+        closable ??
+        (!!(okButtonProps?.disabled ?? disabled) &&
+          (!showCancel || !!cancelButtonProps?.disabled))
+      }
       maskClosable={maskClosable}
       keyboard={keyboard}
       classNames={mergedClassNames}
@@ -143,6 +157,7 @@ export function ConfirmDialog({
             <Button
               variant="secondary"
               {...cancelButtonProps}
+              disabled={cancelButtonProps?.disabled ?? false}
               loading={cancelLoading || cancelButtonProps?.loading}
               onClick={(event) => {
                 cancelButtonProps?.onClick?.(event);
@@ -174,9 +189,15 @@ export function ConfirmDialog({
           </span>
         )}
         <div data-tao-modal-confirm-main="">
-          {title != null && <div data-tao-modal-confirm-title="">{title}</div>}
+          {title != null && (
+            <div id={titleId} data-tao-modal-confirm-title="">
+              {title}
+            </div>
+          )}
           {content != null && (
-            <div data-tao-modal-confirm-content="">{content}</div>
+            <div id={contentId} data-tao-modal-confirm-content="">
+              {content}
+            </div>
           )}
         </div>
       </div>

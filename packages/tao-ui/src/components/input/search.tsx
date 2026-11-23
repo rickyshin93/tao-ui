@@ -89,24 +89,28 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(
       if (input && !submitDisabled && !event.defaultPrevented)
         onSearch?.(input.value, event, { source: 'input' });
     };
+    const searchLabel = ctx.locale.search ?? 'Search';
+    const hasButtonContent = enterButton === 0 || Boolean(enterButton);
+    const iconOnly = enterButton === true || !hasButtonContent;
     const buttonProps: ButtonProps = {
       type: 'button',
       disabled: submitDisabled,
       'aria-busy': isLoading || undefined,
-      'aria-label': ctx.locale.search ?? 'Search',
+      'aria-label': iconOnly ? searchLabel : undefined,
+      // Native buttons use title as a fallback after their content.
+      title: iconOnly ? undefined : searchLabel,
       className: classNames?.button,
       style: styles?.button,
       onMouseDown: (event) => event.preventDefault(),
       onClick: search,
     };
-    const hasButtonContent = enterButton === 0 || Boolean(enterButton);
     const button = customButton ? (
       cloneElement(enterButton as ReactElement<ButtonProps>, {
         ...buttonProps,
         className: cx(enterButton.props.className, classNames?.button),
         style: { ...enterButton.props.style, ...styles?.button },
-        'aria-label':
-          enterButton.props['aria-label'] ?? buttonProps['aria-label'],
+        'aria-label': enterButton.props['aria-label'],
+        title: enterButton.props.title ?? searchLabel,
         ...(enterButton.type === Button
           ? { loading: isLoading, size: props.size ?? enterButton.props.size }
           : {}),
@@ -126,9 +130,7 @@ export const Search = forwardRef<HTMLInputElement, SearchProps>(
         size={props.size}
         variant={hasButtonContent ? 'primary' : 'secondary'}
       >
-        {enterButton === true || !hasButtonContent
-          ? (searchIcon ?? <SearchIcon />)
-          : enterButton}
+        {iconOnly ? (searchIcon ?? <SearchIcon />) : enterButton}
       </Button>
     );
     return (

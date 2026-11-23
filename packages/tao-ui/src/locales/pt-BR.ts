@@ -33,6 +33,8 @@ export const ptBR = createLocale({
   dateRange: 'Selecionar período',
   startDate: 'Data inicial',
   endDate: 'Data final',
+  selectStartDate: 'Selecione uma data inicial.',
+  selectEndDate: 'Selecione uma data final.',
   now: 'Agora',
   ok: 'OK',
   cancel: 'Cancelar',

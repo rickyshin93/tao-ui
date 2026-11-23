@@ -420,6 +420,81 @@ test('opens cascaded columns and emits complete paths and selected option object
   expect(screen.getByTitle('China / Shanghai')).toBeInTheDocument();
 });
 
+test('Cascader keeps an uncontrolled path when its change callback edits it', async () => {
+  render(
+    <Cascader
+      options={options}
+      defaultOpen
+      onChange={(value) => {
+        if (value) value.length = 0;
+      }}
+    />,
+  );
+  fireEvent.click(await screen.findByText('China'));
+  fireEvent.click(screen.getByText('Shanghai'));
+  expect(screen.getByTitle('China / Shanghai')).toBeVisible();
+});
+
+test('disabling a mobile Cascader discards its uncontrolled open session', async () => {
+  const picker = (disabled: boolean) => (
+    <Cascader mobile defaultOpen disabled={disabled} options={options} />
+  );
+  const view = render(picker(false));
+  expect(await screen.findByRole('dialog')).toBeVisible();
+  view.rerender(picker(true));
+  await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+  view.rerender(picker(false));
+  expect(screen.queryByRole('dialog')).toBeNull();
+});
+
+test('Cascader mobile keeps a parent open even if the selected options payload is emptied', async () => {
+  const onChange = rstest.fn();
+  render(
+    <Cascader
+      mobile
+      defaultOpen
+      changeOnSelect
+      options={options}
+      onChange={(value, selected) => {
+        onChange(value);
+        if (selected) selected.length = 0;
+      }}
+    />,
+  );
+  let dialog = await screen.findByRole('dialog');
+  fireEvent.click(within(dialog).getByText('China'));
+  expect(onChange).toHaveBeenLastCalledWith(['cn']);
+  dialog = screen.getByRole('dialog');
+  fireEvent.click(within(dialog).getByText('Shanghai'));
+  expect(onChange).toHaveBeenLastCalledWith(['cn', 'sh']);
+  await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+});
+
+test('Cascader keeps nested multiple paths when its change callback edits one', async () => {
+  const payloads: unknown[] = [];
+  render(
+    <Cascader
+      multiple
+      options={[
+        { value: 'a', label: 'Alpha' },
+        { value: 'b', label: 'Beta' },
+      ]}
+      defaultOpen
+      onChange={(value) => {
+        payloads.push(value?.map((path) => [...path]));
+        if (value?.[0]) value[0].length = 0;
+      }}
+    />,
+  );
+  for (const text of ['Alpha', 'Beta']) {
+    const label = await screen.findByText(text);
+    fireEvent.click(
+      label.parentElement!.querySelector('[class*="-checkbox"]')!,
+    );
+  }
+  expect(payloads).toEqual([[['a']], [['a'], ['b']]]);
+});
+
 test('changeOnSelect emits parent paths and supports custom displayRender', async () => {
   const onChange = rstest.fn();
   render(
@@ -679,4 +754,29 @@ test('Cascader Done cannot restore a selection that the parent replaced while op
   view.rerender(<Cascader {...props} value={[['c']]} />);
   fireEvent.click(within(dialog).getByRole('button', { name: 'Done' }));
   expect(changed).not.toHaveBeenCalled();
+});
+
+test('Panel keeps uncontrolled multiple paths when its change callback edits the payload', () => {
+  const view = render(
+    <Cascader.Panel
+      multiple
+      options={[
+        { value: 'a', label: 'Alpha' },
+        { value: 'b', label: 'Beta' },
+      ]}
+      onChange={(value) => {
+        if (value?.[0]) value[0].length = 0;
+        value?.splice(0);
+      }}
+    />,
+  );
+  for (const text of ['Alpha', 'Beta'])
+    fireEvent.click(
+      screen
+        .getByText(text)
+        .parentElement!.querySelector('[class*="-checkbox"]')!,
+    );
+  expect(
+    view.container.querySelectorAll('[class*="-checkbox-checked"]'),
+  ).toHaveLength(2);
 });

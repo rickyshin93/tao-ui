@@ -237,6 +237,27 @@ test('required state follows a rule factory and its declared dependency', () => 
   expect(detail).toHaveAttribute('aria-required', 'true');
 });
 
+test('a warningOnly required rule does not mark the field as required', () => {
+  const { container } = render(
+    <Form>
+      <Form.Item
+        name="nickname"
+        label="Nickname"
+        rules={[
+          { required: true, warningOnly: true },
+          () => ({ required: true, warningOnly: true }),
+        ]}
+      >
+        <input />
+      </Form.Item>
+    </Form>,
+  );
+  expect(container.querySelector('[data-tao-required]')).toBeNull();
+  expect(screen.getByRole('textbox', { name: 'Nickname' })).not.toHaveAttribute(
+    'aria-required',
+  );
+});
+
 test('presentational item without name renders shell only', () => {
   const { container } = render(
     <Form>

@@ -26,6 +26,35 @@ test('renders with placeholder', () => {
 });
 
 test.each([
+  { mode: 'desktop', mobile: false, showSearch: false },
+  { mode: 'searchable', mobile: false, showSearch: true },
+  { mode: 'mobile', mobile: true, showSearch: true },
+])(
+  '$mode single Select reselects without publishing a value change',
+  async ({ mobile, showSearch }) => {
+    const option = { label: 'Apple', value: 'apple' };
+    const onSelect = rs.fn();
+    const onChange = rs.fn();
+    render(
+      <Select
+        mobile={mobile}
+        showSearch={showSearch}
+        defaultOpen
+        defaultValue="apple"
+        options={[option, { label: 'Banana', value: 'banana' }]}
+        onSelect={onSelect}
+        onChange={onChange}
+      />,
+    );
+    await userEvent.click(
+      screen.getByRole(mobile ? 'button' : 'option', { name: 'Apple' }),
+    );
+    expect(onSelect).toHaveBeenCalledExactlyOnceWith('apple', option);
+    expect(onChange).not.toHaveBeenCalled();
+  },
+);
+
+test.each([
   { name: 'single', mobile: false, showSearch: false, multiple: false },
   { name: 'searchable', mobile: false, showSearch: true, multiple: false },
   { name: 'multiple', mobile: false, showSearch: true, multiple: true },
@@ -1505,10 +1534,14 @@ test.each([undefined, 'multiple', 'tags'] as const)(
     expect(events).toHaveLength(2);
     events.length = 0;
     await userEvent.click(screen.getByRole('option', { name: 'Updated Beta' }));
-    expect(events).toEqual([
-      ['change', mode ? [] : 'b', mode ? [] : updatedBeta],
-      [mode ? 'deselect' : 'select', 'b', updatedBeta],
-    ]);
+    expect(events).toEqual(
+      mode
+        ? [
+            ['change', [], []],
+            ['deselect', 'b', updatedBeta],
+          ]
+        : [['select', 'b', updatedBeta]],
+    );
     expect(trigger).toHaveTextContent('Updated Beta');
   },
 );
@@ -2135,4 +2168,127 @@ test('mobile Select discards a new draft item that becomes disabled before Done'
     label: 'Gamma',
     value: 'c',
   });
+});
+
+test('typing a token separator creates the tag without swallowing the next keystroke', async () => {
+  const onChange = rs.fn();
+  render(
+    <Select
+      mobile={false}
+      showSearch
+      mode="tags"
+      options={[]}
+      tokenSeparators={[',']}
+      onChange={onChange}
+    />,
+  );
+  const input = screen.getByRole('combobox');
+  await userEvent.type(input, 'red,blue,');
+  expect(onChange).toHaveBeenLastCalledWith(['red', 'blue'], []);
+  expect(input).toHaveValue('');
+});
+
+test.each([false, true])(
+  'unmatched multiple-mode separator text stays editable (mobile=%s)',
+  async (mobile) => {
+    render(
+      <Select
+        mobile={mobile}
+        defaultOpen={mobile}
+        showSearch
+        mode="multiple"
+        options={[{ label: 'Alpha', value: 'a' }]}
+        tokenSeparators={[',']}
+      />,
+    );
+    const input = mobile
+      ? screen.getByRole('textbox', { name: 'Search options' })
+      : screen.getByRole('combobox');
+    await userEvent.type(input, 'zz,');
+    await userEvent.type(input, '{Backspace}x');
+    expect(input).toHaveValue('zzx');
+  },
+);
+
+test.each([false, true])(
+  'single Select submits its value under name in native forms (mobile=%s)',
+  (mobile) => {
+    const { container } = render(
+      <form>
+        <Select
+          mobile={mobile}
+          name="selection"
+          defaultValue="a"
+          options={[{ value: 'a', label: 'Alpha' }]}
+        />
+      </form>,
+    );
+    expect(
+      new FormData(container.querySelector('form')!).get('selection'),
+    ).toBe('a');
+  },
+);
+
+test.each([
+  { name: 'desktop', mobile: false, showSearch: false },
+  { name: 'mobile', mobile: true, showSearch: false },
+  { name: 'searchable', mobile: false, showSearch: true },
+])('$name Select honours autoFocus', ({ mobile, showSearch }) => {
+  const { container } = render(
+    <Select
+      autoFocus
+      mobile={mobile}
+      showSearch={showSearch}
+      options={[{ value: 'a', label: 'Alpha' }]}
+    />,
+  );
+  const target = showSearch
+    ? screen.getByRole('combobox')
+    : container.querySelector('[data-tao-select]');
+  expect(document.activeElement).toBe(target);
+});
+
+test('opening a searchable single Select highlights its current value', () => {
+  const onChange = rs.fn();
+  render(
+    <Select
+      mobile={false}
+      showSearch
+      defaultValue="c"
+      options={[
+        { value: 'a', label: 'Alpha' },
+        { value: 'b', label: 'Beta' },
+        { value: 'c', label: 'Gamma' },
+      ]}
+      onChange={onChange}
+    />,
+  );
+  const input = screen.getByRole('combobox');
+  fireEvent.keyDown(input, { key: 'Enter' });
+  expect(
+    document.getElementById(input.getAttribute('aria-activedescendant')!),
+  ).toHaveTextContent('Gamma');
+  fireEvent.keyDown(input, { key: 'ArrowUp' });
+  fireEvent.keyDown(input, { key: 'Enter' });
+  expect(onChange).toHaveBeenCalledExactlyOnceWith('b', {
+    value: 'b',
+    label: 'Beta',
+  });
+});
+
+test('opening a searchable single Select highlights a value changed while closed', () => {
+  const options = [
+    { value: 'a', label: 'Alpha' },
+    { value: 'b', label: 'Beta' },
+    { value: 'c', label: 'Gamma' },
+  ];
+  const { rerender } = render(
+    <Select mobile={false} showSearch value="a" options={options} />,
+  );
+  rerender(<Select mobile={false} showSearch value="c" options={options} />);
+  const input = screen.getByRole('combobox');
+  fireEvent.keyDown(input, { key: 'Enter' });
+  expect(
+    document.getElementById(input.getAttribute('aria-activedescendant')!),
+  ).toHaveTextContent('Gamma');
 });

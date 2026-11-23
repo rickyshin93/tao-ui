@@ -63,6 +63,25 @@ test.each(['typing', 'programmatic'] as const)(
   },
 );
 
+test('Form displays a numeric initial value and InputNumber emits a string after editing', async () => {
+  const onChange = rstest.fn();
+  render(
+    <Form initialValues={{ qty: 18 }}>
+      <Form.Item name="qty" label="Quantity">
+        <InputNumber onChange={onChange} />
+      </Form.Item>
+    </Form>,
+  );
+
+  const input = screen.getByRole('textbox', { name: 'Quantity' });
+  expect(input).toHaveValue('18');
+  expect(onChange).not.toHaveBeenCalled();
+
+  await userEvent.type(input, '2');
+  expect(input).toHaveValue('182');
+  expect(onChange).toHaveBeenLastCalledWith('182');
+});
+
 test('defaultValue remains editable when value is omitted', async () => {
   const { rerender } = render(<InputNumber defaultValue="12" />);
   const input = screen.getByRole('textbox');
@@ -71,6 +90,52 @@ test('defaultValue remains editable when value is omitted', async () => {
   rerender(<InputNumber defaultValue="99" />);
   expect(input).toHaveValue('123');
 });
+
+test.each(['typing', 'pasting'] as const)(
+  'InputNumber emits ASCII digits after %s full-width digits',
+  async (entry) => {
+    const onChange = rstest.fn();
+    render(<InputNumber onChange={onChange} />);
+    const input = screen.getByRole('textbox');
+    const user = userEvent.setup();
+    await user.click(input);
+    if (entry === 'typing') await user.keyboard('１２３');
+    else await user.paste('１２３');
+    expect(input).toHaveValue('123');
+    expect(onChange).toHaveBeenLastCalledWith('123');
+  },
+);
+
+test.each([undefined, 'onBlur'] as const)(
+  'an untouched InputNumber follows the Form validation trigger %s',
+  async (validateTrigger) => {
+    const onChange = rstest.fn();
+    const onBlur = rstest.fn();
+    render(
+      <Form>
+        <Form.Item
+          name="qty"
+          label="Quantity"
+          rules={[{ required: true, message: 'Quantity required' }]}
+          validateTrigger={validateTrigger}
+        >
+          <InputNumber onChange={onChange} onBlur={onBlur} />
+        </Form.Item>
+        <button type="button">Next</button>
+      </Form>,
+    );
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('textbox', { name: 'Quantity' }));
+    await user.tab();
+    expect(onBlur).toHaveBeenCalledExactlyOnceWith('');
+    expect(onChange).not.toHaveBeenCalled();
+    if (validateTrigger === 'onBlur') {
+      expect(await screen.findByText('Quantity required')).toBeVisible();
+    } else {
+      expect(screen.queryByText('Quantity required')).not.toBeInTheDocument();
+    }
+  },
+);
 
 test('IN.1 — renders the Input surface (data-tao-control / input / size / variant)', () => {
   const { container } = render(<InputNumber value="" />);

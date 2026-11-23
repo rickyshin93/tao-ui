@@ -190,6 +190,27 @@ test('custom tao Input preserves its native control wrapper', () => {
   );
 });
 
+test.each(['error', 'warning'] as const)(
+  'a custom tao Input shows the AutoComplete %s status',
+  (status) => {
+    render(
+      <AutoComplete options={options} status={status}>
+        <Input aria-label="Custom input" />
+      </AutoComplete>,
+    );
+    expect(
+      screen
+        .getByRole('combobox', { name: 'Custom input' })
+        .closest('[data-tao-control]'),
+    ).toHaveAttribute(`data-tao-${status}`);
+  },
+);
+
+test('an error status marks the AutoComplete combobox invalid', () => {
+  render(<AutoComplete options={options} status="error" />);
+  expect(screen.getByRole('combobox')).toHaveAttribute('aria-invalid', 'true');
+});
+
 test('legacy Option and dataSource use the same value contract', async () => {
   const onChange = rstest.fn();
   const { rerender } = render(

@@ -27,6 +27,7 @@
 
 [data-tao-splitter-panel][data-tao-collapsed] {
   overflow: hidden;
+  visibility: hidden;
 }
 
 /* ===========================

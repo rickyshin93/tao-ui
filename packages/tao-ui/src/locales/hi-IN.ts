@@ -33,6 +33,8 @@ export const hiIN = createLocale({
   dateRange: 'दिनांक सीमा चुनें',
   startDate: 'प्रारंभ दिनांक',
   endDate: 'समाप्ति दिनांक',
+  selectStartDate: 'प्रारंभ दिनांक चुनें।',
+  selectEndDate: 'समाप्ति दिनांक चुनें।',
   now: 'अभी',
   ok: 'ठीक है',
   cancel: 'रद्द करें',

@@ -464,3 +464,18 @@ test.each(['ltr', 'rtl'] as const)(
     expect(bubbled).toEqual(inputKeys);
   },
 );
+
+test('treeCheckStrictly alone renders visible check indicators', async () => {
+  render(
+    <TreeSelect
+      treeData={treeData}
+      defaultOpen
+      treeDefaultExpandAll
+      treeCheckStrictly
+      defaultValue={[{ value: 'team', label: 'Team' }]}
+    />,
+  );
+  const team = await screen.findByRole('checkbox', { name: 'Team' });
+  expect(team).toHaveAttribute('aria-checked', 'true');
+  expect(team.querySelector('[data-tao-tree-check]')).not.toBeNull();
+});

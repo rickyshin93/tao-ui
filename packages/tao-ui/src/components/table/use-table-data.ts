@@ -135,11 +135,12 @@ export function useTableData<T extends TableRecord>({
   }
   const currentPage = paginationConfig?.current ?? internalPage;
   const rows = useMemo(() => {
-    if (paginationProp === false || paginationConfig?.total !== undefined)
+    // A total beyond the local rows means the data source holds one remote page.
+    if (paginationProp === false || processedData.length < total)
       return processedData;
     const start = (currentPage - 1) * pageSize;
     return processedData.slice(start, start + pageSize);
-  }, [processedData, paginationProp, paginationConfig, currentPage, pageSize]);
+  }, [processedData, paginationProp, total, currentPage, pageSize]);
 
   function notifyChange(
     page: number,
@@ -153,10 +154,7 @@ export function useTableData<T extends TableRecord>({
       const values = Object.hasOwn(nextFilters, key)
         ? nextFilters[key]
         : undefined;
-      filterEntries.push([
-        column.dataIndex == null ? key : String(column.dataIndex),
-        values?.length ? [...values] : null,
-      ]);
+      filterEntries.push([key, values?.length ? [...values] : null]);
     }
     const column =
       nextSort.key === null

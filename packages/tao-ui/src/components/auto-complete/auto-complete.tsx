@@ -161,9 +161,20 @@ function InternalAutoComplete<
       : undefined;
   const optionsChildren = customInput ? undefined : children;
   const input = customInput ?? components?.input;
+  const inheritsStatus =
+    status &&
+    isValidElement<{ status?: TaoStatus }>(input) &&
+    typeof input.type !== 'string' &&
+    input.props.status == null;
   const mergedComponents =
-    disabled && isValidElement<{ disabled?: boolean }>(input)
-      ? { ...components, input: cloneElement(input, { disabled: true }) }
+    isValidElement(input) && (disabled || inheritsStatus)
+      ? {
+          ...components,
+          input: cloneElement(input as ReactElement<Record<string, unknown>>, {
+            ...(disabled ? { disabled: true } : {}),
+            ...(inheritsStatus ? { status } : {}),
+          }),
+        }
       : customInput
         ? { ...components, input: customInput }
         : components;
@@ -219,6 +230,7 @@ function InternalAutoComplete<
       data-tao-error={status === 'error' || undefined}
       data-tao-warning={status === 'warning' || undefined}
       disabled={disabled}
+      aria-invalid={status === 'error' ? true : props['aria-invalid']}
       onInputKeyDown={(event) => {
         props.onInputKeyDown?.(event);
         if (

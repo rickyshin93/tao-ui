@@ -3,6 +3,7 @@ import {
   createContext,
   type ReactNode,
   useContext,
+  useId,
   useLayoutEffect,
   useMemo,
   useRef,
@@ -43,9 +44,17 @@ function CancelBtn() {
 }
 
 function AppConfirm({ config, open, markOpen, close, remove }: DialogEntry) {
-  const { locale } = useTaoConfig();
+  const { locale, disabled } = useTaoConfig();
+  const showCancel = config.okCancel ?? config.type === 'confirm';
+  const closable =
+    config.closable ??
+    (!!(config.okButtonProps?.disabled ?? disabled) &&
+      (config.footer === null ||
+        !showCancel ||
+        !!config.cancelButtonProps?.disabled));
   const [pending, setPending] = useState<'ok' | 'cancel' | null>(null);
   const busy = useRef(false);
+  const contentId = useId();
   useLayoutEffect(() => markOpen(open), [markOpen, open]);
   const run = async (action: 'ok' | 'cancel') => {
     if (busy.current) return;
@@ -97,7 +106,7 @@ function AppConfirm({ config, open, markOpen, close, remove }: DialogEntry) {
       {...config.cancelButtonProps}
       data-tao-modal-action="cancel"
       loading={pending === 'cancel' || config.cancelButtonProps?.loading}
-      disabled={pending === 'ok' || config.cancelButtonProps?.disabled}
+      disabled={pending === 'ok' || !!config.cancelButtonProps?.disabled}
       onClick={(event) => {
         config.cancelButtonProps?.onClick?.(event);
         if (!event.defaultPrevented) void run('cancel');
@@ -108,7 +117,7 @@ function AppConfirm({ config, open, markOpen, close, remove }: DialogEntry) {
   );
   const defaultFooter = (
     <>
-      {(config.okCancel ?? config.type === 'confirm') && <CancelBtn />}
+      {showCancel && <CancelBtn />}
       <OkBtn />
     </>
   );
@@ -132,13 +141,17 @@ function AppConfirm({ config, open, markOpen, close, remove }: DialogEntry) {
         {...config}
         open={open}
         title={config.title}
+        aria-describedby={
+          config['aria-describedby'] ??
+          (config.content != null ? contentId : undefined)
+        }
         width={config.width ?? 416}
         centered={config.centered ?? false}
         closable={
-          config.closable
+          closable
             ? {
                 'aria-label': locale.close,
-                ...(typeof config.closable === 'object' ? config.closable : {}),
+                ...(typeof closable === 'object' ? closable : {}),
               }
             : false
         }
@@ -182,7 +195,9 @@ function AppConfirm({ config, open, markOpen, close, remove }: DialogEntry) {
               {icon}
             </span>
           )}
-          <div data-tao-app-modal-content="">{config.content}</div>
+          <div id={contentId} data-tao-app-modal-content="">
+            {config.content}
+          </div>
         </div>
       </Modal>
     </ActionContext.Provider>

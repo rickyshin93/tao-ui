@@ -7,6 +7,20 @@ description: Version history for @rockshin/tao-ui, including fixes for uploads, 
 
 User-facing changes for `@rockshin/tao-ui`, listed by release. Dates use UTC+8.
 
+## 0.0.59
+
+2026-11-23
+
+- [InputNumber](/components/input-number) accepts numeric Form initial values and full-width digits. Enter commits the normalized value before form submission. Blur still calls `onBlur` and emits a string through `onChange` only when normalization changes the value. Use `validateTrigger="onBlur"` for blur validation.
+- [RangePicker](/components/range-picker) keeps the first endpoint as a draft and announces which endpoint to pick next. By default, both editable endpoints are required. Use `allowEmpty` when an open interval is intentional. [DatePicker](/components/date-picker) preserves the displayed month while time or a controlled value changes.
+- [Select](/components/select) displays selected values that are absent from the option list, submits multiple values through native forms and keeps keyboard focus when removing tags. Use `onSelect` to handle repeated activation of the current single option. `onChange` fires when the selection changes.
+- [Form](/components/form) shows nested field errors with their associated controls and lets RadioGroup and CheckboxGroup validate on blur. [Input.Search](/components/input), [Slider](/components/slider), [Switch](/components/switch) and [QRCode](/components/qr-code) improve accessible names.
+- [Modal](/components/modal) resolves ref-backed portal containers on mount, lets nested pickers handle Escape before the dialog closes, and keeps a default exit available under a disabled provider. [Popover](/components/popover) keeps hover and focus triggers open on click, and [App](/components/app) confirmation dialogs expose their content as a description.
+- [Upload](/components/upload) retains the existing thumbnail while regenerating a preview for the same file. [Carousel](/components/carousel) reports logical slide indices in RTL. [Sonner](/components/sonner) updates toasts in place and [Splitter](/components/splitter) accepts mapped panels.
+- Component fixes also cover picker state, table data and pagination, menu interaction, tree selection, and overlay timers.
+
+[Compare changes](https://github.com/rickyshin93/tao-ui/compare/v0.0.58...v0.0.59)
+
 ## 0.0.58
 
 2026-11-20

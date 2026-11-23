@@ -3,12 +3,39 @@ import { resolve } from 'node:path';
 import { expect, rs, test } from '@rstest/core';
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { Textarea } from '../../src/components/textarea/textarea';
+import { createRef } from 'react';
+import { createPortal } from 'react-dom';
+import {
+  Textarea,
+  type TextareaRef,
+} from '../../src/components/textarea/textarea';
 import { TaoProvider } from '../../src/provider/tao-provider';
 
 test('renders textarea with value', () => {
   render(<Textarea value="hello" onChange={() => {}} />);
   expect(screen.getByRole('textbox')).toHaveValue('hello');
+});
+
+test('Textarea cursor focus selects text inside an iframe', () => {
+  const ref = createRef<TextareaRef>();
+  const frame = document.createElement('iframe');
+  document.body.append(frame);
+  const frameDocument = frame.contentDocument!;
+  const { unmount } = render(
+    createPortal(
+      <Textarea ref={ref} defaultValue="hello" />,
+      frameDocument.body,
+    ),
+  );
+  try {
+    expect(ref.current?.ownerDocument).toBe(frameDocument);
+    act(() => ref.current?.focus({ cursor: 'all' }));
+    expect(ref.current?.selectionStart).toBe(0);
+    expect(ref.current?.selectionEnd).toBe(5);
+  } finally {
+    unmount();
+    frame.remove();
+  }
 });
 
 test('Textarea exposes a complete change event after formatting committed composition', () => {
