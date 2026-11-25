@@ -1,5 +1,6 @@
 import {
   type AriaAttributes,
+  type CSSProperties,
   type KeyboardEvent,
   type ReactNode,
   useCallback,
@@ -43,6 +44,7 @@ export interface TabsProps
   variant?: 'line' | 'card';
   destroyInactiveTabPane?: boolean;
   className?: string;
+  style?: CSSProperties;
   classNames?: SemanticClassNames<TabsSemanticPart>;
   styles?: SemanticStyles<TabsSemanticPart>;
 }
@@ -58,6 +60,7 @@ export function Tabs({
   variant = 'line',
   destroyInactiveTabPane = false,
   className,
+  style,
   classNames,
   styles,
   'aria-label': ariaLabel,
@@ -181,7 +184,11 @@ export function Tabs({
       } else if (e.key === (rtl ? 'ArrowRight' : 'ArrowLeft')) {
         e.preventDefault();
         next =
-          enabledItems[(idx - 1 + enabledItems.length) % enabledItems.length];
+          idx < 0
+            ? enabledItems[enabledItems.length - 1]
+            : enabledItems[
+                (idx - 1 + enabledItems.length) % enabledItems.length
+              ];
       } else if (e.key === 'Home') {
         e.preventDefault();
         next = enabledItems[0];
@@ -209,7 +216,7 @@ export function Tabs({
       data-tao-variant={variant}
       data-tao-size={resolvedSize}
       className={cx(classNames?.root, className)}
-      style={styles?.root}
+      style={{ ...styles?.root, ...style }}
     >
       <div
         data-tao-tabs-nav=""

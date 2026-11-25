@@ -375,3 +375,20 @@ test('disabled FloatButton links block auxiliary activation callbacks', () => {
   expect(fireEvent(anchor, event)).toBe(false);
   expect(onAuxClick).not.toHaveBeenCalled();
 });
+
+test('disabling an open FloatButton.Group collapses its action list and resets uncontrolled open state', () => {
+  const group = (disabled: boolean) => (
+    <FloatButton.Group trigger="click" disabled={disabled}>
+      <FloatButton content="Export" />
+    </FloatButton.Group>
+  );
+  const { rerender } = render(group(false));
+  fireEvent.click(screen.getByRole('button', { name: 'Action' }));
+  expect(screen.getByText('Export')).toBeVisible();
+
+  rerender(group(true));
+  expect(screen.queryByText('Export')).toBeNull();
+
+  rerender(group(false));
+  expect(screen.queryByText('Export')).toBeNull();
+});

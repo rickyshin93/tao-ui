@@ -304,7 +304,10 @@ function MobileSelectContentInner({
           !draftSet.has(search.trim()) &&
           !knownOptions.some(
             (option) =>
-              option.value === search.trim() || option.label === search.trim(),
+              option.value === search.trim() ||
+              ((typeof option.label === 'string' ||
+                typeof option.label === 'number') &&
+                String(option.label) === search.trim()),
           ) && (
             <button
               type="button"

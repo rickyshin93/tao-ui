@@ -7,6 +7,19 @@ description: 查看 @rockshin/tao-ui 各版本的更新，包括上传、选择�
 
 按版本记录 `@rockshin/tao-ui` 的用户可见变更。日期使用 UTC+8。
 
+## 0.0.60
+
+2026-11-26
+
+- [Popover](/zh/components/popover) 和 [Tooltip](/zh/components/tooltip) 在内容清空或恢复时保留触发元素。[Modal](/zh/components/modal) 在异步 `onOk` 等待期间阻止重复确认，并支持通过 `useModal` 返回的弹窗句柄的 `update` 方法更新弹窗类型。
+- [Form](/zh/components/form) 更新字段值时会清除未被替换的旧警告。[DatePicker](/zh/components/date-picker) 和 [RangePicker](/zh/components/range-picker) 正确显示警告状态。[TimePicker](/zh/components/time-picker)、[Cascader](/zh/components/cascader) 和 [TreeSelect](/zh/components/tree-select) 向辅助技术提供无效状态。
+- [Select](/zh/components/select) 在标签模式下遵循选项禁用状态，支持用数字标签匹配选项，移动端草稿标签会去重。[Table](/zh/components/table) 保留被禁用的筛选触发元素，并把文字方向传入筛选菜单。
+- [Dropdown](/zh/components/dropdown) 和 [ContextMenu](/zh/components/context-menu) 将尺寸和文字方向传到通过 Portal 渲染的子菜单，并保留单选分组。[Tabs](/zh/components/tabs) 在键盘循环导航时跳过禁用项。Tabs 和 [Pagination](/zh/components/pagination) 支持根元素 `style`。
+- [DatePicker](/zh/components/date-picker) 校正无效的时间步长。[TimePicker](/zh/components/time-picker) 和 [ColorPicker](/zh/components/color-picker) 使用主题弹层层级，ColorPicker 忽略无效的数字通道输入。
+- [InputNumber](/zh/components/input-number) 转发根元素 `style`，禁用后的失焦不会修改值。[Mentions](/zh/components/mentions) 支持自定义前缀，[Statistic](/zh/components/statistic) 倒计时接受时间戳字符串，[FloatButton](/zh/components/float-button) 组在禁用时收起。
+
+[查看版本差异](https://github.com/rickyshin93/tao-ui/compare/v0.0.59...v0.0.60)
+
 ## 0.0.59
 
 2026-11-23

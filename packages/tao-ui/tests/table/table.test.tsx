@@ -598,7 +598,9 @@ test('editing the filter callback payload cannot change the table filter', async
     />,
   );
   await userEvent.click(screen.getByRole('button', { name: 'Filter' }));
-  await userEvent.click(screen.getByRole('menuitemcheckbox', { name: 'Admin' }));
+  await userEvent.click(
+    screen.getByRole('menuitemcheckbox', { name: 'Admin' }),
+  );
   expect(screen.queryByText('Bob')).not.toBeInTheDocument();
 });
 
@@ -926,7 +928,11 @@ test('a proposed local sort cannot replace a still-active controlled sort', () =
     <Table
       columns={[
         { ...columns[0], sorter: (a, b) => a.name.localeCompare(b.name) },
-        { ...columns[1], sorter: (a, b) => a.age - b.age, sortOrder: 'descend' },
+        {
+          ...columns[1],
+          sorter: (a, b) => a.age - b.age,
+          sortOrder: 'descend',
+        },
       ]}
       dataSource={data}
       rowKey="id"
@@ -934,19 +940,40 @@ test('a proposed local sort cannot replace a still-active controlled sort', () =
     />,
   );
   fireEvent.click(screen.getByRole('button', { name: 'Name' }));
-  expect(onChange.mock.calls[0][2]).toMatchObject({ field: 'name', order: 'ascend' });
-  expect(screen.getByRole('columnheader', { name: 'Age' })).toHaveAttribute('aria-sort', 'descending');
-  expect(screen.getByRole('columnheader', { name: 'Name' })).toHaveAttribute('aria-sort', 'none');
+  expect(onChange.mock.calls[0][2]).toMatchObject({
+    field: 'name',
+    order: 'ascend',
+  });
+  expect(screen.getByRole('columnheader', { name: 'Age' })).toHaveAttribute(
+    'aria-sort',
+    'descending',
+  );
+  expect(screen.getByRole('columnheader', { name: 'Name' })).toHaveAttribute(
+    'aria-sort',
+    'none',
+  );
   expect(screen.getAllByRole('row')[1]).toHaveTextContent('Charlie');
 });
 
 test('removing a column sorter clears its metadata from subsequent pagination', () => {
   const onChange = rstest.fn();
   const view = render(
-    <Table columns={[{ ...columns[1], sorter: true, defaultSortOrder: 'ascend' }]} dataSource={data} rowKey="id" pagination={{ pageSize: 2 }} onChange={onChange} />,
+    <Table
+      columns={[{ ...columns[1], sorter: true, defaultSortOrder: 'ascend' }]}
+      dataSource={data}
+      rowKey="id"
+      pagination={{ pageSize: 2 }}
+      onChange={onChange}
+    />,
   );
   view.rerender(
-    <Table columns={[columns[1]]} dataSource={data} rowKey="id" pagination={{ pageSize: 2 }} onChange={onChange} />,
+    <Table
+      columns={[columns[1]]}
+      dataSource={data}
+      rowKey="id"
+      pagination={{ pageSize: 2 }}
+      onChange={onChange}
+    />,
   );
   fireEvent.click(screen.getByRole('button', { name: 'Next page' }));
   expect(onChange.mock.calls[0][2]).toEqual({ order: null });
@@ -1032,7 +1059,9 @@ test('a rejected controlled filter does not overwrite its local fallback', async
   );
   const view = render(renderTable(['admin']));
   await userEvent.click(screen.getByRole('button', { name: 'Filter' }));
-  await userEvent.click(screen.getByRole('menuitemcheckbox', { name: 'Admin' }));
+  await userEvent.click(
+    screen.getByRole('menuitemcheckbox', { name: 'Admin' }),
+  );
   expect(screen.queryByText('Bob')).not.toBeInTheDocument();
   view.rerender(renderTable());
   expect(screen.queryByText('Bob')).not.toBeInTheDocument();
@@ -1111,6 +1140,36 @@ test('pagination: false shows all data', () => {
   );
   expect(screen.getByText('User 0')).toBeTruthy();
   expect(screen.getByText('User 24')).toBeTruthy();
+});
+
+test('table filter dropdown inherits surrounding RTL direction and keeps its trigger mounted across disabled toggles', async () => {
+  const renderTable = (disabled: boolean) => (
+    <div dir="rtl">
+      <TaoProvider disabled={disabled}>
+        <Table
+          columns={[
+            columns[0],
+            {
+              ...columns[2],
+              filters: [{ text: 'Admin', value: 'admin' }],
+              onFilter: (role, record) => record.role === role,
+            },
+          ]}
+          dataSource={data}
+          rowKey="id"
+          pagination={false}
+        />
+      </TaoProvider>
+    </div>
+  );
+  const view = render(renderTable(false));
+  const trigger = screen.getByRole('button', { name: 'Filter' });
+  await userEvent.click(trigger);
+  expect(
+    document.querySelector('[data-tao-table-filter-panel]'),
+  ).toHaveAttribute('dir', 'rtl');
+  view.rerender(renderTable(true));
+  expect(screen.getByRole('button', { name: 'Filter' })).toBe(trigger);
 });
 
 // ---- Row selection ----
@@ -1556,10 +1615,9 @@ test('a responsive column applies its default sort when it becomes visible', asy
       pagination={false}
     />,
   );
-  expect(await screen.findByRole('columnheader', { name: 'Age' })).toHaveAttribute(
-    'aria-sort',
-    'ascending',
-  );
+  expect(
+    await screen.findByRole('columnheader', { name: 'Age' }),
+  ).toHaveAttribute('aria-sort', 'ascending');
 });
 
 test('responsive column appears once its breakpoint matches', async () => {

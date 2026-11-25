@@ -274,3 +274,16 @@ test('maps the public middle size alias to the shared medium control', () => {
     'medium',
   );
 });
+
+test('getMentions prefers longest overlapping prefix and ignores empty prefixes', () => {
+  expect(Mentions.getMentions('@@alice @bob', { prefix: ['@', '@@'] })).toEqual(
+    [
+      { prefix: '@@', value: 'alice' },
+      { prefix: '@', value: 'bob' },
+    ],
+  );
+  expect(Mentions.getMentions('hello @alice', { prefix: '' })).toEqual([]);
+  expect(Mentions.getMentions('hello @alice', { prefix: ['', '@'] })).toEqual([
+    { prefix: '@', value: 'alice' },
+  ]);
+});

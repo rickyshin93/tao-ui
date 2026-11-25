@@ -2,6 +2,7 @@ import * as RC from '@radix-ui/react-context-menu';
 import { type CSSProperties, type ReactNode, useEffect } from 'react';
 import {
   TaoPortalScope,
+  type TaoSize,
   useTaoConfig,
   useTaoDirection,
 } from '../../provider/tao-provider';
@@ -28,6 +29,7 @@ export interface ContextMenuProps {
   children: ReactNode;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+  size?: TaoSize;
   disabled?: boolean;
   /** Merged onto the floating content. */
   className?: string;
@@ -57,6 +59,7 @@ export function ContextMenu({
   children,
   open,
   onOpenChange,
+  size: sizeProp,
   disabled,
   className,
   style,
@@ -64,7 +67,8 @@ export function ContextMenu({
   styles,
 }: ContextMenuProps) {
   const [direction, directionRef] = useTaoDirection(directionProp, 'self');
-  const { size, disabled: ctxDisabled } = useTaoConfig();
+  const { size: ctxSize, disabled: ctxDisabled } = useTaoConfig();
+  const size = sizeProp ?? ctxSize;
   const resolvedDisabled = disabled ?? ctxDisabled;
   const [realOpen, setOpen] = useControlledOpen({
     open,
@@ -75,7 +79,12 @@ export function ContextMenu({
     if (resolvedDisabled && realOpen && open == null) setOpen(false);
   }, [open, realOpen, resolvedDisabled, setOpen]);
 
-  const { content } = useMenuController(menu, CM, { classNames, styles });
+  const { content } = useMenuController(menu, CM, {
+    size,
+    direction,
+    classNames,
+    styles,
+  });
 
   return (
     <RC.Root

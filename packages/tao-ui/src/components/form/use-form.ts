@@ -69,7 +69,11 @@ export function useForm<Values = any>(
         rcForm.setFields(
           stale.length
             ? [
-                ...stale.map((field) => ({ name: field.name, errors: [] })),
+                ...stale.map((field) => ({
+                  name: field.name,
+                  errors: [],
+                  warnings: [],
+                })),
                 ...nextFields,
               ]
             : nextFields,

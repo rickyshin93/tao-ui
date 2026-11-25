@@ -8,7 +8,7 @@ import {
   within,
 } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { startTransition, Suspense, useState } from 'react';
+import { Suspense, startTransition, useState } from 'react';
 import { Button } from '../../src/components/button/button';
 import { Color } from '../../src/components/color-picker/color';
 import { ColorPicker } from '../../src/components/color-picker/color-picker';
@@ -609,4 +609,27 @@ test('shared controls respect local enabled state and preset disclosure', async 
   expect(screen.getByRole('button', { name: 'Preset #00ff00' })).toBeTruthy();
   fireEvent.click(screen.getByRole('button', { name: 'Brand' }));
   expect(screen.queryByRole('button', { name: 'Preset #00ff00' })).toBeNull();
+});
+
+test('non-numeric channel input is ignored without emitting NaN and format popup layers above shared popups', async () => {
+  const onChange = rstest.fn();
+  render(
+    <ColorPicker
+      open
+      defaultFormat="rgb"
+      defaultValue="#123456"
+      onChange={onChange}
+    />,
+  );
+  const red = await screen.findByRole('spinbutton', { name: 'Red' });
+  red.setAttribute('type', 'text');
+  fireEvent.change(red, { target: { value: '-' } });
+  expect(onChange).not.toHaveBeenCalled();
+
+  const format = screen.getByRole('combobox', { name: 'Color format' });
+  fireEvent.keyDown(format, { key: 'ArrowDown' });
+  const option = await screen.findByRole('option', { name: 'HEX' });
+  expect(
+    option.closest<HTMLElement>('[data-tao-select-content]')?.style.zIndex,
+  ).toBe('calc(var(--tao-z-index-popup) + 10)');
 });

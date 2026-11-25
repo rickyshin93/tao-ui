@@ -218,3 +218,33 @@ test('IN.7 — passes native attrs (id / name / placeholder / disabled / aria-la
   expect(input.disabled).toBe(true);
   expect(input.getAttribute('aria-label')).toBe('Amount');
 });
+
+test('forwards root style and does not commit or emit onChange when blurred by becoming disabled', () => {
+  const onChange = rstest.fn();
+  const { container, rerender } = render(
+    <InputNumber
+      defaultValue="5"
+      min={10}
+      style={{ width: 180 }}
+      styles={{ root: { opacity: 0.9 } }}
+      onChange={onChange}
+    />,
+  );
+  const root = container.querySelector('[data-tao-input]') as HTMLElement;
+  expect(root).toHaveStyle({ width: '180px', opacity: '0.9' });
+
+  const input = container.querySelector('input') as HTMLInputElement;
+  fireEvent.focus(input);
+  rerender(
+    <InputNumber
+      defaultValue="5"
+      min={10}
+      disabled
+      style={{ width: 180 }}
+      onChange={onChange}
+    />,
+  );
+  fireEvent.blur(input);
+  expect(onChange).not.toHaveBeenCalled();
+  expect(input.value).toBe('5');
+});

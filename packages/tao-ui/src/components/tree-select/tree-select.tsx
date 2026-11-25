@@ -218,6 +218,7 @@ function InternalTreeSelect<
       data-tao-error={status === 'error' || undefined}
       data-tao-warning={status === 'warning' || undefined}
       disabled={disabled}
+      aria-invalid={status === 'error' ? true : props['aria-invalid']}
       onInputKeyDown={(event) => {
         props.onInputKeyDown?.(event);
         if (

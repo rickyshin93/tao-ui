@@ -97,7 +97,7 @@
 [data-tao-control][data-tao-variant="outlined"][data-tao-warning]:hover:not(
   [data-disabled]
 ):not(:focus-within) {
-  border-color: color-mix(in oklch, var(--tao-color-warning) 80%, white);
+  border-color: color-mix(in oklab, var(--tao-color-warning) 80%, white);
 }
 
 /* Outlined: warning + focus */
@@ -224,6 +224,11 @@
 /* Borderless: error — text color change */
 [data-tao-control][data-tao-variant="borderless"][data-tao-error] {
   border-block-end-color: var(--tao-error);
+}
+
+/* Borderless: warning */
+[data-tao-control][data-tao-variant="borderless"][data-tao-warning] {
+  border-block-end-color: var(--tao-warning);
 }
 
 /* Borderless: disabled */

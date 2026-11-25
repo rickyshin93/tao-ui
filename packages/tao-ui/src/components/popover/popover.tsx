@@ -275,135 +275,138 @@ export function Popover({
     [changeOpen, containsFocusTarget],
   );
 
-  if (!hasPopup) return <>{children}</>;
-
-  const hoverProps = hoverMode
+  const hoverProps =
+    hasPopup && hoverMode
+      ? {
+          onPointerEnter: scheduleOpen,
+          onPointerLeave: scheduleClose,
+        }
+      : undefined;
+  const triggerProps = hasPopup
     ? {
-        onPointerEnter: scheduleOpen,
-        onPointerLeave: scheduleClose,
+        ...hoverProps,
+        onFocus: focusMode
+          ? () => {
+              if (!restoringFocus.current) changeOpen(true);
+            }
+          : undefined,
+        onBlur: focusMode ? handleBlur : undefined,
+        onContextMenu: contextMenuMode
+          ? (event: MouseEvent<HTMLElement>) => {
+              if (event.defaultPrevented) return;
+              event.preventDefault();
+              changeOpen(true);
+            }
+          : undefined,
       }
     : undefined;
-  const triggerProps = {
-    ...hoverProps,
-    onFocus: focusMode
-      ? () => {
-          if (!restoringFocus.current) changeOpen(true);
-        }
-      : undefined,
-    onBlur: focusMode ? handleBlur : undefined,
-    onContextMenu: contextMenuMode
-      ? (event: MouseEvent<HTMLElement>) => {
-          if (event.defaultPrevented) return;
-          event.preventDefault();
-          changeOpen(true);
-        }
-      : undefined,
-  };
 
   return (
-    <RadixPopover.Root open={realOpen} onOpenChange={changeOpen}>
+    <RadixPopover.Root open={hasPopup && realOpen} onOpenChange={changeOpen}>
       <TriggerPrimitive asChild ref={setTriggerRef} {...triggerProps}>
         {asTriggerChild(children)}
       </TriggerPrimitive>
-      <RadixPopover.Portal forceMount={shouldDestroy ? undefined : true}>
-        <TaoPortalScope asChild direction={direction}>
-          <RadixPopover.Content
-            asChild
-            ref={popupRef}
-            aria-label={ariaLabel}
-            aria-labelledby={
-              ariaLabelledBy ??
-              (!ariaLabel && isRenderable(titleNode) ? titleId : undefined)
-            }
-            aria-describedby={ariaDescribedBy}
-            data-tao-popover=""
-            data-tao-placement={placement}
-            data-tao-keep-alive={!shouldDestroy || undefined}
-            className={cx(classNames?.root, className)}
-            style={{ ...styles?.root, ...style }}
-            {...placementProps}
-            align={
-              direction === 'rtl' &&
-              (placementProps.side === 'top' ||
-                placementProps.side === 'bottom') &&
-              placementProps.align !== 'center'
-                ? placementProps.align === 'start'
-                  ? 'end'
-                  : 'start'
-                : placementProps.align
-            }
-            sideOffset={4}
-            forceMount={shouldDestroy ? undefined : true}
-            onOpenAutoFocus={(event) => event.preventDefault()}
-            onEscapeKeyDown={() => {
-              restoreAfterEscape.current =
-                focusMode &&
-                !!popupRef.current?.contains(document.activeElement);
-            }}
-            onCloseAutoFocus={(event) => {
-              const focusedRetainedContent =
-                !shouldDestroy &&
-                event.currentTarget instanceof HTMLElement &&
-                event.currentTarget.contains(document.activeElement);
-              if (restoreAfterEscape.current || focusedRetainedContent) {
-                restoreAfterEscape.current = false;
-                event.preventDefault();
-                restoringFocus.current = true;
-                triggerRef.current?.focus();
-                restoringFocus.current = false;
+      {hasPopup && (
+        <RadixPopover.Portal forceMount={shouldDestroy ? undefined : true}>
+          <TaoPortalScope asChild direction={direction}>
+            <RadixPopover.Content
+              asChild
+              ref={popupRef}
+              aria-label={ariaLabel}
+              aria-labelledby={
+                ariaLabelledBy ??
+                (!ariaLabel && isRenderable(titleNode) ? titleId : undefined)
               }
-            }}
-            onFocusCapture={focusMode ? cancelTimers : undefined}
-            onBlurCapture={focusMode ? handleBlur : undefined}
-            onInteractOutside={(event) => {
-              // Radix only exempts Popover.Trigger; hover/focus use an Anchor.
-              if (containsTrigger(event.target)) event.preventDefault();
-            }}
-            onFocusOutside={(event) => {
-              // Focus mode owns the close request in handleBlur.
-              if (focusMode) event.preventDefault();
-            }}
-            {...hoverProps}
-          >
-            <PopoverSurface>
-              <div
-                data-tao-popover-container=""
-                className={cx(classNames?.container)}
-                style={styles?.container}
-              >
-                {isRenderable(titleNode) && (
-                  <div
-                    data-tao-popover-title=""
-                    id={titleId}
-                    className={cx(classNames?.title)}
-                    style={styles?.title}
-                  >
-                    {titleNode}
-                  </div>
+              aria-describedby={ariaDescribedBy}
+              data-tao-popover=""
+              data-tao-placement={placement}
+              data-tao-keep-alive={!shouldDestroy || undefined}
+              className={cx(classNames?.root, className)}
+              style={{ ...styles?.root, ...style }}
+              {...placementProps}
+              align={
+                direction === 'rtl' &&
+                (placementProps.side === 'top' ||
+                  placementProps.side === 'bottom') &&
+                placementProps.align !== 'center'
+                  ? placementProps.align === 'start'
+                    ? 'end'
+                    : 'start'
+                  : placementProps.align
+              }
+              sideOffset={4}
+              forceMount={shouldDestroy ? undefined : true}
+              onOpenAutoFocus={(event) => event.preventDefault()}
+              onEscapeKeyDown={() => {
+                restoreAfterEscape.current =
+                  focusMode &&
+                  !!popupRef.current?.contains(document.activeElement);
+              }}
+              onCloseAutoFocus={(event) => {
+                const focusedRetainedContent =
+                  !shouldDestroy &&
+                  event.currentTarget instanceof HTMLElement &&
+                  event.currentTarget.contains(document.activeElement);
+                if (restoreAfterEscape.current || focusedRetainedContent) {
+                  restoreAfterEscape.current = false;
+                  event.preventDefault();
+                  restoringFocus.current = true;
+                  triggerRef.current?.focus();
+                  restoringFocus.current = false;
+                }
+              }}
+              onFocusCapture={focusMode ? cancelTimers : undefined}
+              onBlurCapture={focusMode ? handleBlur : undefined}
+              onInteractOutside={(event) => {
+                // Radix only exempts Popover.Trigger; hover/focus use an Anchor.
+                if (containsTrigger(event.target)) event.preventDefault();
+              }}
+              onFocusOutside={(event) => {
+                // Focus mode owns the close request in handleBlur.
+                if (focusMode) event.preventDefault();
+              }}
+              {...hoverProps}
+            >
+              <PopoverSurface>
+                <div
+                  data-tao-popover-container=""
+                  className={cx(classNames?.container)}
+                  style={styles?.container}
+                >
+                  {isRenderable(titleNode) && (
+                    <div
+                      data-tao-popover-title=""
+                      id={titleId}
+                      className={cx(classNames?.title)}
+                      style={styles?.title}
+                    >
+                      {titleNode}
+                    </div>
+                  )}
+                  {isRenderable(contentNode) && (
+                    <div
+                      data-tao-popover-content=""
+                      className={cx(classNames?.content)}
+                      style={styles?.content}
+                    >
+                      {contentNode}
+                    </div>
+                  )}
+                </div>
+                {arrow !== false && (
+                  <RadixPopover.Arrow asChild>
+                    <span
+                      data-tao-popover-arrow=""
+                      className={cx(classNames?.arrow)}
+                      style={styles?.arrow}
+                    />
+                  </RadixPopover.Arrow>
                 )}
-                {isRenderable(contentNode) && (
-                  <div
-                    data-tao-popover-content=""
-                    className={cx(classNames?.content)}
-                    style={styles?.content}
-                  >
-                    {contentNode}
-                  </div>
-                )}
-              </div>
-              {arrow !== false && (
-                <RadixPopover.Arrow asChild>
-                  <span
-                    data-tao-popover-arrow=""
-                    className={cx(classNames?.arrow)}
-                    style={styles?.arrow}
-                  />
-                </RadixPopover.Arrow>
-              )}
-            </PopoverSurface>
-          </RadixPopover.Content>
-        </TaoPortalScope>
-      </RadixPopover.Portal>
+              </PopoverSurface>
+            </RadixPopover.Content>
+          </TaoPortalScope>
+        </RadixPopover.Portal>
+      )}
     </RadixPopover.Root>
   );
 }

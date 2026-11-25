@@ -37,9 +37,13 @@ export function TimePanel({
 }: TimePanelProps) {
   const { locale } = useTaoConfig();
   const units = getTimeUnits(format);
-  const hourStep = config?.hourStep ?? 1;
-  const minuteStep = config?.minuteStep ?? 1;
-  const secondStep = config?.secondStep ?? 1;
+  const normalizeStep = (step: number | undefined) =>
+    step && Number.isFinite(step) && step > 0
+      ? Math.max(1, Math.trunc(step))
+      : 1;
+  const hourStep = normalizeStep(config?.hourStep);
+  const minuteStep = normalizeStep(config?.minuteStep);
+  const secondStep = normalizeStep(config?.secondStep);
 
   const hours = useMemo(
     () =>

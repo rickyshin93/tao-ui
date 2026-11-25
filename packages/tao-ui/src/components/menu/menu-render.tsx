@@ -6,7 +6,11 @@ import {
   useId,
   useState,
 } from 'react';
-import { TaoPortalScope } from '../../provider/tao-provider';
+import {
+  type TaoDirection,
+  TaoPortalScope,
+  type TaoSize,
+} from '../../provider/tao-provider';
 import {
   cx,
   type SemanticClassNames,
@@ -95,6 +99,8 @@ export interface MenuPrimitives {
 
 export interface RenderCtx {
   P: MenuPrimitives;
+  size?: TaoSize;
+  direction?: TaoDirection;
   classNames?: SemanticClassNames<MenuSemanticPart>;
   styles?: SemanticStyles<MenuSemanticPart>;
   /** Fire item.onClick + menu.onClick for a plain action item. */
@@ -104,6 +110,7 @@ export interface RenderCtx {
   multiple: boolean;
   selectable: boolean;
   onToggle: (key: string) => void;
+  onRadioChange: (key: string) => void;
 }
 
 // ---- Icons ----
@@ -282,16 +289,26 @@ export function renderMenuItems(items: MenuItem[], ctx: RenderCtx): ReactNode {
             <ChevronRightIcon />
           </P.SubTrigger>
           <P.Portal>
-            <TaoPortalScope asChild>
+            <TaoPortalScope asChild direction={ctx.direction}>
               <P.SubContent
                 data-tao-menu-content=""
                 data-tao-menu-sub-content=""
+                data-tao-size={ctx.size}
                 className={cx(ctx.classNames?.subContent)}
                 style={ctx.styles?.subContent}
                 sideOffset={2}
                 alignOffset={-4}
               >
-                {renderMenuItems(item.children, ctx)}
+                {ctx.selectable && !ctx.multiple ? (
+                  <P.RadioGroup
+                    value={ctx.selectedKeys[0]}
+                    onValueChange={ctx.onRadioChange}
+                  >
+                    {renderMenuItems(item.children, ctx)}
+                  </P.RadioGroup>
+                ) : (
+                  renderMenuItems(item.children, ctx)
+                )}
               </P.SubContent>
             </TaoPortalScope>
           </P.Portal>
@@ -404,6 +421,8 @@ export function useMenuController(
   menu: MenuProps,
   P: MenuPrimitives,
   semantic: {
+    size?: TaoSize;
+    direction?: TaoDirection;
     classNames?: SemanticClassNames<MenuSemanticPart>;
     styles?: SemanticStyles<MenuSemanticPart>;
   },
@@ -449,6 +468,8 @@ export function useMenuController(
 
   const ctx: RenderCtx = {
     P,
+    size: semantic.size,
+    direction: semantic.direction,
     classNames: semantic.classNames,
     styles: semantic.styles,
     onAction,
@@ -456,6 +477,7 @@ export function useMenuController(
     multiple,
     selectable,
     onToggle: toggleKey,
+    onRadioChange: radioChange,
   };
 
   const body = renderMenuItems(menu.items, ctx);

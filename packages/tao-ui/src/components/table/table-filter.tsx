@@ -1,18 +1,28 @@
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
-import { TaoPortalScope, useTaoConfig } from '../../provider/tao-provider';
+import { useState } from 'react';
+import {
+  type TaoDirection,
+  TaoPortalScope,
+  useTaoConfig,
+} from '../../provider/tao-provider';
 import { CheckIcon, FilterIcon } from './table-icons';
 import type { TableFilterItem } from './table-types';
 
 export function TableFilterDropdown({
   filters,
   activeValues,
+  direction,
   onSelect,
 }: {
   filters: TableFilterItem[];
   activeValues: string[];
+  direction?: TaoDirection;
   onSelect: (values: string[]) => void;
 }) {
   const { locale, disabled } = useTaoConfig();
+  const [internalOpen, setInternalOpen] = useState(false);
+  if (disabled && internalOpen) setInternalOpen(false);
+  const open = !disabled && internalOpen;
   const toggle = (value: string) => {
     onSelect(
       activeValues.includes(value)
@@ -21,23 +31,26 @@ export function TableFilterDropdown({
     );
   };
 
-  const trigger = (
-    <button
-      type="button"
-      data-tao-table-filter-trigger=""
-      aria-label={locale.messages.filter}
-      disabled={disabled}
-    >
-      <FilterIcon active={activeValues.length > 0} />
-    </button>
-  );
-  if (disabled) return trigger;
-
   return (
-    <DropdownMenu.Root>
-      <DropdownMenu.Trigger asChild>{trigger}</DropdownMenu.Trigger>
+    <DropdownMenu.Root
+      dir={direction}
+      open={open}
+      onOpenChange={(next) => {
+        if (!disabled || !next) setInternalOpen(next);
+      }}
+    >
+      <DropdownMenu.Trigger asChild disabled={disabled}>
+        <button
+          type="button"
+          data-tao-table-filter-trigger=""
+          aria-label={locale.messages.filter}
+          disabled={disabled}
+        >
+          <FilterIcon active={activeValues.length > 0} />
+        </button>
+      </DropdownMenu.Trigger>
       <DropdownMenu.Portal>
-        <TaoPortalScope asChild>
+        <TaoPortalScope asChild direction={direction}>
           <DropdownMenu.Content
             data-tao-table-filter-panel=""
             align="end"

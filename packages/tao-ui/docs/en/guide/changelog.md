@@ -7,6 +7,19 @@ description: Version history for @rockshin/tao-ui, including fixes for uploads, 
 
 User-facing changes for `@rockshin/tao-ui`, listed by release. Dates use UTC+8.
 
+## 0.0.60
+
+2026-11-26
+
+- [Popover](/components/popover) and [Tooltip](/components/tooltip) preserve their trigger elements when content becomes empty or is restored. [Modal](/components/modal) prevents repeated confirmation while an async `onOk` is pending and supports changing the dialog type through the `update` method on the dialog handle.
+- [Form](/components/form) clears stale warnings when a field value is updated without replacement warnings. [DatePicker](/components/date-picker) and [RangePicker](/components/range-picker) display warning status, and [TimePicker](/components/time-picker), [Cascader](/components/cascader), and [TreeSelect](/components/tree-select) expose invalid state to assistive technology.
+- [Select](/components/select) respects disabled options in tags mode, matches numeric labels during tag entry, and deduplicates mobile draft tags. [Table](/components/table) keeps disabled filter triggers mounted and passes text direction into the filter menu.
+- [Dropdown](/components/dropdown) and [ContextMenu](/components/context-menu) carry size and text direction into portaled submenus and preserve radio grouping. [Tabs](/components/tabs) skips disabled tabs when wrapping keyboard navigation. Tabs and [Pagination](/components/pagination) honor root `style`.
+- [DatePicker](/components/date-picker) normalizes invalid time steps. [TimePicker](/components/time-picker) and [ColorPicker](/components/color-picker) use the theme popup stacking level, and ColorPicker ignores invalid numeric channel input.
+- [InputNumber](/components/input-number) forwards root `style` and skips value changes on disabled blur. [Mentions](/components/mentions) respects custom prefixes, [Statistic](/components/statistic) accepts timestamp strings for countdowns, and disabling a [FloatButton](/components/float-button) group collapses it.
+
+[Compare changes](https://github.com/rickyshin93/tao-ui/compare/v0.0.59...v0.0.60)
+
 ## 0.0.59
 
 2026-11-23

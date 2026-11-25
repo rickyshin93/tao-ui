@@ -12,6 +12,8 @@
 - none
 
 ## Done
+- 2026-11-26 Verified the component fixes for tao-ui 0.0.60 across overlay lifecycle, modal confirmation, picker and form status, Select tags, RTL menus and table filters, and keyboard navigation. Both React targets and the required package gates passed.
+- 2026-11-23 Published `@rockshin/tao-ui@0.0.59`. Release CI, live bilingual changelogs and npm tarball integrity passed.
 - 2026-11-23 Fixed eight component behaviors covering InputNumber blur and full-width digits, RangePicker drafts and announcements, Upload thumbnails, Form feedback, Modal exits, Select reselection and Search button names. React 18/19 tests, required gates and the bilingual docs build passed. See `.logs/component-contract-fixes-20261123/final-exits.log`.
 - 2026-11-23 Fixed InputNumber rendering with numeric Form initial values. Edits still emit strings. The regression and required gates passed on React 18/19. See `.logs/input-number-form-initial-value-20261123/`.
 - 2026-11-22 Completed review rounds 11–30 and fixed 21 defects across Form controls, InputNumber, Select, date pickers, Carousel RTL, Modal, Popover, App, Sonner and Splitter. Required gates passed with 4,448 tests, and the Chromium Carousel RTL check passed on React 18/19. See `.logs/bug-review-20-rounds-20261122/verification.md`.

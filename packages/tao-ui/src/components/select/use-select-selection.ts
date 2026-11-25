@@ -68,35 +68,41 @@ export function useSelectSelection(props: SelectionProps, disabled: boolean) {
   const select = useCallback(
     (next: string): boolean => {
       if (disabled) return false;
-      const option = optionByValue.get(next);
+      const option =
+        optionByValue.get(next) ??
+        (mode === 'tags' ? optionByToken.get(next) : undefined);
+      if (option?.disabled) return false;
+      const canonical = option?.value ?? next;
       if (!multiple) {
-        if (next !== value) publish(next);
-        if (option) onSelect?.(next, option);
+        if (canonical !== value) publish(canonical);
+        if (option) onSelect?.(canonical, option);
         return true;
       }
 
-      const existed = selectedValueSet.has(next);
+      const existed = selectedValueSet.has(canonical);
       const nextArray = existed
-        ? valueArray.filter((item) => item !== next)
-        : [...valueArray, next];
+        ? valueArray.filter((item) => item !== canonical)
+        : [...valueArray, canonical];
       if (!existed && maxCount != null && nextArray.length > maxCount)
         return false;
 
       publish(nextArray);
       if (option) {
-        if (existed) onDeselect?.(next, option);
-        else onSelect?.(next, option);
+        if (existed) onDeselect?.(canonical, option);
+        else onSelect?.(canonical, option);
       }
       return true;
     },
     [
       disabled,
+      mode,
       multiple,
       value,
       selectedValueSet,
       valueArray,
       maxCount,
       optionByValue,
+      optionByToken,
       publish,
       onSelect,
       onDeselect,
@@ -151,12 +157,13 @@ export function useSelectSelection(props: SelectionProps, disabled: boolean) {
 
   const remove = useCallback(
     (removed: string) => {
-      if (!multiple) return;
-      publish(valueArray.filter((item) => item !== removed));
+      if (disabled || !multiple) return;
       const option = optionByValue.get(removed);
+      if (option?.disabled) return;
+      publish(valueArray.filter((item) => item !== removed));
       if (option) onDeselect?.(removed, option);
     },
-    [multiple, valueArray, optionByValue, publish, onDeselect],
+    [disabled, multiple, valueArray, optionByValue, publish, onDeselect],
   );
 
   const commit = useCallback(
@@ -197,9 +204,10 @@ export function useSelectSelection(props: SelectionProps, disabled: boolean) {
   );
 
   const clear = useCallback(() => {
+    if (disabled) return;
     publish(multiple ? [] : undefined, true);
     onClear?.();
-  }, [multiple, publish, onClear]);
+  }, [disabled, multiple, publish, onClear]);
 
   const selectedOption = useMemo(
     () =>

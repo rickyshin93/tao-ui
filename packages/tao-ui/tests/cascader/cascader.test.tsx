@@ -780,3 +780,8 @@ test('Panel keeps uncontrolled multiple paths when its change callback edits the
     view.container.querySelectorAll('[class*="-checkbox-checked"]'),
   ).toHaveLength(2);
 });
+
+test('error status marks Cascader combobox invalid', () => {
+  render(<Cascader options={options} status="error" />);
+  expect(screen.getByRole('combobox')).toHaveAttribute('aria-invalid', 'true');
+});

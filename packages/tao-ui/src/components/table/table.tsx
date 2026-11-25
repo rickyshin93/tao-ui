@@ -490,7 +490,10 @@ export function Table<T extends TableRecord = Record<string, unknown>>({
                       className={resolvedClassNames['selection.cell']}
                       style={{
                         width: selectionColWidth,
-                        ...stickyStyle(stickyPositions[SELECTION_COLUMN_INDEX], 3),
+                        ...stickyStyle(
+                          stickyPositions[SELECTION_COLUMN_INDEX],
+                          3,
+                        ),
                         ...resolvedStyles['selection.cell'],
                       }}
                     >
@@ -580,6 +583,7 @@ export function Table<T extends TableRecord = Record<string, unknown>>({
                             <TableFilterDropdown
                               filters={col.filters!}
                               activeValues={activeFilterValues}
+                              direction={direction}
                               onSelect={onFilter}
                             />
                           )}

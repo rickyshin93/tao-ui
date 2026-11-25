@@ -335,3 +335,30 @@ test('conditional boolean titles leave the focused trigger without an empty tool
   );
   expect(screen.getByRole('tooltip')).toHaveTextContent('0');
 });
+
+test('toggling Tooltip title between empty and active keeps the trigger mounted and focused', () => {
+  const view = render(
+    <Tooltip title="">
+      <input defaultValue="draft" aria-label="Email" />
+    </Tooltip>,
+  );
+  const input = screen.getByRole('textbox', { name: 'Email' });
+  act(() => input.focus());
+  expect(input).toHaveFocus();
+
+  view.rerender(
+    <Tooltip title="Invalid email">
+      <input defaultValue="draft" aria-label="Email" />
+    </Tooltip>,
+  );
+  expect(screen.getByRole('textbox', { name: 'Email' })).toBe(input);
+  expect(input).toHaveFocus();
+
+  view.rerender(
+    <Tooltip title={undefined}>
+      <input defaultValue="draft" aria-label="Email" />
+    </Tooltip>,
+  );
+  expect(screen.getByRole('textbox', { name: 'Email' })).toBe(input);
+  expect(input).toHaveFocus();
+});
