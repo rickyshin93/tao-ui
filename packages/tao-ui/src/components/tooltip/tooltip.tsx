@@ -6,9 +6,10 @@ import {
   useCallback,
   useEffect,
   useRef,
+  useState,
 } from 'react';
 import { TaoPortalScope, useTaoDirection } from '../../provider/tao-provider';
-import { asTriggerChild, useControlledOpen } from '../../utils/overlay';
+import { asTriggerChild } from '../../utils/overlay';
 import { useCommittedRef } from '../../utils/refs';
 import {
   cx,
@@ -54,15 +55,7 @@ export interface TooltipProps {
 
 // ---- Tooltip ----
 
-export function Tooltip(props: TooltipProps) {
-  const { title, children } = props;
-  if (title == null || title === '' || typeof title === 'boolean') {
-    return <>{children}</>;
-  }
-  return <ActiveTooltip {...props} />;
-}
-
-function ActiveTooltip({
+export function Tooltip({
   direction: directionProp,
   title,
   placement = 'top',
@@ -79,12 +72,24 @@ function ActiveTooltip({
   styles,
   children,
 }: TooltipProps) {
+  const hasTitle = title != null && title !== '' && typeof title !== 'boolean';
   const [direction, directionRef] = useTaoDirection(directionProp, 'self');
-  const [realOpen, setOpen] = useControlledOpen({
-    open,
-    defaultOpen,
-    onOpenChange,
-  });
+  const isControlled = open != null;
+  const [internalOpen, setInternalOpen] = useState(() =>
+    Boolean(hasTitle && defaultOpen),
+  );
+  if (!hasTitle && internalOpen) {
+    setInternalOpen(false);
+  }
+  const realOpen = hasTitle && (isControlled ? open : internalOpen);
+  const setOpen = useCallback(
+    (next: boolean) => {
+      if (next && !hasTitle) return;
+      if (!isControlled) setInternalOpen(next);
+      onOpenChange?.(next);
+    },
+    [hasTitle, isControlled, onOpenChange],
+  );
   const latestSetOpen = useCommittedRef(setOpen);
 
   // Pointer-initiated closes are deferred by mouseLeaveDelay; the flag tells
@@ -162,39 +167,43 @@ function ActiveTooltip({
         >
           {asTriggerChild(children)}
         </RadixTooltip.Trigger>
-        <RadixTooltip.Portal>
-          <TaoPortalScope direction={direction}>
-            <RadixTooltip.Content
-              data-tao-tooltip-content=""
-              className={cx(classNames?.content, className)}
-              style={{ ...colorStyle, ...styles?.content, ...style }}
-              side={placement}
-              sideOffset={4}
-              onEscapeKeyDown={() => {
-                pointerDriven.current = false;
-              }}
-              {...hoverProps}
-            >
-              {title}
-              {arrow && (
-                <RadixTooltip.Arrow asChild>
-                  <span
-                    data-tao-tooltip-arrow=""
-                    className={cx(classNames?.arrow)}
-                    style={{
-                      // consumed by the ::before arrow square (inline styles
-                      // can't target pseudo-elements directly)
-                      ...(color
-                        ? ({ '--tao-tooltip-arrow-bg': color } as CSSProperties)
-                        : undefined),
-                      ...styles?.arrow,
-                    }}
-                  />
-                </RadixTooltip.Arrow>
-              )}
-            </RadixTooltip.Content>
-          </TaoPortalScope>
-        </RadixTooltip.Portal>
+        {hasTitle && (
+          <RadixTooltip.Portal>
+            <TaoPortalScope direction={direction}>
+              <RadixTooltip.Content
+                data-tao-tooltip-content=""
+                className={cx(classNames?.content, className)}
+                style={{ ...colorStyle, ...styles?.content, ...style }}
+                side={placement}
+                sideOffset={4}
+                onEscapeKeyDown={() => {
+                  pointerDriven.current = false;
+                }}
+                {...hoverProps}
+              >
+                {title}
+                {arrow && (
+                  <RadixTooltip.Arrow asChild>
+                    <span
+                      data-tao-tooltip-arrow=""
+                      className={cx(classNames?.arrow)}
+                      style={{
+                        // consumed by the ::before arrow square (inline styles
+                        // can't target pseudo-elements directly)
+                        ...(color
+                          ? ({
+                              '--tao-tooltip-arrow-bg': color,
+                            } as CSSProperties)
+                          : undefined),
+                        ...styles?.arrow,
+                      }}
+                    />
+                  </RadixTooltip.Arrow>
+                )}
+              </RadixTooltip.Content>
+            </TaoPortalScope>
+          </RadixTooltip.Portal>
+        )}
       </RadixTooltip.Root>
     </RadixTooltip.Provider>
   );

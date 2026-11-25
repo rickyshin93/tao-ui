@@ -479,3 +479,8 @@ test('treeCheckStrictly alone renders visible check indicators', async () => {
   expect(team).toHaveAttribute('aria-checked', 'true');
   expect(team.querySelector('[data-tao-tree-check]')).not.toBeNull();
 });
+
+test('error status marks TreeSelect combobox invalid', () => {
+  render(<TreeSelect treeData={treeData} status="error" />);
+  expect(screen.getByRole('combobox')).toHaveAttribute('aria-invalid', 'true');
+});

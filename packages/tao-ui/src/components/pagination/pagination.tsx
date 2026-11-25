@@ -1,4 +1,10 @@
-import { type ReactNode, useCallback, useMemo, useState } from 'react';
+import {
+  type CSSProperties,
+  type ReactNode,
+  useCallback,
+  useMemo,
+  useState,
+} from 'react';
 import { type TaoSize, useTaoConfig } from '../../provider/tao-provider';
 import {
   cx,
@@ -28,13 +34,15 @@ export interface PaginationProps {
   size?: TaoSize;
   disabled?: boolean;
   className?: string;
+  style?: CSSProperties;
   classNames?: SemanticClassNames<PaginationSemanticPart>;
   styles?: SemanticStyles<PaginationSemanticPart>;
 }
 
 // ---- Helpers ----
 
-const isValidPageSize = (size: number) => Number.isSafeInteger(size) && size > 0;
+const isValidPageSize = (size: number) =>
+  Number.isSafeInteger(size) && size > 0;
 
 function range(start: number, end: number): number[] {
   const result: number[] = [];
@@ -127,6 +135,7 @@ export function Pagination({
   size,
   disabled,
   className,
+  style,
   classNames,
   styles,
 }: PaginationProps) {
@@ -144,7 +153,9 @@ export function Pagination({
   const [internalPageSize, setInternalPageSize] = useState(defaultPageSize);
   const pageSize = isPageSizeControlled ? pageSizeProp : internalPageSize;
   if (!Number.isSafeInteger(total) || total < 0)
-    throw new RangeError('Pagination total must be a non-negative safe integer');
+    throw new RangeError(
+      'Pagination total must be a non-negative safe integer',
+    );
   if (!Number.isSafeInteger(current))
     throw new RangeError('Pagination current page must be a safe integer');
   if (!isValidPageSize(pageSize))
@@ -195,7 +206,7 @@ export function Pagination({
       data-tao-disabled={resolvedDisabled || undefined}
       aria-label={ctx.locale.messages.pagination}
       className={cx(classNames?.root, className)}
-      style={styles?.root}
+      style={{ ...styles?.root, ...style }}
     >
       {showTotal && (
         <span

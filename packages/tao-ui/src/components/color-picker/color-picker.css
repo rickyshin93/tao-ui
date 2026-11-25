@@ -54,7 +54,7 @@
     overflow-wrap: anywhere;
   }
   [data-tao-color-popup] {
-    z-index: calc(var(--tao-z-index-popup-base) + 50);
+    z-index: var(--tao-z-index-popup);
     width: 304px;
     max-width: calc(100vw - 24px);
     max-height: var(--radix-popover-content-available-height);

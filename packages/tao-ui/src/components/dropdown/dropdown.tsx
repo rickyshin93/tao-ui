@@ -64,6 +64,7 @@ export interface DropdownProps {
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
+  size?: TaoSize;
   disabled?: boolean;
   /** Show a pointing arrow on the menu. Defaults to `false`. */
   arrow?: boolean;
@@ -146,6 +147,7 @@ export function Dropdown(props: DropdownProps) {
     open,
     defaultOpen,
     onOpenChange,
+    size: sizeProp,
     disabled,
     arrow = false,
     className,
@@ -154,7 +156,8 @@ export function Dropdown(props: DropdownProps) {
     styles,
   } = props;
 
-  const { size, disabled: ctxDisabled } = useTaoConfig();
+  const { size: ctxSize, disabled: ctxDisabled } = useTaoConfig();
+  const size = sizeProp ?? ctxSize;
   const resolvedDisabled = disabled ?? ctxDisabled;
 
   const isContext = trigger.includes('contextMenu');
@@ -209,7 +212,7 @@ export function Dropdown(props: DropdownProps) {
   const { content, selectedKeys, commitSelection } = useMenuController(
     menu,
     DD,
-    { classNames, styles },
+    { size, direction, classNames, styles },
   );
   const triggerChild = asTriggerChild(children);
 
@@ -225,6 +228,7 @@ export function Dropdown(props: DropdownProps) {
         }}
         open={realOpen && !resolvedDisabled}
         onOpenChange={setOpen}
+        size={sizeProp}
         disabled={disabled}
         className={className}
         style={style}
@@ -323,7 +327,12 @@ function DropdownButton({
       >
         {children}
       </Button>
-      <Dropdown menu={menu} disabled={disabled} {...dropdownRest}>
+      <Dropdown
+        menu={menu}
+        size={resolvedSize}
+        disabled={disabled}
+        {...dropdownRest}
+      >
         <Button
           variant={variant}
           size={resolvedSize}

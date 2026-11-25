@@ -197,10 +197,26 @@ export function useTaoDirection(
         : getComposedParent(element);
     if (!target) return;
     const update = () => {
+      let resolved: TaoDirection | undefined;
+      for (
+        let ancestor: Element | null = target;
+        ancestor;
+        ancestor = getComposedParent(ancestor)
+      ) {
+        const inlineDir = (ancestor as HTMLElement).style?.direction;
+        if (inlineDir === 'rtl' || inlineDir === 'ltr') {
+          resolved = inlineDir;
+          break;
+        }
+        const attrDir = ancestor.getAttribute('dir');
+        if (attrDir === 'rtl' || attrDir === 'ltr') {
+          resolved = attrDir;
+          break;
+        }
+      }
+      const computed = getComputedStyle(target).direction;
       const value =
-        getComputedStyle(target).direction ||
-        target.closest('[dir]')?.getAttribute('dir') ||
-        contextDirection;
+        resolved ?? (computed === 'rtl' ? 'rtl' : (contextDirection ?? 'ltr'));
       setInherited(value === 'rtl' ? 'rtl' : 'ltr');
       for (
         let ancestor: Element | null = target;

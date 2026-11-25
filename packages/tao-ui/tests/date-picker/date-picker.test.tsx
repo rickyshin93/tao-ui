@@ -709,3 +709,26 @@ test('time edits and recreated controlled values keep the navigated month', asyn
   rerender(<DatePicker mobile={false} open value={dayjs('2026-01-15')} />);
   expect(title()).toBe('Feb2026');
 });
+
+test.each([false, true])(
+  'status="warning" marks DatePicker trigger with data-tao-warning (mobile=%s)',
+  (mobile) => {
+    const { container } = render(
+      <DatePicker mobile={mobile} status="warning" />,
+    );
+    expect(
+      container.querySelector('[data-tao-picker-trigger]'),
+    ).toHaveAttribute('data-tao-warning', 'true');
+  },
+);
+
+test('non-positive time step configuration falls back safely instead of throwing RangeError', () => {
+  render(
+    <DatePicker
+      mobile={false}
+      open
+      showTime={{ hourStep: 0, minuteStep: -5, secondStep: Number.NaN }}
+    />,
+  );
+  expect(screen.getByRole('group', { name: 'Hour' })).toBeInTheDocument();
+});

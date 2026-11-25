@@ -32,15 +32,15 @@ import {
   type SemanticClassNames,
   type SemanticStyles,
 } from '../../utils/semantic';
-import { Drawer } from '../drawer/drawer';
 import { Button } from '../button/button';
+import { Drawer } from '../drawer/drawer';
 import { CalendarGrid } from './calendar/calendar-grid';
 import { MonthGrid } from './calendar/month-grid';
-import { YearGrid } from './calendar/year-grid';
 import { TimePanel } from './calendar/time-panel';
+import { YearGrid } from './calendar/year-grid';
 import './date-picker.css';
-import { Presets } from './presets';
 import { formatPickerDate, parsePickerDate } from './date-localization';
+import { Presets } from './presets';
 import {
   getDefaultFormat,
   type PickerRef,
@@ -946,6 +946,7 @@ export const RangePicker = forwardRef(function RangePicker(
       data-tao-size={resolvedSize}
       data-tao-variant={resolvedVariant}
       data-tao-error={status === 'error' || undefined}
+      data-tao-warning={status === 'warning' || undefined}
       disabled={resolvedDisabled}
       onClick={() => setOpen(true)}
       className={cx(classNames?.root, className)}
@@ -1003,6 +1004,7 @@ export const RangePicker = forwardRef(function RangePicker(
       data-tao-size={resolvedSize}
       data-tao-variant={resolvedVariant}
       data-tao-error={status === 'error' || undefined}
+      data-tao-warning={status === 'warning' || undefined}
       data-disabled={resolvedDisabled || undefined}
       className={cx(classNames?.root, className)}
       style={{ ...styles?.root, ...style }}

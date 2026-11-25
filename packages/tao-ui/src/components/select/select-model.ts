@@ -29,8 +29,11 @@ export function buildSelectIndex(options: SelectOption[]): SelectIndex {
     if (!optionByToken.has(option.value)) {
       optionByToken.set(option.value, option);
     }
-    if (typeof option.label === 'string' && !optionByToken.has(option.label)) {
-      optionByToken.set(option.label, option);
+    if (
+      (typeof option.label === 'string' || typeof option.label === 'number') &&
+      !optionByToken.has(String(option.label))
+    ) {
+      optionByToken.set(String(option.label), option);
     }
   });
 

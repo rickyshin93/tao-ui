@@ -123,8 +123,8 @@
        DERIVED: Error color palette
        =========================== */
     --tao-error: var(--tao-color-error);
-    --tao-error-hover: color-mix(in oklch, var(--tao-color-error) 80%, white);
-    --tao-error-active: color-mix(in oklch, var(--tao-color-error) 90%, black);
+    --tao-error-hover: color-mix(in oklab, var(--tao-color-error) 80%, white);
+    --tao-error-active: color-mix(in oklab, var(--tao-color-error) 90%, black);
     --tao-error-bg: color-mix(
       in oklab,
       var(--tao-color-error) 6%,

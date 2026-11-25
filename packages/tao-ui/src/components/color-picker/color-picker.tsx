@@ -115,8 +115,9 @@ function PickerPanel() {
         step={step}
         value={number}
         onChange={(event) => {
-          if (event.target.value !== '')
-            change(clamp(Number(event.target.value), max));
+          const parsed = Number(event.target.value);
+          if (event.target.value !== '' && Number.isFinite(parsed))
+            change(clamp(parsed, max));
         }}
       />
     </label>
@@ -239,7 +240,7 @@ function PickerPanel() {
           size="small"
           style={{ width: '5.5em', flexShrink: 0 }}
           styles={{
-            popup: { zIndex: 'calc(var(--tao-z-index-popup-base) + 60)' },
+            popup: { zIndex: 'calc(var(--tao-z-index-popup) + 10)' },
           }}
           value={format}
           disabled={props.disabledFormat ?? false}

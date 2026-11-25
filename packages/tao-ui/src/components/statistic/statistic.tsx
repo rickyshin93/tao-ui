@@ -280,7 +280,14 @@ function StatisticTimer({
   useLayoutEffect(() => {
     callbacks.current = { onChange, onFinish };
   }, [onChange, onFinish]);
-  const timestamp = value === undefined ? NaN : new Date(value).getTime();
+  const normalized =
+    typeof value === 'string' &&
+    value.trim() !== '' &&
+    Number.isFinite(Number(value))
+      ? Number(value)
+      : value;
+  const timestamp =
+    normalized === undefined ? NaN : new Date(normalized).getTime();
   const target = Number.isNaN(timestamp) ? undefined : timestamp;
   useEffect(() => {
     if (target === undefined) {

@@ -212,3 +212,16 @@ test('an explicitly empty Statistic value does not render a numeric zero', () =>
   rerender(<Statistic value={0} />);
   expect(screen.getByText('0')).toBeInTheDocument();
 });
+
+test('countdown accepts numeric string timestamps matching StatisticValue', () => {
+  rstest.useFakeTimers();
+  try {
+    rstest.setSystemTime(new Date('2026-01-01T00:00:00Z'));
+    render(
+      <Statistic.Countdown value={String(Date.now() + 5000)} format="ss" />,
+    );
+    expect(screen.getByText('05')).toBeVisible();
+  } finally {
+    rstest.useRealTimers();
+  }
+});

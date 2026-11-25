@@ -42,6 +42,7 @@ export interface UseNumberInputOptions {
   allowNegative?: boolean;
   min?: number;
   max?: number;
+  disabled?: boolean;
 }
 
 export interface UseNumberInputReturn {
@@ -75,6 +76,7 @@ export function useNumberInput(
     allowNegative = false,
     min,
     max,
+    disabled: disabledProp,
   } = opts;
 
   // Form can supply a number from initialValues or setFieldsValue.
@@ -84,6 +86,7 @@ export function useNumberInput(
       : externalValue;
 
   const config = useTaoConfig();
+  const disabled = disabledProp ?? config.disabled;
   const locale = localeProp ?? config.locale.numberLocale;
   const fmtOpts = useMemo(
     () =>
@@ -215,6 +218,7 @@ export function useNumberInput(
   }, [displayBuffer]);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (disabled) return;
     const raw = e.target.value;
     const cursor = e.target.selectionStart ?? raw.length;
     let canonical = parse(raw, fmtOpts);
@@ -260,6 +264,7 @@ export function useNumberInput(
 
   const handleBlur = () => {
     isFocusedRef.current = false;
+    if (disabled) return;
     const previous = isValueControlled ? (value ?? '') : derivedActual;
     const actual = commit();
     if (actual !== previous) onChange?.(actual);
@@ -267,11 +272,12 @@ export function useNumberInput(
   };
 
   const handleFocus = () => {
+    if (disabled) return;
     isFocusedRef.current = true;
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.nativeEvent.isComposing || e.keyCode === 229) return;
+    if (disabled || e.nativeEvent.isComposing || e.keyCode === 229) return;
     if (e.key === 'Enter') {
       // Commit before an Enter-triggered form submission reads the value.
       const previous = isValueControlled ? (value ?? '') : derivedActual;

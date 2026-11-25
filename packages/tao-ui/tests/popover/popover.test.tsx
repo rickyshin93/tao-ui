@@ -739,3 +739,32 @@ test('clicking the focused input of a focus Popover keeps it open', async () => 
   await user.click(input);
   expect(popup.dataset.state).toBe('open');
 });
+
+test('toggling Popover content between empty and active keeps the trigger mounted and focused', () => {
+  const view = render(
+    <Popover trigger="focus" content="">
+      <input defaultValue="query" aria-label="Search" />
+    </Popover>,
+  );
+  const input = screen.getByRole('textbox', { name: 'Search' });
+  expect(document.querySelector('[data-tao-popover]')).toBeNull();
+  input.focus();
+  expect(input).toHaveFocus();
+
+  view.rerender(
+    <Popover trigger="focus" content="Suggestions">
+      <input defaultValue="query" aria-label="Search" />
+    </Popover>,
+  );
+  expect(screen.getByRole('textbox', { name: 'Search' })).toBe(input);
+  expect(input).toHaveFocus();
+
+  view.rerender(
+    <Popover trigger="focus" content={undefined}>
+      <input defaultValue="query" aria-label="Search" />
+    </Popover>,
+  );
+  expect(screen.getByRole('textbox', { name: 'Search' })).toBe(input);
+  expect(input).toHaveFocus();
+  expect(document.querySelector('[data-tao-popover]')).toBeNull();
+});

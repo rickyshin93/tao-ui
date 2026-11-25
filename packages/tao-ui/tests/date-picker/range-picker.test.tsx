@@ -35,6 +35,7 @@ test('range calendar uses provider language in its drawer and navigation', () =>
     screen.getAllByRole('columnheader', { name: '一' }).length,
   ).toBeGreaterThan(0);
 });
+
 import { Form } from '../../src/components/form';
 
 test('renders with placeholder', () => {
@@ -867,6 +868,19 @@ test('desktop RangePicker keeps its announcement region mounted before opening',
   expect(screen.getByRole('status')).toBe(status);
   expect(status).toHaveTextContent('Select an end date.');
 });
+
+test.each([false, true])(
+  'status="warning" marks RangePicker trigger with data-tao-warning (mobile=%s)',
+  (mobile) => {
+    const { container } = render(
+      <RangePicker mobile={mobile} status="warning" />,
+    );
+    expect(container.querySelector('[data-tao-range-trigger]')).toHaveAttribute(
+      'data-tao-warning',
+      'true',
+    );
+  },
+);
 
 test('RangePicker keeps the end as a draft until the start is picked', async () => {
   const onChange = rstest.fn();

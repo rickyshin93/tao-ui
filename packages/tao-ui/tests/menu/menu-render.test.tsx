@@ -188,3 +188,47 @@ test('a multiple-selection menu stays open while the user checks several items',
     screen.getByRole('menuitemcheckbox', { name: 'Beta' }),
   ).toHaveAttribute('aria-checked', 'true');
 });
+
+test('portaled submenus inherit size, RTL direction and single-select RadioGroup scope, and Dropdown.Button forwards size', async () => {
+  const onSelect = rstest.fn();
+  render(
+    <div dir="rtl">
+      <Dropdown.Button
+        open
+        size="small"
+        menu={{
+          selectable: true,
+          selectedKeys: ['light'],
+          onSelect,
+          items: [
+            {
+              key: 'theme',
+              label: 'Theme',
+              children: [
+                { key: 'light', label: 'Light' },
+                { key: 'dark', label: 'Dark' },
+              ],
+            },
+          ],
+        }}
+      >
+        Appearance
+      </Dropdown.Button>
+    </div>,
+  );
+  const rootMenu = document.querySelector('[data-tao-dropdown]');
+  expect(rootMenu).toHaveAttribute('data-tao-size', 'small');
+
+  const subTrigger = screen.getByRole('menuitem', { name: 'Theme' });
+  subTrigger.focus();
+  await userEvent.keyboard('{ArrowLeft}');
+  const dark = await screen.findByRole('menuitemradio', { name: 'Dark' });
+  const subMenu = dark.closest('[data-tao-menu-sub-content]');
+  expect(subMenu).toHaveAttribute('data-tao-size', 'small');
+  expect(subMenu).toHaveAttribute('dir', 'rtl');
+  await userEvent.click(dark);
+  expect(onSelect).toHaveBeenCalledWith({
+    key: 'dark',
+    selectedKeys: ['dark'],
+  });
+});

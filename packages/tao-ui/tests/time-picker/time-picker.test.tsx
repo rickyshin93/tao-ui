@@ -182,3 +182,17 @@ test('RangePicker formats both ends and clears the range with the upstream paylo
   expect(inputs[0]).toHaveValue('');
   expect(inputs[1]).toHaveValue('');
 });
+
+test('error status marks TimePicker and RangePicker inputs aria-invalid and popup uses shared popup z-index', async () => {
+  const { rerender } = render(<TimePicker status="error" open />);
+  expect(screen.getByRole('textbox')).toHaveAttribute('aria-invalid', 'true');
+  const popup = (
+    await screen.findByRole('listbox', { name: 'Select an hour' })
+  ).closest<HTMLElement>('.tao-time-picker-dropdown');
+  expect(popup?.style.zIndex).toBe('var(--tao-z-index-popup)');
+
+  rerender(<TimePicker.RangePicker status="error" />);
+  for (const input of screen.getAllByRole('textbox')) {
+    expect(input).toHaveAttribute('aria-invalid', 'true');
+  }
+});

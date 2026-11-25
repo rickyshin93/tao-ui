@@ -2292,3 +2292,72 @@ test('opening a searchable single Select highlights a value changed while closed
     document.getElementById(input.getAttribute('aria-activedescendant')!),
   ).toHaveTextContent('Gamma');
 });
+
+test('tags Enter ignores disabled option values/labels and tagRender onClose cannot remove locked options', async () => {
+  const onChange = rs.fn();
+  render(
+    <Select
+      mobile={false}
+      mode="tags"
+      showSearch
+      defaultValue={['locked']}
+      options={[
+        { value: 'locked', label: 'Locked Role', disabled: true },
+        { value: 'blocked', label: 'Blocked Role', disabled: true },
+      ]}
+      tagRender={({ label, onClose }) => (
+        <button type="button" onClick={onClose}>
+          Remove {label}
+        </button>
+      )}
+      onChange={onChange}
+    />,
+  );
+  const input = screen.getByRole('combobox');
+  fireEvent.change(input, { target: { value: 'blocked' } });
+  fireEvent.keyDown(input, { key: 'Enter' });
+  fireEvent.change(input, { target: { value: 'Blocked Role' } });
+  fireEvent.keyDown(input, { key: 'Enter' });
+  fireEvent.click(screen.getByRole('button', { name: 'Remove Locked Role' }));
+  expect(onChange).not.toHaveBeenCalled();
+});
+
+test('numeric option labels normalize tokens, respect disabled status and avoid duplicate mobile tag prompts', () => {
+  const onChange = rs.fn();
+  const options = [
+    { value: 'y2025', label: 2025 },
+    { value: 'y2026', label: 2026, disabled: true },
+  ];
+  const { unmount } = render(
+    <Select
+      mobile={false}
+      mode="tags"
+      showSearch
+      options={options}
+      tokenSeparators={[',']}
+      onChange={onChange}
+    />,
+  );
+  const input = screen.getByRole('combobox');
+  fireEvent.change(input, { target: { value: '2025,2026,' } });
+  fireEvent.keyDown(input, { key: 'Enter' });
+  expect(onChange).toHaveBeenCalledExactlyOnceWith(
+    ['y2025'],
+    [{ value: 'y2025', label: 2025 }],
+  );
+  unmount();
+
+  render(
+    <Select
+      mobile
+      open
+      mode="tags"
+      showSearch
+      searchValue="2025"
+      options={options}
+    />,
+  );
+  expect(
+    document.querySelectorAll('[data-tao-sheet-list] [data-tao-sheet-item]'),
+  ).toHaveLength(1);
+});

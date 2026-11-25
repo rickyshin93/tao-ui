@@ -104,7 +104,7 @@ export function useModal(): [ModalHookApi, ReactElement] {
         <ConfirmDialog
           {...d.config}
           key={d.key}
-          type={d.type}
+          type={d.config.type ?? d.type}
           open={d.open}
           onMount={d.onMount}
           close={d.close}

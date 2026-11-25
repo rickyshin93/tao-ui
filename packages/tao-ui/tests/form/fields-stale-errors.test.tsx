@@ -1,5 +1,11 @@
 import { expect, test } from '@rstest/core';
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react';
 import { createRef, useState } from 'react';
 import { Form, type FormInstance } from '../../src/components/form';
 
@@ -35,7 +41,9 @@ test('controlled fields drop stale validation errors when the value changes', as
   expect(await screen.findByText('Required')).toBeInTheDocument();
 
   fireEvent.click(screen.getByRole('button', { name: 'Fix' }));
-  await waitFor(() => expect(screen.queryByText('Required')).not.toBeInTheDocument());
+  await waitFor(() =>
+    expect(screen.queryByText('Required')).not.toBeInTheDocument(),
+  );
 });
 
 test('setFields drops stale validation errors when only the value changes', async () => {
@@ -48,7 +56,9 @@ test('setFields drops stale validation errors when only the value changes', asyn
     </Form>,
   );
   submitForm();
-  await waitFor(() => expect(form.current?.getFieldError('name')).toEqual(['Required']));
+  await waitFor(() =>
+    expect(form.current?.getFieldError('name')).toEqual(['Required']),
+  );
 
   act(() => form.current?.setFields([{ name: 'name', value: 'fixed' }]));
   await waitFor(() => expect(form.current?.getFieldError('name')).toEqual([]));
@@ -65,8 +75,51 @@ test('setFields keeps validation state the caller provides', async () => {
     </Form>,
   );
   submitForm();
-  await waitFor(() => expect(form.current?.getFieldError('name')).toEqual(['Required']));
+  await waitFor(() =>
+    expect(form.current?.getFieldError('name')).toEqual(['Required']),
+  );
 
-  act(() => form.current?.setFields([{ name: 'name', value: 'fixed', errors: ['Custom'] }]));
-  await waitFor(() => expect(form.current?.getFieldError('name')).toEqual(['Custom']));
+  act(() =>
+    form.current?.setFields([
+      { name: 'name', value: 'fixed', errors: ['Custom'] },
+    ]),
+  );
+  await waitFor(() =>
+    expect(form.current?.getFieldError('name')).toEqual(['Custom']),
+  );
+});
+
+test('value-only writes through controlled fields and setFields clear stale warnings', async () => {
+  const warnRule = {
+    warningOnly: true,
+    validator: async (_: unknown, value: unknown) => {
+      if (value !== 'strong') throw new Error('Weak value');
+    },
+  };
+  const form = createRef<FormInstance>();
+  const { rerender } = render(
+    <Form ref={form} fields={[{ name: 'secret', value: 'weak' }]}>
+      <Form.Item name="secret" rules={[warnRule]}>
+        <input />
+      </Form.Item>
+    </Form>,
+  );
+
+  await act(async () => {
+    await form.current?.validateFields();
+  });
+  expect(form.current?.getFieldWarning('secret')).toEqual(['Weak value']);
+  expect(screen.getByText('Weak value')).toBeInTheDocument();
+
+  rerender(
+    <Form ref={form} fields={[{ name: 'secret', value: 'strong' }]}>
+      <Form.Item name="secret" rules={[warnRule]}>
+        <input />
+      </Form.Item>
+    </Form>,
+  );
+  await waitFor(() =>
+    expect(form.current?.getFieldWarning('secret')).toEqual([]),
+  );
+  expect(screen.queryByText('Weak value')).not.toBeInTheDocument();
 });

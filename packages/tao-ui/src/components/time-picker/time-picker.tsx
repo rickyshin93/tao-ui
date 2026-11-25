@@ -8,29 +8,28 @@ import dayjsConfig from '@rc-component/picker/generate/dayjs';
 import type { Locale, RangePickerRef } from '@rc-component/picker/interface';
 import enLocale from '@rc-component/picker/locale/en_US';
 import type { Dayjs } from 'dayjs';
-import { useMemo, useState } from 'react';
-import {
-  type TaoDirection,
-  useTaoDirection,
-} from '../../provider/tao-provider';
-import { mergeRefs } from '../../utils/refs';
-import {
-  normalizeDigits,
-  resolveNumberFormat,
-} from '../../number-input/locale';
 import {
   type ButtonHTMLAttributes,
   type CSSProperties,
   forwardRef,
   type ReactNode,
   useImperativeHandle,
+  useMemo,
   useRef,
+  useState,
 } from 'react';
 import {
+  normalizeDigits,
+  resolveNumberFormat,
+} from '../../number-input/locale';
+import {
+  type TaoDirection,
   TaoPortalScope,
   useTaoConfig,
+  useTaoDirection,
   useTaoInternalConfig,
 } from '../../provider/tao-provider';
+import { mergeRefs } from '../../utils/refs';
 import { cx } from '../../utils/semantic';
 import { Button } from '../button/button';
 import { parsePickerDate } from '../date-picker/date-localization';
@@ -242,7 +241,7 @@ function useAppearance(
           position: 'absolute' as const,
           width: 'max-content',
           maxWidth: 'calc(100vw - 24px)',
-          zIndex: 'calc(var(--tao-z-index-popup-base) + 50)',
+          zIndex: 'var(--tao-z-index-popup)' as CSSProperties['zIndex'],
           ...props.popupStyle,
           ...styles?.popup?.root,
         },
@@ -371,6 +370,7 @@ const SingleTimePicker = forwardRef<TimePickerRef, TimePickerProps>(
             'Select time'
           }
           prefixCls={prefixCls}
+          aria-invalid={status === 'error' ? true : props['aria-invalid']}
           aria-busy={status === 'validating' || undefined}
           suffix={
             suffix !== undefined ? (
@@ -511,6 +511,7 @@ export const TimeRangePicker = forwardRef<
           ]
         }
         prefixCls={prefixCls}
+        aria-invalid={status === 'error' ? true : props['aria-invalid']}
         aria-busy={status === 'validating' || undefined}
         suffix={
           suffix !== undefined ? (

@@ -94,7 +94,9 @@ test('activating the selected tab does not emit a redundant change', () => {
   const onChange = rs.fn();
   render(<Tabs items={items} onChange={onChange} />);
   fireEvent.click(screen.getByRole('tab', { name: 'Tab A' }));
-  fireEvent.keyDown(screen.getByRole('tab', { name: 'Tab A' }), { key: 'Home' });
+  fireEvent.keyDown(screen.getByRole('tab', { name: 'Tab A' }), {
+    key: 'Home',
+  });
   expect(onChange).not.toHaveBeenCalled();
 });
 
@@ -346,6 +348,31 @@ test('tabs with spaces in their keys still name their panels', () => {
   expect(screen.getByRole('tab', { name: 'Archive' }).id).not.toBe(
     screen.getByRole('tab', { name: 'Monthly report' }).id,
   );
+});
+
+test('Tabs forwards root style and ArrowLeft from a disabled tab wraps to the last enabled tab', () => {
+  const onChange = rs.fn();
+  const { container } = render(
+    <Tabs
+      activeKey="a"
+      style={{ marginTop: 12 }}
+      styles={{ root: { opacity: 0.9 } }}
+      onChange={onChange}
+      items={[
+        { key: 'a', label: 'Tab A', disabled: true, children: 'A' },
+        { key: 'b', label: 'Tab B', children: 'B' },
+        { key: 'c', label: 'Tab C', children: 'C' },
+      ]}
+    />,
+  );
+  expect(container.querySelector('[data-tao-tabs]')).toHaveStyle({
+    marginTop: '12px',
+    opacity: '0.9',
+  });
+  fireEvent.keyDown(screen.getByRole('tab', { name: 'Tab A' }), {
+    key: 'ArrowLeft',
+  });
+  expect(onChange).toHaveBeenCalledWith('c');
 });
 
 test('a resized label repositions the active underline without changing items', () => {

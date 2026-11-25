@@ -332,6 +332,7 @@ function InternalCascader<
         data-tao-error={status === 'error' || undefined}
         data-tao-warning={status === 'warning' || undefined}
         disabled={disabled}
+        aria-invalid={status === 'error' ? true : props['aria-invalid']}
         className={cx(className, rootClassName, classes?.root)}
         style={{ ...semanticStyles?.root, ...style }}
         classNames={classes}

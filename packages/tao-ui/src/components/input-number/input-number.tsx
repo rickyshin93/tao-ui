@@ -1,5 +1,6 @@
 import {
   type AriaAttributes,
+  type CSSProperties,
   type ForwardedRef,
   forwardRef,
   type ReactNode,
@@ -58,6 +59,7 @@ export interface InputNumberProps
   id?: string;
   name?: string;
   className?: string;
+  style?: CSSProperties;
   classNames?: SemanticClassNames<InputNumberSemanticPart>;
   styles?: SemanticStyles<InputNumberSemanticPart>;
 }
@@ -81,13 +83,14 @@ export const InputNumber = forwardRef(function InputNumber(
     'aria-invalid': ariaInvalid,
     'aria-required': ariaRequired,
     className,
+    style,
     classNames,
     styles,
     ...hookOptions
   }: InputNumberProps,
   forwardedRef: ForwardedRef<HTMLInputElement>,
 ) {
-  const { inputProps } = useNumberInput(hookOptions);
+  const { inputProps } = useNumberInput({ ...hookOptions, disabled });
   const { ref, ...inputRest } = inputProps;
   return (
     <Input
@@ -109,6 +112,7 @@ export const InputNumber = forwardRef(function InputNumber(
       aria-invalid={status === 'error' || error ? true : ariaInvalid}
       aria-required={ariaRequired}
       className={className}
+      style={style}
       classNames={classNames}
       styles={styles}
       {...inputRest}

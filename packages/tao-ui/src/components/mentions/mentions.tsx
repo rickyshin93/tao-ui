@@ -65,7 +65,10 @@ function getMentions(
   value = '',
   { prefix = '@', split = ' ' }: MentionsConfig = {},
 ): MentionsEntity[] {
-  const prefixes = Array.isArray(prefix) ? prefix : [prefix];
+  const prefixes = (Array.isArray(prefix) ? prefix : [prefix])
+    .filter(Boolean)
+    .sort((a, b) => b.length - a.length);
+  if (!prefixes.length) return [];
   const tokens = split === ' ' ? value.split(/\s+/u) : value.split(split);
   return tokens.flatMap((text) => {
     const match = prefixes.find((candidate) => text.startsWith(candidate));

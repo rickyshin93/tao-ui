@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { afterEach, expect, rstest, test } from '@rstest/core';
 import {
   act,
@@ -7,7 +8,6 @@ import {
   waitFor,
 } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { readFileSync } from 'node:fs';
 import { createContext, StrictMode, useContext, useState } from 'react';
 import { Modal } from '../../src/components/modal';
 import {
@@ -728,4 +728,39 @@ test('Escape closes an expanded combobox before the Modal that contains it', asy
   expect(onClose).not.toHaveBeenCalled();
   await user.keyboard('{Escape}');
   expect(onClose).toHaveBeenCalledTimes(1);
+});
+
+test('ConfirmDialog deduplicates synchronous async onOk clicks and useModal honors config.type updates', async () => {
+  const modal = renderHookModal();
+  let resolveOk!: () => void;
+  const pendingOk = new Promise<void>((resolve) => {
+    resolveOk = resolve;
+  });
+  const onOk = rstest.fn().mockReturnValue(pendingOk);
+  let handle!: ReturnType<typeof modal.confirm>;
+  act(() => {
+    handle = modal.confirm({
+      title: 'Confirm deployment',
+      okCancel: true,
+      onOk,
+    });
+  });
+
+  act(() => {
+    handle.update({ type: 'success' });
+  });
+  expect(
+    document.querySelector('[data-tao-modal-confirm-icon]'),
+  ).toHaveAttribute('data-tao-status', 'success');
+
+  const ok = screen.getByRole('button', { name: 'OK' });
+  fireEvent.click(ok);
+  fireEvent.click(ok);
+  expect(onOk).toHaveBeenCalledTimes(1);
+
+  await act(async () => {
+    resolveOk();
+    await pendingOk;
+  });
+  await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
 });

@@ -234,3 +234,17 @@ test('Pagination rejects a fractional controlled page before rendering fractiona
     'Pagination current page must be a safe integer',
   );
 });
+
+test('Pagination forwards root style alongside styles.root', () => {
+  const { container } = render(
+    <Pagination
+      total={50}
+      style={{ marginTop: 16 }}
+      styles={{ root: { gap: 8 } }}
+    />,
+  );
+  expect(container.querySelector('[data-tao-pagination]')).toHaveStyle({
+    marginTop: '16px',
+    gap: '8px',
+  });
+});

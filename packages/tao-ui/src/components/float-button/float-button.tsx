@@ -275,7 +275,8 @@ const FloatButtonGroup = forwardRef<FloatButtonGroupRef, FloatButtonGroupProps>(
       ...buttonProps
     } = props;
     const [internal, setInternal] = useState(false);
-    const expanded = open ?? internal;
+    if (disabled && internal) setInternal(false);
+    const expanded = !disabled && (open ?? internal);
     const root = useRef<HTMLDivElement>(null);
     const triggerRef = useRef<FloatButtonElement>(null);
     const pointerInside = useRef(false);

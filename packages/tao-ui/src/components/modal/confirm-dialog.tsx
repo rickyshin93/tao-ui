@@ -5,6 +5,7 @@ import {
   useRef,
   useState,
 } from 'react';
+import { useTaoConfig } from '../../provider/tao-provider';
 import {
   cx,
   type SemanticClassNames,
@@ -13,7 +14,6 @@ import {
 import { Button, type ButtonProps } from '../button/button';
 import { StatusIcon } from '../status-icon/status-icon';
 import { Modal, type ModalSemanticPart } from './modal';
-import { useTaoConfig } from '../../provider/tao-provider';
 
 export type ConfirmType = 'info' | 'success' | 'error' | 'warning' | 'confirm';
 
@@ -85,6 +85,7 @@ export function ConfirmDialog({
   const contentId = useId();
   const [loading, setLoading] = useState(false);
   const [cancelLoading, setCancelLoading] = useState(false);
+  const okPending = useRef(false);
   const cancelPending = useRef(false);
   useLayoutEffect(() => onMount?.(), [onMount]);
   const showCancel = okCancel ?? type === 'confirm';
@@ -95,16 +96,24 @@ export function ConfirmDialog({
   ) => {
     const result = handler?.();
     if (isPromise(result)) {
-      if (withLoading) setLoading(true);
-      else setCancelLoading(true);
+      if (withLoading) {
+        okPending.current = true;
+        setLoading(true);
+      } else {
+        setCancelLoading(true);
+      }
       try {
         await result;
         close();
       } catch {
         // Reject keeps the dialog open.
       } finally {
-        if (withLoading) setLoading(false);
-        else setCancelLoading(false);
+        if (withLoading) {
+          okPending.current = false;
+          setLoading(false);
+        } else {
+          setCancelLoading(false);
+        }
       }
     } else {
       close();
@@ -112,7 +121,7 @@ export function ConfirmDialog({
   };
 
   const handleOk = () => {
-    if (cancelPending.current) return;
+    if (cancelPending.current || okPending.current) return;
     return runAndClose(onOk, true);
   };
   const handleCancel = async () => {
